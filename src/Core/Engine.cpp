@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 #include "Engine.h"
-#include "InputManager.h"
 #include "StateManager.h"
 
 // cannot set to 0 in case of division by 0!!
@@ -52,11 +51,11 @@ void Core::Engine::setupEventCallbacks() {
 		throw std::exception();
 	}
 
-	glfwSetFramebufferSizeCallback(ptr_window, InputManager::fbsize_cb);
-	glfwSetKeyCallback(ptr_window, InputManager::key_cb);
-	glfwSetMouseButtonCallback(ptr_window, InputManager::mousebutton_cb);
-	glfwSetCursorPosCallback(ptr_window, InputManager::mousepos_cb);
-	glfwSetScrollCallback(ptr_window, InputManager::mousescroll_cb);
+	//glfwSetFramebufferSizeCallback(ptr_window, InputManager::fbsize_cb);
+	//glfwSetKeyCallback(ptr_window, InputManager::key_cb);
+	//glfwSetMouseButtonCallback(ptr_window, InputManager::mousebutton_cb);
+	//glfwSetCursorPosCallback(ptr_window, InputManager::mousepos_cb);
+	//glfwSetScrollCallback(ptr_window, InputManager::mousescroll_cb);
 }
 
 void Core::Engine::calculateDeltaTime() {
@@ -137,13 +136,18 @@ void Core::Engine::run() {
 
 		setTitle(window_title + " | " + std::to_string(1.f / delta_time) + " fps");
 
+		//Update all systems
+		for (auto& system : systems) {
+			system->update();
+		}
+
 		StateManager::getInstance().run();
 
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
 
 		//Input To Terminate Engine
-		if (InputManager::getInstance().key_is_pressed(GLFW_KEY_ESCAPE) || !getGameRunning()) {
+		if (!getGameRunning()) {
 
 			NIKEEngine.terminate();
 		}
@@ -180,4 +184,15 @@ int Core::Engine::getWindowHeight() const {
 
 float Core::Engine::getDeltaTime() const {
 	return delta_time;
+}
+
+void Core::Engine::addSystem(std::shared_ptr<System::Base> system, size_t index) {
+
+	if (index == std::string::npos && index >= systems.size()) {
+		systems.push_back(system);
+	}
+	else {
+		std::vector<std::shared_ptr<System::Base>>::iterator it = systems.begin();
+		systems.insert(it + index, system);
+	}
 }

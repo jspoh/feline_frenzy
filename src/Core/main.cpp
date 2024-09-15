@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 #include "Engine.h"
-#include "InputManager.h"
 
 // debug stuff
 bool DEBUG = false;

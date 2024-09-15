@@ -8,6 +8,9 @@
 
 #pragma once
 
+#ifndef INPUT_HPP
+#define INPUT_HPP
+
 #include "stdafx.h"
 
 class InputManager {
@@ -42,3 +45,5 @@ public:
 	// for event handling usage
 	bool key_is_pressed(int key) const;
 };
+
+#endif //!INPUT_HPP

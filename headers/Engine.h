@@ -12,25 +12,22 @@
 #define ENGINE_HPP
 
 #include "stdafx.h"
+#include "System.h"
 
 namespace Core {
 
 	class Engine {
 	private:
-		//Window
+		
+		//Engine Variables
 		GLFWwindow* ptr_window;
-
-		//Window Width
 		int window_width;
-
-		//Window Height
 		int window_height;
-
-		//Window Title
 		std::string window_title;
-
-		//Delta Time
 		float delta_time;
+
+		//Pointer to engine systems
+		std::vector<std::shared_ptr<System::Base>> systems;
 
 		//Default Constructor For Engine
 		Engine();
@@ -101,6 +98,15 @@ namespace Core {
 
 		//Get Delta Time
 		float getDeltaTime() const;
+
+		/**
+		 * Add new system into core engine
+		 *
+		 * \param system	shared pointer to new system
+		 * \param index		index to insert system, if not specified or out of range
+		 *					system will be inserted at the back
+		 */
+		void addSystem(std::shared_ptr<System::Base> system, size_t index = std::string::npos);
 	};
 
 	//Predefined name for core engine

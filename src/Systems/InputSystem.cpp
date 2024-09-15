@@ -8,7 +8,7 @@
 
 
 #include "stdafx.h"
-#include "InputManager.h"
+#include "InputSystem.h"
 #include "Engine.h"
 
 InputManager& InputManager::getInstance() {
