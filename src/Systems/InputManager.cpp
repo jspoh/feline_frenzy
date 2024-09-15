@@ -9,16 +9,15 @@
 
 #include "stdafx.h"
 #include "InputManager.h"
-#include "GLManager.h"
+#include "Engine.h"
 
 InputManager& InputManager::getInstance() {
 	static InputManager instance;
 	return instance;
 }
 
-void InputManager::fbsize_cb([[maybe_unused]] GLFWwindow* window, int width, int height) {
-	GLManager::getInstance().window_width = width;
-	GLManager::getInstance().window_height = height;
+void InputManager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {
+
 }
 
 void InputManager::key_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, [[maybe_unused]] int mods) {
@@ -57,5 +56,5 @@ void InputManager::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xo
 }
 
 bool InputManager::key_is_pressed(int key) const {
-	return glfwGetKey(GLManager::getInstance().ptr_window, key) == GLFW_PRESS;
+	return glfwGetKey(NIKEEngine.getWindow(), key) == GLFW_PRESS;
 }
