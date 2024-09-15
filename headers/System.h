@@ -21,7 +21,7 @@ namespace System {
 		//Constructor
 		Base() : b_system_active{ true } {}
 
-		//Init System
+		//Virtual Init
 		virtual void init() {}
 
 		//Pure virtual function to be implemented in inherited class
@@ -37,7 +37,7 @@ namespace System {
 			return b_system_active;
 		}
 
-		//Destructor
+		//Virtual Destructor
 		virtual ~Base() = default;
 	};
 }

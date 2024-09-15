@@ -8,6 +8,8 @@
 
 #include "stdafx.h"
 #include "Engine.h"
+#include "InputSystem.h"
+
 
 // debug stuff
 bool DEBUG = false;
@@ -18,7 +20,9 @@ int main() {
 	//Initialize Engine With Config File
 	NIKEEngine.init("src/Core/Config.txt");
 
-	//Add Systems To Engine Here
+	//Add Input System
+	Input::Manager::getInstance().init();
+	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::Base*) {}));
 
 	//Engine Game Loop
 	NIKEEngine.run();

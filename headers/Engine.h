@@ -45,12 +45,6 @@ namespace Core {
 		 */
 		void readConfigFile(std::string const& file_path);
 
-		/**
-		 * sets up event callback functions using InputManager class.
-		 *
-		 */
-		void setupEventCallbacks();
-
 		//Calculate Delta Time
 		void calculateDeltaTime();
 

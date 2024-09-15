@@ -45,19 +45,6 @@ void Core::Engine::readConfigFile(std::string const& file_path) {
 	fileStream.close();
 }
 
-void Core::Engine::setupEventCallbacks() {
-	if (!ptr_window) {
-		cerr << "Window not initialized" << endl;
-		throw std::exception();
-	}
-
-	//glfwSetFramebufferSizeCallback(ptr_window, InputManager::fbsize_cb);
-	//glfwSetKeyCallback(ptr_window, InputManager::key_cb);
-	//glfwSetMouseButtonCallback(ptr_window, InputManager::mousebutton_cb);
-	//glfwSetCursorPosCallback(ptr_window, InputManager::mousepos_cb);
-	//glfwSetScrollCallback(ptr_window, InputManager::mousescroll_cb);
-}
-
 void Core::Engine::calculateDeltaTime() {
 	static float prev_time = static_cast<float>(glfwGetTime());
 	float curr_time = static_cast<float>(glfwGetTime());
@@ -104,10 +91,6 @@ void Core::Engine::init(std::string const& file_path) {
 
 	glfwMakeContextCurrent(ptr_window);
 
-	setupEventCallbacks();
-
-	glfwSetInputMode(ptr_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
 	GLenum err = glewInit();
 	if (err != GLEW_OK) {
 		cerr << "GLEW init failed: " << glewGetErrorString(err) << endl;
@@ -138,7 +121,9 @@ void Core::Engine::run() {
 
 		//Update all systems
 		for (auto& system : systems) {
-			system->update();
+			if (system->getSystemActive()) {
+				system->update();
+			}
 		}
 
 		StateManager::getInstance().run();
@@ -192,7 +177,7 @@ void Core::Engine::addSystem(std::shared_ptr<System::Base> system, size_t index)
 		systems.push_back(system);
 	}
 	else {
-		std::vector<std::shared_ptr<System::Base>>::iterator it = systems.begin();
+		auto it = systems.begin();
 		systems.insert(it + index, system);
 	}
 }

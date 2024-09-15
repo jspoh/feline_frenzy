@@ -9,22 +9,41 @@
 
 #include "stdafx.h"
 #include "InputSystem.h"
-#include "Engine.h"
 
-InputManager& InputManager::getInstance() {
-	static InputManager instance;
-	return instance;
+void Input::Manager::setupEventCallbacks() {
+	if (!NIKEEngine.getWindow()) {
+		cerr << "Window not initialized" << endl;
+		throw std::exception();
+	}
+
+	glfwSetFramebufferSizeCallback(NIKEEngine.getWindow(), fbsize_cb);
+	glfwSetKeyCallback(NIKEEngine.getWindow(), key_cb);
+	glfwSetMouseButtonCallback(NIKEEngine.getWindow(), mousebutton_cb);
+	glfwSetCursorPosCallback(NIKEEngine.getWindow(), mousepos_cb);
+	glfwSetScrollCallback(NIKEEngine.getWindow(), mousescroll_cb);
 }
 
-void InputManager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {
+void Input::Manager::init() {
+	setupEventCallbacks();
+
+	glfwSetInputMode(NIKEEngine.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void Input::Manager::update() {
+	if (key_is_pressed(GLFW_KEY_ESCAPE)) {
+		NIKEEngine.terminate();
+	}
+}
+
+void Input::Manager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {
 
 }
 
-void InputManager::key_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, [[maybe_unused]] int mods) {
+void Input::Manager::key_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int key, [[maybe_unused]] int scancode, [[maybe_unused]] int action, [[maybe_unused]] int mods) {
 	
 }
 
-void InputManager::mousebutton_cb([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) {
+void Input::Manager::mousebutton_cb([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) {
 	switch (button) {
 	case GLFW_MOUSE_BUTTON_LEFT:
 		if (action == GLFW_PRESS) {
@@ -45,16 +64,16 @@ void InputManager::mousebutton_cb([[maybe_unused]] GLFWwindow* window, int butto
 	}
 }
 
-void InputManager::mousepos_cb([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
+void Input::Manager::mousepos_cb([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
 	getInstance().mouse.x = static_cast<float>(xpos);
 	getInstance().mouse.y = static_cast<float>(ypos);
 }
 
-void InputManager::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {
+void Input::Manager::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {
 	getInstance().mouse.scroll_x = static_cast<float>(xoffset);
 	getInstance().mouse.scroll_y = static_cast<float>(yoffset);
 }
 
-bool InputManager::key_is_pressed(int key) const {
+bool Input::Manager::key_is_pressed(int key) const {
 	return glfwGetKey(NIKEEngine.getWindow(), key) == GLFW_PRESS;
 }
