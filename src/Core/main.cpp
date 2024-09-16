@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "Engine.h"
 #include "InputSystem.h"
+#include "AudioSystem.h"
 
 
 // debug stuff
@@ -23,6 +24,10 @@ int main() {
 	//Add Input System
 	Input::Manager::getInstance().init();
 	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::Base*) {}), "Input");
+
+	// Add Audio System for testing
+	AudioSystem::AudioSystem::getInstance().init();
+	NIKEEngine.addSystem(std::shared_ptr<AudioSystem::AudioSystem>(&AudioSystem::AudioSystem::getInstance(), [](System::Base*) {}), "Audio");
 
 	//Engine Game Loop
 	NIKEEngine.run();
