@@ -19,26 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\data\db.cpp" />
-    <ClCompile Include="src\engine\GLManager.cpp" />
-    <ClCompile Include="src\engine\InputManager.cpp" />
-    <ClCompile Include="src\engine\RenderManager.cpp" />
-    <ClCompile Include="src\engine\StateManager.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\math\Vector2.cpp" />
-    <ClCompile Include="src\math\Vector4.cpp" />
-    <ClCompile Include="src\states\MenuState.cpp" />
+    <ClCompile Include="src\Data\db.cpp" />
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Systems\InputSystem.cpp" />
+    <ClCompile Include="src\Systems\RenderManager.cpp" />
+    <ClCompile Include="src\Systems\StateManager.cpp" />
+    <ClCompile Include="src\Core\main.cpp" />
+    <ClCompile Include="src\Math\Vector2.cpp" />
+    <ClCompile Include="src\Math\Vector4.cpp" />
+    <ClCompile Include="src\States\MenuState.cpp" />
+    <ClCompile Include="src\Core\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\db.h" />
-    <ClInclude Include="headers\GLManager.h" />
-    <ClInclude Include="headers\InputManager.h" />
+    <ClInclude Include="headers\Engine.h" />
+    <ClInclude Include="headers\InputSystem.h" />
     <ClInclude Include="headers\json.hpp" />
     <ClInclude Include="headers\MenuState.h" />
     <ClInclude Include="headers\RenderManager.h" />
     <ClInclude Include="headers\State.h" />
     <ClInclude Include="headers\StateManager.h" />
     <ClInclude Include="headers\stdafx.h" />
+    <ClInclude Include="headers\System.h" />
     <ClInclude Include="headers\Vector2.h" />
     <ClInclude Include="headers\Vector4.h" />
   </ItemGroup>
@@ -50,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\meshes\square.txt" />
+    <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -146,7 +152,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,7 +177,7 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
