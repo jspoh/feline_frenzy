@@ -52,7 +52,7 @@ void Core::Engine::calculateDeltaTime() {
 	prev_time = curr_time;
 }
 
-bool Core::Engine::getGameRunning() const {
+bool Core::Engine::getWindowOpen() const {
 	return !glfwWindowShouldClose(NIKEEngine.getWindow());
 }
 
@@ -107,33 +107,41 @@ void Core::Engine::init(std::string const& file_path) {
 
 void Core::Engine::run() {
 
-	while (getGameRunning()) {
+	while (getWindowOpen()) {
 
 		//Calculate Delta Time
 		calculateDeltaTime();
 
+		//Poll system events ( Interativity with app )
 		glfwPollEvents();
 
+		//Set BG Color
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//Set Window Title
 		setTitle(window_title + " | " + std::to_string(1.f / delta_time) + " fps");
 
 		//Update all systems
 		for (auto& system : systems) {
-			if (system->getSystemActive()) {
+			if (system->getActiveState()) {
 				system->update();
 			}
 		}
 
+		//Single access to system
+		//accessSystem("Input")->update();
+
+		//State Manager
 		StateManager::getInstance().run();
 
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
 
-		//Input To Terminate Engine
-		if (!getGameRunning()) {
+		//Check if window is open
+		if (!getWindowOpen()) {
 
+			//Terminate window
 			NIKEEngine.terminate();
 		}
 	}
@@ -171,13 +179,28 @@ float Core::Engine::getDeltaTime() const {
 	return delta_time;
 }
 
-void Core::Engine::addSystem(std::shared_ptr<System::Base> system, size_t index) {
+void Core::Engine::addSystem(std::shared_ptr<System::Base> system, std::string const& sys_identifier, size_t index) {
 
+	//Check if system has already been created
+	if (systems_map.find(sys_identifier) != systems_map.end()) {
+		return;
+	}
+
+	//Check for index
 	if (index == std::string::npos && index >= systems.size()) {
+		//Insert system at back
 		systems.push_back(system);
 	}
 	else {
+		//Insert system
 		auto it = systems.begin();
 		systems.insert(it + index, system);
 	}
+
+	//Emplace shared pointer to system in map
+	systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_identifier), std::forward_as_tuple(system));
+}
+
+std::shared_ptr<System::Base> Core::Engine::accessSystem(std::string const& sys_identifier) {
+	return systems_map.at(sys_identifier);
 }

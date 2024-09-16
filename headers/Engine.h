@@ -28,6 +28,7 @@ namespace Core {
 
 		//Pointer to engine systems
 		std::vector<std::shared_ptr<System::Base>> systems;
+		std::unordered_map<std::string, std::shared_ptr<System::Base>> systems_map;
 
 		//Default Constructor For Engine
 		Engine();
@@ -49,7 +50,7 @@ namespace Core {
 		void calculateDeltaTime();
 
 		//Get Game Running
-		bool getGameRunning() const;
+		bool getWindowOpen() const;
 
 	public:
 
@@ -96,11 +97,20 @@ namespace Core {
 		/**
 		 * Add new system into core engine
 		 *
-		 * \param system	shared pointer to new system
-		 * \param index		index to insert system, if not specified or out of range
-		 *					system will be inserted at the back
+		 * \param system			shared pointer to new system
+		 * \param sys_identifier	system identifier
+		 * \param index				index to insert system, if not specified or out of range
+		 *							system will be inserted at the back
 		 */
-		void addSystem(std::shared_ptr<System::Base> system, size_t index = std::string::npos);
+		void addSystem(std::shared_ptr<System::Base> system, std::string const& sys_identifier, size_t index = std::string::npos);
+
+		/**
+		 * Access system already within core engine
+		 *
+		 * \param sys_identifier	system identifier
+		 *
+		 */
+		std::shared_ptr<System::Base> accessSystem(std::string const& sys_identifier);
 	};
 
 	//Predefined name for core engine

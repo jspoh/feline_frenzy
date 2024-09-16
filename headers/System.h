@@ -28,12 +28,12 @@ namespace System {
 		virtual void update() = 0;
 
 		//Set System active
-		void setSystemActive(bool state) {
+		void setActiveState(bool state) {
 			b_system_active = state;
 		}
 
 		//Get System active
-		bool getSystemActive() const {
+		bool getActiveState() const {
 			return b_system_active;
 		}
 
