@@ -15,14 +15,25 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
-// Fmod headers
-#include "FMOD/fmod.h"
-#include "FMOD/fmod_codec.h"
-#include "FMOD/fmod_common.h"
-#include "FMOD/fmod_dsp.h"
-#include "FMOD/fmod_dsp_effects.h"
-#include "FMOD/fmod_errors.h"
-#include "FMOD/fmod_output.h"
+// Fmod core headers
+#include "FMOD_CORE/fmod.h"
+#include "FMOD_CORE/fmod.hpp"
+#include "FMOD_CORE/fmod_codec.h"
+#include "FMOD_CORE/fmod_common.h"
+#include "FMOD_CORE/fmod_dsp.h"
+#include "FMOD_CORE/fmod_dsp_effects.h"
+#include "FMOD_CORE/fmod_errors.h"
+#include "FMOD_CORE/fmod_output.h"
+
+// Fmod studio headers
+#include "FMOD_STUDIO/fmod_studio.h"
+#include "FMOD_STUDIO/fmod_studio.hpp"
+#include "FMOD_STUDIO/fmod_studio_common.h"
+
+// Fmod bank headers
+#include "FMOD_FSBANK/fsbank.h"
+#include "FMOD_FSBANK/fsbank_errors.h"
+
 
 // standard headers
 #include <iostream>

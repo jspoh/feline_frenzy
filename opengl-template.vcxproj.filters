@@ -45,6 +45,9 @@
     <ClCompile Include="src\Core\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Systems\AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\stdafx.h">
@@ -83,7 +86,10 @@
     <ClInclude Include="headers\System.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Component.h">
+    <ClInclude Include="headers\AudioComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\AudioSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

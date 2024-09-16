@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Systems\AudioSystem.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
     <ClCompile Include="src\Systems\RenderManager.cpp" />
     <ClCompile Include="src\Systems\StateManager.cpp" />
@@ -34,7 +35,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Component.h" />
+    <ClInclude Include="headers\AudioSystem.h" />
+    <ClInclude Include="headers\AudioComponent.h" />
     <ClInclude Include="headers\db.h" />
     <ClInclude Include="headers\Engine.h" />
     <ClInclude Include="headers\InputSystem.h" />
@@ -158,7 +160,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;fmodstudio_vc.lib;fmodstudioL_vc.lib;fsbank_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -185,7 +187,7 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;fmodstudio_vc.lib;fmodstudioL_vc.lib;fsbank_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
