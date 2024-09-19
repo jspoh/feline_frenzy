@@ -23,6 +23,7 @@
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
     <ClCompile Include="src\Systems\renderer\Model.cpp" />
+    <ClCompile Include="src\Systems\renderer\Object.cpp" />
     <ClCompile Include="src\Systems\renderer\RenderManager.cpp" />
     <ClCompile Include="src\Systems\renderer\ShaderManager.cpp" />
     <ClCompile Include="src\Systems\StateManager.cpp" />

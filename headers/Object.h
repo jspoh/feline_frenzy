@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   Object.h
- * \brief  Model class that holds the VAO, draw count, and primitive type.
+ * \brief  An object is a model with attributes
  *
  * \author g.boonxuensean
  * \date   September 2024
@@ -14,16 +14,29 @@
 
 
 class Object {
-	public : 
-		Model* model;
+	private:
+		std::string model_ref;
 		Vector2 position;
 		Vector2 scale;
-		Vector2 rotation;
+		float rotation;
+		// !TODO: add in transform mtx once math lib is done
 
-		Object(Model* mdl, Vector2 pos = Vector2(0.0f, 0.0f), Vector2 scl = Vector2(1.0f, 1.0f), Vector2 rot = Vector2(0.0f, 0.0f))
-			: model(mdl), position(pos), scale(scl), rotation(rot) {}
+	public : 
+		// Constructors
+		Object(const std::string& mdl, Vector2 pos = Vector2(0.0f, 0.0f), Vector2 scl = Vector2(1.0f, 1.0f), float rot = 0);
 
-		void draw() const {
-			model->draw();
-		}
+		// Getters and setters
+
+		void setPosition(const Vector2& pos);
+		Vector2 getPosition() const; 
+
+		void setScale(const Vector2& scl);
+		Vector2 getScale() const;
+
+		void setRot(float rot);
+		float getRot() const;
+
+		void update(float dt);
+
+		void draw() const;
 };

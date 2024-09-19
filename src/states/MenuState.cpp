@@ -37,7 +37,8 @@ void MenuState::update() {
 }
 
 void MenuState::render() {
-	RenderManager::getInstance().drawModel("square");
+	Object obj("square");
+	obj.draw();
 }
 
 void MenuState::exit() {

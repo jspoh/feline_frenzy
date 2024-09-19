@@ -2,7 +2,7 @@
  * \file   Model.cpp
  * \brief  Implementation of the Model class.
  *
- * \author jings
+ * \author g.boonxuensean@digipen.edu
  * \date   September 2024
  *********************************************************************/
 #include "stdafx.h"
