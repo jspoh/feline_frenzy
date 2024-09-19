@@ -11,6 +11,7 @@
 #include "MenuState.h"
 #include "StateManager.h"
 #include "RenderManager.h"
+#include "AudioSystem.h"
 
 
 MenuState::MenuState() {
@@ -27,9 +28,15 @@ MenuState& MenuState::getInstance() {
 
 void MenuState::load() {
 	RenderManager::getInstance().registerMesh("square", "assets/meshes/square.txt");
+	
 }
 
 void MenuState::init() {
+	// Audio system testing
+	NE_AUDIO_GROUP test_group = AudioSystem::AudioSystem::getInstance().CreateAudioGroup("group 1");
+	NE_AUDIO test_sound = AudioSystem::AudioSystem::getInstance().NEAudioLoadSound("assets/Audio/test_sound.ogg", "test");
+	AudioSystem::AudioSystem::getInstance().NEAudioPlay(test_sound, test_group, 1.f, 1.f, 0);
+
 }
 
 void MenuState::update() {

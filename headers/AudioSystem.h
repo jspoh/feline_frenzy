@@ -38,10 +38,46 @@ namespace AudioSystem {
 		~AudioSystem() override;
 
 		// Load audio file (sound)
-		NE_AUDIO NEAudioLoadSound(std::string& file_path, NE_AUDIO_GROUP audio_group);
+		NE_AUDIO NEAudioLoadSound(std::string const& file_path, std::string const& tag);
 
 		// Load audio file (music)
-		NE_AUDIO NEAudioLoadMusic(std::string& file_path, NE_AUDIO_GROUP audio_group);
+		NE_AUDIO NEAudioLoadMusic(std::string const& file_path, std::string const& tag);
+
+		// Create audio group
+		NE_AUDIO_GROUP CreateAudioGroup(std::string const& audio_group_tag);
+
+		// Check audio group exist
+		bool NEAudioIsValidGroup(std::string const& audio_group_tag);
+
+		// Check audio exist
+		bool NEAudioIsValid(NE_AUDIO_GROUP group);
+
+		// Play sound
+		void NEAudioPauseGroup(NE_AUDIO_GROUP group);
+
+		// Play music
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop);
+
+		// Resume music
+		void NEAudioResumeGroup(NE_AUDIO_GROUP group);
+
+		// Set pitch
+		void NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch);
+
+		// Set volume
+		void NEAudioSetGroupVolume(NE_AUDIO_GROUP group);
+
+		// Stop sound
+		void NEAudioStopGroup(NE_AUDIO_GROUP group);
+
+		// Unload audio group
+		void NEAudioUnloadGroup(NE_AUDIO_GROUP group);
+
+		// Unload audio
+		void NEAudioUnloadAudio(NE_AUDIO audio);
+
+		// Check if audio playimg
+		void IsPlaying(NE_AUDIO audio);
 
 	private:
 		// Delete Copy Constructor & Copy Assignment

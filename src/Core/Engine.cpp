@@ -103,6 +103,7 @@ void Core::Engine::init(std::string const& file_path) {
 
 	//Engine Init Successful
 	cout << "GL init success" << endl;
+
 }
 
 void Core::Engine::run() {
