@@ -10,13 +10,8 @@
 
 #include "stdafx.h"
 #include "ShaderManager.h"
-
-// !TODO: move this code
-struct Model {
-	unsigned int vaoid;
-	unsigned int primitive_type;
-	unsigned int draw_count;	// number of vertices to draw
-};
+#include "Model.h"
+#include "Object.h"
 
 
 class RenderManager {
@@ -25,7 +20,7 @@ private:
 	~RenderManager();
 
 	// vertex array objects + data required for drawing
-	std::unordered_map<std::string, Model> models;
+	std::unordered_map<std::string, Model*> models;
 
 	ShaderManager shaderManager;
 
@@ -61,7 +56,8 @@ public:
 	 * \param path_to_mesh
 	 * \return success
 	 */
-	bool registerMesh(std::string mesh_ref, std::string path_to_mesh);
+	void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
 
-	void drawModel(std::string mdl_ref);
+	void drawModel(const std::string& model_ref);
+
 };

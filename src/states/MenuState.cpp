@@ -26,7 +26,8 @@ MenuState& MenuState::getInstance() {
 }
 
 void MenuState::load() {
-	RenderManager::getInstance().registerMesh("square", "assets/meshes/square.txt");
+	RenderManager::getInstance().registerModel("square", "assets/meshes/square.txt");
+	RenderManager::getInstance().registerModel("triangle", "assets/meshes/triangle.txt");
 }
 
 void MenuState::init() {
