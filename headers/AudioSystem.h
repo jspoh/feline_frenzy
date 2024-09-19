@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "Engine.h"
 #include "AudioComponent.h"
+#include "InputSystem.h"
 
 /************************************
 * SOME NOTES TO TAKE NOTE OF:
@@ -49,14 +50,17 @@ namespace AudioSystem {
 		// Check audio group exist
 		bool NEAudioIsValidGroup(std::string const& audio_group_tag);
 
+		// Play music
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop);
+
+		// Stop sound
+		void NEAudioStopGroup(std::string const& tag);
+
 		// Check audio exist
 		bool NEAudioIsValid(NE_AUDIO_GROUP group);
 
 		// Play sound
 		void NEAudioPauseGroup(NE_AUDIO_GROUP group);
-
-		// Play music
-		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop);
 
 		// Resume music
 		void NEAudioResumeGroup(NE_AUDIO_GROUP group);
@@ -66,9 +70,6 @@ namespace AudioSystem {
 
 		// Set volume
 		void NEAudioSetGroupVolume(NE_AUDIO_GROUP group);
-
-		// Stop sound
-		void NEAudioStopGroup(NE_AUDIO_GROUP group);
 
 		// Unload audio group
 		void NEAudioUnloadGroup(NE_AUDIO_GROUP group);

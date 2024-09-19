@@ -40,10 +40,10 @@ namespace Audio {
 		AUDIO_MAP audio_map;
 
 		// Volume 
-		float volume;
+		float volume{};
 
 		// Pitch
-		float pitch;
+		float pitch{};
 		
 	};
 

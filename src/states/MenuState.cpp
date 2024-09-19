@@ -33,9 +33,11 @@ void MenuState::load() {
 
 void MenuState::init() {
 	// Audio system testing
+	NIKEEngine.accessSystem("audio")->getActiveState();
 	NE_AUDIO_GROUP test_group = AudioSystem::AudioSystem::getInstance().CreateAudioGroup("group 1");
-	NE_AUDIO test_sound = AudioSystem::AudioSystem::getInstance().NEAudioLoadSound("assets/Audio/test_sound.ogg", "test");
-	AudioSystem::AudioSystem::getInstance().NEAudioPlay(test_sound, test_group, 1.f, 1.f, 0);
+	// NE_AUDIO test_sound = AudioSystem::AudioSystem::getInstance().NEAudioLoadSound("assets/Audio/test_sound.ogg", "test");
+	NE_AUDIO test_music = AudioSystem::AudioSystem::getInstance().NEAudioLoadMusic("assets/Audio/test_music.wav", "test");
+	AudioSystem::AudioSystem::getInstance().NEAudioPlay(test_music, test_group, 1.f, 1.f, 0);
 
 }
 

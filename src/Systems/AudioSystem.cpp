@@ -127,5 +127,63 @@ bool AudioSystem::AudioSystem::NEAudioIsValidGroup(std::string const& audio_grou
 
 void AudioSystem::AudioSystem::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop)
 {
-	audio_components->fmod_system->playSound(audio, group, 0, nullptr);
+	audio_components->fmod_system->playSound(audio, group, 0, nullptr);	
+	// This is same as UNREFERENCED_PARAMETER
+	static_cast<void>(vol);
+	static_cast<void>(pitch);
+	static_cast<void>(loop);
+}
+
+void AudioSystem::AudioSystem::NEAudioStopGroup(std::string const& tag)
+{
+	// This is same as UNREFERENCED_PARAMETER
+	static_cast<void>(tag);
+	if (true)
+	{
+
+	}
+	audio_components->audio_group_map[tag]->stop();
+}
+
+bool AudioSystem::AudioSystem::NEAudioIsValid(NE_AUDIO_GROUP group)
+{
+	static_cast<void>(group);
+	return false;
+}
+
+void AudioSystem::AudioSystem::NEAudioPauseGroup(NE_AUDIO_GROUP group)
+{
+	static_cast<void>(group);
+
+}
+
+void AudioSystem::AudioSystem::NEAudioResumeGroup(NE_AUDIO_GROUP group)
+{
+	static_cast<void>(group);
+}
+
+void AudioSystem::AudioSystem::NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch)
+{
+	static_cast<void>(group);
+	static_cast<void>(pitch);
+}
+
+void AudioSystem::AudioSystem::NEAudioSetGroupVolume(NE_AUDIO_GROUP group)
+{
+	static_cast<void>(group);
+}
+
+void AudioSystem::AudioSystem::NEAudioUnloadGroup(NE_AUDIO_GROUP group)
+{
+	static_cast<void>(group);
+}
+
+void AudioSystem::AudioSystem::NEAudioUnloadAudio(NE_AUDIO audio)
+{
+	static_cast<void>(audio);
+}
+
+void AudioSystem::AudioSystem::IsPlaying(NE_AUDIO audio)
+{
+	static_cast<void>(audio);
 }
