@@ -109,3 +109,23 @@ void ShaderManager::useShader(const std::string& shader_ref) {
 void ShaderManager::unuseShader() {
 	glUseProgram(0);
 }
+
+// Uniform setters
+
+void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
+	unsigned int shader = shader_programs.at(shader_ref);
+	int location = glGetUniformLocation(shader, name.c_str());
+	glUniform1i(location, value);
+}
+
+void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
+	unsigned int shader = shader_programs.at(shader_ref);
+	int location = glGetUniformLocation(shader, name.c_str());
+	glUniform1f(location, value);
+}
+
+void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const glm::mat3& value) {
+	unsigned int shader = shader_programs.at(shader_ref);
+	int location = glGetUniformLocation(shader, name.c_str());
+	glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+}

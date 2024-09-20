@@ -34,5 +34,9 @@ class ShaderManager {
 		*/
 		void unuseShader();
 
+		// Uniform setter overload functions
+		void setUniform(const std::string& shader_ref, const std::string& name, int value);
+		void setUniform(const std::string& shader_ref, const std::string& name, float value);
+		void setUniform(const std::string& shader_ref, const std::string& name, const glm::mat3& value);
 
 };

@@ -19,12 +19,15 @@ private:
 	RenderManager();
 	~RenderManager();
 
-	// vertex array objects + data required for drawing
-	std::unordered_map<std::string, Model*> models;
 
 	ShaderManager shaderManager;
 
 public:
+
+	// vertex array objects + data required for drawing
+	std::unordered_map<std::string, Model*> models;
+	std::unordered_map<std::string, Object> objects;
+
 	static RenderManager& getInstance();
 
 	/**
@@ -57,7 +60,8 @@ public:
 	 * \return success
 	 */
 	void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
+	void registerObject(const std::string& object_ref, const std::string& model_ref);
 
-	void drawModel(const std::string& model_ref);
+	void drawObjects();
 
 };

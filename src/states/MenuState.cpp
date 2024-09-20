@@ -31,14 +31,15 @@ void MenuState::load() {
 }
 
 void MenuState::init() {
+	RenderManager::getInstance().registerObject("obj1", "square");
+	RenderManager::getInstance().registerObject("obj2", "triangle");
 }
 
 void MenuState::update() {
 }
 
 void MenuState::render() {
-	Object obj("square");
-	obj.draw();
+	RenderManager::getInstance().drawObjects();
 }
 
 void MenuState::exit() {

@@ -40,14 +40,25 @@ void RenderManager::registerModel(const std::string& model_ref, const std::strin
     }
 }
 
-void RenderManager::drawModel(const std::string& model_ref) {
-    auto it = models.find(model_ref);
-    if (it != models.end()) {
-        shaderManager.useShader("base");
-        it->second->draw();
-        shaderManager.unuseShader();
-    }
-    else {
+void RenderManager::registerObject(const std::string& object_ref, const std::string& model_ref) {
+    // Check if the model exists before creating the object
+    if (models.find(model_ref) == models.end()) {
         cerr << "Model not found: " << model_ref << endl;
+        return;
     }
+
+    Object obj(model_ref);
+
+    objects[object_ref] = obj;
+}
+
+//!TODO change to draw object to draw each object and each object will reference the model
+void RenderManager::drawObjects() {
+    shaderManager.useShader("base");
+
+    for (const auto& [object_ref, object] : objects) {
+        object.draw();
+    }
+
+    shaderManager.unuseShader();
 }

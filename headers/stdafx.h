@@ -14,6 +14,7 @@
 // graphics headers
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include "glm/mat3x3.hpp"
 
 // standard headers
 #include <iostream>
@@ -38,6 +39,7 @@
 // our completed headers
 #include "Vector2.h"
 #include "Vector4.h"
+
 
 class NullStream {
 public:
