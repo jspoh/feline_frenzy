@@ -6,6 +6,7 @@
  * \date   September 2024
  *********************************************************************/
 
+#include "stdafx.h"
 #include "CollisionUtils.h"
 #include <cmath>
 
