@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Systems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\CollisionUtils.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
     <ClCompile Include="src\Systems\RenderManager.cpp" />
     <ClCompile Include="src\Systems\StateManager.cpp" />
@@ -34,6 +36,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\CollisionSystem.h" />
+    <ClInclude Include="headers\CollisionUtils.h" />
     <ClInclude Include="headers\db.h" />
     <ClInclude Include="headers\Engine.h" />
     <ClInclude Include="headers\InputSystem.h" />

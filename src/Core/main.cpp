@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "Engine.h"
 #include "InputSystem.h"
+#include "CollisionSystem.h"
 
 
 // debug stuff
@@ -23,6 +24,10 @@ int main() {
 	//Add Input System
 	Input::Manager::getInstance().init();
 	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::Base*) {}), "Input");
+
+	// Add Collision System
+	Collision::Manager::getInstance().init();
+	NIKEEngine.addSystem(std::shared_ptr<Collision::Manager>(&Collision::Manager::getInstance(), [](System::Base*) {}), "Collision");
 
 	//Engine Game Loop
 	NIKEEngine.run();
