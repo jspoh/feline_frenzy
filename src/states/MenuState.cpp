@@ -32,16 +32,22 @@ void MenuState::load() {
 }
 
 void MenuState::init() {
-	// Audio system testing
-	NIKEEngine.accessSystem("audio")->getActiveState();
+	// Audio system testing (1st way of playing audio)
+	// NIKEEngine.accessSystem("audio")->getActiveState();
 	NE_AUDIO_GROUP test_group = AudioSystem::AudioSystem::getInstance().CreateAudioGroup("group 1");
-	// NE_AUDIO test_sound = AudioSystem::AudioSystem::getInstance().NEAudioLoadSound("assets/Audio/test_sound.ogg", "test");
-	NE_AUDIO test_music = AudioSystem::AudioSystem::getInstance().NEAudioLoadMusic("assets/Audio/test_music.wav", "test");
-	AudioSystem::AudioSystem::getInstance().NEAudioPlay(test_music, test_group, 1.f, 1.f, 0);
+	NE_AUDIO test_sound = AudioSystem::AudioSystem::getInstance().NEAudioLoadSound("assets/Audio/test_sound.ogg", "test_sound");
+	AudioSystem::AudioSystem::getInstance().NEAudioLoadMusic("assets/Audio/test_music.wav", "test_music");
+	// Audio system testing (1st way of playing audio)
+	AudioSystem::AudioSystem::getInstance().NEAudioPlay(test_sound, test_group, 1.f, 1.f, 0);
+
+	// 2nd way of playing audio
+	AudioSystem::AudioSystem::getInstance().CreateAudioGroup("group 2");
+	AudioSystem::AudioSystem::getInstance().NEAudioPlay("test_music", "group 2", 1.f, 1.f, 0);
 
 }
 
 void MenuState::update() {
+	AudioSystem::AudioSystem::getInstance().NEAudioStopGroup("group 2");
 }
 
 void MenuState::render() {

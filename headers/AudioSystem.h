@@ -47,11 +47,18 @@ namespace AudioSystem {
 		// Create audio group
 		NE_AUDIO_GROUP CreateAudioGroup(std::string const& audio_group_tag);
 
+		// Gettors for audio group and audio
+		NE_AUDIO_GROUP GetAudioGroup(std::string const& tag);
+
+		NE_AUDIO GetAudio(std::string const& tag);
+
 		// Check audio group exist
 		bool NEAudioIsValidGroup(std::string const& audio_group_tag);
 
 		// Play music
-		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop);
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool loop);
+
+		void NEAudioPlay(std::string const&, std::string const&, float vol, float pitch, bool loop);
 
 		// Stop sound
 		void NEAudioStopGroup(std::string const& tag);

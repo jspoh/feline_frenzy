@@ -115,6 +115,16 @@ NE_AUDIO_GROUP AudioSystem::AudioSystem::CreateAudioGroup(std::string const& aud
 	return temp;
 }
 
+NE_AUDIO_GROUP AudioSystem::AudioSystem::GetAudioGroup(std::string const& tag)
+{
+	return audio_components->audio_group_map[tag];
+}
+
+NE_AUDIO AudioSystem::AudioSystem::GetAudio(std::string const& tag)
+{
+	return audio_components->audio_map[tag];
+}
+
 bool AudioSystem::AudioSystem::NEAudioIsValidGroup(std::string const& audio_group_tag)
 {
 	// Check if the group already exists in the map
@@ -134,15 +144,23 @@ void AudioSystem::AudioSystem::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group,
 	static_cast<void>(loop);
 }
 
+void AudioSystem::AudioSystem::NEAudioPlay(std::string const& audio_tag, std::string const& audio_group_tag, float vol, float pitch, bool loop)
+{
+	audio_components->fmod_system->playSound(GetAudio(audio_tag), GetAudioGroup(audio_group_tag), 0, nullptr);
+	// This is same as UNREFERENCED_PARAMETER
+	static_cast<void>(vol);
+	static_cast<void>(pitch);
+	static_cast<void>(loop);
+}
+
 void AudioSystem::AudioSystem::NEAudioStopGroup(std::string const& tag)
 {
 	// This is same as UNREFERENCED_PARAMETER
 	static_cast<void>(tag);
-	if (true)
+	if (Input::Manager::getInstance().key_is_pressed(GLFW_KEY_Q))
 	{
-
+		audio_components->audio_group_map[tag]->stop();
 	}
-	audio_components->audio_group_map[tag]->stop();
 }
 
 bool AudioSystem::AudioSystem::NEAudioIsValid(NE_AUDIO_GROUP group)
