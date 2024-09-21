@@ -32,9 +32,11 @@ void MenuState::load() {
 }
 
 void MenuState::init() {
-	Matrix33::Matrix_33 test{};
+	Matrix33::Matrix_33 test{}, test_scale{};
 	Matrix33::Matrix_33Translate(test,6,7);
-	cout << test << endl;
+	Matrix33::Matrix_33Scale(test_scale, 3, 5);
+	Matrix33::Matrix_33 result = test * test_scale;
+	cout << result << endl;
 }
 
 void MenuState::update() {

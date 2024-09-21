@@ -119,8 +119,7 @@ std::ostream& Matrix33::operator<<(std::ostream& os, const Matrix_33& input)
 
 Matrix_33 Matrix33::operator*(const Matrix_33& lhs, const Matrix_33& rhs)
 {
-	Matrix_33 result{};
-	result = lhs;
+	Matrix_33 result{ lhs };
 	result *= rhs;
 
 	return result;
@@ -225,8 +224,8 @@ void Matrix33::Matrix_33RotDeg(Matrix_33& result, float angle)
 
 void Matrix33::Matrix_33Translate(Matrix_33& result, float const& x, float const& y)
 {
-	result(0, 0) = 0;    result(0, 1) = 0;    result(0, 2) = x;
-	result(1, 0) = 0;    result(1, 1) = 0;    result(1, 2) = y;
+	result(0, 0) = 1;    result(0, 1) = 0;    result(0, 2) = x;
+	result(1, 0) = 0;    result(1, 1) = 1;    result(1, 2) = y;
 	result(2, 0) = 0;    result(2, 1) = 0;    result(2, 2) = 1;
 }
 
