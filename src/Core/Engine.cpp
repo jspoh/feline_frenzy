@@ -14,7 +14,8 @@
 //float Core::Engine::dt = 1.f;
 
 Core::Engine::Engine()
-	: ptr_window{ nullptr }, window_width{ 0 }, window_height{ 0 }, window_title{ "" }, delta_time{ 0.0f }
+	: ptr_window{ nullptr }, window_size{}, window_title{""}, delta_time{0.0f},
+	target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f }
 {}
 
 Core::Engine::~Engine() {
@@ -36,27 +37,16 @@ void Core::Engine::readConfigFile(std::string const& file_path) {
 		std::getline(fileStream, data);
 		window_title = data.substr(data.find_first_of('"') + 1, data.find_last_of('"') - data.find_first_of('"') - 1);
 		std::getline(fileStream, data);
-		std::stringstream(data) >> temp >> window_width;
+		std::stringstream(data) >> temp >> window_size.x;
 		std::getline(fileStream, data);
-		std::stringstream(data) >> temp >> window_height;
+		std::stringstream(data) >> temp >> window_size.y;
 	}
 
 	//Close file stream
 	fileStream.close();
 }
 
-void Core::Engine::calculateDeltaTime() {
-	static float prev_time = static_cast<float>(glfwGetTime());
-	float curr_time = static_cast<float>(glfwGetTime());
-	delta_time = curr_time - prev_time;
-	prev_time = curr_time;
-}
-
-bool Core::Engine::getWindowOpen() const {
-	return !glfwWindowShouldClose(NIKEEngine.getWindow());
-}
-
-void Core::Engine::init(std::string const& file_path) {
+void Core::Engine::configSystem() {
 	if (!glfwInit()) {
 		cerr << "Failed to initialize GLFW\n";
 		throw std::exception();
@@ -65,7 +55,7 @@ void Core::Engine::init(std::string const& file_path) {
 	glfwSetErrorCallback([](int error, const char* description) {
 		cerr << "Error " << error << ": " << description << endl;
 		throw std::exception();
-	});
+		});
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -78,11 +68,8 @@ void Core::Engine::init(std::string const& file_path) {
 	glfwWindowHint(GLFW_BLUE_BITS, 8); glfwWindowHint(GLFW_ALPHA_BITS, 8);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // window dimensions are static
 
-	//Read config file
-	readConfigFile(file_path);
-
 	//Create window
-	ptr_window = glfwCreateWindow(window_width, window_height, window_title.c_str(), nullptr, nullptr);
+	ptr_window = glfwCreateWindow(static_cast<int>(window_size.x), static_cast<int>(window_size.y), window_title.c_str(), nullptr, nullptr);
 	if (!ptr_window) {
 		cerr << "Failed to create window" << endl;
 		glfwTerminate();
@@ -97,17 +84,54 @@ void Core::Engine::init(std::string const& file_path) {
 		throw std::exception();
 	}
 
+	//Engine Init Successful
+	cout << "GL init success" << endl;
+
+}
+
+void Core::Engine::calculateDeltaTime() {
+	//Static prev time
+	static double prev_time = glfwGetTime();
+
+	//Calculate delta time
+	curr_time = glfwGetTime();
+	delta_time = static_cast<float>(curr_time - prev_time);
+	actual_fps = 1.0f / delta_time;
+	prev_time = curr_time;
+}
+
+void Core::Engine::controlFPS() {
+
+	//Target delta time
+	double target_frame_time = 1.0 / target_fps;
+	//double frame_time = glfwGetTime() - curr_time;
+
+	//Sleep thread for fps
+	while (glfwGetTime() - curr_time < target_frame_time) {
+		//Current default system timer resolution is around 15.6 ms
+		//Sleeping this thread will lead to inaccurate time control, thread sleeps for too long
+		//std::this_thread::sleep_for(std::chrono::duration<double>(target_frame_time - frame_time));
+	}
+}
+
+void Core::Engine::init(std::string const& file_path, int fps) {
+	//Read config file
+	readConfigFile(file_path);
+
+	//Config glfw window system
+	configSystem();
+
+	//Set Target FPS
+	target_fps = fps;
+
 	// initialize states
 	StateManager::getInstance().register_all_states();		// important!
 	StateManager::getInstance().set_active_state("main_menu");
-
-	//Engine Init Successful
-	cout << "GL init success" << endl;
 }
 
 void Core::Engine::run() {
 
-	while (getWindowOpen()) {
+	while (!glfwWindowShouldClose(NIKEEngine.getWindow())) {
 
 		//Calculate Delta Time
 		calculateDeltaTime();
@@ -120,7 +144,7 @@ void Core::Engine::run() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Set Window Title
-		setTitle(window_title + " | " + std::to_string(1.f / delta_time) + " fps");
+		setWinTitle(window_title + " | " + std::to_string(actual_fps) + " fps");
 
 		//Update all systems
 		for (auto& system : systems) {
@@ -129,8 +153,8 @@ void Core::Engine::run() {
 			}
 		}
 
-		//Single access to system
-		//accessSystem("Input")->update();
+		//To disable v-sync ( testing fps control )
+		//glfwSwapInterval(0);
 
 		//State Manager
 		StateManager::getInstance().run();
@@ -139,11 +163,14 @@ void Core::Engine::run() {
 		glfwSwapBuffers(ptr_window);
 
 		//Check if window is open
-		if (!getWindowOpen()) {
+		if (glfwWindowShouldClose(NIKEEngine.getWindow())) {
 
 			//Terminate window
 			NIKEEngine.terminate();
 		}
+
+		//Control FPS
+		controlFPS();
 	}
 }
 
@@ -151,7 +178,7 @@ void Core::Engine::terminate() {
 	glfwSetWindowShouldClose(NIKEEngine.ptr_window, GLFW_TRUE);
 }
 
-void Core::Engine::setTitle(std::string const& title) {
+void Core::Engine::setWinTitle(std::string const& title) {
 	glfwSetWindowTitle(ptr_window, title.c_str());
 }
 
@@ -159,20 +186,23 @@ GLFWwindow* Core::Engine::getWindow() const {
 	return ptr_window;
 }
 
-void Core::Engine::setWindowWidth(int width) {
-	window_width = width;
+void Core::Engine::setWindowSize(float width, float height) {
+	window_size.x = width;
+	window_size.y = height;
+
+	glfwSetWindowSize(ptr_window, static_cast<int>(window_size.x), static_cast<int>(window_size.y));
 }
 
-int Core::Engine::getWindowWidth() const {
-	return window_width;
+Vector2 const& Core::Engine::getWindowSize() const {
+	return window_size;
 }
 
-void Core::Engine::setWindowHeight(int height) {
-	window_height = height;
+void Core::Engine::setTargetFPS(int fps) {
+	target_fps = fps;
 }
 
-int Core::Engine::getWindowHeight() const {
-	return window_height;
+float Core::Engine::getCurrentFPS() const {
+	return actual_fps;
 }
 
 float Core::Engine::getDeltaTime() const {

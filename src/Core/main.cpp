@@ -10,7 +10,6 @@
 #include "Engine.h"
 #include "InputSystem.h"
 
-
 // debug stuff
 bool DEBUG = false;
 NullStream nullstream;
@@ -18,7 +17,7 @@ NullStream nullstream;
 int main() {
 
 	//Initialize Engine With Config File
-	NIKEEngine.init("src/Core/Config.txt");
+	NIKEEngine.init("src/Core/Config.txt", 60);
 
 	//Add Input System
 	Input::Manager::getInstance().init();
