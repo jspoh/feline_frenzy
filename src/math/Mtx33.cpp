@@ -157,7 +157,7 @@ void Matrix33::Matrix_33Transpose(Matrix_33& result, const Matrix_33& input)
 	result(2, 2) = input(2, 2);
 }
 
-void Matrix33::Matrix_33Inverse(Matrix_33& result, float& determinant, const Matrix_33& input)
+void Matrix33::Matrix_33Inverse(Matrix_33& result, const Matrix_33& input)
 {
 	// Calculations of co factor matrix
 	Matrix_33 adjoint{};
@@ -178,7 +178,7 @@ void Matrix33::Matrix_33Inverse(Matrix_33& result, float& determinant, const Mat
 	Matrix_33Transpose(transpose, adjoint);
 
 	// Find determinant using diagonal - anti-diagonal
-	determinant = Matrix_33Determinant(input);
+	float determinant = Matrix_33Determinant(input);
 	// Checking if determinant not equals to 0, can inverse
 	if (determinant != 0)
 	{

@@ -53,7 +53,7 @@ namespace Matrix33 {
 	// Result is the matrix that is transposed from input
 	void Matrix_33Transpose(Matrix_33& result, const Matrix_33& input);
 	// Result is the matrix that is inversed from input
-	void Matrix_33Inverse(Matrix_33& result, float& determinant, const Matrix_33& input);
+	void Matrix_33Inverse(Matrix_33& result, const Matrix_33& input);
 	// Transpose the inverse matrix, result will be the transposed inverse input matrix
 	// void Matrix_33InverseTranspose(Matrix_33& result, const Matrix_33& input);
 	// Result is the scalar matrix
