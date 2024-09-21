@@ -11,11 +11,6 @@
 #include "InputSystem.h"
 
 void Input::Manager::setupEventCallbacks() {
-	if (!NIKEEngine.getWindow()) {
-		cerr << "Window not initialized" << endl;
-		throw std::exception();
-	}
-
 	glfwSetFramebufferSizeCallback(NIKEEngine.getWindow(), fbsize_cb);
 	glfwSetKeyCallback(NIKEEngine.getWindow(), key_cb);
 	glfwSetMouseButtonCallback(NIKEEngine.getWindow(), mousebutton_cb);
@@ -24,8 +19,10 @@ void Input::Manager::setupEventCallbacks() {
 }
 
 void Input::Manager::init() {
+	//Setup event callbacks
 	setupEventCallbacks();
 
+	//Setup input mode
 	glfwSetInputMode(NIKEEngine.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 

@@ -21,10 +21,16 @@ namespace Core {
 		
 		//Engine Variables
 		GLFWwindow* ptr_window;
-		int window_width;
-		int window_height;
+		Vector2 window_size;
 		std::string window_title;
+
+		//Delta time variables
 		float delta_time;
+		double curr_time;
+
+		//FPS Variables
+		int target_fps;
+		float actual_fps;
 
 		//Pointer to engine systems
 		std::vector<std::shared_ptr<System::Base>> systems;
@@ -46,11 +52,14 @@ namespace Core {
 		 */
 		void readConfigFile(std::string const& file_path);
 
+		//Configure systems ( GLFW & GLEW )
+		void configSystem();
+
 		//Calculate Delta Time
 		void calculateDeltaTime();
 
-		//Get Game Running
-		bool getWindowOpen() const;
+		//FPS control
+		void controlFPS();
 
 	public:
 
@@ -65,7 +74,7 @@ namespace Core {
 		}
 
 		//Init Window with config file
-		void init(std::string const& file_path);
+		void init(std::string const& file_path, int fps = 60);
 
 		//Run Game Loop
 		void run();
@@ -77,19 +86,19 @@ namespace Core {
 		GLFWwindow* getWindow() const;
 
 		//Set Window Title
-		void setTitle(std::string const& title);
+		void setWinTitle(std::string const& title);
 
-		//Set Window Width
-		void setWindowWidth(int width);
+		//Set Window Size
+		void setWindowSize(float width, float height);
 
-		//Get Window Width
-		int getWindowWidth() const;
+		//Get Window Size
+		Vector2 const& getWindowSize() const;
 
-		//Set Window Height
-		void setWindowHeight(int height);
+		//Set Target FPS
+		void setTargetFPS(int fps);
 
-		//Get Window Height
-		int getWindowHeight() const;
+		//Get Current FPS
+		float getCurrentFPS() const;
 
 		//Get Delta Time
 		float getDeltaTime() const;
