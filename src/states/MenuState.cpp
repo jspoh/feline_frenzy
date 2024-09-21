@@ -11,6 +11,8 @@
 #include "MenuState.h"
 #include "StateManager.h"
 #include "RenderManager.h"
+#include "Mtx33.h"
+
 
 
 MenuState::MenuState() {
@@ -30,6 +32,9 @@ void MenuState::load() {
 }
 
 void MenuState::init() {
+	Matrix33::Matrix_33 test{};
+	Matrix33::Matrix_33Translate(test,6,7);
+	cout << test << endl;
 }
 
 void MenuState::update() {

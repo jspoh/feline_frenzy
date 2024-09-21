@@ -27,13 +27,15 @@ Matrix_33::Matrix_33(const Matrix_33& rhs)
 	}
 }
 
-// helper swap function for copy assignment
+// Helper swap function for copy assignment
 static void swap(Matrix_33& lhs, Matrix_33& rhs)
 {
-	// swapping of all data members
-	std::swap(lhs.matrix_33[0][0], rhs.matrix_33[0][0]), std::swap(lhs.matrix_33[0][1], rhs.matrix_33[0][1]), std::swap(lhs.matrix_33[0][2], rhs.matrix_33[0][2]);
-	std::swap(lhs.matrix_33[1][0], rhs.matrix_33[1][0]), std::swap(lhs.matrix_33[1][1], rhs.matrix_33[1][1]), std::swap(lhs.matrix_33[1][2], rhs.matrix_33[1][2]);
-	std::swap(lhs.matrix_33[2][0], rhs.matrix_33[2][0]), std::swap(lhs.matrix_33[2][1], rhs.matrix_33[2][1]), std::swap(lhs.matrix_33[2][2], rhs.matrix_33[2][2]);
+	// Swapping of all data members
+	for (int i = 0; i < lhs.matrix_33.size(); ++i) {
+		for (int j = 0; j < lhs.matrix_33[i].size(); ++j) {
+			std::swap(lhs(i, j), rhs(i, j));
+		}
+	}
 }
 
 
@@ -76,7 +78,7 @@ Matrix_33& Matrix33::Matrix_33::operator*=(const float scale)
 {
 	for (size_t i = 0; i < matrix_33.size(); ++i)
 	{
-		for (size_t j = 0; j < matrix_33[i].size(); ++j)
+		for (size_t j = 0; j < matrix_33.size(); ++j)
 		{
 			matrix_33[i][j] = scale;
 		}
@@ -109,9 +111,9 @@ Matrix_33& Matrix_33::operator*=(const Matrix_33& rhs)
 
 std::ostream& Matrix33::operator<<(std::ostream& os, const Matrix_33& input)
 {
-	os << "[[" << input(0, 0) << ", " << input(0, 1) << ", " << input(0, 2) << "], "
-		<< "[" << input(1, 0) << ", " << input(1, 1) << ", " << input(1, 2) << "], "
-		<< "[" << input(2, 0) << ", " << input(2, 1) << ", " << input(2, 2) << "]]";
+	os << "[" << input(0, 0) << ", " << input(0, 1) << ", " << input(0, 2) << "] " << endl
+		<< "[" << input(1, 0) << ", " << input(1, 1) << ", " << input(1, 2) << "] " << endl
+		<< "[" << input(2, 0) << ", " << input(2, 1) << ", " << input(2, 2) << "]" << endl;
 	return os;
 }
 
@@ -177,8 +179,7 @@ void Matrix33::Matrix_33Inverse(Matrix_33& result, float& determinant, const Mat
 	Matrix_33Transpose(transpose, adjoint);
 
 	// Find determinant using diagonal - anti-diagonal
-	determinant = (input(0, 0) * input(1, 1) * input(2, 2) + input(1, 0) * input(2, 1) * input(0, 2) +input(2, 0) * input(0, 1) * input(1, 2)) -
-		(input(2, 0) * input(1, 1) * input(0, 2) + input(1, 0) * input(0, 1) * input(2, 2) + input(0, 0) * input(1, 2) * input(2, 1));
+	determinant = Matrix_33Determinant(input);
 	// Checking if determinant not equals to 0, can inverse
 	if (determinant != 0)
 	{
@@ -224,8 +225,8 @@ void Matrix33::Matrix_33RotDeg(Matrix_33& result, float angle)
 
 void Matrix33::Matrix_33Translate(Matrix_33& result, float const& x, float const& y)
 {
-	result(0, 0) = x;    result(0, 1) = 0;    result(0, 2) = x;
-	result(1, 0) = 0;    result(1, 1) = y;    result(1, 2) = y;
+	result(0, 0) = 0;    result(0, 1) = 0;    result(0, 2) = x;
+	result(1, 0) = 0;    result(1, 1) = 0;    result(1, 2) = y;
 	result(2, 0) = 0;    result(2, 1) = 0;    result(2, 2) = 1;
 }
 

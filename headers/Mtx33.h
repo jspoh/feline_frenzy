@@ -10,8 +10,8 @@
 class Vector3;
 
 namespace Matrix33 {
-	struct Matrix_33 {
-		
+	class Matrix_33 {
+	public:
 		// Ctors
 		Matrix_33() : matrix_33{} {}
 		Matrix_33(const float* p_arr);
@@ -29,12 +29,12 @@ namespace Matrix33 {
 
 		// Gettors/Settors
 		float& operator()(int row, int col);
-		const float& operator()(int row, int col) const;
-
-		std::array<std::array<float, 3>, 3> matrix_33{};
+		const float& operator()(int row, int col) const; 
 
 		// Debug :D
 		friend std::ostream& operator<<(std::ostream& os, const Matrix_33& input);
+	public:
+		std::array<std::array<float, 3>, 3> matrix_33{};
 
 	};
 
