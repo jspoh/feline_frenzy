@@ -29,6 +29,7 @@ RenderManager& RenderManager::getInstance() {
 	return instance;
 }
 
+// Adds a mesh / model into the model map
 void RenderManager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
     Model* model = new Model();
     if (model->loadMesh(path_to_mesh)) {
@@ -40,25 +41,47 @@ void RenderManager::registerModel(const std::string& model_ref, const std::strin
     }
 }
 
-void RenderManager::registerObject(const std::string& object_ref, const std::string& model_ref) {
+// Constructs an object and places it into the object map
+void RenderManager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector2& position, const Vector2& scale, float rotation) {
     // Check if the model exists before creating the object
     if (models.find(model_ref) == models.end()) {
         cerr << "Model not found: " << model_ref << endl;
         return;
     }
 
-    Object obj(model_ref);
+    // !TODO each object should have its own shader ref
+    Object obj(model_ref, "base", position, scale, rotation);
 
-    objects[object_ref] = obj;
+    objects[object_ref] = std::move(obj);
+   
 }
 
-//!TODO change to draw object to draw each object and each object will reference the model
+// Returns a pointer to an object in the map
+Object* RenderManager::getObject(const std::string& object_ref) {
+    if (objects.find(object_ref) != objects.end()) {
+        return &objects[object_ref];
+    }
+    cerr << "Object not found: " << object_ref << endl;
+    return nullptr;
+}
+
+// Update all objects transform matrix
+void RenderManager::updateObjects() {
+    for (auto& [object_ref, object] : objects) {
+        object.update(0);
+    }
+}
+
+// Draw all objects
 void RenderManager::drawObjects() {
-    shaderManager.useShader("base");
 
     for (const auto& [object_ref, object] : objects) {
-        object.draw();
-    }
+        shaderManager.useShader(object.getShaderRef());
 
+        shaderManager.setUniform(object.getShaderRef(), "model_to_ndc", object.getXform());
+       
+        object.draw();
+
+    }
     shaderManager.unuseShader();
 }

@@ -104,6 +104,7 @@ void ShaderManager::useShader(const std::string& shader_ref) {
 		cerr << "Shader reference not found: " << shader_ref << endl;
 		throw std::exception();
 	}
+
 }
 
 void ShaderManager::unuseShader() {
@@ -113,19 +114,47 @@ void ShaderManager::unuseShader() {
 // Uniform setters
 
 void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
-	unsigned int shader = shader_programs.at(shader_ref);
-	int location = glGetUniformLocation(shader, name.c_str());
-	glUniform1i(location, value);
+	if (shader_programs.find(shader_ref) != shader_programs.end()) {
+		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
+		if (location >= 0) {
+			glUniform1i(location, value);
+		}
+		else {
+			cerr << "Uniform location not found for: " << name << endl;
+		}
+	}
+	else {
+		cerr << "Shader program not found for: " << shader_ref << endl;
+	}
 }
 
 void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
-	unsigned int shader = shader_programs.at(shader_ref);
-	int location = glGetUniformLocation(shader, name.c_str());
-	glUniform1f(location, value);
+	if (shader_programs.find(shader_ref) != shader_programs.end()) {
+		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
+		if (location >= 0) {
+			glUniform1f(location, value);
+		}
+		else {
+			cerr << "Uniform location not found for: " << name << endl;
+		}
+	}
+	else {
+		cerr << "Shader program not found for: " << shader_ref << endl;
+	}
 }
 
 void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const glm::mat3& value) {
-	unsigned int shader = shader_programs.at(shader_ref);
-	int location = glGetUniformLocation(shader, name.c_str());
-	glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+
+	if (shader_programs.find(shader_ref) != shader_programs.end()) {
+		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
+		if (location >= 0) {
+			glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+		}
+		else {
+			cerr << "Uniform location not found for: " << name << endl;
+		}
+	}
+	else {
+		cerr << "Shader program not found for: " << shader_ref << endl;
+	}
 }

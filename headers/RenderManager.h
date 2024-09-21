@@ -60,8 +60,27 @@ public:
 	 * \return success
 	 */
 	void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
-	void registerObject(const std::string& object_ref, const std::string& model_ref);
-
+	/**
+	*  creates an object and places it into a map of objects
+	*  object has 
+	*  object_ref - key for map
+	*  model_ref - which model/mesh its referencing
+	*  position - position of object (NDC Range x-axis [-1, 1], y-axis[-1,1])
+	*  scale - scale of object 
+	*  rotation - degrees (0-360)
+	* */
+	void createObject(const std::string& object_ref, const std::string& model_ref, const Vector2& position = Vector2(0.f,0.f), const Vector2& scale = Vector2(1.f, 1.f), float rotation = 0);
+	/**
+	* returns an object pointer from the object map
+	* */
+	Object* getObject(const std::string& object_ref);
+	/**
+	* update all object's xform
+	* */
+	void updateObjects();
+	/**
+	* calls all of objects draws
+	* */
 	void drawObjects();
 
 };

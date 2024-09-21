@@ -11,11 +11,14 @@
 #include "RenderManager.h"
 
 
-Object::Object(const std::string& mdl, Vector2 pos, Vector2 scl, float rot, glm::mat3 xform)
-	: model_ref(mdl), position(pos), scale(scl), rotation(rot), mdl_to_ndc_xform(xform) {}
+Object::Object(const std::string& mdl, const std::string& shdr, Vector2 pos, Vector2 scl, float rot, glm::mat3 xform)
+	: model_ref(mdl), shader_ref(shdr), position(pos), scale(scl), rotation(rot), mdl_to_ndc_xform(xform) {}
 
 std::string Object::getModelRef() const {
 	return model_ref;
+}
+std::string Object::getShaderRef() const {
+	return shader_ref;
 }
 
 void Object::setPosition(const Vector2& pos) {
@@ -52,10 +55,37 @@ glm::mat3 Object::getXform() const {
 
 
 void Object::update(float dt) {
-	// empty for now
+
+	glm::mat3 model_mat, world_to_ndc_mat, trans_rot_mat, scale_mat;
+	// Scaling matrix
+	scale_mat = glm::mat3{
+		scale.x, 0, 0,
+		0, scale.y, 0,
+		0,         0, 1,
+	};
+
+	// !TODO add orientation
+	float angleDisp = rotation;
+	if (rotation != 0) {
+
+		rotation += 0.01;
+	}
+
+	// Translate and rotate matrix
+	trans_rot_mat = glm::mat3{
+		cos(angleDisp), sin(angleDisp), 0,
+		-sin(angleDisp), cos(angleDisp),  0,
+		position.x, position.y, 1,
+	};
+
+	model_mat = trans_rot_mat * scale_mat;
+
+
+	mdl_to_ndc_xform = model_mat;
 }
 
 void Object::draw() const {
+
 
 	auto it = RenderManager::getInstance().models.find(model_ref);
 
