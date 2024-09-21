@@ -30,6 +30,12 @@
     <ClCompile Include="src\Core\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\math\Mtx33.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Vector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Systems\InputSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -89,7 +95,13 @@
     <ClInclude Include="headers\InputSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\Mtx33.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="headers\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Vector3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\ShaderManager.h">
@@ -99,8 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\textured_rendering.vert" />

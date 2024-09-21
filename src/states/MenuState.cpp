@@ -11,7 +11,9 @@
 #include "MenuState.h"
 #include "StateManager.h"
 #include "RenderManager.h"
+#include "Mtx33.h"
 
+#define PI 3.14F
 
 MenuState::MenuState() {
 	StateManager::getInstance().register_state("main_menu", this);
@@ -40,6 +42,15 @@ void MenuState::init() {
 	
 	// init triangle obj with values
 	RenderManager::getInstance().createObject("obj2", "triangle", Vector2(0.5,0.5), Vector2(0.5,0.5));
+	
+	Matrix33::Matrix_33 test{}, test_scale{}, test_rot{}, temp{};
+	Matrix33::Matrix_33Translate(test,6,7);
+	Matrix33::Matrix_33Scale(test_scale, 3, 5);
+	Matrix33::Matrix_33Rot(test_rot, PI);
+	Matrix33::Matrix_33 result = test * test_scale;
+	temp = result;
+	Matrix33::Matrix_33Inverse(result, temp);
+	cout << result << endl;
 }
 
 void MenuState::update() {
