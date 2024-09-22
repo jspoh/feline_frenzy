@@ -16,6 +16,10 @@ namespace Matrix33 {
 		Matrix_33() : matrix_33{} {}
 		Matrix_33(const float* p_arr);
 		Matrix_33(const Matrix_33& rhs);
+		Matrix_33(float m00, float m01, float m02,
+			float m10, float m11, float m12,
+			float m20, float m21, float m22);
+		Matrix_33(float val);
 		~Matrix_33() = default;
 
 		// Copy assignment

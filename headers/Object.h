@@ -20,15 +20,15 @@ class Object {
 		Vector2 position;
 		Vector2 scale;
 		float rotation;
-		glm::mat3 mdl_to_ndc_xform;
+		Matrix33::Matrix_33 mdl_to_ndc_xform;
 		// !TODO: change to our matrix lib
 
 	public : 
 		// Constructors
 		Object()
-			: model_ref(""), shader_ref(""), position(0.0f, 0.0f), scale(1.0f, 1.0f), rotation(0.0f), mdl_to_ndc_xform(1.0f) {}
+			: model_ref(""), shader_ref(""), position(0.0f, 0.0f), scale(1.0f, 1.0f), rotation(0.0f), mdl_to_ndc_xform(1.f) {}
 
-		Object(const std::string& mdl, const std::string& shdr, Vector2 pos = Vector2(0.0f, 0.0f), Vector2 scl = Vector2(1.0f, 1.0f), float rot = 0, glm::mat3 xform = 1.0f);
+		Object(const std::string& mdl, const std::string& shdr, Vector2 pos = Vector2(0.0f, 0.0f), Vector2 scl = Vector2(1.0f, 1.0f), float rot = 0, Matrix33::Matrix_33 xform = 1.f);
 
 		// Getters and setters
 		std::string getModelRef() const;
@@ -43,8 +43,8 @@ class Object {
 		void setRot(float rot);
 		float getRot() const;
 
-		void setXform(glm::mat3 xform);
-		glm::mat3 getXform() const;
+		void setXform(Matrix33::Matrix_33 xform);
+		Matrix33::Matrix_33 getXform() const;
 
 		void update(float dt);
 

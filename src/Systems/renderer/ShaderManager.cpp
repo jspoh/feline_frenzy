@@ -143,12 +143,12 @@ void ShaderManager::setUniform(const std::string& shader_ref, const std::string&
 	}
 }
 
-void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const glm::mat3& value) {
+void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value) {
 
 	if (shader_programs.find(shader_ref) != shader_programs.end()) {
 		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
 		if (location >= 0) {
-			glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+			glUniformMatrix3fv(location, 1, GL_FALSE, &value(0,0));
 		}
 		else {
 			cerr << "Uniform location not found for: " << name << endl;

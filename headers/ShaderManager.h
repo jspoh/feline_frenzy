@@ -37,6 +37,6 @@ class ShaderManager {
 		// Uniform setter overload functions
 		void setUniform(const std::string& shader_ref, const std::string& name, int value);
 		void setUniform(const std::string& shader_ref, const std::string& name, float value);
-		void setUniform(const std::string& shader_ref, const std::string& name, const glm::mat3& value);
+		void setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value);
 
 };

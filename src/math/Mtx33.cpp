@@ -5,6 +5,23 @@
 using namespace Matrix33;
 constexpr float PI_OVER_180 = 0.0174532925199432f;;
 
+Matrix_33::Matrix_33(float m00, float m01, float m02,
+					float m10, float m11, float m12,
+					float m20, float m21, float m22)
+{
+	matrix_33[0][0] = m00; matrix_33[0][1] = m01; matrix_33[0][2] = m02;
+	matrix_33[1][0] = m10; matrix_33[1][1] = m11; matrix_33[1][2] = m12;
+	matrix_33[2][0] = m20; matrix_33[2][1] = m21; matrix_33[2][2] = m22;
+}
+
+Matrix_33::Matrix_33(float val) {
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			matrix_33[i][j] = val;
+		}
+	}
+}
+
 Matrix_33::Matrix_33(const float* pArr)
 {
 	for (size_t i = 0; i < matrix_33.size(); ++i)

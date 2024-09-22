@@ -14,7 +14,7 @@ layout (location=0) out vec3 f_color;
 uniform mat3 model_to_ndc;
 
 void main() {
-//	gl_Position = vec4(a_position, 0.0, 1.0);
+	//	gl_Position = vec4(a_position, 0.0, 1.0); no uniform
 	gl_Position = vec4( vec2(model_to_ndc * vec3(a_position, 1.f)), 0.0, 1.0);
 	f_color = a_color;
 }

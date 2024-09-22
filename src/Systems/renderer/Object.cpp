@@ -11,7 +11,7 @@
 #include "RenderManager.h"
 
 
-Object::Object(const std::string& mdl, const std::string& shdr, Vector2 pos, Vector2 scl, float rot, glm::mat3 xform)
+Object::Object(const std::string& mdl, const std::string& shdr, Vector2 pos, Vector2 scl, float rot, Matrix33::Matrix_33 xform)
 	: model_ref(mdl), shader_ref(shdr), position(pos), scale(scl), rotation(rot), mdl_to_ndc_xform(xform) {}
 
 std::string Object::getModelRef() const {
@@ -45,20 +45,20 @@ float Object::getRot() const {
 	return rotation;
 }
 
-void Object::setXform(glm::mat3 xform) {
+void Object::setXform(Matrix33::Matrix_33 xform) {
 	mdl_to_ndc_xform = xform;
 }
 
-glm::mat3 Object::getXform() const {
+Matrix33::Matrix_33 Object::getXform() const {
 	return mdl_to_ndc_xform;
 }
 
 
 void Object::update(float dt) {
 
-	glm::mat3 model_mat, world_to_ndc_mat, trans_rot_mat, scale_mat;
+	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, trans_rot_mat, scale_mat;
 	// Scaling matrix
-	scale_mat = glm::mat3{
+	scale_mat = Matrix33::Matrix_33{
 		scale.x, 0, 0,
 		0, scale.y, 0,
 		0,         0, 1,
@@ -70,9 +70,8 @@ void Object::update(float dt) {
 
 		rotation += 0.01;
 	}
-
 	// Translate and rotate matrix
-	trans_rot_mat = glm::mat3{
+	trans_rot_mat = Matrix33::Matrix_33{
 		cos(angleDisp), sin(angleDisp), 0,
 		-sin(angleDisp), cos(angleDisp),  0,
 		position.x, position.y, 1,

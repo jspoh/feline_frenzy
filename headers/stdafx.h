@@ -39,6 +39,7 @@
 // our completed headers
 #include "Vector2.h"
 #include "Vector4.h"
+#include "Mtx33.h"
 
 
 class NullStream {
