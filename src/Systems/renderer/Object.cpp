@@ -10,6 +10,8 @@
 #include "Object.h"
 #include "RenderManager.h"
 
+using namespace Matrix33;
+
 
 Object::Object(const std::string& mdl, const std::string& shdr, Vector2 pos, Vector2 scl, float rot, Matrix33::Matrix_33 xform)
 	: model_ref(mdl), shader_ref(shdr), position(pos), scale(scl), rotation(rot), mdl_to_ndc_xform(xform) {}
@@ -56,7 +58,7 @@ Matrix33::Matrix_33 Object::getXform() const {
 
 void Object::update(float dt) {
 
-	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, trans_rot_mat, scale_mat;
+	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, result, scale_mat, rot_mat, trans_mat;
 	// Scaling matrix
 	scale_mat = Matrix33::Matrix_33{
 		scale.x, 0, 0,
@@ -71,14 +73,20 @@ void Object::update(float dt) {
 		rotation += 0.01;
 	}
 	// Translate and rotate matrix
-	trans_rot_mat = Matrix33::Matrix_33{
-		cos(angleDisp), sin(angleDisp), 0,
-		-sin(angleDisp), cos(angleDisp),  0,
-		position.x, position.y, 1,
-	};
+	//trans_rot_mat = Matrix33::Matrix_33{
+	//	cos(angleDisp), sin(angleDisp), 0,
+	//	-sin(angleDisp), cos(angleDisp),  0,
+	//	position.x, position.y, 1,
+	//};
 
-	model_mat = trans_rot_mat * scale_mat;
+	Matrix_33Rot(rot_mat, angleDisp);
+	Matrix_33Scale(scale_mat, scale.x, scale.y);
+	Matrix_33Translate(trans_mat, position.x, position.y);
 
+	result = trans_mat * rot_mat * scale_mat;
+
+	// For GLM to use, need transpose after T*R*S
+	Matrix_33Transpose(model_mat, result);
 
 	mdl_to_ndc_xform = model_mat;
 }
