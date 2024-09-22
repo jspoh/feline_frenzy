@@ -42,7 +42,7 @@ void RenderManager::registerModel(const std::string& model_ref, const std::strin
 }
 
 // Constructs an object and places it into the object map
-void RenderManager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector2& position, const Vector2& scale, float rotation) {
+void RenderManager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color, const Vector2& position, const Vector2& scale, float orientation, float rotation) {
     // Check if the model exists before creating the object
     if (models.find(model_ref) == models.end()) {
         cerr << "Model not found: " << model_ref << endl;
@@ -50,7 +50,7 @@ void RenderManager::createObject(const std::string& object_ref, const std::strin
     }
 
     // !TODO each object should have its own shader ref
-    Object obj(model_ref, "base", position, scale, rotation);
+    Object obj(model_ref, "base", color, position, scale, orientation, rotation);
 
     objects[object_ref] = std::move(obj);
    
@@ -78,6 +78,7 @@ void RenderManager::drawObjects() {
     for (const auto& [object_ref, object] : objects) {
         shaderManager.useShader(object.getShaderRef());
 
+        shaderManager.setUniform(object.getShaderRef(), "f_color", object.getColor());
         shaderManager.setUniform(object.getShaderRef(), "model_to_ndc", object.getXform());
        
         object.draw();

@@ -13,8 +13,8 @@
 using namespace Matrix33;
 
 
-Object::Object(const std::string& mdl, const std::string& shdr, Vector2 pos, Vector2 scl, float rot, Matrix33::Matrix_33 xform)
-	: model_ref(mdl), shader_ref(shdr), position(pos), scale(scl), rotation(rot), mdl_to_ndc_xform(xform) {}
+Object::Object(const std::string& mdl, const std::string& shdr, Vector3 clr, Vector2 pos, Vector2 scl, float ori, float rot, Matrix33::Matrix_33 xform)
+	: model_ref(mdl), shader_ref(shdr), color(clr), position(pos), scale(scl), orientation(ori), rotation(rot), mdl_to_ndc_xform(xform) {}
 
 std::string Object::getModelRef() const {
 	return model_ref;
@@ -23,8 +23,16 @@ std::string Object::getShaderRef() const {
 	return shader_ref;
 }
 
-void Object::setPosition(const Vector2& pos) {
-	position = pos;
+void Object::setColor(const Vector3& clr) {
+	color = clr;
+}
+
+Vector3 Object::getColor() const {
+	return color;
+}
+
+void Object::setPosition(float x, float y) {
+	position = Vector2(x,y);
 }
 
 Vector2 Object::getPosition() const{
@@ -47,6 +55,14 @@ float Object::getRot() const {
 	return rotation;
 }
 
+void Object::setOrientation(float ori) {
+	orientation = ori;
+}
+
+float Object::getOrientation() const{
+	return orientation;
+}
+
 void Object::setXform(Matrix33::Matrix_33 xform) {
 	mdl_to_ndc_xform = xform;
 }
@@ -59,25 +75,10 @@ Matrix33::Matrix_33 Object::getXform() const {
 void Object::update(float dt) {
 
 	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, result, scale_mat, rot_mat, trans_mat;
-	// Scaling matrix
-	scale_mat = Matrix33::Matrix_33{
-		scale.x, 0, 0,
-		0, scale.y, 0,
-		0,         0, 1,
-	};
-
-	// !TODO add orientation
-	float angleDisp = rotation;
-	if (rotation != 0) {
-
-		rotation += 0.01;
-	}
-	// Translate and rotate matrix
-	//trans_rot_mat = Matrix33::Matrix_33{
-	//	cos(angleDisp), sin(angleDisp), 0,
-	//	-sin(angleDisp), cos(angleDisp),  0,
-	//	position.x, position.y, 1,
-	//};
+	
+	// Modulus the object rotation so it doesnt result in a large number overtime
+	orientation = fmod(orientation, 360.f);
+	float angleDisp = (orientation += rotation) * PI / 180;
 
 	Matrix_33Rot(rot_mat, angleDisp);
 	Matrix_33Scale(scale_mat, scale.x, scale.y);
@@ -85,10 +86,11 @@ void Object::update(float dt) {
 
 	result = trans_mat * rot_mat * scale_mat;
 
-	// For GLM to use, need transpose after T*R*S
+	// OpenGL requires matrix in col maj so transpose
 	Matrix_33Transpose(model_mat, result);
 
 	mdl_to_ndc_xform = model_mat;
+	
 }
 
 void Object::draw() const {

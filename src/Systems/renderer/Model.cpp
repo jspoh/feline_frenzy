@@ -34,10 +34,6 @@ bool Model::loadMesh(const std::string& path_to_mesh) {
 	std::vector<Vector2> vertices;
 	vertices.reserve(vertex_count);
 
-	// color
-	std::vector<Vector4> colors;
-	colors.reserve(vertex_count);
-
 	// indices (indexed rendering with element buffer object)
 	std::vector<unsigned int> indices;
 	indices.reserve(index_count);
@@ -53,16 +49,6 @@ bool Model::loadMesh(const std::string& path_to_mesh) {
 				>> ndc_x >> placeholder
 				>> ndc_y;
 			vertices.emplace_back(ndc_x, ndc_y);
-			break;
-		}
-		case 'c': {
-			float r, g, b, a;
-			mesh_file
-				>> r >> placeholder
-				>> g >> placeholder
-				>> b >> placeholder
-				>> a;
-			colors.emplace_back(r, g, b, a);
 			break;
 		}
 		case 'i': {
@@ -90,21 +76,20 @@ bool Model::loadMesh(const std::string& path_to_mesh) {
 		throw std::exception();
 	}
 
-	createBuffers(vertices, colors, indices);
+	createBuffers(vertices, indices);
 	draw_count = index_count;
 
 	return true;
 }
 
-void Model::createBuffers(const std::vector<Vector2>& vertices, const std::vector<Vector4>& colors, const std::vector<unsigned int>& indices) {
+void Model::createBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices) {
 	// VBO (Vertex Buffer Object)
 	glCreateBuffers(1, &vboid);
 	glNamedBufferStorage(vboid,
-		sizeof(Vector2) * vertices.size() + sizeof(Vector4) * colors.size(),
+		sizeof(Vector2) * vertices.size(),
 		nullptr, // nullptr means no data is transferred
 		GL_DYNAMIC_STORAGE_BIT);
 	glNamedBufferSubData(vboid, 0, sizeof(Vector2) * vertices.size(), vertices.data());
-	glNamedBufferSubData(vboid, vertices.size() * sizeof(Vector2), colors.size() * sizeof(Vector4), colors.data());
 
 	// VAO (Vertex Array Object)
 	glCreateVertexArrays(1, &vaoid);
@@ -115,11 +100,7 @@ void Model::createBuffers(const std::vector<Vector2>& vertices, const std::vecto
 	glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
 	glVertexArrayAttribBinding(vaoid, 0, 0);
 
-	// Vertex Color Array
-	glEnableVertexArrayAttrib(vaoid, 1); // vertex attribute index 1
-	glVertexArrayVertexBuffer(vaoid, 1, vboid, sizeof(Vector2) * vertices.size(), sizeof(Vector4)); // buffer binding point 1
-	glVertexArrayAttribFormat(vaoid, 1, 4, GL_FLOAT, GL_FALSE, 0);
-	glVertexArrayAttribBinding(vaoid, 1, 1);
+	// REMOVED Vertex Color Array (Using uniform to pass color)
 
 	// Create EBO
 	glCreateBuffers(1, &eboid);
