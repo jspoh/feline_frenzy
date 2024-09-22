@@ -32,7 +32,7 @@ namespace Input {
 	class Manager : public System::Base {
 	private:
 
-		//Private Constructor
+		//Private Default Constructor
 		Manager() = default;
 
 		//Delete Copy Constructor & Copy Assignment

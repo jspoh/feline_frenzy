@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Managers\Component.cpp" />
+    <ClCompile Include="src\Managers\Entity.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
     <ClCompile Include="src\Systems\RenderManager.cpp" />
     <ClCompile Include="src\Systems\StateManager.cpp" />
@@ -34,8 +36,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Component.h" />
     <ClInclude Include="headers\db.h" />
     <ClInclude Include="headers\Engine.h" />
+    <ClInclude Include="headers\Entity.h" />
     <ClInclude Include="headers\InputSystem.h" />
     <ClInclude Include="headers\json.hpp" />
     <ClInclude Include="headers\MenuState.h" />

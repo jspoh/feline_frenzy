@@ -11,7 +11,6 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
-#include "stdafx.h"
 #include "System.h"
 
 namespace Core {
