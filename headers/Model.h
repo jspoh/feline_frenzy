@@ -24,5 +24,5 @@ class Model {
 		void draw() const;
 
 	private:
-		void createBuffers(const std::vector<Vector2>& vertices, const std::vector<Vector4>& colors, const std::vector<unsigned int>& indices);
+		void createBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices);
 };

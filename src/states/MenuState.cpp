@@ -13,7 +13,7 @@
 #include "RenderManager.h"
 
 
-#define PI 3.14F
+
 
 MenuState::MenuState() {
 	StateManager::getInstance().register_state("main_menu", this);
@@ -34,15 +34,20 @@ void MenuState::load() {
 }
 
 void MenuState::init() {
+
 	// init square obj with values
 	RenderManager::getInstance().createObject("obj1", "square");
 	Object* obj = RenderManager::getInstance().getObject("obj1");
 	obj->setScale(Vector2(0.8f, 0.8f));
 	obj->setRot(1.f);
+	obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
 	
 	// init triangle obj with values
-	RenderManager::getInstance().createObject("obj2", "triangle", Vector2(0.5,0.5), Vector2(0.5,0.5));
+	RenderManager::getInstance().createObject("obj2", "triangle",Vector3(0.f,1.f,1.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), 45.f);
 	
+	// Init camera (player)
+	RenderManager::getInstance().createObject("camera", "triangle", Vector3(0.f, 0.f, 0.f), Vector2(0.f, 0.f), Vector2(0.125f, 0.25f));
+
 	Matrix33::Matrix_33 test{}, test_scale{}, test_rot{}, temp{};
 	Matrix33::Matrix_33Translate(test,6,7);
 	Matrix33::Matrix_33Scale(test_scale, 3, 5);
@@ -54,6 +59,12 @@ void MenuState::init() {
 }
 
 void MenuState::update() {
+	Object* obj = RenderManager::getInstance().getObject("camera");
+	if (obj->getPosition().y <= 1) {
+		obj->setPosition(0, obj->getPosition().y + 0.005f);
+	}
+
+	// Updates all object tranformation
 	RenderManager::getInstance().updateObjects();
 }
 

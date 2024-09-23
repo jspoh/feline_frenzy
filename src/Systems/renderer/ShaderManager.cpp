@@ -158,3 +158,19 @@ void ShaderManager::setUniform(const std::string& shader_ref, const std::string&
 		cerr << "Shader program not found for: " << shader_ref << endl;
 	}
 }
+
+void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3& value) {
+
+	if (shader_programs.find(shader_ref) != shader_programs.end()) {
+		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
+		if (location >= 0) {
+			glUniform3fv(location, 1, &value.x);
+		}
+		else {
+			cerr << "Uniform location not found for: " << name << endl;
+		}
+	}
+	else {
+		cerr << "Shader program not found for: " << shader_ref << endl;
+	}
+}

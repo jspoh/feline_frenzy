@@ -48,10 +48,6 @@ public:
 	 * v 0.5,0.5
 	 * v -0.5,0.5
 	 * v -0.5,-0.5
-	 * c 1.0,0.0,0.0,1.0
-	 * c 0.0,1.0,0.0,1.0
-	 * c 0.0,0.0,1.0,1.0
-	 * c 1.0,1.0,1.0,1.0
 	 * i 0,1,2,2,3,0
 	 * 
 	 * 
@@ -65,11 +61,13 @@ public:
 	*  object has 
 	*  object_ref - key for map
 	*  model_ref - which model/mesh its referencing
+	*  color - color of object in Vec3
 	*  position - position of object (NDC Range x-axis [-1, 1], y-axis[-1,1])
 	*  scale - scale of object 
-	*  rotation - degrees (0-360)
+	*  rotation - how fast you want the object to spin degrees (-360f to 360f)
+	*  orientation - where the object is oriented in degrees (-360f to 360f)
 	* */
-	void createObject(const std::string& object_ref, const std::string& model_ref, const Vector2& position = Vector2(0.f,0.f), const Vector2& scale = Vector2(1.f, 1.f), float rotation = 0);
+	void createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color = Vector3(0.f, 0.f, 0.f), const Vector2& position = Vector2(0.f,0.f), const Vector2& scale = Vector2(1.f, 1.f), float orientation = 0, float rotation = 0);
 	/**
 	* returns an object pointer from the object map
 	* */
