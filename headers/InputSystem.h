@@ -29,7 +29,7 @@ namespace Input {
 		float scroll_y{};
 	};
 
-	class Manager : public System::Base {
+	class Manager : public System::ISystem {
 	private:
 
 		//Private Default Constructor

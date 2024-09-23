@@ -33,6 +33,7 @@
 #include <iterator>
 #include <bitset>
 #include <queue>
+#include <set>
 
 // external headers
 #include "json.hpp"

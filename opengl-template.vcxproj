@@ -23,6 +23,7 @@
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Managers\Component.cpp" />
     <ClCompile Include="src\Managers\Entity.cpp" />
+    <ClCompile Include="src\Managers\System.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
     <ClCompile Include="src\Systems\RenderManager.cpp" />
     <ClCompile Include="src\Systems\StateManager.cpp" />

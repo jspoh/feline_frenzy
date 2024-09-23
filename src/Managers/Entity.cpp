@@ -30,8 +30,8 @@ void Entity::Manager::destroyEntity(Entity::Type entity) {
 	avail_entities.push(entity);
 }
 
-Component::Signature Entity::Manager::getSignature(Entity::Type entity) const {
-	return entities.at(entity);
+void Entity::Manager::setSignature(Entity::Type entity, Component::Type signature) {
+	entities.at(entity) = signature;
 }
 
 int Entity::Manager::getEntityCount() const {

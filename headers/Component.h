@@ -13,24 +13,25 @@
 
 namespace Component {
 
-	class IMap {
+	//Component Array interface
+	class IArray {
 	private:
 	public:
-		virtual ~IMap() = default;
+		virtual ~IArray() = default;
 	};
 
-	//Component Map ( Entity Map of unique components of type T )
+	//Component Array ( Entity Map of unique components of type T )
 	template<typename T>
-	class Map : public IMap {
+	class Array : public IArray {
 	private:
 
 		//Unique component of same type identified by Entity type
-		std::unordered_map<Entity::Type, T> component_map;
+		std::unordered_map<Entity::Type, T> component_array;
 
 	public:
 
 		//Default constructor
-		Map() = default;
+		Array() = default;
 
 		//Add new component
 		void addComponent(Entity::Type entity, T&& component);
@@ -56,15 +57,15 @@ namespace Component {
 		//Map to component type ( used for signature setting )
 		std::unordered_map<std::string, Component::Type> component_types;
 
-		//Map to map of component type
-		std::unordered_map<std::string, std::shared_ptr<IMap>> component_maps;
+		//Map to array of component type
+		std::unordered_map<std::string, std::shared_ptr<IArray>> component_arrays;
 
 		//Private type casting for easy retrieval
 		template<typename T>
-		std::shared_ptr<Map<T>> getComponentMap() {
+		std::shared_ptr<Array<T>> getComponentArray() {
 			std::string type_name{ typeid(T).name() };
 
-			return std::static_pointer_cast<Map<T>>(component_maps.at(type_name));
+			return std::static_pointer_cast<Array<T>>(component_arrays.at(type_name));
 		}
 
 	public:
@@ -83,7 +84,7 @@ namespace Component {
 			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_count));
 
 			//Add component map
-			component_maps.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::move(std::make_shared<Map<T>>())));
+			component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::move(std::make_shared<Array<T>>())));
 
 			//Increment component count variable
 			component_count++;
@@ -96,7 +97,7 @@ namespace Component {
 			std::string type_name{ typeid(T).name() };
 
 			//Add component
-			getComponentMap<T>()->addComponent(entity, std::move(component));
+			getComponentArray<T>()->addComponent(entity, std::move(component));
 		}
 
 		//Remove component 
@@ -106,13 +107,13 @@ namespace Component {
 			std::string type_name{ typeid(T).name() };
 
 			//Remove component
-			getComponentMap<T>()->removeComponent(entity);
+			getComponentArray<T>()->removeComponent(entity);
 		}
 
 		//Retrieve component associated with entity type
 		template<typename T>
 		T& getComponent(Entity::Type entity) {
-			return getComponentMap<T>()->getComponent(entity);
+			return getComponentArray<T>()->getComponent(entity);
 		}
 		
 		//Get Component Type

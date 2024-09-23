@@ -45,13 +45,10 @@ namespace Entity {
 		void destroyEntity(Entity::Type entity);
 
 		//Set signature
-		template<typename T>
-		void setSignature(Entity::Type entity, T component) {
-			entities.at(entity).set(component, true);
-		}
+		void setSignature(Entity::Type entity, Component::Type signature);
 
 		//Get signature
-		Component::Signature getSignature(Entity::Type entity) const;
+		Component::Signature const& getSignature(Entity::Type entity) const;
 
 		//Get number of active entities
 		int getEntityCount() const;

@@ -11,6 +11,8 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include "Entity.h"
+#include "Component.h"
 #include "System.h"
 
 namespace Core {
@@ -32,8 +34,8 @@ namespace Core {
 		float actual_fps;
 
 		//Pointer to engine systems
-		std::vector<std::shared_ptr<System::Base>> systems;
-		std::unordered_map<std::string, std::shared_ptr<System::Base>> systems_map;
+		std::vector<std::shared_ptr<System::ISystem>> systems;
+		std::unordered_map<std::string, std::shared_ptr<System::ISystem>> systems_map;
 
 		//Default Constructor For Engine
 		Engine();
@@ -110,7 +112,7 @@ namespace Core {
 		 * \param index				index to insert system, if not specified or out of range
 		 *							system will be inserted at the back
 		 */
-		void addSystem(std::shared_ptr<System::Base> system, std::string const& sys_identifier, size_t index = std::string::npos);
+		void addSystem(std::shared_ptr<System::ISystem> system, std::string const& sys_identifier, size_t index = std::string::npos);
 
 		/**
 		 * Access system already within core engine
@@ -118,7 +120,7 @@ namespace Core {
 		 * \param sys_identifier	system identifier
 		 *
 		 */
-		std::shared_ptr<System::Base> accessSystem(std::string const& sys_identifier);
+		std::shared_ptr<System::ISystem> accessSystem(std::string const& sys_identifier);
 	};
 
 	//Predefined name for core engine

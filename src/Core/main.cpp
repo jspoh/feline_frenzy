@@ -21,7 +21,7 @@ int main() {
 
 	//Add Input System
 	Input::Manager::getInstance().init();
-	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::Base*) {}), "Input");
+	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::ISystem*) {}), "Input");
 
 	//Engine Game Loop
 	NIKEEngine.run();

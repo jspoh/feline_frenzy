@@ -209,7 +209,7 @@ float Core::Engine::getDeltaTime() const {
 	return delta_time;
 }
 
-void Core::Engine::addSystem(std::shared_ptr<System::Base> system, std::string const& sys_identifier, size_t index) {
+void Core::Engine::addSystem(std::shared_ptr<System::ISystem> system, std::string const& sys_identifier, size_t index) {
 
 	//Check if system has already been created
 	if (systems_map.find(sys_identifier) != systems_map.end()) {
@@ -231,6 +231,6 @@ void Core::Engine::addSystem(std::shared_ptr<System::Base> system, std::string c
 	systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_identifier), std::forward_as_tuple(system));
 }
 
-std::shared_ptr<System::Base> Core::Engine::accessSystem(std::string const& sys_identifier) {
+std::shared_ptr<System::ISystem> Core::Engine::accessSystem(std::string const& sys_identifier) {
 	return systems_map.at(sys_identifier);
 }

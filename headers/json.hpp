@@ -2601,12 +2601,12 @@ JSON_HEDLEY_DIAGNOSTIC_POP
              template<typename> class AllocatorType,                       \
              template<typename, typename = void> class JSONSerializer,     \
              class BinaryType,                                             \
-             class CustomBaseClass>
+             class CustomISystemClass>
 
 #define NLOHMANN_BASIC_JSON_TPL                                            \
     basic_json<ObjectType, ArrayType, StringType, BooleanType,             \
     NumberIntegerType, NumberUnsignedType, NumberFloatType,                \
-    AllocatorType, JSONSerializer, BinaryType, CustomBaseClass>
+    AllocatorType, JSONSerializer, BinaryType, CustomISystemClass>
 
 // Macros to simplify conversion from/to types
 
@@ -3407,7 +3407,7 @@ NLOHMANN_JSON_NAMESPACE_END
     template<typename T, typename SFINAE = void> class JSONSerializer =
     adl_serializer,
     class BinaryType = std::vector<std::uint8_t>, // cppcheck-suppress syntaxError
-    class CustomBaseClass = void>
+    class CustomISystemClass = void>
     class basic_json;
 
     /// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
@@ -6302,7 +6302,7 @@ class iterator_input_adapter
     IteratorType current;
     IteratorType end;
 
-    template<typename BaseInputAdapter, size_t T>
+    template<typename ISystemInputAdapter, size_t T>
     friend struct wide_string_input_helper;
 
     bool empty() const
@@ -6311,14 +6311,14 @@ class iterator_input_adapter
     }
 };
 
-template<typename BaseInputAdapter, size_t T>
+template<typename ISystemInputAdapter, size_t T>
 struct wide_string_input_helper;
 
-template<typename BaseInputAdapter>
-struct wide_string_input_helper<BaseInputAdapter, 4>
+template<typename ISystemInputAdapter>
+struct wide_string_input_helper<ISystemInputAdapter, 4>
 {
     // UTF-32
-    static void fill_buffer(BaseInputAdapter& input,
+    static void fill_buffer(ISystemInputAdapter& input,
                             std::array<std::char_traits<char>::int_type, 4>& utf8_bytes,
                             size_t& utf8_bytes_index,
                             size_t& utf8_bytes_filled)
@@ -6372,11 +6372,11 @@ struct wide_string_input_helper<BaseInputAdapter, 4>
     }
 };
 
-template<typename BaseInputAdapter>
-struct wide_string_input_helper<BaseInputAdapter, 2>
+template<typename ISystemInputAdapter>
+struct wide_string_input_helper<ISystemInputAdapter, 2>
 {
     // UTF-16
-    static void fill_buffer(BaseInputAdapter& input,
+    static void fill_buffer(ISystemInputAdapter& input,
                             std::array<std::char_traits<char>::int_type, 4>& utf8_bytes,
                             size_t& utf8_bytes_index,
                             size_t& utf8_bytes_filled)
@@ -6435,13 +6435,13 @@ struct wide_string_input_helper<BaseInputAdapter, 2>
 };
 
 // Wraps another input adapter to convert wide character types into individual bytes.
-template<typename BaseInputAdapter, typename WideCharType>
+template<typename ISystemInputAdapter, typename WideCharType>
 class wide_string_input_adapter
 {
   public:
     using char_type = char;
 
-    wide_string_input_adapter(BaseInputAdapter base)
+    wide_string_input_adapter(ISystemInputAdapter base)
         : base_adapter(base) {}
 
     typename std::char_traits<char>::int_type get_character() noexcept
@@ -6462,12 +6462,12 @@ class wide_string_input_adapter
     }
 
   private:
-    BaseInputAdapter base_adapter;
+    ISystemInputAdapter base_adapter;
 
     template<size_t T>
     void fill_buffer()
     {
-        wide_string_input_helper<BaseInputAdapter, T>::fill_buffer(base_adapter, utf8_bytes, utf8_bytes_index, utf8_bytes_filled);
+        wide_string_input_helper<ISystemInputAdapter, T>::fill_buffer(base_adapter, utf8_bytes, utf8_bytes_index, utf8_bytes_filled);
     }
 
     /// a buffer for UTF-8 bytes
@@ -13649,7 +13649,7 @@ namespace detail
 /*!
 @brief a template for a reverse iterator class
 
-@tparam Base the base iterator type to reverse. Valid types are @ref
+@tparam ISystem the base iterator type to reverse. Valid types are @ref
 iterator (to create @ref reverse_iterator) and @ref const_iterator (to
 create @ref const_reverse_iterator).
 
@@ -13659,20 +13659,20 @@ create @ref const_reverse_iterator).
   The iterator that can be moved can be moved in both directions (i.e.
   incremented and decremented).
 - [OutputIterator](https://en.cppreference.com/w/cpp/named_req/OutputIterator):
-  It is possible to write to the pointed-to element (only if @a Base is
+  It is possible to write to the pointed-to element (only if @a ISystem is
   @ref iterator).
 
 @since version 1.0.0
 */
-template<typename Base>
-class json_reverse_iterator : public std::reverse_iterator<Base>
+template<typename ISystem>
+class json_reverse_iterator : public std::reverse_iterator<ISystem>
 {
   public:
     using difference_type = std::ptrdiff_t;
     /// shortcut to the reverse iterator adapter
-    using base_iterator = std::reverse_iterator<Base>;
+    using base_iterator = std::reverse_iterator<ISystem>;
     /// the reference type for the pointed-to element
-    using reference = typename Base::reference;
+    using reference = typename ISystem::reference;
 
     /// create reverse iterator from iterator
     explicit json_reverse_iterator(const typename base_iterator::iterator_type& it) noexcept
@@ -13736,7 +13736,7 @@ class json_reverse_iterator : public std::reverse_iterator<Base>
     }
 
     /// return the key of an object iterator
-    auto key() const -> decltype(std::declval<Base>().key())
+    auto key() const -> decltype(std::declval<ISystem>().key())
     {
         auto it = --this->base();
         return it.key();
@@ -19397,7 +19397,7 @@ The invariants are checked by member function assert_invariant().
 */
 NLOHMANN_BASIC_JSON_TPL_DECLARATION
 class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
-    : public ::nlohmann::detail::json_base_class<CustomBaseClass>
+    : public ::nlohmann::detail::json_base_class<CustomISystemClass>
 {
   private:
     template<detail::value_t> friend struct detail::external_constructor;
@@ -19424,7 +19424,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// workaround type for MSVC
     using basic_json_t = NLOHMANN_BASIC_JSON_TPL;
-    using json_base_class_t = ::nlohmann::detail::json_base_class<CustomBaseClass>;
+    using json_base_class_t = ::nlohmann::detail::json_base_class<CustomISystemClass>;
 
   JSON_PRIVATE_UNLESS_TESTED:
     // convenience aliases for types residing in namespace detail;
@@ -19450,7 +19450,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     using iter_impl = ::nlohmann::detail::iter_impl<BasicJsonType>;
     template<typename Iterator>
     using iteration_proxy = ::nlohmann::detail::iteration_proxy<Iterator>;
-    template<typename Base> using json_reverse_iterator = ::nlohmann::detail::json_reverse_iterator<Base>;
+    template<typename ISystem> using json_reverse_iterator = ::nlohmann::detail::json_reverse_iterator<ISystem>;
 
     template<typename CharType>
     using output_adapter_t = ::nlohmann::detail::output_adapter_t<CharType>;
