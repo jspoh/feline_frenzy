@@ -47,9 +47,6 @@ namespace Component {
 	class Manager {
 	private:
 
-		//Private Default Constructor
-		Manager() = default;
-
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
@@ -70,6 +67,9 @@ namespace Component {
 
 	public:
 
+		//Default Constructor
+		Manager() = default;
+
 		//Register component with manager
 		template<typename T>
 		void registerComponent() {
@@ -79,6 +79,9 @@ namespace Component {
 
 			//Component type name
 			std::string type_name{ typeid(T).name() };
+
+			//Check if component has been registered before
+			assert(component_types.find(type_name) == component_types.end() && "Component already registered.");
 
 			//Add component type
 			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_count));
@@ -92,7 +95,7 @@ namespace Component {
 
 		//Add component associated with entity type
 		template<typename T>
-		void addComponent(Entity::Type entity, T&& component) {
+		void addEntityComponent(Entity::Type entity, T&& component) {
 			//Component type name
 			std::string type_name{ typeid(T).name() };
 
@@ -100,9 +103,9 @@ namespace Component {
 			getComponentArray<T>()->addComponent(entity, std::move(component));
 		}
 
-		//Remove component 
+		//Remove component associated with entity type
 		template<typename T>
-		void addComponent(Entity::Type entity) {
+		void removeEntityComponent(Entity::Type entity) {
 			//Component type name
 			std::string type_name{ typeid(T).name() };
 
@@ -112,7 +115,7 @@ namespace Component {
 
 		//Retrieve component associated with entity type
 		template<typename T>
-		T& getComponent(Entity::Type entity) {
+		T& getEntityComponent(Entity::Type entity) {
 			return getComponentArray<T>()->getComponent(entity);
 		}
 		
@@ -121,6 +124,9 @@ namespace Component {
 		Component::Type getComponentType() {
 			//Component type name
 			std::string type_name{ typeid(T).name() };
+
+			//Check if component has been registered
+			assert(component_types.find(type_name) != component_types.end() && "Component not yet registered.");
 
 			return component_types.at(type_name);
 		}

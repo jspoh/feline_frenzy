@@ -115,6 +115,10 @@ void Core::Engine::controlFPS() {
 }
 
 void Core::Engine::init(std::string const& file_path, int fps) {
+	entity_manager = std::make_unique<Entity::Manager>();
+	component_manager = std::make_unique<Component::Manager>();
+	system_manager = std::make_unique<System::Manager>();
+
 	//Read config file
 	readConfigFile(file_path);
 
@@ -147,11 +151,7 @@ void Core::Engine::run() {
 		setWinTitle(window_title + " | " + std::to_string(actual_fps) + " fps");
 
 		//Update all systems
-		for (auto& system : systems) {
-			if (system->getActiveState()) {
-				system->update();
-			}
-		}
+		system_manager->updateSystems();
 
 		//To disable v-sync ( testing fps control )
 		//glfwSwapInterval(0);
@@ -209,28 +209,21 @@ float Core::Engine::getDeltaTime() const {
 	return delta_time;
 }
 
-void Core::Engine::addSystem(std::shared_ptr<System::ISystem> system, std::string const& sys_identifier, size_t index) {
-
-	//Check if system has already been created
-	if (systems_map.find(sys_identifier) != systems_map.end()) {
-		return;
-	}
-
-	//Check for index
-	if (index == std::string::npos && index >= systems.size()) {
-		//Insert system at back
-		systems.push_back(system);
-	}
-	else {
-		//Insert system
-		auto it = systems.begin();
-		systems.insert(it + index, system);
-	}
-
-	//Emplace shared pointer to system in map
-	systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_identifier), std::forward_as_tuple(system));
+/*****************************************************************//**
+* Entity Methods
+*********************************************************************/
+Entity::Type Core::Engine::createEntity() {
+	return entity_manager->createEntity();
 }
 
-std::shared_ptr<System::ISystem> Core::Engine::accessSystem(std::string const& sys_identifier) {
-	return systems_map.at(sys_identifier);
+void Core::Engine::destroyEntity(Entity::Type entity) {
+	entity_manager->destroyEntity(entity);
 }
+
+/*****************************************************************//**
+* Comonent Methods
+*********************************************************************/
+
+/*****************************************************************//**
+* System Methods
+*********************************************************************/

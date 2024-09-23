@@ -18,6 +18,9 @@ Entity::Manager::Manager() {
 
 Entity::Type Entity::Manager::createEntity() {
 
+	//Check if entity has reached the max limit
+	assert(!avail_entities.empty() && "Too many entities created.");
+
 	//Construct a new entity into entities map
 	Entity::Type id{ avail_entities.front() };
 	entities.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple());
@@ -26,12 +29,28 @@ Entity::Type Entity::Manager::createEntity() {
 }
 
 void Entity::Manager::destroyEntity(Entity::Type entity) {
+	//Check if entity has alr been created
+	assert(entities.find(entity) != entities.end() && "Entity not found.");
+
+	//Erase entity and push into avail entities
 	entities.erase(entity);
 	avail_entities.push(entity);
 }
 
 void Entity::Manager::setSignature(Entity::Type entity, Component::Type signature) {
+	//Check if entity has alr been created
+	assert(entities.find(entity) != entities.end() && "Entity not found.");
+
+	//Set Signature
 	entities.at(entity) = signature;
+}
+
+Component::Signature const& Entity::Manager::getSignature(Entity::Type entity) const {
+	//Check if entity has alr been created
+	assert(entities.find(entity) != entities.end() && "Entity not found.");
+
+	//Get Signature
+	return entities.at(entity);
 }
 
 int Entity::Manager::getEntityCount() const {

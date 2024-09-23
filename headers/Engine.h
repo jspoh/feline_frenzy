@@ -19,6 +19,16 @@ namespace Core {
 
 	class Engine {
 	private:
+
+		//Default Constructor For Engine
+		Engine();
+
+		//Delete Copy Constructor & Copy Assignment
+		Engine(Engine const& copy) = delete;
+		void operator=(Engine const& copy) = delete;
+
+		//Destructor
+		~Engine();
 		
 		//Engine Variables
 		GLFWwindow* ptr_window;
@@ -33,19 +43,10 @@ namespace Core {
 		int target_fps;
 		float actual_fps;
 
-		//Pointer to engine systems
-		std::vector<std::shared_ptr<System::ISystem>> systems;
-		std::unordered_map<std::string, std::shared_ptr<System::ISystem>> systems_map;
-
-		//Default Constructor For Engine
-		Engine();
-
-		//Delete Copy Constructor & Copy Assignment
-		Engine(Engine const& copy) = delete;
-		void operator=(Engine const& copy) = delete;
-
-		//Destructor
-		~Engine();
+		//Managers
+		std::unique_ptr<Entity::Manager> entity_manager;
+		std::unique_ptr<Component::Manager> component_manager;
+		std::unique_ptr<System::Manager> system_manager;
 
 		/**
 		 * Read & Deserialize Data From Config File
@@ -104,23 +105,79 @@ namespace Core {
 		//Get Delta Time
 		float getDeltaTime() const;
 
-		/**
-		 * Add new system into core engine
-		 *
-		 * \param system			shared pointer to new system
-		 * \param sys_identifier	system identifier
-		 * \param index				index to insert system, if not specified or out of range
-		 *							system will be inserted at the back
-		 */
-		void addSystem(std::shared_ptr<System::ISystem> system, std::string const& sys_identifier, size_t index = std::string::npos);
+		/*****************************************************************//**
+		* Entity Methods
+		*********************************************************************/
+		//Create Entity
+		Entity::Type createEntity();
 
-		/**
-		 * Access system already within core engine
-		 *
-		 * \param sys_identifier	system identifier
-		 *
-		 */
-		std::shared_ptr<System::ISystem> accessSystem(std::string const& sys_identifier);
+		//Destroy Entity
+		void destroyEntity(Entity::Type entity);
+
+		/*****************************************************************//**
+		* Comonent Methods
+		*********************************************************************/
+		template<typename T>
+		void registerComponent() {
+			component_manager->registerComponent<T>();
+		}
+
+		template<typename T>
+		void addEntityComponent(Entity::Type entity, T component) {
+
+			//Add component
+			component_manager->addEntityComponent<T>(entity, component);
+
+			//Set bit signature of component to true
+			Component::Signature sign = entity_manager->getSignature(entity);
+			sign.set(component_manager->getComponentType<T>(), true);
+			entity_manager->setSignature(entity, sign);
+
+			//Update entities list
+			system_manager->updateEntitiesList(entity, sign);
+		}
+
+		template<typename T>
+		void removeEntityComponent(Entity::Type entity) {
+			//Remove component
+			component_manager->removeEntityComponent<T>(entity);
+
+			//Set bit signature of component to false
+			Component::Signature sign = entity_manager->getSignature(entity);
+			sign.set(component_manager->getComponentType<T>(), false);
+			entity_manager->setSignature(entity, sign);
+
+			//Update entities list
+			system_manager->updateEntitiesList(entity, sign);
+		}
+
+		template<typename T>
+		T& getEntityComponent(Entity::Type entity) {
+			return component_manager->getEntityComponent<T>(entity);
+		}
+
+		template<typename T>
+		Component::Type getComponentType() {
+			return component_manager->getComponentType<T>();
+		}
+
+		/*****************************************************************//**
+		* System Methods
+		*********************************************************************/
+		template<typename T>
+		std::shared_ptr<T> addSystem()
+		{
+			return system_manager->addSystem<T>();
+		}
+
+		template<typename T>
+		void setSystemSignature(Component::Signature signature)
+		{
+			system_manager->setSignature<T>(signature);
+		}
+
+		//Update system entities list
+		void updateEntitiesList();
 	};
 
 	//Predefined name for core engine

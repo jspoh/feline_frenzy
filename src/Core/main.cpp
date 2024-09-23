@@ -19,9 +19,12 @@ int main() {
 	//Initialize Engine With Config File
 	NIKEEngine.init("src/Core/Config.txt", 60);
 
-	//Add Input System
-	Input::Manager::getInstance().init();
-	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::ISystem*) {}), "Input");
+	//For testing
+	//NIKEEngine.registerComponent<Vector2>();
+	//NIKEEngine.createEntity();
+
+	//Add Input Systemss
+	NIKEEngine.addSystem<Input::Manager>();
 
 	//Engine Game Loop
 	NIKEEngine.run();

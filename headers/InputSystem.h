@@ -32,9 +32,6 @@ namespace Input {
 	class Manager : public System::ISystem {
 	private:
 
-		//Private Default Constructor
-		Manager() = default;
-
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
@@ -53,6 +50,9 @@ namespace Input {
 		static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
 
 	public:
+		//Private Default Constructor
+		Manager() = default;
+
 		Mouse mouse{};
 
 		//Singleton Of Manager Class

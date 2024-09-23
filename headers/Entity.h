@@ -17,9 +17,6 @@ namespace Entity {
 	class Manager {
 	private:
 
-		//Default constructor
-		Manager();
-
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
@@ -32,11 +29,8 @@ namespace Entity {
 
 	public:
 
-		//Singleton Of Manager Class
-		static Manager& getInstance() {
-			static Manager instance;
-			return instance;
-		}
+		//Default constructor
+		Manager();
 
 		//Create Entity
 		Entity::Type createEntity();

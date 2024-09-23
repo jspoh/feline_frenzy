@@ -19,7 +19,7 @@ namespace System {
 		//System signature
 		Component::Signature c_id;
 
-		//System entities
+		//List of entities to update
 		std::set<Entity::Type> entities;
 
 		//System active
@@ -42,10 +42,16 @@ namespace System {
 		bool getActiveState() const;
 
 		//Set system signature
-		void setSignaure(Component::Signature signature);
+		void setSignature(Component::Signature signature);
 
 		//Get system signautre
 		Component::Signature getSignature() const;
+
+		//Add entity
+		void addEntity(Entity::Type entity);
+
+		//Remove Entity
+		void removeEntity(Entity::Type entity);
 
 		//Virtual Destructor
 		virtual ~ISystem() = default;
@@ -54,49 +60,51 @@ namespace System {
 	//System Manager
 	class Manager {
 	private:
-		//Private Default Constructor
-		Manager() = default;
 
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
 
-		//Pointer to engine systems in contiguous array
+		//Pointer to systems in contiguous array
 		std::vector<std::shared_ptr<System::ISystem>> systems;
 
 		//Map to systems for individual access
 		std::unordered_map<std::string, std::shared_ptr<System::ISystem>> systems_map;
 
+		//Private type casting for easy retrieval
+		template<typename T>
+		std::shared_ptr<T> getSystem() {
+			std::string type_name{ typeid(T).name() };
+
+			return std::static_pointer_cast<T>(systems_map.at(type_name));
+		}
+
 	public:
+
+		//Default Constructor
+		Manager() = default;
 
 		//Index for adding system is only if
 		template<typename T>
-		std::shared_ptr<T> addSystem(size_t index = std::string::npos) {
+		std::shared_ptr<T> addSystem() {
 
 			//System type name
-			std::string sys_name{ typeid(T).name };
+			std::string sys_name{ typeid(T).name() };
+
+			//Check if system has already been added
+			assert(systems_map.find(sys_name) == systems_map.end() && "System already registered.");
 
 			//System object
 			std::shared_ptr<T> system{ std::make_shared<T>() };
 
-			//Check if system has already been added
-			if (systems_map.find(sys_name) != systems_map.end()) {
-				return systems_map.at(sys_name);
-			}
-
-			//Check for index
-			if (index == std::string::npos && index >= systems.size()) {
-				//Insert system at back
-				systems.push_back(system);
-			}
-			else {
-				//Insert system
-				auto it = systems.begin();
-				systems.insert(it + index, system);
-			}
+			//Insert system at back
+			systems.push_back(system);
 
 			//Emplace shared pointer to system in map
-			systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_name), std::forward_as_tuple(std::move(system)));
+			systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_name), std::forward_as_tuple(system));
+
+			//Return system created
+			return system;
 		}
 
 		//Set signature of system
@@ -104,7 +112,7 @@ namespace System {
 		void setSignature(Component::Signature const& signature) {
 
 			//System type name
-			std::string sys_name{ typeid(T).name };
+			std::string sys_name{ typeid(T).name() };
 
 			//Set signature of system
 			systems_map.at(sys_name)->setSignaure(signature);
@@ -118,11 +126,11 @@ namespace System {
 		 */
 		template<typename T>
 		std::shared_ptr<T> accessSystem() {
-			//System type name
-			std::string sys_name{ typeid(T).name };
-
-			return systems_map.at(sys_name);
+			return getSystem<T>();
 		}
+
+		//Update entities list
+		void updateEntitiesList(Entity::Type entity, Component::Signature e_signature);
 
 		//Update all systems
 		void updateSystems();
