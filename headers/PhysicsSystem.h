@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Engine.h"
+#include "Object.h"
 
 namespace Physics {
 
@@ -37,6 +38,9 @@ namespace Physics {
 
 		//Update Inputs
 		void update() override;
+
+		//Move Object
+		void move(Object* object);
 
 		//Default Destructor
 		~Manager() override = default;

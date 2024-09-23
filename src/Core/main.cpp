@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "Engine.h"
 #include "InputSystem.h"
+#include "PhysicsSystem.h"
 
 // debug stuff
 bool DEBUG = false;
@@ -22,6 +23,10 @@ int main() {
 	//Add Input System
 	Input::Manager::getInstance().init();
 	NIKEEngine.addSystem(std::shared_ptr<Input::Manager>(&Input::Manager::getInstance(), [](System::Base*) {}), "Input");
+
+	//Add Physics System
+	Physics::Manager::getInstance().init();
+	NIKEEngine.addSystem(std::shared_ptr<Physics::Manager>(&Physics::Manager::getInstance(), [](System::Base*) {}), "Physics");
 
 	//Engine Game Loop
 	NIKEEngine.run();
