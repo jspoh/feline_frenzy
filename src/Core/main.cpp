@@ -19,12 +19,20 @@ int main() {
 	//Initialize Engine With Config File
 	NIKEEngine.init("src/Core/Config.txt", 60);
 
-	//For testing
-	//NIKEEngine.registerComponent<Vector2>();
-	//NIKEEngine.createEntity();
+	//Register input component
+	NIKEEngine.registerComponent<Input::Mouse>();
 
-	//Add Input Systemss
-	NIKEEngine.addSystem<Input::Manager>();
+	//Add Input Singleton System
+	NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
+
+	//Set system signature
+	Component::Signature sign;
+	sign.set(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.setSystemSignature<Input::Manager>(sign);
+
+	//Create entity with mouse component
+	Entity::Type e = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponent<Input::Mouse>(e, Input::Mouse());
 
 	//Engine Game Loop
 	NIKEEngine.run();

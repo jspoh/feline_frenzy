@@ -37,7 +37,7 @@ void Entity::Manager::destroyEntity(Entity::Type entity) {
 	avail_entities.push(entity);
 }
 
-void Entity::Manager::setSignature(Entity::Type entity, Component::Type signature) {
+void Entity::Manager::setSignature(Entity::Type entity, Component::Signature signature) {
 	//Check if entity has alr been created
 	assert(entities.find(entity) != entities.end() && "Entity not found.");
 

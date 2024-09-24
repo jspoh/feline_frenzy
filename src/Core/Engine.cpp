@@ -217,7 +217,11 @@ Entity::Type Core::Engine::createEntity() {
 }
 
 void Core::Engine::destroyEntity(Entity::Type entity) {
+
+	//Destroy all data related to entity
 	entity_manager->destroyEntity(entity);
+	component_manager->entityDestroyed(entity);
+	system_manager->entityDestroyed(entity);
 }
 
 /*****************************************************************//**

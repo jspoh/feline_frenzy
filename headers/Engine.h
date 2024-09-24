@@ -123,10 +123,10 @@ namespace Core {
 		}
 
 		template<typename T>
-		void addEntityComponent(Entity::Type entity, T component) {
+		void addEntityComponent(Entity::Type entity, T&& component) {
 
 			//Add component
-			component_manager->addEntityComponent<T>(entity, component);
+			component_manager->addEntityComponent<T>(entity, std::move(component));
 
 			//Set bit signature of component to true
 			Component::Signature sign = entity_manager->getSignature(entity);
@@ -165,9 +165,14 @@ namespace Core {
 		* System Methods
 		*********************************************************************/
 		template<typename T>
-		std::shared_ptr<T> addSystem()
+		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr)
 		{
-			return system_manager->addSystem<T>();
+			if (singleton_sys) {
+				return system_manager->registerSystem<T>(singleton_sys);
+			}
+			else {
+				return system_manager->registerSystem<T>();
+			}
 		}
 
 		template<typename T>
@@ -175,9 +180,6 @@ namespace Core {
 		{
 			system_manager->setSignature<T>(signature);
 		}
-
-		//Update system entities list
-		void updateEntitiesList();
 	};
 
 	//Predefined name for core engine

@@ -18,6 +18,9 @@ namespace Component {
 	private:
 	public:
 		virtual ~IArray() = default;
+
+		//Remove destroyed entity
+		virtual void entityDestroyed(Entity::Type entity) = 0;
 	};
 
 	//Component Array ( Entity Map of unique components of type T )
@@ -34,13 +37,36 @@ namespace Component {
 		Array() = default;
 
 		//Add new component
-		void addComponent(Entity::Type entity, T&& component);
+		void addComponent(Entity::Type entity, T&& component) {
+			//Check if entity has already been added
+			assert(component_array.find(entity) == component_array.end() && "Entity has already been added for this component.");
+
+			//Emplace component and entity
+			component_array.emplace(std::piecewise_construct, std::forward_as_tuple(entity), std::forward_as_tuple(std::move(component)));
+		}
 
 		//Remove existing component
-		void removeComponent(Entity::Type entity);
+		void removeComponent(Entity::Type entity) {
+			//Check if entity is present within components to delete
+			assert(component_array.find(entity) != component_array.end() && "Entity not found. Unable to remove.");
+
+			//Remove entitys
+			component_array.erase(entity);
+		}
 
 		//Get entity component data
-		T& getComponent(Entity::Type entity);
+		T& getComponent(Entity::Type entity) {
+			//Check if entity is present within components
+			assert(component_array.find(entity) != component_array.end() && "Entity not found. Unable to retrieve component array.");
+
+			//Return component array
+			return component_array.at(entity);
+		}
+
+		//Remove destroyed entity
+		void entityDestroyed(Entity::Type entity) override {
+			removeComponent(entity);
+		}
 	};
 
 	//Manager of the component Array
@@ -87,7 +113,7 @@ namespace Component {
 			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_count));
 
 			//Add component map
-			component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::move(std::make_shared<Array<T>>())));
+			component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::make_shared<Array<T>>()));
 
 			//Increment component count variable
 			component_count++;
@@ -128,8 +154,12 @@ namespace Component {
 			//Check if component has been registered
 			assert(component_types.find(type_name) != component_types.end() && "Component not yet registered.");
 
+			//Return component type
 			return component_types.at(type_name);
 		}
+
+		//Remove entity from all components
+		void entityDestroyed(Entity::Type entity);
 	};
 }
 

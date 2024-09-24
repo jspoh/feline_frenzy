@@ -39,7 +39,7 @@ namespace Entity {
 		void destroyEntity(Entity::Type entity);
 
 		//Set signature
-		void setSignature(Entity::Type entity, Component::Type signature);
+		void setSignature(Entity::Type entity, Component::Signature signature);
 
 		//Get signature
 		Component::Signature const& getSignature(Entity::Type entity) const;
@@ -48,6 +48,5 @@ namespace Entity {
 		int getEntityCount() const;
 	};
 }
-
 
 #endif //!ENTITY_HPP

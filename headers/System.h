@@ -15,7 +15,7 @@ namespace System {
 
 	//System interface
 	class ISystem {
-	private:
+	protected:
 		//System signature
 		Component::Signature c_id;
 
@@ -86,7 +86,7 @@ namespace System {
 
 		//Index for adding system is only if
 		template<typename T>
-		std::shared_ptr<T> addSystem() {
+		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr) {
 
 			//System type name
 			std::string sys_name{ typeid(T).name() };
@@ -95,7 +95,17 @@ namespace System {
 			assert(systems_map.find(sys_name) == systems_map.end() && "System already registered.");
 
 			//System object
-			std::shared_ptr<T> system{ std::make_shared<T>() };
+			std::shared_ptr<T> system;
+			
+			if (singleton_sys) {
+				system = singleton_sys;
+			}
+			else {
+				system = std::make_shared<T>();
+			}
+
+			//Init system
+			system->init();
 
 			//Insert system at back
 			systems.push_back(system);
@@ -107,6 +117,19 @@ namespace System {
 			return system;
 		}
 
+		//Set system state
+		template<typename T>
+		void setSystemState(bool state) {
+			//System type name
+			std::string sys_name{ typeid(T).name() };
+
+			//Check if system is present
+			assert(systems_map.find(sys_name) != systems_map.end() && "System not registered. Setting of state failed");
+
+			//Remove system
+			systems_map.at(sys_name)->setActiveState(state);
+		}
+
 		//Set signature of system
 		template<typename T>
 		void setSignature(Component::Signature const& signature) {
@@ -115,7 +138,7 @@ namespace System {
 			std::string sys_name{ typeid(T).name() };
 
 			//Set signature of system
-			systems_map.at(sys_name)->setSignaure(signature);
+			systems_map.at(sys_name)->setSignature(signature);
 		}
 
 		/**
@@ -131,6 +154,9 @@ namespace System {
 
 		//Update entities list
 		void updateEntitiesList(Entity::Type entity, Component::Signature e_signature);
+
+		//Remove entity from all systems
+		void entityDestroyed(Entity::Type entity);
 
 		//Update all systems
 		void updateSystems();

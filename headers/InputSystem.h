@@ -11,7 +11,6 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include "stdafx.h"
 #include "Engine.h"
 
 namespace Input {
@@ -27,6 +26,18 @@ namespace Input {
 		// most mousewheels will only scroll on y axis
 		float scroll_x{};
 		float scroll_y{};
+	};
+
+	//Input Mode
+	enum class KeyMode {
+		CHECK = GLFW_PRESS,
+		RELEASE = GLFW_RELEASE,
+		TRIGGERED
+	};
+
+	struct Key {
+
+
 	};
 
 	class Manager : public System::ISystem {
@@ -49,15 +60,17 @@ namespace Input {
 		static void mousepos_cb(GLFWwindow* window, double xpos, double ypos);
 		static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
 
+		//Input variables
+		Mouse mouse;
+
 	public:
-		//Private Default Constructor
+
+		//Default Constructor
 		Manager() = default;
 
-		Mouse mouse{};
-
 		//Singleton Of Manager Class
-		static Manager& getInstance() {
-			static Manager instance;
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
 			return instance;
 		}
 

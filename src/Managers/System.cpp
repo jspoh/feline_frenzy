@@ -52,6 +52,14 @@ void System::Manager::updateEntitiesList(Entity::Type entity, Component::Signatu
 	}
 }
 
+void System::Manager::entityDestroyed(Entity::Type entity) {
+
+	//Remove entity from all systems
+	for (auto& system : systems) {
+		system->removeEntity(entity);
+	}
+}
+
 void System::Manager::updateSystems() {
 
 	//Update all systems
