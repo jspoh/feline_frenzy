@@ -84,29 +84,37 @@ namespace CollisionUtils {
         float mouseY = Input::Manager::getInstance().mouse.y;
 
         // Calculate the boundaries of the rectangle
-        float left = center.x - width / 2.0f;
-        float right = center.x + width / 2.0f;
-        float top = center.y - height / 2.0f;
-        float bottom = center.y + height / 2.0f;
+        float left = center.x - (width / 2.0f);
+        float right = center.x + (width / 2.0f);
+        float top = center.y - (height / 2.0f);
+        float bottom = center.y + (height / 2.0f);
 
         // Check if the mouse is inside the rectangle
         if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
-            // Print where the mouse is relative to the center of the rectangle
-            if (mouseX < center.x)
-                cout << "Mouse is on the left side of the center." << endl;
-            else
-                cout << "Mouse is on the right side of the center." << endl;
 
-            if (mouseY < center.y)
-                cout << "Mouse is above the center." << endl;
-            else
-                cout << "Mouse is below the center." << endl;
+            // Check if the mouse is exactly at the center
+            if (mouseX == center.x && mouseY == center.y) {
+                cout << "Mouse is exactly at the center of the rectangle." << endl;
+            }
+            else {
+                // Print where the mouse is relative to the center of the rectangle
+                if (mouseX < center.x)
+                    cout << "Mouse is on the left side of the center." << endl;
+                else
+                    cout << "Mouse is on the right side of the center." << endl;
+
+                if (mouseY < center.y)
+                    cout << "Mouse is above the center." << endl;
+                else
+                    cout << "Mouse is below the center." << endl;
+            }
 
             return true;
         }
 
         return false;
     }
+
 
     // Detect if the mouse is inside a circular area
     bool detectMClickCircle(const Vector2& center, float radius) {
