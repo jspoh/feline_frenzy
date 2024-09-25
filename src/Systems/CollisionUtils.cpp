@@ -32,24 +32,31 @@ namespace CollisionUtils {
     }
 
     bool aabbRectRectCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b) {
-        // Check if the right side of A is to the left of the right side of B
-        // This ensures A is not completely to the left of B
-        bool x_overlap = (pos_a.x < pos_b.x + size_b.x);
+        // Step 1: Static collision detection
+        if (pos_a.x < pos_b.x + size_b.x &&
+            pos_a.x + size_a.x > pos_b.x &&
+            pos_a.y < pos_b.y + size_b.y &&
+            pos_a.y + size_a.y > pos_b.y) {
+            return true;  // Static collision detected
+        }
 
-        // Check if the left side of A is to the right of the left side of B
-        // This ensures A is not completely to the right of B
-        x_overlap = x_overlap && (pos_a.x + size_a.x > pos_b.x);
+        // Step 2: Dynamic collision detection using relative velocity
+        Vector2 relativeVel = vel_a - vel_b;
 
-        // Check if the top side of A is below the bottom side of B
-        // This ensures A is not completely above B
-        bool y_overlap = (pos_a.y < pos_b.y + size_b.y);
+        // Calculate time of collision along X-axis
+        float tFirstX = (pos_b.x - (pos_a.x + size_a.x)) / relativeVel.x;
+        float tLastX = ((pos_b.x + size_b.x) - pos_a.x) / relativeVel.x;
 
-        // Check if the bottom side of A is above the top side of B
-        // This ensures A is not completely below B
-        y_overlap = y_overlap && (pos_a.y + size_a.y > pos_b.y);
+        // Calculate time of collision along Y-axis
+        float tFirstY = (pos_b.y - (pos_a.y + size_a.y)) / relativeVel.y;
+        float tLastY = ((pos_b.y + size_b.y) - pos_a.y) / relativeVel.y;
 
-        // If both X-axis and Y-axis overlap conditions are true, the AABBs are colliding
-        return x_overlap && y_overlap;
+        // Ensure the collision happens within the valid time frame (tFirst <= tLast)
+        if (tFirstX > tLastY || tFirstY > tLastX) {
+            return false; // No dynamic collision
+        }
+
+        return true; // Dynamic collision detected
     }
 
 
