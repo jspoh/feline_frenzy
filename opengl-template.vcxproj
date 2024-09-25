@@ -23,6 +23,7 @@
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\math\Mtx33.cpp" />
     <ClCompile Include="src\math\Vector3.cpp" />
+    <ClCompile Include="src\Systems\renderer\Camera.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
     <ClCompile Include="src\Systems\PhysicsSystem.cpp" />
     <ClCompile Include="src\Systems\renderer\Model.cpp" />
@@ -40,6 +41,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Camera.h" />
     <ClInclude Include="headers\db.h" />
     <ClInclude Include="headers\Engine.h" />
     <ClInclude Include="headers\InputSystem.h" />

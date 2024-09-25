@@ -55,7 +55,7 @@ class Object {
 		void setXform(Matrix33::Matrix_33 xform);
 		Matrix33::Matrix_33 getXform() const;
 
-		void update(float dt);
+		void update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform);
 
 		void draw() const;
 };

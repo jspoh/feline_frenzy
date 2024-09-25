@@ -10,8 +10,10 @@
 
 #include "stdafx.h"
 #include "ShaderManager.h"
+#include "Engine.h"
 #include "Model.h"
 #include "Object.h"
+#include "Camera.h"
 
 
 class RenderManager {
@@ -21,6 +23,7 @@ private:
 
 
 	ShaderManager shaderManager;
+	std::unique_ptr<Camera> camera;
 
 public:
 
@@ -56,6 +59,9 @@ public:
 	 * \return success
 	 */
 	void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
+
+	void initCamera(const std::string& object_ref);
+
 	/**
 	*  creates an object and places it into a map of objects
 	*  object has 

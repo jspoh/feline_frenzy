@@ -9,7 +9,6 @@
 
 #include "stdafx.h"
 #include "RenderManager.h"
-#include "Engine.h"
 
 RenderManager::RenderManager() {
 	// compile shaders
@@ -27,6 +26,19 @@ RenderManager::~RenderManager() {
 RenderManager& RenderManager::getInstance() {
 	static RenderManager instance;
 	return instance;
+}
+
+
+void RenderManager::initCamera(const std::string& object_ref) {
+    if (objects.find(object_ref) == objects.end()) {
+        cerr << "Object not found: " << object_ref << endl;
+        return;
+    }
+
+    Object cam_obj = objects[object_ref];
+    camera = std::make_unique<Camera>();
+    camera->init(cam_obj);
+
 }
 
 // Adds a mesh / model into the model map
@@ -67,8 +79,13 @@ Object* RenderManager::getObject(const std::string& object_ref) {
 
 // Update all objects transform matrix
 void RenderManager::updateObjects() {
+
+
     for (auto& [object_ref, object] : objects) {
-        object.update(0);
+        if (object_ref == "camera") {
+            camera.get()->update(object);
+        }
+        object.update(0, camera->getWorldToNDCXform());
     }
 }
 
@@ -86,3 +103,4 @@ void RenderManager::drawObjects() {
     }
     shaderManager.unuseShader();
 }
+
