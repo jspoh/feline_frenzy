@@ -21,7 +21,7 @@
     <ClCompile Include="src\math\Vector2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\states\MenuState.cpp">
+    <ClCompile Include="src\Scenes\MenuScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\math\Vector4.cpp">
@@ -36,7 +36,7 @@
     <ClCompile Include="src\Systems\sysRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Managers\mState.cpp">
+    <ClCompile Include="src\Managers\mScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\main.cpp">
@@ -54,6 +54,9 @@
     <ClCompile Include="src\Managers\mSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scenes\SplashScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Core\stdafx.h">
@@ -68,13 +71,10 @@
     <ClInclude Include="headers\Math\Vector2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Managers\mState.h">
+    <ClInclude Include="headers\Managers\mScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\States\State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\States\MenuState.h">
+    <ClInclude Include="headers\Scenes\MenuScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\Systems\sysRender.h">
@@ -96,6 +96,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\Managers\mComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Scenes\SplashScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

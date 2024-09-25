@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   System.h
+ * \file   mSystem.h
  * \brief  System manager for ecs architecture
  *
  * \author ho
@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef SYSTEM_HPP
-#define SYSTEM_HPP
+#ifndef M_SYSTEM_HPP
+#define M_SYSTEM_HPP
 
 namespace System {
 
@@ -186,4 +186,4 @@ namespace System {
 	};
 }
 
-#endif //!SYSTEM_HPP
+#endif //!M_SYSTEM_HPP

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef COMPONENT_HPP
-#define COMPONENT_HPP
+#ifndef M_COMPONENT_HPP
+#define M_COMPONENT_HPP
 
 namespace Component {
 
@@ -172,4 +172,4 @@ namespace Component {
 	};
 }
 
-#endif // !COMPONENT_HPP
+#endif // !M_COMPONENT_HPP

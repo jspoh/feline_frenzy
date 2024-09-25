@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   InputManager.h
+ * \file   sysInput.cpp
  * \brief  input manager for engine
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu

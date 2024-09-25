@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef ENTITY_HPP
-#define ENTITY_HPP
+#ifndef M_ENTITY_HPP
+#define M_ENTITY_HPP
 
 namespace Entity {
 
@@ -49,4 +49,4 @@ namespace Entity {
 	};
 }
 
-#endif //!ENTITY_HPP
+#endif //!M_ENTITY_HPP

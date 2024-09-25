@@ -14,6 +14,7 @@
 #include "../headers/Managers/mEntity.h"
 #include "../headers/Managers/mComponent.h"
 #include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/mScene.h"
 
 namespace Core {
 
@@ -47,6 +48,7 @@ namespace Core {
 		std::unique_ptr<Entity::Manager> entity_manager;
 		std::unique_ptr<Component::Manager> component_manager;
 		std::unique_ptr<System::Manager> system_manager;
+		std::unique_ptr<Scenes::Manager> scene_manager;
 
 		/**
 		 * Read & Deserialize Data From Config File
@@ -191,6 +193,21 @@ namespace Core {
 		{
 			system_manager->addComponentType<T>(component);
 		}
+
+		/*****************************************************************//**
+		* Scene Methods
+		*********************************************************************/
+		//Register scenes
+		template<typename T>
+		void registerScenes(std::string const& scene_id) {
+			scene_manager->registerScenes<T>(scene_id);
+		}
+
+		//Set current scene
+		void changeScene(std::string const& scene_id);
+
+		//Go back to previous scene
+		void changePrevScene();
 	};
 
 	//Predefined name for core engine

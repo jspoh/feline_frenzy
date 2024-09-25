@@ -8,10 +8,6 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Core/Engine.h"
-#include "../headers/Managers/mState.h"
-
-// cannot set to 0 in case of division by 0!!
-//float Core::Engine::dt = 1.f;
 
 Core::Engine::Engine()
 	: ptr_window{ nullptr }, window_size{}, window_title{""}, delta_time{0.0f},
@@ -118,6 +114,7 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 	entity_manager = std::make_unique<Entity::Manager>();
 	component_manager = std::make_unique<Component::Manager>();
 	system_manager = std::make_unique<System::Manager>();
+	scene_manager = std::make_unique<Scenes::Manager>();
 
 	//Read config file
 	readConfigFile(file_path);
@@ -127,10 +124,6 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 
 	//Set Target FPS
 	target_fps = fps;
-
-	// initialize states
-	StateManager::getInstance().register_all_states();		// important!
-	StateManager::getInstance().set_active_state("main_menu");
 }
 
 void Core::Engine::run() {
@@ -143,21 +136,14 @@ void Core::Engine::run() {
 		//Poll system events ( Interativity with app )
 		glfwPollEvents();
 
-		//Set BG Color
-		glClearColor(1, 1, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		//Set Window Title
 		setWinTitle(window_title + " | " + std::to_string(actual_fps) + " fps");
 
 		//Update all systems
 		system_manager->updateSystems();
 
-		//To disable v-sync ( testing fps control )
-		//glfwSwapInterval(0);
-
-		//State Manager
-		StateManager::getInstance().run();
+		//State Manager render ( to be removed )
+		scene_manager->render();
 
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
@@ -225,9 +211,13 @@ void Core::Engine::destroyEntity(Entity::Type entity) {
 }
 
 /*****************************************************************//**
-* Comonent Methods
+* Scene Methods
 *********************************************************************/
 
-/*****************************************************************//**
-* System Methods
-*********************************************************************/
+void Core::Engine::changeScene(std::string const& scene_id) {
+	scene_manager->changeScene(scene_id);
+}
+
+void Core::Engine::changePrevScene() {
+	scene_manager->previousScene();
+}
