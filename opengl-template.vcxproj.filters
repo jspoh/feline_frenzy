@@ -30,10 +30,16 @@
     <ClCompile Include="src\Core\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\math\Mtx33.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Vector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Systems\InputSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Systems\RenderManager.cpp">
+    <ClCompile Include="src\Systems\renderer\RenderManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Systems\StateManager.cpp">
@@ -49,6 +55,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Systems\CollisionUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\renderer\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\renderer\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\renderer\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +101,7 @@
     <ClInclude Include="headers\InputSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\System.h">
+    <ClInclude Include="headers\Mtx33.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\CollisionSystem.h">
@@ -95,6 +110,19 @@
     <ClInclude Include="headers\CollisionUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Vector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Object.h">
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\textured_rendering.vert" />

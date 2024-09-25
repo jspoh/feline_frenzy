@@ -11,9 +11,13 @@
 
 #define _CRTDBG_MAP_ALLOC
 
+// CONSTANTS
+#define PI atan(1)*4
+
 // graphics headers
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include "glm/mat3x3.hpp"
 
 // standard headers
 #include <iostream>
@@ -37,7 +41,10 @@
 
 // our completed headers
 #include "Vector2.h"
+#include "Vector3.h"
 #include "Vector4.h"
+#include "Mtx33.h"
+
 
 class NullStream {
 public:

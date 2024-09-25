@@ -23,8 +23,13 @@
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Systems\CollisionSystem.cpp" />
     <ClCompile Include="src\Systems\CollisionUtils.cpp" />
+    <ClCompile Include="src\math\Mtx33.cpp" />
+    <ClCompile Include="src\math\Vector3.cpp" />
     <ClCompile Include="src\Systems\InputSystem.cpp" />
-    <ClCompile Include="src\Systems\RenderManager.cpp" />
+    <ClCompile Include="src\Systems\renderer\Model.cpp" />
+    <ClCompile Include="src\Systems\renderer\Object.cpp" />
+    <ClCompile Include="src\Systems\renderer\RenderManager.cpp" />
+    <ClCompile Include="src\Systems\renderer\ShaderManager.cpp" />
     <ClCompile Include="src\Systems\StateManager.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
@@ -43,12 +48,17 @@
     <ClInclude Include="headers\InputSystem.h" />
     <ClInclude Include="headers\json.hpp" />
     <ClInclude Include="headers\MenuState.h" />
+    <ClInclude Include="headers\Model.h" />
+    <ClInclude Include="headers\Object.h" />
+    <ClInclude Include="headers\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
+    <ClInclude Include="headers\ShaderManager.h" />
     <ClInclude Include="headers\State.h" />
     <ClInclude Include="headers\StateManager.h" />
     <ClInclude Include="headers\stdafx.h" />
     <ClInclude Include="headers\System.h" />
     <ClInclude Include="headers\Vector2.h" />
+    <ClInclude Include="headers\Vector3.h" />
     <ClInclude Include="headers\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
