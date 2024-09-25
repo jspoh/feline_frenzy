@@ -13,8 +13,8 @@
 using namespace Matrix33;
 
 
-Object::Object(const std::string& mdl, const std::string& shdr, Vector3 clr, Vector2 pos, Vector2 scl, float ori, float rot, Matrix33::Matrix_33 xform)
-	: model_ref(mdl), shader_ref(shdr), color(clr), position(pos), scale(scl), orientation(ori), rotation(rot), mdl_to_ndc_xform(xform) {}
+Object::Object(const std::string& mdl, const std::string& shdr, Vector3 clr, Vector2 pos, Vector2 scl, float ori, float rot, float vel, Matrix33::Matrix_33 xform)
+	: model_ref(mdl), shader_ref(shdr), color(clr), position(pos), scale(scl), orientation(ori), rotation(rot), velocity(vel), mdl_to_ndc_xform(xform) {}
 
 std::string Object::getModelRef() const {
 	return model_ref;
@@ -47,11 +47,19 @@ Vector2 Object::getScale() const {
 	return scale;
 }
 
-void Object::setRot(float rot) {
+void Object::setVelocity(float vel) {
+	velocity = vel;
+}
+
+float Object::getVelocity() const {
+	return velocity;
+}
+
+void Object::setRotation(float rot) {
 	rotation = rot;
 }
 
-float Object::getRot() const {
+float Object::getRotation() const {
 	return rotation;
 }
 
@@ -71,14 +79,13 @@ Matrix33::Matrix_33 Object::getXform() const {
 	return mdl_to_ndc_xform;
 }
 
-
 void Object::update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform) {
 
 	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, result, scale_mat, rot_mat, trans_mat;
 	
 	// Modulus the object rotation so it doesnt result in a large number overtime
 	orientation = fmod(orientation, 360.f);
-	float angleDisp = (orientation += rotation) * PI / 180;
+	float angleDisp = (orientation += rotation * dt) * PI / 180;
 
 	Matrix_33Rot(rot_mat, angleDisp);
 	Matrix_33Scale(scale_mat, scale.x, scale.y);
@@ -95,9 +102,11 @@ void Object::update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform) {
 
 void Object::draw() const {
 
-
 	auto it = RenderManager::getInstance().models.find(model_ref);
-
-	it->second->draw();
-
+	if (it != RenderManager::getInstance().models.end()) {
+		it->second->draw();
+	}
+	else {
+		cerr << "Model not found: " << model_ref << endl;
+	}
 }

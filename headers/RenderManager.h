@@ -23,7 +23,7 @@ private:
 
 
 	ShaderManager shaderManager;
-	std::unique_ptr<Camera> camera;
+	std::unique_ptr<Camera> camera; // smart ptr to camera
 
 public:
 
@@ -39,7 +39,6 @@ public:
 	 * mesh data format: newline separated values for each vertex, each value is a float.
 	 * `v` prefix indicates vertex attribute
 	 * `i` prefix indicates index attribute. (indexed rendering with element buffer object)
-	 * `c` prefix indicates color attribute. (optional)
 	 * top of the file indicates vertex count, index count. int format.
 	 * 
 	 * important to note that anticlockwise generated shapes are front facing and vice versa.
@@ -68,12 +67,13 @@ public:
 	*  object_ref - key for map
 	*  model_ref - which model/mesh its referencing
 	*  color - color of object in Vec3
-	*  position - position of object (NDC Range x-axis [-1, 1], y-axis[-1,1])
+	*  position - position of object (In world space)
 	*  scale - scale of object 
 	*  rotation - how fast you want the object to spin degrees (-360f to 360f)
 	*  orientation - where the object is oriented in degrees (-360f to 360f)
+	*  velocity - vel of obj
 	* */
-	void createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color = Vector3(0.f, 0.f, 0.f), const Vector2& position = Vector2(0.f,0.f), const Vector2& scale = Vector2(1.f, 1.f), float orientation = 0, float rotation = 0);
+	void createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color = Vector3(0.f, 0.f, 0.f), const Vector2& position = Vector2(0.f,0.f), const Vector2& scale = Vector2(1.f, 1.f), float orientation = 0, float rotation = 0, float velocity = 0);
 	/**
 	* returns an object pointer from the object map
 	* */

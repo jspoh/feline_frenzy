@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "RenderManager.h"
 
+
 RenderManager::RenderManager() {
 	// compile shaders
 	shaderManager.loadShader("base", "shaders/base.vert", "shaders/base.frag");
@@ -28,16 +29,22 @@ RenderManager& RenderManager::getInstance() {
 	return instance;
 }
 
-
 void RenderManager::initCamera(const std::string& object_ref) {
     if (objects.find(object_ref) == objects.end()) {
         cerr << "Object not found: " << object_ref << endl;
         return;
     }
 
+    // Get window size
+    float wWidth = Core::Engine::getInstance().getWindowSize().x;
+    float wHeight = Core::Engine::getInstance().getWindowSize().y;
+
+    // Get camera object
     Object cam_obj = objects[object_ref];
+    // Create a pointer to camera class
     camera = std::make_unique<Camera>();
-    camera->init(cam_obj);
+    // Init camera
+    camera->init(cam_obj, wWidth, wHeight);
 
 }
 
@@ -54,7 +61,7 @@ void RenderManager::registerModel(const std::string& model_ref, const std::strin
 }
 
 // Constructs an object and places it into the object map
-void RenderManager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color, const Vector2& position, const Vector2& scale, float orientation, float rotation) {
+void RenderManager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color, const Vector2& position, const Vector2& scale, float orientation, float rotation, float velocity) {
     // Check if the model exists before creating the object
     if (models.find(model_ref) == models.end()) {
         cerr << "Model not found: " << model_ref << endl;
@@ -62,7 +69,7 @@ void RenderManager::createObject(const std::string& object_ref, const std::strin
     }
 
     // !TODO each object should have its own shader ref
-    Object obj(model_ref, "base", color, position, scale, orientation, rotation);
+    Object obj(model_ref, "base", color, position, scale, orientation, rotation, velocity );
 
     objects[object_ref] = std::move(obj);
    
@@ -79,13 +86,13 @@ Object* RenderManager::getObject(const std::string& object_ref) {
 
 // Update all objects transform matrix
 void RenderManager::updateObjects() {
-
+    float deltaTime = Core::Engine::getInstance().getDeltaTime();
 
     for (auto& [object_ref, object] : objects) {
         if (object_ref == "camera") {
             camera.get()->update(object);
         }
-        object.update(0, camera->getWorldToNDCXform());
+        object.update(deltaTime, camera->getWorldToNDCXform());
     }
 }
 
