@@ -72,7 +72,7 @@ Matrix33::Matrix_33 Object::getXform() const {
 }
 
 
-void Object::update(float dt) {
+void Object::update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform) {
 
 	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, result, scale_mat, rot_mat, trans_mat;
 	
@@ -84,7 +84,7 @@ void Object::update(float dt) {
 	Matrix_33Scale(scale_mat, scale.x, scale.y);
 	Matrix_33Translate(trans_mat, position.x, position.y);
 
-	result = trans_mat * rot_mat * scale_mat;
+	result = cam_to_ndc_xform * trans_mat * rot_mat * scale_mat;
 
 	// OpenGL requires matrix in col maj so transpose
 	Matrix_33Transpose(model_mat, result);

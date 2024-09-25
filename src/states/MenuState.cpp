@@ -36,33 +36,27 @@ void MenuState::load() {
 void MenuState::init() {
 
 	// init square obj with values
-	RenderManager::getInstance().createObject("obj1", "square");
-	Object* obj = RenderManager::getInstance().getObject("obj1");
-	obj->setScale(Vector2(0.8f, 0.8f));
-	obj->setRot(1.f);
-	obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
-	
-	// init triangle obj with values
-	RenderManager::getInstance().createObject("obj2", "triangle",Vector3(0.f,1.f,1.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), 45.f);
-	
-	// Init camera (player)
-	RenderManager::getInstance().createObject("camera", "triangle", Vector3(0.f, 0.f, 0.f), Vector2(0.f, 0.f), Vector2(0.125f, 0.25f));
+	//RenderManager::getInstance().createObject("obj1", "square");
+	//Object* obj = RenderManager::getInstance().getObject("obj1");
+	//obj->setScale(Vector2(0.8f, 0.8f));
 
-	Matrix33::Matrix_33 test{}, test_scale{}, test_rot{}, temp{};
-	Matrix33::Matrix_33Translate(test,6,7);
-	Matrix33::Matrix_33Scale(test_scale, 3, 5);
-	Matrix33::Matrix_33Rot(test_rot, PI);
-	Matrix33::Matrix_33 result = test * test_scale;
-	temp = result;
-	Matrix33::Matrix_33Inverse(result, temp);
-	cout << result << endl;
+	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
+
+	// Init game objects into game world
+	RenderManager::getInstance().createObject("obj1", "square", Vector3(1.f, 0.f, 0.f), Vector2(-19800, -20000), Vector2(200.f,150.f), 0.f , -1.5f);
+	RenderManager::getInstance().createObject("obj2", "square", Vector3(0.f, 1.f, 0.f), Vector2(-19200, -20000), Vector2(225.f, 175.f), 0.f, 1.f);
+
+	// Init camera object (player)
+	RenderManager::getInstance().createObject("camera", "triangle", Vector3(0.f, 0.f, 0.f), Vector2(-19500, -19700), Vector2(50.f, 100.f), 180.f);
+	// Init camera
+	RenderManager::getInstance().initCamera("camera");
+
 }
 
 void MenuState::update() {
 	Object* obj = RenderManager::getInstance().getObject("camera");
-	if (obj->getPosition().y <= 1) {
-		obj->setPosition(0, obj->getPosition().y + 0.005f);
-	}
+	obj->setPosition(obj->getPosition().x, obj->getPosition().y - 1.f);
+
 
 	// Updates all object tranformation
 	RenderManager::getInstance().updateObjects();
