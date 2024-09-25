@@ -16,7 +16,7 @@ void Physics::Manager::init() {
 }
 
 void Physics::Manager::update() {
-    Physics::Manager::getInstance().move(RenderManager::getInstance().getObject("obj1"));
+    Physics::Manager::getInstance().move(RenderManager::getInstance().getObject("camera"));
 }
 
 void Physics::Manager::move(Object* object) {

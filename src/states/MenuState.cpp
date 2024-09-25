@@ -59,10 +59,10 @@ void MenuState::init() {
 }
 
 void MenuState::update() {
-	Object* obj = RenderManager::getInstance().getObject("camera");
+	/*Object* obj = RenderManager::getInstance().getObject("camera");
 	if (obj->getPosition().y <= 1) {
 		obj->setPosition(0, obj->getPosition().y + 0.005f);
-	}
+	}*/
 
 	// Updates all object tranformation
 	RenderManager::getInstance().updateObjects();
