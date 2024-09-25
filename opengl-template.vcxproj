@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Systems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\CollisionUtils.cpp" />
     <ClCompile Include="src\math\Mtx33.cpp" />
     <ClCompile Include="src\math\Vector3.cpp" />
     <ClCompile Include="src\Systems\renderer\Camera.cpp" />
@@ -42,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Camera.h" />
+    <ClInclude Include="headers\CollisionSystem.h" />
+    <ClInclude Include="headers\CollisionUtils.h" />
     <ClInclude Include="headers\db.h" />
     <ClInclude Include="headers\Engine.h" />
     <ClInclude Include="headers\InputSystem.h" />
