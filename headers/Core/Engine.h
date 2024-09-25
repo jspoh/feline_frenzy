@@ -11,9 +11,9 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
-#include "Entity.h"
-#include "Component.h"
-#include "System.h"
+#include "../headers/Managers/mEntity.h"
+#include "../headers/Managers/mComponent.h"
+#include "../headers/Managers/mSystem.h"
 
 namespace Core {
 
@@ -123,10 +123,10 @@ namespace Core {
 		}
 
 		template<typename T>
-		void addEntityComponent(Entity::Type entity, T&& component) {
+		void addEntityComponentObj(Entity::Type entity, T&& component) {
 
 			//Add component
-			component_manager->addEntityComponent<T>(entity, std::move(component));
+			component_manager->addEntityComponentObj<T>(entity, std::move(component));
 
 			//Set bit signature of component to true
 			Component::Signature sign = entity_manager->getSignature(entity);
@@ -134,7 +134,7 @@ namespace Core {
 			entity_manager->setSignature(entity, sign);
 
 			//Update entities list
-			system_manager->updateEntitiesList(entity, sign);
+			system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), true);
 		}
 
 		template<typename T>
@@ -148,12 +148,17 @@ namespace Core {
 			entity_manager->setSignature(entity, sign);
 
 			//Update entities list
-			system_manager->updateEntitiesList(entity, sign);
+			system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), false);
 		}
 
 		template<typename T>
 		T& getEntityComponent(Entity::Type entity) {
 			return component_manager->getEntityComponent<T>(entity);
+		}
+
+		template<typename T>
+		bool checkEntityComponent(Entity::Type entity) {
+			return component_manager->checkEntityComponent<T>(entity);
 		}
 
 		template<typename T>
@@ -176,9 +181,15 @@ namespace Core {
 		}
 
 		template<typename T>
-		void setSystemSignature(Component::Signature signature)
+		std::shared_ptr<T> accessSystem()
 		{
-			system_manager->setSignature<T>(signature);
+			return system_manager->accessSystem<T>();
+		}
+
+		template<typename T>
+		void addSystemComponentType(Component::Type component)
+		{
+			system_manager->addComponentType<T>(component);
 		}
 	};
 

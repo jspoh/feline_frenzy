@@ -21,12 +21,12 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Managers\Component.cpp" />
-    <ClCompile Include="src\Managers\Entity.cpp" />
-    <ClCompile Include="src\Managers\System.cpp" />
-    <ClCompile Include="src\Systems\InputSystem.cpp" />
-    <ClCompile Include="src\Systems\RenderManager.cpp" />
-    <ClCompile Include="src\Systems\StateManager.cpp" />
+    <ClCompile Include="src\Managers\mComponent.cpp" />
+    <ClCompile Include="src\Managers\mEntity.cpp" />
+    <ClCompile Include="src\Managers\mSystem.cpp" />
+    <ClCompile Include="src\Systems\sysInput.cpp" />
+    <ClCompile Include="src\Systems\sysRender.cpp" />
+    <ClCompile Include="src\Managers\mState.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
@@ -37,20 +37,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Component.h" />
-    <ClInclude Include="headers\db.h" />
-    <ClInclude Include="headers\Engine.h" />
-    <ClInclude Include="headers\Entity.h" />
-    <ClInclude Include="headers\InputSystem.h" />
-    <ClInclude Include="headers\json.hpp" />
-    <ClInclude Include="headers\MenuState.h" />
-    <ClInclude Include="headers\RenderManager.h" />
-    <ClInclude Include="headers\State.h" />
-    <ClInclude Include="headers\StateManager.h" />
-    <ClInclude Include="headers\stdafx.h" />
-    <ClInclude Include="headers\System.h" />
-    <ClInclude Include="headers\Vector2.h" />
-    <ClInclude Include="headers\Vector4.h" />
+    <ClInclude Include="headers\Managers\mComponent.h" />
+    <ClInclude Include="headers\Data\db.h" />
+    <ClInclude Include="headers\Core\Engine.h" />
+    <ClInclude Include="headers\Managers\mEntity.h" />
+    <ClInclude Include="headers\Systems\sysInput.h" />
+    <ClInclude Include="headers\Data\json.hpp" />
+    <ClInclude Include="headers\States\MenuState.h" />
+    <ClInclude Include="headers\Systems\sysRender.h" />
+    <ClInclude Include="headers\States\State.h" />
+    <ClInclude Include="headers\Managers\mState.h" />
+    <ClInclude Include="headers\Core\stdafx.h" />
+    <ClInclude Include="headers\Managers\mSystem.h" />
+    <ClInclude Include="headers\Math\Vector2.h" />
+    <ClInclude Include="headers\Math\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
@@ -158,6 +158,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../headers/Core/stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -183,6 +184,7 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../headers/Core/stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

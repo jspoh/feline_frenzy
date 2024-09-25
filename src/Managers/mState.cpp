@@ -6,11 +6,11 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "StateManager.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Managers/mState.h"
 
 // all possible states for initialization (registration)
-#include "MenuState.h"
+#include "../headers/States/MenuState.h"
 
 void StateManager::register_all_states() {
 	// register all states here

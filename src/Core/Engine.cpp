@@ -6,9 +6,9 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Engine.h"
-#include "StateManager.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
+#include "../headers/Managers/mState.h"
 
 // cannot set to 0 in case of division by 0!!
 //float Core::Engine::dt = 1.f;

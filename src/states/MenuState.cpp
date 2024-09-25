@@ -7,10 +7,10 @@
  *********************************************************************/
 
 
-#include "stdafx.h"
-#include "MenuState.h"
-#include "StateManager.h"
-#include "RenderManager.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/States/MenuState.h"
+#include "../headers/Managers/mState.h"
+#include "../headers/Systems/sysRender.h"
 
 
 MenuState::MenuState() {

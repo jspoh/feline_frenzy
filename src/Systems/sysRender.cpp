@@ -7,9 +7,9 @@
  *********************************************************************/
 
 
-#include "stdafx.h"
-#include "RenderManager.h"
-#include "Engine.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/sysRender.h"
+#include "../headers/Core/Engine.h"
 
 void RenderManager::compileShader(std::string shader_ref, std::string vtx_path, std::string frag_path) {
 	// read and compile vertex shader

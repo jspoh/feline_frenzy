@@ -11,21 +11,26 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include "Engine.h"
+#include "../headers/Core/Engine.h"
 
 namespace Input {
 
-	class Mouse {
-	public:
-		float x{};
-		float y{};
+	struct Key {
 
-		bool is_lbutton_pressed{};
-		bool is_rbutton_pressed{};
+	};
 
-		// most mousewheels will only scroll on y axis
-		float scroll_x{};
-		float scroll_y{};
+	struct Mouse {
+		//Pos of button
+		float x;
+		float y;
+
+		//L & R Button pressed
+		bool is_lbutton_pressed;
+		bool is_rbutton_pressed;
+
+		//most mousewheels will only scroll on y axis
+		float scroll_x;
+		float scroll_y;
 	};
 
 	//Input Mode
@@ -33,11 +38,6 @@ namespace Input {
 		CHECK = GLFW_PRESS,
 		RELEASE = GLFW_RELEASE,
 		TRIGGERED
-	};
-
-	struct Key {
-
-
 	};
 
 	class Manager : public System::ISystem {

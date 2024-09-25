@@ -6,8 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Component.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Managers/mComponent.h"
 
 void Component::Manager::entityDestroyed(Entity::Type entity) {
 	for (auto& c_array : component_arrays) {

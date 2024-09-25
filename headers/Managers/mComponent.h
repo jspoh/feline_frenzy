@@ -63,8 +63,14 @@ namespace Component {
 			return component_array.at(entity);
 		}
 
+		//Check if entity component is present
+		bool checkComponent(Entity::Type entity) const {
+			return component_array.find(entity) != component_array.end();
+		}
+
 		//Remove destroyed entity
 		void entityDestroyed(Entity::Type entity) override {
+			if(component_array.find(entity) != component_array.end())
 			removeComponent(entity);
 		}
 	};
@@ -91,6 +97,9 @@ namespace Component {
 			return std::static_pointer_cast<Array<T>>(component_arrays.at(type_name));
 		}
 
+		//Component id
+		Component::Type component_id{ 0 };
+
 	public:
 
 		//Default Constructor
@@ -100,9 +109,6 @@ namespace Component {
 		template<typename T>
 		void registerComponent() {
 
-			//Static component count variable
-			static Component::Type component_count{ 0 };
-
 			//Component type name
 			std::string type_name{ typeid(T).name() };
 
@@ -110,18 +116,15 @@ namespace Component {
 			assert(component_types.find(type_name) == component_types.end() && "Component already registered.");
 
 			//Add component type
-			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_count));
+			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_id++));
 
 			//Add component map
 			component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::make_shared<Array<T>>()));
-
-			//Increment component count variable
-			component_count++;
 		}
 
 		//Add component associated with entity type
 		template<typename T>
-		void addEntityComponent(Entity::Type entity, T&& component) {
+		void addEntityComponentObj(Entity::Type entity, T&& component) {
 			//Component type name
 			std::string type_name{ typeid(T).name() };
 
@@ -143,6 +146,12 @@ namespace Component {
 		template<typename T>
 		T& getEntityComponent(Entity::Type entity) {
 			return getComponentArray<T>()->getComponent(entity);
+		}
+
+		//Check if entity component is present
+		template<typename T>
+		bool checkEntityComponent(Entity::Type entity) {
+			return getComponentArray<T>()->checkComponent(entity);
 		}
 		
 		//Get Component Type

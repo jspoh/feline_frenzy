@@ -17,17 +17,25 @@ namespace System {
 	class ISystem {
 	protected:
 		//System signature
-		Component::Signature c_id;
+		Component::Signature system_signature;
+
+		//Component Types
+		std::set<Component::Type> component_types;
 
 		//List of entities to update
 		std::set<Entity::Type> entities;
+
+		//Linked components will use signature for filtering entities
+		//Unlinked components will check if any of the system components
+		//are present within entity. If present, entity is added to the entities list
+		bool b_components_linked;
 
 		//System active
 		bool b_system_active;
 	public:
 
 		//Constructor
-		ISystem() : c_id{}, b_system_active { true } {}
+		ISystem() : system_signature{}, b_components_linked{ true }, b_system_active { true } {}
 
 		//Virtual Init
 		virtual void init() {}
@@ -35,14 +43,26 @@ namespace System {
 		//Pure virtual function to be implemented in inherited class
 		virtual void update() = 0;
 
+		//Set components linked mode
+		void setComponentsLinked(bool state);
+
+		//Get components linked mode
+		bool getComponentsLinked() const;
+
 		//Set System active
 		void setActiveState(bool state);
 
 		//Get System active
 		bool getActiveState() const;
 
-		//Set system signature
-		void setSignature(Component::Signature signature);
+		//Add component type
+		void addComponentType(Component::Type component);
+
+		//Remove component type
+		void removeComponentType(Component::Type component);
+
+		//Check if component is present
+		bool checkComponentType(Component::Type component) const;
 
 		//Get system signautre
 		Component::Signature getSignature() const;
@@ -52,6 +72,9 @@ namespace System {
 
 		//Remove Entity
 		void removeEntity(Entity::Type entity);
+
+		//Check if entity is present
+		bool checkEntity(Entity::Type entity) const;
 
 		//Virtual Destructor
 		virtual ~ISystem() = default;
@@ -132,13 +155,13 @@ namespace System {
 
 		//Set signature of system
 		template<typename T>
-		void setSignature(Component::Signature const& signature) {
+		void addComponentType(Component::Type component) {
 
 			//System type name
 			std::string sys_name{ typeid(T).name() };
 
 			//Set signature of system
-			systems_map.at(sys_name)->setSignature(signature);
+			systems_map.at(sys_name)->addComponentType(component);
 		}
 
 		/**
@@ -152,8 +175,8 @@ namespace System {
 			return getSystem<T>();
 		}
 
-		//Update entities list
-		void updateEntitiesList(Entity::Type entity, Component::Signature e_signature);
+		//Update entities list based on signature
+		void updateEntitiesList(Entity::Type entity, Component::Signature e_signature, Component::Type component, bool b_component_added);
 
 		//Remove entity from all systems
 		void entityDestroyed(Entity::Type entity);

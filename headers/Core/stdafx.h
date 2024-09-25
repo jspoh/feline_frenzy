@@ -36,11 +36,11 @@
 #include <set>
 
 // external headers
-#include "json.hpp"
+#include "../headers/Data/json.hpp"
 
 // our completed headers
-#include "Vector2.h"
-#include "Vector4.h"
+#include "../headers/Math/Vector2.h"
+#include "../headers/Math/Vector4.h"
 
 namespace Entity {
 

@@ -6,8 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "InputSystem.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/sysInput.h"
 
 void Input::Manager::setupEventCallbacks() {
 	glfwSetFramebufferSizeCallback(NIKEEngine.getWindow(), fbsize_cb);
@@ -26,11 +26,16 @@ void Input::Manager::init() {
 }
 
 void Input::Manager::update() {
+
+	//Update all entities
 	for (auto& entity : entities) {
-		auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
-		e_mouse = mouse;
+		if (NIKEEngine.checkEntityComponent<Input::Mouse>(entity)) {
+			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
+			e_mouse = mouse;
+		}
 	}
 
+	//Check if escape key is pressed
 	if (key_is_pressed(GLFW_KEY_ESCAPE)) {
 		NIKEEngine.terminate();
 	}

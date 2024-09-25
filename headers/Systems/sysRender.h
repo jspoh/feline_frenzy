@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "stdafx.h"
+#include "../headers/Core/stdafx.h"
 
 
 // !TODO: move this code

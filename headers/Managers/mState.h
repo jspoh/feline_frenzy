@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "stdafx.h"
-#include "State.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/States/State.h"
 
 
 class StateManager {

@@ -6,8 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Entity.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Managers/mEntity.h"
 
 Entity::Manager::Manager() {
 	//Fill avail_entities with all possibles indexes up to the limit
