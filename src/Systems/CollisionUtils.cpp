@@ -8,7 +8,8 @@
 
 #include "stdafx.h"
 #include "CollisionUtils.h"
-#include <cmath>
+#include "InputSystem.h"
+#include <iostream>
 
 namespace CollisionUtils {
 
@@ -26,15 +27,31 @@ namespace CollisionUtils {
         float distX = pos_a.x - pos_b.x;
         float distY = pos_a.y - pos_b.y;
         float distance = std::sqrt(distX * distX + distY * distY);
-        return distance < (radius_a + radius_b);
+
+        return (distance < (radius_a + radius_b));
     }
 
-    bool aabbCollisionCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b) {
-        return (pos_a.x < pos_b.x + size_b.x &&
-            pos_a.x + size_a.x > pos_b.x &&
-            pos_a.y < pos_b.y + size_b.y &&
-            pos_a.y + size_a.y > pos_b.y);
+    bool aabbRectRectCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b) {
+        // Check if the right side of A is to the left of the right side of B
+        // This ensures A is not completely to the left of B
+        bool x_overlap = (pos_a.x < pos_b.x + size_b.x);
+
+        // Check if the left side of A is to the right of the left side of B
+        // This ensures A is not completely to the right of B
+        x_overlap = x_overlap && (pos_a.x + size_a.x > pos_b.x);
+
+        // Check if the top side of A is below the bottom side of B
+        // This ensures A is not completely above B
+        bool y_overlap = (pos_a.y < pos_b.y + size_b.y);
+
+        // Check if the bottom side of A is above the top side of B
+        // This ensures A is not completely below B
+        y_overlap = y_overlap && (pos_a.y + size_a.y > pos_b.y);
+
+        // If both X-axis and Y-axis overlap conditions are true, the AABBs are colliding
+        return x_overlap && y_overlap;
     }
+
 
     bool satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b) {
         // Calculate the half extents for each box
@@ -58,5 +75,56 @@ namespace CollisionUtils {
 
         // If we get here, both axes overlap, so a collision exists
         return true;
+    }
+
+    // Detect if the mouse is inside a rectangular area
+    bool detectMClickRect(const Vector2& center, float width, float height) {
+        // Get the mouse position from Input::Manager
+        float mouseX = Input::Manager::getInstance().mouse.x;
+        float mouseY = Input::Manager::getInstance().mouse.y;
+
+        // Calculate the boundaries of the rectangle
+        float left = center.x - width / 2.0f;
+        float right = center.x + width / 2.0f;
+        float top = center.y - height / 2.0f;
+        float bottom = center.y + height / 2.0f;
+
+        // Check if the mouse is inside the rectangle
+        if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
+            // Print where the mouse is relative to the center of the rectangle
+            if (mouseX < center.x)
+                cout << "Mouse is on the left side of the center." << endl;
+            else
+                cout << "Mouse is on the right side of the center." << endl;
+
+            if (mouseY < center.y)
+                cout << "Mouse is above the center." << endl;
+            else
+                cout << "Mouse is below the center." << endl;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // Detect if the mouse is inside a circular area
+    bool detectMClickCircle(const Vector2& center, float radius) {
+        // Get the mouse position from Input::Manager
+        float mouseX = Input::Manager::getInstance().mouse.x;
+        float mouseY = Input::Manager::getInstance().mouse.y;
+
+        // Calculate the distance from the mouse to the center of the circle
+        float distX = mouseX - center.x;
+        float distY = mouseY - center.y;
+        float distance = std::sqrt(distX * distX + distY * distY);
+
+        // Check if the mouse is inside the circle
+        if (distance <= radius) {
+            cout << "Mouse is inside the circle." << endl;
+            return true;
+        }
+
+        return false;
     }
 }

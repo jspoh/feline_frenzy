@@ -31,6 +31,11 @@ namespace Collision {
             Vector2 position;  // Position of the object (X, Y) world coordinates...
             Vector2 size;      // Size (width, height)
             float radius = 0.0f; // Optional for circle colliders
+
+            // Test...
+            Vector2 velocity;
+            Vector2 rect_min;
+            Vector2 rect_max;
         };
 
         std::vector<Collider> colliders;  // List of colliders in the system (CURRENTLY STORES ALL COLLIDERS)
@@ -39,7 +44,7 @@ namespace Collision {
         bool detectCollision(const Collider& a, const Collider& b) const;
 
         // Test function to check for collision between 2 positions...
-        bool checkCollisionBetween(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b, float radius_a = 0.0f, float radius_b = 0.0f);
+        bool checkCollisionBetween(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, float radius_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b, float radius_b);
 
 
     public:

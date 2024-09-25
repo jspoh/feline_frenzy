@@ -35,7 +35,7 @@ bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) c
     if (a.radius > 0.0f && b.radius > 0.0f) {
         return CollisionUtils::circleCollisionCheck(a.position, a.radius, b.position, b.radius);
     }
-    else if (CollisionUtils::aabbCollisionCheck(a.position, a.size, b.position, b.size)) {
+    else if (CollisionUtils::aabbRectRectCheck(a.position, a.size, a.velocity, b.position, b.size, b.velocity)) {
         return true;
     }
     else {
@@ -44,14 +44,14 @@ bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) c
 }
 
 // Test function to detect collision between 2 positions...
-bool Collision::Manager::checkCollisionBetween(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b, float radius_a, float radius_b) {
+bool Collision::Manager::checkCollisionBetween(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, float radius_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b, float radius_b) {
     // Check circle, then AABB, then SAT
     if (radius_a > 0.0f && radius_b > 0.0f) {
         return CollisionUtils::circleCollisionCheck(pos_a, radius_a, pos_b, radius_b);
     }
     else {
         // Check for AABB or SAT collision
-        if (CollisionUtils::aabbCollisionCheck(pos_a, size_a, pos_b, size_b)) {
+        if (CollisionUtils::aabbRectRectCheck(pos_a, size_a, vel_a, pos_b, size_b, vel_b)) {
             return true;
         }
         else {
