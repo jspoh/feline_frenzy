@@ -3,137 +3,57 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\math\Mtx33.cpp" />
-    <ClCompile Include="src\math\Vector3.cpp" />
-    <ClCompile Include="src\Systems\InputSystem.cpp" />
-    <ClCompile Include="src\Systems\renderer\Model.cpp" />
-    <ClCompile Include="src\Systems\renderer\Object.cpp" />
-    <ClCompile Include="src\Systems\renderer\RenderManager.cpp" />
-    <ClCompile Include="src\Systems\renderer\ShaderManager.cpp" />
-    <ClCompile Include="src\Systems\StateManager.cpp" />
+    <ClCompile Include="src\Systems\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Systems\CollisionSystem.cpp"/>
+    <ClCompile Include="src\Systems\CollisionUtils.cpp"/>
+    <ClCompile Include="src\Math\Mtx33.cpp" />
+    <ClCompile Include="src\Math\Vector3.cpp" />
+    <ClCompile Include="src\Systems\Render\Camera.cpp" />
+    <ClCompile Include="src\Systems\Render\Model.cpp" />
+    <ClCompile Include="src\Systems\Render\Object.cpp" />
+    <ClCompile Include="src\Systems\Render\sysRender.cpp" />
+    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
+    <ClCompile Include="src\Managers\mComponent.cpp" />
+    <ClCompile Include="src\Managers\mEntity.cpp" />
+    <ClCompile Include="src\Managers\mSystem.cpp" />
+    <ClCompile Include="src\Scenes\SplashScene.cpp" />
+    <ClCompile Include="src\Systems\sysInput.cpp" />
+    <ClCompile Include="src\Managers\mScene.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
-    <ClCompile Include="src\States\MenuState.cpp" />
+    <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
-    <ClCompile Include="src\Systems\PhysicsSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-  
-    <ClCompile Include="src\data\db.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Vector2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\states\MenuState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Vector4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Mtx33.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Vector3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\InputSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\RenderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\StateManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\CollisionSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\CollisionUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\ShaderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="headers\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\db.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\json.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Vector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\StateManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\MenuState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\RenderManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Vector4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\InputSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Mtx33.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\CollisionSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\CollisionUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\System.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Vector3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\ShaderManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Object.h">
     <ClInclude Include="headers\PhysicsSystem.h" />
+    <ClInclude Include="headers\CollisionSystem.h" />
+    <ClInclude Include="headers\CollisionUtils.h" />
+    <ClInclude Include="headers\Systems\Render\Camera.h" />
+    <ClInclude Include="headers\Systems\Render\Model.h" />
+    <ClInclude Include="headers\Systems\Render\Object.h" />
+    <ClInclude Include="headers\Math\Mtx33.h" />
+    <ClInclude Include="headers\RenderManager.h" />
+    <ClInclude Include="headers\Systems\Render\sysShader.h" />
+    <ClInclude Include="headers\Math\Vector3.h" />
+    <ClInclude Include="headers\Managers\mComponent.h" />
+    <ClInclude Include="headers\Data\db.h" />
+    <ClInclude Include="headers\Core\Engine.h" />
+    <ClInclude Include="headers\Managers\mEntity.h" />
+    <ClInclude Include="headers\Scenes\SplashScene.h" />
+    <ClInclude Include="headers\Systems\sysInput.h" />
+    <ClInclude Include="headers\Data\json.hpp" />
+    <ClInclude Include="headers\Scenes\MenuScene.h" />
+    <ClInclude Include="headers\Systems\Render\sysRender.h" />
+    <ClInclude Include="headers\Managers\mScene.h" />
+    <ClInclude Include="headers\Core\stdafx.h" />
+    <ClInclude Include="headers\Managers\mSystem.h" />
+    <ClInclude Include="headers\Math\Vector2.h" />
+    <ClInclude Include="headers\Math\Vector4.h" />
+    <ClInclude Include="headers\Components\cRender.h" />
+    <ClInclude Include="headers\Components\cTransform.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\textured_rendering.vert" />
-    <None Include="shaders\textured_rendering.frag" />
-    <None Include="shaders\base.vert" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
     <None Include="shaders\textured_rendering.frag" />

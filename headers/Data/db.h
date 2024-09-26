@@ -16,7 +16,7 @@ Technology is prohibited.
 
 #pragma once
 
-#include "stdafx.h"
+#include "../headers/Core/stdafx.h"
 
 
 const std::string dbPath = R"(data.json)";

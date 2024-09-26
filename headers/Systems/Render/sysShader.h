@@ -8,9 +8,11 @@
 
 #pragma once
 
-#include "stdafx.h"
+#ifndef SHADER_MANAGER_HPP
+#define SHADER_MANAGER_HPP
 
-class ShaderManager {
+namespace Shader {
+	class Manager {
 	private:
 		std::unordered_map<std::string, unsigned int> shader_programs;
 
@@ -23,9 +25,9 @@ class ShaderManager {
 		 */
 		unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 
-	public :
-		ShaderManager();
-		~ShaderManager();
+	public:
+		Manager();
+		~Manager();
 
 		void loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 		void useShader(const std::string& shader_ref);
@@ -39,4 +41,7 @@ class ShaderManager {
 		void setUniform(const std::string& shader_ref, const std::string& name, float value);
 		void setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value);
 		void setUniform(const std::string& shader_ref, const std::string& name, const Vector3& value);
-};
+	};
+}
+
+#endif // !SHADER_MANAGER_HPP

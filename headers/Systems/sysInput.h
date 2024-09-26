@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   InputManager.h
+ * \file   sysInput.h
  * \brief  input manager for engine
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
@@ -11,29 +11,37 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include "stdafx.h"
-#include "Engine.h"
+#include "../headers/Core/Engine.h"
 
 namespace Input {
 
-	class Mouse {
-	public:
-		float x{};
-		float y{};
+	struct Key {
 
-		bool is_lbutton_pressed{};
-		bool is_rbutton_pressed{};
-
-		// most mousewheels will only scroll on y axis
-		float scroll_x{};
-		float scroll_y{};
 	};
 
-	class Manager : public System::Base {
-	private:
+	struct Mouse {
+		//Pos of button
+		float x;
+		float y;
 
-		//Private Constructor
-		Manager() = default;
+		//L & R Button pressed
+		bool is_lbutton_pressed;
+		bool is_rbutton_pressed;
+
+		//most mousewheels will only scroll on y axis
+		float scroll_x;
+		float scroll_y;
+	};
+
+	//Input Mode
+	enum class KeyMode {
+		CHECK = GLFW_PRESS,
+		RELEASE = GLFW_RELEASE,
+		TRIGGERED
+	};
+
+	class Manager : public System::ISystem {
+	private:
 
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
@@ -52,12 +60,17 @@ namespace Input {
 		static void mousepos_cb(GLFWwindow* window, double xpos, double ypos);
 		static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
 
+		//Input variables
+		Mouse mouse;
+
 	public:
-		Mouse mouse{};
+
+		//Default Constructor
+		Manager() = default;
 
 		//Singleton Of Manager Class
-		static Manager& getInstance() {
-			static Manager instance;
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
 			return instance;
 		}
 

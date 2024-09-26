@@ -6,18 +6,18 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "ShaderManager.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Render/sysShader.h"
 
-ShaderManager::ShaderManager() {}
+Shader::Manager::Manager() {}
 
-ShaderManager::~ShaderManager() {
+Shader::Manager::~Manager() {
 	for (auto& [ref, shader_program] : shader_programs) {
 		glDeleteProgram(shader_program);
 	}
 }
 
-unsigned int ShaderManager::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+unsigned int Shader::Manager::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
 	// read and compile vertex shader
 	std::ifstream vtx_file{ vtx_path };
 	if (!vtx_file.is_open()) {
@@ -90,13 +90,13 @@ unsigned int ShaderManager::compileShader(const std::string& shader_ref, const s
 	return shader_handle;
 }
 
-void ShaderManager::loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+void Shader::Manager::loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
 	if (shader_programs.find(shader_ref) == shader_programs.end()) {
 		shader_programs[shader_ref] = compileShader(shader_ref, vtx_path, frag_path);
 	}
 }
 
-void ShaderManager::useShader(const std::string& shader_ref) {
+void Shader::Manager::useShader(const std::string& shader_ref) {
 	if (shader_programs.find(shader_ref) != shader_programs.end()) {
 		glUseProgram(shader_programs[shader_ref]);
 	}
@@ -107,13 +107,13 @@ void ShaderManager::useShader(const std::string& shader_ref) {
 
 }
 
-void ShaderManager::unuseShader() {
+void Shader::Manager::unuseShader() {
 	glUseProgram(0);
 }
 
 // Uniform setters
 
-void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
+void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
 	if (shader_programs.find(shader_ref) != shader_programs.end()) {
 		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
 		if (location >= 0) {
@@ -128,7 +128,7 @@ void ShaderManager::setUniform(const std::string& shader_ref, const std::string&
 	}
 }
 
-void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
+void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
 	if (shader_programs.find(shader_ref) != shader_programs.end()) {
 		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
 		if (location >= 0) {
@@ -143,7 +143,7 @@ void ShaderManager::setUniform(const std::string& shader_ref, const std::string&
 	}
 }
 
-void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value) {
+void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value) {
 
 	if (shader_programs.find(shader_ref) != shader_programs.end()) {
 		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());
@@ -159,7 +159,7 @@ void ShaderManager::setUniform(const std::string& shader_ref, const std::string&
 	}
 }
 
-void ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3& value) {
+void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3& value) {
 
 	if (shader_programs.find(shader_ref) != shader_programs.end()) {
 		int location = glGetUniformLocation(shader_programs[shader_ref], name.c_str());

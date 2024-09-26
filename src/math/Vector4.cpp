@@ -6,8 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Vector4.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Math/Vector4.h"
 
 Vector4 Vector4::operator+(const Vector4& rhs) const {
 	return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
