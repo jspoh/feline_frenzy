@@ -6,15 +6,12 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Engine.h"
-#include "StateManager.h"
-
-// cannot set to 0 in case of division by 0!!
-//float Core::Engine::dt = 1.f;
+#include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
 
 Core::Engine::Engine()
-	: ptr_window{ nullptr }, window_width{ 0 }, window_height{ 0 }, window_title{ "" }, delta_time{ 0.0f }
+	: ptr_window{ nullptr }, window_size{}, window_title{""}, delta_time{0.0f},
+	target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f }
 {}
 
 Core::Engine::~Engine() {
@@ -36,27 +33,16 @@ void Core::Engine::readConfigFile(std::string const& file_path) {
 		std::getline(fileStream, data);
 		window_title = data.substr(data.find_first_of('"') + 1, data.find_last_of('"') - data.find_first_of('"') - 1);
 		std::getline(fileStream, data);
-		std::stringstream(data) >> temp >> window_width;
+		std::stringstream(data) >> temp >> window_size.x;
 		std::getline(fileStream, data);
-		std::stringstream(data) >> temp >> window_height;
+		std::stringstream(data) >> temp >> window_size.y;
 	}
 
 	//Close file stream
 	fileStream.close();
 }
 
-void Core::Engine::calculateDeltaTime() {
-	static float prev_time = static_cast<float>(glfwGetTime());
-	float curr_time = static_cast<float>(glfwGetTime());
-	delta_time = curr_time - prev_time;
-	prev_time = curr_time;
-}
-
-bool Core::Engine::getWindowOpen() const {
-	return !glfwWindowShouldClose(NIKEEngine.getWindow());
-}
-
-void Core::Engine::init(std::string const& file_path) {
+void Core::Engine::configSystem() {
 	if (!glfwInit()) {
 		cerr << "Failed to initialize GLFW\n";
 		throw std::exception();
@@ -65,7 +51,7 @@ void Core::Engine::init(std::string const& file_path) {
 	glfwSetErrorCallback([](int error, const char* description) {
 		cerr << "Error " << error << ": " << description << endl;
 		throw std::exception();
-	});
+		});
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -78,11 +64,8 @@ void Core::Engine::init(std::string const& file_path) {
 	glfwWindowHint(GLFW_BLUE_BITS, 8); glfwWindowHint(GLFW_ALPHA_BITS, 8);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // window dimensions are static
 
-	//Read config file
-	readConfigFile(file_path);
-
 	//Create window
-	ptr_window = glfwCreateWindow(window_width, window_height, window_title.c_str(), nullptr, nullptr);
+	ptr_window = glfwCreateWindow(static_cast<int>(window_size.x), static_cast<int>(window_size.y), window_title.c_str(), nullptr, nullptr);
 	if (!ptr_window) {
 		cerr << "Failed to create window" << endl;
 		glfwTerminate();
@@ -97,18 +80,55 @@ void Core::Engine::init(std::string const& file_path) {
 		throw std::exception();
 	}
 
-	// initialize states
-	StateManager::getInstance().register_all_states();		// important!
-	StateManager::getInstance().set_active_state("main_menu");
-
 	//Engine Init Successful
 	cout << "GL init success" << endl;
 
 }
 
+void Core::Engine::calculateDeltaTime() {
+	//Static prev time
+	static double prev_time = glfwGetTime();
+
+	//Calculate delta time
+	curr_time = glfwGetTime();
+	delta_time = static_cast<float>(curr_time - prev_time);
+	actual_fps = 1.0f / delta_time;
+	prev_time = curr_time;
+}
+
+void Core::Engine::controlFPS() {
+
+	//Target delta time
+	double target_frame_time = 1.0 / target_fps;
+	//double frame_time = glfwGetTime() - curr_time;
+
+	//Sleep thread for fps
+	while (glfwGetTime() - curr_time < target_frame_time) {
+		//Current default system timer resolution is around 15.6 ms
+		//Sleeping this thread will lead to inaccurate time control, thread sleeps for too long
+		//std::this_thread::sleep_for(std::chrono::duration<double>(target_frame_time - frame_time));
+	}
+}
+
+void Core::Engine::init(std::string const& file_path, int fps) {
+	entity_manager = std::make_unique<Entity::Manager>();
+	component_manager = std::make_unique<Component::Manager>();
+	system_manager = std::make_unique<System::Manager>();
+	scene_manager = std::make_unique<Scenes::Manager>();
+
+	//Read config file
+	readConfigFile(file_path);
+
+	//Config glfw window system
+	configSystem();
+
+	//Set Target FPS
+	target_fps = fps;
+}
+
 void Core::Engine::run() {
 
-	while (getWindowOpen()) {
+	while (!glfwWindowShouldClose(NIKEEngine.getWindow())) {
 
 		//Calculate Delta Time
 		calculateDeltaTime();
@@ -116,35 +136,27 @@ void Core::Engine::run() {
 		//Poll system events ( Interativity with app )
 		glfwPollEvents();
 
-		//Set BG Color
-		glClearColor(1, 1, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		//Set Window Title
-		setTitle(window_title + " | " + std::to_string(1.f / delta_time) + " fps");
+		setWinTitle(window_title + " | " + std::to_string(actual_fps) + " fps");
 
 		//Update all systems
-		for (auto& system : systems) {
-			if (system->getActiveState()) {
-				system->update();
-			}
-		}
+		system_manager->updateSystems();
 
-		//Single access to system
-		//accessSystem("Input")->update();
-
-		//State Manager
-		StateManager::getInstance().run();
+		//State Manager render ( to be removed )
+		scene_manager->render();
 
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
 
 		//Check if window is open
-		if (!getWindowOpen()) {
+		if (glfwWindowShouldClose(NIKEEngine.getWindow())) {
 
 			//Terminate window
 			NIKEEngine.terminate();
 		}
+
+		//Control FPS
+		controlFPS();
 	}
 }
 
@@ -152,7 +164,7 @@ void Core::Engine::terminate() {
 	glfwSetWindowShouldClose(NIKEEngine.ptr_window, GLFW_TRUE);
 }
 
-void Core::Engine::setTitle(std::string const& title) {
+void Core::Engine::setWinTitle(std::string const& title) {
 	glfwSetWindowTitle(ptr_window, title.c_str());
 }
 
@@ -160,48 +172,52 @@ GLFWwindow* Core::Engine::getWindow() const {
 	return ptr_window;
 }
 
-void Core::Engine::setWindowWidth(int width) {
-	window_width = width;
+void Core::Engine::setWindowSize(float width, float height) {
+	window_size.x = width;
+	window_size.y = height;
+
+	glfwSetWindowSize(ptr_window, static_cast<int>(window_size.x), static_cast<int>(window_size.y));
 }
 
-int Core::Engine::getWindowWidth() const {
-	return window_width;
+Vector2 const& Core::Engine::getWindowSize() const {
+	return window_size;
 }
 
-void Core::Engine::setWindowHeight(int height) {
-	window_height = height;
+void Core::Engine::setTargetFPS(int fps) {
+	target_fps = fps;
 }
 
-int Core::Engine::getWindowHeight() const {
-	return window_height;
+float Core::Engine::getCurrentFPS() const {
+	return actual_fps;
 }
 
 float Core::Engine::getDeltaTime() const {
 	return delta_time;
 }
 
-void Core::Engine::addSystem(std::shared_ptr<System::Base> system, std::string const& sys_identifier, size_t index) {
-
-	//Check if system has already been created
-	if (systems_map.find(sys_identifier) != systems_map.end()) {
-		return;
-	}
-
-	//Check for index
-	if (index == std::string::npos && index >= systems.size()) {
-		//Insert system at back
-		systems.push_back(system);
-	}
-	else {
-		//Insert system
-		auto it = systems.begin();
-		systems.insert(it + index, system);
-	}
-
-	//Emplace shared pointer to system in map
-	systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_identifier), std::forward_as_tuple(system));
+/*****************************************************************//**
+* Entity Methods
+*********************************************************************/
+Entity::Type Core::Engine::createEntity() {
+	return entity_manager->createEntity();
 }
 
-std::shared_ptr<System::Base> Core::Engine::accessSystem(std::string const& sys_identifier) {
-	return systems_map.at(sys_identifier);
+void Core::Engine::destroyEntity(Entity::Type entity) {
+
+	//Destroy all data related to entity
+	entity_manager->destroyEntity(entity);
+	component_manager->entityDestroyed(entity);
+	system_manager->entityDestroyed(entity);
+}
+
+/*****************************************************************//**
+* Scene Methods
+*********************************************************************/
+
+void Core::Engine::changeScene(std::string const& scene_id) {
+	scene_manager->changeScene(scene_id);
+}
+
+void Core::Engine::changePrevScene() {
+	scene_manager->previousScene();
 }

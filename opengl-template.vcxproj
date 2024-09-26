@@ -22,13 +22,23 @@
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Systems\AudioSystem.cpp" />
-    <ClCompile Include="src\Systems\InputSystem.cpp" />
-    <ClCompile Include="src\Systems\RenderManager.cpp" />
-    <ClCompile Include="src\Systems\StateManager.cpp" />
+    <ClCompile Include="src\Math\Mtx33.cpp" />
+    <ClCompile Include="src\Math\Vector3.cpp" />
+    <ClCompile Include="src\Systems\Render\Camera.cpp" />
+    <ClCompile Include="src\Systems\Render\Model.cpp" />
+    <ClCompile Include="src\Systems\Render\Object.cpp" />
+    <ClCompile Include="src\Systems\Render\sysRender.cpp" />
+    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
+    <ClCompile Include="src\Managers\mComponent.cpp" />
+    <ClCompile Include="src\Managers\mEntity.cpp" />
+    <ClCompile Include="src\Managers\mSystem.cpp" />
+    <ClCompile Include="src\Scenes\SplashScene.cpp" />
+    <ClCompile Include="src\Systems\sysInput.cpp" />
+    <ClCompile Include="src\Managers\mScene.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
-    <ClCompile Include="src\States\MenuState.cpp" />
+    <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -38,17 +48,30 @@
     <ClInclude Include="headers\AudioSystem.h" />
     <ClInclude Include="headers\AudioComponent.h" />
     <ClInclude Include="headers\db.h" />
-    <ClInclude Include="headers\Engine.h" />
-    <ClInclude Include="headers\InputSystem.h" />
     <ClInclude Include="headers\json.hpp" />
-    <ClInclude Include="headers\MenuState.h" />
+    <ClInclude Include="headers\Components\cRender.h" />
+    <ClInclude Include="headers\Components\cTransform.h" />
+    <ClInclude Include="headers\Systems\Render\Camera.h" />
+    <ClInclude Include="headers\Systems\Render\Model.h" />
+    <ClInclude Include="headers\Systems\Render\Object.h" />
+    <ClInclude Include="headers\Math\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
-    <ClInclude Include="headers\State.h" />
-    <ClInclude Include="headers\StateManager.h" />
-    <ClInclude Include="headers\stdafx.h" />
-    <ClInclude Include="headers\System.h" />
-    <ClInclude Include="headers\Vector2.h" />
-    <ClInclude Include="headers\Vector4.h" />
+    <ClInclude Include="headers\Systems\Render\sysShader.h" />
+    <ClInclude Include="headers\Math\Vector3.h" />
+    <ClInclude Include="headers\Managers\mComponent.h" />
+    <ClInclude Include="headers\Data\db.h" />
+    <ClInclude Include="headers\Core\Engine.h" />
+    <ClInclude Include="headers\Managers\mEntity.h" />
+    <ClInclude Include="headers\Scenes\SplashScene.h" />
+    <ClInclude Include="headers\Systems\sysInput.h" />
+    <ClInclude Include="headers\Data\json.hpp" />
+    <ClInclude Include="headers\Scenes\MenuScene.h" />
+    <ClInclude Include="headers\Systems\Render\sysRender.h" />
+    <ClInclude Include="headers\Managers\mScene.h" />
+    <ClInclude Include="headers\Core\stdafx.h" />
+    <ClInclude Include="headers\Managers\mSystem.h" />
+    <ClInclude Include="headers\Math\Vector2.h" />
+    <ClInclude Include="headers\Math\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
@@ -156,6 +179,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../headers/Core/stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -181,6 +205,7 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../headers/Core/stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
