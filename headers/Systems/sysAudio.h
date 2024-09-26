@@ -3,10 +3,10 @@
 #ifndef AUDIOSYS_HPP
 #define AUDIOSYS_HPP
 
-#include "stdafx.h"
-#include "Engine.h"
-#include "AudioComponent.h"
-#include "InputSystem.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
+#include "../headers/Components/cAudio.h"
+#include "../headers/Systems/sysInput.h"
 
 /************************************
 * SOME NOTES TO TAKE NOTE OF:
@@ -16,7 +16,7 @@
 
 namespace AudioSystem {
 
-	class AudioSystem : public System::Base
+	class AudioSystem : public System::ISystem
 	{
 	public:
 
@@ -93,7 +93,13 @@ namespace AudioSystem {
 		void operator=(AudioSystem const& copy) = delete;
 		
 		// Audio Components (here for the time being)
-		std::unique_ptr<Audio::AudioComponents> audio_components = std::make_unique<Audio::AudioComponents>();
+		// std::unique_ptr<Audio::AudioComponents> audio_components = std::make_unique<Audio::AudioComponents>();
+		// Fmod stuff
+		FMOD::System* fmod_system = nullptr;
+
+		// Init the maps
+		AUDIO_GROUP audio_group_map;
+		AUDIO_MAP audio_map;
 	};
 
 }

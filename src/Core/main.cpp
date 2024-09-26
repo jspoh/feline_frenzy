@@ -10,6 +10,7 @@
 #include "../headers/Core/Engine.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Scenes/SplashScene.h"
+#include "../headers/Systems/sysAudio.h"
 
 // debug stuff
 bool DEBUG = false;
@@ -25,8 +26,7 @@ int main() {
 	NIKEEngine.registerScenes<Menu::Scene>("MENU");
 
 	// Add Audio System for testing
-	AudioSystem::AudioSystem::getInstance().init();
-	NIKEEngine.addSystem(std::shared_ptr<AudioSystem::AudioSystem>(&AudioSystem::AudioSystem::getInstance(), [](System::Base*) {}), "Audio");
+	// NIKEEngine.registerSystem(<AudioSystem::AudioSystem>();
 
 	//Engine Game Loop
 	NIKEEngine.run();

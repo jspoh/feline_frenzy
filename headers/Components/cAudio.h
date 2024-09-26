@@ -1,6 +1,10 @@
 #pragma once
 
-#include "stdafx.h"
+#ifndef C_AUDIO_HPP
+#define C_AUDIO_HPP
+
+
+#include "../headers/Core/stdafx.h"
 
 /************************************
 * SOME NOTES TO TAKE NOTE OF: 
@@ -26,18 +30,11 @@ namespace Audio {
 
 	struct AudioComponents
 	{
-		// Fmod stuff
-		FMOD::System* fmod_system = nullptr;
-
 		//// Fmod studio system
 		//FMOD::Studio::System* fmod_studio_system;
 
 		// File buffer to read .wav files and stuff
 		char* file_buffer = nullptr;
-
-		// Init the maps
-		AUDIO_GROUP audio_group_map;
-		AUDIO_MAP audio_map;
 
 		// Volume 
 		float volume{};
@@ -48,3 +45,5 @@ namespace Audio {
 	};
 
 }
+
+#endif
