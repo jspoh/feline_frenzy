@@ -7,8 +7,8 @@
  *********************************************************************/
 #pragma once
 
-#include "stdafx.h"
-#include "Object.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Render/Object.h"
 
 class Camera {
 

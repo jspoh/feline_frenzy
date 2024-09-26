@@ -39,8 +39,12 @@
 #include "../headers/Data/json.hpp"
 
 // our completed headers
+#include "../headers/Math/Mtx33.h"	
 #include "../headers/Math/Vector2.h"
+#include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
+
+#define PI static_cast<float> (atan(1)*4.f)
 
 namespace Entity {
 

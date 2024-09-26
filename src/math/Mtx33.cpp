@@ -1,6 +1,6 @@
 
-#include "stdafx.h"
-#include "Mtx33.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Math/Mtx33.h"
 
 using namespace Matrix33;
 constexpr float PI_OVER_180 = 0.0174532925199432f;;

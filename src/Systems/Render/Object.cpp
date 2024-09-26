@@ -6,9 +6,9 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Object.h"
-#include "RenderManager.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Render/Object.h"
+#include "../headers/Systems/Render/sysRender.h"
 
 using namespace Matrix33;
 
@@ -85,7 +85,7 @@ void Object::update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform) {
 	
 	// Modulus the object rotation so it doesnt result in a large number overtime
 	orientation = fmod(orientation, 360.f);
-	float angleDisp = (orientation += rotation * dt) * PI / 180;
+	float angleDisp = (orientation += rotation * dt) * PI / 180.f;
 
 	Matrix_33Rot(rot_mat, angleDisp);
 	Matrix_33Scale(scale_mat, scale.x, scale.y);
@@ -102,8 +102,8 @@ void Object::update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform) {
 
 void Object::draw() const {
 
-	auto it = RenderManager::getInstance().models.find(model_ref);
-	if (it != RenderManager::getInstance().models.end()) {
+	auto it = Render::Manager::getInstance().models.find(model_ref);
+	if (it != Render::Manager::getInstance().models.end()) {
 		it->second->draw();
 	}
 	else {

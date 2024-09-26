@@ -6,8 +6,9 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Camera.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Render/Camera.h"
+
 
 
 Camera::Camera() : position(Vector2(0, 0)), target(Vector2(0, 0)), up(Vector2(0, 1)), height(0), ar(0) {
@@ -31,7 +32,7 @@ void Camera::init(const Object& camObj, float wWidth, float wHeight) {
 	// !TODO set height as a constant from the config
 	height = 1000;
 	ar = static_cast<float>(wWidth) / wHeight;
-	float angleDisp = camObj.getOrientation() * PI / 180;;
+	float angleDisp = camObj.getOrientation() * PI / 180.f;
 
 	up = Vector2(-sin(angleDisp), cos(angleDisp));
 	target = Vector2(cos(angleDisp), sin(angleDisp));

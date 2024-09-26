@@ -21,13 +21,13 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\math\Mtx33.cpp" />
-    <ClCompile Include="src\math\Vector3.cpp" />
-    <ClCompile Include="src\Systems\renderer\Camera.cpp" />
-    <ClCompile Include="src\Systems\renderer\Model.cpp" />
-    <ClCompile Include="src\Systems\renderer\Object.cpp" />
-    <ClCompile Include="src\Systems\renderer\RenderManager.cpp" />
-    <ClCompile Include="src\Systems\renderer\ShaderManager.cpp" />
+    <ClCompile Include="src\Math\Mtx33.cpp" />
+    <ClCompile Include="src\Math\Vector3.cpp" />
+    <ClCompile Include="src\Systems\Render\Camera.cpp" />
+    <ClCompile Include="src\Systems\Render\Model.cpp" />
+    <ClCompile Include="src\Systems\Render\Object.cpp" />
+    <ClCompile Include="src\Systems\Render\sysRender.cpp" />
+    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
     <ClCompile Include="src\Managers\mComponent.cpp" />
     <ClCompile Include="src\Managers\mEntity.cpp" />
     <ClCompile Include="src\Managers\mSystem.cpp" />
@@ -44,13 +44,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Camera.h" />
-    <ClInclude Include="headers\Model.h" />
-    <ClInclude Include="headers\Object.h" />
-    <ClInclude Include="headers\Mtx33.h" />
+    <ClInclude Include="headers\Components\cRender.h" />
+    <ClInclude Include="headers\Components\cTransform.h" />
+    <ClInclude Include="headers\Systems\Render\Camera.h" />
+    <ClInclude Include="headers\Systems\Render\Model.h" />
+    <ClInclude Include="headers\Systems\Render\Object.h" />
+    <ClInclude Include="headers\Math\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
-    <ClInclude Include="headers\ShaderManager.h" />
-    <ClInclude Include="headers\Vector3.h" />
+    <ClInclude Include="headers\Systems\Render\sysShader.h" />
+    <ClInclude Include="headers\Math\Vector3.h" />
     <ClInclude Include="headers\Managers\mComponent.h" />
     <ClInclude Include="headers\Data\db.h" />
     <ClInclude Include="headers\Core\Engine.h" />
@@ -59,7 +61,7 @@
     <ClInclude Include="headers\Systems\sysInput.h" />
     <ClInclude Include="headers\Data\json.hpp" />
     <ClInclude Include="headers\Scenes\MenuScene.h" />
-    <ClInclude Include="headers\Systems\sysRender.h" />
+    <ClInclude Include="headers\Systems\Render\sysRender.h" />
     <ClInclude Include="headers\Managers\mScene.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\mSystem.h" />

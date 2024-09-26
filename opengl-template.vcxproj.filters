@@ -1,149 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="src\Data\db.cpp" />
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Math\Mtx33.cpp" />
+    <ClCompile Include="src\Math\Vector3.cpp" />
+    <ClCompile Include="src\Systems\Render\Camera.cpp" />
+    <ClCompile Include="src\Systems\Render\Model.cpp" />
+    <ClCompile Include="src\Systems\Render\Object.cpp" />
+    <ClCompile Include="src\Systems\Render\sysRender.cpp" />
+    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
+    <ClCompile Include="src\Managers\mComponent.cpp" />
+    <ClCompile Include="src\Managers\mEntity.cpp" />
+    <ClCompile Include="src\Managers\mSystem.cpp" />
+    <ClCompile Include="src\Scenes\SplashScene.cpp" />
+    <ClCompile Include="src\Systems\sysInput.cpp" />
+    <ClCompile Include="src\Managers\mScene.cpp" />
+    <ClCompile Include="src\Core\main.cpp" />
+    <ClCompile Include="src\Math\Vector2.cpp" />
+    <ClCompile Include="src\Math\Vector4.cpp" />
+    <ClCompile Include="src\Scenes\MenuScene.cpp" />
+    <ClCompile Include="src\Core\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\data\db.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Vector2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scenes\MenuScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Vector4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Mtx33.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\math\Vector3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\RenderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\sysInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\mScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\ShaderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Systems\renderer\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\mEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\mComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\mSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scenes\SplashScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="headers\Systems\Render\Camera.h" />
+    <ClInclude Include="headers\Systems\Render\Model.h" />
+    <ClInclude Include="headers\Systems\Render\Object.h" />
+    <ClInclude Include="headers\Math\Mtx33.h" />
+    <ClInclude Include="headers\RenderManager.h" />
+    <ClInclude Include="headers\Systems\Render\sysShader.h" />
+    <ClInclude Include="headers\Math\Vector3.h" />
+    <ClInclude Include="headers\Managers\mComponent.h" />
+    <ClInclude Include="headers\Data\db.h" />
+    <ClInclude Include="headers\Core\Engine.h" />
+    <ClInclude Include="headers\Managers\mEntity.h" />
+    <ClInclude Include="headers\Scenes\SplashScene.h" />
+    <ClInclude Include="headers\Systems\sysInput.h" />
+    <ClInclude Include="headers\Data\json.hpp" />
+    <ClInclude Include="headers\Scenes\MenuScene.h" />
+    <ClInclude Include="headers\Systems\Render\sysRender.h" />
+    <ClInclude Include="headers\Managers\mScene.h" />
+    <ClInclude Include="headers\Core\stdafx.h" />
+    <ClInclude Include="headers\Managers\mSystem.h" />
+    <ClInclude Include="headers\Math\Vector2.h" />
+    <ClInclude Include="headers\Math\Vector4.h" />
+    <ClInclude Include="headers\Components\cRender.h" />
+    <ClInclude Include="headers\Components\cTransform.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Core\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Data\db.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Data\json.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Math\Vector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Managers\mScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Scenes\MenuScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Systems\sysRender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Math\Vector4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Core\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Systems\sysInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Managers\mSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Managers\mEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Managers\mComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Scenes\SplashScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\InputSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Mtx33.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\System.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Vector3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\ShaderManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Object.h">
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\textured_rendering.vert" />
-    <None Include="shaders\textured_rendering.frag" />
-    <None Include="shaders\base.vert" />
     <None Include="shaders\base.frag" />
+    <None Include="shaders\base.vert" />
+    <None Include="shaders\textured_rendering.frag" />
+    <None Include="shaders\textured_rendering.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\meshes\square.txt" />

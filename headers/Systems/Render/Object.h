@@ -9,8 +9,8 @@
 #pragma once
 
 
-#include "stdafx.h"
-#include "Model.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Render/Model.h"
 
 
 class Object {

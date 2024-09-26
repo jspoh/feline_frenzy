@@ -6,30 +6,28 @@
  * \date   September 2024
  *********************************************************************/
 
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Render/sysRender.h"
 
-#include "stdafx.h"
-#include "RenderManager.h"
-
-
-RenderManager::RenderManager() {
+Render::Manager::Manager() {
 	// compile shaders
 	shaderManager.loadShader("base", "shaders/base.vert", "shaders/base.frag");
 	shaderManager.loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
 	// !TODO: shader for text rendering(?)
 }
 
-RenderManager::~RenderManager() {
+Render::Manager::~Manager() {
     for (auto& [ref, model] : models) {
         delete model;
     }
 }
 
-RenderManager& RenderManager::getInstance() {
-	static RenderManager instance;
+Render::Manager& Render::Manager::getInstance() {
+	static Render::Manager instance;
 	return instance;
 }
 
-void RenderManager::initCamera(const std::string& object_ref) {
+void Render::Manager::initCamera(const std::string& object_ref) {
     if (objects.find(object_ref) == objects.end()) {
         cerr << "Object not found: " << object_ref << endl;
         return;
@@ -49,7 +47,7 @@ void RenderManager::initCamera(const std::string& object_ref) {
 }
 
 // Adds a mesh / model into the model map
-void RenderManager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
+void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
     Model* model = new Model();
     if (model->loadMesh(path_to_mesh)) {
         models[model_ref] = model;
@@ -61,7 +59,7 @@ void RenderManager::registerModel(const std::string& model_ref, const std::strin
 }
 
 // Constructs an object and places it into the object map
-void RenderManager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color, const Vector2& position, const Vector2& scale, float orientation, float rotation, float velocity) {
+void Render::Manager::createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color, const Vector2& position, const Vector2& scale, float orientation, float rotation, float velocity) {
     // Check if the model exists before creating the object
     if (models.find(model_ref) == models.end()) {
         cerr << "Model not found: " << model_ref << endl;
@@ -76,7 +74,7 @@ void RenderManager::createObject(const std::string& object_ref, const std::strin
 }
 
 // Returns a pointer to an object in the map
-Object* RenderManager::getObject(const std::string& object_ref) {
+Object* Render::Manager::getObject(const std::string& object_ref) {
     if (objects.find(object_ref) != objects.end()) {
         return &objects[object_ref];
     }
@@ -85,7 +83,7 @@ Object* RenderManager::getObject(const std::string& object_ref) {
 }
 
 // Update all objects transform matrix
-void RenderManager::updateObjects() {
+void Render::Manager::updateObjects() {
     float deltaTime = Core::Engine::getInstance().getDeltaTime();
 
     for (auto& [object_ref, object] : objects) {
@@ -97,7 +95,7 @@ void RenderManager::updateObjects() {
 }
 
 // Draw all objects
-void RenderManager::drawObjects() {
+void Render::Manager::drawObjects() {
 
     for (const auto& [object_ref, object] : objects) {
         shaderManager.useShader(object.getShaderRef());

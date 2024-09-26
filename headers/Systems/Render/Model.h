@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "stdafx.h"
+#ifndef RENDER_MODEL_HPP
+#define RENDER_MODEL_HPP
 
 class Model {
 	public: 
@@ -26,3 +27,5 @@ class Model {
 	private:
 		void createBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices);
 };
+
+#endif // !RENDER_MODEL_HPP
