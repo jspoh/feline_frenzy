@@ -11,13 +11,9 @@
 
 #define _CRTDBG_MAP_ALLOC
 
-// CONSTANTS
-#define PI atan(1)*4
-
 // graphics headers
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
-#include "glm/mat3x3.hpp"
 
 // standard headers
 #include <iostream>
@@ -35,16 +31,37 @@
 #include <memory>
 #include <cmath>
 #include <iterator>
+#include <bitset>
+#include <queue>
+#include <set>
 
 // external headers
-#include "json.hpp"
+#include "../headers/Data/json.hpp"
 
 // our completed headers
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
-#include "Mtx33.h"
+#include "../headers/Math/Vector2.h"
+#include "../headers/Math/Vector4.h"
 
+namespace Entity {
+
+    //Entity Type
+    using Type = uint16_t;
+
+    //Max number of entities to be created at a single point
+    const Type MAX = 2500;
+}
+
+namespace Component {
+
+    //Component Signature Type
+    using Type = uint8_t;
+
+    //Max components to be stored in a signature
+    const Type MAX = 64;
+
+    //Nested components signature
+    using Signature = std::bitset<MAX>;
+}
 
 class NullStream {
 public:

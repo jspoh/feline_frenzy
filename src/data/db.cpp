@@ -13,8 +13,8 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "stdafx.h"
-#include "db.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Data/db.h"
 
 using json = nlohmann::json;
 

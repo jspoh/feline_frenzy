@@ -6,12 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Engine.h"
-#include "StateManager.h"
-
-// cannot set to 0 in case of division by 0!!
-//float Core::Engine::dt = 1.f;
+#include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
 
 Core::Engine::Engine()
 	: ptr_window{ nullptr }, window_size{}, window_title{""}, delta_time{0.0f},
@@ -115,6 +111,11 @@ void Core::Engine::controlFPS() {
 }
 
 void Core::Engine::init(std::string const& file_path, int fps) {
+	entity_manager = std::make_unique<Entity::Manager>();
+	component_manager = std::make_unique<Component::Manager>();
+	system_manager = std::make_unique<System::Manager>();
+	scene_manager = std::make_unique<Scenes::Manager>();
+
 	//Read config file
 	readConfigFile(file_path);
 
@@ -123,10 +124,6 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 
 	//Set Target FPS
 	target_fps = fps;
-
-	// initialize states
-	StateManager::getInstance().register_all_states();		// important!
-	StateManager::getInstance().set_active_state("main_menu");
 }
 
 void Core::Engine::run() {
@@ -139,25 +136,14 @@ void Core::Engine::run() {
 		//Poll system events ( Interativity with app )
 		glfwPollEvents();
 
-		//Set BG Color
-		glClearColor(1, 1, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		//Set Window Title
 		setWinTitle(window_title + " | " + std::to_string(actual_fps) + " fps");
 
 		//Update all systems
-		for (auto& system : systems) {
-			if (system->getActiveState()) {
-				system->update();
-			}
-		}
+		system_manager->updateSystems();
 
-		//To disable v-sync ( testing fps control )
-		//glfwSwapInterval(0);
-
-		//State Manager
-		StateManager::getInstance().run();
+		//State Manager render ( to be removed )
+		scene_manager->render();
 
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
@@ -209,28 +195,29 @@ float Core::Engine::getDeltaTime() const {
 	return delta_time;
 }
 
-void Core::Engine::addSystem(std::shared_ptr<System::Base> system, std::string const& sys_identifier, size_t index) {
-
-	//Check if system has already been created
-	if (systems_map.find(sys_identifier) != systems_map.end()) {
-		return;
-	}
-
-	//Check for index
-	if (index == std::string::npos && index >= systems.size()) {
-		//Insert system at back
-		systems.push_back(system);
-	}
-	else {
-		//Insert system
-		auto it = systems.begin();
-		systems.insert(it + index, system);
-	}
-
-	//Emplace shared pointer to system in map
-	systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_identifier), std::forward_as_tuple(system));
+/*****************************************************************//**
+* Entity Methods
+*********************************************************************/
+Entity::Type Core::Engine::createEntity() {
+	return entity_manager->createEntity();
 }
 
-std::shared_ptr<System::Base> Core::Engine::accessSystem(std::string const& sys_identifier) {
-	return systems_map.at(sys_identifier);
+void Core::Engine::destroyEntity(Entity::Type entity) {
+
+	//Destroy all data related to entity
+	entity_manager->destroyEntity(entity);
+	component_manager->entityDestroyed(entity);
+	system_manager->entityDestroyed(entity);
+}
+
+/*****************************************************************//**
+* Scene Methods
+*********************************************************************/
+
+void Core::Engine::changeScene(std::string const& scene_id) {
+	scene_manager->changeScene(scene_id);
+}
+
+void Core::Engine::changePrevScene() {
+	scene_manager->previousScene();
 }

@@ -6,8 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "Vector2.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Math/Vector2.h"
 
 Vector2 Vector2::operator+(const Vector2& rhs) const {
 	return Vector2(x + rhs.x, y + rhs.y);
