@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "stdafx.h"
+#include "../headers/Core/stdafx.h"
 
 
 // !TODO: move this code
@@ -23,6 +23,17 @@ class RenderManager {
 private:
 	RenderManager();
 	~RenderManager();
+
+	std::unordered_map<std::string, unsigned int> shader_programs;
+
+	/**
+	 * compiles shader and adds to shader_programs.
+	 *
+	 * \param shader_ref	shader program's reference string
+	 * \param vtx_path		path to vertex shader
+	 * \param frag_path		path to fragment shader
+	 */
+	void compileShader(std::string shader_ref, std::string vtx_path, std::string frag_path);
 
 	// vertex array objects + data required for drawing
 	std::unordered_map<std::string, Model> models;
@@ -60,6 +71,10 @@ public:
 	 * \return success
 	 */
 	bool registerMesh(std::string mesh_ref, std::string path_to_mesh);
+
+	void useShader(std::string shader_ref);
+
+	void unuseShader();
 
 	void drawModel(std::string mdl_ref);
 };
