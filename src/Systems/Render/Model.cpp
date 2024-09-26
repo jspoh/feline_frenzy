@@ -11,9 +11,6 @@
 Model::Model() : vaoid(0), vboid(0), eboid(0), draw_count(0) {}
 
 Model::~Model() {
-    glDeleteVertexArrays(1, &vaoid);
-    glDeleteBuffers(1, &vboid);
-    glDeleteBuffers(1, &eboid);
 }
 
 // only for base rendering shader because of attrib locations

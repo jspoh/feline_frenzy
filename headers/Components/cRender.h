@@ -12,8 +12,11 @@ namespace Render {
 		float alpha;
 	};
 
-	struct Camera {
-
+	struct Model {
+		unsigned int vaoid;
+		unsigned int vboid;
+		unsigned int eboid;
+		unsigned int draw_count;
 	};
 }
 
