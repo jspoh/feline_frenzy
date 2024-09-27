@@ -51,7 +51,7 @@ bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) c
         return CollisionUtils::satCheck(a.position, a.size, b.position, b.size);
     }
 }
-
+// Test function
 bool Collision::Manager::checkCollisionBetween( const Vector2& vel_a, const Vector2& rect_min_a, const Vector2& rect_max_a,
                                                 const Vector2& vel_b, const Vector2& rect_min_b, const Vector2& rect_max_b,
                                                 float radius_a, float radius_b) {
@@ -82,8 +82,8 @@ void Collision::Manager::registerCollider(const Vector2& position, const Vector2
             collider.size = size;
             collider.radius = radius;
             collider.velocity = velocity;
-            collider.rect_min = { position.x - size.x / 2, position.y - size.y / 2 };
-            collider.rect_max = { position.x + size.x / 2, position.y + size.y / 2 };
+            collider.rect_min = { position.x - (size.x / 2), position.y - (size.y / 2) }; // Bounding box min
+            collider.rect_max = { position.x + (size.x / 2), position.y + (size.y / 2) }; // Bounding box max
             return;  // Successfully registered
         }
     }
