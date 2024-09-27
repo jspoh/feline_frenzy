@@ -2,8 +2,8 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
-    <ClCompile Include="src\Systems\AudioSystem.cpp"/>
     <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
     <ClCompile Include="src\Systems\Render\Camera.cpp" />
@@ -22,10 +22,15 @@
     <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
+    <ClCompile Include="src\Managers\mAssetManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\AudioComponent.h"/>
-    <ClInclude Include="headers\AudioSystem.h">
+    <ClInclude Include="headers\Systems\sysAudio.h" />
+    <ClInclude Include="headers\Components\cAudio.h" />
+    <ClInclude Include="headers\db.h" />
+    <ClInclude Include="headers\json.hpp" />
+    <ClInclude Include="headers\Components\cRender.h" />
+    <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Systems\Render\Camera.h" />
     <ClInclude Include="headers\Systems\Render\Model.h" />
     <ClInclude Include="headers\Systems\Render\Object.h" />
@@ -47,8 +52,7 @@
     <ClInclude Include="headers\Managers\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />
     <ClInclude Include="headers\Math\Vector4.h" />
-    <ClInclude Include="headers\Components\cRender.h" />
-    <ClInclude Include="headers\Components\cTransform.h" />
+    <ClInclude Include="headers\Managers\mAssetManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

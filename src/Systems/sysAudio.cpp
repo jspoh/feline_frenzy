@@ -1,9 +1,17 @@
+/*****************************************************************//**
+ * \file   sysAudio.cpp
+ * \brief  Audio manager function definitions 
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysAudio.h"
+#include "../headers/Systems/sysInput.h"
 
 // Create Fmod instance
-AudioSystem::AudioSystem::AudioSystem()
+Audio::Manager::Manager()
 {
 	FMOD_RESULT result;
 	result = FMOD::System_Create(&fmod_system);
@@ -29,12 +37,12 @@ AudioSystem::AudioSystem::AudioSystem()
 	}
 }
 
-void AudioSystem::AudioSystem::init()
+void Audio::Manager::init()
 {
 
 }
 
-void AudioSystem::AudioSystem::update()
+void Audio::Manager::update()
 {
 	fmod_system->update();
 	// For debug purposes
@@ -42,13 +50,13 @@ void AudioSystem::AudioSystem::update()
 }
 
 // Release Fmod system
-AudioSystem::AudioSystem::~AudioSystem()
+Audio::Manager::~Manager()
 {
 	// Release fmod studio
 	fmod_system->release();
 }
 
-NE_AUDIO AudioSystem::AudioSystem::NEAudioLoadSound(std::string const& file_path, std::string const& tag)
+Audio::NE_AUDIO Audio::Manager::NEAudioLoadSound(std::string const& file_path)
 {
 	NE_AUDIO temp = nullptr;
 	FMOD_RESULT result;
@@ -62,13 +70,10 @@ NE_AUDIO AudioSystem::AudioSystem::NEAudioLoadSound(std::string const& file_path
 		return nullptr;
 	}
 
-	// Push sound after reading from file
-	audio_map[tag] = temp;
-
 	return temp;
 }
 
-NE_AUDIO AudioSystem::AudioSystem::NEAudioLoadMusic(std::string const& file_path, std::string const& tag)
+Audio::NE_AUDIO Audio::Manager::NEAudioLoadMusic(std::string const& file_path)
 {
 
 	NE_AUDIO temp;
@@ -84,19 +89,11 @@ NE_AUDIO AudioSystem::AudioSystem::NEAudioLoadMusic(std::string const& file_path
 		return temp;
 	}
 
-	// Push sound after reading from file
-	audio_map[tag] = temp;
-
 	return temp;
 }
 
-NE_AUDIO_GROUP AudioSystem::AudioSystem::CreateAudioGroup(std::string const& audio_group_tag)
+Audio::NE_AUDIO_GROUP Audio::Manager::CreateAudioGroup(std::string const& audio_group_tag)
 {
-	// Check if the group already exists in the map
-	if (audio_group_map.find(audio_group_tag) != audio_group_map.end())
-	{
-		cerr << "AUDIO GROUP ALREADY EXISTS" << endl;
-	}
 
 	NE_AUDIO_RESULT result{};
 	NE_AUDIO_GROUP temp = nullptr;
@@ -110,32 +107,10 @@ NE_AUDIO_GROUP AudioSystem::AudioSystem::CreateAudioGroup(std::string const& aud
 	{
 		cout << "AUDIO GROUP INITIALIZED" << endl;
 	}
-	// Push into audio group map
-	audio_group_map[audio_group_tag] = temp;
 	return temp;
 }
 
-NE_AUDIO_GROUP AudioSystem::AudioSystem::GetAudioGroup(std::string const& tag)
-{
-	return audio_group_map[tag];
-}
-
-NE_AUDIO AudioSystem::AudioSystem::GetAudio(std::string const& tag)
-{
-	return audio_map[tag];
-}
-
-bool AudioSystem::AudioSystem::NEAudioIsValidGroup(std::string const& audio_group_tag)
-{
-	// Check if the group already exists in the map
-	if (audio_group_map.find(audio_group_tag) != audio_group_map.end())
-	{
-		return true;
-	}
-	return false;
-}
-
-void AudioSystem::AudioSystem::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop)
+void Audio::Manager::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop)
 {
 	fmod_system->playSound(audio, group, 0, nullptr);	
 	// This is same as UNREFERENCED_PARAMETER
@@ -144,16 +119,7 @@ void AudioSystem::AudioSystem::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group,
 	static_cast<void>(loop);
 }
 
-void AudioSystem::AudioSystem::NEAudioPlay(std::string const& audio_tag, std::string const& audio_group_tag, float vol, float pitch, bool loop)
-{
-	fmod_system->playSound(GetAudio(audio_tag), GetAudioGroup(audio_group_tag), 0, nullptr);
-	// This is same as UNREFERENCED_PARAMETER
-	static_cast<void>(vol);
-	static_cast<void>(pitch);
-	static_cast<void>(loop);
-}
-
-void AudioSystem::AudioSystem::NEAudioStopGroup(std::string const& tag)
+void Audio::Manager::NEAudioStopGroup(std::string const& tag)
 {
 	// This is same as UNREFERENCED_PARAMETER
 	static_cast<void>(tag);
@@ -163,45 +129,39 @@ void AudioSystem::AudioSystem::NEAudioStopGroup(std::string const& tag)
 	//}
 }
 
-bool AudioSystem::AudioSystem::NEAudioIsValid(NE_AUDIO_GROUP group)
-{
-	static_cast<void>(group);
-	return false;
-}
-
-void AudioSystem::AudioSystem::NEAudioPauseGroup(NE_AUDIO_GROUP group)
+void Audio::Manager::NEAudioPauseGroup(NE_AUDIO_GROUP group)
 {
 	static_cast<void>(group);
 
 }
 
-void AudioSystem::AudioSystem::NEAudioResumeGroup(NE_AUDIO_GROUP group)
+void Audio::Manager::NEAudioResumeGroup(NE_AUDIO_GROUP group)
 {
 	static_cast<void>(group);
 }
 
-void AudioSystem::AudioSystem::NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch)
+void Audio::Manager::NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch)
 {
 	static_cast<void>(group);
 	static_cast<void>(pitch);
 }
 
-void AudioSystem::AudioSystem::NEAudioSetGroupVolume(NE_AUDIO_GROUP group)
+void Audio::Manager::NEAudioSetGroupVolume(NE_AUDIO_GROUP group)
 {
 	static_cast<void>(group);
 }
 
-void AudioSystem::AudioSystem::NEAudioUnloadGroup(NE_AUDIO_GROUP group)
+void Audio::Manager::NEAudioUnloadGroup(NE_AUDIO_GROUP group)
 {
 	static_cast<void>(group);
 }
 
-void AudioSystem::AudioSystem::NEAudioUnloadAudio(NE_AUDIO audio)
+void Audio::Manager::NEAudioUnloadAudio(NE_AUDIO audio)
 {
 	static_cast<void>(audio);
 }
 
-void AudioSystem::AudioSystem::IsPlaying(NE_AUDIO audio)
+void Audio::Manager::IsPlaying(NE_AUDIO audio)
 {
 	static_cast<void>(audio);
 }

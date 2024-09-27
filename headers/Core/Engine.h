@@ -15,6 +15,7 @@
 #include "../headers/Managers/mComponent.h"
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Managers/mScene.h"
+#include "../headers/Managers/mAssetManager.h"
 
 namespace Core {
 
@@ -49,6 +50,7 @@ namespace Core {
 		std::unique_ptr<Component::Manager> component_manager;
 		std::unique_ptr<System::Manager> system_manager;
 		std::unique_ptr<Scenes::Manager> scene_manager;
+		std::unique_ptr<Asset::Manager> asset_manager;
 
 		/**
 		 * Read & Deserialize Data From Config File

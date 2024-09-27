@@ -18,7 +18,9 @@ namespace Splash {
 	class Scene : public Scenes::IScene {
 	private:
 		//Create scene specific variables here
-		Entity::Type mouse_click;
+		Entity::Type mouse_click; 
+		// BGM goes here
+		Entity::Type bg_music;
 
 	public:
 
