@@ -36,6 +36,10 @@ namespace Collision {
             Vector2 velocity;
             Vector2 rect_min;
             Vector2 rect_max;
+
+            // For bounding box and bounding sphere
+            Vector2 min;
+            Vector2 max;
         };
 
         std::vector<Collider> colliders;  // List of colliders in the system (CURRENTLY STORES ALL COLLIDERS)
