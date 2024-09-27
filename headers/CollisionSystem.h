@@ -28,27 +28,38 @@ namespace Collision {
         void operator=(Manager const& copy) = delete;
 
         struct Collider {
+            // Note Vector2 default initialized to zero vector already
+
+            bool active = false; // Tracks if collider is in use
+
+            int objType = 7; // Placeholder for object type
+
             Vector2 position;  // Position of the object (X, Y) world coordinates...
             Vector2 size;      // Size (width, height)
             float radius = 0.0f; // Optional for circle colliders
-
-            // Test...
-            Vector2 velocity;
+            Vector2 velocity; // Current velocity
+            
+            // For bounding box
             Vector2 rect_min;
             Vector2 rect_max;
 
-            // For bounding box and bounding sphere
-            Vector2 min;
-            Vector2 max;
+            // For bounding sphere...unused for now
+            Vector2 cir_min;
+            Vector2 cir_max;
         };
 
         std::vector<Collider> colliders;  // List of colliders in the system (CURRENTLY STORES ALL COLLIDERS)
+
+        // Function to set bounding box for collider
+        void setBoundingBox(Collider);
 
         // Function to detect collisions between two colliders!
         bool detectCollision(const Collider& a, const Collider& b) const;
 
         // Test function to check for collision between 2 positions...
-        bool checkCollisionBetween(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, float radius_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b, float radius_b);
+        bool checkCollisionBetween( const Vector2& vel_a, const Vector2& rect_min_a, const Vector2& rect_max_a,
+                                    const Vector2& vel_b, const Vector2& rect_min_b, const Vector2& rect_max_b,
+                                    float radius_a, float radius_b);
 
 
     public:
@@ -65,7 +76,7 @@ namespace Collision {
         void update() override;
 
         // Register a new collider
-        void registerCollider(const Vector2& position, const Vector2& size, float radius = 0.0f);
+        void registerCollider(const Vector2& position, const Vector2& size, float radius, const Vector2& velocity);
 
         // Unregister a collider
         void unregisterCollider(const Vector2& position);
