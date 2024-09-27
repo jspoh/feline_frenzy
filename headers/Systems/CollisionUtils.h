@@ -6,7 +6,7 @@
  * \author Min Khant Ko
  * \date   September 2024
  *********************************************************************/
-
+/*
 #pragma once
 
 #ifndef COLLISION_UTILS_HPP
@@ -40,3 +40,4 @@ namespace CollisionUtils {
 }
 
 #endif // COLLISION_UTILS_HPP
+*/

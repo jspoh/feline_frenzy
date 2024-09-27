@@ -6,17 +6,17 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
-#include "PhysicsSystem.h"
-#include "InputSystem.h"
-#include "RenderManager.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/sysPhysics.h"
 
 void Physics::Manager::init() {
 
 }
 
 void Physics::Manager::update() {
-    Physics::Manager::getInstance().move(RenderManager::getInstance().getObject("camera"));
+    //Physics::Manager::getInstance().move(RenderManager::getInstance().getObject("camera"));
+    //NIKEEngine.accessSystem<Physics::Manager>()->getInstance()->move(Render::Manager::getInstance().getObject("camera"));
+    NIKEEngine.accessSystem<Physics::Manager>()->getInstance()->move(NIKEEngine.accessSystem<Render::Manager>()->getObject("camera"));
 }
 
 void Physics::Manager::move(Object* object) {
@@ -31,21 +31,21 @@ void Physics::Manager::move(Object* object) {
     Vector2 moveVec{};
     Vector2 objPos = object->getPosition();
 
-    if (Input::Manager::getInstance().key_is_pressed(GLFW_KEY_D)) {
+    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_D)){
         moveVec.x += 1.0f;
     }
-    if (Input::Manager::getInstance().key_is_pressed(GLFW_KEY_A)) {
+    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_A)) {
         moveVec.x -= 1.0f;
     }
-    if (Input::Manager::getInstance().key_is_pressed(GLFW_KEY_W)) {
+    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_W)) {
         moveVec.y += 1.0f;
     }
-    if (Input::Manager::getInstance().key_is_pressed(GLFW_KEY_S)) {
+    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_S)) {
         moveVec.y -= 1.0f;
     }
 
     // Calculate magnitude of movement
-    float magnitude = sqrt((moveVec.x * moveVec.x) + (moveVec.y * moveVec.y));
+    //float magnitude = sqrt((moveVec.x * moveVec.x) + (moveVec.y * moveVec.y));
 
     // Normalizing movement
     if (moveVec.lengthSq() > 0.0f) {

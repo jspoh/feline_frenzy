@@ -6,6 +6,7 @@
  * \date   September 2024
  *********************************************************************/
 
+/*
 #pragma once
 
 #ifndef COLLISION_SYSTEM_HPP
@@ -72,3 +73,4 @@ namespace Collision {
 }
 
 #endif // COLLISION_SYSTEM_HPP
+*/

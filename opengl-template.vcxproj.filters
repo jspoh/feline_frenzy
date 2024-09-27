@@ -3,9 +3,9 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Systems\PhysicsSystem.cpp" />
-    <ClCompile Include="src\Systems\CollisionSystem.cpp"/>
-    <ClCompile Include="src\Systems\CollisionUtils.cpp"/>
+    <ClCompile Include="src\Systems\sysPhysics.cpp" />
+    <ClCompile Include="src\Systems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\CollisionUtils.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
     <ClCompile Include="src\Systems\Render\Camera.cpp" />
@@ -26,9 +26,9 @@
     <ClCompile Include="src\Core\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\PhysicsSystem.h" />
-    <ClInclude Include="headers\CollisionSystem.h" />
-    <ClInclude Include="headers\CollisionUtils.h" />
+    <ClInclude Include="headers\Systems\sysPhysics.h" />
+    <ClInclude Include="headers\Systems\CollisionSystem.h" />
+    <ClInclude Include="headers\Systems\CollisionUtils.h" />
     <ClInclude Include="headers\Systems\Render\Camera.h" />
     <ClInclude Include="headers\Systems\Render\Model.h" />
     <ClInclude Include="headers\Systems\Render\Object.h" />

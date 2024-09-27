@@ -6,7 +6,10 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "stdafx.h"
+
+#include "../headers/Core/stdafx.h"
+
+/*
 #include "CollisionUtils.h"
 #include "InputSystem.h"
 #include <iostream>
@@ -143,3 +146,4 @@ namespace CollisionUtils {
         return false;
     }
 }
+*/

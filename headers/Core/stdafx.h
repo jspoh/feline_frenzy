@@ -44,6 +44,10 @@
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
 
+// components
+#include "../headers/Components/cRender.h"
+#include "../headers/Components/cTransform.h"
+
 #define PI static_cast<float> (atan(1)*4.f)
 
 namespace Entity {

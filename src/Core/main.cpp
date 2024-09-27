@@ -10,8 +10,9 @@
 #include "../headers/Core/Engine.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Scenes/SplashScene.h"
-#include "PhysicsSystem.h"
-#include "CollisionSystem.h"
+#include "../headers/Systems/sysPhysics.h"
+#include "../headers/Systems/sysInput.h"
+#include "../headers/Systems/CollisionSystem.h"
 
 // debug stuff
 bool DEBUG = false;
@@ -26,13 +27,19 @@ int main() {
 	NIKEEngine.registerScenes<Splash::Scene>("SPLASH");
 	NIKEEngine.registerScenes<Menu::Scene>("MENU");
 
-	//Add Physics System
-	Physics::Manager::getInstance().init();
-	NIKEEngine.addSystem(std::shared_ptr<Physics::Manager>(&Physics::Manager::getInstance(), [](System::Base*) {}), "Physics");
-	
+	// Transform
+	NIKEEngine.registerComponent<Transform::Transform>();
+	NIKEEngine.registerComponent<Transform::Velocity>();
+
+	// Add Input System
+	NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
+
+	/*Physics::Manager::getInstance().init();*/
+	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
+
 	// Add Collision System
-	Collision::Manager::getInstance().init();
-	NIKEEngine.addSystem(std::shared_ptr<Collision::Manager>(&Collision::Manager::getInstance(), [](System::Base*) {}), "Collision");
+	//Collision::Manager::getInstance().init();
+	//NIKEEngine.registerSystem(std::shared_ptr<Collision::Manager>(&Collision::Manager::getInstance()));
 
 	//Engine Game Loop
 	NIKEEngine.run();

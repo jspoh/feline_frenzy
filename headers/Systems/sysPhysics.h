@@ -11,32 +11,34 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
-#include "stdafx.h"
-#include "Engine.h"
-#include "Object.h"
+
+#include "../headers/Systems/sysInput.h"
+#include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Core/Engine.h"
+#include "../headers/Systems/Render/Object.h"
 
 namespace Physics {
 
-	class Manager : public System::Base {
+	class Manager : public System::ISystem {
 	private:
-		//Private Constructor
-		Manager() = default;
-
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
 
 	public:
+		//Default Constructor
+		Manager() = default;
+
 		//Singleton Of Manager Class
-		static Manager& getInstance() {
-			static Manager instance;
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
 			return instance;
 		}
 
-		//Init Inputs
+		//Init
 		void init() override;
 
-		//Update Inputs
+		//Update
 		void update() override;
 
 		//Move Object
