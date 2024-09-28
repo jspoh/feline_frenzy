@@ -17,12 +17,12 @@
 namespace CollisionUtils {
 
     template <typename T>
-    T get_max(const T a, const T b) {
+    T getMax(const T a, const T b) {
         return (a > b) ? a : b;
     }
 
     template <typename T>
-    T get_min(const T a, const T b) {
+    T getMin(const T a, const T b) {
         return (a < b) ? a : b;
     }
 
@@ -34,33 +34,71 @@ namespace CollisionUtils {
         return (distance < (radius_a + radius_b));
     }
 
-    bool aabbRectRectCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b) {
+    bool aabbRectRectCheck(const Vector2& vel_a, const Vector2& vel_b,
+        const Vector2& min_a, const Vector2& max_a,
+        const Vector2& min_b, const Vector2& max_b,
+        float& firstTimeOfCollision) {
         // Step 1: Static collision detection
-        if (pos_a.x < pos_b.x + size_b.x &&
-            pos_a.x + size_a.x > pos_b.x &&
-            pos_a.y < pos_b.y + size_b.y &&
-            pos_a.y + size_a.y > pos_b.y) {
-            return true;  // Static collision detected
+        // Check if the two AABBs are overlapping statically
+        if (!(max_a.x < min_b.x || min_a.x > max_b.x ||
+            max_a.y < min_b.y || min_a.y > max_b.y)) {
+            // If there is an overlap in both x and y axes, a static collision occurs
+            return true;
         }
 
-        // Step 2: Dynamic collision detection using relative velocity
-        Vector2 relativeVel = vel_a - vel_b;
+        // Step 2: Calculate relative velocity
+        Vector2 velRel = { vel_a.x - vel_b.x, vel_a.y - vel_b.y };
 
-        // Calculate time of collision along X-axis
-        float tFirstX = (pos_b.x - (pos_a.x + size_a.x)) / relativeVel.x;
-        float tLastX = ((pos_b.x + size_b.x) - pos_a.x) / relativeVel.x;
+        // Initialize time of first and last collision along each axis
+        Vector2 tFirst = { 0.0f, 0.0f };
+        //Vector2 tLast = { (float)AEFrameRateControllerGetFrameTime(), (float)AEFrameRateControllerGetFrameTime() }; // Need a way to get time for previous frame
+        Vector2 tLast = { 0.0f, 0.0f }; // Placeholder
 
-        // Calculate time of collision along Y-axis
-        float tFirstY = (pos_b.y - (pos_a.y + size_a.y)) / relativeVel.y;
-        float tLastY = ((pos_b.y + size_b.y) - pos_a.y) / relativeVel.y;
-
-        // Ensure the collision happens within the valid time frame (tFirst <= tLast)
-        if (tFirstX > tLastY || tFirstY > tLastX) {
-            return false; // No dynamic collision
+        // Step 3: Check dynamic collision on x-axis
+        if (velRel.x != 0) {
+            if (velRel.x > 0) {
+                tFirst.x = (min_a.x - max_b.x) / velRel.x;
+                tLast.x = (max_a.x - min_b.x) / velRel.x;
+            }
+            else {
+                tFirst.x = (max_a.x - min_b.x) / velRel.x;
+                tLast.x = (min_a.x - max_b.x) / velRel.x;
+            }
+        }
+        else if (max_a.x < min_b.x || min_a.x > max_b.x) {
+            return false; // No collision on the x-axis if there's no relative movement and no static collision
         }
 
-        return true; // Dynamic collision detected
+        // Step 4: Check dynamic collision on y-axis
+        if (velRel.y != 0) {
+            if (velRel.y > 0) {
+                tFirst.y = (min_a.y - max_b.y) / velRel.y;
+                tLast.y = (max_a.y - min_b.y) / velRel.y;
+            }
+            else {
+                tFirst.y = (max_a.y - min_b.y) / velRel.y;
+                tLast.y = (min_a.y - max_b.y) / velRel.y;
+            }
+        }
+        else if (max_a.y < min_b.y || min_a.y > max_b.y) {
+            return false; // No collision on the y-axis if there's no relative movement and no static collision
+        }
+
+        // Step 5: Check if collisions occur within the time frame
+        float tFirstOverall = getMax(tFirst.x, tFirst.y);
+        float tLastOverall = getMin(tLast.x, tLast.y);
+
+        // Ensure that the time of first collision occurs before the time of last collision
+        if (tFirstOverall > tLastOverall /* || tFirstOverall > AEFrameRateControllerGetFrameTime() */) { // Need a way to get time for previous frame
+            return false; // No collision detected
+        }
+
+        // If we have a valid time of collision, update the output parameter
+        firstTimeOfCollision = tFirstOverall;
+
+        return true; // Collision detected
     }
+
 
 
     bool satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b) {

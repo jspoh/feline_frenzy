@@ -16,18 +16,22 @@
 
 namespace CollisionUtils {
 
-    // Utility functions for max and min
+    // Utility functions
     template <typename T>
-    T get_max(const T a, const T b);
+    T getMax(const T a, const T b);
 
     template <typename T>
-    T get_min(const T a, const T b);
+    T getMin(const T a, const T b);
 
     // Circle collision check
     bool circleCollisionCheck(const Vector2& pos_a, float radius_a, const Vector2& pos_b, float radius_b);
 
     // AABB collision check for rectangle to rectangle
-    bool aabbRectRectCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& vel_a, const Vector2& pos_b, const Vector2& size_b, const Vector2& vel_b);
+    bool aabbRectRectCheck( const Vector2& vel_a, const Vector2& vel_b,
+                            const Vector2& min_a, const Vector2& max_a,
+                            const Vector2& min_b, const Vector2& max_b,
+                            float& firstTimeOfCollision);
+
 
     // Separating Axis Theorem (SAT) check
     bool satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b);
