@@ -25,9 +25,6 @@ int main() {
 	NIKEEngine.registerScenes<Splash::Scene>("SPLASH");
 	NIKEEngine.registerScenes<Menu::Scene>("MENU");
 
-	// Add Audio System for testing
-	// NIKEEngine.registerSystem(<AudioSystem::AudioSystem>();
-
 	//Engine Game Loop
 	NIKEEngine.run();
 

@@ -79,6 +79,12 @@ namespace Core {
 			return instance;
 		}
 
+
+		// To get asset manager
+		Asset::Manager& getAssetManager() {
+			return *asset_manager;
+		}
+
 		//Init Window with config file
 		void init(std::string const& file_path, int fps = 60);
 
@@ -214,6 +220,9 @@ namespace Core {
 
 	//Predefined name for core engine
 	#define NIKEEngine Core::Engine::getInstance()
+
+	// Predefined name for asset manager
+	#define ASSET_MANAGER NIKEEngine.getAssetManager()
 }
 
 #endif // !ENGINE_HPP

@@ -31,6 +31,9 @@ namespace Audio {
 
 		std::string audio_tag_group;
 
+		// Bool to check if audio is played
+		bool is_played = false;
+
 		// Volume 
 		float volume{};
 

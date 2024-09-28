@@ -26,7 +26,7 @@ namespace Asset
 		// Load sound and music using the respective functions
 		void LoadSound(std::string file_path, std::string audio_tag);
 		void LoadMusic(std::string file_path, std::string audio_tag);
-		void MakeAudioGroup(std::string const& audio_group_tag);
+		void CreateAudioGroup(std::string const& audio_group_tag);
 
 		// Gettors
 		Audio::NE_AUDIO GetAudio(std::string audio_tag);

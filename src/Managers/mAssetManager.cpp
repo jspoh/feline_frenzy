@@ -22,7 +22,7 @@ namespace Asset
 		return audio_list[audio_tag];
 	}
 
-	void Manager::MakeAudioGroup(std::string const& audio_group_tag)
+	void Manager::CreateAudioGroup(std::string const& audio_group_tag)
 	{	
 		Audio::NE_AUDIO_GROUP to_add = NIKEEngine.accessSystem<Audio::Manager>()->CreateAudioGroup(audio_group_tag);
 
@@ -50,6 +50,7 @@ namespace Asset
 		}
 		return false;
 	}
+
 	bool Manager::IsValidAudio(std::string const& audio_tag)
 	{
 		// Check if the group already exists in the map

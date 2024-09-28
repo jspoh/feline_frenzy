@@ -9,6 +9,7 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/sysInput.h"
+#include "../headers/Core/Engine.h"
 
 // Create Fmod instance
 Audio::Manager::Manager()
@@ -47,6 +48,20 @@ void Audio::Manager::update()
 	fmod_system->update();
 	// For debug purposes
 	// cout << "AUDIO SYSTEM IS UPDATING" << endl;
+	for (const auto& entity : entities)
+	{	
+		// Check entity contain sound component
+		if (NIKEEngine.checkEntityComponent<Audio::cAudio>(entity)) 
+		{
+			Audio::cAudio& c_audio = NIKEEngine.getEntityComponent<Audio::cAudio>(entity);
+			if (!c_audio.is_played)
+			{
+				NEAudioPlay(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, 0);
+				c_audio.is_played = true;
+			}
+		}
+	}
+
 }
 
 // Release Fmod system
@@ -66,8 +81,10 @@ Audio::NE_AUDIO Audio::Manager::NEAudioLoadSound(std::string const& file_path)
 	// Check for audio file validadity
 	if (result != FMOD_OK)
 	{
-		cerr << "YOUR FILE WRONG BODO" << endl;
-		return nullptr;
+		throw std::runtime_error("YOUR FILE WRONG BODO");
+	}
+	else {
+		cout << "Audio loaded!" << endl;
 	}
 
 	return temp;
@@ -85,8 +102,7 @@ Audio::NE_AUDIO Audio::Manager::NEAudioLoadMusic(std::string const& file_path)
 	// Check for audio file validadity
 	if (result != FMOD_OK)
 	{
-		cerr << "YOUR FILE WRONG BODO" << endl;
-		return temp;
+		throw std::runtime_error("YOUR FILE WRONG BODO");
 	}
 
 	return temp;
@@ -100,8 +116,7 @@ Audio::NE_AUDIO_GROUP Audio::Manager::CreateAudioGroup(std::string const& audio_
 	result = fmod_system->createChannelGroup(audio_group_tag.c_str(), &temp);
 	if (result != FMOD_OK)
 	{
-		cerr << "AUDIO GROUP NOT INITIALIZED" << endl;
-		return temp;
+		throw std::runtime_error("AUDIO GROUP NOT INITIALIZED");
 	}
 	else
 	{
@@ -113,20 +128,19 @@ Audio::NE_AUDIO_GROUP Audio::Manager::CreateAudioGroup(std::string const& audio_
 void Audio::Manager::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop)
 {
 	fmod_system->playSound(audio, group, 0, nullptr);	
+	cout << "AUDIO PLAY" << endl;
 	// This is same as UNREFERENCED_PARAMETER
 	static_cast<void>(vol);
 	static_cast<void>(pitch);
 	static_cast<void>(loop);
 }
 
-void Audio::Manager::NEAudioStopGroup(std::string const& tag)
+void Audio::Manager::NEAudioStopGroup(NE_AUDIO_GROUP group)
 {
 	// This is same as UNREFERENCED_PARAMETER
-	static_cast<void>(tag);
-	//if (Input::Manager::getInstance().key_is_pressed(GLFW_KEY_Q))
-	//{
-	//	audio_group_map[tag]->stop();
-	//}
+	static_cast<void>(group);
+	cout << "AUDIO STOPPED" << endl;
+	group->stop();
 }
 
 void Audio::Manager::NEAudioPauseGroup(NE_AUDIO_GROUP group)

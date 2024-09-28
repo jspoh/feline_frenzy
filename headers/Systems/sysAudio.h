@@ -72,7 +72,7 @@ namespace Audio {
 		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool loop);
 
 		// Stop sound
-		void NEAudioStopGroup(std::string const& tag);
+		void NEAudioStopGroup(NE_AUDIO_GROUP group);
 
 		// Play sound
 		void NEAudioPauseGroup(NE_AUDIO_GROUP group);
