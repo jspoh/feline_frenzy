@@ -15,6 +15,17 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
+// Fmod core headers
+#include "FMOD_CORE/fmod.h"
+#include "FMOD_CORE/fmod.hpp"
+#include "FMOD_CORE/fmod_codec.h"
+#include "FMOD_CORE/fmod_common.h"
+#include "FMOD_CORE/fmod_dsp.h"
+#include "FMOD_CORE/fmod_dsp_effects.h"
+#include "FMOD_CORE/fmod_errors.h"
+#include "FMOD_CORE/fmod_output.h"
+
+
 // standard headers
 #include <iostream>
 #include <fstream>
@@ -39,8 +50,12 @@
 #include "../headers/Data/json.hpp"
 
 // our completed headers
+#include "../headers/Math/Mtx33.h"	
 #include "../headers/Math/Vector2.h"
+#include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
+
+#define PI static_cast<float> (atan(1)*4.f)
 
 namespace Entity {
 
