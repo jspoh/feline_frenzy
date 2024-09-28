@@ -25,15 +25,6 @@
 #include "FMOD_CORE/fmod_errors.h"
 #include "FMOD_CORE/fmod_output.h"
 
-// Fmod studio headers
-#include "FMOD_STUDIO/fmod_studio.h"
-#include "FMOD_STUDIO/fmod_studio.hpp"
-#include "FMOD_STUDIO/fmod_studio_common.h"
-
-// Fmod bank headers
-#include "FMOD_FSBANK/fsbank.h"
-#include "FMOD_FSBANK/fsbank_errors.h"
-
 
 // standard headers
 #include <iostream>

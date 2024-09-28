@@ -26,7 +26,7 @@ Audio::Manager::Manager()
 		cout << "FMOD SYS CREATED!" << endl;
 	}
 
-	result = fmod_system->init(512, FMOD_STUDIO_INIT_NORMAL, 0);
+	result = fmod_system->init(512, FMOD_INIT_NORMAL, 0);
 	// Check if fmod studio system is initialized
 	if (result != FMOD_OK)
 	{
