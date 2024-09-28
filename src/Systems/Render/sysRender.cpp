@@ -139,6 +139,15 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 	return true;
 }
 
+
+void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
+	std::shared_ptr model = std::make_shared<Model>();
+	if (loadMesh(path_to_mesh, model)) {
+		models[model_ref] = model;
+	}
+}
+
+
 void Render::Manager::transformMatrix(Transform::Transform& xform) {
 	//Transform matrix here
 	Matrix33::Matrix_33 model_mat, world_to_ndc_mat, result, scale_mat, rot_mat, trans_mat;
@@ -151,17 +160,10 @@ void Render::Manager::transformMatrix(Transform::Transform& xform) {
 	Matrix_33Rot(rot_mat, angleDisp);
 	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
 	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
-	result = xform.x_form * trans_mat * rot_mat * scale_mat;
+	result = trans_mat * rot_mat * scale_mat;
 
 	// OpenGL requires matrix in col maj so transpose
 	Matrix_33Transpose(xform.x_form, result);
-}
-
-void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
-    std::shared_ptr model = std::make_shared<Model>();
-    if (loadMesh(path_to_mesh, model)) {
-        models[model_ref] = model;
-    }
 }
 
 void Render::Manager::init() {
@@ -177,31 +179,35 @@ void Render::Manager::update() {
     //    }
     //    object.update(deltaTime, camera->getWorldToNDCXform());
     //}
+	
+	// Before drawing clear screen
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Update all entities
 	for (auto& entity : entities) {
 		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
 
-		shaderManager.useShader("base");
-
 		//Transform matrix here
 		transformMatrix(e_transform);
 
+		shaderManager.useShader(e_transform.shader_ref);
+
 		//Shader set uniform
-		shaderManager.setUniform("base", "f_color", e_color.color);
-		shaderManager.setUniform("base", "model_to_ndc", e_transform.x_form);
+		shaderManager.setUniform(e_transform.shader_ref, "f_color", e_color.color);
+		shaderManager.setUniform(e_transform.shader_ref, "model_to_ndc", e_transform.x_form);
 
 		//Find model
-		std::string ref = "square";
-		assert(models.find(ref) != models.end() && "Model not found.");
-		auto model = models.at(ref);
+		assert(models.find(e_transform.model_ref) != models.end() && "Model not found.");
+		auto model = models.at(e_transform.model_ref);
+
 
 		//Draw model
 		glBindVertexArray(model->vaoid);
 		glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
+
+		shaderManager.unuseShader();
 	}
 
-	shaderManager.unuseShader();
 }

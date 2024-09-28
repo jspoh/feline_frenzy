@@ -10,10 +10,10 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/Render/Object.h"
 
-class Camera {
+class CameraObject {
 
 	public:
-		Camera();
+		CameraObject();
 
 		void init(const Object& camObj, float wHeight, float wWidth);
 		void update(const Object& camObj);

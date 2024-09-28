@@ -46,6 +46,7 @@
     <ClInclude Include="headers\Math\Vector4.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
+    <ClInclude Include="headers\Components\cCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
