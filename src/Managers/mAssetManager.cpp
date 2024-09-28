@@ -1,3 +1,10 @@
+/*****************************************************************//**
+ * \file   mAssetManager.cpp
+ * \brief  Asset manager function definitions
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Managers/mAssetManager.h"

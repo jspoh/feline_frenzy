@@ -48,7 +48,7 @@ void Splash::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio());
 
 	// Load music files with asset manager
-	ASSET_MANAGER.LoadMusic("assets/Audio/test_music.wav", "test_music");
+	ASSET_MANAGER.LoadMusic("assets/Audio/test_music.ogg", "test_music");
 	ASSET_MANAGER.CreateAudioGroup("test_group");
 }
 

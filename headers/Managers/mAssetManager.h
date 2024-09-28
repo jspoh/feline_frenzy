@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   mAssetManager.h
+ * \brief  Asset manager function declarations
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
+
 #pragma once
 
 #ifndef ASSET_MANAGER_HPP
