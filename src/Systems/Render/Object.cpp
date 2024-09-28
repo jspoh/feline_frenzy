@@ -102,11 +102,11 @@ void Object::update(float dt, const Matrix33::Matrix_33& cam_to_ndc_xform) {
 
 void Object::draw() const {
 
-	auto it = Render::Manager::getInstance().models.find(model_ref);
-	if (it != Render::Manager::getInstance().models.end()) {
-		it->second->draw();
-	}
-	else {
-		cerr << "Model not found: " << model_ref << endl;
-	}
+	//auto it = Render::Manager::getInstance().models.find(model_ref);
+	//if (it != Render::Manager::getInstance().models.end()) {
+	//	it->second->draw();
+	//}
+	//else {
+	//	cerr << "Model not found: " << model_ref << endl;
+	//}
 }

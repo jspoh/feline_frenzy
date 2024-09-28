@@ -11,6 +11,7 @@ namespace Transform {
 		Vector2 position;
 		Vector2 scale;
 		float rotation;
+		Matrix33::Matrix_33 x_form;
 	};
 
 	struct Velocity {
