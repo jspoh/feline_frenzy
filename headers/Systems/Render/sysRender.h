@@ -23,6 +23,7 @@
 namespace Render {
 
 	class Manager : public System::ISystem{
+
 	private:
 
 		//Delete Copy Constructor & Copy Assignment
@@ -42,7 +43,7 @@ namespace Render {
 		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
 
 		//Transform matrix
-		void transformMatrix(Transform::Transform& xform);
+		void transformMatrix(Transform::Transform& xform, Matrix33::Matrix_33 world_to_ndc_mat);
 
 	public:
 		//Constructor
@@ -83,7 +84,7 @@ namespace Render {
 		 */
 		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
 
-		void initCamera(const std::string& object_ref);
+		void initCamera(float camHeight);
 
 		/**
 		* update all object's xform

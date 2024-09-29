@@ -28,19 +28,19 @@ CameraObject::CameraObject() : position(Vector2(0, 0)), target(Vector2(0, 0)), u
 	world_to_ndc_xform = cam_to_ndc_xform * view_xform;
 }
 
-void CameraObject::init(const Object& camObj, float wWidth, float wHeight) {
+void CameraObject::init(float wWidth, float wHeight, float camHeight) {
 	// !TODO set height as a constant from the config
-	height = 1000;
+	height = camHeight;
 	ar = static_cast<float>(wWidth) / wHeight;
-	float angleDisp = camObj.getOrientation() * PI / 180.f;
+	float angleDisp = 0 * PI / 180.f;
 
 	up = Vector2(-sin(angleDisp), cos(angleDisp));
 	target = Vector2(cos(angleDisp), sin(angleDisp));
 
 	// Shifts camera to player
 	view_xform = Matrix33::Matrix_33{
-		1, 0,  -camObj.getPosition().x,
-		0, 1,  -camObj.getPosition().y,
+		1, 0, 0,
+		0, 1, 0,
 		0, 0, 1
 	};
 
@@ -54,10 +54,10 @@ void CameraObject::init(const Object& camObj, float wWidth, float wHeight) {
 	
 }
 
-void CameraObject::update(const Object& camObj) {
+void CameraObject::update() {
 	view_xform = Matrix33::Matrix_33{
-	1, 0,  -camObj.getPosition().x,
-	0, 1,  -camObj.getPosition().y,
+	1, 0,  -position.x,
+	0, 1,  -position.y,
 	0, 0, 1
 	};
 

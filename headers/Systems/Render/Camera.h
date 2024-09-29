@@ -15,8 +15,8 @@ class CameraObject {
 	public:
 		CameraObject();
 
-		void init(const Object& camObj, float wHeight, float wWidth);
-		void update(const Object& camObj);
+		void init(float wHeight, float wWidth, float camHeight);
+		void update();
 
 		void setPosition(float x, float y);
 		const Vector2& getPosition() const;

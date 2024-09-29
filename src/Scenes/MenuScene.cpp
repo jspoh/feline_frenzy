@@ -15,15 +15,16 @@ void Menu::Scene::load() {
 	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
 	NIKEEngine.registerComponent<Transform::Transform>();
 	NIKEEngine.registerComponent<Render::Color>();
-	//NIKEEngine.registerComponent<Camera::Camera>();
+	NIKEEngine.registerComponent<Camera::Camera>();
 
 	//Add Input Singleton System
 	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
+	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Color>());
-	//NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Camera::Camera>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Camera::Camera>());
 
 	//Load models
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
@@ -40,11 +41,11 @@ void Menu::Scene::init() {
 	//Create entity
 	std::vector<Entity::Type> entities;
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), { "base", "square", {0.0f, 0.0f}, {1.0f, 1.0f}, 0.0f, Matrix33::Matrix_33()});
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), { "base", "square", {0.0f, 0.0f}, {225.f, 175.f}, 0.0f, Matrix33::Matrix_33(), false});
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(0), {{0.0f, 0.0f, 0.0f}, 1.0f});
 
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), { "base", "triangle", {0.0f, 0.0f}, {0.5f, 1.0f}, 0.0f, Matrix33::Matrix_33() });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), { "base", "triangle", {122.0f, 0.0f}, {50.f, 100.f}, 0.0f, Matrix33::Matrix_33(), true });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), { {1.0f, 0.0f, 0.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());

@@ -21,6 +21,8 @@ namespace Transform {
 		Vector2 scale;
 		float rotation;
 		Matrix33::Matrix_33 x_form;
+
+		bool isCam;
 	};
 
 	struct Velocity {
