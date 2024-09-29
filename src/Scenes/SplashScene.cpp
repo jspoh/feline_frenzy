@@ -38,13 +38,6 @@ void Splash::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Input::Key>(mouse_click, Input::Key());
 }
 
-void Splash::Scene::render() {
-	//For testing
-	if (NIKEEngine.getEntityComponent<Input::Mouse>(mouse_click).is_lbutton_pressed) {
-		NIKEEngine.changeScene("MENU");
-	}
-}
-
 void Splash::Scene::exit() {
 
 }

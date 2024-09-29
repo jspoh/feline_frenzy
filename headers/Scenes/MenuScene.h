@@ -28,9 +28,6 @@ namespace Menu {
 		//Scene phases
 		void load() override;
 		void init() override;
-
-		void render() override;
-
 		void exit() override;
 		void unload() override;
 
