@@ -71,7 +71,7 @@ namespace Render {
 		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
 
 		//Render object with texture
-		void renderObject(const Render::Model& model, const std::string& texture_ref);
+		void renderObject(const Render::Mesh& e_mesh);
 
 	public:
 		//Constructor

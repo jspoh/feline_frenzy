@@ -40,6 +40,7 @@ namespace Matrix33 {
 	public:
 		std::array<std::array<float, 3>, 3> matrix_33{};
 
+		static Matrix_33 Identity();
 	};
 
 	// Matrix Multiplication (THIS IS SAME AS MATRIX CONCAT)

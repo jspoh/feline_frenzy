@@ -202,11 +202,13 @@ void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color con
 	shader_system->unuseShader();
 }
 
-void Render::Manager::renderObject(const Render::Model& model, const std::string& texture_ref) {
+void Render::Manager::renderObject(const Render::Mesh& e_mesh) {
 	constexpr const char* texture_shader = "tex";
 	constexpr const char* texture_uniform = "u_tex2d";
 	constexpr const char* transform_uniform = "u_transform";
 	constexpr int texture_unit = 6;
+
+	const Render::Model& model = *models.at(e_mesh.model_ref);
 
 	glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -216,18 +218,17 @@ void Render::Manager::renderObject(const Render::Model& model, const std::string
 	// set texture
 	glBindTextureUnit(
 		texture_unit, // texture unit (binding index)
-		textures.at(texture_ref)
+		textures.at(e_mesh.texture_ref)
 	);
 
-	glTextureParameteri(textures.at(texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(textures.at(texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	Matrix33::Matrix_33 identity;
-	Matrix33::Matrix_33Identitiy(identity);
-	//Matrix33::Matrix_33Scale(identity, 2.0f, 2.0f);
+	Matrix33::Matrix_33 xform = e_mesh.x_form;
+	//Matrix33::Matrix_33Scale(xform, 2.0f, 2.0f);
 
 	shader_system->setUniform(texture_shader, texture_uniform, texture_unit);
-	shader_system->setUniform(texture_shader, transform_uniform, identity);
+	shader_system->setUniform(texture_shader, transform_uniform, xform);
 
 	glBindVertexArray(model.vaoid);
 	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
@@ -369,13 +370,13 @@ void Render::Manager::update() {
 		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
 
 		//Render object
-		// @TODO jspoh: revert this (used for testing)
-		if (i < 3)
+		if (e_mesh.texture_ref.empty()) {
 			renderObject(e_mesh, e_color);
-		else if (i == 3)
-			renderObject(*models.at(e_mesh.model_ref), std::string{ "duck" });
-		else
-			renderObject(*models.at(e_mesh.model_ref), std::string{ "water" });
+		}
+		else {
+			renderObject(e_mesh);
+		}
+
 
 		//Render debugging wireframe
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };

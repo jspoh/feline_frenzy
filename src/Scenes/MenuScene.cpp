@@ -78,14 +78,14 @@ void Menu::Scene::init() {
 	//Render::Manager::getInstance().initCamera("camera");
 
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33() });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {0.0f, 0.0f}, {100.f, 100.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck"});
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {200.0f, 200.0f}, {200.f, 200.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
 
-	//entities.push_back(NIKEEngine.createEntity());
-	//NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33() });
-	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(4), { {0.0f, 0.0f}, {100.f, 100.f}, 0.0f });
-	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(4), { {1.0f, 1.0f, 1.0f}, 1.0f });
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "water" });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(4), { {100.0f, 100.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(4), { {1.0f, 1.0f, 1.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {
