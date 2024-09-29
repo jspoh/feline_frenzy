@@ -10,6 +10,74 @@
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
 
+void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
+	std::ifstream ifs{ scene_filepath, std::ios::in };
+
+	// Open Scene file
+	if (!ifs) {
+		cerr << "Failed to open mesh file: " << scene_filepath << endl;
+		return;
+	}
+
+	ifs.seekg(0, std::ios::beg);
+	std::string line;
+	getline(ifs, line); // first line is count of objects in scene
+	std::istringstream line_sstm{ line };
+	int obj_cnt;
+	line_sstm >> obj_cnt; // read count of objects in scene
+
+	while (obj_cnt--) { // read each object's parameters
+		// Create entity
+		Entity::Type entity = NIKEEngine.createEntity();
+
+		std::string model_name, object_name, shdr_prgm, vert_file, frag_file;
+		Vector3 clr_atr{};
+		Vector2 scaling{}, orientation{}, position{};
+
+		// !TODO create a proper system to register mesh data
+		getline(ifs, line); // 1st parameter: model's name
+		std::istringstream line_modelname{ line };
+		line_modelname >> model_name;
+
+		getline(ifs, line); // object name
+		std::istringstream line_objectname{ line };
+		line_objectname >> object_name;
+		
+		// !TODO create a proper system to register shader files
+		getline(ifs, line); // shader files
+		std::istringstream line_shdrprgm{ line };
+		line_shdrprgm >> shdr_prgm >> vert_file >> frag_file;
+
+		// Color
+		getline(ifs, line);
+		std::istringstream line_clrattr{ line };
+		line_clrattr >> clr_atr.x >> clr_atr.y >> clr_atr.z;
+
+		// Scaling
+		getline(ifs, line);
+		std::istringstream line_scale{ line };
+		line_scale >> scaling.x >> scaling.y;
+
+		// Orientation & rotation
+		getline(ifs, line);
+		std::istringstream line_orient{ line };
+		line_orient >> orientation.x >> orientation.y;
+
+		// Position
+		getline(ifs, line);
+		std::istringstream line_pos{ line };
+		line_pos >> position.x >> position.y;
+
+		// Add components to the entity
+		NIKEEngine.addEntityComponentObj<Render::Mesh>(entity, { shdr_prgm, model_name, Matrix33::Matrix_33() });
+		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, 0.0f }); // 0.0f for rotation
+		NIKEEngine.addEntityComponentObj<Render::Color>(entity, { clr_atr, 1.0f });  // Assuming alpha = 1.0f for now
+
+
+		// Push the entity into the vector
+		entities.push_back(entity);
+	}
+}
 
 void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Transform::Transform>();
@@ -37,39 +105,22 @@ void Menu::Scene::init() {
 
 	//Create entity
 	std::vector<Entity::Type> entities;
+	loadFromFile("assets/Scenes/mainmenu.scn", entities);
 
-	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(0), { "base", "square", Matrix33::Matrix_33()});
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), {{0.0f, 0.0f}, {225.f, 175.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(0), {{0.0f, 0.0f, 0.0f}, 1.0f});
-	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), {"CAM1", {0.0f, 0.0f}, 1000.0f });
-
-	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(1), { "base", "triangle", Matrix33::Matrix_33() });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), {{122.0f, 0.0f}, {50.f, 100.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), { {1.0f, 0.0f, 0.0f}, 1.0f });
-	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), {"CAM2", {122.0f, 0.0f}, 1000.0f });
-
-	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(2), { "base", "circle", Matrix33::Matrix_33() });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 0.0f, 1.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());
 	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), Render::Color());
 
+	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
+	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
 
-	// Init game objects into game world
-	//Render::Manager::getInstance().createObject("obj1", "square", Vector3(1.f, 0.f, 0.f), Vector2(-19800, -20000), Vector2(200.f, 150.f), 0.f, -17.5f);
-	//Render::Manager::getInstance().createObject("obj2", "square", Vector3(0.f, 1.f, 0.f), Vector2(-19200, -20000), Vector2(225.f, 175.f), 0.f, 28.f);
-	//Render::Manager::getInstance().createObject("obj3", "square", Vector3(0.5f, 1.f, 0.5f), Vector2(-19500, -19700), Vector2(225.f, 175.f), 0.f);
-	//Render::Manager::getInstance().createObject("obj4", "square", Vector3(0.2f, 0.2f, 0.2f), Vector2(-19500, -20500), Vector2(225.f, 175.f), 0.f);
-	//// Init camera object (player)
-	//Render::Manager::getInstance().createObject("camera", "triangle", Vector3(0.f, 0.f, 0.f), Vector2(-19500, -19700), Vector2(50.f, 100.f), 180.f);
-	////// Init camera
-	//Render::Manager::getInstance().initCamera("camera");
+	//entities.push_back(NIKEEngine.createEntity());
+	//NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(2), { "base", "circle", Matrix33::Matrix_33() });
+	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f });
+	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 0.0f, 1.0f}, 1.0f });
+
 }
 
 void Menu::Scene::exit() {
