@@ -27,9 +27,6 @@
     <ClInclude Include="headers\Systems\sysPhysics.h" />
     <ClInclude Include="headers\Systems\sysCollision.h" />
     <ClInclude Include="headers\Systems\CollisionUtils.h" />
-    <ClInclude Include="headers\Systems\Render\Camera.h" />
-    <ClInclude Include="headers\Systems\Render\Model.h" />
-    <ClInclude Include="headers\Systems\Render\Object.h" />
     <ClInclude Include="headers\Systems\Render\sysCamera.h" />
     <ClInclude Include="headers\Math\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
@@ -52,12 +49,14 @@
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
+    <ClInclude Include="headers\Components\cMove.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
     <None Include="shaders\textured_rendering.frag" />
     <None Include="shaders\textured_rendering.vert" />
+    <None Include="db\data.json" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\meshes\square.txt" />

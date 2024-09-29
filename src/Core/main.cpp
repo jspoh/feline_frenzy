@@ -30,6 +30,7 @@ int main() {
 	// Transform
 	NIKEEngine.registerComponent<Transform::Transform>();
 	NIKEEngine.registerComponent<Transform::Velocity>();
+	NIKEEngine.registerComponent<Move::Move>();
 
 	// Add Input System
 	//NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());

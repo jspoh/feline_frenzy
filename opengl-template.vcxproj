@@ -45,6 +45,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Components\cMove.h" />
     <ClInclude Include="headers\Systems\sysCollision.h" />
     <ClInclude Include="headers\Systems\CollisionUtils.h" />
     <ClInclude Include="headers\Systems\sysPhysics.h" />
@@ -72,6 +73,7 @@
     <ClInclude Include="headers\Math\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="db\data.json" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
     <None Include="shaders\textured_rendering.frag" />
