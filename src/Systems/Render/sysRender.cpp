@@ -205,6 +205,7 @@ void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color con
 void Render::Manager::renderObject(const Render::Model& model, const std::string& texture_ref) {
 	constexpr const char* texture_shader = "tex";
 	constexpr const char* texture_uniform = "u_tex2d";
+	constexpr const char* transform_uniform = "u_transform";
 	constexpr int texture_unit = 6;
 
 	// use shader
@@ -221,10 +222,10 @@ void Render::Manager::renderObject(const Render::Model& model, const std::string
 
 	Matrix33::Matrix_33 identity;
 	Matrix33::Matrix_33Identitiy(identity);
-	Matrix33::Matrix_33Scale(identity, 1.0f, 2.0f);
+	//Matrix33::Matrix_33Scale(identity, 1.0f, 2.0f);
 
 	shader_system->setUniform(texture_shader, texture_uniform, texture_unit);
-	shader_system->setUniform(texture_shader, "u_transform", identity);
+	shader_system->setUniform(texture_shader, transform_uniform, identity);
 
 	glBindVertexArray(model.vaoid);
 	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
@@ -307,10 +308,6 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 
 	// no longer needed
 	delete[] tex_data;
-
-	// set texture parameters
-	glTextureParameteri(tex_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(tex_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// register texture
 	textures[texture_ref] = tex_id;
