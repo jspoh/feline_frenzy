@@ -10,6 +10,7 @@
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Core/Engine.h"
+#include "../headers/Components/cAudio.h"
 
 // Create Fmod instance
 Audio::Manager::Manager()
@@ -56,7 +57,7 @@ void Audio::Manager::update()
 			Audio::cAudio& c_audio = NIKEEngine.getEntityComponent<Audio::cAudio>(entity);
 			if (!c_audio.is_played)
 			{
-				NEAudioPlay(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, 0);
+				NEAudioPlay(c_audio.audio, c_audio.audio_group, c_audio.volume, c_audio.pitch, 0);
 				c_audio.is_played = true;
 			}
 		}
