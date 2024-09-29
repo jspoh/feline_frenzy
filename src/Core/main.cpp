@@ -28,15 +28,15 @@ int main() {
 	NIKEEngine.registerScenes<Menu::Scene>("MENU");
 
 	// Transform
-	NIKEEngine.registerComponent<Transform::Transform>();
-	NIKEEngine.registerComponent<Transform::Velocity>();
-	NIKEEngine.registerComponent<Move::Move>();
+	//NIKEEngine.registerComponent<Transform::Transform>();
+	//NIKEEngine.registerComponent<Transform::Velocity>();
+	//NIKEEngine.registerComponent<Move::Move>();
 
 	// Add Input System
 	//NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
 
 	// Add Physics System
-	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
+	//NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
 
 	// Add Collision System
 	//NIKEEngine.registerSystem<Collision::Manager>(Collision::Manager::getInstance());
