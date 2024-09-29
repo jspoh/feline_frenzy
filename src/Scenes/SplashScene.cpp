@@ -24,11 +24,11 @@ void Splash::Scene::init() {
 	//Register input component
 	NIKEEngine.registerComponent<Input::Mouse>();
 	NIKEEngine.registerComponent<Input::Key>();
-	NIKEEngine.registerComponent<Audio::cAudio>();
+	//NIKEEngine.registerComponent<Audio::cAudio>();
 
 	//Add Input Singleton System
 	NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
-	NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());
+	//NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());
 
 	NIKEEngine.accessSystem<Input::Manager>()->setComponentsLinked(false);
 
@@ -36,20 +36,20 @@ void Splash::Scene::init() {
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Key>());
 
-	NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
+	//NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
 
 	//Create entity with mouse component
 	mouse_click = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(mouse_click, Input::Mouse());
 	NIKEEngine.addEntityComponentObj<Input::Key>(mouse_click, Input::Key());
 
-	// Create entity to test for audio
-	bg_music = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio());
+	//// Create entity to test for audio
+	//bg_music = NIKEEngine.createEntity();
+	//NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio());
 
-	// Load music files with asset manager
-	ASSET_MANAGER.LoadMusic("assets/Audio/test_music.ogg", "test_music");
-	ASSET_MANAGER.CreateAudioGroup("test_group");
+	//// Load music files with asset manager
+	//ASSET_MANAGER.LoadMusic("assets/Audio/test_music.ogg", "test_music");
+	//ASSET_MANAGER.CreateAudioGroup("test_group");
 }
 
 void Splash::Scene::exit() {

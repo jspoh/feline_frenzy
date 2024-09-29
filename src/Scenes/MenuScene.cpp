@@ -12,7 +12,6 @@
 
 
 void Menu::Scene::load() {
-	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
 	NIKEEngine.registerComponent<Transform::Transform>();
 	NIKEEngine.registerComponent<Render::Mesh>();
 	NIKEEngine.registerComponent<Render::Color>();
