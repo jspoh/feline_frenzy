@@ -76,6 +76,7 @@
     <None Include="shaders\textured_rendering.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="assets\meshes\circle.txt" />
     <Text Include="assets\meshes\square.txt" />
     <Text Include="src\Core\Config.txt" />
   </ItemGroup>

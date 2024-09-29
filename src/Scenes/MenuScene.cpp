@@ -29,6 +29,7 @@ void Menu::Scene::load() {
 	//Load models
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("triangle", "assets/meshes/triangle.txt");
+	NIKEEngine.accessSystem<Render::Manager>()->registerModel("circle", "assets/meshes/circle.txt");
 }
 
 void Menu::Scene::init() {
@@ -48,9 +49,9 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), { "base", "triangle", {122.0f, 0.0f}, {50.f, 100.f}, 0.0f, Matrix33::Matrix_33(), true });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), { {1.0f, 0.0f, 0.0f}, 1.0f });
 
-	//entities.push_back(NIKEEngine.createEntity());
-	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), Transform::Transform());
-	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), Render::Color());
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { "base", "circle", {322.0f, 122.0f}, {100.f, 100.f}, 0.0f, Matrix33::Matrix_33(), false });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 1.0f, 0.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());

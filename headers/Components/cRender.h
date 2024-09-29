@@ -13,10 +13,12 @@ namespace Render {
 	};
 
 	struct Model {
-		// !TODO add primitive_type
+
 		unsigned int vaoid;
 		unsigned int vboid;
 		unsigned int eboid;
+
+		unsigned int primitive_type;
 		unsigned int draw_count;
 	};
 }

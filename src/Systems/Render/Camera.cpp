@@ -29,7 +29,7 @@ CameraObject::CameraObject() : position(Vector2(0, 0)), target(Vector2(0, 0)), u
 }
 
 void CameraObject::init(float wWidth, float wHeight, float camHeight) {
-	// !TODO set height as a constant from the config
+
 	height = camHeight;
 	ar = static_cast<float>(wWidth) / wHeight;
 	float angleDisp = 0 * PI / 180.f;
