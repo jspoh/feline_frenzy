@@ -37,8 +37,26 @@ namespace Render {
 		//Map to models for drawing
 		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models;
 
-		//Create buffer
-		void createBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Render::Model> model);
+		// Map to textures for drawing
+		std::unordered_map<std::string, unsigned int> textures;
+
+		/**
+		 * creates a vertex array object for base opengl shaders.
+		 * 
+		 * \param vertices
+		 * \param indices
+		 * \param model		vao will be stored here
+		 */
+		void createBaseBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Render::Model> model);
+
+		/**
+		 * creates a vertex array object for base opengl shaders.
+		 *
+		 * \param vertices
+		 * \param indices
+		 * \param model		vao will be stored here
+		 */
+		void createTextureBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2>& tex_coords, std::shared_ptr<Render::Model> model);
 
 		//Load mesh from txt file
 		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
@@ -51,6 +69,9 @@ namespace Render {
 
 		//Render debugging wireframe
 		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
+
+		//Render object with texture
+		void renderObject(const Render::Model& model, const std::string& texture_ref);
 
 	public:
 		//Constructor
@@ -69,20 +90,22 @@ namespace Render {
 		 * creates vertex array object. from mesh data and registers it to meshes.
 		 *
 		 * mesh data format: newline separated values for each vertex, each value is a float.
+		 * `n` prefix indicates name attribute
 		 * `v` prefix indicates vertex attribute
-		 * `i` prefix indicates index attribute. (indexed rendering with element buffer object)
+		 * `t` prefix indicates index(triangle) attribute. (indexed rendering with element buffer object)
 		 * top of the file indicates vertex count, index count. int format.
 		 *
 		 * important to note that anticlockwise generated shapes are front facing and vice versa.
 		 * back facing triangles will be culled.
 		 *
 		 * example square mesh:
-		 * 4,6
-		 * v 0.5,-0.5
-		 * v 0.5,0.5
-		 * v -0.5,0.5
-		 * v -0.5,-0.5
-		 * i 0,1,2,2,3,0
+			n square
+			v 0.5 -0.5
+			v 0.5 0.5
+			v -0.5 0.5
+			v -0.5 -0.5
+			t 0 1 2
+			t 2 3 0
 		 *
 		 *
 		 * \param mesh_ref
@@ -90,6 +113,9 @@ namespace Render {
 		 * \return success
 		 */
 		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
+
+		// Register texture
+		void registerTexture(const std::string& texture_ref, const std::string& path_to_texture);
 
 		//Track camera entity
 		void trackCamEntity(std::string const& cam_identifier);

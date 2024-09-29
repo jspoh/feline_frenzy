@@ -31,6 +31,10 @@ void Menu::Scene::load() {
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("triangle", "assets/meshes/triangle.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("circle", "assets/meshes/circle.txt");
+	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square-texture", "assets/meshes/square-texture.txt");
+
+	// load textures
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
 }
 
 void Menu::Scene::init() {
@@ -71,6 +75,11 @@ void Menu::Scene::init() {
 	//Render::Manager::getInstance().createObject("camera", "triangle", Vector3(0.f, 0.f, 0.f), Vector2(-19500, -19700), Vector2(50.f, 100.f), 180.f);
 	////// Init camera
 	//Render::Manager::getInstance().initCamera("camera");
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33() });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {0.0f, 0.0f}, {100.f, 100.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {
