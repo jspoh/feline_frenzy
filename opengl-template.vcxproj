@@ -42,7 +42,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Systems\Render\sysCamera.h" />
@@ -72,6 +71,7 @@
     <None Include="shaders\textured_rendering.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="assets\meshes\circle.txt" />
     <Text Include="assets\meshes\square.txt" />
     <Text Include="src\Core\Config.txt" />
   </ItemGroup>
