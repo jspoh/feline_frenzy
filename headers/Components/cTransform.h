@@ -6,6 +6,7 @@
 #include "../headers/Core/stdafx.h"
 
 namespace Transform {
+	// Maybe a mesh struct?
 
 	struct Transform {
 		Vector2 position;

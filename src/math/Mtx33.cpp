@@ -150,6 +150,18 @@ Matrix_33 Matrix33::operator*(const Matrix_33& lhs, const Matrix_33& rhs)
 	return result;
 }
 
+Matrix_33 Matrix33::operator*(float scalar, const Matrix_33& rhs)
+{
+	Matrix_33 result{ rhs };
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			result(i, j) *= scalar;
+		}
+	}
+
+	return result;
+}
+
 float Matrix33::Matrix_33Determinant(const Matrix_33& input)
 {
 	float result{};

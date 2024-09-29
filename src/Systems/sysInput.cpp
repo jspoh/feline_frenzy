@@ -36,6 +36,11 @@ void Input::Manager::update() {
 		}
 	}
 
+	//Temp changing scene here
+	if (mouse.is_lbutton_pressed) {
+		NIKEEngine.changeScene("MENU");
+	}
+
 	//Check if escape key is pressed
 	if (key_is_pressed(GLFW_KEY_ESCAPE)) {
 		NIKEEngine.terminate();

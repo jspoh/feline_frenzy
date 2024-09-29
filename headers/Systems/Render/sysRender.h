@@ -12,29 +12,58 @@
 #define RENDER_MANAGER_HPP
 
 #include "../headers/Systems/Render/sysShader.h"
+#include "../headers/Systems/Render/sysCamera.h"
+#include "../headers/Components/cRender.h"
+#include "../headers/Components/cTransform.h"
+#include "../headers/Managers/mSystem.h"
 #include "../headers/Core/Engine.h"
-#include "../headers/Systems/Render/Model.h"
-#include "../headers/Systems/Render/Object.h"
-#include "../headers/Systems/Render/Camera.h"
 
 namespace Render {
 
-	class Manager {
+	class Manager : public System::ISystem{
+
 	private:
-		Manager();
-		~Manager();
 
+		//Delete Copy Constructor & Copy Assignment
+		Manager(Manager const& copy) = delete;
+		void operator=(Manager const& copy) = delete;
 
-		Shader::Manager shaderManager;
-		std::unique_ptr<Camera> camera; // smart ptr to camera
+		//Shader system
+		std::unique_ptr<Shader::Manager> shader_system;
+
+		//Camera System
+		std::unique_ptr<Camera::System> camera_system; // smart ptr to camera
+
+		//Map to models for drawing
+		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models;
+
+		//Create buffer
+		void createBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Render::Model> model);
+
+		//Load mesh from txt file
+		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
+
+		//Transform matrix
+		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
+
+		//Render object
+		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color);
+
+		//Render debugging wireframe
+		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
 
 	public:
+		//Constructor
+		Manager() = default;
 
-		// vertex array objects + data required for drawing
-		std::unordered_map<std::string, Model*> models;
-		std::unordered_map<std::string, Object> objects;
+		//Destructor
+		~Manager();
 
-		static Manager& getInstance();
+		//Singleton Of Manager Class
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			return instance;
+		}
 
 		/**
 		 * creates vertex array object. from mesh data and registers it to meshes.
@@ -62,34 +91,18 @@ namespace Render {
 		 */
 		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
 
-		void initCamera(const std::string& object_ref);
+		//Track camera entity
+		void trackCamEntity(std::string const& cam_identifier);
 
-		/**
-		*  creates an object and places it into a map of objects
-		*  object has
-		*  object_ref - key for map
-		*  model_ref - which model/mesh its referencing
-		*  color - color of object in Vec3
-		*  position - position of object (In world space)
-		*  scale - scale of object
-		*  rotation - how fast you want the object to spin degrees (-360f to 360f)
-		*  orientation - where the object is oriented in degrees (-360f to 360f)
-		*  velocity - vel of obj
-		* */
-		void createObject(const std::string& object_ref, const std::string& model_ref, const Vector3& color = Vector3(0.f, 0.f, 0.f), const Vector2& position = Vector2(0.f, 0.f), const Vector2& scale = Vector2(1.f, 1.f), float orientation = 0, float rotation = 0, float velocity = 0);
-		/**
-		* returns an object pointer from the object map
-		* */
-		Object* getObject(const std::string& object_ref);
 		/**
 		* update all object's xform
 		* */
-		void updateObjects();
-		/**
-		* calls all of objects draws
-		* */
-		void drawObjects();
+		void init() override;
 
+		/**
+		* update all object's xform
+		* */
+		void update() override;
 	};
 }
 

@@ -7,13 +7,34 @@
 
 namespace Render {
 
+	struct Cam {
+
+		std::string id;
+
+		Vector2 position;	// Position of camera
+
+		float height;	// represents how much of the world is visible vertically (zoom level).
+	};
+
 	struct Color {
 		Vector3 color;
 		float alpha;
 	};
 
-	struct Camera {
+	struct Mesh {
+		std::string shader_ref;
+		std::string model_ref;
+		Matrix33::Matrix_33 x_form;
+	};
 
+	struct Model {
+
+		unsigned int vaoid;
+		unsigned int vboid;
+		unsigned int eboid;
+
+		unsigned int primitive_type;
+		unsigned int draw_count;
 	};
 }
 

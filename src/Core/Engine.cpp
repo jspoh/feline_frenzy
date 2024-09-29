@@ -145,9 +145,6 @@ void Core::Engine::run() {
 		//Update all systems
 		system_manager->updateSystems();
 
-		//State Manager render ( to be removed )
-		scene_manager->render();
-
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
 
