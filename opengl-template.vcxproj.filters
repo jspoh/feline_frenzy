@@ -4,7 +4,7 @@
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Systems\sysPhysics.cpp" />
-    <ClCompile Include="src\Systems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\sysCollision.cpp" />
     <ClCompile Include="src\Systems\CollisionUtils.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
@@ -27,7 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\sysPhysics.h" />
-    <ClInclude Include="headers\Systems\CollisionSystem.h" />
+    <ClInclude Include="headers\Systems\sysCollision.h" />
     <ClInclude Include="headers\Systems\CollisionUtils.h" />
     <ClInclude Include="headers\Systems\Render\Camera.h" />
     <ClInclude Include="headers\Systems\Render\Model.h" />

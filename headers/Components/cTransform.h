@@ -26,7 +26,7 @@ namespace Transform {
 	};
 
 	struct Velocity {
-
+		Vector2 velocity;
 	};
 }
 

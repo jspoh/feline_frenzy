@@ -7,12 +7,9 @@
  *********************************************************************/
 
 
+#include "../headers/Systems/CollisionUtils.h"
+#include "../headers/Systems/sysInput.h"
 #include "../headers/Core/stdafx.h"
-
-/*
-#include "CollisionUtils.h"
-#include "InputSystem.h"
-#include <iostream>
 
 namespace CollisionUtils {
 
@@ -98,7 +95,7 @@ namespace CollisionUtils {
 
         return true; // Collision detected
     }
-
+}
 
 
     bool satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b) {
@@ -125,6 +122,7 @@ namespace CollisionUtils {
         return true;
     }
 
+    /*
     // Detect if the mouse is inside a rectangular area
     bool detectMClickRect(const Vector2& center, float width, float height) {
         // Get the mouse position from Input::Manager

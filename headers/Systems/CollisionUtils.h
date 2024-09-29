@@ -6,13 +6,14 @@
  * \author Min Khant Ko
  * \date   September 2024
  *********************************************************************/
-/*
+
 #pragma once
 
 #ifndef COLLISION_UTILS_HPP
 #define COLLISION_UTILS_HPP
 
-#include "Vector2.h"
+#include "../headers/Math/Vector2.h"
+#include "../headers/Core/stdafx.h"
 
 namespace CollisionUtils {
 
@@ -44,4 +45,3 @@ namespace CollisionUtils {
 }
 
 #endif // COLLISION_UTILS_HPP
-*/

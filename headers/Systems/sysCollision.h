@@ -6,20 +6,21 @@
  * \date   September 2024
  *********************************************************************/
 
-/*
+
 #pragma once
 
 #ifndef COLLISION_SYSTEM_HPP
 #define COLLISION_SYSTEM_HPP
 
-#include "stdafx.h"
-#include "System.h"
-#include "Vector2.h"
-#include "CollisionUtils.h"
+#include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
+#include "../headers/Math/Vector2.h"
+#include "../headers/Systems/CollisionUtils.h"
 
+/*
 namespace Collision {
 
-    class Manager : public System::Base {
+    class Manager : public System::ISystem {
     private:
         // Private constructor for singleton pattern
         Manager() = default;
@@ -64,9 +65,9 @@ namespace Collision {
 
 
     public:
-        // Singleton instance
-        static Manager& getInstance() {
-            static Manager instance;
+        //Singleton Of Manager Class
+        static std::shared_ptr<Manager> getInstance() {
+            static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
             return instance;
         }
 
@@ -87,5 +88,6 @@ namespace Collision {
     };
 }
 
-#endif // COLLISION_SYSTEM_HPP
 */
+
+#endif // COLLISION_SYSTEM_HPP

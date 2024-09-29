@@ -6,7 +6,9 @@
  * \date   September 2024
  *********************************************************************/
 #include "../headers/Core/stdafx.h"
+#include "../headers/Systems/sysCollision.h"
 
+/*
 void Collision::Manager::init() {
     colliders.resize(300);  // Pre-allocate 300 colliders
     for (auto& collider : colliders) {
@@ -48,6 +50,7 @@ bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) c
         return CollisionUtils::satCheck(a.position, a.size, b.position, b.size);
     }
 }
+
 // Test function
 bool Collision::Manager::checkCollisionBetween( const Vector2& vel_a, const Vector2& rect_min_a, const Vector2& rect_max_a,
                                                 const Vector2& vel_b, const Vector2& rect_min_b, const Vector2& rect_max_b,
@@ -100,3 +103,5 @@ void Collision::Manager::unregisterCollider(const Vector2& position) {
     }
 }
 
+
+*/

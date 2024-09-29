@@ -16,6 +16,7 @@
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Core/Engine.h"
 #include "../headers/Systems/Render/Object.h"
+#include "../headers/Systems/sysCollision.h"
 
 namespace Physics {
 
@@ -28,6 +29,9 @@ namespace Physics {
 	public:
 		//Default Constructor
 		Manager() = default;
+
+		//Default Destructor
+		~Manager() override = default;
 
 		//Singleton Of Manager Class
 		static std::shared_ptr<Manager> getInstance() {
@@ -42,10 +46,7 @@ namespace Physics {
 		void update() override;
 
 		//Move Object
-		void move(Object* object);
-
-		//Default Destructor
-		~Manager() override = default;
+		//void move(Transform::Transform& transform);
 	};
 }
 

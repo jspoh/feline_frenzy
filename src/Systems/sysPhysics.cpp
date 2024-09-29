@@ -2,23 +2,87 @@
  * \file   PhysicsSystem.cpp
  * \brief  Physics system for engine
  *
- * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \author b.soh
  * \date   September 2024
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysPhysics.h"
 
+// Forward declaration for Collision
+//namespace Collision {
+//    class Manager;
+//}
+
+
 void Physics::Manager::init() {
 
 }
 
 void Physics::Manager::update() {
-    //Physics::Manager::getInstance().move(RenderManager::getInstance().getObject("camera"));
-    //NIKEEngine.accessSystem<Physics::Manager>()->getInstance()->move(Render::Manager::getInstance().getObject("camera"));
-    NIKEEngine.accessSystem<Physics::Manager>()->getInstance()->move(NIKEEngine.accessSystem<Render::Manager>()->getObject("camera"));
+    float dt = NIKEEngine.getDeltaTime();
+
+    for (const auto& entity : entities) {
+        // Check if entity contains Transform component
+        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity)) {
+
+            // Reference to transform component
+            Transform::Transform& transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+
+            // Check if entity contains Velocity component
+            if (NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
+                // Ref to velocity component
+                Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
+                
+                // Reset Velocity
+                velocity.velocity.x = 0.0f;
+                velocity.velocity.y = 0.0f;
+
+                // Check if entity contains Move component
+                if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
+                    // Ref to Move component
+                    Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
+
+                    // Speed
+                    const float speed = 1000.0f;
+
+                    if (move.Up == true) {
+                        velocity.velocity.y += speed;
+                    }
+
+                    if (move.Down == true) {
+                        velocity.velocity.y -= speed;
+                    }
+
+                    if (move.Left == true) {
+                        velocity.velocity.x -= speed;
+                    }
+
+                    if (move.Right == true) {
+                        velocity.velocity.x += speed;
+                    }
+                }
+
+                // Normalize Movement
+                if (transform.position.lengthSq() > 0.0f) {
+                    transform.position = transform.position.normalize();
+                }
+
+                // Apply velocity
+                transform.position.x += velocity.velocity.x * dt;
+                transform.position.y += velocity.velocity.y * dt;
+            }
+        }
+    }
+    
+
+    //NIKEEngine.accessSystem<Entity::Manager>()->getEntitiesWithComponents();
+
+    // Move Camera
+    //NIKEEngine.accessSystem<Physics::Manager>()->getInstance()->move(NIKEEngine.accessSystem<Render::Manager>()->getObject("camera"));
 }
 
+/*
 void Physics::Manager::move(Object* object) {
     const float speed = 1000.0f;
     const float dt = NIKEEngine.getDeltaTime();
@@ -44,9 +108,6 @@ void Physics::Manager::move(Object* object) {
         moveVec.y -= 1.0f;
     }
 
-    // Calculate magnitude of movement
-    //float magnitude = sqrt((moveVec.x * moveVec.x) + (moveVec.y * moveVec.y));
-
     // Normalizing movement
     if (moveVec.lengthSq() > 0.0f) {
         moveVec = moveVec.normalized();
@@ -56,3 +117,4 @@ void Physics::Manager::move(Object* object) {
     objPos += moveVec * speed * dt;
     object->setPosition(objPos.x, objPos.y);
 }
+*/

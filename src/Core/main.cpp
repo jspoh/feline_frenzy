@@ -12,7 +12,7 @@
 #include "../headers/Scenes/SplashScene.h"
 #include "../headers/Systems/sysPhysics.h"
 #include "../headers/Systems/sysInput.h"
-#include "../headers/Systems/CollisionSystem.h"
+#include "../headers/Systems/sysCollision.h"
 
 // debug stuff
 bool DEBUG = false;
@@ -32,14 +32,13 @@ int main() {
 	NIKEEngine.registerComponent<Transform::Velocity>();
 
 	// Add Input System
-	NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
+	//NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
 
-	/*Physics::Manager::getInstance().init();*/
+	// Add Physics System
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
 
 	// Add Collision System
-	//Collision::Manager::getInstance().init();
-	//NIKEEngine.registerSystem(std::shared_ptr<Collision::Manager>(&Collision::Manager::getInstance()));
+	//NIKEEngine.registerSystem<Collision::Manager>(Collision::Manager::getInstance());
 
 	//Engine Game Loop
 	NIKEEngine.run();

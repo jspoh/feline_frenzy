@@ -47,6 +47,7 @@
 // components
 #include "../headers/Components/cRender.h"
 #include "../headers/Components/cTransform.h"
+#include "../headers/Components/cMove.h"
 
 #define PI static_cast<float> (atan(1)*4.f)
 
