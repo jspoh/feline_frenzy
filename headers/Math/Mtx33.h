@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   Mtx33.h
+ * \brief  Matrix function declarations for Matrix library
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
+
 #pragma once
 
 #ifndef MTX33

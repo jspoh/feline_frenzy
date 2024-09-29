@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   Mtx33.cpp
+ * \brief  Matrix function definitions for Matrix library
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
+
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Math/Mtx33.h"

@@ -15,6 +15,7 @@
 #include "../headers/Managers/mComponent.h"
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Managers/mScene.h"
+#include "../headers/Managers/mAssetManager.h"
 
 namespace Core {
 
@@ -49,6 +50,7 @@ namespace Core {
 		std::unique_ptr<Component::Manager> component_manager;
 		std::unique_ptr<System::Manager> system_manager;
 		std::unique_ptr<Scenes::Manager> scene_manager;
+		std::unique_ptr<Asset::Manager> asset_manager;
 
 		/**
 		 * Read & Deserialize Data From Config File
@@ -75,6 +77,12 @@ namespace Core {
 		static Engine& getInstance() {
 			static Core::Engine instance;
 			return instance;
+		}
+
+
+		// To get asset manager
+		Asset::Manager& getAssetManager() {
+			return *asset_manager;
 		}
 
 		//Init Window with config file
@@ -212,6 +220,9 @@ namespace Core {
 
 	//Predefined name for core engine
 	#define NIKEEngine Core::Engine::getInstance()
+
+	// Predefined name for asset manager
+	#define ASSET_MANAGER NIKEEngine.getAssetManager()
 }
 
 #endif // !ENGINE_HPP

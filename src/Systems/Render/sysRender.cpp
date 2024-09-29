@@ -202,7 +202,7 @@ void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color con
 
 	//Draw model
 	glBindVertexArray(model->vaoid);
-	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 
 	//Unuse shader
@@ -253,7 +253,7 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 
 	//Shader set uniform
 	//Scale wire frame
-	Matrix33::Matrix_33 scaled_wire_frame = 1.01f * e_mesh.x_form;
+	Matrix33::Matrix_33 scaled_wire_frame = 1.0f * e_mesh.x_form;
 	Matrix_33Transpose(scaled_wire_frame, scaled_wire_frame);
 	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
 	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", scaled_wire_frame);
@@ -410,7 +410,6 @@ void Render::Manager::update() {
 	camera_system->update();
 
 	//Update all entities
-	int i{};
 	for (auto& entity : entities) {
 		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
@@ -434,7 +433,5 @@ void Render::Manager::update() {
 
 		//Unuse shader
 		shader_system->unuseShader();
-
-		i++;
 	}
 }
