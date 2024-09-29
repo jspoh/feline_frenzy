@@ -41,25 +41,24 @@ void Menu::Scene::init() {
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(0), { "base", "square", Matrix33::Matrix_33()});
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), {{0.0f, 0.0f}, {225.f, 175.f}, 0.0f, false});
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), {{0.0f, 0.0f}, {225.f, 175.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(0), {{0.0f, 0.0f, 0.0f}, 1.0f});
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), {"CAM1", {0.0f, 0.0f}, 1000.0f });
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(1), { "base", "triangle", Matrix33::Matrix_33() });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), {{122.0f, 0.0f}, {50.f, 100.f}, 0.0f, true });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), {{122.0f, 0.0f}, {50.f, 100.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), { {1.0f, 0.0f, 0.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), {"CAM2", {122.0f, 0.0f}, 1000.0f });
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(2), { "base", "circle", Matrix33::Matrix_33() });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f, false });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 0.0f, 1.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());
 	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), Render::Color());
-
 
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
 
