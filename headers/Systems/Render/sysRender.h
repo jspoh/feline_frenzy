@@ -77,13 +77,14 @@ namespace Render {
 		 * all .tex files should be 256x256 in RGBA8 format.
 		 * 
 		 * \param path_to_texture
-		 * \param width
-		 * \param height
-		 * \param size
+		 * \param [out] width
+		 * \param [out] height
+		 * \param [out] tex_size
+		 * @param [out] is_tex_ext
 		 * 
 		 * @returns dynamically allocated char*
 		 */
-		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size);
+		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_ext);
 
 	public:
 		//Constructor

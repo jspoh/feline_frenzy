@@ -276,7 +276,7 @@ void Render::Manager::registerModel(const std::string& model_ref, const std::str
 	}
 }
 
-char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size) {
+char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_ext) {
 	// find file type
 	std::string junk, filetype;
 	std::stringstream ss{ path_to_texture };
@@ -284,6 +284,8 @@ char* Render::Manager::prepareImageData(const std::string& path_to_texture, int&
 	std::getline(ss, filetype, '.');
 
 	if (filetype == "tex") {
+		is_tex_ext = true;
+
 		width = 256;
 		height = 256;
 
@@ -312,6 +314,8 @@ char* Render::Manager::prepareImageData(const std::string& path_to_texture, int&
 	}
 
 	// is not .tex file
+	is_tex_ext = false;
+
 	int channels;
 	char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
 	if (img_data == nullptr) {
@@ -338,13 +342,14 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 	std::getline(ss, filetype, '.');
 
 	int tex_width, tex_height, tex_size;
-	const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size);
+	bool is_tex_ext = false;
+	const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_ext);
 
 	// create texture
 	unsigned int tex_id;
 	glCreateTextures(GL_TEXTURE_2D, 1, &tex_id);
 	glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
-	glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+	glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, (is_tex_ext ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, tex_data);
 
 	// no longer needed
 	delete[] tex_data;
