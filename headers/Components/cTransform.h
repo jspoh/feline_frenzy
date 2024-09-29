@@ -12,8 +12,6 @@ namespace Transform {
 		Vector2 position;
 		Vector2 scale;
 		float rotation;
-
-		bool isCam;
 	};
 
 	struct Velocity {

@@ -15,7 +15,6 @@
 #include "../headers/Systems/Render/sysCamera.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Components/cTransform.h"
-#include "../headers/Components/cCamera.h"
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Core/Engine.h"
 

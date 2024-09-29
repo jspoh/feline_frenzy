@@ -49,45 +49,59 @@ void Render::Manager::createBuffers(const std::vector<Vector2>& vertices, const 
 }
 
 bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<Model> model) {
-	std::ifstream mesh_file{ path_to_mesh };
+	std::ifstream mesh_file{ path_to_mesh, std::ios::in };
 	if (!mesh_file.is_open()) {
 		cerr << "Failed to open mesh file: " << path_to_mesh << endl;
 		return false;
 	}
 
-	// placeholder for parsing
-	char placeholder;
+	mesh_file.seekg(0, std::ios::beg);
 
-	int vertex_count, index_count;
-	mesh_file >> vertex_count >> placeholder >> index_count;
+	std::string line;
+	float ndc_x, ndc_y;
+	GLshort index;
 
 	// pos
 	std::vector<Vector2> vertices;
-	vertices.reserve(vertex_count);
 
 	// indices (indexed rendering with element buffer object)
 	std::vector<unsigned int> indices;
-	indices.reserve(index_count);
+
 
 	// line data type (eg. vertex, color, indices)
 	char type;
 
-	while (mesh_file >> type) {
+	while (getline(mesh_file, line)){
+		std::istringstream line_sstm{ line };
+
+		line_sstm >> type;
+
 		switch (type) {
+		case 'n': {
+			break;
+		}
 		case 'v': {
-			float ndc_x, ndc_y;
-			mesh_file
-				>> ndc_x >> placeholder
-				>> ndc_y;
+
+			line_sstm >> ndc_x >> ndc_y;
 			vertices.emplace_back(ndc_x, ndc_y);
 			break;
 		}
-		case 'i': {
-			for (int _{}; _ < index_count; _++) {
-				unsigned int i;
-				mesh_file
-					>> i >> placeholder;
-				indices.push_back(i);
+		case 't': {
+			if (model->primitive_type == 0) {
+				model->primitive_type = GL_TRIANGLES;
+			}
+			while (line_sstm >> index) { // Grab index position
+				indices.emplace_back(index);
+			}
+			break;
+		}
+
+		case 'f': {
+			if (model->primitive_type == 0) {
+				model->primitive_type = GL_TRIANGLE_FAN;
+			}
+			while (line_sstm >> index) { // Grab index position
+				indices.emplace_back(index);
 			}
 			break;
 		}
@@ -96,19 +110,10 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 			return false;
 		}
 	}
-
-	// ensure that the vertex and index count matches the file
-	if (vertices.size() != vertex_count) {
-		cerr << "Vertex count mismatch. Expected: " << vertex_count << " Actual: " << vertices.size() << endl;
-		throw std::exception();
-	}
-	if (indices.size() != index_count) {
-		cerr << "Index count mismatch. Expected: " << index_count << " Actual: " << indices.size() << endl;
-		throw std::exception();
-	}
+	mesh_file.close();
 
 	createBuffers(vertices, indices, model);
-	model->draw_count = index_count;
+	model->draw_count = static_cast<GLuint>(indices.size());
 
 	return true;
 }
@@ -148,7 +153,7 @@ void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color con
 
 	//Draw model
 	glBindVertexArray(model->vaoid);
-	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 
 	//Unuse shader
@@ -251,8 +256,5 @@ void Render::Manager::update() {
 		//Render debugging wireframe
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
 		renderWireFrame(e_mesh, wire_frame_color);
-
-		//Unuse shader
-		shader_system->unuseShader();
 	}
 }
