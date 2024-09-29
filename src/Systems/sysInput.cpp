@@ -8,6 +8,7 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysInput.h"
+#include "../headers/Core/Engine.h"
 
 void Input::Manager::setupEventCallbacks() {
 	glfwSetFramebufferSizeCallback(NIKEEngine.getWindow(), fbsize_cb);

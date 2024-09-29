@@ -12,7 +12,10 @@
 Core::Engine::Engine()
 	: ptr_window{ nullptr }, window_size{}, window_title{""}, delta_time{0.0f},
 	target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f }
-{}
+{
+	// Initialize asset manager
+	asset_manager = std::make_unique<Asset::Manager>();
+}
 
 Core::Engine::~Engine() {
 	glfwTerminate();

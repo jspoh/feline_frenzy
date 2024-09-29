@@ -10,6 +10,7 @@
 #include "../headers/Core/Engine.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Scenes/SplashScene.h"
+#include "../headers/Systems/sysAudio.h"
 
 // debug stuff
 bool DEBUG = false;
