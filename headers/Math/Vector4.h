@@ -7,6 +7,8 @@
  *********************************************************************/
 
 #pragma once
+#pragma warning(push)
+#pragma warning(disable: 26495) // Disable the specific warning for this block
 
 class Vector4 {
 public:
@@ -37,3 +39,5 @@ public:
 	float lengthSq() const;
 	float length() const;
 };
+
+#pragma warning(pop) // Re-enable the warning after this block

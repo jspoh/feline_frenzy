@@ -117,7 +117,7 @@ namespace Core {
 		void destroyEntity(Entity::Type entity);
 
 		/*****************************************************************//**
-		* Comonent Methods
+		* Component Methods
 		*********************************************************************/
 		template<typename T>
 		void registerComponent() {

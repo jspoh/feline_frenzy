@@ -16,12 +16,14 @@
 #include "../headers/Systems/Render/Camera.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Components/cTransform.h"
+#include "../headers/Components/cCamera.h"
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Core/Engine.h"
 
 namespace Render {
 
 	class Manager : public System::ISystem{
+
 	private:
 
 		//Delete Copy Constructor & Copy Assignment
@@ -29,7 +31,7 @@ namespace Render {
 		void operator=(Manager const& copy) = delete;
 
 		Shader::Manager shaderManager;
-		std::unique_ptr<Camera> camera; // smart ptr to camera
+		std::unique_ptr<CameraObject> camera; // smart ptr to camera
 
 		//Map to models for drawing
 		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models;
@@ -41,7 +43,7 @@ namespace Render {
 		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
 
 		//Transform matrix
-		void transformMatrix(Transform::Transform& xform);
+		void transformMatrix(Transform::Transform& xform, Matrix33::Matrix_33 world_to_ndc_mat);
 
 	public:
 		//Constructor
@@ -82,7 +84,7 @@ namespace Render {
 		 */
 		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
 
-		void initCamera(const std::string& object_ref);
+		void initCamera(float camHeight);
 
 		/**
 		* update all object's xform

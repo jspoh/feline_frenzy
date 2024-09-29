@@ -9,19 +9,22 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Components/cTransform.h"
+
 
 void Menu::Scene::load() {
 	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
 	NIKEEngine.registerComponent<Transform::Transform>();
 	NIKEEngine.registerComponent<Render::Color>();
+	NIKEEngine.registerComponent<Camera::Camera>();
 
 	//Add Input Singleton System
 	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
+	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Color>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Camera::Camera>());
 
 	//Load models
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
@@ -29,6 +32,7 @@ void Menu::Scene::load() {
 }
 
 void Menu::Scene::init() {
+	glClearColor(1, 1, 1, 1);
 	// init square obj with values
 	//RenderManager::getInstance().createObject("obj1", "square");
 	//Object* obj = RenderManager::getInstance().getObject("obj1");
@@ -37,12 +41,12 @@ void Menu::Scene::init() {
 	//Create entity
 	std::vector<Entity::Type> entities;
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), { {0.0f, 0.0f}, {50.0f, 50.0f}, 0.0f, Matrix33::Matrix_33()});
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(0), { "base", "square", {0.0f, 0.0f}, {225.f, 175.f}, 0.0f, Matrix33::Matrix_33(), false});
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(0), {{0.0f, 0.0f, 0.0f}, 1.0f});
 
-	//entities.push_back(NIKEEngine.createEntity());
-	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), Transform::Transform());
-	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), Render::Color());
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), { "base", "triangle", {122.0f, 0.0f}, {50.f, 100.f}, 0.0f, Matrix33::Matrix_33(), true });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), { {1.0f, 0.0f, 0.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), Transform::Transform());
@@ -66,8 +70,6 @@ void Menu::Scene::init() {
 }
 
 void Menu::Scene::render() {
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Object* obj = Render::Manager::getInstance().getObject("camera");
 	//obj->setPosition(obj->getPosition().x, obj->getPosition().y - 1.f);

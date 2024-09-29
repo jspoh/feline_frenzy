@@ -10,13 +10,13 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/Render/Object.h"
 
-class Camera {
+class CameraObject {
 
 	public:
-		Camera();
+		CameraObject();
 
-		void init(const Object& camObj, float wHeight, float wWidth);
-		void update(const Object& camObj);
+		void init(float wHeight, float wWidth, float camHeight);
+		void update();
 
 		void setPosition(float x, float y);
 		const Vector2& getPosition() const;
