@@ -52,15 +52,16 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), {"CAM2", {122.0f, 0.0f}, 1000.0f });
 
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { "base", "circle", {322.0f, 122.0f}, {100.f, 100.f}, 0.0f, Matrix33::Matrix_33(), false });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 1.0f, 0.0f}, 1.0f });
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(2), { "base", "circle", Matrix33::Matrix_33() });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f, false });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 0.0f, 1.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());
 	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), Render::Color());
 
 
-	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM1");
+	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
 
 	// Init game objects into game world
 	//Render::Manager::getInstance().createObject("obj1", "square", Vector3(1.f, 0.f, 0.f), Vector2(-19800, -20000), Vector2(200.f, 150.f), 0.f, -17.5f);
