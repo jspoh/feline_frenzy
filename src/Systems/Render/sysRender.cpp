@@ -22,6 +22,11 @@ Render::Manager::~Manager() {
 		glDeleteBuffers(1, &model.second->vboid);
 		glDeleteBuffers(1, &model.second->eboid);
 	}
+
+	// clear textures
+	for (std::pair<std::string, unsigned int> texture : textures) {
+		glDeleteTextures(1, &texture.second);
+	}
 }
 
 void Render::Manager::createBaseBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Model> model) {
