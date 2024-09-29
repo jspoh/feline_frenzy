@@ -208,6 +208,8 @@ void Render::Manager::renderObject(const Render::Model& model, const std::string
 	constexpr const char* transform_uniform = "u_transform";
 	constexpr int texture_unit = 6;
 
+	glPolygonMode(GL_FRONT, GL_FILL);
+
 	// use shader
 	shader_system->useShader(texture_shader);
 
@@ -217,8 +219,8 @@ void Render::Manager::renderObject(const Render::Model& model, const std::string
 		textures.at(texture_ref)
 	);
 
-	glTextureParameteri(textures.at(texture_ref), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTextureParameteri(textures.at(texture_ref), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(textures.at(texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(textures.at(texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	Matrix33::Matrix_33 identity;
 	Matrix33::Matrix_33Identitiy(identity);
@@ -304,7 +306,6 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 	glCreateTextures(GL_TEXTURE_2D, 1, &tex_id);
 	glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
 	glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
-	glGenerateTextureMipmap(tex_id);
 
 	// no longer needed
 	delete[] tex_data;
