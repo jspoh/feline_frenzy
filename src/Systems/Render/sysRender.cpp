@@ -12,13 +12,6 @@
 #include "../headers/Components/cRender.h"
 #include "../headers/Math/Mtx33.h"
 
-Render::Manager::Manager() {
-	// compile shaders
-	shaderManager.loadShader("base", "shaders/base.vert", "shaders/base.frag");
-	shaderManager.loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
-	// !TODO: shader for text rendering(?)
-}
-
 Render::Manager::~Manager() {
 
 	//Clear models
@@ -125,6 +118,23 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 	return true;
 }
 
+void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
+	//Transform matrix here
+	Matrix33::Matrix_33 model_mat, result, scale_mat, rot_mat, trans_mat;
+	float orientation = 0.0f;
+
+	// Modulus the object rotation so it doesnt result in a large number overtime
+	orientation = fmod(orientation, 360.f);
+	float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+
+	Matrix_33Rot(rot_mat, angleDisp);
+	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
+	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+
+	// OpenGL requires matrix in col maj so transpose
+	Matrix_33Transpose(mesh.x_form, result);
+}
 
 void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
 	std::shared_ptr model = std::make_shared<Model>();
@@ -133,87 +143,76 @@ void Render::Manager::registerModel(const std::string& model_ref, const std::str
 	}
 }
 
-
-void Render::Manager::initCamera(float camHeight) {
-
-	// Get window size
-	float wWidth = Core::Engine::getInstance().getWindowSize().x;
-	float wHeight = Core::Engine::getInstance().getWindowSize().y;
-
-	// Create a pointer to camera class
-	camera = std::make_unique<CameraObject>();
-	// Init camera
-	camera->init(wWidth, wHeight, camHeight);
-
-}
-
-
-
-void Render::Manager::transformMatrix(Transform::Transform& xform, Matrix33::Matrix_33 world_to_ndc_mat) {
-	//Transform matrix here
-	Matrix33::Matrix_33 model_mat, result, scale_mat, rot_mat, trans_mat;
-	float orientation = 0.0f;
-
-	// Modulus the object rotation so it doesnt result in a large number overtime
-	orientation = fmod(orientation, 360.f);
-	float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * PI / 180.f;
-
-	Matrix_33Rot(rot_mat, angleDisp);
-	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
-	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
-	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
-
-	// OpenGL requires matrix in col maj so transpose
-	Matrix_33Transpose(xform.x_form, result);
+void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
+	camera_system->trackCamEntity(cam_identifier);
 }
 
 void Render::Manager::init() {
-	initCamera(1000.f);
+	//Create shader system
+	shader_system = std::make_unique<Shader::Manager>();
+
+	//Load shaders
+	shader_system->loadShader("base", "shaders/base.vert", "shaders/base.frag");
+	shader_system->loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
+
+	//Create camera system
+	camera_system = std::make_unique<Camera::System>();
+
+	//Init Camera ( Camera height defaulted at 1000.0f )
+	camera_system->init(1000.0f);
 }
 
 void Render::Manager::update() {
-    //float deltaTime = Core::Engine::getInstance().getDeltaTime();
-
-    //for (auto& [object_ref, object] : objects) {
-    //    if (object_ref == "camera") {
-    //        camera.get()->update(object);
-    //    }
-    //    object.update(deltaTime, camera->getWorldToNDCXform());
-    //}
 	
 	// Before drawing clear screen
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	//Update set of cameras
+	std::set<Entity::Type> cam_entities;
+	for (auto& entity : entities) {
+		//Update camera position
+		if (!NIKEEngine.checkEntityComponent<Render::Cam>(entity))
+			continue;
+
+		//Update camera and push to list
+		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+		auto& e_camera = NIKEEngine.getEntityComponent<Render::Cam>(entity);
+		e_camera.position = e_transform.position;
+		cam_entities.insert(entity);
+	}
+
+	//Update camera with set of cam entities
+	camera_system->updateCameraEntities(std::move(cam_entities));
+
+	//Update camera system
+	camera_system->update();
+
 	//Update all entities
 	for (auto& entity : entities) {
 		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
 		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
 
-		if (e_transform.isCam == true) {
-			camera.get()->setPosition(e_transform.position.x, e_transform.position.y);
-			camera.get()->update();
-		}
-
 		//Transform matrix here
-		transformMatrix(e_transform, camera.get()->getWorldToNDCXform());
+		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
 
-		shaderManager.useShader(e_transform.shader_ref);
+		//Use shader
+		shader_system->useShader(e_mesh.shader_ref);
 
 		//Shader set uniform
-		shaderManager.setUniform(e_transform.shader_ref, "f_color", e_color.color);
-		shaderManager.setUniform(e_transform.shader_ref, "model_to_ndc", e_transform.x_form);
+		shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+		shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
 
 		//Find model
-		assert(models.find(e_transform.model_ref) != models.end() && "Model not found.");
-		auto model = models.at(e_transform.model_ref);
-
+		assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
+		auto& model = models.at(e_mesh.model_ref);
 
 		//Draw model
 		glBindVertexArray(model->vaoid);
 		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 
-		shaderManager.unuseShader();
+		//Unuse shader
+		shader_system->unuseShader();
 	}
-
 }
