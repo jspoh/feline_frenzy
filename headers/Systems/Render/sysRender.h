@@ -73,6 +73,18 @@ namespace Render {
 		//Render object with texture
 		void renderObject(const Render::Mesh& e_mesh);
 
+		/**
+		 * all .tex files should be 256x256 in RGBA8 format.
+		 * 
+		 * \param path_to_texture
+		 * \param width
+		 * \param height
+		 * \param size
+		 * 
+		 * @returns dynamically allocated char*
+		 */
+		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size);
+
 	public:
 		//Constructor
 		Manager() = default;
@@ -114,7 +126,15 @@ namespace Render {
 		 */
 		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
 
-		// Register texture
+		/**
+		 * registers textures.
+		 * 
+		 * files ending in `.tex` are assumed to already be clean RGBA8 format
+		 * other files are parsed with stb_image.h
+		 * 
+		 * \param texture_ref
+		 * \param path_to_texture
+		 */
 		void registerTexture(const std::string& texture_ref, const std::string& path_to_texture);
 
 		//Track camera entity

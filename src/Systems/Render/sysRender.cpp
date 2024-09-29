@@ -11,6 +11,8 @@
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Math/Mtx33.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "data/stb_image.h"
 
 Render::Manager::~Manager() {
 
@@ -274,33 +276,71 @@ void Render::Manager::registerModel(const std::string& model_ref, const std::str
 	}
 }
 
+char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size) {
+	// find file type
+	std::string junk, filetype;
+	std::stringstream ss{ path_to_texture };
+	std::getline(ss, junk, '.');
+	std::getline(ss, filetype, '.');
+
+	if (filetype == "tex") {
+		width = 256;
+		height = 256;
+
+		std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
+		if (!texture_file.is_open()) {
+			cerr << "Failed to open texture file: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to open texture file.");
+		}
+
+		// get tex_size of texture file
+		tex_size = static_cast<int>(texture_file.tellg());
+
+		// return to beginning of file
+		texture_file.seekg(0, std::ios::beg);
+
+		char* tex_data{ new char[tex_size] };
+
+		// read tex data into ptr
+		if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
+			cerr << "Failed to read texture file: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to read texture file.");
+		}
+		texture_file.close();
+
+		return tex_data;
+	}
+
+	// is not .tex file
+	int channels;
+	char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
+	if (img_data == nullptr) {
+		cerr << "Failed to load image data: " << path_to_texture << endl;
+		throw std::runtime_error("Failed to load image data.");
+	}
+
+	tex_size = width * height * channels;
+
+	char* data = new char[tex_size];
+	for (int i{}; i < tex_size; i++) {
+		data[i] = img_data[i];
+	}
+	stbi_image_free(img_data);
+
+	return data;
+}
+
 void Render::Manager::registerTexture(const std::string& texture_ref, const std::string& path_to_texture) {
 	// @TODO jspoh: get tex w and h and bytes per texel(should be 4)
-	unsigned int tex_width = 256;
-	unsigned int tex_height = 256;
-	unsigned int bytes_per_texel = 4;
 
-	// read file as binary object, starting at end(to get file size)
-	std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
-	if (!texture_file.is_open()) {
-		cerr << "Failed to open texture file: " << path_to_texture << endl;
-		throw std::runtime_error("Failed to open texture file.");
-	}
+	// find file type
+	std::string junk, filetype;
+	std::stringstream ss{ path_to_texture };
+	std::getline(ss, junk, '.');
+	std::getline(ss, filetype, '.');
 
-	// get size of texture file
-	const std::streamsize tex_size = texture_file.tellg();
-
-	// return to beginning of file
-	texture_file.seekg(0, std::ios::beg);
-
-	char* tex_data{ new char[tex_size] };
-
-	// read tex data into ptr
-	if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
-		cerr << "Failed to read texture file: " << path_to_texture << endl;
-		throw std::runtime_error("Failed to read texture file.");
-	}
-	texture_file.close();
+	int tex_width, tex_height, tex_size;
+	const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size);
 
 	// create texture
 	unsigned int tex_id;
