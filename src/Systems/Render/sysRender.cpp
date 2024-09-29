@@ -331,8 +331,6 @@ char* Render::Manager::prepareImageData(const std::string& path_to_texture, int&
 }
 
 void Render::Manager::registerTexture(const std::string& texture_ref, const std::string& path_to_texture) {
-	// @TODO jspoh: get tex w and h and bytes per texel(should be 4)
-
 	// find file type
 	std::string junk, filetype;
 	std::stringstream ss{ path_to_texture };
@@ -353,6 +351,8 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 
 	// register texture
 	textures[texture_ref] = tex_id;
+
+	cout << "Successfully registered texture " << texture_ref << " from " << path_to_texture << endl;
 }
 
 void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
