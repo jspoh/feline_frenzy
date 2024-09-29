@@ -35,6 +35,7 @@ void Menu::Scene::load() {
 
 	// load textures
 	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("water", "assets/textures/water-rgba-256.tex");
 }
 
 void Menu::Scene::init() {
@@ -80,6 +81,11 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33() });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {0.0f, 0.0f}, {100.f, 100.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
+
+	//entities.push_back(NIKEEngine.createEntity());
+	//NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33() });
+	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(4), { {0.0f, 0.0f}, {100.f, 100.f}, 0.0f });
+	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(4), { {1.0f, 1.0f, 1.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {

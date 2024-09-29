@@ -368,10 +368,13 @@ void Render::Manager::update() {
 		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
 
 		//Render object
-		if (i != 3)
+		// @TODO jspoh: revert this (used for testing)
+		if (i < 3)
 			renderObject(e_mesh, e_color);
-		else
+		else if (i == 3)
 			renderObject(*models.at(e_mesh.model_ref), std::string{ "duck" });
+		else
+			renderObject(*models.at(e_mesh.model_ref), std::string{ "water" });
 
 		//Render debugging wireframe
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
