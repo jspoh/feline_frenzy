@@ -45,6 +45,9 @@ namespace Matrix33 {
 	// Matrix Multiplication (THIS IS SAME AS MATRIX CONCAT)
 	Matrix_33 operator* (const Matrix_33& lhs, const Matrix_33& rhs);
 
+	//Matrix scalar
+	Matrix_33 operator* (float scalar, const Matrix_33& rhs);
+
 	Vector2 operator* (const Vector2& lhs, const Matrix_33& rhs);
 	Vector2 operator* (const Matrix_33& lhs, const Vector2& rhs);
 

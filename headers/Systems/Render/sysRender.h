@@ -47,6 +47,12 @@ namespace Render {
 		//Transform matrix
 		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
 
+		//Render object
+		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color);
+
+		//Render debugging wireframe
+		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
+
 	public:
 		//Constructor
 		Manager() = default;

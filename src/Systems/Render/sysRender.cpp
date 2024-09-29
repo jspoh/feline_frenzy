@@ -131,6 +131,60 @@ void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh&
 	Matrix_33Transpose(mesh.x_form, result);
 }
 
+void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+	//Set Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	//Use shader
+	shader_system->useShader(e_mesh.shader_ref);
+
+	//Shader set uniform
+	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
+
+	//Find model
+	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
+	auto& model = models.at(e_mesh.model_ref);
+
+	//Draw model
+	glBindVertexArray(model->vaoid);
+	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+
+	//Unuse shader
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+	//Set Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//Use shader
+	shader_system->useShader(e_mesh.shader_ref);
+
+	//Shader set uniform
+	//Scale wire frame
+	Matrix33::Matrix_33 scaled_wire_frame = 1.01f * e_mesh.x_form;
+	Matrix_33Transpose(scaled_wire_frame, scaled_wire_frame);
+	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", scaled_wire_frame);
+
+	//Find model
+	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
+	auto& model = models.at(e_mesh.model_ref);
+
+	//Draw model
+	glBindVertexArray(model->vaoid);
+	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+
+	//Unuse shader
+	shader_system->unuseShader();
+
+	//Reset Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
 	std::shared_ptr model = std::make_shared<Model>();
 	if (loadMesh(path_to_mesh, model)) {
@@ -191,21 +245,12 @@ void Render::Manager::update() {
 		//Transform matrix here
 		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
 
-		//Use shader
-		shader_system->useShader(e_mesh.shader_ref);
+		//Render object
+		renderObject(e_mesh, e_color);
 
-		//Shader set uniform
-		shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-		shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
-
-		//Find model
-		assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
-		auto& model = models.at(e_mesh.model_ref);
-
-		//Draw model
-		glBindVertexArray(model->vaoid);
-		glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
-		glBindVertexArray(0);
+		//Render debugging wireframe
+		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
+		renderWireFrame(e_mesh, wire_frame_color);
 
 		//Unuse shader
 		shader_system->unuseShader();
