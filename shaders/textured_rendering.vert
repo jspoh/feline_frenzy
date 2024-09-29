@@ -14,6 +14,6 @@ uniform mat3 u_transform;
 
 void main() {
 	vec2 in_position_transformed = (u_transform * vec3(a_position, 1.0)).xy;
-	gl_Position = vec4(a_position, 0.0, 1.0);
+	gl_Position = vec4(in_position_transformed, 0.0, 1.0);
 	f_texcoord = a_tex_coord;
 }

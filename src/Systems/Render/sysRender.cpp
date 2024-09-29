@@ -222,7 +222,7 @@ void Render::Manager::renderObject(const Render::Model& model, const std::string
 
 	Matrix33::Matrix_33 identity;
 	Matrix33::Matrix_33Identitiy(identity);
-	//Matrix33::Matrix_33Scale(identity, 1.0f, 2.0f);
+	//Matrix33::Matrix_33Scale(identity, 2.0f, 2.0f);
 
 	shader_system->setUniform(texture_shader, texture_uniform, texture_unit);
 	shader_system->setUniform(texture_shader, transform_uniform, identity);
@@ -293,7 +293,7 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 	char* tex_data{ new char[tex_size] };
 
 	// read tex data into ptr
-	if (!texture_file.read(tex_data, tex_size)) {
+	if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
 		cerr << "Failed to read texture file: " << path_to_texture << endl;
 		throw std::runtime_error("Failed to read texture file.");
 	}
