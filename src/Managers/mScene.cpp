@@ -14,11 +14,17 @@
 
 void Scenes::Manager::initScene(std::string const& scene_id) {
 	curr_scene = states.at(scene_id);
+	prev_scene = curr_scene;
 	curr_scene->load();
 	curr_scene->init();
 }
 
 void Scenes::Manager::changeScene(std::string const& scene_id) {
+	//Change scene only if its not the same scene
+	if (states.at(scene_id) == curr_scene) {
+		return;
+	}
+
 	//Free & Unload Old Scene
 	if (curr_scene) {
 		curr_scene->exit();
@@ -44,6 +50,12 @@ void Scenes::Manager::restartScene() {
 }
 
 void Scenes::Manager::previousScene() {
+	//If prev scene is same as curr scene, restart curr scene
+	if (prev_scene == curr_scene) {
+		restartScene();
+		return;
+	}
+
 	//Free & Unload Old State
 	if (curr_scene) {
 		curr_scene->exit();
@@ -58,8 +70,4 @@ void Scenes::Manager::previousScene() {
 		curr_scene->load();
 		curr_scene->init();
 	}
-}
-
-void Scenes::Manager::render() {
-	curr_scene->render();
 }

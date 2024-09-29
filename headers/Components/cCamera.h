@@ -12,9 +12,6 @@ namespace Camera {
 		Vector2 position;	// Position of camera
 
 		float height;	// represents how much of the world is visible vertically (zoom level).
-
-		// Matrix transformation
-		Matrix33::Matrix_33 world_to_ndc_xform;
 	};
 }
 

@@ -22,9 +22,6 @@ namespace Scenes {
 		//Phases
 		virtual void load() = 0;
 		virtual void init() = 0;
-
-		virtual void render() = 0;
-
 		virtual void exit() = 0;
 		virtual void unload() = 0;
 
@@ -80,9 +77,6 @@ namespace Scenes {
 
 		//Go To Previous scene
 		void previousScene();
-
-		//Update ( to be removed )
-		void render();
 	};
 }
 

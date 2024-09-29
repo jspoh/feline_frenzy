@@ -12,8 +12,7 @@
 #define RENDER_MANAGER_HPP
 
 #include "../headers/Systems/Render/sysShader.h"
-#include "../headers/Systems/Render/Object.h"
-#include "../headers/Systems/Render/Camera.h"
+#include "../headers/Systems/Render/sysCamera.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cCamera.h"
@@ -30,8 +29,11 @@ namespace Render {
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
 
-		Shader::Manager shaderManager;
-		std::unique_ptr<CameraObject> camera; // smart ptr to camera
+		//Shader system
+		std::unique_ptr<Shader::Manager> shader_system;
+
+		//Camera System
+		std::unique_ptr<Camera::System> camera_system; // smart ptr to camera
 
 		//Map to models for drawing
 		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models;
@@ -43,11 +45,11 @@ namespace Render {
 		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
 
 		//Transform matrix
-		void transformMatrix(Transform::Transform& xform, Matrix33::Matrix_33 world_to_ndc_mat);
+		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
 
 	public:
 		//Constructor
-		Manager();
+		Manager() = default;
 
 		//Destructor
 		~Manager();
@@ -84,7 +86,8 @@ namespace Render {
 		 */
 		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
 
-		void initCamera(float camHeight);
+		//Track camera entity
+		void trackCamEntity(std::string const& cam_identifier);
 
 		/**
 		* update all object's xform
@@ -95,10 +98,6 @@ namespace Render {
 		* update all object's xform
 		* */
 		void update() override;
-		/**
-		* calls all of objects draws
-		* */
-		void drawObjects();
 	};
 }
 
