@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   cAudio.h
+ * \file   sysAudio.h
  * \brief  Audio system manager function declarations
  *
  * \author Bryan Lim
