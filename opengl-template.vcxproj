@@ -47,8 +47,6 @@
     <ClInclude Include="headers\Managers\mAssetManager.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
-    <ClInclude Include="headers\db.h" />
-    <ClInclude Include="headers\json.hpp" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Systems\Render\sysCamera.h" />
@@ -79,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\meshes\circle.txt" />
+    <Text Include="assets\meshes\square-texture.txt" />
     <Text Include="assets\meshes\square.txt" />
     <Text Include="src\Core\Config.txt" />
   </ItemGroup>

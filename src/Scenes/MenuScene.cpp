@@ -98,6 +98,12 @@ void Menu::Scene::load() {
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("triangle", "assets/meshes/triangle.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("circle", "assets/meshes/circle.txt");
+	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square-texture", "assets/meshes/square-texture.txt");
+
+	// load textures
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("water", "assets/textures/water-rgba-256.tex");
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("tree", "assets/textures/tree.jpg");
 }
 
 void Menu::Scene::init() {

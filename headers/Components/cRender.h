@@ -25,6 +25,7 @@ namespace Render {
 		std::string shader_ref;
 		std::string model_ref;
 		Matrix33::Matrix_33 x_form;
+		std::string texture_ref;		// optional
 	};
 
 	struct Model {
