@@ -10,6 +10,7 @@
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Systems/sysPhysics.h"
+#include "../headers/Managers/mSerialization.h"
 
 //!TODO Clean up scene parser
 void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
@@ -178,4 +179,9 @@ void Menu::Scene::exit() {
 
 void Menu::Scene::unload() {
 
+}
+
+void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
+	Serialization::Manager serializationManager;
+    serializationManager.loadSceneFromFile(scene_filepath, entities);
 }

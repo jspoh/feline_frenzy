@@ -24,6 +24,7 @@
     <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
     <ClCompile Include="src\Managers\mAssetManager.cpp" />
+    <ClCompile Include="src\Managers\mSerialization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\sysPhysics.h" />
@@ -55,6 +56,7 @@
     <ClInclude Include="headers\Managers\mAssetManager.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cMove.h" />
+    <ClInclude Include="headers\Managers\mSerialization.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
