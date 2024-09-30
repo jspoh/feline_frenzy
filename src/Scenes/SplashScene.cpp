@@ -44,18 +44,14 @@ void Splash::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(mouse_click, Input::Mouse());
 	NIKEEngine.addEntityComponentObj<Input::Key>(mouse_click, Input::Key());
 
-	// Load music files with asset manager
-	ASSET_MANAGER.LoadMusic("assets/Audio/test_music.wav", "test_music");
-	ASSET_MANAGER.CreateAudioGroup("test_group");
+	//// Load music files with asset manager
+	//ASSET_MANAGER.LoadMusic("assets/Audio/test_music.wav", "test_music");
+	//ASSET_MANAGER.CreateAudioGroup("test_group");
 
-	// Create entity to test for audio
-	bg_music = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, false));
+	////// Create entity to test for audio
+	//bg_music = NIKEEngine.createEntity();
+	//NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, false));
 
-}
-
-void Splash::Scene::render() {
-	
 }
 
 void Splash::Scene::exit() {
