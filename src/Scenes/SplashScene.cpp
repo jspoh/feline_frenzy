@@ -23,8 +23,8 @@ void Splash::Scene::init() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Register input component
-	NIKEEngine.registerComponent<Input::Mouse>();
 	NIKEEngine.registerComponent<Input::Key>();
+	NIKEEngine.registerComponent<Input::Mouse>();
 	// NIKEEngine.registerComponent<Audio::cAudio>();
 
 	//Add Input Singleton System
@@ -34,15 +34,15 @@ void Splash::Scene::init() {
 	NIKEEngine.accessSystem<Input::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
-	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Key>());
+	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
 
 	// NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
 
-	//Create entity with mouse component
-	mouse_click = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Input::Mouse>(mouse_click, Input::Mouse());
-	NIKEEngine.addEntityComponentObj<Input::Key>(mouse_click, Input::Key());
+	//Create entity with mouse & key component for testing
+	input = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Input::Key>(input, { Input::TriggerMode::TRIGGERED });
+	NIKEEngine.addEntityComponentObj<Input::Mouse>(input, { Input::TriggerMode::TRIGGERED });
 
 	//// Load music files with asset manager
 	//ASSET_MANAGER.LoadMusic("assets/Audio/test_music.wav", "test_music");

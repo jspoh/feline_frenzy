@@ -44,6 +44,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Managers\mAssetManager.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />

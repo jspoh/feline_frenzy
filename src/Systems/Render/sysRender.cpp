@@ -429,9 +429,6 @@ void Render::Manager::update() {
 
 		//Render debugging wireframe
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
-		renderWireFrame(e_mesh, wire_frame_color);
-
-		//Unuse shader
-		shader_system->unuseShader();
+		//renderWireFrame(e_mesh, wire_frame_color);
 	}
 }
