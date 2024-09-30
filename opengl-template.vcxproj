@@ -70,6 +70,7 @@
     <ClInclude Include="headers\Math\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\scenes\mainmenu.scn" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
     <None Include="shaders\textured_rendering.frag" />
@@ -79,6 +80,7 @@
     <Text Include="assets\meshes\circle.txt" />
     <Text Include="assets\meshes\square-texture.txt" />
     <Text Include="assets\meshes\square.txt" />
+    <Text Include="assets\meshes\triangle.txt" />
     <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

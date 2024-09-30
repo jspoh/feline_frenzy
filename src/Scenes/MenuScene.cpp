@@ -69,7 +69,8 @@ void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<En
 		line_pos >> position.x >> position.y;
 
 		// Add components to the entity
-		NIKEEngine.addEntityComponentObj<Render::Mesh>(entity, { shdr_prgm, model_name, Matrix33::Matrix_33() });
+		//!TODO add data serialization for textured object
+		NIKEEngine.addEntityComponentObj<Render::Mesh>(entity, { shdr_prgm, model_name, Matrix33::Matrix_33()});
 		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, 0.0f }); // 0.0f for rotation
 		NIKEEngine.addEntityComponentObj<Render::Color>(entity, { clr_atr, 1.0f });  // Assuming alpha = 1.0f for now
 
@@ -111,8 +112,23 @@ void Menu::Scene::init() {
 
 	//Create entity
 	std::vector<Entity::Type> entities;
-	loadFromFile("assets/Scenes/mainmenu.scn", entities);
 
+	loadFromFile("assets/scenes/mainmenu.scn", entities);
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck" });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {400.0f, -200.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "water" });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(4), { {100.0f, -200.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(4), { {1.0f, 1.0f, 1.0f}, 1.0f });
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(5), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "tree" });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {-200.0f, -200.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());
