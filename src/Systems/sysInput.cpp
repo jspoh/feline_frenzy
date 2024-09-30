@@ -8,6 +8,7 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysInput.h"
+#include "../headers/Components/cTransform.h"
 
 
 
@@ -125,6 +126,15 @@ void Input::Manager::update() {
 			}
 		}
 
+		else if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
+		{
+			Transform::Runtime_Transform& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
+			// Check if S key is pressed for runtime scale, R key is pressed for runtime rotate
+			e_runtime.runtime_scale = key.b_output && (key.key_type == GLFW_KEY_S);
+			e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
+		}
+
+
 		// Checking for Move component
 		else if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
 			// Ref to Move component
@@ -175,6 +185,8 @@ void Input::Manager::update() {
 	if (key.b_output && (key.key_type == GLFW_KEY_ESCAPE)) {
 		NIKEEngine.terminate();
 	}
+
+
 }
 
 void Input::Manager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {

@@ -10,7 +10,6 @@
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Systems/sysPhysics.h"
-#include "../headers/Systems/sysInput.h"
 
 //!TODO Clean up scene parser
 void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
@@ -87,6 +86,7 @@ void Menu::Scene::load() {
 	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
 	NIKEEngine.registerComponent<Transform::Velocity>();
 	NIKEEngine.registerComponent<Transform::Transform>();
+	NIKEEngine.registerComponent<Transform::Runtime_Transform>();
 	NIKEEngine.registerComponent<Move::Movement>();
 	NIKEEngine.registerComponent<Render::Mesh>();
 	NIKEEngine.registerComponent<Render::Color>();
@@ -96,12 +96,20 @@ void Menu::Scene::load() {
 	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
 
+	// Set components link
+	// NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
+	NIKEEngine.accessSystem<Physics::Manager>()->setComponentsLinked(false);
+
+	
+
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Mesh>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Color>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Velocity>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
 
 	//Load models
@@ -131,6 +139,7 @@ void Menu::Scene::init() {
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck" });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {400.0f, -200.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities.at(3), Transform::Runtime_Transform());
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
 
 	entities.push_back(NIKEEngine.createEntity());

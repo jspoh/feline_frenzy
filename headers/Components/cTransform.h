@@ -14,6 +14,13 @@ namespace Transform {
 		float rotation;
 	};
 
+	struct Runtime_Transform {
+		bool runtime_scale = false;
+		bool runtime_rotate = false;
+	};
+
+
+
 	struct Velocity {
 		Vector2 velocity;
 	};
