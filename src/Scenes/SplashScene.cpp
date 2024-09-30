@@ -52,18 +52,10 @@ void Splash::Scene::init() {
 	bg_music = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, false));
 
-	//// Create entity to test for audio
-	//bg_music = NIKEEngine.createEntity();
-	//NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio());
-
 }
 
 void Splash::Scene::render() {
-	//For testing
-	if (NIKEEngine.getEntityComponent<Input::Mouse>(mouse_click).is_lbutton_pressed) {
-		NIKEEngine.changeScene("MENU");
-		NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(ASSET_MANAGER.GetAudioGroup("test_group"));
-	}
+	
 }
 
 void Splash::Scene::exit() {
