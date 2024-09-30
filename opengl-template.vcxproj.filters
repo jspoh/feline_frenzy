@@ -19,6 +19,7 @@
     <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
+    <ClCompile Include="src\Managers\mSerialization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\Render\sysCamera.h" />
@@ -42,7 +43,7 @@
     <ClInclude Include="headers\Math\Vector4.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
-    <ClInclude Include="headers\Components\cCamera.h" />
+    <ClInclude Include="headers\Managers\mSerialization.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

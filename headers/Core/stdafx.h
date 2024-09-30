@@ -44,6 +44,10 @@
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
 
+// components
+#include "../headers/Components/cRender.h"
+#include "../headers/Components/cTransform.h"
+
 //Math defines
 #define _USE_MATH_DEFINES
 #include <math.h>

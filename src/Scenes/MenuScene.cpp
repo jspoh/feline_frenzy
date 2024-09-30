@@ -9,6 +9,7 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Managers/mSerialization.h"
 
 
 void Menu::Scene::load() {
@@ -79,4 +80,9 @@ void Menu::Scene::exit() {
 
 void Menu::Scene::unload() {
 
+}
+
+void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
+	Serialization::Manager serializationManager;
+    serializationManager.loadSceneFromFile(scene_filepath, entities);
 }
