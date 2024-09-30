@@ -33,6 +33,18 @@ void Input::Manager::update() {
 			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
 			e_mouse = mouse;
 		}
+
+		// Checking for Move component
+		if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
+			// Ref to Move component
+			Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
+
+			//Check if escape key is pressed
+			move.Up = key_is_pressed(GLFW_KEY_W);
+			move.Left = key_is_pressed(GLFW_KEY_A);
+			move.Down = key_is_pressed(GLFW_KEY_S);
+			move.Right = key_is_pressed(GLFW_KEY_D);
+		}
 	}
 
 	//Temp changing scene here

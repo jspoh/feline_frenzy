@@ -23,57 +23,54 @@ void Physics::Manager::update() {
     float dt = NIKEEngine.getDeltaTime();
 
     for (const auto& entity : entities) {
-        // Check if entity contains Transform component
-        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity)) {
+        // Check if entity contains Transform component and Velocity component
+        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) && NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
 
             // Reference to transform component
             Transform::Transform& transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 
-            // Check if entity contains Velocity component
-            if (NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
-                // Ref to velocity component
-                Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
+            // Ref to velocity component
+            Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
 
-                // Check if entity contains Move component
-                if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
-                    // Ref to Move component
-                    Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
+            const float speed = 10.0f;
 
-                    // Reset Velocity
-                    velocity.velocity.y = 0.0f;
-                    velocity.velocity.x = 0.0f;
+            // Check if entity contains Move component
+            
+            if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
+                // Ref to Move component
+                Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
 
-                    // Speed
-                    const float speed = 1000.0f;
-                    bool movingY = false;
-                    bool movingX = false;
+                // Reset Velocity
+                velocity.velocity.y = 0.0f;
+                velocity.velocity.x = 0.0f;
 
-                    if (move.Up == true) {
-                        velocity.velocity.y += speed;
-                    }
-
-                    if (move.Down == true) {
-                        velocity.velocity.y -= speed;
-                    }
-
-                    if (move.Left == true) {
-                        velocity.velocity.x -= speed;
-                    }
-
-                    if (move.Right == true) {
-                        velocity.velocity.x += speed;
-                    }
+                if (move.Up) {
+                    velocity.velocity.y += speed;
                 }
 
-                // Normalize Movement
-                if (transform.position.lengthSq() > 0.0f) {
-                    transform.position = transform.position.normalize();
+                if (move.Down) {
+                    velocity.velocity.y -= speed;
                 }
 
-                // Apply velocity
-                transform.position.x += velocity.velocity.x * dt;
-                transform.position.y += velocity.velocity.y * dt;
+                if (move.Left) {
+                    velocity.velocity.x -= speed;
+                }
+
+                if (move.Right) {
+                    velocity.velocity.x += speed;
+                }
             }
+
+            // Normalize Movement
+            if (velocity.velocity.lengthSq() > 0.0f) {
+                velocity.velocity = velocity.velocity.normalize();
+            }
+
+            // Apply velocity
+            transform.position += velocity.velocity * speed * dt;
+            //transform.position.x += velocity.velocity.x * dt;
+            //transform.position.y += velocity.velocity.y * dt;
+                
         }
     }
     
