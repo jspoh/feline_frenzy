@@ -141,6 +141,8 @@ namespace Render {
 		//Track camera entity
 		void trackCamEntity(std::string const& cam_identifier);
 
+		const Camera::System* getCamEntity();
+
 		/**
 		* update all object's xform
 		* */

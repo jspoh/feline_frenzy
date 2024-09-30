@@ -28,6 +28,9 @@ namespace Camera {
 		//Get matrix
 		const Matrix33::Matrix_33& getWorldToNDCXform() const;
 
+		//Get cam pos
+		const Vector2& getCamPos() const;
+
 		//Update camera entities
 		void updateCameraEntities(std::set<Entity::Type>&& entities);
 

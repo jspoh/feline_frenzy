@@ -368,6 +368,9 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
 	camera_system->trackCamEntity(cam_identifier);
 }
+const Camera::System* Render::Manager::getCamEntity() {
+	return camera_system.get();
+}
 
 void Render::Manager::init() {
 	//Create shader system
@@ -425,7 +428,6 @@ void Render::Manager::update() {
 		else {
 			renderObject(e_mesh);
 		}
-
 
 		//Render debugging wireframe
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };

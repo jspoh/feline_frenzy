@@ -20,6 +20,15 @@ Vector3 Vector3::operator*(float rhs) const {
 	return Vector3(x * rhs, y * rhs, z * rhs);
 }
 
+// Matrix33 multiplication
+Vector3 Vector3::operator*(const Matrix33::Matrix_33& mat) const {
+	Vector3 result;
+	result.x = mat.matrix_33[0][0] * x +  mat.matrix_33[0][1] * y +  mat.matrix_33[0][2] * z;
+	result.y = mat.matrix_33[1][0] * x +  mat.matrix_33[1][1] * y +  mat.matrix_33[1][2] * z;
+	result.z =  mat.matrix_33[2][0] * x +  mat.matrix_33[2][1] * y +  mat.matrix_33[2][2] * z;
+	return result;
+}
+
 Vector3 Vector3::operator/(float rhs) const {
 	return Vector3(x / rhs, y / rhs, z / rhs);
 }

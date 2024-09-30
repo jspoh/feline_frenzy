@@ -12,6 +12,7 @@
 #include "../headers/Systems/sysPhysics.h"
 #include "../headers/Systems/sysInput.h"
 
+//!TODO Clean up scene parser
 void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
 	std::ifstream ifs{ scene_filepath, std::ios::in };
 
@@ -91,11 +92,9 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
 
-	//Add Input Singleton System
+	//Add Singleton System
 	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
-	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
-	NIKEEngine.accessSystem<Physics::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());

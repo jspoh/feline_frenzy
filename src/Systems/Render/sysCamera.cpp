@@ -92,6 +92,10 @@ const Matrix33::Matrix_33& Camera::System::getWorldToNDCXform() const
 	return world_to_ndc_xform; 
 };
 
+const Vector2& Camera::System::getCamPos() const {
+	return cam_pos;
+}
+
 void Camera::System::updateCameraEntities(std::set<Entity::Type>&& entities) {
 	cam_entities = std::move(entities);
 }

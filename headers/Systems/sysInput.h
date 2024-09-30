@@ -11,9 +11,11 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
+#include "../headers/Core/Engine.h"
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Components/cInput.h"
 #include "../headers/Managers/mEvents.h"
+#include "../headers/Systems/Render/sysRender.h"
 
 namespace Input {
 
