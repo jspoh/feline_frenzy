@@ -42,6 +42,9 @@ namespace Physics {
 		//Init
 		void init() override;
 
+		// Runtime scaling and rotation
+		void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
+
 		//Update
 		void update() override;
 

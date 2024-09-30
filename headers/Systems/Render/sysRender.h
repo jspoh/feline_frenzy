@@ -73,9 +73,6 @@ namespace Render {
 		//Render object with texture
 		void renderObject(const Render::Mesh& e_mesh);
 
-		// Runtime scaling and rotation
-		void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
-
 		/**
 		 * all .tex files should be 256x256 in RGBA8 format.
 		 * 

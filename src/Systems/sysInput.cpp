@@ -130,7 +130,8 @@ void Input::Manager::update() {
 		{
 			Transform::Runtime_Transform& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
 			// Check if S key is pressed for runtime scale, R key is pressed for runtime rotate
-			e_runtime.runtime_scale = key.b_output && (key.key_type == GLFW_KEY_S);
+			e_runtime.runtime_scale_up = key.b_output && (key.key_type == GLFW_KEY_Z);
+			e_runtime.runtime_scale_down = key.b_output && (key.key_type == GLFW_KEY_X);
 			e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
 		}
 

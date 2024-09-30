@@ -19,6 +19,28 @@ void Physics::Manager::init() {
 
 }
 
+void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
+{
+
+	if (runtime_comp.runtime_scale_up)
+	{
+		transform_comp.scale.x *= 1.05f;
+		transform_comp.scale.y *= 1.05f;
+	}
+
+    if (runtime_comp.runtime_scale_down)
+    {
+        transform_comp.scale.x /= 1.05f;
+        transform_comp.scale.y /= 1.05f;
+    }
+
+	if (runtime_comp.runtime_rotate)
+	{
+		transform_comp.rotation += 10.f;
+	}
+
+}
+
 void Physics::Manager::update() {
     float dt = NIKEEngine.getDeltaTime();
 
@@ -71,6 +93,15 @@ void Physics::Manager::update() {
             // Apply velocity
             transform.position += velocity.velocity * speed * dt;
 
+        }
+        else if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) && NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
+        {
+            // Reference to transform component
+            Transform::Transform& c_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+
+            // Ref to runtime component
+            Transform::Runtime_Transform& c_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
+            runtimeScaleOrRotate(c_runtime, c_transform);
         }
     }
 }

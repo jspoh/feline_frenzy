@@ -244,19 +244,6 @@ void Render::Manager::renderObject(const Render::Mesh& e_mesh) {
 	shader_system->unuseShader();
 }
 
-void Render::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
-{
-	if (runtime_comp.runtime_scale)
-	{
-		transform_comp.scale.x *= 1.05f;
-		transform_comp.scale.y *= 1.05f;
-	}
-	if (runtime_comp.runtime_rotate)
-	{
-		transform_comp.rotation += 10.f;
-	}
-}
-
 void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
 	//Set Polygon Mode
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -430,9 +417,6 @@ void Render::Manager::update() {
 		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
 		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
-		auto& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
-
-		runtimeScaleOrRotate(e_runtime, e_transform);
 
 		//Transform matrix here
 		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());

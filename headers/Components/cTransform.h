@@ -15,8 +15,9 @@ namespace Transform {
 	};
 
 	struct Runtime_Transform {
-		bool runtime_scale = false;
+		bool runtime_scale_up = false;
 		bool runtime_rotate = false;
+		bool runtime_scale_down = false;
 	};
 
 
