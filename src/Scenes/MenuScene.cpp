@@ -31,6 +31,12 @@ void Menu::Scene::load() {
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("triangle", "assets/meshes/triangle.txt");
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("circle", "assets/meshes/circle.txt");
+	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square-texture", "assets/meshes/square-texture.txt");
+
+	// load textures
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("water", "assets/textures/water-rgba-256.tex");
+	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("tree", "assets/textures/tree.jpg");
 }
 
 void Menu::Scene::init() {
@@ -71,6 +77,21 @@ void Menu::Scene::init() {
 	//Render::Manager::getInstance().createObject("camera", "triangle", Vector3(0.f, 0.f, 0.f), Vector2(-19500, -19700), Vector2(50.f, 100.f), 180.f);
 	////// Init camera
 	//Render::Manager::getInstance().initCamera("camera");
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck"});
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {200.0f, 200.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "water" });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(4), { {100.0f, 100.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(4), { {1.0f, 1.0f, 1.0f}, 1.0f });
+
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(5), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "tree" });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {300.0f, 300.0f}, {200.f, 200.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {
