@@ -32,7 +32,7 @@ void Physics::Manager::update() {
             // Ref to velocity component
             Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
 
-            const float speed = 10.0f;
+            const float speed = 100.0f;
 
             // Check if entity contains Move component
             
@@ -40,24 +40,26 @@ void Physics::Manager::update() {
                 // Ref to Move component
                 Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
 
+                const float movespeed = 300.0f;
+
                 // Reset Velocity
                 velocity.velocity.y = 0.0f;
                 velocity.velocity.x = 0.0f;
 
                 if (move.Up) {
-                    velocity.velocity.y += speed;
+                    velocity.velocity.y += movespeed;
                 }
 
                 if (move.Down) {
-                    velocity.velocity.y -= speed;
+                    velocity.velocity.y -= movespeed;
                 }
 
                 if (move.Left) {
-                    velocity.velocity.x -= speed;
+                    velocity.velocity.x -= movespeed;
                 }
 
                 if (move.Right) {
-                    velocity.velocity.x += speed;
+                    velocity.velocity.x += movespeed;
                 }
             }
             

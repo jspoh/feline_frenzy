@@ -64,6 +64,7 @@ void Menu::Scene::init() {
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(2), { "base", "circle", Matrix33::Matrix_33() });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f, false });
+	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(2), { {0.0f, 1.0f} });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 0.0f, 1.0f}, 1.0f });
 
 	//entities.push_back(NIKEEngine.createEntity());

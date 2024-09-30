@@ -35,7 +35,7 @@ void Input::Manager::update() {
 		}
 
 		// Checking for Move component
-		if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
+		else if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
 			// Ref to Move component
 			Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
 
