@@ -169,12 +169,13 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 
 void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
 	//Transform matrix here
-	Matrix33::Matrix_33 model_mat, result, scale_mat, rot_mat, trans_mat;
-	float orientation = 0.0f;
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
+	// Scrap orientation for now
 	// Modulus the object rotation so it doesnt result in a large number overtime
-	orientation = fmod(orientation, 360.f);
-	float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+	// float orientation = fmod(orientation, 360.f);
+	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+	float angleDisp = xform.rotation;
 
 	Matrix_33Rot(rot_mat, angleDisp);
 	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
