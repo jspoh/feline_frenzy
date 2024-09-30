@@ -9,6 +9,8 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Systems/sysPhysics.h"
+#include "../headers/Systems/sysInput.h"
 
 void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
 	std::ifstream ifs{ scene_filepath, std::ios::in };
@@ -81,7 +83,10 @@ void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::vector<En
 }
 
 void Menu::Scene::load() {
+	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
+	NIKEEngine.registerComponent<Transform::Velocity>();
 	NIKEEngine.registerComponent<Transform::Transform>();
+	NIKEEngine.registerComponent<Move::Movement>();
 	NIKEEngine.registerComponent<Render::Mesh>();
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
@@ -89,11 +94,16 @@ void Menu::Scene::load() {
 	//Add Input Singleton System
 	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
 	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
+	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
+	NIKEEngine.accessSystem<Physics::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Mesh>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Color>());
+	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Velocity>());
+	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
 
 	//Load models
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
@@ -115,6 +125,10 @@ void Menu::Scene::init() {
 
 	loadFromFile("assets/scenes/mainmenu.scn", entities);
 
+	NIKEEngine.addEntityComponentObj<Move::Movement>(entities.at(1), {false, false, false, false});
+	
+	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(2), { {0.0f, 1.0f} });
+
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck" });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {400.0f, -200.0f}, {200.f, 200.f}, 0.0f });
@@ -129,6 +143,8 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(5), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "tree" });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {-200.0f, -200.0f}, {200.f, 200.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
+	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
+
 
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());

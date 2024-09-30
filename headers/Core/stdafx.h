@@ -55,6 +55,12 @@
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
 
+// components
+#include "../headers/Components/cRender.h"
+#include "../headers/Components/cTransform.h"
+#include "../headers/Components/cMove.h"
+
+#define PI static_cast<float> (atan(1)*4.f)
 //Math defines
 #define _USE_MATH_DEFINES
 #include <math.h>

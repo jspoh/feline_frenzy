@@ -123,6 +123,18 @@ void Input::Manager::update() {
 				break;
 			}
 		}
+
+		// Checking for Move component
+		else if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
+			// Ref to Move component
+			Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
+
+			//Check if escape key is pressed
+			move.Up = key_is_pressed(GLFW_KEY_W);
+			move.Left = key_is_pressed(GLFW_KEY_A);
+			move.Down = key_is_pressed(GLFW_KEY_S);
+			move.Right = key_is_pressed(GLFW_KEY_D);
+		}
 	}
 
 	//Temp changing scene here
