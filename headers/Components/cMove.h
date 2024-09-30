@@ -6,7 +6,7 @@
 #include "../headers/Core/stdafx.h"
 
 namespace Move {
-	struct Move {
+	struct Movement {
 		bool Up;
 		bool Down;
 		bool Left;

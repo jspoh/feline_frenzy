@@ -16,7 +16,7 @@ void Menu::Scene::load() {
 	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
 	NIKEEngine.registerComponent<Transform::Velocity>();
 	NIKEEngine.registerComponent<Transform::Transform>();
-	NIKEEngine.registerComponent<Move::Move>();
+	NIKEEngine.registerComponent<Move::Movement>();
 	NIKEEngine.registerComponent<Render::Mesh>();
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
@@ -32,8 +32,8 @@ void Menu::Scene::load() {
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Mesh>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Color>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Velocity>());
-	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Move>());
-	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Move>());
+	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
 
 	//Load models
 	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
@@ -57,7 +57,7 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(1), { "base", "triangle", Matrix33::Matrix_33() });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(1), {{122.0f, 0.0f}, {50.f, 100.f}, 0.0f, true });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
-	NIKEEngine.addEntityComponentObj<Move::Move>(entities.at(1), {false, false, false, false});
+	NIKEEngine.addEntityComponentObj<Move::Movement>(entities.at(1), {false, false, false, false});
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(1), { {1.0f, 0.0f, 0.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), {"CAM2", {122.0f, 0.0f}, 1000.0f });
 

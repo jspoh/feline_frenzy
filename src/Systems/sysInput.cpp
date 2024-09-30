@@ -35,9 +35,9 @@ void Input::Manager::update() {
 		}
 
 		// Checking for Move component
-		if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
+		if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
 			// Ref to Move component
-			Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
+			Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
 
 			//Check if escape key is pressed
 			move.Up = key_is_pressed(GLFW_KEY_W);

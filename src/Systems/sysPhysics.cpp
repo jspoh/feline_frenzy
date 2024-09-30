@@ -36,9 +36,9 @@ void Physics::Manager::update() {
 
             // Check if entity contains Move component
             
-            if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
+            if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
                 // Ref to Move component
-                Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
+                Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
 
                 // Reset Velocity
                 velocity.velocity.y = 0.0f;
@@ -60,7 +60,7 @@ void Physics::Manager::update() {
                     velocity.velocity.x += speed;
                 }
             }
-
+            
             // Normalize Movement
             if (velocity.velocity.lengthSq() > 0.0f) {
                 velocity.velocity = velocity.velocity.normalize();
