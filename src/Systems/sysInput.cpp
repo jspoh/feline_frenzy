@@ -127,7 +127,8 @@ void Input::Manager::update() {
 
 	//Temp changing scene here
 	if (mouse.b_output && (mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
-		NIKEEngine.changeScene("MENU");
+		auto menu_event = std::make_shared<Scenes::ChangeSceneEvent>(Scenes::Actions::CHANGE, "MENU");
+		NIKEEngine.dispatchEvent(menu_event);
 	}
 
 	//Check if escape key is pressed

@@ -22,6 +22,7 @@
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Managers\mAssetManager.cpp" />
+    <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
@@ -46,6 +47,7 @@
   <ItemGroup>
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Managers\mAssetManager.h" />
+    <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cRender.h" />

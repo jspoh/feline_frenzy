@@ -14,6 +14,7 @@
 #include "../headers/Managers/mEntity.h"
 #include "../headers/Managers/mComponent.h"
 #include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/mEvents.h"
 #include "../headers/Managers/mScene.h"
 #include "../headers/Managers/mAssetManager.h"
 
@@ -49,8 +50,11 @@ namespace Core {
 		std::unique_ptr<Entity::Manager> entity_manager;
 		std::unique_ptr<Component::Manager> component_manager;
 		std::unique_ptr<System::Manager> system_manager;
-		std::unique_ptr<Scenes::Manager> scene_manager;
+		std::unique_ptr<Events::Manager> events_manager;
 		std::unique_ptr<Asset::Manager> asset_manager;
+
+		//Scenes manager
+		std::shared_ptr<Scenes::Manager> scenes_manager;
 
 		/**
 		 * Read & Deserialize Data From Config File
@@ -208,14 +212,24 @@ namespace Core {
 		//Register scenes
 		template<typename T>
 		void registerScenes(std::string const& scene_id) {
-			scene_manager->registerScenes<T>(scene_id);
+			scenes_manager->registerScenes<T>(scene_id);
 		}
 
-		//Set current scene
-		void changeScene(std::string const& scene_id);
+		/*****************************************************************//**
+		* Events Methods
+		*********************************************************************/
 
-		//Go back to previous scene
-		void changePrevScene();
+		//Add event listener
+		template<typename T>
+		void addEventListeners(std::shared_ptr<Events::IEventListener> listener) {
+			events_manager->addEventListeners<T>(listener);
+		}
+
+		//Dispatch event
+		template<typename T>
+		void dispatchEvent(std::shared_ptr<T> event) {
+			events_manager->dispatchEvent<T>(event);
+		}
 	};
 
 	//Predefined name for core engine
