@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   cAudio.h
+ * \file   sysAudio.h
  * \brief  Audio system manager function declarations
  *
  * \author Bryan Lim
@@ -11,7 +11,6 @@
 #ifndef AUDIOSYS_HPP
 #define AUDIOSYS_HPP
 
-#include "../headers/Components/cAudio.h"
 #include "../headers/Managers/mSystem.h"
 
 /************************************

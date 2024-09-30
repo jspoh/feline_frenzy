@@ -13,6 +13,7 @@
 
 
 #include "../headers/Core/stdafx.h"
+#include "../headers/Systems/sysAudio.h"
 
 /************************************
 * SOME NOTES TO TAKE NOTE OF: 
@@ -26,19 +27,26 @@ namespace Audio {
 	struct cAudio
 	{
 
-		// Tag for audio and audio group
-		std::string audio_tag;
+		// Audio and audio group
+		NE_AUDIO audio;
 
-		std::string audio_tag_group;
+		NE_AUDIO_GROUP audio_group;
 
 		// Bool to check if audio is played
 		bool is_played = false;
 
+		// Bool to indicate loop
+		bool is_loop;
+
 		// Volume 
-		float volume{};
+		float volume;
 
 		// Pitch
-		float pitch{};
+		float pitch;
+
+		// Ctor
+		cAudio(NE_AUDIO param_audio, NE_AUDIO_GROUP param_audio_group, float param_volume, float param_pitch, bool param_loop)
+			: audio{ param_audio }, audio_group{ param_audio_group }, is_played{ false }, is_loop{ param_loop }, volume{ param_volume }, pitch{ param_pitch } {}
 	};
 
 }
