@@ -171,7 +171,7 @@ bool Collision::Manager::aabbRectRectCheck(const Vector2& vel_a, const Vector2& 
 
     // Initialize time of first and last collision along each axis
     Vector2 tFirst = { 0.0f, 0.0f };
-    Vector2 tLast = { NIKEEngine.getDeltaTime(), NIKEEngine.getDeltaTime() }; // Need a way to get time for previous frame
+    Vector2 tLast = { NIKEEngine.accessWindow()->getDeltaTime(), NIKEEngine.accessWindow()->getDeltaTime() }; // Need a way to get time for previous frame
 
     // Step 3: Check dynamic collision on x-axis
     if (velRel.x != 0) {
@@ -208,7 +208,7 @@ bool Collision::Manager::aabbRectRectCheck(const Vector2& vel_a, const Vector2& 
     float tLastOverall = getMin(tLast.x, tLast.y);
 
     // Ensure that the time of first collision occurs before the time of last collision
-    if (tFirstOverall > tLastOverall || tFirstOverall > NIKEEngine.getDeltaTime()) { // Need a way to get time for previous frame
+    if (tFirstOverall > tLastOverall || tFirstOverall > NIKEEngine.accessWindow()->getDeltaTime()) { // Need a way to get time for previous frame
         return false; // No collision detected
     }
 
