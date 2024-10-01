@@ -78,6 +78,11 @@ void GameLogic::Manager::update() {
 					NIKEEngine.accessWindow()->terminate();
 				}
 			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_P))
+			{
+				NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
+			}
 		}
 
 
