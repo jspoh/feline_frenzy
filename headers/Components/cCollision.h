@@ -9,14 +9,20 @@ namespace Collision {
 
     struct Collider {
         bool active = false; // Tracks if collider is in use (collision enabled or not)
-        Vector2 position;  // Position of the object (X, Y) world coordinates
-        Vector2 size;      // Size (width, height)
+        //Vector2 position;  // Position of the object (X, Y) world coordinates
+        //Vector2 size;      // Size (width, height)
         float radius = 0.0f; // Optional for circle colliders
-        Vector2 velocity; // Current velocity
+        //Vector2 velocity; // Current velocity
 
         // For bounding box
         Vector2 rect_min;
         Vector2 rect_max;
+
+        // Which sides of bounding box are colliding/"blocked"
+        bool left = false;
+        bool right = false;
+        bool top = false;
+        bool bottom = false;
 
         // For bounding sphere...unused for now
         Vector2 cir_min;

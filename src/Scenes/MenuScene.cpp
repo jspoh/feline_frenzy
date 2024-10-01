@@ -24,6 +24,7 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Render::Mesh>();
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
+	NIKEEngine.registerComponent<Collision::Collider>(); // Under sysPhysics
 
 	//Add Singleton System
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
@@ -45,6 +46,7 @@ void Menu::Scene::load() {
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType <Collision::Collider>()); // Under sysPhysics
 
 	//Register Shaders
 	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
@@ -71,14 +73,17 @@ void Menu::Scene::init() {
 	loadFromFile("assets/scenes/mainmenu.scn", entities);
 
 	NIKEEngine.addEntityComponentObj<Move::Movement>(entities.at(1), {false, false, false, false});
-	
+
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(2), { {0.0f, 1.0f} });
+	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(2)); // Set collider for "player" entity
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck" });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {400.0f, -200.0f}, {200.f, 200.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities.at(3), Transform::Runtime_Transform());
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
+	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(3), { {0.0f, 0.0f} });
+	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(3)); // Set collider for duck entity (test collision)
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "water" });

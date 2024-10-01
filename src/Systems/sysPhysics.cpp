@@ -2,7 +2,7 @@
  * \file   PhysicsSystem.cpp
  * \brief  Physics system for engine
  *
- * \author b.soh
+ * \author b.soh, ko.m
  * \date   September 2024
  *********************************************************************/
 
@@ -15,7 +15,7 @@
 //}
 
 void Physics::Manager::init() {
-
+    // Add Collider component
 }
 
 void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
@@ -43,22 +43,55 @@ void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtim
 void Physics::Manager::update() {
     float dt = NIKEEngine.accessWindow()->getDeltaTime();
 
+    // Loop through all entities to perform collision checks
+    for (Entity::Type entityA : entities) {
+        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entityA) &&
+            NIKEEngine.checkEntityComponent<Transform::Velocity>(entityA) &&
+            NIKEEngine.checkEntityComponent<Collision::Collider>(entityA)) {
+
+            // Reference to components of entityA
+            Transform::Transform& transformA = NIKEEngine.getEntityComponent<Transform::Transform>(entityA);
+            Transform::Velocity& velocityA = NIKEEngine.getEntityComponent<Transform::Velocity>(entityA);
+            Collision::Collider& colliderA = NIKEEngine.getEntityComponent<Collision::Collider>(entityA);
+
+            // Reset the collision flags for entityA
+            colliderA.left = colliderA.right = colliderA.top = colliderA.bottom = false;
+
+            // Loop through all other entities for collision detection
+            for (Entity::Type entityB : entities) {
+                if (entityA == entityB) {
+                    continue; // Skip self-collision
+                }
+
+                if (NIKEEngine.checkEntityComponent<Transform::Transform>(entityB) &&
+                    NIKEEngine.checkEntityComponent<Collision::Collider>(entityB)) {
+
+                    float firstTimeOfCollision = 0.0f;
+
+                    // Perform AABB collision detection between entityA and entityB
+                    Physics::Manager::getInstance()->collision_manager.detectAABBRectRect(entityA, entityB, firstTimeOfCollision);
+                }
+            }
+        }
+    }
+
+    // Loop through all entities to perform physics and movement updates
     for (const auto& entity : entities) {
         // Check if entity contains Transform component and Velocity component
-        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) && NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
+        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) &&
+            NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
 
             // Reference to transform component
             Transform::Transform& transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 
-            // Ref to velocity component
+            // Reference to velocity component
             Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
 
             const float speed = 100.0f;
 
             // Check if entity contains Move component
-
             if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
-                // Ref to Move component
+                // Reference to Move component
                 Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
 
                 const float movespeed = 300.0f;
@@ -67,20 +100,41 @@ void Physics::Manager::update() {
                 velocity.velocity.y = 0.0f;
                 velocity.velocity.x = 0.0f;
 
-                if (move.Up) {
-                    velocity.velocity.y += movespeed;
-                }
+                if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
+                    Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
+                    // Adjust movement based on user input and collision flags
+                    if (move.Up && !collider.top) {
+                        velocity.velocity.y += movespeed;
+                    }
 
-                if (move.Down) {
-                    velocity.velocity.y -= movespeed;
-                }
+                    if (move.Down && !collider.bottom) {
+                        velocity.velocity.y -= movespeed;
+                    }
 
-                if (move.Left) {
-                    velocity.velocity.x -= movespeed;
-                }
+                    if (move.Left && !collider.left) {
+                        velocity.velocity.x -= movespeed;
+                    }
 
-                if (move.Right) {
-                    velocity.velocity.x += movespeed;
+                    if (move.Right && !collider.right) {
+                        velocity.velocity.x += movespeed;
+                    }
+                }
+                else {
+                    if (move.Up) {
+                        velocity.velocity.y += movespeed;
+                    }
+
+                    if (move.Down) {
+                        velocity.velocity.y -= movespeed;
+                    }
+
+                    if (move.Left) {
+                        velocity.velocity.x -= movespeed;
+                    }
+
+                    if (move.Right) {
+                        velocity.velocity.x += movespeed;
+                    }
                 }
             }
 
@@ -89,16 +143,17 @@ void Physics::Manager::update() {
                 velocity.velocity = velocity.velocity.normalize();
             }
 
-            // Apply velocity
+            // Apply velocity to transform component if no collision in that direction
             transform.position += velocity.velocity * speed * dt;
 
         }
-        else if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) && NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
-        {
+        else if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) &&
+            NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity)) {
+
             // Reference to transform component
             Transform::Transform& c_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 
-            // Ref to runtime component
+            // Reference to runtime component
             Transform::Runtime_Transform& c_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
             runtimeScaleOrRotate(c_runtime, c_transform);
         }

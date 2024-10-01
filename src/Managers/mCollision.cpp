@@ -10,19 +10,18 @@
 #include "../headers/Managers/mCollision.h"
 #include "../headers/Systems/sysInput.h"
 
-
-
 Collision::Manager::Manager() {
-    colliders.resize(100);  // Pre-allocate 100 colliders
+    /*colliders.resize(100);  // Pre-allocate 100 colliders
     for (auto& collider : colliders) {
         collider.active = false;  // Mark all colliders as unused at start
-    }
+    }*/
 }
 
 Collision::Manager::~Manager() {
-    colliders.clear();  // Clear the vector collection to free memory
+    /*colliders.clear();  // Clear the vector collection to free memory*/
 }
 
+/*
 void Collision::Manager::registerCollider(const Vector2& position, const Vector2& size, float radius, const Vector2& velocity) {
     for (auto& collider : colliders) {
         if (!collider.active) {
@@ -122,7 +121,30 @@ bool Collision::Manager::detectCollision(const Transform::Transform& aT, const T
 
     return false;
 }
+*/
 
+// Set collider component
+bool Collision::Manager::setColliderComp(Entity::Type& cEntity) {
+    // Check that entity has Transform component
+    if (!NIKEEngine.checkEntityComponent<Transform::Transform>(cEntity)) {
+        cout << "Entity's Transform not set" << endl;
+        return false;
+    }
+
+    // Reference to Transform component
+    Transform::Transform& eTransform = NIKEEngine.getEntityComponent<Transform::Transform>(cEntity);
+
+    // Reference to Velocity component
+    Transform::Velocity& eVelocity = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntity);
+
+    Vector2 Rect_Min = { eTransform.position.x - (eTransform.scale.x * 0.5f), eTransform.position.y - (eTransform.scale.y * 0.5f) };
+    Vector2 Rect_Max = { eTransform.position.x + (eTransform.scale.x * 0.5f), eTransform.position.y + (eTransform.scale.y * 0.5f) };
+
+    // cCollider.h
+    NIKEEngine.addEntityComponentObj<Collision::Collider>(cEntity, { true, 0.0f, Rect_Min, Rect_Max, false, false, false, false, {0.0f, 0.0f}, {0.0f, 0.0f} });
+
+    return true;
+}
 
 template <typename T>
 T Collision::Manager::getMax(const T a, const T b) const {
@@ -143,7 +165,6 @@ T Collision::Manager::getMin(const T a, const T b) const {
         return b;
     }
 }
-
 
 
 bool Collision::Manager::circleCollisionCheck(const Vector2& pos_a, float radius_a, const Vector2& pos_b, float radius_b) const {
@@ -172,7 +193,7 @@ bool Collision::Manager::aabbRectRectCheck(const Vector2& vel_a, const Vector2& 
     // Initialize time of first and last collision along each axis
     Vector2 tFirst = { 0.0f, 0.0f };
     Vector2 tLast = { NIKEEngine.accessWindow()->getDeltaTime(), NIKEEngine.accessWindow()->getDeltaTime() }; // Need a way to get time for previous frame
-
+ 
     // Step 3: Check dynamic collision on x-axis
     if (velRel.x != 0) {
         if (velRel.x > 0) {
@@ -214,6 +235,129 @@ bool Collision::Manager::aabbRectRectCheck(const Vector2& vel_a, const Vector2& 
 
     // If we have a valid time of collision, update the output parameter
     firstTimeOfCollision = tFirstOverall;
+
+    return true; // Collision detected
+}
+
+bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type& cEntityB, float& firstTimeOfCollision) {
+
+    // Check that entity has Transform and Collider component
+    if (!NIKEEngine.checkEntityComponent<Transform::Transform>(cEntityA) || !NIKEEngine.checkEntityComponent<Collision::Collider>(cEntityA) ||
+        !NIKEEngine.checkEntityComponent<Transform::Transform>(cEntityB) || !NIKEEngine.checkEntityComponent<Collision::Collider>(cEntityB)) {
+        cout << "Entity's Transform or Collider not set" << endl;
+        return false;
+    }
+
+    // Reference to Transform components
+    Transform::Transform& eTransformA = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityA);
+    Transform::Transform& eTransformB = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityB);
+
+    // Reference to Velocity components
+    Transform::Velocity& eVelocityA = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntityA);
+    Transform::Velocity& eVelocityB = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntityB);
+
+    // Reference to Collider components
+    Collision::Collider& eColliderA = NIKEEngine.getEntityComponent<Collision::Collider>(cEntityA);
+    Collision::Collider& eColliderB = NIKEEngine.getEntityComponent<Collision::Collider>(cEntityB);
+
+    // Reset the collision flags for both colliders
+    eColliderA.left = eColliderA.right = eColliderA.top = eColliderA.bottom = false;
+    eColliderB.left = eColliderB.right = eColliderB.top = eColliderB.bottom = false;
+
+    // Step 1: Static collision detection
+    if (!(eColliderA.rect_max.x < eColliderB.rect_min.x || eColliderA.rect_min.x > eColliderB.rect_max.x ||
+        eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y)) {
+        // If there is an overlap, set the blocking sides based on the relative positions
+        if (eColliderA.rect_max.x > eColliderB.rect_min.x && eColliderA.rect_min.x < eColliderB.rect_min.x) {
+            eColliderA.right = true; // `a` is blocked on the right by `b`
+            eColliderB.left = true;  // `b` is blocked on the left by `a`
+        }
+        if (eColliderA.rect_min.x < eColliderB.rect_max.x && eColliderA.rect_max.x > eColliderB.rect_max.x) {
+            eColliderA.left = true;  // `a` is blocked on the left by `b`
+            eColliderB.right = true; // `b` is blocked on the right by `a`
+        }
+        if (eColliderA.rect_max.y > eColliderB.rect_min.y && eColliderA.rect_min.y < eColliderB.rect_min.y) {
+            eColliderA.bottom = true; // `a` is blocked at the bottom by `b`
+            eColliderB.top = true;    // `b` is blocked at the top by `a`
+        }
+        if (eColliderA.rect_min.y < eColliderB.rect_max.y && eColliderA.rect_max.y > eColliderB.rect_max.y) {
+            eColliderA.top = true;    // `a` is blocked on the top by `b`
+            eColliderB.bottom = true; // `b` is blocked at the bottom by `a`
+        }
+        return true;
+    }
+
+    // Step 2: Calculate relative velocity for dynamic collision
+    Vector2 velRel = { eVelocityA.velocity.x - eVelocityB.velocity.x, eVelocityA.velocity.y - eVelocityB.velocity.y };
+
+    // Initialize time of first and last collision along each axis
+    Vector2 tFirst = { 0.0f, 0.0f };
+    Vector2 tLast = { NIKEEngine.accessWindow()->getDeltaTime(), NIKEEngine.accessWindow()->getDeltaTime() };
+
+    // Step 3: Check dynamic collision on x-axis
+    if (velRel.x != 0) {
+        if (velRel.x > 0) {
+            tFirst.x = (eColliderA.rect_min.x - eColliderB.rect_max.x) / velRel.x;
+            tLast.x = (eColliderA.rect_max.x - eColliderB.rect_min.x) / velRel.x;
+        }
+        else {
+            tFirst.x = (eColliderA.rect_max.x - eColliderB.rect_min.x) / velRel.x;
+            tLast.x = (eColliderA.rect_min.x - eColliderB.rect_max.x) / velRel.x;
+        }
+    }
+    else if (eColliderA.rect_max.x < eColliderB.rect_min.x || eColliderA.rect_min.x > eColliderB.rect_max.x) {
+        return false; // No collision on the x-axis if there's no relative movement and no static collision
+    }
+
+    // Step 4: Check dynamic collision on y-axis
+    if (velRel.y != 0) {
+        if (velRel.y > 0) {
+            tFirst.y = (eColliderA.rect_min.y - eColliderB.rect_max.y) / velRel.y;
+            tLast.y = (eColliderA.rect_max.y - eColliderB.rect_min.y) / velRel.y;
+        }
+        else {
+            tFirst.y = (eColliderA.rect_max.y - eColliderB.rect_min.y) / velRel.y;
+            tLast.y = (eColliderA.rect_min.y - eColliderB.rect_max.y) / velRel.y;
+        }
+    }
+    else if (eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y) {
+        return false; // No collision on the y-axis if there's no relative movement and no static collision
+    }
+
+    // Step 5: Check if collisions occur within the time frame
+    float tFirstOverall = getMax(tFirst.x, tFirst.y);
+    float tLastOverall = getMin(tLast.x, tLast.y);
+
+    if (tFirstOverall > tLastOverall || tFirstOverall > NIKEEngine.accessWindow()->getDeltaTime()) {
+        return false; // No collision detected
+    }
+
+    // If we have a valid time of collision, update the output parameter
+    firstTimeOfCollision = tFirstOverall;
+
+    // Determine which side of both entities is being blocked
+    if (tFirst.x > tFirst.y) {
+        // Collision primarily along the x-axis
+        if (velRel.x > 0) {
+            eColliderA.right = true; // `a` is blocked on the right side
+            eColliderB.left = true;  // `b` is blocked on the left side
+        }
+        else {
+            eColliderA.left = true;  // `a` is blocked on the left side
+            eColliderB.right = true; // `b` is blocked on the right side
+        }
+    }
+    else {
+        // Collision primarily along the y-axis
+        if (velRel.y > 0) {
+            eColliderA.bottom = true; // `a` is blocked on the bottom side
+            eColliderB.top = true;    // `b` is blocked on the top side
+        }
+        else {
+            eColliderA.top = true;    // `a` is blocked on the top side
+            eColliderB.bottom = true; // `b` is blocked on the bottom side
+        }
+    }
 
     return true; // Collision detected
 }
