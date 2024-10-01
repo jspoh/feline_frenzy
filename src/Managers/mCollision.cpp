@@ -272,24 +272,24 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
         cout << "Collision detected between EntityA and EntityB (Static collision)" << endl;
 
         if (eColliderA.rect_max.x > eColliderB.rect_min.x && eColliderA.rect_min.x < eColliderB.rect_min.x) {
-            eColliderA.right = true; // `a` is blocked on the right by `b`
-            eColliderB.left = true;  // `b` is blocked on the left by `a`
+            eColliderA.right = true; // 'a' is blocked on the right by 'b'
+            eColliderB.left = true;  // 'b' is blocked on the left by 'a'
             cout << "EntityA is blocked on the right by EntityB" << endl;
         }
         if (eColliderA.rect_min.x < eColliderB.rect_max.x && eColliderA.rect_max.x > eColliderB.rect_max.x) {
-            eColliderA.left = true;  // `a` is blocked on the left by `b`
-            eColliderB.right = true; // `b` is blocked on the right by `a`
+            eColliderA.left = true;  // 'a' is blocked on the left by 'b'
+            eColliderB.right = true; // 'b' is blocked on the right by 'a'
             cout << "EntityA is blocked on the left by EntityB" << endl;
         }
         if (eColliderA.rect_max.y > eColliderB.rect_min.y && eColliderA.rect_min.y < eColliderB.rect_min.y) {
-            eColliderA.bottom = true; // `a` is blocked at the bottom by `b`
-            eColliderB.top = true;    // `b` is blocked at the top by `a`
-            cout << "EntityA is blocked at the bottom by EntityB" << endl;
+            eColliderA.top = true;    // 'a' is blocked at the top by 'b'
+            eColliderB.bottom = true; // 'b' is blocked at the bottom by 'a'
+            cout << "EntityA is blocked on the top by EntityB" << endl;
         }
         if (eColliderA.rect_min.y < eColliderB.rect_max.y && eColliderA.rect_max.y > eColliderB.rect_max.y) {
-            eColliderA.top = true;    // `a` is blocked on the top by `b`
-            eColliderB.bottom = true; // `b` is blocked at the bottom by `a`
-            cout << "EntityA is blocked on the top by EntityB" << endl;
+            eColliderA.bottom = true; // 'a' is blocked on the bottom by 'b'
+            eColliderB.top = true;    // 'b' is blocked at the top by 'a'
+            cout << "EntityA is blocked at the bottom by EntityB" << endl;
         }
         return true;
     }
@@ -319,12 +319,12 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     // Step 4: Check dynamic collision on y-axis
     if (velRel.y != 0) {
         if (velRel.y > 0) {
-            tFirst.y = (eColliderA.rect_min.y - eColliderB.rect_max.y) / velRel.y;
-            tLast.y = (eColliderA.rect_max.y - eColliderB.rect_min.y) / velRel.y;
-        }
-        else {
             tFirst.y = (eColliderA.rect_max.y - eColliderB.rect_min.y) / velRel.y;
             tLast.y = (eColliderA.rect_min.y - eColliderB.rect_max.y) / velRel.y;
+        }
+        else {
+            tFirst.y = (eColliderA.rect_min.y - eColliderB.rect_max.y) / velRel.y;
+            tLast.y = (eColliderA.rect_max.y - eColliderB.rect_min.y) / velRel.y;
         }
     }
     else if (eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y) {
@@ -348,32 +348,34 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     if (tFirst.x > tFirst.y) {
         // Collision primarily along the x-axis
         if (velRel.x > 0) {
-            eColliderA.right = true; // `a` is blocked on the right side
-            eColliderB.left = true;  // `b` is blocked on the left side
+            eColliderA.right = true; // 'a' is blocked on the right side
+            eColliderB.left = true;  // 'b' is blocked on the left side
             cout << "EntityA is blocked on the right side by EntityB" << endl;
         }
         else {
-            eColliderA.left = true;  // `a` is blocked on the left side
-            eColliderB.right = true; // `b` is blocked on the right side
+            eColliderA.left = true;  // 'a' is blocked on the left side
+            eColliderB.right = true; // 'b' is blocked on the right side
             cout << "EntityA is blocked on the left side by EntityB" << endl;
         }
     }
     else {
         // Collision primarily along the y-axis
         if (velRel.y > 0) {
-            eColliderA.bottom = true; // `a` is blocked on the bottom side
-            eColliderB.top = true;    // `b` is blocked on the top side
-            cout << "EntityA is blocked at the bottom by EntityB" << endl;
+            eColliderA.top = true;    // 'a' is blocked on the top side (inverted Y-axis)
+            eColliderB.bottom = true; // 'b' is blocked on the bottom side
+            cout << "EntityA is blocked on the top by EntityB" << endl;
         }
         else {
-            eColliderA.top = true;    // `a` is blocked on the top side
-            eColliderB.bottom = true; // `b` is blocked at the bottom by `a`
-            cout << "EntityA is blocked on the top by EntityB" << endl;
+            eColliderA.bottom = true; // 'a' is blocked on the bottom side (inverted Y-axis)
+            eColliderB.top = true;    // 'b' is blocked on the top side
+            cout << "EntityA is blocked at the bottom by EntityB" << endl;
         }
     }
 
     return true; // Collision detected
 }
+
+
 
 bool Collision::Manager::satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b) const {
     // Calculate the half extents for each box
