@@ -88,7 +88,6 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
 
-
 	//entities.push_back(NIKEEngine.createEntity());
 	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());
 	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), Render::Color());

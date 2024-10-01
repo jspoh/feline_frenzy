@@ -117,6 +117,7 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 	system_manager = std::make_unique<System::Manager>();
 	events_manager = std::make_unique<Events::Manager>();
 	asset_manager = std::make_unique<Asset::Manager>();
+	collision_manager = std::make_unique<Collision::Manager>();
 
 	//Scenes manager
 	scenes_manager = std::make_unique<Scenes::Manager>();

@@ -17,6 +17,7 @@
 #include "../headers/Managers/mEvents.h"
 #include "../headers/Managers/mScene.h"
 #include "../headers/Managers/mAssetManager.h"
+#include "../headers/Managers/mCollision.h"
 
 namespace Core {
 
@@ -52,6 +53,7 @@ namespace Core {
 		std::unique_ptr<System::Manager> system_manager;
 		std::unique_ptr<Events::Manager> events_manager;
 		std::unique_ptr<Asset::Manager> asset_manager;
+		std::unique_ptr<Collision::Manager> collision_manager;
 
 		//Scenes manager
 		std::shared_ptr<Scenes::Manager> scenes_manager;
