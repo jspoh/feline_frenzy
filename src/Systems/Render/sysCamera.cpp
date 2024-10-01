@@ -92,7 +92,7 @@ const Matrix33::Matrix_33& Camera::System::getWorldToNDCXform() const
 	return world_to_ndc_xform; 
 };
 
-const Vector3& Camera::System::getPosToWorld(const Vector2& pos) const
+const Vector3 Camera::System::getPosToWorld(const Vector2& pos) const
 {
 	float ndcX = (2.0f * pos.x) / NIKEEngine.accessWindow()->getWindowSize().x - 1.0f;
 	float ndcY = 1.0f - (2.0f * pos.y) / NIKEEngine.accessWindow()->getWindowSize().y;

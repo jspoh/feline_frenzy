@@ -409,7 +409,7 @@ void Render::Manager::update() {
 
 		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
 
-		transformAndRenderEntity(e_transform, e_mesh, e_color, 0);
+		transformAndRenderEntity(e_transform, e_mesh, e_color, 1);
 	}
 
 	// Update and render cameras last
