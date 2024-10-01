@@ -1,5 +1,5 @@
 /*****************************************************************//**
-* \file   sysCollision.cpp
+* \file   mCollision.cpp
 * \brief  Implements the collision manager.
 *
 * \author Min Khant Ko
@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysCollision.h"
+#include "../headers/Managers/mCollision.h"
 #include "../headers/Systems/sysInput.h"
 
 
@@ -20,7 +20,7 @@ Collision::Manager::Manager() {
 }
 
 Collision::Manager::~Manager() {
-    colliders.clear();  // Clear the vector to free memory
+    colliders.clear();  // Clear the vector collection to free memory
 }
 
 void Collision::Manager::registerCollider(const Vector2& position, const Vector2& size, float radius, const Vector2& velocity) {
@@ -31,8 +31,24 @@ void Collision::Manager::registerCollider(const Vector2& position, const Vector2
             collider.size = size;
             collider.radius = radius;
             collider.velocity = velocity;
-            collider.rect_min = { position.x - (size.x / 2), position.y - (size.y / 2) };
-            collider.rect_max = { position.x + (size.x / 2), position.y + (size.y / 2) };
+            collider.rect_min = { position.x - (size.x * 0.5f), position.y - (size.y * 0.5f) };
+            collider.rect_max = { position.x + (size.x * 0.5f), position.y + (size.y * 0.5f) };
+            return;
+        }
+    }
+    cout << "Error: No available colliders to register!" << endl;
+}
+
+void Collision::Manager::registerCollider(const Transform::Transform& transformT, const Transform::Velocity& transformV) {
+    for (auto& collider : colliders) {
+        if (!collider.active) {
+            collider.active = true;
+            collider.position = transformT.position;
+            collider.size = transformT.scale;
+            collider.radius = 0.0f;
+            collider.velocity = transformV.velocity;
+            collider.rect_min = { transformT.position.x - (transformT.scale.x * 0.5f), transformT.position.y - (transformT.scale.y * 0.5f) };
+            collider.rect_max = { transformT.position.x + (transformT.scale.x * 0.5f), transformT.position.y + (transformT.scale.y * 0.5f) };
             return;
         }
     }
@@ -49,7 +65,7 @@ void Collision::Manager::unregisterCollider(const Vector2& position) {
     }
 }
 
-bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) const {
+bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) {
     // Placeholder for collision time
     float timeOfCollision = 0.0f;
 
@@ -63,6 +79,50 @@ bool Collision::Manager::detectCollision(const Collider& a, const Collider& b) c
         return satCheck(a.position, a.size, b.position, b.size);
     }
 }
+
+bool Collision::Manager::detectCollision(const Transform::Transform& aT, const Transform::Velocity& aV, const Transform::Transform& bT, const Transform::Velocity& bV) {
+
+    Collider* colliderA = nullptr;
+    Collider* colliderB = nullptr;
+
+    for (auto& collider : colliders) {
+        if (collider.position.x == aT.position.x && collider.position.y == aT.position.y) {
+            colliderA = &collider;  // Point to the matching collider for A
+            collider.active = true;
+        }
+        else if (collider.position.x == bT.position.x && collider.position.y == bT.position.y) {
+            colliderB = &collider;  // Point to the matching collider for B
+            collider.active = true;
+        }
+    }
+
+    // Colliders for A and B don't exist yet then register
+    if (colliderA == nullptr) {
+        registerCollider(aT, aV);
+        for (auto& collider : colliders) {
+            if (collider.position.x == aT.position.x && collider.position.y == aT.position.y) {
+                colliderA = &collider;
+                break;
+            }
+        }
+    }
+    if (colliderB == nullptr) {
+        registerCollider(bT, bV);
+        for (auto& collider : colliders) {
+            if (collider.position.x == bT.position.x && collider.position.y == bT.position.y) {
+                colliderB = &collider;
+                break;
+            }
+        }
+    }
+
+    if (colliderA && colliderB) {
+        return detectCollision(*colliderA, *colliderB);  // Note to dereference pointers to pass the colliders
+    }
+
+    return false;
+}
+
 
 template <typename T>
 T Collision::Manager::getMax(const T a, const T b) const {
@@ -162,8 +222,8 @@ bool Collision::Manager::aabbRectRectCheck(const Vector2& vel_a, const Vector2& 
 
 bool Collision::Manager::satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b) const {
     // Calculate the half extents for each box
-    Vector2 half_extent_a(size_a.x / 2.0f, size_a.y / 2.0f);
-    Vector2 half_extent_b(size_b.x / 2.0f, size_b.y / 2.0f);
+    Vector2 half_extent_a(size_a.x * 0.5f, size_a.y * 0.5f);
+    Vector2 half_extent_b(size_b.x * 0.5f, size_b.y * 0.5f);
 
     // Calculate the center points of both boxes
     Vector2 center_a = pos_a + half_extent_a;
@@ -188,14 +248,14 @@ bool Collision::Manager::satCheck(const Vector2& pos_a, const Vector2& size_a, c
 bool Collision::Manager::detectMClickRect(const Vector2& center, float width, float height) {
     // Get the mouse position from Input::Manager
     const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
-    float mouseX = mouse.x;
-    float mouseY = mouse.y;
+    float mouseX = mouse.button_pos.x;
+    float mouseY = mouse.button_pos.y;
 
     // Calculate the boundaries of the rectangle
-    float left = center.x - (width / 2.0f);
-    float right = center.x + (width / 2.0f);
-    float top = center.y - (height / 2.0f);
-    float bottom = center.y + (height / 2.0f);
+    float left = center.x - (width * 0.5f);
+    float right = center.x + (width * 0.5f);
+    float top = center.y - (height * 0.5f);
+    float bottom = center.y + (height * 0.5f);
 
     // Check if the mouse is inside the rectangle
     if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
@@ -229,8 +289,8 @@ bool Collision::Manager::detectMClickCircle(const Vector2& center, float radius)
 
     // Get the mouse position from Input::Manager
     const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
-    float mouseX = mouse.x;
-    float mouseY = mouse.y;
+    float mouseX = mouse.button_pos.x;
+    float mouseY = mouse.button_pos.y;
 
     // Calculate the distance from the mouse to the center of the circle
     float distX = mouseX - center.x;

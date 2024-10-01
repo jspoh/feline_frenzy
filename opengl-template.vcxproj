@@ -24,7 +24,7 @@
     <ClCompile Include="src\Managers\mAssetManager.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
-    <ClCompile Include="src\Systems\sysCollision.cpp" />
+    <ClCompile Include="src\Managers\mCollision.cpp" />
     <ClCompile Include="src\Systems\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
@@ -48,13 +48,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Managers\mAssetManager.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />
-    <ClInclude Include="headers\Systems\sysCollision.h" />
+    <ClInclude Include="headers\Managers\mCollision.h" />
     <ClInclude Include="headers\Systems\sysPhysics.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cRender.h" />

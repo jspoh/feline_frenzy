@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   sysCollision.h
+ * \file   mCollision.h
  * \brief  Collision manager header for the physics system.
  *
  * \author Min Khant Ko
@@ -11,27 +11,12 @@
 #ifndef COLLISION_MANAGER_HPP
 #define COLLISION_MANAGER_HPP
 
+#include "../headers/Components/cCollision.h"
+
 namespace Collision {
 
     class Manager {
     private:
-
-        struct Collider {
-            bool active = false; // Tracks if collider is in use
-            Vector2 position;  // Position of the object (X, Y) world coordinates
-            Vector2 size;      // Size (width, height)
-            float radius = 0.0f; // Optional for circle colliders
-            Vector2 velocity; // Current velocity
-
-            // For bounding box
-            Vector2 rect_min;
-            Vector2 rect_max;
-
-            // For bounding sphere...unused for now
-            Vector2 cir_min;
-            Vector2 cir_max;
-        };
-
         std::vector<Collider> colliders;  // List of all colliders
 
         // Utility functions
@@ -67,13 +52,15 @@ namespace Collision {
 
         // Register a new collider
         void registerCollider(const Vector2& position, const Vector2& size, float radius, const Vector2& velocity);
+        void registerCollider(const Transform::Transform& transformT, const Transform::Velocity& transformV);
 
-        // Unregister a collider
+        // Unregister a collider // Currently pass in just position
         void unregisterCollider(const Vector2& position);
 
-        // Detect ANY collision between 2 colliders
-        bool detectCollision(const Collider& a, const Collider& b) const;
-
+        // Detect any collision between 2 colliders
+        bool detectCollision(const Collider& a, const Collider& b);
+        // Detect any collision between 2 cTransform
+        bool detectCollision(const Transform::Transform& aT, const Transform::Velocity& aV, const Transform::Transform& bT, const Transform::Velocity& bV);
     };
 }
 

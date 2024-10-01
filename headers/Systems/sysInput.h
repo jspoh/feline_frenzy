@@ -82,9 +82,6 @@ namespace Input {
 		//Default Destructor
 		~Manager() override = default;
 
-		// for event handling usage
-		bool key_is_pressed(int key) const;
-
 		// Getter for mouse position // MKK added to get mouse publicly
 		Mouse getMouse() const {
 			return mouse;

@@ -68,7 +68,8 @@ namespace Audio {
 		NE_AUDIO_GROUP GetAudioGroup(std::string const& tag);
 
 		// Play music
-		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool loop);
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool 
+		);
 
 		// Stop sound
 		void NEAudioStopGroup(NE_AUDIO_GROUP group);

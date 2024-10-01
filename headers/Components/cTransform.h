@@ -20,8 +20,6 @@ namespace Transform {
 		bool runtime_scale_down = false;
 	};
 
-
-
 	struct Velocity {
 		Vector2 velocity;
 	};

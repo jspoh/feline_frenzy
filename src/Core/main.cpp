@@ -13,7 +13,6 @@
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/sysPhysics.h"
 #include "../headers/Systems/sysInput.h"
-#include "../headers/Systems/sysCollision.h"
 
 // debug stuff
 bool DEBUG = false;
@@ -43,9 +42,6 @@ int main() {
 
 	// Add Physics System
 	//NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
-
-	// Add Collision System
-	//NIKEEngine.registerSystem<Collision::Manager>(Collision::Manager::getInstance());
 
 	//Engine Game Loop
 	NIKEEngine.run();
