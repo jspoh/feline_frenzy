@@ -12,6 +12,7 @@
 #define M_STATE_HPP
 
 #include "../headers/Managers/mEvents.h"
+#include "../headers/Managers/mSystem.h"
 
 namespace Scenes {
 
@@ -55,7 +56,7 @@ namespace Scenes {
 	};
 
 	//Scenes manager
-	class Manager : public Events::IEventListener {
+	class Manager : public System::ISystem, public Events::IEventListener {
 	private:
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
@@ -85,11 +86,6 @@ namespace Scenes {
 		//Go To Previous scene
 		void previousScene();
 
-	public:
-
-		//Default Constructor
-		Manager() = default;
-
 		//Register scenes
 		template<typename T>
 		void registerScenes(std::string const& scene_id) {
@@ -106,11 +102,25 @@ namespace Scenes {
 			}
 		}
 
+	public:
+
+		//Default Constructor
+		Manager() = default;
+
+		//Singleton Of Manager Class
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			return instance;
+		}
+
+		//Init
+		void init() override;
+
+		//Update
+		void update() override;
+
 		//Execute event
 		void executeEvent(std::shared_ptr<Events::IEvent> event) override;
-
-		//Change Scene based on new scene queued
-		void updateScenes();
 	};
 }
 

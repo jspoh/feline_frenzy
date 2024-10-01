@@ -17,13 +17,15 @@
     <ClCompile Include="src\Managers\mSystem.cpp" />
     <ClCompile Include="src\Scenes\SplashScene.cpp" />
     <ClCompile Include="src\Systems\sysInput.cpp" />
-    <ClCompile Include="src\Managers\mScene.cpp" />
+    <ClCompile Include="src\Systems\sysScene.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
-    <ClCompile Include="src\Managers\mAssetManager.cpp" />
+    <ClCompile Include="src\Managers\mAssets.cpp" />
+    <ClCompile Include="src\Managers\mEvents.cpp" />
+    <ClCompile Include="src\Managers\mWindows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\sysPhysics.h" />
@@ -45,16 +47,19 @@
     <ClInclude Include="headers\Data\json.hpp" />
     <ClInclude Include="headers\Scenes\MenuScene.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
-    <ClInclude Include="headers\Managers\mScene.h" />
+    <ClInclude Include="headers\Systems\sysScene.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />
     <ClInclude Include="headers\Math\Vector4.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
-    <ClInclude Include="headers\Managers\mAssetManager.h" />
+    <ClInclude Include="headers\Managers\mAssets.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cMove.h" />
+    <ClInclude Include="headers\Components\cInput.h" />
+    <ClInclude Include="headers\Managers\mEvents.h" />
+    <ClInclude Include="headers\Managers\mWindows.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
@@ -62,10 +67,13 @@
     <None Include="shaders\textured_rendering.frag" />
     <None Include="shaders\textured_rendering.vert" />
     <None Include="db\data.json" />
+    <None Include="assets\scenes\mainmenu.scn" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\meshes\square.txt" />
     <Text Include="src\Core\Config.txt" />
     <Text Include="assets\meshes\circle.txt" />
+    <Text Include="assets\meshes\square-texture.txt" />
+    <Text Include="assets\meshes\triangle.txt" />
   </ItemGroup>
 </Project>

@@ -14,8 +14,6 @@
 namespace Shader {
 	class Manager {
 	private:
-		std::unordered_map<std::string, unsigned int> shader_programs;
-
 		/**
 		 * compiles shader and adds to shader_programs.
 		 *
@@ -26,10 +24,10 @@ namespace Shader {
 		unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 
 	public:
-		Manager();
-		~Manager();
+		Manager() = default;
+		~Manager() = default;
 
-		void loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
+		unsigned int loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 		void useShader(const std::string& shader_ref);
 		/**
 		* Unbind the active shader program.

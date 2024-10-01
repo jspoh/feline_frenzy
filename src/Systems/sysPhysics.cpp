@@ -14,7 +14,6 @@
 //    class Manager;
 //}
 
-
 void Physics::Manager::init() {
 
 }
@@ -42,7 +41,7 @@ void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtim
 }
 
 void Physics::Manager::update() {
-    float dt = NIKEEngine.getDeltaTime();
+    float dt = NIKEEngine.accessWindow()->getDeltaTime();
 
     for (const auto& entity : entities) {
         // Check if entity contains Transform component and Velocity component

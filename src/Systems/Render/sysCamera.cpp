@@ -29,7 +29,7 @@ Camera::System::System() : target(Vector2(0, 0)), up(Vector2(0, 1)) {
 
 void Camera::System::init(float camera_height) {
 	// !TODO set height as a constant from the config
-	aspect_ratio = NIKEEngine.getWindowSize().x / NIKEEngine.getWindowSize().y;
+	aspect_ratio = NIKEEngine.accessWindow()->getWindowSize().x / NIKEEngine.accessWindow()->getWindowSize().y;
 	cam_height = camera_height;
 	cam_pos = { 0.0f, 0.0f };
 	float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
@@ -70,7 +70,7 @@ void Camera::System::update() {
 	}
 
 	//Update aspect ratio
-	aspect_ratio = NIKEEngine.getWindowSize().x / NIKEEngine.getWindowSize().y;
+	aspect_ratio = NIKEEngine.accessWindow()->getWindowSize().x / NIKEEngine.accessWindow()->getWindowSize().y;
 
 	//Update matrix
 	view_xform = Matrix33::Matrix_33{

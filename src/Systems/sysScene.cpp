@@ -7,7 +7,7 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mScene.h"
+#include "../headers/Systems/sysScene.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Scenes/SplashScene.h"
 
@@ -71,14 +71,13 @@ void Scenes::Manager::previousScene() {
 	}
 }
 
-void Scenes::Manager::executeEvent(std::shared_ptr<Events::IEvent> event) {
-	
-	new_scene = *std::dynamic_pointer_cast<Scenes::ChangeSceneEvent>(event);
+void Scenes::Manager::init() {
+	//Register scene ( First scene registered will be default starting scene )
+	registerScenes<Splash::Scene>("SPLASH");
+	registerScenes<Menu::Scene>("MENU");
 }
 
-void Scenes::Manager::updateScenes() {
-	//auto scene_event = std::dynamic_pointer_cast<Scenes::ChangeSceneEvent>(event);
-
+void Scenes::Manager::update() {
 	//Switch cases to perform scene management actions
 	switch (new_scene.scene_action) {
 	case Scenes::Actions::CHANGE:
@@ -93,4 +92,9 @@ void Scenes::Manager::updateScenes() {
 	default:
 		break;
 	}
+}
+
+void Scenes::Manager::executeEvent(std::shared_ptr<Events::IEvent> event) {
+	
+	new_scene = *std::dynamic_pointer_cast<Scenes::ChangeSceneEvent>(event);
 }
