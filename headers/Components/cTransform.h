@@ -7,23 +7,20 @@
 
 namespace Transform {
 	// Maybe a mesh struct?
-	struct Mesh {
-		// std::string shader_ref;
-		// std::string model_ref;
-		// texture shit
-	};
 
 	struct Transform {
-		std::string shader_ref;
-		std::string model_ref;
-
 		Vector2 position;
 		Vector2 scale;
 		float rotation;
-		Matrix33::Matrix_33 x_form;
-
-		bool isCam;
 	};
+
+	struct Runtime_Transform {
+		bool runtime_scale_up = false;
+		bool runtime_rotate = false;
+		bool runtime_scale_down = false;
+	};
+
+
 
 	struct Velocity {
 		Vector2 velocity;

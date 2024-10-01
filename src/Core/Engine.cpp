@@ -12,7 +12,8 @@
 Core::Engine::Engine()
 	: ptr_window{ nullptr }, window_size{}, window_title{""}, delta_time{0.0f},
 	target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f }
-{}
+{
+}
 
 Core::Engine::~Engine() {
 	glfwTerminate();
@@ -114,7 +115,12 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 	entity_manager = std::make_unique<Entity::Manager>();
 	component_manager = std::make_unique<Component::Manager>();
 	system_manager = std::make_unique<System::Manager>();
-	scene_manager = std::make_unique<Scenes::Manager>();
+	events_manager = std::make_unique<Events::Manager>();
+	asset_manager = std::make_unique<Asset::Manager>();
+
+	//Scenes manager
+	scenes_manager = std::make_unique<Scenes::Manager>();
+	addEventListeners<Scenes::ChangeSceneEvent>(scenes_manager);
 
 	//Read config file
 	readConfigFile(file_path);
@@ -139,11 +145,11 @@ void Core::Engine::run() {
 		//Set Window Title
 		setWinTitle(window_title + " | " + std::to_string(actual_fps) + " fps");
 
+		//Update game scenes
+		scenes_manager->updateScenes();
+
 		//Update all systems
 		system_manager->updateSystems();
-
-		//State Manager render ( to be removed )
-		scene_manager->render();
 
 		//Might move this into render system
 		glfwSwapBuffers(ptr_window);
@@ -208,16 +214,4 @@ void Core::Engine::destroyEntity(Entity::Type entity) {
 	entity_manager->destroyEntity(entity);
 	component_manager->entityDestroyed(entity);
 	system_manager->entityDestroyed(entity);
-}
-
-/*****************************************************************//**
-* Scene Methods
-*********************************************************************/
-
-void Core::Engine::changeScene(std::string const& scene_id) {
-	scene_manager->changeScene(scene_id);
-}
-
-void Core::Engine::changePrevScene() {
-	scene_manager->previousScene();
 }

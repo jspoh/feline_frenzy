@@ -15,7 +15,7 @@
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Core/Engine.h"
-#include "../headers/Systems/Render/Object.h"
+//#include "../headers/Systems/Render/Object.h"
 #include "../headers/Systems/sysCollision.h"
 
 namespace Physics {
@@ -41,6 +41,9 @@ namespace Physics {
 
 		//Init
 		void init() override;
+
+		// Runtime scaling and rotation
+		void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
 
 		//Update
 		void update() override;

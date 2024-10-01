@@ -15,6 +15,17 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
+// Fmod core headers
+#include "FMOD_CORE/fmod.h"
+#include "FMOD_CORE/fmod.hpp"
+#include "FMOD_CORE/fmod_codec.h"
+#include "FMOD_CORE/fmod_common.h"
+#include "FMOD_CORE/fmod_dsp.h"
+#include "FMOD_CORE/fmod_dsp_effects.h"
+#include "FMOD_CORE/fmod_errors.h"
+#include "FMOD_CORE/fmod_output.h"
+
+
 // standard headers
 #include <iostream>
 #include <fstream>
@@ -50,6 +61,9 @@
 #include "../headers/Components/cMove.h"
 
 #define PI static_cast<float> (atan(1)*4.f)
+//Math defines
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 namespace Entity {
 

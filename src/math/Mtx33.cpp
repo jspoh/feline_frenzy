@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   Mtx33.cpp
+ * \brief  Matrix function definitions for Matrix library
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
+
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Math/Mtx33.h"
@@ -42,6 +50,16 @@ Matrix_33::Matrix_33(const Matrix_33& rhs)
 			matrix_33[i][j] = rhs.matrix_33[i][j];
 		}
 	}
+}
+
+Matrix_33 Matrix_33::Identity()
+{
+	Matrix_33 result{};
+	result(0, 0) = 1.f; result(0, 1) = 0.f; result(0, 2) = 0.f;
+	result(1, 0) = 0.f; result(1, 1) = 1.f; result(1, 2) = 0.f;
+	result(2, 0) = 0.f; result(2, 1) = 0.f; result(2, 2) = 1.f;
+
+	return result;
 }
 
 // Helper swap function for copy assignment
@@ -138,6 +156,18 @@ Matrix_33 Matrix33::operator*(const Matrix_33& lhs, const Matrix_33& rhs)
 {
 	Matrix_33 result{ lhs };
 	result *= rhs;
+
+	return result;
+}
+
+Matrix_33 Matrix33::operator*(float scalar, const Matrix_33& rhs)
+{
+	Matrix_33 result{ rhs };
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			result(i, j) *= scalar;
+		}
+	}
 
 	return result;
 }

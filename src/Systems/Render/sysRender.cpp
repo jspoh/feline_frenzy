@@ -1,7 +1,7 @@
 /*****************************************************************//**
  * \file   RenderManager.cpp
- * \brief  
- * 
+ * \brief
+ *
  * \author jings
  * \date   September 2024
  *********************************************************************/
@@ -11,13 +11,8 @@
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Math/Mtx33.h"
-
-Render::Manager::Manager() {
-	// compile shaders
-	shaderManager.loadShader("base", "shaders/base.vert", "shaders/base.frag");
-	shaderManager.loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
-	// !TODO: shader for text rendering(?)
-}
+#define STB_IMAGE_IMPLEMENTATION
+#include "data/stb_image.h"
 
 Render::Manager::~Manager() {
 
@@ -27,9 +22,14 @@ Render::Manager::~Manager() {
 		glDeleteBuffers(1, &model.second->vboid);
 		glDeleteBuffers(1, &model.second->eboid);
 	}
+
+	// clear textures
+	for (std::pair<std::string, unsigned int> texture : textures) {
+		glDeleteTextures(1, &texture.second);
+	}
 }
 
-void Render::Manager::createBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Model> model) {
+void Render::Manager::createBaseBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Model> model) {
 	// VBO (Vertex Buffer Object)
 	glCreateBuffers(1, &model->vboid);
 	glNamedBufferStorage(model->vboid,
@@ -55,46 +55,97 @@ void Render::Manager::createBuffers(const std::vector<Vector2>& vertices, const 
 	glVertexArrayElementBuffer(model->vaoid, model->eboid);
 }
 
+void Render::Manager::createTextureBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2>& tex_coords, std::shared_ptr<Render::Model> model) {
+	// VBO (Vertex Buffer Object)
+	glCreateBuffers(1, &model->vboid);
+	glNamedBufferStorage(model->vboid,
+		sizeof(Vector2) * vertices.size() + sizeof(Vector2) * tex_coords.size(),
+		nullptr, // nullptr means no data is transferred
+		GL_DYNAMIC_STORAGE_BIT);
+	glNamedBufferSubData(model->vboid, 0, sizeof(Vector2) * vertices.size(), vertices.data());
+	glNamedBufferSubData(model->vboid, sizeof(Vector2) * vertices.size(), sizeof(Vector2) * tex_coords.size(), tex_coords.data());
+
+	// VAO (Vertex Array Object)
+	glCreateVertexArrays(1, &model->vaoid);
+
+	// Vertex Position Array
+	glEnableVertexArrayAttrib(model->vaoid, 0); // vertex attribute index 0
+	glVertexArrayVertexBuffer(model->vaoid, 0, model->vboid, 0, sizeof(Vector2)); // buffer binding point 0
+	glVertexArrayAttribFormat(model->vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribBinding(model->vaoid, 0, 0);
+
+	// Vertex texture coordinates
+	glEnableVertexArrayAttrib(model->vaoid, 2);
+	glVertexArrayVertexBuffer(model->vaoid, 1, model->vboid, sizeof(Vector2) * vertices.size(), sizeof(Vector2));
+	glVertexArrayAttribFormat(model->vaoid, 2, 2, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribBinding(model->vaoid, 2, 1);
+
+	// Create EBO
+	glCreateBuffers(1, &model->eboid);
+	glNamedBufferStorage(model->eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
+	glVertexArrayElementBuffer(model->vaoid, model->eboid);
+}
+
 bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<Model> model) {
-	std::ifstream mesh_file{ path_to_mesh };
+	std::ifstream mesh_file{ path_to_mesh, std::ios::in };
 	if (!mesh_file.is_open()) {
 		cerr << "Failed to open mesh file: " << path_to_mesh << endl;
 		return false;
 	}
 
-	// placeholder for parsing
-	char placeholder;
+	mesh_file.seekg(0, std::ios::beg);
 
-	int vertex_count, index_count;
-	mesh_file >> vertex_count >> placeholder >> index_count;
+	std::string line;
+	GLshort index;
 
 	// pos
 	std::vector<Vector2> vertices;
-	vertices.reserve(vertex_count);
+	std::vector<Vector2> tex_coords;
 
 	// indices (indexed rendering with element buffer object)
 	std::vector<unsigned int> indices;
-	indices.reserve(index_count);
+
+
 
 	// line data type (eg. vertex, color, indices)
 	char type;
 
-	while (mesh_file >> type) {
+	while (getline(mesh_file, line)) {
+		std::istringstream line_sstm{ line };
+
+		line_sstm >> type;
+
 		switch (type) {
-		case 'v': {
+		case 'n': {// name
+			break;
+		}
+		case 'v': {// vertex
 			float ndc_x, ndc_y;
-			mesh_file
-				>> ndc_x >> placeholder
-				>> ndc_y;
+			line_sstm >> ndc_x >> ndc_y;
 			vertices.emplace_back(ndc_x, ndc_y);
 			break;
 		}
+		case 't': {// triangle indices
+			if (model->primitive_type == 0) {
+				model->primitive_type = GL_TRIANGLES;
+			}
+			while (line_sstm >> index) { // Grab index position
+				indices.emplace_back(index);
+			}
+			break;
+		}
 		case 'i': {
-			for (int _{}; _ < index_count; _++) {
-				unsigned int i;
-				mesh_file
-					>> i >> placeholder;
-				indices.push_back(i);
+			float tex_x, tex_y;
+			line_sstm >> tex_x >> tex_y;
+			tex_coords.emplace_back(tex_x, tex_y);
+			break;
+		}
+		case 'f': {// fan indices
+			if (model->primitive_type == 0) {
+				model->primitive_type = GL_TRIANGLE_FAN;
+			}
+			while (line_sstm >> index) { // Grab index position
+				indices.emplace_back(index);
 			}
 			break;
 		}
@@ -103,23 +154,126 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 			return false;
 		}
 	}
+	mesh_file.close();
 
-	// ensure that the vertex and index count matches the file
-	if (vertices.size() != vertex_count) {
-		cerr << "Vertex count mismatch. Expected: " << vertex_count << " Actual: " << vertices.size() << endl;
-		throw std::exception();
+	if (tex_coords.size() == 0) {
+		createBaseBuffers(vertices, indices, model);
 	}
-	if (indices.size() != index_count) {
-		cerr << "Index count mismatch. Expected: " << index_count << " Actual: " << indices.size() << endl;
-		throw std::exception();
+	else {
+		createTextureBuffers(vertices, indices, tex_coords, model);
 	}
-
-	createBuffers(vertices, indices, model);
-	model->draw_count = index_count;
+	model->draw_count = static_cast<GLuint>(indices.size());
 
 	return true;
 }
 
+void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
+	//Transform matrix here
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
+
+	// Scrap orientation for now
+	// Modulus the object rotation so it doesnt result in a large number overtime
+	// float orientation = fmod(orientation, 360.f);
+	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+	float angleDisp = xform.rotation;
+
+	Matrix_33Rot(rot_mat, angleDisp);
+	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
+	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+
+	// OpenGL requires matrix in col maj so transpose
+	Matrix_33Transpose(mesh.x_form, result);
+}
+
+void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+	//Set Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	//Use shader
+	shader_system->useShader(e_mesh.shader_ref);
+
+	//Shader set uniform
+	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
+
+	//Find model
+	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
+	auto& model = models.at(e_mesh.model_ref);
+
+	//Draw model
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+
+	//Unuse shader
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderObject(const Render::Mesh& e_mesh) {
+	constexpr const char* texture_shader = "tex";
+	constexpr const char* texture_uniform = "u_tex2d";
+	constexpr const char* transform_uniform = "u_transform";
+	constexpr int texture_unit = 6;
+
+	const Render::Model& model = *models.at(e_mesh.model_ref);
+
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	// use shader
+	shader_system->useShader(texture_shader);
+
+	// set texture
+	glBindTextureUnit(
+		texture_unit, // texture unit (binding index)
+		textures.at(e_mesh.texture_ref)
+	);
+
+	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	Matrix33::Matrix_33 xform = e_mesh.x_form;
+	//Matrix33::Matrix_33Scale(xform, 2.0f, 2.0f);
+
+	shader_system->setUniform(texture_shader, texture_uniform, texture_unit);
+	shader_system->setUniform(texture_shader, transform_uniform, xform);
+
+	glBindVertexArray(model.vaoid);
+	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+
+	glBindVertexArray(0);
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+	//Set Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//Use shader
+	shader_system->useShader(e_mesh.shader_ref);
+
+	//Shader set uniform
+	//Scale wire frame
+	Matrix33::Matrix_33 scaled_wire_frame = 1.0f * e_mesh.x_form;
+	Matrix_33Transpose(scaled_wire_frame, scaled_wire_frame);
+	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", scaled_wire_frame);
+
+	//Find model
+	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
+	auto& model = models.at(e_mesh.model_ref);
+
+	//Draw model
+	glBindVertexArray(model->vaoid);
+	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+
+	//Unuse shader
+	shader_system->unuseShader();
+
+	//Reset Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
 
 void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
 	std::shared_ptr model = std::make_shared<Model>();
@@ -128,87 +282,156 @@ void Render::Manager::registerModel(const std::string& model_ref, const std::str
 	}
 }
 
+char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_ext) {
+	// find file type
+	std::string junk, filetype;
+	std::stringstream ss{ path_to_texture };
+	std::getline(ss, junk, '.');
+	std::getline(ss, filetype, '.');
 
-void Render::Manager::initCamera(float camHeight) {
+	if (filetype == "tex") {
+		is_tex_ext = true;
 
-	// Get window size
-	float wWidth = Core::Engine::getInstance().getWindowSize().x;
-	float wHeight = Core::Engine::getInstance().getWindowSize().y;
+		width = 256;
+		height = 256;
 
-	// Create a pointer to camera class
-	camera = std::make_unique<CameraObject>();
-	// Init camera
-	camera->init(wWidth, wHeight, camHeight);
+		std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
+		if (!texture_file.is_open()) {
+			cerr << "Failed to open texture file: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to open texture file.");
+		}
 
+		// get tex_size of texture file
+		tex_size = static_cast<int>(texture_file.tellg());
+
+		// return to beginning of file
+		texture_file.seekg(0, std::ios::beg);
+
+		char* tex_data{ new char[tex_size] };
+
+		// read tex data into ptr
+		if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
+			cerr << "Failed to read texture file: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to read texture file.");
+		}
+		texture_file.close();
+
+		return tex_data;
+	}
+
+	// is not .tex file
+	is_tex_ext = false;
+
+	int channels;
+	char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
+	if (img_data == nullptr) {
+		cerr << "Failed to load image data: " << path_to_texture << endl;
+		throw std::runtime_error("Failed to load image data.");
+	}
+
+	tex_size = width * height * channels;
+
+	char* data = new char[tex_size];
+	for (int i{}; i < tex_size; i++) {
+		data[i] = img_data[i];
+	}
+	stbi_image_free(img_data);
+
+	return data;
 }
 
+void Render::Manager::registerTexture(const std::string& texture_ref, const std::string& path_to_texture) {
+	// find file type
+	std::string junk, filetype;
+	std::stringstream ss{ path_to_texture };
+	std::getline(ss, junk, '.');
+	std::getline(ss, filetype, '.');
 
+	int tex_width, tex_height, tex_size;
+	bool is_tex_ext = false;
+	const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_ext);
 
-void Render::Manager::transformMatrix(Transform::Transform& xform, Matrix33::Matrix_33 world_to_ndc_mat) {
-	//Transform matrix here
-	Matrix33::Matrix_33 model_mat, result, scale_mat, rot_mat, trans_mat;
-	float orientation = 0.0f;
+	// create texture
+	unsigned int tex_id;
+	glCreateTextures(GL_TEXTURE_2D, 1, &tex_id);
+	glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
+	glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, (is_tex_ext ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, tex_data);
 
-	// Modulus the object rotation so it doesnt result in a large number overtime
-	orientation = fmod(orientation, 360.f);
-	float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * PI / 180.f;
+	// no longer needed
+	delete[] tex_data;
 
-	Matrix_33Rot(rot_mat, angleDisp);
-	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
-	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
-	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+	// register texture
+	textures[texture_ref] = tex_id;
 
-	// OpenGL requires matrix in col maj so transpose
-	Matrix_33Transpose(xform.x_form, result);
+	cout << "Successfully registered texture " << texture_ref << " from " << path_to_texture << endl;
+}
+
+void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
+	camera_system->trackCamEntity(cam_identifier);
+}
+const Camera::System* Render::Manager::getCamEntity() {
+	return camera_system.get();
 }
 
 void Render::Manager::init() {
-	initCamera(1000.f);
+	//Create shader system
+	shader_system = std::make_unique<Shader::Manager>();
+
+	//Load shaders
+	shader_system->loadShader("base", "shaders/base.vert", "shaders/base.frag");
+	shader_system->loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
+
+	//Create camera system
+	camera_system = std::make_unique<Camera::System>();
+
+	//Init Camera ( Camera height defaulted at 1000.0f )
+	camera_system->init(1000.0f);
 }
 
 void Render::Manager::update() {
-    //float deltaTime = Core::Engine::getInstance().getDeltaTime();
 
-    //for (auto& [object_ref, object] : objects) {
-    //    if (object_ref == "camera") {
-    //        camera.get()->update(object);
-    //    }
-    //    object.update(deltaTime, camera->getWorldToNDCXform());
-    //}
-	
 	// Before drawing clear screen
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	//Update set of cameras
+	std::set<Entity::Type> cam_entities;
+	for (auto& entity : entities) {
+		//Update camera position
+		if (!NIKEEngine.checkEntityComponent<Render::Cam>(entity))
+			continue;
+
+		//Update camera and push to list
+		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+		auto& e_camera = NIKEEngine.getEntityComponent<Render::Cam>(entity);
+		e_camera.position = e_transform.position;
+		cam_entities.insert(entity);
+	}
+
+	//Update camera with set of cam entities
+	camera_system->updateCameraEntities(std::move(cam_entities));
+
+	//Update camera system
+	camera_system->update();
 
 	//Update all entities
 	for (auto& entity : entities) {
 		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
 		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
 
-		if (e_transform.isCam == true) {
-			camera.get()->setPosition(e_transform.position.x, e_transform.position.y);
-			camera.get()->update();
+		//Transform matrix here
+		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
+
+		//Render object
+		if (e_mesh.texture_ref.empty()) {
+			renderObject(e_mesh, e_color);
+		}
+		else {
+			renderObject(e_mesh);
 		}
 
-		//Transform matrix here
-		transformMatrix(e_transform, camera.get()->getWorldToNDCXform());
-
-		shaderManager.useShader(e_transform.shader_ref);
-
-		//Shader set uniform
-		shaderManager.setUniform(e_transform.shader_ref, "f_color", e_color.color);
-		shaderManager.setUniform(e_transform.shader_ref, "model_to_ndc", e_transform.x_form);
-
-		//Find model
-		assert(models.find(e_transform.model_ref) != models.end() && "Model not found.");
-		auto model = models.at(e_transform.model_ref);
-
-
-		//Draw model
-		glBindVertexArray(model->vaoid);
-		glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
-		glBindVertexArray(0);
-
-		shaderManager.unuseShader();
+		//Render debugging wireframe
+		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
+		//renderWireFrame(e_mesh, wire_frame_color);
 	}
-
 }

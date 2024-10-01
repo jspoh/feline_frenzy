@@ -19,102 +19,89 @@ void Physics::Manager::init() {
 
 }
 
+void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
+{
+
+	if (runtime_comp.runtime_scale_up)
+	{
+		transform_comp.scale.x *= 1.05f;
+		transform_comp.scale.y *= 1.05f;
+	}
+
+    if (runtime_comp.runtime_scale_down)
+    {
+        transform_comp.scale.x /= 1.05f;
+        transform_comp.scale.y /= 1.05f;
+    }
+
+	if (runtime_comp.runtime_rotate)
+	{
+		transform_comp.rotation += 10.f;
+	}
+
+}
+
 void Physics::Manager::update() {
     float dt = NIKEEngine.getDeltaTime();
 
     for (const auto& entity : entities) {
-        // Check if entity contains Transform component
-        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity)) {
+        // Check if entity contains Transform component and Velocity component
+        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) && NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
 
             // Reference to transform component
             Transform::Transform& transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 
-            // Check if entity contains Velocity component
-            if (NIKEEngine.checkEntityComponent<Transform::Velocity>(entity)) {
-                // Ref to velocity component
-                Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
-                
+            // Ref to velocity component
+            Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
+
+            const float speed = 100.0f;
+
+            // Check if entity contains Move component
+
+            if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
+                // Ref to Move component
+                Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
+
+                const float movespeed = 300.0f;
+
                 // Reset Velocity
-                velocity.velocity.x = 0.0f;
                 velocity.velocity.y = 0.0f;
+                velocity.velocity.x = 0.0f;
 
-                // Check if entity contains Move component
-                if (NIKEEngine.checkEntityComponent<Move::Move>(entity)) {
-                    // Ref to Move component
-                    Move::Move& move = NIKEEngine.getEntityComponent<Move::Move>(entity);
-
-                    // Speed
-                    const float speed = 1000.0f;
-
-                    if (move.Up == true) {
-                        velocity.velocity.y += speed;
-                    }
-
-                    if (move.Down == true) {
-                        velocity.velocity.y -= speed;
-                    }
-
-                    if (move.Left == true) {
-                        velocity.velocity.x -= speed;
-                    }
-
-                    if (move.Right == true) {
-                        velocity.velocity.x += speed;
-                    }
+                if (move.Up) {
+                    velocity.velocity.y += movespeed;
                 }
 
-                // Normalize Movement
-                if (transform.position.lengthSq() > 0.0f) {
-                    transform.position = transform.position.normalize();
+                if (move.Down) {
+                    velocity.velocity.y -= movespeed;
                 }
 
-                // Apply velocity
-                transform.position.x += velocity.velocity.x * dt;
-                transform.position.y += velocity.velocity.y * dt;
+                if (move.Left) {
+                    velocity.velocity.x -= movespeed;
+                }
+
+                if (move.Right) {
+                    velocity.velocity.x += movespeed;
+                }
             }
+
+            // Normalize Movement
+            if (velocity.velocity.lengthSq() > 0.0f) {
+                velocity.velocity = velocity.velocity.normalize();
+            }
+
+            // Apply velocity
+            transform.position += velocity.velocity * speed * dt;
+
+        }
+        else if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) && NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
+        {
+            // Reference to transform component
+            Transform::Transform& c_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+
+            // Ref to runtime component
+            Transform::Runtime_Transform& c_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
+            runtimeScaleOrRotate(c_runtime, c_transform);
         }
     }
-    
-
-    //NIKEEngine.accessSystem<Entity::Manager>()->getEntitiesWithComponents();
-
-    // Move Camera
-    //NIKEEngine.accessSystem<Physics::Manager>()->getInstance()->move(NIKEEngine.accessSystem<Render::Manager>()->getObject("camera"));
 }
-
-/*
-void Physics::Manager::move(Object* object) {
-    const float speed = 1000.0f;
-    const float dt = NIKEEngine.getDeltaTime();
-
-    if (!object) {
-        cout << "Object does not exist" << endl;
-        return;
-    }
-
-    Vector2 moveVec{};
-    Vector2 objPos = object->getPosition();
-
-    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_D)){
-        moveVec.x += 1.0f;
-    }
-    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_A)) {
-        moveVec.x -= 1.0f;
-    }
-    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_W)) {
-        moveVec.y += 1.0f;
-    }
-    if (NIKEEngine.accessSystem<Input::Manager>()->getInstance()->key_is_pressed(GLFW_KEY_S)) {
-        moveVec.y -= 1.0f;
-    }
-
-    // Normalizing movement
-    if (moveVec.lengthSq() > 0.0f) {
-        moveVec = moveVec.normalized();
-    }
-
-    // Applying movement
-    objPos += moveVec * speed * dt;
-    object->setPosition(objPos.x, objPos.y);
-}
-*/

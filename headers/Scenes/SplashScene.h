@@ -18,7 +18,9 @@ namespace Splash {
 	class Scene : public Scenes::IScene {
 	private:
 		//Create scene specific variables here
-		Entity::Type mouse_click;
+		Entity::Type input; 
+		// BGM goes here
+		Entity::Type bg_music;
 
 	public:
 
@@ -28,9 +30,6 @@ namespace Splash {
 		//Scene phases
 		void load() override;
 		void init() override;
-
-		void render() override;
-
 		void exit() override;
 		void unload() override;
 

@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   Mtx33.h
+ * \brief  Matrix function declarations for Matrix library
+ *
+ * \author Bryan Lim
+ * \date   September 2024
+ *********************************************************************/
+
 #pragma once
 
 #ifndef MTX33
@@ -40,10 +48,14 @@ namespace Matrix33 {
 	public:
 		std::array<std::array<float, 3>, 3> matrix_33{};
 
+		static Matrix_33 Identity();
 	};
 
 	// Matrix Multiplication (THIS IS SAME AS MATRIX CONCAT)
 	Matrix_33 operator* (const Matrix_33& lhs, const Matrix_33& rhs);
+
+	//Matrix scalar
+	Matrix_33 operator* (float scalar, const Matrix_33& rhs);
 
 	Vector2 operator* (const Vector2& lhs, const Matrix_33& rhs);
 	Vector2 operator* (const Matrix_33& lhs, const Vector2& rhs);
