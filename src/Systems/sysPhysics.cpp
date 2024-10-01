@@ -43,6 +43,16 @@ void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtim
 void Physics::Manager::update() {
     float dt = NIKEEngine.accessWindow()->getDeltaTime();
 
+    // Loop through all entities to reset collision flags
+    for (Entity::Type entity : entities) {
+        if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
+            Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
+            collider.left = collider.right = collider.top = collider.bottom = false;
+
+            //cout << "E bounding box min: " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_min.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_min.y << endl;
+            //cout << "E bounding box max: " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_max.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_max.y << endl;
+        }
+    }
     // Loop through all entities to perform collision checks
     for (Entity::Type entityA : entities) {
         if (NIKEEngine.checkEntityComponent<Transform::Transform>(entityA) &&
@@ -53,9 +63,6 @@ void Physics::Manager::update() {
             Transform::Transform& transformA = NIKEEngine.getEntityComponent<Transform::Transform>(entityA);
             Transform::Velocity& velocityA = NIKEEngine.getEntityComponent<Transform::Velocity>(entityA);
             Collision::Collider& colliderA = NIKEEngine.getEntityComponent<Collision::Collider>(entityA);
-
-            // Reset the collision flags for entityA
-            colliderA.left = colliderA.right = colliderA.top = colliderA.bottom = false;
 
             // Loop through all other entities for collision detection
             for (Entity::Type entityB : entities) {
@@ -146,6 +153,12 @@ void Physics::Manager::update() {
             // Apply velocity to transform component if no collision in that direction
             transform.position += velocity.velocity * speed * dt;
 
+            // Update collider bounding box
+            if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
+                Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
+                collider.rect_min = transform.position - (transform.scale * 0.5f);
+                collider.rect_max = transform.position + (transform.scale * 0.5f);
+            }
         }
         else if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) &&
             NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity)) {
@@ -159,3 +172,4 @@ void Physics::Manager::update() {
         }
     }
 }
+

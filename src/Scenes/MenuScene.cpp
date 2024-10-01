@@ -75,7 +75,6 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Move::Movement>(entities.at(1), {false, false, false, false});
 
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(2), { {0.0f, 1.0f} });
-	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(2)); // Set collider for "player" entity
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck" });
@@ -84,6 +83,8 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(3), { {0.0f, 0.0f} });
 	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(3)); // Set collider for duck entity (test collision)
+	//cout << "Duck bounding box min: " << NIKEEngine.getEntityComponent<Collision::Collider>(entities.at(3)).rect_min.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entities.at(3)).rect_min.y << endl;
+	//cout << "Duck bounding box max: " << NIKEEngine.getEntityComponent<Collision::Collider>(entities.at(3)).rect_max.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entities.at(3)).rect_max.y << endl;
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "water" });
@@ -104,6 +105,7 @@ void Menu::Scene::init() {
 	//Create camera
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });
+	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(1)); // Set collider for "player" entity (test collision)
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
 }
 
