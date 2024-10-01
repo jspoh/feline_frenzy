@@ -27,6 +27,7 @@
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
+    <ClCompile Include="src\Systems\sysGameLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\sysPhysics.h" />
@@ -62,6 +63,7 @@
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
     <ClInclude Include="headers\Managers\mSerialization.h" />
+    <ClInclude Include="headers\Systems\sysGameLogic.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

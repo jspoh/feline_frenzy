@@ -109,7 +109,7 @@ namespace System {
 
 		//Index for adding system is only if
 		template<typename T>
-		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr) {
+		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr, int index = -1) {
 
 			//System type name
 			std::string sys_name{ typeid(T).name() };
@@ -131,7 +131,12 @@ namespace System {
 			system->init();
 
 			//Insert system at back
-			systems.push_back(system);
+			if (index >= 0) {
+				systems.insert(systems.begin() + index, system);
+			}
+			else {
+				systems.push_back(system);
+			}
 
 			//Emplace shared pointer to system in map
 			systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_name), std::forward_as_tuple(system));

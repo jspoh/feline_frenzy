@@ -8,8 +8,8 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysInput.h"
+#include "../headers/Core/Engine.h"
 #include "../headers/Components/cTransform.h"
-#include "../headers/Systems/sysScene.h"
 
 void Input::Manager::setupEventCallbacks() {
 	glfwSetFramebufferSizeCallback(NIKEEngine.accessWindow()->getWindow(), fbsize_cb);
@@ -146,44 +146,6 @@ void Input::Manager::update() {
 			move.Down = key.b_output && (key.key_type == GLFW_KEY_S);
 			move.Right = key.b_output && (key.key_type == GLFW_KEY_D);
 		}
-
-
-	}
-
-	//Temp changing scene here
-	if (mouse.b_output && (mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
-		auto menu_event = std::make_shared<Scenes::ChangeSceneEvent>(Scenes::Actions::CHANGE, "MENU");
-		NIKEEngine.accessEvents()->dispatchEvent(menu_event);
-	}
-
-	// !TODO make sure cannot use outside of MenuScene
-	if (mouse.b_output == true && (mouse.button_type == GLFW_MOUSE_BUTTON_RIGHT)) {
-		auto render_manager = Render::Manager::getInstance();
-		auto camera_system = render_manager->getCamEntity();
-		float mouseX = mouse.button_pos.x;
-		float mouseY = mouse.button_pos.y;
-		float ndcX = (2.0f * mouse.button_pos.x) / NIKEEngine.accessWindow()->getWindowSize().x - 1.0f;
-		float ndcY = 1.0f - (2.0f * mouseY) / NIKEEngine.accessWindow()->getWindowSize().y;
-
-		Matrix33::Matrix_33 ndc_to_world_xform;
-		Matrix33::Matrix_33Inverse(ndc_to_world_xform, camera_system->getWorldToNDCXform());
-
-		Vector3 ndc_coords = { ndcX, ndcY, 1.0f }; // NDC in homogeneous coordinates
-		Vector3 world_coords = ndc_coords * ndc_to_world_xform;
-
-		Entity::Type entity = NIKEEngine.createEntity();
-		NIKEEngine.addEntityComponentObj<Render::Mesh>(entity, { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "tree" });
-		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { {world_coords.x ,world_coords.y}, {200.f, 200.f}, 0.0f });
-		NIKEEngine.addEntityComponentObj<Render::Color>(entity, { {1.0f, 1.0f, 1.0f}, 1.0f });
-
-		mouse.b_output = false;
-
-	}
-
-
-	//Check if escape key is pressed
-	if (key.b_output && (key.key_type == GLFW_KEY_ESCAPE)) {
-		NIKEEngine.accessWindow()->terminate();
 	}
 }
 

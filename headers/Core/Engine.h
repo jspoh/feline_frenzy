@@ -126,14 +126,9 @@ namespace Core {
 		* System Methods
 		*********************************************************************/
 		template<typename T>
-		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr)
+		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr, int index = -1)
 		{
-			if (singleton_sys) {
-				return system_manager->registerSystem<T>(singleton_sys);
-			}
-			else {
-				return system_manager->registerSystem<T>();
-			}
+			return system_manager->registerSystem<T>(singleton_sys, index);
 		}
 
 		template<typename T>

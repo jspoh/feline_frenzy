@@ -11,6 +11,7 @@
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Components/cAudio.h"
+#include "../headers/Systems/sysGameLogic.h"
 
 void Splash::Scene::load() {
 
@@ -26,6 +27,7 @@ void Splash::Scene::init() {
 	NIKEEngine.registerComponent<Input::Key>();
 	NIKEEngine.registerComponent<Input::Mouse>();
 	NIKEEngine.registerComponent<Audio::cAudio>();
+	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
 
 	//Add Input Singleton System
 	NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
@@ -40,6 +42,13 @@ void Splash::Scene::init() {
 
 	//Add audio component 
 	NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
+
+	//Register game logic system
+	NIKEEngine.registerSystem<GameLogic::Manager>();
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.accessSystem<GameLogic::Manager>()->setComponentsLinked(false);
 
 	//Create entity with mouse & key component for testing
 	input = NIKEEngine.createEntity();
