@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   mAssetsManager.h
+ * \file   mAssets.h
  * \brief  Assets manager function declarations
  *
  * \author Bryan Lim
@@ -11,6 +11,8 @@
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
 
+#include "../headers/Systems/sysAudio.h"
+
 namespace Assets
 {
 	class Manager
@@ -20,7 +22,7 @@ namespace Assets
 		//Default constructor
 		Manager() = default;
 
-		//Default destructor
+		// Dtor
 		~Manager();
 
 		/*****************************************************************//**
@@ -59,7 +61,7 @@ namespace Assets
 		void createAudioGroup(std::string const& audio_group_tag);
 
 		//Get audio
-		std::shared_ptr<FMOD::Sound> getAudio(std::string audio_tag);
+		std::shared_ptr<FMOD::Sound> getAudio(std::string const& audio_tag);
 
 		//Get audio group
 		std::shared_ptr<FMOD::ChannelGroup> getAudioGroup(std::string const& tag);
@@ -79,10 +81,10 @@ namespace Assets
 		std::unordered_map<std::string, unsigned int> shaders_list;
 
 		//Map of audios
-		std::unordered_map<std::string, std::shared_ptr<FMOD::Sound>> audio_list;
+		std::unordered_map<std::string, Audio::NE_AUDIO> audio_list;
 
 		//Map of audio groups
-		std::unordered_map<std::string, std::shared_ptr<FMOD::ChannelGroup>> audio_group_list;
+		std::unordered_map<std::string, Audio::NE_AUDIO_GROUP> audio_group_list;
 	};
 }
 

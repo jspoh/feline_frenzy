@@ -22,6 +22,7 @@
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Managers\mAssets.cpp" />
+    <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
@@ -54,6 +55,7 @@
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Components\cScene.h" />
     <ClInclude Include="headers\Managers\mAssets.h" />
+    <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
@@ -100,6 +102,7 @@
     <Text Include="assets\meshes\square.txt" />
     <Text Include="assets\meshes\triangle.txt" />
     <Text Include="src\Core\Config.txt" />
+    <Text Include="src\Managers\crash_log.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -202,7 +205,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
@@ -230,7 +233,7 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>

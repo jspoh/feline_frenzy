@@ -20,6 +20,7 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 	windows_manager = std::make_unique<Windows::Manager>();
 	events_manager = std::make_unique<Events::Manager>();
 	assets_manager = std::make_unique<Assets::Manager>();
+	debug_manager = std::make_unique<Debug::Manager>();
 
 	//Read config file
 	windows_manager->readConfigFile(file_path);
@@ -96,4 +97,9 @@ std::unique_ptr<Events::Manager>& Core::Engine::accessEvents() {
 *********************************************************************/
 std::unique_ptr<Assets::Manager>& Core::Engine::accessAssets() {
 	return assets_manager;
+}
+
+std::unique_ptr<Debug::Manager>& Core::Engine::accessDebug()
+{
+	return debug_manager;
 }

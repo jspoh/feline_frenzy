@@ -132,7 +132,13 @@ void Audio::Manager::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol
 
 	group->setVolume(vol);
 	group->setPitch(pitch);
-	loop ? group->setMode(FMOD_LOOP_NORMAL) : group->setMode(FMOD_LOOP_OFF);
+	if (loop)
+	{
+		group->setMode(FMOD_LOOP_NORMAL);
+	}
+	else {
+		group->setMode(FMOD_LOOP_OFF);
+	} 
 }
 
 void Audio::Manager::NEAudioStopGroup(NE_AUDIO_GROUP group)

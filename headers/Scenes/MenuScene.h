@@ -18,7 +18,7 @@ namespace Menu {
 	class Scene : public Scenes::IScene {
 	private:
 		//Create scene specific variables here
-		
+		Entity::Type crash_entity;
 
 	public:
 

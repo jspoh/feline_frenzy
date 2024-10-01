@@ -14,7 +14,31 @@
 bool DEBUG = true;
 NullStream nullstream;
 
-int main() {
+static void createConsole() {
+	// Create a new console window
+	AllocConsole();  
+
+	FILE* fp;
+
+	// Redirect cin and cout to the new console
+	// Redirect stdout
+	freopen_s(&fp, "CONOUT$", "w", stdout);  
+	// Redirect stderr
+	freopen_s(&fp, "CONOUT$", "w", stderr);  
+	// Redirect stdin
+	freopen_s(&fp, "CONIN$", "r", stdin);    
+}
+
+int WINAPI WinMain(
+	[[maybe_unused]] _In_ HINSTANCE hInstance,
+	[[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,
+	[[maybe_unused]] _In_ LPSTR lpCmdLine,
+	[[maybe_unused]] _In_ int nCmdShow
+)
+{
+
+	// Function call to create console, comment out if needed
+	createConsole();
 
 	//// Enable run-time memory check for debug builds.
 	#if defined(DEBUG) | defined(_DEBUG)
@@ -27,17 +51,6 @@ int main() {
 	//Register scenes manager
 	NIKEEngine.registerSystem<Scenes::Manager>(Scenes::Manager::getInstance());
 	NIKEEngine.accessEvents()->addEventListeners<Scenes::ChangeSceneEvent>(NIKEEngine.accessSystem<Scenes::Manager>());
-
-	// Transform
-	//NIKEEngine.registerComponent<Transform::Transform>();
-	//NIKEEngine.registerComponent<Transform::Velocity>();
-	//NIKEEngine.registerComponent<Move::Move>();
-
-	// Add Input System
-	//NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
-
-	// Add Physics System
-	//NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
 
 	//Engine Game Loop
 	NIKEEngine.run();
