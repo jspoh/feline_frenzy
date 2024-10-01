@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   mAssetsManager.cpp
+ * \file   mAssets.cpp
  * \brief  Assets manager function definitions
  *
  * \author Bryan Lim
@@ -124,7 +124,7 @@ void Assets::Manager::registerMusicAudio(std::string const& file_path, std::stri
 	audio_list[audio_tag] = NIKEEngine.accessSystem<Audio::Manager>()->NEAudioLoadMusic(file_path);
 }
 
-std::shared_ptr<FMOD::Sound> Assets::Manager::getAudio(std::string audio_tag)
+std::shared_ptr<FMOD::Sound> Assets::Manager::getAudio(std::string const& audio_tag)
 {
 	// Check if the audio already exists in the map
 	if (audio_list.find(audio_tag) == audio_list.end())

@@ -17,6 +17,7 @@
 #include "../headers/Managers/mWindows.h"
 #include "../headers/Managers/mEvents.h"
 #include "../headers/Managers/mAssets.h"
+#include "../headers/Managers/mDebug.h"
 
 namespace Core {
 
@@ -42,6 +43,7 @@ namespace Core {
 		std::unique_ptr<Windows::Manager> windows_manager;
 		std::unique_ptr<Events::Manager> events_manager;
 		std::unique_ptr<Assets::Manager> assets_manager;
+		std::unique_ptr<Debug::Manager> debug_manager;
 
 	public:
 
@@ -157,6 +159,7 @@ namespace Core {
 		* Assets Methods
 		*********************************************************************/
 		std::unique_ptr<Assets::Manager>& accessAssets();
+		std::unique_ptr<Debug::Manager>& accessDebug();
 	};
 
 	//Predefined name for core engine

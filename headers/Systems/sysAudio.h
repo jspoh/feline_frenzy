@@ -64,9 +64,6 @@ namespace Audio {
 		// Create audio group
 		NE_AUDIO_GROUP CreateAudioGroup(std::string const& audio_group_tag);
 
-		// Gettors for audio group and audio
-		NE_AUDIO_GROUP GetAudioGroup(std::string const& tag);
-
 		// Play music
 		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool loop);
 
@@ -99,8 +96,6 @@ namespace Audio {
 		Manager(Manager const& rhs) = delete;
 		void operator=(Manager const& copy) = delete;
 		
-		// Audio Components (here for the time being)
-		// std::unique_ptr<Audio::AudioComponents> audio_components = std::make_unique<Audio::AudioComponents>();
 		// Fmod stuff
 		FMOD::System* fmod_system = nullptr;
 	};

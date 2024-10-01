@@ -54,14 +54,33 @@ void GameLogic::Manager::update() {
 			}
 		}
 
-		//Escape program
+		
+		/***********************************************
+		* Check your keypresses here!!!
+		************************************************/
 		if (NIKEEngine.checkEntityComponent<Input::Key>(entity)) {
 			auto& e_key = NIKEEngine.getEntityComponent<Input::Key>(entity);
 			//Check if escape key is pressed
+			//Escape program
 			if (e_key.b_output && (e_key.key_type == GLFW_KEY_ESCAPE)) {
 				NIKEEngine.accessWindow()->terminate();
 			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_C))
+			{
+				try
+				{
+					throw std::runtime_error("crash");
+				}
+				catch (const std::exception&)
+				{
+					NIKEEngine.accessDebug()->logCrash();
+					NIKEEngine.accessWindow()->terminate();
+				}
+			}
 		}
+
+
 	}
 }
 

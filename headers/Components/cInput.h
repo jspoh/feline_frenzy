@@ -26,16 +26,16 @@ namespace Input {
 
 	struct Mouse {
 		//Input trigger mode
-		TriggerMode mode;
+		TriggerMode mode{};
 
 		//Pos of button
 		Vector2 button_pos;
 
 		//Button type triggered
-		int button_type;
+		int button_type{};
 
 		//Output result
-		bool b_output;
+		bool b_output = false;
 
 		//most mousewheels will only scroll on y axis
 		Vector2 scroll;

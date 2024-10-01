@@ -12,7 +12,6 @@
 #include "../headers/Systems/sysPhysics.h"
 #include "../headers/Managers/mSerialization.h"
 #include "../headers/Systems/sysGameLogic.h"
-
 //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
@@ -100,6 +99,7 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
+
 }
 
 void Menu::Scene::exit() {
