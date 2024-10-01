@@ -1,0 +1,34 @@
+/*****************************************************************//**
+ * \file   mSerialization.h
+ * \brief  Serialization manager
+ *
+ * \author b.soh
+ * \date   September 2024
+ *********************************************************************/
+
+#pragma once
+
+#ifndef M_SERIALIZATION_HPP
+#define M_SERIALIZATION_HPP
+
+#include "../Core/Engine.h"
+
+
+namespace Serialization {
+	class Manager {
+	private:
+		//Delete Copy Constructor & Copy Assignment
+		Manager(Manager const& copy) = delete;
+		void operator=(Manager const& copy) = delete;
+
+	public:
+		//Default Constructor
+		Manager() = default;
+
+		// Load Scene from File
+		void loadSceneFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities);
+
+	};
+}
+
+#endif // !M_SERIALIZATION_HPP

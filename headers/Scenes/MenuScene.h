@@ -30,7 +30,6 @@ namespace Menu {
 		void init() override;
 		void exit() override;
 		void unload() override;
-
 		void loadFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities);
 
 		//Default destructor
