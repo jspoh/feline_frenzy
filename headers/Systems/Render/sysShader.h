@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   ShaderManager.h
+ * \file   sysShader.h
  * \brief
  *
  * \author g.boonxuensean@digipen.edu

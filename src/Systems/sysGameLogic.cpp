@@ -27,7 +27,7 @@ void GameLogic::Manager::update() {
 		if (NIKEEngine.checkEntityComponent<GameLogic::ObjectSpawner>(entity)) {
 			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
 
-			if (e_mouse.b_output && (e_mouse.button_type == GLFW_MOUSE_BUTTON_RIGHT)) {
+			if (e_mouse.b_output && (e_mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
 				auto camera_system = NIKEEngine.accessSystem<Render::Manager>()->getCamEntity();
 				float ndcX = (2.0f * e_mouse.button_pos.x) / NIKEEngine.accessWindow()->getWindowSize().x - 1.0f;
 				float ndcY = 1.0f - (2.0f * e_mouse.button_pos.y) / NIKEEngine.accessWindow()->getWindowSize().y;

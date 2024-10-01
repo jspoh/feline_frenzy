@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   Camera.h
+ * \file   sysCamera.h
  * \brief  
  *
  * \author g.boonxuensean@digipen.edu
@@ -28,6 +28,8 @@ namespace Camera {
 		//Get matrix
 		const Matrix33::Matrix_33& getWorldToNDCXform() const;
 
+		// Get Pos to World coordinates
+		const Vector3& getPosToWorld(const Vector2& pos) const;
 		//Get cam pos
 		const Vector2& getCamPos() const;
 

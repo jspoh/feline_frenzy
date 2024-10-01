@@ -1,8 +1,9 @@
 /*****************************************************************//**
- * \file   RenderManager.h
+ * \file   sysRender.h
  * \brief
  *
  * \author jings
+ * \co-author g.boonxuensean
  * \date   September 2024
  *********************************************************************/
 
@@ -55,6 +56,19 @@ namespace Render {
 		//Load mesh from txt file
 		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
 
+		/**
+		 * all .tex files should be 256x256 in RGBA8 format.
+		 *
+		 * \param path_to_texture
+		 * \param [out] width
+		 * \param [out] height
+		 * \param [out] tex_size
+		 * @param [out] is_tex_ext
+		 *
+		 * @returns dynamically allocated char*
+		 */
+		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_ext);
+
 		//Transform matrix
 		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
 
@@ -64,18 +78,11 @@ namespace Render {
 		//Render debugging wireframe
 		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
 
-		/**
-		 * all .tex files should be 256x256 in RGBA8 format.
-		 * 
-		 * \param path_to_texture
-		 * \param [out] width
-		 * \param [out] height
-		 * \param [out] tex_size
-		 * @param [out] is_tex_ext
-		 * 
-		 * @returns dynamically allocated char*
-		 */
-		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_ext);
+		//Helper function to encapsulate rendering
+		void transformAndRenderEntity(Transform::Transform& e_transform,
+			Render::Mesh& e_mesh,
+			const Render::Color& e_color, bool debugMode);
+
 
 	public:
 		//Constructor

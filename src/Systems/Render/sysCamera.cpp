@@ -1,6 +1,6 @@
 /*****************************************************************//**
- * \file   Camera.cpp
- * \brief  Implementation 
+ * \file   sysCamera.cpp
+ * \brief  Implementation of camera system
  *
  * \author g.boonxuensean@digipen.edu
  * \date   September 2024
@@ -91,6 +91,21 @@ const Matrix33::Matrix_33& Camera::System::getWorldToNDCXform() const
 { 
 	return world_to_ndc_xform; 
 };
+
+const Vector3& Camera::System::getPosToWorld(const Vector2& pos) const
+{
+	float ndcX = (2.0f * pos.x) / NIKEEngine.accessWindow()->getWindowSize().x - 1.0f;
+	float ndcY = 1.0f - (2.0f * pos.y) / NIKEEngine.accessWindow()->getWindowSize().y;
+
+	Matrix33::Matrix_33 ndc_to_world_xform;
+	Matrix33::Matrix_33Inverse(ndc_to_world_xform, world_to_ndc_xform);
+
+	Vector3 ndc_coords = { ndcX, ndcY, 1.0f }; // NDC in homogeneous coordinates
+	Vector3 world_coords = ndc_coords * ndc_to_world_xform;
+
+	return world_coords;
+};
+
 
 const Vector2& Camera::System::getCamPos() const {
 	return cam_pos;
