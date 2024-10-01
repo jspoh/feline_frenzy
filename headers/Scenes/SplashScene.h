@@ -22,6 +22,9 @@ namespace Splash {
 		// BGM goes here
 		Entity::Type bg_music;
 
+		//New scene entity
+		Entity::Type next_scene;
+
 	public:
 
 		//Dfeault constructor

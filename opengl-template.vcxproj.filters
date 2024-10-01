@@ -64,6 +64,7 @@
     <ClInclude Include="headers\Managers\mWindows.h" />
     <ClInclude Include="headers\Managers\mSerialization.h" />
     <ClInclude Include="headers\Systems\sysGameLogic.h" />
+    <ClInclude Include="headers\Components\cScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

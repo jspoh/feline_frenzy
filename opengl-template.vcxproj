@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cInput.h" />
+    <ClInclude Include="headers\Components\cScene.h" />
     <ClInclude Include="headers\Managers\mAssets.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />

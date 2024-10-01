@@ -11,7 +11,7 @@
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Core/Engine.h"
 #include "../headers/Components/cInput.h"
-#include "../headers/Systems/sysScene.h"
+#include "../headers/Components/cScene.h"
 #include "../headers/Managers/mEvents.h"
 
 void GameLogic::Manager::init() {
@@ -46,7 +46,7 @@ void GameLogic::Manager::update() {
 		}
 
 		//Changing scene to menu
-		if (NIKEEngine.checkEntityComponent<Input::Mouse>(entity)) {
+		if (NIKEEngine.checkEntityComponent<Scenes::ChangeSceneEvent>(entity)) {
 			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
 			if (e_mouse.b_output && (e_mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
 				auto menu_event = std::make_shared<Scenes::ChangeSceneEvent>(Scenes::Actions::CHANGE, "MENU");
