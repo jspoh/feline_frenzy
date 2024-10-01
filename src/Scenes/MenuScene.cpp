@@ -11,6 +11,7 @@
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Systems/sysPhysics.h"
 #include "../headers/Managers/mSerialization.h"
+#include "../headers/Systems/sysGameLogic.h"
 
 //!TODO Clean up scene parser
 
@@ -25,12 +26,12 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Render::Cam>();
 
 	//Add Singleton System
-	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
+	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
 
 	// Set components link
-	// NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 	NIKEEngine.accessSystem<Physics::Manager>()->setComponentsLinked(false);
+	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
@@ -90,15 +91,15 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
 
+	//Create object spawner
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Input::Mouse>(entities.at(6), { Input::TriggerMode::TRIGGERED });
+	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(entities.at(6), {});
+
+	//Create camera
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
-
-	//entities.push_back(NIKEEngine.createEntity());
-	//NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(2), { "base", "circle", Matrix33::Matrix_33() });
-	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(2), { {322.0f, 122.0f}, {100.f, 100.f}, 0.0f });
-	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(2), { {1.0f, 0.0f, 1.0f}, 1.0f });
-
 }
 
 void Menu::Scene::exit() {

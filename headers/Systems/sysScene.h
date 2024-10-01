@@ -11,8 +11,8 @@
 #ifndef M_STATE_HPP
 #define M_STATE_HPP
 
-#include "../headers/Managers/mEvents.h"
 #include "../headers/Managers/mSystem.h"
+#include "../headers/Components/cScene.h"
 
 namespace Scenes {
 
@@ -30,29 +30,6 @@ namespace Scenes {
 
 		//Default virtual destructor
 		virtual ~IScene() = default;
-	};
-
-	//Scene manager actions
-	enum class Actions {
-		IDLE = 0,
-		CHANGE,
-		RESTART,
-		PREVIOUS
-	};
-
-	//Change Scene Event
-	class ChangeSceneEvent : public Events::IEvent {
-	public:
-		Actions scene_action;
-		std::string next_scene_id;
-
-		//Default constructor
-		ChangeSceneEvent() : scene_action { Actions::IDLE }, next_scene_id{""} {}
-
-		//Constructor
-		ChangeSceneEvent(Actions action, std::string next_scene)
-			: scene_action{ action }, next_scene_id{ next_scene }
-		{}
 	};
 
 	//Scenes manager
