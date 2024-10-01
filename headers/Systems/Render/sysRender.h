@@ -34,12 +34,6 @@ namespace Render {
 		//Camera System
 		std::unique_ptr<Camera::System> camera_system; // smart ptr to camera
 
-		//Map to models for drawing
-		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models;
-
-		// Map to textures for drawing
-		std::unordered_map<std::string, unsigned int> textures;
-
 		/**
 		 * creates a vertex array object for base opengl shaders.
 		 * 
@@ -65,13 +59,10 @@ namespace Render {
 		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
 
 		//Render object
-		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color);
+		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color = {{0.0f, 0.0f, 0.0f}, 1.0f});
 
 		//Render debugging wireframe
 		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
-
-		//Render object with texture
-		void renderObject(const Render::Mesh& e_mesh);
 
 		/**
 		 * all .tex files should be 256x256 in RGBA8 format.
@@ -91,7 +82,7 @@ namespace Render {
 		Manager() = default;
 
 		//Destructor
-		~Manager();
+		~Manager() = default;
 
 		//Singleton Of Manager Class
 		static std::shared_ptr<Manager> getInstance() {
@@ -125,7 +116,7 @@ namespace Render {
 		 * \param path_to_mesh
 		 * \return success
 		 */
-		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
+		std::shared_ptr<Render::Model> registerModel(const std::string& path_to_mesh);
 
 		/**
 		 * registers textures.
@@ -136,7 +127,10 @@ namespace Render {
 		 * \param texture_ref
 		 * \param path_to_texture
 		 */
-		void registerTexture(const std::string& texture_ref, const std::string& path_to_texture);
+		unsigned int registerTexture(const std::string& path_to_texture);
+
+		//Register shader
+		unsigned int registerShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 
 		//Track camera entity
 		void trackCamEntity(std::string const& cam_identifier);

@@ -8,14 +8,10 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Core/Engine.h"
-#include "../headers/Scenes/MenuScene.h"
-#include "../headers/Scenes/SplashScene.h"
-#include "../headers/Systems/sysAudio.h"
-#include "../headers/Systems/sysPhysics.h"
-#include "../headers/Systems/sysInput.h"
+#include "../headers/Systems/sysScene.h"
 
 // debug stuff
-bool DEBUG = false;
+bool DEBUG = true;
 NullStream nullstream;
 
 int main() {
@@ -28,9 +24,9 @@ int main() {
 	//Initialize Engine With Config File
 	NIKEEngine.init("src/Core/Config.txt", 60);
 
-	//Register scene ( First scene registered will be default starting scene )
-	NIKEEngine.registerScenes<Splash::Scene>("SPLASH");
-	NIKEEngine.registerScenes<Menu::Scene>("MENU");
+	//Register scenes manager
+	NIKEEngine.registerSystem<Scenes::Manager>(Scenes::Manager::getInstance());
+	NIKEEngine.accessEvents()->addEventListeners<Scenes::ChangeSceneEvent>(NIKEEngine.accessSystem<Scenes::Manager>());
 
 	// Transform
 	//NIKEEngine.registerComponent<Transform::Transform>();

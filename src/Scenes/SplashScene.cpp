@@ -25,33 +25,34 @@ void Splash::Scene::init() {
 	//Register input component
 	NIKEEngine.registerComponent<Input::Key>();
 	NIKEEngine.registerComponent<Input::Mouse>();
-	// NIKEEngine.registerComponent<Audio::cAudio>();
+	NIKEEngine.registerComponent<Audio::cAudio>();
 
 	//Add Input Singleton System
 	NIKEEngine.registerSystem<Input::Manager>(Input::Manager::getInstance());
-	// NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());
-
 	NIKEEngine.accessSystem<Input::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Key>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
 
-	// NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
+	//Register audio system
+	NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());
+
+	//Add audio component 
+	NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
 
 	//Create entity with mouse & key component for testing
 	input = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Key>(input, { Input::TriggerMode::TRIGGERED });
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(input, { Input::TriggerMode::TRIGGERED });
 
-	//// Load music files with asset manager
-	//ASSET_MANAGER.LoadMusic("assets/Audio/test_music.wav", "test_music");
-	//ASSET_MANAGER.CreateAudioGroup("test_group");
+	// Load music files with asset manager
+	NIKEEngine.accessAssets()->registerMusicAudio("assets/Audio/test_music.wav", "test_music");
+	NIKEEngine.accessAssets()->createAudioGroup("test_group");
 
-	////// Create entity to test for audio
-	//bg_music = NIKEEngine.createEntity();
-	//NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, false));
-
+	//// Create entity to test for audio
+	bg_music = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Audio::cAudio>(bg_music, Audio::cAudio(NIKEEngine.accessAssets()->getAudio("test_music"), NIKEEngine.accessAssets()->getAudioGroup("test_group"), 1.f, 1.f, false));
 }
 
 void Splash::Scene::exit() {

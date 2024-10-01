@@ -21,8 +21,9 @@
   <ItemGroup>
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Managers\mAssetManager.cpp" />
+    <ClCompile Include="src\Managers\mAssets.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
+    <ClCompile Include="src\Managers\mWindows.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Managers\mCollision.cpp" />
     <ClCompile Include="src\Systems\sysPhysics.cpp" />
@@ -37,7 +38,7 @@
     <ClCompile Include="src\Managers\mSystem.cpp" />
     <ClCompile Include="src\Scenes\SplashScene.cpp" />
     <ClCompile Include="src\Systems\sysInput.cpp" />
-    <ClCompile Include="src\Managers\mScene.cpp" />
+    <ClCompile Include="src\Systems\sysScene.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
@@ -50,8 +51,9 @@
   <ItemGroup>
     <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Components\cInput.h" />
-    <ClInclude Include="headers\Managers\mAssetManager.h" />
+    <ClInclude Include="headers\Managers\mAssets.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
+    <ClInclude Include="headers\Managers\mWindows.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />
@@ -75,7 +77,7 @@
     <ClInclude Include="headers\Data\json.hpp" />
     <ClInclude Include="headers\Scenes\MenuScene.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
-    <ClInclude Include="headers\Managers\mScene.h" />
+    <ClInclude Include="headers\Systems\sysScene.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />

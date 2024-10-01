@@ -32,8 +32,6 @@ void Menu::Scene::load() {
 	// NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 	NIKEEngine.accessSystem<Physics::Manager>()->setComponentsLinked(false);
 
-	
-
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Mesh>());
@@ -47,16 +45,20 @@ void Menu::Scene::load() {
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
 
-	//Load models
-	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square", "assets/meshes/square.txt");
-	NIKEEngine.accessSystem<Render::Manager>()->registerModel("triangle", "assets/meshes/triangle.txt");
-	NIKEEngine.accessSystem<Render::Manager>()->registerModel("circle", "assets/meshes/circle.txt");
-	NIKEEngine.accessSystem<Render::Manager>()->registerModel("square-texture", "assets/meshes/square-texture.txt");
+	//Register Shaders
+	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
+	NIKEEngine.accessAssets()->registerShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
 
-	// load textures
-	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
-	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("water", "assets/textures/water-rgba-256.tex");
-	NIKEEngine.accessSystem<Render::Manager>()->registerTexture("tree", "assets/textures/tree.jpg");
+	//Register models
+	NIKEEngine.accessAssets()->registerModel("square", "assets/meshes/square.txt");
+	NIKEEngine.accessAssets()->registerModel("triangle", "assets/meshes/triangle.txt");
+	NIKEEngine.accessAssets()->registerModel("circle", "assets/meshes/circle.txt");
+	NIKEEngine.accessAssets()->registerModel("square-texture", "assets/meshes/square-texture.txt");
+
+	//Register textures
+	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
+	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
+	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
 }
 
 void Menu::Scene::init() {
@@ -87,10 +89,6 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {-200.0f, -200.0f}, {200.f, 200.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
-
-	//entities.push_back(NIKEEngine.createEntity());
-	//NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), Transform::Transform());
-	//NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), Render::Color());
 
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });

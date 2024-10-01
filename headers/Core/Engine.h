@@ -14,10 +14,10 @@
 #include "../headers/Managers/mEntity.h"
 #include "../headers/Managers/mComponent.h"
 #include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/mWindows.h"
 #include "../headers/Managers/mEvents.h"
-#include "../headers/Managers/mScene.h"
-#include "../headers/Managers/mAssetManager.h"
 #include "../headers/Managers/mCollision.h"
+#include "../headers/Managers/mAssets.h"
 
 namespace Core {
 
@@ -25,7 +25,7 @@ namespace Core {
 	private:
 
 		//Default Constructor For Engine
-		Engine();
+		Engine() = default;
 
 		//Delete Copy Constructor & Copy Assignment
 		Engine(Engine const& copy) = delete;
@@ -33,45 +33,16 @@ namespace Core {
 
 		//Destructor
 		~Engine();
-		
-		//Engine Variables
-		GLFWwindow* ptr_window;
-		Vector2 window_size;
-		std::string window_title;
 
-		//Delta time variables
-		float delta_time;
-		double curr_time;
-
-		//FPS Variables
-		int target_fps;
-		float actual_fps;
-
-		//Managers
+		//Coordinated Managers
 		std::unique_ptr<Entity::Manager> entity_manager;
 		std::unique_ptr<Component::Manager> component_manager;
 		std::unique_ptr<System::Manager> system_manager;
+
+		//Standalone Managers
+		std::unique_ptr<Windows::Manager> windows_manager;
 		std::unique_ptr<Events::Manager> events_manager;
-		std::unique_ptr<Asset::Manager> asset_manager;
-		std::unique_ptr<Collision::Manager> collision_manager;
-
-		//Scenes manager
-		std::shared_ptr<Scenes::Manager> scenes_manager;
-
-		/**
-		 * Read & Deserialize Data From Config File
-		 * Basic Data: Window Dimensions & Title
-		 */
-		void readConfigFile(std::string const& file_path);
-
-		//Configure systems ( GLFW & GLEW )
-		void configSystem();
-
-		//Calculate Delta Time
-		void calculateDeltaTime();
-
-		//FPS control
-		void controlFPS();
+		std::unique_ptr<Assets::Manager> assets_manager;
 
 	public:
 
@@ -85,41 +56,11 @@ namespace Core {
 			return instance;
 		}
 
-
-		// To get asset manager
-		Asset::Manager& getAssetManager() {
-			return *asset_manager;
-		}
-
 		//Init Window with config file
 		void init(std::string const& file_path, int fps = 60);
 
 		//Run Game Loop
 		void run();
-
-		//Terminate Game Loop
-		void terminate();
-
-		//Get Window
-		GLFWwindow* getWindow() const;
-
-		//Set Window Title
-		void setWinTitle(std::string const& title);
-
-		//Set Window Size
-		void setWindowSize(float width, float height);
-
-		//Get Window Size
-		Vector2 const& getWindowSize() const;
-
-		//Set Target FPS
-		void setTargetFPS(int fps);
-
-		//Get Current FPS
-		float getCurrentFPS() const;
-
-		//Get Delta Time
-		float getDeltaTime() const;
 
 		/*****************************************************************//**
 		* Entity Methods
@@ -209,36 +150,23 @@ namespace Core {
 		}
 
 		/*****************************************************************//**
-		* Scene Methods
+		* Access Window Functions
 		*********************************************************************/
-		//Register scenes
-		template<typename T>
-		void registerScenes(std::string const& scene_id) {
-			scenes_manager->registerScenes<T>(scene_id);
-		}
+		std::unique_ptr<Windows::Manager>& accessWindow();
 
 		/*****************************************************************//**
-		* Events Methods
+		* Access Events
 		*********************************************************************/
+		std::unique_ptr<Events::Manager>& accessEvents();
 
-		//Add event listener
-		template<typename T>
-		void addEventListeners(std::shared_ptr<Events::IEventListener> listener) {
-			events_manager->addEventListeners<T>(listener);
-		}
-
-		//Dispatch event
-		template<typename T>
-		void dispatchEvent(std::shared_ptr<T> event) {
-			events_manager->dispatchEvent<T>(event);
-		}
+		/*****************************************************************//**
+		* Assets Methods
+		*********************************************************************/
+		std::unique_ptr<Assets::Manager>& accessAssets();
 	};
 
 	//Predefined name for core engine
 	#define NIKEEngine Core::Engine::getInstance()
-
-	// Predefined name for asset manager
-	#define ASSET_MANAGER NIKEEngine.getAssetManager()
 }
 
 #endif // !ENGINE_HPP

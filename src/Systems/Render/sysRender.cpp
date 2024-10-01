@@ -7,27 +7,13 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Math/Mtx33.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
-
-Render::Manager::~Manager() {
-
-	//Clear models
-	for (auto& model : models) {
-		glDeleteVertexArrays(1, &model.second->vaoid);
-		glDeleteBuffers(1, &model.second->vboid);
-		glDeleteBuffers(1, &model.second->eboid);
-	}
-
-	// clear textures
-	for (std::pair<std::string, unsigned int> texture : textures) {
-		glDeleteTextures(1, &texture.second);
-	}
-}
 
 void Render::Manager::createBaseBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Model> model) {
 	// VBO (Vertex Buffer Object)
@@ -186,61 +172,42 @@ void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh&
 	Matrix_33Transpose(mesh.x_form, result);
 }
 
-void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color) {
-	//Set Polygon Mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	//Use shader
-	shader_system->useShader(e_mesh.shader_ref);
-
-	//Shader set uniform
-	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
-
-	//Find model
-	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
-	auto& model = models.at(e_mesh.model_ref);
-
-	//Draw model
-	glBindVertexArray(model->vaoid);
-	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-	glBindVertexArray(0);
-
-	//Unuse shader
-	shader_system->unuseShader();
-}
-
-void Render::Manager::renderObject(const Render::Mesh& e_mesh) {
-	constexpr const char* texture_shader = "tex";
-	constexpr const char* texture_uniform = "u_tex2d";
-	constexpr const char* transform_uniform = "u_transform";
-	constexpr int texture_unit = 6;
-
-	const Render::Model& model = *models.at(e_mesh.model_ref);
-
+void Render::Manager::renderObject(const Render::Mesh& e_mesh, Render::Color const& e_color) {
+	//Set polygon mode
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	// use shader
-	shader_system->useShader(texture_shader);
+	shader_system->useShader(e_mesh.shader_ref);
+	
+	//Texture of shape
+	if (e_mesh.texture_ref == "") {
+		//Shader set uniform
+		shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+		shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
+	} else {
+		constexpr int texture_unit = 6;
 
-	// set texture
-	glBindTextureUnit(
-		texture_unit, // texture unit (binding index)
-		textures.at(e_mesh.texture_ref)
-	);
+		// set texture
+		glBindTextureUnit(
+			texture_unit, // texture unit (binding index)
+			NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref)
+		);
 
-	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	Matrix33::Matrix_33 xform = e_mesh.x_form;
-	//Matrix33::Matrix_33Scale(xform, 2.0f, 2.0f);
+		shader_system->setUniform(e_mesh.shader_ref, "u_tex2d", texture_unit);
+		shader_system->setUniform(e_mesh.shader_ref, "u_transform", e_mesh.x_form);
+	}
 
-	shader_system->setUniform(texture_shader, texture_uniform, texture_unit);
-	shader_system->setUniform(texture_shader, transform_uniform, xform);
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel(e_mesh.model_ref);
 
-	glBindVertexArray(model.vaoid);
-	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+	//Draw
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 
+	//Unuse texture
 	glBindVertexArray(0);
 	shader_system->unuseShader();
 }
@@ -250,18 +217,18 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	//Use shader
-	shader_system->useShader(e_mesh.shader_ref);
+	shader_system->useShader("base");
 
 	//Shader set uniform
 	//Scale wire frame
 	Matrix33::Matrix_33 scaled_wire_frame = 1.0f * e_mesh.x_form;
 	Matrix_33Transpose(scaled_wire_frame, scaled_wire_frame);
-	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", scaled_wire_frame);
 
-	//Find model
-	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
-	auto& model = models.at(e_mesh.model_ref);
+	shader_system->setUniform("base", "f_color", e_color.color);
+	shader_system->setUniform("base", "model_to_ndc", scaled_wire_frame);
+
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel(e_mesh.model_ref);
 
 	//Draw model
 	glBindVertexArray(model->vaoid);
@@ -275,11 +242,13 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
-	std::shared_ptr model = std::make_shared<Model>();
+std::shared_ptr<Render::Model> Render::Manager::registerModel(const std::string& path_to_mesh) {
+	std::shared_ptr<Model> model = std::make_shared<Model>();
 	if (loadMesh(path_to_mesh, model)) {
-		models[model_ref] = model;
+		return model;
 	}
+
+	return nullptr;
 }
 
 char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_ext) {
@@ -340,7 +309,7 @@ char* Render::Manager::prepareImageData(const std::string& path_to_texture, int&
 	return data;
 }
 
-void Render::Manager::registerTexture(const std::string& texture_ref, const std::string& path_to_texture) {
+unsigned int Render::Manager::registerTexture(const std::string& path_to_texture) {
 	// find file type
 	std::string junk, filetype;
 	std::stringstream ss{ path_to_texture };
@@ -360,15 +329,20 @@ void Render::Manager::registerTexture(const std::string& texture_ref, const std:
 	// no longer needed
 	delete[] tex_data;
 
-	// register texture
-	textures[texture_ref] = tex_id;
+	cout << "Successfully registered texture from " << path_to_texture << endl;
 
-	cout << "Successfully registered texture " << texture_ref << " from " << path_to_texture << endl;
+	// Return texture
+	return tex_id;
+}
+
+unsigned int Render::Manager::registerShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+	return shader_system->loadShader(shader_ref, vtx_path, frag_path);
 }
 
 void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
 	camera_system->trackCamEntity(cam_identifier);
 }
+
 const Camera::System* Render::Manager::getCamEntity() {
 	return camera_system.get();
 }
@@ -376,10 +350,6 @@ const Camera::System* Render::Manager::getCamEntity() {
 void Render::Manager::init() {
 	//Create shader system
 	shader_system = std::make_unique<Shader::Manager>();
-
-	//Load shaders
-	shader_system->loadShader("base", "shaders/base.vert", "shaders/base.frag");
-	shader_system->loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
 
 	//Create camera system
 	camera_system = std::make_unique<Camera::System>();
@@ -423,15 +393,10 @@ void Render::Manager::update() {
 		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
 
 		//Render object
-		if (e_mesh.texture_ref.empty()) {
-			renderObject(e_mesh, e_color);
-		}
-		else {
-			renderObject(e_mesh);
-		}
+		renderObject(e_mesh, e_color);
 
 		//Render debugging wireframe
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
-		//renderWireFrame(e_mesh, wire_frame_color);
+		renderWireFrame(e_mesh, wire_frame_color);
 	}
 }

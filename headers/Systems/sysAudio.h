@@ -21,8 +21,8 @@
 
 namespace Audio {
 
-	using NE_AUDIO = FMOD::Sound*;
-	using NE_AUDIO_GROUP = FMOD::ChannelGroup*;
+	using NE_AUDIO = std::shared_ptr<FMOD::Sound>;
+	using NE_AUDIO_GROUP = std::shared_ptr<FMOD::ChannelGroup>;
 
 	// Audio group will be tagged with a string tag
 	using AUDIO_GROUP = std::unordered_map<std::string, NE_AUDIO_GROUP>;
@@ -84,7 +84,7 @@ namespace Audio {
 		void NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch);
 
 		// Set volume
-		void NEAudioSetGroupVolume(NE_AUDIO_GROUP group);
+		void NEAudioSetGroupVolume(NE_AUDIO_GROUP group, float vol);
 
 		// Unload audio group
 		void NEAudioUnloadGroup(NE_AUDIO_GROUP group);

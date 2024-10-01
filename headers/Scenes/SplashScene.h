@@ -11,7 +11,7 @@
 #ifndef SPLASH_SCENE_HPP
 #define SPLASH_SCENE_HPP
 
-#include "../headers/Managers/mScene.h"
+#include "../headers/Systems/sysScene.h"
 #include "../headers/Core/Engine.h"
 
 namespace Splash {

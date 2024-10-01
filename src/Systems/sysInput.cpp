@@ -9,15 +9,14 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Components/cTransform.h"
-
-
+#include "../headers/Systems/sysScene.h"
 
 void Input::Manager::setupEventCallbacks() {
-	glfwSetFramebufferSizeCallback(NIKEEngine.getWindow(), fbsize_cb);
-	glfwSetKeyCallback(NIKEEngine.getWindow(), key_cb);
-	glfwSetMouseButtonCallback(NIKEEngine.getWindow(), mousebutton_cb);
-	glfwSetCursorPosCallback(NIKEEngine.getWindow(), mousepos_cb);
-	glfwSetScrollCallback(NIKEEngine.getWindow(), mousescroll_cb);
+	glfwSetFramebufferSizeCallback(NIKEEngine.accessWindow()->getWindow(), fbsize_cb);
+	glfwSetKeyCallback(NIKEEngine.accessWindow()->getWindow(), key_cb);
+	glfwSetMouseButtonCallback(NIKEEngine.accessWindow()->getWindow(), mousebutton_cb);
+	glfwSetCursorPosCallback(NIKEEngine.accessWindow()->getWindow(), mousepos_cb);
+	glfwSetScrollCallback(NIKEEngine.accessWindow()->getWindow(), mousescroll_cb);
 }
 
 void Input::Manager::init() {
@@ -25,7 +24,7 @@ void Input::Manager::init() {
 	setupEventCallbacks();
 
 	//Setup input mode
-	glfwSetInputMode(NIKEEngine.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(NIKEEngine.accessWindow()->getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	mouse.mode = Input::TriggerMode::TRIGGERED;
 }
@@ -154,7 +153,7 @@ void Input::Manager::update() {
 	//Temp changing scene here
 	if (mouse.b_output && (mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
 		auto menu_event = std::make_shared<Scenes::ChangeSceneEvent>(Scenes::Actions::CHANGE, "MENU");
-		NIKEEngine.dispatchEvent(menu_event);
+		NIKEEngine.accessEvents()->dispatchEvent(menu_event);
 	}
 
 	// !TODO make sure cannot use outside of MenuScene
@@ -163,8 +162,8 @@ void Input::Manager::update() {
 		auto camera_system = render_manager->getCamEntity();
 		float mouseX = mouse.button_pos.x;
 		float mouseY = mouse.button_pos.y;
-		float ndcX = (2.0f * mouse.button_pos.x) / NIKEEngine.getWindowSize().x - 1.0f;
-		float ndcY = 1.0f - (2.0f * mouseY) / NIKEEngine.getWindowSize().y;
+		float ndcX = (2.0f * mouse.button_pos.x) / NIKEEngine.accessWindow()->getWindowSize().x - 1.0f;
+		float ndcY = 1.0f - (2.0f * mouseY) / NIKEEngine.accessWindow()->getWindowSize().y;
 
 		Matrix33::Matrix_33 ndc_to_world_xform;
 		Matrix33::Matrix_33Inverse(ndc_to_world_xform, camera_system->getWorldToNDCXform());
@@ -184,10 +183,8 @@ void Input::Manager::update() {
 
 	//Check if escape key is pressed
 	if (key.b_output && (key.key_type == GLFW_KEY_ESCAPE)) {
-		NIKEEngine.terminate();
+		NIKEEngine.accessWindow()->terminate();
 	}
-
-
 }
 
 void Input::Manager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {
