@@ -87,6 +87,9 @@ namespace System {
 	class Manager {
 	private:
 
+		// This to track last call time
+		std::chrono::steady_clock::time_point last_call_time = std::chrono::steady_clock::now();
+
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
