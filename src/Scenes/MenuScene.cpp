@@ -86,14 +86,6 @@ void Menu::Scene::init() {
 
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["duckobj"], Transform::Runtime_Transform());
 
-	// Animation test
-	Entity::Type animated = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Render::Texture>(animated, { "ame" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 4.0f, 1.0f / 5.0f}, {0.0f, 0.0f} });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(animated, { {500.0f, 200.0f}, {500.f, 500.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Animation::cBase>(animated, Animation::cBase("AME-ANIMATOR", 1, 2.0f, true));
-	NIKEEngine.addEntityComponentObj<Animation::cSprite>(animated, Animation::cSprite({ 4.0f, 5.0f }, { 0.0f, 0.0f }, {2.0f, 4.0f}));
-	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(animated, Transform::Runtime_Transform());
-
 	//Create camera
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["obj1"], { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["camera"], { "CAM2", {122.0f, 0.0f}, 1000.0f });
