@@ -2,7 +2,7 @@
  * \file   SplashScene.h
  * \brief
  *
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -11,16 +11,19 @@
 #ifndef SPLASH_SCENE_HPP
 #define SPLASH_SCENE_HPP
 
-#include "../headers/Managers/mScene.h"
+#include "../headers/Systems/sysScene.h"
 #include "../headers/Core/Engine.h"
 
 namespace Splash {
 	class Scene : public Scenes::IScene {
 	private:
 		//Create scene specific variables here
-		Entity::Type mouse_click; 
+		Entity::Type input; 
 		// BGM goes here
 		Entity::Type bg_music;
+
+		//New scene entity
+		Entity::Type next_scene;
 
 	public:
 

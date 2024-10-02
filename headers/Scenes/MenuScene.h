@@ -2,7 +2,7 @@
  * \file   MenuScene.h
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -11,14 +11,14 @@
 #ifndef MENU_SCENE_HPP
 #define MENU_SCENE_HPP
 
-#include "../headers/Managers/mScene.h"
+#include "../headers/Systems/sysScene.h"
 #include "../headers/Core/Engine.h"
 
 namespace Menu {
 	class Scene : public Scenes::IScene {
 	private:
 		//Create scene specific variables here
-		
+		Entity::Type crash_entity;
 
 	public:
 
@@ -30,6 +30,7 @@ namespace Menu {
 		void init() override;
 		void exit() override;
 		void unload() override;
+		void loadFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities);
 
 		//Default destructor
 		~Scene() override = default;

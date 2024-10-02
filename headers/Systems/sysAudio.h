@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   cAudio.h
+ * \file   sysAudio.h
  * \brief  Audio system manager function declarations
  *
  * \author Bryan Lim
@@ -11,7 +11,6 @@
 #ifndef AUDIOSYS_HPP
 #define AUDIOSYS_HPP
 
-#include "../headers/Components/cAudio.h"
 #include "../headers/Managers/mSystem.h"
 
 /************************************
@@ -22,8 +21,8 @@
 
 namespace Audio {
 
-	using NE_AUDIO = FMOD::Sound*;
-	using NE_AUDIO_GROUP = FMOD::ChannelGroup*;
+	using NE_AUDIO = std::shared_ptr<FMOD::Sound>;
+	using NE_AUDIO_GROUP = std::shared_ptr<FMOD::ChannelGroup>;
 
 	// Audio group will be tagged with a string tag
 	using AUDIO_GROUP = std::unordered_map<std::string, NE_AUDIO_GROUP>;
@@ -53,6 +52,11 @@ namespace Audio {
 		// Update Audio system
 		void update() override;
 
+		std::string getSysName() override
+		{
+			return "Audio System";
+		}
+
 		//Default Destructor
 		~Manager() override;
 
@@ -65,11 +69,9 @@ namespace Audio {
 		// Create audio group
 		NE_AUDIO_GROUP CreateAudioGroup(std::string const& audio_group_tag);
 
-		// Gettors for audio group and audio
-		NE_AUDIO_GROUP GetAudioGroup(std::string const& tag);
-
 		// Play music
-		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool loop);
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool 
+		);
 
 		// Stop sound
 		void NEAudioStopGroup(NE_AUDIO_GROUP group);
@@ -84,7 +86,7 @@ namespace Audio {
 		void NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch);
 
 		// Set volume
-		void NEAudioSetGroupVolume(NE_AUDIO_GROUP group);
+		void NEAudioSetGroupVolume(NE_AUDIO_GROUP group, float vol);
 
 		// Unload audio group
 		void NEAudioUnloadGroup(NE_AUDIO_GROUP group);
@@ -100,8 +102,6 @@ namespace Audio {
 		Manager(Manager const& rhs) = delete;
 		void operator=(Manager const& copy) = delete;
 		
-		// Audio Components (here for the time being)
-		// std::unique_ptr<Audio::AudioComponents> audio_components = std::make_unique<Audio::AudioComponents>();
 		// Fmod stuff
 		FMOD::System* fmod_system = nullptr;
 	};

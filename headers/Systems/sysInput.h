@@ -5,40 +5,15 @@
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
-
 #pragma once
 
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
 #include "../headers/Managers/mSystem.h"
+#include "../headers/Components/cInput.h"
 
 namespace Input {
-
-	struct Key {
-
-	};
-
-	struct Mouse {
-		//Pos of button
-		float x;
-		float y;
-
-		//L & R Button pressed
-		bool is_lbutton_pressed;
-		bool is_rbutton_pressed;
-
-		//most mousewheels will only scroll on y axis
-		float scroll_x;
-		float scroll_y;
-	};
-
-	//Input Mode
-	enum class KeyMode {
-		CHECK = GLFW_PRESS,
-		RELEASE = GLFW_RELEASE,
-		TRIGGERED
-	};
 
 	class Manager : public System::ISystem {
 	private:
@@ -60,13 +35,33 @@ namespace Input {
 		static void mousepos_cb(GLFWwindow* window, double xpos, double ypos);
 		static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
 
-		//Input variables
+		//Mouse input
 		Mouse mouse;
+
+		//Boolean for mouse inputs
+		bool b_mouse_triggered;
+		bool b_mouse_released;
+
+		//Input mode checkss
+		bool mouseTriggerCheck();
+		bool mouseReleaseCheck();
+
+		//Key input
+		Key key;
+
+		//Boolean for mouse inputs
+		bool b_key_triggered;
+		bool b_key_released;
+
+		//Input mode checkss
+		bool keyTriggerCheck();
+		bool keyReleaseCheck();
 
 	public:
 
 		//Default Constructor
-		Manager() = default;
+		Manager() : mouse(), b_mouse_triggered{false}, b_mouse_released{false},
+			key(), b_key_triggered{false}, b_key_released{false} {}
 
 		//Singleton Of Manager Class
 		static std::shared_ptr<Manager> getInstance() {
@@ -77,14 +72,22 @@ namespace Input {
 		//Init Inputs
 		void init() override;
 
+		std::string getSysName() override
+		{
+			return "Input System";
+		}
+
 		//Update Inputs
 		void update() override;
 
 		//Default Destructor
 		~Manager() override = default;
 
-		// for event handling usage
-		bool key_is_pressed(int key) const;
+		// Getter for mouse position // MKK added to get mouse publicly
+		Mouse getMouse() const {
+			return mouse;
+		}
+
 	};
 }
 

@@ -2,7 +2,7 @@
  * \file   Vector2.h
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -27,6 +27,9 @@ public:
 	Vector2& operator-=(const Vector2& rhs);
 	Vector2& operator*=(float rhs);
 	Vector2& operator/=(float rhs);
+
+	bool operator==(const Vector2& rhs);
+	bool operator!=(const Vector2& rhs);
 
 	float dot(const Vector2& rhs) const;
 	float lengthSq() const;

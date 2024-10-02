@@ -2,7 +2,7 @@
  * \file   Vector3.h
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -21,6 +21,7 @@ public:
 	Vector3 operator+(const Vector3& rhs) const;
 	Vector3 operator-(const Vector3& rhs) const;
 	Vector3 operator*(float rhs) const;
+	Vector3 operator*(const Matrix33::Matrix_33& mat) const;
 	Vector3 operator/(float rhs) const;
 
 	Vector3& operator+=(const Vector3& rhs);

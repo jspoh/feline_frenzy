@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   ShaderManager.h
+ * \file   sysShader.h
  * \brief
  *
  * \author g.boonxuensean@digipen.edu
@@ -14,8 +14,6 @@
 namespace Shader {
 	class Manager {
 	private:
-		std::unordered_map<std::string, unsigned int> shader_programs;
-
 		/**
 		 * compiles shader and adds to shader_programs.
 		 *
@@ -26,10 +24,10 @@ namespace Shader {
 		unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 
 	public:
-		Manager();
-		~Manager();
+		Manager() = default;
+		~Manager() = default;
 
-		void loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
+		unsigned int loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 		void useShader(const std::string& shader_ref);
 		/**
 		* Unbind the active shader program.
@@ -41,6 +39,9 @@ namespace Shader {
 		void setUniform(const std::string& shader_ref, const std::string& name, float value);
 		void setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value);
 		void setUniform(const std::string& shader_ref, const std::string& name, const Vector3& value);
+
+		//Sprite sheet
+		void setUniform(const std::string& shader_ref, const std::string& name, const Vector2& value);
 	};
 }
 

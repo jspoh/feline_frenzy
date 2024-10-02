@@ -8,8 +8,8 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysAudio.h"
-#include "../headers/Systems/sysInput.h"
 #include "../headers/Core/Engine.h"
+#include "../headers/Components/cAudio.h"
 
 // Create Fmod instance
 Audio::Manager::Manager()
@@ -56,7 +56,7 @@ void Audio::Manager::update()
 			Audio::cAudio& c_audio = NIKEEngine.getEntityComponent<Audio::cAudio>(entity);
 			if (!c_audio.is_played)
 			{
-				NEAudioPlay(ASSET_MANAGER.GetAudio("test_music"), ASSET_MANAGER.GetAudioGroup("test_group"), 1.f, 1.f, 0);
+				NEAudioPlay(c_audio.audio, c_audio.audio_group, c_audio.volume, c_audio.pitch, 0);
 				c_audio.is_played = true;
 			}
 		}
@@ -73,7 +73,7 @@ Audio::Manager::~Manager()
 
 Audio::NE_AUDIO Audio::Manager::NEAudioLoadSound(std::string const& file_path)
 {
-	NE_AUDIO temp = nullptr;
+	FMOD::Sound* temp = nullptr;
 	FMOD_RESULT result;
 	// Create sound to be pushed into container
 	result = fmod_system->createSound(file_path.c_str(), FMOD_DEFAULT, nullptr, &temp);
@@ -87,13 +87,13 @@ Audio::NE_AUDIO Audio::Manager::NEAudioLoadSound(std::string const& file_path)
 		cout << "Audio loaded!" << endl;
 	}
 
-	return temp;
+	return std::shared_ptr<FMOD::Sound>(temp, [](FMOD::Sound*){});
 }
 
 Audio::NE_AUDIO Audio::Manager::NEAudioLoadMusic(std::string const& file_path)
 {
 
-	NE_AUDIO temp;
+	FMOD::Sound* temp = nullptr;
 	FMOD_RESULT result;
 	// Create sound to be pushed into container
 	// !!! FMOD will handle the reading from file using createStream function
@@ -105,14 +105,14 @@ Audio::NE_AUDIO Audio::Manager::NEAudioLoadMusic(std::string const& file_path)
 		throw std::runtime_error("YOUR FILE WRONG BODO");
 	}
 
-	return temp;
+	return std::shared_ptr<FMOD::Sound>(temp, [](FMOD::Sound*) {});
 }
 
 Audio::NE_AUDIO_GROUP Audio::Manager::CreateAudioGroup(std::string const& audio_group_tag)
 {
 
 	NE_AUDIO_RESULT result{};
-	NE_AUDIO_GROUP temp = nullptr;
+	FMOD::ChannelGroup* temp = nullptr;
 	result = fmod_system->createChannelGroup(audio_group_tag.c_str(), &temp);
 	if (result != FMOD_OK)
 	{
@@ -122,57 +122,60 @@ Audio::NE_AUDIO_GROUP Audio::Manager::CreateAudioGroup(std::string const& audio_
 	{
 		cout << "AUDIO GROUP INITIALIZED" << endl;
 	}
-	return temp;
+	return std::shared_ptr<FMOD::ChannelGroup>(temp, [](FMOD::ChannelGroup*){});
 }
 
 void Audio::Manager::NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP group, float vol, float pitch, bool loop)
 {
-	fmod_system->playSound(audio, group, 0, nullptr);	
+	fmod_system->playSound(audio.get(), group.get(), 0, nullptr);
 	cout << "AUDIO PLAY" << endl;
-	// This is same as UNREFERENCED_PARAMETER
-	static_cast<void>(vol);
-	static_cast<void>(pitch);
-	static_cast<void>(loop);
+
+	group->setVolume(vol);
+	group->setPitch(pitch);
+	if (loop)
+	{
+		group->setMode(FMOD_LOOP_NORMAL);
+	}
+	else {
+		group->setMode(FMOD_LOOP_OFF);
+	} 
 }
 
 void Audio::Manager::NEAudioStopGroup(NE_AUDIO_GROUP group)
 {
 	// This is same as UNREFERENCED_PARAMETER
-	static_cast<void>(group);
 	cout << "AUDIO STOPPED" << endl;
 	group->stop();
 }
 
 void Audio::Manager::NEAudioPauseGroup(NE_AUDIO_GROUP group)
 {
-	static_cast<void>(group);
-
+	group->setPaused(true);
 }
 
 void Audio::Manager::NEAudioResumeGroup(NE_AUDIO_GROUP group)
 {
-	static_cast<void>(group);
+	group->setPaused(false);
 }
 
 void Audio::Manager::NEAudioSetGroupPitch(NE_AUDIO_GROUP group, float pitch)
 {
-	static_cast<void>(group);
-	static_cast<void>(pitch);
+	group->setPitch(pitch);
 }
 
-void Audio::Manager::NEAudioSetGroupVolume(NE_AUDIO_GROUP group)
+void Audio::Manager::NEAudioSetGroupVolume(NE_AUDIO_GROUP group, float vol)
 {
-	static_cast<void>(group);
+	group->setVolume(vol);
 }
 
 void Audio::Manager::NEAudioUnloadGroup(NE_AUDIO_GROUP group)
 {
-	static_cast<void>(group);
+	group->release();
 }
 
 void Audio::Manager::NEAudioUnloadAudio(NE_AUDIO audio)
 {
-	static_cast<void>(audio);
+	audio->release();
 }
 
 void Audio::Manager::IsPlaying(NE_AUDIO audio)

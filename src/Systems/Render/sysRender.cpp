@@ -1,33 +1,21 @@
 /*****************************************************************//**
- * \file   RenderManager.cpp
+ * \file   sysRender.cpp
  * \brief
  *
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \co-author g.boonxuensean
  * \date   September 2024
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
+#include "../headers/Core/Engine.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Math/Mtx33.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
-
-Render::Manager::~Manager() {
-
-	//Clear models
-	for (auto& model : models) {
-		glDeleteVertexArrays(1, &model.second->vaoid);
-		glDeleteBuffers(1, &model.second->vboid);
-		glDeleteBuffers(1, &model.second->eboid);
-	}
-
-	// clear textures
-	for (std::pair<std::string, unsigned int> texture : textures) {
-		glDeleteTextures(1, &texture.second);
-	}
-}
 
 void Render::Manager::createBaseBuffers(const std::vector<Vector2>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Model> model) {
 	// VBO (Vertex Buffer Object)
@@ -46,8 +34,6 @@ void Render::Manager::createBaseBuffers(const std::vector<Vector2>& vertices, co
 	glVertexArrayVertexBuffer(model->vaoid, 0, model->vboid, 0, sizeof(Vector2)); // buffer binding point 0
 	glVertexArrayAttribFormat(model->vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
 	glVertexArrayAttribBinding(model->vaoid, 0, 0);
-
-	// REMOVED Vertex Color Array (Using uniform to pass color)
 
 	// Create EBO
 	glCreateBuffers(1, &model->eboid);
@@ -84,6 +70,100 @@ void Render::Manager::createTextureBuffers(const std::vector<Vector2>& vertices,
 	glCreateBuffers(1, &model->eboid);
 	glNamedBufferStorage(model->eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 	glVertexArrayElementBuffer(model->vaoid, model->eboid);
+}
+
+char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
+	// find file type
+	std::string junk, filetype;
+	std::stringstream ss{ path_to_texture };
+	std::getline(ss, junk, '.');
+	std::getline(ss, filetype, '.');
+
+	if (filetype == "tex") {
+		is_tex_or_png_ext = true;
+
+		width = 256;
+		height = 256;
+
+		std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
+		if (!texture_file.is_open()) {
+			cerr << "Failed to open texture file: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to open texture file.");
+		}
+
+		// get tex_size of texture file
+		tex_size = static_cast<int>(texture_file.tellg());
+
+		// return to beginning of file
+		texture_file.seekg(0, std::ios::beg);
+
+		char* tex_data{ new char[tex_size] };
+
+		// read tex data into ptr
+		if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
+			cerr << "Failed to read texture file: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to read texture file.");
+		}
+		texture_file.close();
+
+		return tex_data;
+	}
+
+	// is not .tex file
+	if (filetype == "png") {
+		is_tex_or_png_ext = true;
+	}
+	else {
+		is_tex_or_png_ext = false;
+	}
+
+	int channels;
+	stbi_set_flip_vertically_on_load(true);
+	char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
+	if (img_data == nullptr) {
+		cerr << "Failed to load image data: " << path_to_texture << endl;
+		throw std::runtime_error("Failed to load image data.");
+	}
+
+	tex_size = width * height * channels;
+
+	char* data = new char[tex_size];
+	for (int i{}; i < tex_size; i++) {
+		data[i] = img_data[i];
+	}
+	stbi_image_free(img_data);
+
+	return data;
+}
+
+unsigned int Render::Manager::registerTexture(const std::string& path_to_texture) {
+	// find file type
+	std::string junk, filetype;
+	std::stringstream ss{ path_to_texture };
+	std::getline(ss, junk, '.');
+	std::getline(ss, filetype, '.');
+
+	int tex_width, tex_height, tex_size;
+	bool is_tex_or_png_ext = false;
+	const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
+
+	// create texture
+	unsigned int tex_id;
+	glCreateTextures(GL_TEXTURE_2D, 1, &tex_id);
+	glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
+	glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, (is_tex_or_png_ext ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, tex_data);
+
+	// no longer needed
+	delete[] tex_data;
+
+	cout << "Successfully registered texture from " << path_to_texture << endl;
+
+	// Return texture
+	return tex_id;
+}
+
+unsigned int Render::Manager::registerShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+	return shader_system->loadShader(shader_ref, vtx_path, frag_path);
 }
 
 bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<Model> model) {
@@ -167,104 +247,133 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 	return true;
 }
 
-void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
-	//Transform matrix here
-	Matrix33::Matrix_33 model_mat, result, scale_mat, rot_mat, trans_mat;
-	float orientation = 0.0f;
+std::shared_ptr<Render::Model> Render::Manager::registerModel(const std::string& path_to_mesh) {
+	std::shared_ptr<Model> model = std::make_shared<Model>();
+	if (loadMesh(path_to_mesh, model)) {
+		return model;
+	}
 
+	return nullptr;
+}
+
+void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat) {
+	//Transform matrix here
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
+
+	// Scrap orientation for now
 	// Modulus the object rotation so it doesnt result in a large number overtime
-	orientation = fmod(orientation, 360.f);
-	float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+	// float orientation = fmod(orientation, 360.f);
+	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+	float angleDisp = obj.rotation;
 
 	Matrix_33Rot(rot_mat, angleDisp);
-	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
-	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+	Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
 
 	// OpenGL requires matrix in col maj so transpose
-	Matrix_33Transpose(mesh.x_form, result);
+	Matrix_33Transpose(x_form, result);
 }
 
-void Render::Manager::renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color) {
-	//Set Polygon Mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void Render::Manager::transformMatrixDebug(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat) {
+	//Transform matrix here
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
-	//Use shader
-	shader_system->useShader(e_mesh.shader_ref);
+	Matrix_33Rot(rot_mat, 0);
+	Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+	Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
+	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
 
-	//Shader set uniform
-	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
-
-	//Find model
-	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
-	auto& model = models.at(e_mesh.model_ref);
-
-	//Draw model
-	glBindVertexArray(model->vaoid);
-	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-	glBindVertexArray(0);
-
-	//Unuse shader
-	shader_system->unuseShader();
+	// OpenGL requires matrix in col maj so transpose
+	Matrix_33Transpose(x_form, result);
 }
 
-void Render::Manager::renderObject(const Render::Mesh& e_mesh) {
-	constexpr const char* texture_shader = "tex";
-	constexpr const char* texture_uniform = "u_tex2d";
-	constexpr const char* transform_uniform = "u_transform";
-	constexpr int texture_unit = 6;
-
-	const Render::Model& model = *models.at(e_mesh.model_ref);
-
+void Render::Manager::renderObject(Render::Shape const& e_shape) {
+	//Set polygon mode
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	// use shader
-	shader_system->useShader(texture_shader);
+	shader_system->useShader("base");
+
+	//Shader set uniform
+	shader_system->setUniform("base", "f_color", e_shape.color.color);
+	shader_system->setUniform("base", "f_opacity", e_shape.color.alpha);
+	shader_system->setUniform("base", "model_to_ndc", e_shape.x_form);
+
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel(e_shape.model_ref);
+
+	//Draw
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+	//Unuse texture
+	glBindVertexArray(0);
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderObject(Render::Texture const& e_texture) {
+	//Set polygon mode
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	// use shader
+	shader_system->useShader("tex");
+
+	//Texture unit
+	constexpr int texture_unit = 6;
 
 	// set texture
 	glBindTextureUnit(
 		texture_unit, // texture unit (binding index)
-		textures.at(e_mesh.texture_ref)
+		NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref)
 	);
 
-	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(textures.at(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	Matrix33::Matrix_33 xform = e_mesh.x_form;
-	//Matrix33::Matrix_33Scale(xform, 2.0f, 2.0f);
+	//Caculate UV Offset
+	Vector2 uv_offset{ e_texture.frame_index.x * e_texture.frame_size.x, e_texture.frame_index.y * e_texture.frame_size.y };
 
-	shader_system->setUniform(texture_shader, texture_uniform, texture_unit);
-	shader_system->setUniform(texture_shader, transform_uniform, xform);
+	//Translate UV offset to bottom left
+	uv_offset.y = std::abs(1 - uv_offset.y - e_texture.frame_size.y);
 
-	glBindVertexArray(model.vaoid);
-	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+	//Set uniforms for texture rendering
+	shader_system->setUniform("tex", "u_tex2d", texture_unit);
+	shader_system->setUniform("tex", "u_opacity", e_texture.color.alpha);
+	shader_system->setUniform("tex", "u_transform", e_texture.x_form);
+	shader_system->setUniform("tex", "uvOffset", uv_offset);
+	shader_system->setUniform("tex", "frameSize", e_texture.frame_size);
 
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel("square-texture");
+
+	//Draw
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+	//Unuse texture
 	glBindVertexArray(0);
 	shader_system->unuseShader();
 }
 
-void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+void Render::Manager::renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color) {
 	//Set Polygon Mode
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	//Use shader
-	shader_system->useShader(e_mesh.shader_ref);
+	shader_system->useShader("base");
 
 	//Shader set uniform
-	//Scale wire frame
-	Matrix33::Matrix_33 scaled_wire_frame = 1.0f * e_mesh.x_form;
-	Matrix_33Transpose(scaled_wire_frame, scaled_wire_frame);
-	shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-	shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", scaled_wire_frame);
+	shader_system->setUniform("base", "f_color", e_color.color);
+	shader_system->setUniform("base", "f_opacity", e_color.alpha);
+	shader_system->setUniform("base", "model_to_ndc", x_form);
 
-	//Find model
-	assert(models.find(e_mesh.model_ref) != models.end() && "Model not found.");
-	auto& model = models.at(e_mesh.model_ref);
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel("square");
 
 	//Draw model
 	glBindVertexArray(model->vaoid);
-	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_LINE_LOOP, model->draw_count, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 
 	//Unuse shader
@@ -274,114 +383,61 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void Render::Manager::registerModel(const std::string& model_ref, const std::string& path_to_mesh) {
-	std::shared_ptr model = std::make_shared<Model>();
-	if (loadMesh(path_to_mesh, model)) {
-		models[model_ref] = model;
+void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
+	auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+
+	//Check If Shape
+	if (NIKEEngine.checkEntityComponent<Render::Shape>(entity)) {
+		auto& e_shape = NIKEEngine.getEntityComponent<Render::Shape>(entity);
+
+		// Transform matrix here
+		transformMatrix(e_transform, e_shape.x_form, camera_system->getWorldToNDCXform());
+
+		//Render Shape
+		renderObject(e_shape);
 	}
-}
+	else if (NIKEEngine.checkEntityComponent<Render::Texture>(entity)) {
+		auto& e_texture = NIKEEngine.getEntityComponent<Render::Texture>(entity);
 
-char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_ext) {
-	// find file type
-	std::string junk, filetype;
-	std::stringstream ss{ path_to_texture };
-	std::getline(ss, junk, '.');
-	std::getline(ss, filetype, '.');
+		// Transform matrix here
+		transformMatrix(e_transform, e_texture.x_form, camera_system->getWorldToNDCXform());
 
-	if (filetype == "tex") {
-		is_tex_ext = true;
-
-		width = 256;
-		height = 256;
-
-		std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
-		if (!texture_file.is_open()) {
-			cerr << "Failed to open texture file: " << path_to_texture << endl;
-			throw std::runtime_error("Failed to open texture file.");
-		}
-
-		// get tex_size of texture file
-		tex_size = static_cast<int>(texture_file.tellg());
-
-		// return to beginning of file
-		texture_file.seekg(0, std::ios::beg);
-
-		char* tex_data{ new char[tex_size] };
-
-		// read tex data into ptr
-		if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
-			cerr << "Failed to read texture file: " << path_to_texture << endl;
-			throw std::runtime_error("Failed to read texture file.");
-		}
-		texture_file.close();
-
-		return tex_data;
+		// Render Texture
+		renderObject(e_texture);
 	}
 
-	// is not .tex file
-	is_tex_ext = false;
+	if (debugMode) {
+		Matrix33::Matrix_33 mtx_wireframe;
+		//Calculate wireframe matrix
+		transformMatrixDebug(e_transform, mtx_wireframe, camera_system->getWorldToNDCXform());
 
-	int channels;
-	char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
-	if (img_data == nullptr) {
-		cerr << "Failed to load image data: " << path_to_texture << endl;
-		throw std::runtime_error("Failed to load image data.");
+		// Render debugging wireframe
+		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
+		renderWireFrame(mtx_wireframe, wire_frame_color);
 	}
-
-	tex_size = width * height * channels;
-
-	char* data = new char[tex_size];
-	for (int i{}; i < tex_size; i++) {
-		data[i] = img_data[i];
-	}
-	stbi_image_free(img_data);
-
-	return data;
-}
-
-void Render::Manager::registerTexture(const std::string& texture_ref, const std::string& path_to_texture) {
-	// find file type
-	std::string junk, filetype;
-	std::stringstream ss{ path_to_texture };
-	std::getline(ss, junk, '.');
-	std::getline(ss, filetype, '.');
-
-	int tex_width, tex_height, tex_size;
-	bool is_tex_ext = false;
-	const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_ext);
-
-	// create texture
-	unsigned int tex_id;
-	glCreateTextures(GL_TEXTURE_2D, 1, &tex_id);
-	glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
-	glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, (is_tex_ext ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, tex_data);
-
-	// no longer needed
-	delete[] tex_data;
-
-	// register texture
-	textures[texture_ref] = tex_id;
-
-	cout << "Successfully registered texture " << texture_ref << " from " << path_to_texture << endl;
 }
 
 void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
 	camera_system->trackCamEntity(cam_identifier);
 }
 
+std::unique_ptr<Camera::System>& Render::Manager::getCamEntity() {
+	return camera_system;
+}
+
 void Render::Manager::init() {
 	//Create shader system
 	shader_system = std::make_unique<Shader::Manager>();
-
-	//Load shaders
-	shader_system->loadShader("base", "shaders/base.vert", "shaders/base.frag");
-	shader_system->loadShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
 
 	//Create camera system
 	camera_system = std::make_unique<Camera::System>();
 
 	//Init Camera ( Camera height defaulted at 1000.0f )
 	camera_system->init(1000.0f);
+
+	//GL enable opacity blending option
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Render::Manager::update() {
@@ -403,35 +459,23 @@ void Render::Manager::update() {
 		cam_entities.insert(entity);
 	}
 
-	//Update camera with set of cam entities
+	//Update camera with set of cam entitiess
 	camera_system->updateCameraEntities(std::move(cam_entities));
 
 	//Update camera system
 	camera_system->update();
 
-	//Update all entities
+	//Update all and render except camera entities
 	for (auto& entity : entities) {
-		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
-		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
-		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
+		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
+		transformAndRenderEntity(entity, 1);
+	}
 
-		//Transform matrix here
-		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
-
-		//Render object
-		if (e_mesh.texture_ref.empty()) {
-			renderObject(e_mesh, e_color);
-		}
-		else {
-			renderObject(e_mesh);
+	// Render camera above all components
+	for (auto& entity : entities) {
+		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) {
+			transformAndRenderEntity(entity, 1);
 		}
 
-
-		//Render debugging wireframe
-		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
-		renderWireFrame(e_mesh, wire_frame_color);
-
-		//Unuse shader
-		shader_system->unuseShader();
 	}
 }

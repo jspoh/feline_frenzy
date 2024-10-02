@@ -2,7 +2,7 @@
  * \file   Vector2.cpp
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -47,6 +47,14 @@ Vector2& Vector2::operator/=(float rhs) {
 	x /= rhs;
 	y /= rhs;
 	return *this;
+}
+
+bool Vector2::operator==(const Vector2& rhs) {
+	return (this->x == rhs.x) && (this->y == rhs.y);
+}
+
+bool Vector2::operator!=(const Vector2& rhs) {
+	return (this->x != rhs.x) || (this->y != rhs.y);
 }
 
 float Vector2::dot(const Vector2& rhs) const {

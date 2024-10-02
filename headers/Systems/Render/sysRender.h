@@ -1,8 +1,9 @@
 /*****************************************************************//**
- * \file   RenderManager.h
+ * \file   sysRender.h
  * \brief
  *
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \co-author g.boonxuensean
  * \date   September 2024
  *********************************************************************/
 
@@ -34,12 +35,6 @@ namespace Render {
 		//Camera System
 		std::unique_ptr<Camera::System> camera_system; // smart ptr to camera
 
-		//Map to models for drawing
-		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models;
-
-		// Map to textures for drawing
-		std::unordered_map<std::string, unsigned int> textures;
-
 		/**
 		 * creates a vertex array object for base opengl shaders.
 		 * 
@@ -61,37 +56,42 @@ namespace Render {
 		//Load mesh from txt file
 		bool loadMesh(const std::string& path_to_mesh, std::shared_ptr<Render::Model> model);
 
-		//Transform matrix
-		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
-
-		//Render object
-		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color);
-
-		//Render debugging wireframe
-		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
-
-		//Render object with texture
-		void renderObject(const Render::Mesh& e_mesh);
-
 		/**
 		 * all .tex files should be 256x256 in RGBA8 format.
-		 * 
+		 *
 		 * \param path_to_texture
 		 * \param [out] width
 		 * \param [out] height
 		 * \param [out] tex_size
 		 * @param [out] is_tex_ext
-		 * 
+		 *
 		 * @returns dynamically allocated char*
 		 */
-		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_ext);
+		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
+
+		//Transform matrix
+		void transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
+
+		void transformMatrixDebug(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
+		
+		//Render Shape
+		void renderObject(Render::Shape const& e_shape);
+
+		//Render Texture
+		void renderObject(Render::Texture const& e_texture);
+
+		//Render debugging wireframe
+		void renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color);
+
+		//Helper function to encapsulate rendering
+		void transformAndRenderEntity(Entity::Type entity, bool debugMode);
 
 	public:
 		//Constructor
 		Manager() = default;
 
 		//Destructor
-		~Manager();
+		~Manager() = default;
 
 		//Singleton Of Manager Class
 		static std::shared_ptr<Manager> getInstance() {
@@ -125,7 +125,13 @@ namespace Render {
 		 * \param path_to_mesh
 		 * \return success
 		 */
-		void registerModel(const std::string& model_ref, const std::string& path_to_mesh);
+		std::shared_ptr<Render::Model> registerModel(const std::string& path_to_mesh);
+
+
+		std::string getSysName()
+		{
+			return "Render System";
+		}
 
 		/**
 		 * registers textures.
@@ -136,10 +142,16 @@ namespace Render {
 		 * \param texture_ref
 		 * \param path_to_texture
 		 */
-		void registerTexture(const std::string& texture_ref, const std::string& path_to_texture);
+		unsigned int registerTexture(const std::string& path_to_texture);
+
+		//Register shader
+		unsigned int registerShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 
 		//Track camera entity
 		void trackCamEntity(std::string const& cam_identifier);
+
+		//Get camera entity
+		std::unique_ptr<Camera::System>& getCamEntity();
 
 		/**
 		* update all object's xform

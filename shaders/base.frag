@@ -9,10 +9,11 @@
 // layout (location=0) in vec3 f_color; (uses uniform now)
 
 uniform vec3 f_color;
+uniform float f_opacity;
 
 layout (location=0) out vec4 out_color;
 
 void main() {
-	out_color = vec4(f_color, 1.0);
+	out_color = vec4(f_color, f_opacity);
 }
 

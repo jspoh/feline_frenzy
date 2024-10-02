@@ -2,7 +2,7 @@
  * \file   mScene.h
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -10,6 +10,9 @@
 
 #ifndef M_STATE_HPP
 #define M_STATE_HPP
+
+#include "../headers/Managers/mSystem.h"
+#include "../headers/Components/cScene.h"
 
 namespace Scenes {
 
@@ -29,8 +32,8 @@ namespace Scenes {
 		virtual ~IScene() = default;
 	};
 
-	//State manager
-	class Manager {
+	//Scenes manager
+	class Manager : public System::ISystem, public Events::IEventListener {
 	private:
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
@@ -45,26 +48,8 @@ namespace Scenes {
 		//Prev scene
 		std::shared_ptr<IScene> prev_scene;
 
-	public:
-
-		//Default Constructor
-		Manager() = default;
-
-		//Register scenes
-		template<typename T>
-		void registerScenes(std::string const& scene_id) {
-
-			//New scene
-			std::shared_ptr<T> new_scene{ std::make_shared<T>() };
-
-			//Construct scene obj
-			states.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(new_scene));
-
-			//Default starting state will be the first state registered
-			if (!curr_scene) {
-				initScene(scene_id);
-			}
-		}
+		//Change scene event queue
+		ChangeSceneEvent new_scene;
 
 		//Init starting scene
 		void initScene(std::string const& scene_id);
@@ -77,6 +62,47 @@ namespace Scenes {
 
 		//Go To Previous scene
 		void previousScene();
+
+		//Register scenes
+		template<typename T>
+		void registerScenes(std::string const& scene_id) {
+
+			//New scene
+			std::shared_ptr<T> scene{ std::make_shared<T>() };
+
+			//Construct scene obj
+			states.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
+
+			//Default starting state will be the first state registered
+			if (!curr_scene) {
+				initScene(scene_id);
+			}
+		}
+
+	public:
+
+		//Default Constructor
+		Manager() = default;
+
+		//Singleton Of Manager Class
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			return instance;
+		}
+
+		//Init
+		void init() override;
+
+		std::string getSysName() override
+		{
+			return "Scene System";
+		}
+
+		//Update
+		void update() override;
+
+		//Execute event
+		void executeEvent(std::shared_ptr<Events::IEvent> event) override;
 	};
 }
 

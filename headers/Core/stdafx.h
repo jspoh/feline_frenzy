@@ -45,6 +45,9 @@
 #include <bitset>
 #include <queue>
 #include <set>
+#include <Windows.h>
+#include <ctime>
+#include <iomanip>
 
 // external headers
 #include "../headers/Data/json.hpp"
@@ -54,6 +57,14 @@
 #include "../headers/Math/Vector2.h"
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
+
+// components
+#include "../headers/Components/cRender.h"
+#include "../headers/Components/cTransform.h"
+#include "../headers/Components/cMove.h"
+
+//Utility Systems
+#include "../headers/Utility/uSystems.h"
 
 //Math defines
 #define _USE_MATH_DEFINES
@@ -65,7 +76,7 @@ namespace Entity {
     using Type = uint16_t;
 
     //Max number of entities to be created at a single point
-    const Type MAX = 2500;
+    const Type MAX = 5000;
 }
 
 namespace Component {

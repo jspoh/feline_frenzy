@@ -2,15 +2,14 @@
  * \file   StateManager.cpp
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mScene.h"
-
-// all possible states for initialization (registration)
+#include "../headers/Systems/sysScene.h"
 #include "../headers/Scenes/MenuScene.h"
+#include "../headers/Scenes/SplashScene.h"
 
 void Scenes::Manager::initScene(std::string const& scene_id) {
 	curr_scene = states.at(scene_id);
@@ -70,4 +69,32 @@ void Scenes::Manager::previousScene() {
 		curr_scene->load();
 		curr_scene->init();
 	}
+}
+
+void Scenes::Manager::init() {
+	//Register scene ( First scene registered will be default starting scene )
+	registerScenes<Splash::Scene>("SPLASH");
+	registerScenes<Menu::Scene>("MENU");
+}
+
+void Scenes::Manager::update() {
+	//Switch cases to perform scene management actions
+	switch (new_scene.scene_action) {
+	case Scenes::Actions::CHANGE:
+		changeScene(new_scene.next_scene_id);
+		break;
+	case Scenes::Actions::RESTART:
+		restartScene();
+		break;
+	case Scenes::Actions::PREVIOUS:
+		previousScene();
+		break;
+	default:
+		break;
+	}
+}
+
+void Scenes::Manager::executeEvent(std::shared_ptr<Events::IEvent> event) {
+	
+	new_scene = *std::dynamic_pointer_cast<Scenes::ChangeSceneEvent>(event);
 }
