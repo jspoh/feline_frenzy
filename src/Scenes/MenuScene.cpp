@@ -12,6 +12,7 @@
 #include "../headers/Systems/sysPhysics.h"
 #include "../headers/Managers/mSerialization.h"
 #include "../headers/Systems/sysGameLogic.h"
+#include "../headers/Systems/Animation/sysAnimation.h"
 //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
@@ -24,9 +25,12 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Render::Texture>();
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
+	NIKEEngine.registerComponent<Animation::cBase>();
+	NIKEEngine.registerComponent<Animation::cSprite>();
 
 	//Add Singleton System
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
+	NIKEEngine.registerSystem<Animation::Manager>();
 	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
 
 	// Set components link
@@ -34,10 +38,6 @@ void Menu::Scene::load() {
 	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
 
 	//Add component types to system
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Shape>());
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Texture>());
-
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
 
@@ -45,6 +45,17 @@ void Menu::Scene::load() {
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Shape>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Texture>());
+
+	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Animation::cBase>());
+	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Animation::cSprite>());
+	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Render::Texture>());
+
+	//Add event listener for animation system
+	NIKEEngine.accessEvents()->addEventListeners<Animation::AnimationEvent>(NIKEEngine.accessSystem<Animation::Manager>());
 
 	//Register Shaders
 	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
@@ -94,6 +105,8 @@ void Menu::Scene::init() {
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(6), { "ame" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 4.0f, 1.0f / 5.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(6), { {0.0f, 0.0f}, {500.f, 500.f}, 0.0f });
+	NIKEEngine.addEntityComponentObj<Animation::cBase>(entities.at(6), Animation::cBase("AME-ANIMATOR", 1, 2.0f, true));
+	NIKEEngine.addEntityComponentObj<Animation::cSprite>(entities.at(6), Animation::cSprite({ 4.0f, 5.0f }, { 0.0f, 0.0f }, {2.0f, 4.0f}));
 
 	//Create object spawner
 	entities.push_back(NIKEEngine.createEntity());

@@ -1,0 +1,180 @@
+/*****************************************************************//**
+ * \file   subAnimations.cpp
+ * \brief	Sprite animation
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
+ * \date   October 2024
+ *********************************************************************/
+
+#include "../headers/Core/stdafx.h"
+#include "../headers/Systems/Animation/subAnimations.h"
+
+ /*****************************************************************//**
+ * Base Animation
+ *********************************************************************/
+
+void Animation::Base::animationEndChecker(Animation::cBase& base_components) {
+	//Incr Completed Animations
+	if (++base_components.completed_animations >= base_components.animations_to_complete && base_components.animations_to_complete) {
+		base_components.b_animation_stop = true;
+		base_components.b_animation_finished = true;
+		base_components.animations_to_complete = base_components.completed_animations;
+	}
+}
+
+void Animation::Base::stopAnimation(Animation::cBase& base_components) {
+	base_components.b_animation_stop = true;
+}
+
+void Animation::Base::resumeAnimation(Animation::cBase& base_components) {
+	if (!base_components.b_animation_finished) {
+		base_components.b_animation_stop = false;
+	}
+}
+
+void Animation::Base::restartAnimation(Animation::cBase& base_components) {
+	base_components.b_animation_stop = false;
+	base_components.b_animation_finished = false;
+	base_components.completed_animations = 0;
+
+	base_components.b_reverse = false;
+}
+
+void Animation::Base::finishAnimation(Animation::cBase& base_components) {
+	base_components.b_animation_finished = true;
+	base_components.b_animation_stop = true;
+}
+
+/*****************************************************************//**
+* Spritesheet Animation
+*********************************************************************/
+
+int Animation::SpriteSheet::frameCount(Animation::cSprite const& sprite_component) {
+	int num_sprites = 0;
+	//Calculating Num Of Sprites To Animate
+	for (int i = (int)sprite_component.start_index.y; i < (int)sprite_component.sheet_size.y; i++) {
+		for (int j = (int)sprite_component.start_index.x; j < (int)sprite_component.sheet_size.x; j++) {
+
+			//Inc Num Of Sprites To Animate
+			num_sprites++;
+
+			//Check If End Index Has Been Reached
+			if (i == sprite_component.end_index.y && j == sprite_component.end_index.x) {
+				break;
+			}
+		}
+	}
+
+	return num_sprites;
+}
+
+void Animation::SpriteSheet::iterateForward(Animation::cSprite& sprite_component) {
+	//Iterate Sprites Forward
+	if (sprite_component.curr_index.x < sprite_component.sheet_size.x - 1) {
+		//Increment X
+		sprite_component.curr_index.x++;
+	}
+	else {
+		//Reset X To Left Side Of Sheet
+		sprite_component.curr_index.x = 0;
+
+		//Increment Y Or Reset Y To Top Of Sheet
+		if (sprite_component.curr_index.y < sprite_component.sheet_size.y - 1) {
+			sprite_component.curr_index.y++;
+		}
+		else {
+			sprite_component.curr_index.y = 0;
+		}
+	}
+}
+
+void Animation::SpriteSheet::iterateBackWard(Animation::cSprite& sprite_component) {
+	//Iterate Sprites Backward
+	if (sprite_component.curr_index.x > 0) {
+		//Increment X
+		sprite_component.curr_index.x--;
+	}
+	else {
+		//Reset X To Left Side Of Sheet
+		sprite_component.curr_index.x = sprite_component.sheet_size.x - 1;
+
+		//Increment Y Or Reset Y To Top Of Sheet
+		if (sprite_component.curr_index.y > 0) {
+			sprite_component.curr_index.y--;
+		}
+		else {
+			sprite_component.curr_index.y = sprite_component.sheet_size.y - 1;
+		}
+	}
+}
+
+void Animation::SpriteSheet::animateSprite(Animation::cBase& base_component, Animation::cSprite& sprite_component, Render::Texture& sprite_texture) {
+	//Calculate Time Before Next Animation
+	float timePerAnimation{ base_component.animation_speed / frameCount(sprite_component)};
+
+	//Wait For Next Iteration
+	if (base_component.timer.getElapsedTime() >= timePerAnimation && !base_component.b_animation_stop) {
+
+		//Reset Timer
+		base_component.timer.restartClock();
+
+		//Iterate Curr Sprite
+		if (!base_component.b_reverse) {
+			iterateForward(sprite_component);
+		}
+		else {
+			iterateBackWard(sprite_component);
+		}
+
+		//If End Has Been Reached
+		if (sprite_component.curr_index == sprite_component.end_index) {
+			//Check If Animation Is Finished
+			animationEndChecker(base_component);
+
+			//PingPong Function Checking
+			if (base_component.b_pingpong) {
+
+				//Set Reverse Iterator To True
+				base_component.b_reverse = true;
+			}
+			else {
+				sprite_component.curr_index = sprite_component.start_index;
+			}
+		}
+
+		//If CurrSprite Is At Start
+		if (sprite_component.curr_index == sprite_component.start_index && base_component.b_reverse) {
+			//Check If Animation Is Finished
+			animationEndChecker(base_component);
+
+			//Set Reverse Iterator To False
+			base_component.b_reverse = false;
+		}
+	}
+
+	//Move sprite index back to starting index
+	if (base_component.b_animation_finished) {
+		sprite_component.curr_index = sprite_component.start_index;
+	}
+
+	sprite_texture.frame_index = sprite_component.curr_index;
+}
+
+void Animation::SpriteSheet::executeEvent(Animation::Mode event_mode, Animation::cBase& base_components) {
+	switch (event_mode) {
+	case Animation::Mode::PAUSE:
+		stopAnimation(base_components);
+		break;
+	case Animation::Mode::RESUME:
+		resumeAnimation(base_components);
+		break;
+	case Animation::Mode::RESTART:
+		restartAnimation(base_components);
+		break;
+	case Animation::Mode::END:
+		finishAnimation(base_components);
+		break;
+	default:
+		break;
+	}
+}

@@ -13,6 +13,7 @@
 #include "../headers/Components/cInput.h"
 #include "../headers/Components/cScene.h"
 #include "../headers/Managers/mEvents.h"
+#include "../headers/Components/cAnimation.h"
 
 void GameLogic::Manager::init() {
 
@@ -81,9 +82,31 @@ void GameLogic::Manager::update() {
 			{
 				NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
 			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_K))
+			{
+				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::END, "AME-ANIMATOR");
+				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
+			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_L))
+			{
+				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::RESTART, "AME-ANIMATOR");
+				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
+			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_I))
+			{
+				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::PAUSE, "AME-ANIMATOR");
+				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
+			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_J))
+			{
+				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::RESUME, "AME-ANIMATOR");
+				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
+			}
 		}
-
-
 	}
 }
 

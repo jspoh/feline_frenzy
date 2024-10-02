@@ -28,6 +28,9 @@ public:
 	Vector2& operator*=(float rhs);
 	Vector2& operator/=(float rhs);
 
+	bool operator==(const Vector2& rhs);
+	bool operator!=(const Vector2& rhs);
+
 	float dot(const Vector2& rhs) const;
 	float lengthSq() const;
 	float length() const;

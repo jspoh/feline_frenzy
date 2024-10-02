@@ -25,8 +25,7 @@
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
-    <ClCompile Include="src\Systems\Animation\baseAnimation.cpp" />
-    <ClCompile Include="src\Systems\Animation\spriteAnimation.cpp" />
+    <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Systems\sysCollision.cpp" />
@@ -53,16 +52,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Utility\uSystems.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Components\cScene.h" />
     <ClInclude Include="headers\Managers\mAssets.h" />
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
-    <ClInclude Include="headers\Systems\Animation\baseAnimation.h" />
-    <ClInclude Include="headers\Systems\Animation\spriteAnimation.h" />
+    <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -94,6 +94,7 @@
     <ClInclude Include="headers\Managers\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />
     <ClInclude Include="headers\Math\Vector4.h" />
+    <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\scenes\mainmenu.scn" />
