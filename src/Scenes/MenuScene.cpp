@@ -73,17 +73,16 @@ void Menu::Scene::init() {
 	loadFromFile("assets/scenes/mainmenu.scn", entities);
 
 	NIKEEngine.addEntityComponentObj<Move::Movement>(entities.at(1), {false, false, false, false});
+	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} }); // Need Velocity component for Collider component currently
+	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(1)); // Set collider for "player" entity (test collision)
 
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(2), { {0.0f, 1.0f} });
 
-	//Add velocity to entity 1
-	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
 
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(3), { "duck",Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {400.0f, -200.0f}, {200.f, 200.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities.at(3), Transform::Runtime_Transform());
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(3), { {0.0f, 0.0f} });
 	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(3)); // Set collider for duck entity (test collision)
 	//cout << "Duck bounding box min: " << NIKEEngine.getEntityComponent<Collision::Collider>(entities.at(3)).rect_min.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entities.at(3)).rect_min.y << endl;
@@ -96,7 +95,6 @@ void Menu::Scene::init() {
 	entities.push_back(NIKEEngine.createEntity());
 	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(5), { "tree" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {-200.0f, -200.0f}, {200.f, 200.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(5), { {0.0f, 0.0f} });
 	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(5)); // Set collider for tree entity (test collision)
 
@@ -108,8 +106,7 @@ void Menu::Scene::init() {
 	//Create camera
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });
-	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} }); // Need Velocity component for Collider component currently
-	Physics::Manager::getInstance()->collision_manager.setColliderComp(entities.at(1)); // Set collider for "player" entity (test collision)
+
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
 }
 

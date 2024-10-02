@@ -269,17 +269,17 @@ void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix33:
 	Matrix_33Transpose(x_form, result);
 }
 
-void Render::Manager::transformMatrixDebug(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
+void Render::Manager::transformMatrixDebug(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat) {
 	//Transform matrix here
 	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
 	Matrix_33Rot(rot_mat, 0);
-	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
-	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+	Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
 
 	// OpenGL requires matrix in col maj so transpose
-	Matrix_33Transpose(mesh.x_form, result);
+	Matrix_33Transpose(x_form, result);
 }
 
 void Render::Manager::renderObject(Render::Shape const& e_shape) {
@@ -458,6 +458,15 @@ void Render::Manager::update() {
 
 	//Update all and render except camera entities
 	for (auto& entity : entities) {
+		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
 		transformAndRenderEntity(entity, 1);
+	}
+
+	// Render camera above all components
+	for (auto& entity : entities) {
+		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) {
+			transformAndRenderEntity(entity, 1);
+		}
+
 	}
 }

@@ -72,7 +72,7 @@ namespace Render {
 		//Transform matrix
 		void transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
 
-		void transformMatrixDebug(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
+		void transformMatrixDebug(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
 		
 		//Render Shape
 		void renderObject(Render::Shape const& e_shape);
