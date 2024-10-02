@@ -25,6 +25,9 @@
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
+    <ClCompile Include="src\Systems\Animation\baseAnimation.cpp" />
+    <ClCompile Include="src\Systems\Animation\spriteAnimation.cpp" />
+    <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Systems\sysCollision.cpp" />
     <ClCompile Include="src\Systems\CollisionUtils.cpp" />
@@ -58,6 +61,9 @@
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
+    <ClInclude Include="headers\Systems\Animation\baseAnimation.h" />
+    <ClInclude Include="headers\Systems\Animation\spriteAnimation.h" />
+    <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />

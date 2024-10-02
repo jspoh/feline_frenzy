@@ -67,7 +67,7 @@ namespace Render {
 		 *
 		 * @returns dynamically allocated char*
 		 */
-		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_ext);
+		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
 
 		//Transform matrix
 		void transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);

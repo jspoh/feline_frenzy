@@ -60,6 +60,7 @@ void Menu::Scene::load() {
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
+	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
 }
 
 void Menu::Scene::init() {
@@ -90,10 +91,14 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(5), { "tree" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {-200.0f, -200.0f}, {200.f, 200.f}, 0.0f });
 
+	entities.push_back(NIKEEngine.createEntity());
+	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(6), { "ame" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 4.0f, 1.0f / 5.0f}, {0.0f, 0.0f} });
+	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(6), { {0.0f, 0.0f}, {500.f, 500.f}, 0.0f });
+
 	//Create object spawner
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Input::Mouse>(entities.at(6), { Input::TriggerMode::TRIGGERED });
-	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(entities.at(6), {});
+	NIKEEngine.addEntityComponentObj<Input::Mouse>(entities.at(7), { Input::TriggerMode::TRIGGERED });
+	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(entities.at(7), {});
 
 	//Create camera
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
