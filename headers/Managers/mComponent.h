@@ -19,6 +19,9 @@ namespace Component {
 	public:
 		virtual ~IArray() = default;
 
+		//Clone entity
+		virtual void cloneEntity(Entity::Type clone, Entity::Type copy) = 0;
+
 		//Remove destroyed entity
 		virtual void entityDestroyed(Entity::Type entity) = 0;
 	};
@@ -66,6 +69,17 @@ namespace Component {
 		//Check if entity component is present
 		bool checkComponent(Entity::Type entity) const {
 			return component_array.find(entity) != component_array.end();
+		}
+
+		//Clone entity
+		void cloneEntity(Entity::Type clone, Entity::Type copy) override {
+			//Clone entity
+			if (component_array.find(copy) != component_array.end()) {
+				T temp_copy = component_array.at(copy);
+
+				//Emplace component and entity
+				component_array.emplace(std::piecewise_construct, std::forward_as_tuple(clone), std::forward_as_tuple(std::move(temp_copy)));
+			}
 		}
 
 		//Remove destroyed entity
@@ -166,6 +180,9 @@ namespace Component {
 			//Return component type
 			return component_types.at(type_name);
 		}
+
+		//Clone entity
+		void cloneEntity(Entity::Type clone, Entity::Type copy);
 
 		//Remove entity from all components
 		void entityDestroyed(Entity::Type entity);

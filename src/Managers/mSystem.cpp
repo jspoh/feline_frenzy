@@ -102,6 +102,14 @@ void System::Manager::updateEntitiesList(Entity::Type entity, Component::Signatu
 	}
 }
 
+void System::Manager::cloneEntity(Entity::Type clone, Entity::Type copy) {
+	//Remove entity from all systems
+	for (auto& system : systems) {
+		if (system->checkEntity(copy))
+			system->addEntity(clone);
+	}
+}
+
 void System::Manager::entityDestroyed(Entity::Type entity) {
 
 	//Remove entity from all systems

@@ -70,6 +70,15 @@ Entity::Type Core::Engine::createEntity() {
 	return entity_manager->createEntity();
 }
 
+Entity::Type Core::Engine::cloneEntity(Entity::Type copy) {
+	Entity::Type new_entity = entity_manager->createEntity();
+	component_manager->cloneEntity(new_entity, copy);
+	entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
+	system_manager->cloneEntity(new_entity, copy);
+
+	return new_entity;
+}
+
 void Core::Engine::destroyEntity(Entity::Type entity) {
 
 	//Destroy all data related to entity
@@ -93,11 +102,15 @@ std::unique_ptr<Events::Manager>& Core::Engine::accessEvents() {
 }
 
 /*****************************************************************//**
-* Assets Assets
+* Access Assets
 *********************************************************************/
 std::unique_ptr<Assets::Manager>& Core::Engine::accessAssets() {
 	return assets_manager;
 }
+
+/*****************************************************************//**
+* Access Debug
+*********************************************************************/
 
 std::unique_ptr<Debug::Manager>& Core::Engine::accessDebug()
 {

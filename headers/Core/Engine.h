@@ -70,6 +70,9 @@ namespace Core {
 		//Create Entity
 		Entity::Type createEntity();
 
+		//Clone entity ( ID of clone returned )
+		Entity::Type cloneEntity(Entity::Type copy);
+
 		//Destroy Entity
 		void destroyEntity(Entity::Type entity);
 

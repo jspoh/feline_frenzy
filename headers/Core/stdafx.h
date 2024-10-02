@@ -15,6 +15,11 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
+#undef APIENTRY
+
+//Window header
+#include <Windows.h>
+
 // Fmod core headers
 #include "FMOD_CORE/fmod.h"
 #include "FMOD_CORE/fmod.hpp"
@@ -45,7 +50,6 @@
 #include <bitset>
 #include <queue>
 #include <set>
-#include <Windows.h>
 #include <ctime>
 #include <iomanip>
 

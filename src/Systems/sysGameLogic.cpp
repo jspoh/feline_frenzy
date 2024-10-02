@@ -40,9 +40,8 @@ void GameLogic::Manager::update() {
 				Vector3 ndc_coords = { ndcX, ndcY, 1.0f }; // NDC in homogeneous coordinates
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
-				Entity::Type new_entity = NIKEEngine.createEntity();
-				NIKEEngine.addEntityComponentObj<Render::Texture>(new_entity, { "tree" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
-				NIKEEngine.addEntityComponentObj<Transform::Transform>(new_entity, { {world_coords.x ,world_coords.y}, {200.f, 200.f}, 0.0f });
+				Entity::Type new_entity = NIKEEngine.cloneEntity(6);
+				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
 			}
 		}
 
