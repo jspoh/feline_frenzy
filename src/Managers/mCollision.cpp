@@ -269,27 +269,29 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
 
         // Determine side of collision based on smallest overlap
         if (overlapX < overlapY) {
-            if (eColliderA.rect_max.x > eColliderB.rect_min.x) {
-                eColliderA.right = true;
-                eColliderB.left = true;
-                cout << "EntityA is blocked on the right by EntityB" << endl;
-            }
-            else {
-                eColliderA.left = true;
-                eColliderB.right = true;
-                cout << "EntityA is blocked on the left by EntityB" << endl;
+            if (eColliderA.rect_min.x < eColliderB.rect_max.x && eColliderA.rect_max.x > eColliderB.rect_min.x) {
+                // Collision primarily on the x-axis
+                if (eColliderA.rect_min.x < eColliderB.rect_min.x) {
+                    eColliderA.right = true;
+                    cout << "EntityA is blocked on the right by EntityB" << endl;
+                }
+                else {
+                    eColliderA.left = true;
+                    cout << "EntityA is blocked on the left by EntityB" << endl;
+                }
             }
         }
         else {
-            if (eColliderA.rect_max.y > eColliderB.rect_min.y) {
-                eColliderA.top = true;
-                eColliderB.bottom = true;
-                cout << "EntityA is blocked on the top by EntityB" << endl;
-            }
-            else {
-                eColliderA.bottom = true;
-                eColliderB.top = true;
-                cout << "EntityA is blocked at the bottom by EntityB" << endl;
+            if (eColliderA.rect_min.y < eColliderB.rect_max.y && eColliderA.rect_max.y > eColliderB.rect_min.y) {
+                // Collision primarily on the y-axis
+                if (eColliderA.rect_min.y < eColliderB.rect_min.y) {
+                    eColliderA.top = true;
+                    cout << "EntityA is blocked on the top by EntityB" << endl;
+                }
+                else {
+                    eColliderA.bottom = true;
+                    cout << "EntityA is blocked at the bottom by EntityB" << endl;
+                }
             }
         }
         return true;
@@ -343,67 +345,34 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     // Update the time of first collision
     firstTimeOfCollision = tFirstOverall;
 
-    // Step 6: Determine which side of both entities is being blocked
+    // Step 6: Determine which side of both entities is being blocked based on the primary axis
     cout << "Collision detected between EntityA and EntityB (Dynamic collision)" << endl;
 
     if (tFirst.x < tFirst.y) {
         // Collision primarily along the x-axis
         if (velRel.x > 0) {
             eColliderA.right = true; // 'a' is blocked on the right side
-            eColliderB.left = true;  // 'b' is blocked on the left side
             cout << "EntityA is blocked on the right side by EntityB" << endl;
         }
         else {
             eColliderA.left = true;  // 'a' is blocked on the left side
-            eColliderB.right = true; // 'b' is blocked on the right side
             cout << "EntityA is blocked on the left side by EntityB" << endl;
-        }
-
-        // Check for overlap on the y-axis to block if necessary
-        if (!(eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y)) {
-            if (velRel.y > 0) {
-                eColliderA.top = true;    // 'a' is blocked on the top side
-                eColliderB.bottom = true; // 'b' is blocked on the bottom side
-                cout << "EntityA is blocked on the top by EntityB" << endl;
-            }
-            else {
-                eColliderA.bottom = true; // 'a' is blocked on the bottom side
-                eColliderB.top = true;    // 'b' is blocked on the top side
-                cout << "EntityA is blocked at the bottom by EntityB" << endl;
-            }
         }
     }
     else {
         // Collision primarily along the y-axis
         if (velRel.y > 0) {
             eColliderA.top = true;    // 'a' is blocked on the top side
-            eColliderB.bottom = true; // 'b' is blocked on the bottom side
             cout << "EntityA is blocked on the top by EntityB" << endl;
         }
         else {
             eColliderA.bottom = true; // 'a' is blocked on the bottom side
-            eColliderB.top = true;    // 'b' is blocked on the top side
             cout << "EntityA is blocked at the bottom by EntityB" << endl;
-        }
-
-        // Check for overlap on the x-axis to block if necessary
-        if (!(eColliderA.rect_max.x < eColliderB.rect_min.x || eColliderA.rect_min.x > eColliderB.rect_max.x)) {
-            if (velRel.x > 0) {
-                eColliderA.right = true; // 'a' is blocked on the right side
-                eColliderB.left = true;  // 'b' is blocked on the left side
-                cout << "EntityA is blocked on the right side by EntityB" << endl;
-            }
-            else {
-                eColliderA.left = true;  // 'a' is blocked on the left side
-                eColliderB.right = true; // 'b' is blocked on the right side
-                cout << "EntityA is blocked on the left side by EntityB" << endl;
-            }
         }
     }
 
     return true; // Collision detected
 }
-
 
 
 
