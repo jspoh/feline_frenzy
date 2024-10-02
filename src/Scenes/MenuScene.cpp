@@ -20,7 +20,8 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Transform::Transform>();
 	NIKEEngine.registerComponent<Transform::Runtime_Transform>();
 	NIKEEngine.registerComponent<Move::Movement>();
-	NIKEEngine.registerComponent<Render::Mesh>();
+	NIKEEngine.registerComponent<Render::Shape>();
+	NIKEEngine.registerComponent<Render::Texture>();
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
 
@@ -34,8 +35,8 @@ void Menu::Scene::load() {
 
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Mesh>());
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Color>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Shape>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Texture>());
 
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
@@ -73,22 +74,21 @@ void Menu::Scene::init() {
 	
 	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(2), { {0.0f, 1.0f} });
 
+	//Add velocity to entity 1
+	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
+
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(3), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "duck" });
+	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(3), { "duck",Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(3), { {400.0f, -200.0f}, {200.f, 200.f}, 0.0f });
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities.at(3), Transform::Runtime_Transform());
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(3), { {1.0f, 1.0f, 1.0f}, 1.0f });
 
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(4), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "water" });
+	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(4), { "water" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(4), { {100.0f, -200.0f}, {200.f, 200.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(4), { {1.0f, 1.0f, 1.0f}, 1.0f });
 
 	entities.push_back(NIKEEngine.createEntity());
-	NIKEEngine.addEntityComponentObj<Render::Mesh>(entities.at(5), { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "tree" });
+	NIKEEngine.addEntityComponentObj<Render::Texture>(entities.at(5), { "tree" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 	NIKEEngine.addEntityComponentObj<Transform::Transform>(entities.at(5), { {-200.0f, -200.0f}, {200.f, 200.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Render::Color>(entities.at(5), { {1.0f, 1.0f, 1.0f}, 1.0f });
-	NIKEEngine.addEntityComponentObj<Transform::Velocity>(entities.at(1), { {0.0f, 0.0f} });
 
 	//Create object spawner
 	entities.push_back(NIKEEngine.createEntity());
@@ -99,7 +99,6 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(0), { "CAM1", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities.at(1), { "CAM2", {122.0f, 0.0f}, 1000.0f });
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
-
 }
 
 void Menu::Scene::exit() {

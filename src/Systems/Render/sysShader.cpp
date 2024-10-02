@@ -137,3 +137,13 @@ void Shader::Manager::setUniform(const std::string& shader_ref, const std::strin
 		cerr << "Uniform location not found for: " << name << endl;
 	}
 }
+
+void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector2& value) {
+	int location = glGetUniformLocation(NIKEEngine.accessAssets()->getShader(shader_ref), name.c_str());
+	if (location >= 0) {
+		glUniform2f(location, value.x, value.y);
+	}
+	else {
+		cerr << "Uniform location not found for: " << name << endl;
+	}
+}

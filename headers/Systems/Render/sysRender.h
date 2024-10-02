@@ -70,19 +70,19 @@ namespace Render {
 		char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_ext);
 
 		//Transform matrix
-		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
+		void transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
 
-		//Render object
-		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color = {{0.0f, 0.0f, 0.0f}, 1.0f});
+		//Render Shape
+		void renderObject(Render::Shape const& e_shape);
+
+		//Render Texture
+		void renderObject(Render::Texture const& e_texture);
 
 		//Render debugging wireframe
-		void renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color);
+		void renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color);
 
 		//Helper function to encapsulate rendering
-		void transformAndRenderEntity(Transform::Transform& e_transform,
-			Render::Mesh& e_mesh,
-			const Render::Color& e_color, bool debugMode);
-
+		void transformAndRenderEntity(Entity::Type entity, bool debugMode);
 
 	public:
 		//Constructor
@@ -148,7 +148,8 @@ namespace Render {
 		//Track camera entity
 		void trackCamEntity(std::string const& cam_identifier);
 
-		const Camera::System* getCamEntity();
+		//Get camera entity
+		std::unique_ptr<Camera::System>& getCamEntity();
 
 		/**
 		* update all object's xform

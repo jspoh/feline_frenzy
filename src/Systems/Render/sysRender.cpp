@@ -35,8 +35,6 @@ void Render::Manager::createBaseBuffers(const std::vector<Vector2>& vertices, co
 	glVertexArrayAttribFormat(model->vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
 	glVertexArrayAttribBinding(model->vaoid, 0, 0);
 
-	// REMOVED Vertex Color Array (Using uniform to pass color)
-
 	// Create EBO
 	glCreateBuffers(1, &model->eboid);
 	glNamedBufferStorage(model->eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
@@ -162,7 +160,6 @@ unsigned int Render::Manager::registerShader(const std::string& shader_ref, cons
 	return shader_system->loadShader(shader_ref, vtx_path, frag_path);
 }
 
-
 bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<Model> model) {
 	std::ifstream mesh_file{ path_to_mesh, std::ios::in };
 	if (!mesh_file.is_open()) {
@@ -244,7 +241,6 @@ bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<
 	return true;
 }
 
-
 std::shared_ptr<Render::Model> Render::Manager::registerModel(const std::string& path_to_mesh) {
 	std::shared_ptr<Model> model = std::make_shared<Model>();
 	if (loadMesh(path_to_mesh, model)) {
@@ -254,7 +250,7 @@ std::shared_ptr<Render::Model> Render::Manager::registerModel(const std::string&
 	return nullptr;
 }
 
-void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
+void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat) {
 	//Transform matrix here
 	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
@@ -262,47 +258,31 @@ void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh&
 	// Modulus the object rotation so it doesnt result in a large number overtime
 	// float orientation = fmod(orientation, 360.f);
 	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
-	float angleDisp = xform.rotation;
+	float angleDisp = obj.rotation;
 
 	Matrix_33Rot(rot_mat, angleDisp);
-	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
-	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+	Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
 
 	// OpenGL requires matrix in col maj so transpose
-	Matrix_33Transpose(mesh.x_form, result);
+	Matrix_33Transpose(x_form, result);
 }
 
-void Render::Manager::renderObject(const Render::Mesh& e_mesh, Render::Color const& e_color) {
+void Render::Manager::renderObject(Render::Shape const& e_shape) {
 	//Set polygon mode
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	// use shader
-	shader_system->useShader(e_mesh.shader_ref);
-	
-	//Texture of shape
-	if (e_mesh.texture_ref == "") {
-		//Shader set uniform
-		shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-		shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
-	} else {
-		constexpr int texture_unit = 6;
+	shader_system->useShader("base");
 
-		// set texture
-		glBindTextureUnit(
-			texture_unit, // texture unit (binding index)
-			NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref)
-		);
-
-		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		shader_system->setUniform(e_mesh.shader_ref, "u_tex2d", texture_unit);
-		shader_system->setUniform(e_mesh.shader_ref, "u_transform", e_mesh.x_form);
-	}
+	//Shader set uniform
+	shader_system->setUniform("base", "f_color", e_shape.color.color);
+	shader_system->setUniform("base", "f_opacity", e_shape.color.alpha);
+	shader_system->setUniform("base", "model_to_ndc", e_shape.x_form);
 
 	//Get model
-	auto model = NIKEEngine.accessAssets()->getModel(e_mesh.model_ref);
+	auto model = NIKEEngine.accessAssets()->getModel(e_shape.model_ref);
 
 	//Draw
 	glBindVertexArray(model->vaoid);
@@ -313,7 +293,48 @@ void Render::Manager::renderObject(const Render::Mesh& e_mesh, Render::Color con
 	shader_system->unuseShader();
 }
 
-void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+void Render::Manager::renderObject(Render::Texture const& e_texture) {
+	//Set polygon mode
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	// use shader
+	shader_system->useShader("tex");
+
+	//Texture unit
+	constexpr int texture_unit = 6;
+
+	// set texture
+	glBindTextureUnit(
+		texture_unit, // texture unit (binding index)
+		NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref)
+	);
+
+	glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	//Translate UV offset to bottom right
+	Vector2 uv_offset = e_texture.uv_offset + Vector2(0.0f, (1.0f - e_texture.frame_size.x));
+
+	//Set uniforms for texture rendering
+	shader_system->setUniform("tex", "u_tex2d", texture_unit);
+	shader_system->setUniform("tex", "u_opacity", e_texture.color.alpha);
+	shader_system->setUniform("tex", "u_transform", e_texture.x_form);
+	shader_system->setUniform("tex", "uvOffset", uv_offset);
+	shader_system->setUniform("tex", "frameSize", e_texture.frame_size);
+
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel("square-texture");
+
+	//Draw
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+	//Unuse texture
+	glBindVertexArray(0);
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color) {
 	//Set Polygon Mode
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -322,7 +343,8 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 
 	//Shader set uniform
 	shader_system->setUniform("base", "f_color", e_color.color);
-	shader_system->setUniform("base", "model_to_ndc", e_mesh.x_form);
+	shader_system->setUniform("base", "f_opacity", e_color.alpha);
+	shader_system->setUniform("base", "model_to_ndc", x_form);
 
 	//Get model
 	auto model = NIKEEngine.accessAssets()->getModel("square");
@@ -339,29 +361,46 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void Render::Manager::transformAndRenderEntity(Transform::Transform& e_transform,
-	Render::Mesh& e_mesh,
-	const Render::Color& e_color, bool debugMode) {
-	// Transform matrix here
-	transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
+void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
+	auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 
-	// Render object
-	renderObject(e_mesh, e_color);
+	//Check If Shape
+	if (NIKEEngine.checkEntityComponent<Render::Shape>(entity)) {
+		auto& e_shape = NIKEEngine.getEntityComponent<Render::Shape>(entity);
 
-	if (debugMode) {
-		// Render debugging wireframe
-		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
-		renderWireFrame(e_mesh, wire_frame_color);
+		// Transform matrix here
+		transformMatrix(e_transform, e_shape.x_form, camera_system->getWorldToNDCXform());
+
+		//Render Shape
+		renderObject(e_shape);
+	}
+	else if (NIKEEngine.checkEntityComponent<Render::Texture>(entity)) {
+		auto& e_texture = NIKEEngine.getEntityComponent<Render::Texture>(entity);
+
+		// Transform matrix here
+		transformMatrix(e_transform, e_texture.x_form, camera_system->getWorldToNDCXform());
+
+		// Render Texture
+		renderObject(e_texture);
 	}
 
+	if (debugMode) {
+		Matrix33::Matrix_33 mtx_wireframe;
+		//Calculate wireframe matrix
+		transformMatrix(e_transform, mtx_wireframe, camera_system->getWorldToNDCXform());
+
+		// Render debugging wireframe
+		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
+		renderWireFrame(mtx_wireframe, wire_frame_color);
+	}
 }
 
 void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
 	camera_system->trackCamEntity(cam_identifier);
 }
 
-const Camera::System* Render::Manager::getCamEntity() {
-	return camera_system.get();
+std::unique_ptr<Camera::System>& Render::Manager::getCamEntity() {
+	return camera_system;
 }
 
 void Render::Manager::init() {
@@ -373,6 +412,10 @@ void Render::Manager::init() {
 
 	//Init Camera ( Camera height defaulted at 1000.0f )
 	camera_system->init(1000.0f);
+
+	//GL enable opacity blending option
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Render::Manager::update() {
@@ -402,10 +445,6 @@ void Render::Manager::update() {
 
 	//Update all and render except camera entities
 	for (auto& entity : entities) {
-		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
-		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
-		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
-
-		transformAndRenderEntity(e_transform, e_mesh, e_color, 1);
+		transformAndRenderEntity(entity, 1);
 	}
 }
