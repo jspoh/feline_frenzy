@@ -47,7 +47,7 @@ void Physics::Manager::update() {
     for (Entity::Type entity : entities) {
         if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
             Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
-            collider.left = collider.right = collider.top = collider.bottom = false;
+            collider.left = collider.right = collider.top = collider.bottom = false; // Must reset in physics loop
 
             //cout << "E bounding box min: " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_min.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_min.y << endl;
             //cout << "E bounding box max: " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_max.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_max.y << endl;

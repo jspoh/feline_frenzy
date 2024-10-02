@@ -25,6 +25,7 @@
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
+    <ClCompile Include="src\Scenes\mmCopy.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
@@ -97,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\scenes\mainmenu.scn" />
+    <None Include="assets\Scenes\mmCopy.scn" />
     <None Include="db\data.json" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
