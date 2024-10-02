@@ -125,6 +125,12 @@ namespace Render {
 		 */
 		std::shared_ptr<Render::Model> registerModel(const std::string& path_to_mesh);
 
+
+		std::string getSysName()
+		{
+			return "Render System";
+		}
+
 		/**
 		 * registers textures.
 		 * 

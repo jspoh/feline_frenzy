@@ -110,11 +110,61 @@ void System::Manager::entityDestroyed(Entity::Type entity) {
 	}
 }
 
-void System::Manager::updateSystems() {
-
-	//Update all systems
-	for (auto& system : systems) {
-		if (system->getActiveState())
-		system->update();
+void System::Manager::systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times)
+{
+	if (system_times.empty()) {
+		cout << "No active systems to report on." << endl;
+		return;
 	}
+
+	// Calculate total time for all systems
+	double total_system_time = 0.0;
+
+	// Print header for system performance percentages
+	cout << "System Performance (% of total game loop time):" << endl;
+
+	// Calculate the time spent in each active system
+	for (size_t i = 0; i < systems.size(); ++i)
+	{
+		if (systems[i]->getActiveState())
+		{
+			// Calculate the percentage of the total time for each active system
+			double percentage = (system_times[i] / game_loop_time) * 100.0;
+			cout << systems[i]->getSysName() << ": " << percentage << "%" << endl;
+
+			// Accumulate total system time
+			total_system_time += percentage;
+		}
+	}
+
+	// Print total system percentage
+	cout << "Total Active System Time: " << total_system_time << "%" << endl;
+	
+}
+
+void System::Manager::updateSystems() 
+{
+	std::chrono::steady_clock::time_point total_start_time = std::chrono::steady_clock::now();
+	// Vector to hold each of the system duration
+	std::vector<double> system_times;
+
+	// Update all systems
+	for (size_t i = 0; i < systems.size(); ++i) {
+		if (systems[i]->getActiveState())
+		{
+			std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
+			systems[i]->update();
+			std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
+
+			// Calculate the time taken by the system
+			std::chrono::duration<double, std::milli> system_duration = system_end_time - system_start_time;
+			system_times.push_back(system_duration.count());
+		}
+	}
+	// Track total end time for the update call
+	std::chrono::steady_clock::time_point total_end_time = std::chrono::steady_clock::now();
+	double total_game_loop_time = std::chrono::duration<double, std::milli>(total_end_time - total_start_time).count();
+
+	// Call to calculate and display system runtime percentage
+	systemRuntimePercentage(total_game_loop_time, system_times);
 }

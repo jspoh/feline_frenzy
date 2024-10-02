@@ -93,6 +93,11 @@ namespace Scenes {
 		//Init
 		void init() override;
 
+		std::string getSysName() override
+		{
+			return "Scene System";
+		}
+
 		//Update
 		void update() override;
 

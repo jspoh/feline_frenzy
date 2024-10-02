@@ -34,14 +34,14 @@ namespace CollisionUtils {
                             float& firstTimeOfCollision);
 
 
-    // Separating Axis Theorem (SAT) check
-    bool satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b);
+    //// Separating Axis Theorem (SAT) check
+    //bool satCheck(const Vector2& pos_a, const Vector2& size_a, const Vector2& pos_b, const Vector2& size_b);
 
-    // Function to detect if the mouse is inside a rectangle area
-    bool detectMClickRect(const Vector2& center, float width, float height);
+    //// Function to detect if the mouse is inside a rectangle area
+    //bool detectMClickRect(const Vector2& center, float width, float height);
 
-    // Function to detect if the mouse is inside a circle area
-    bool detectMClickCircle(const Vector2& center, float radius);
+    //// Function to detect if the mouse is inside a circle area
+    //bool detectMClickCircle(const Vector2& center, float radius);
 }
 
 #endif // COLLISION_UTILS_HPP

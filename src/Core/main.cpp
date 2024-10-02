@@ -39,6 +39,7 @@ int WINAPI WinMain(
 
 	// Function call to create console, comment out if needed
 	createConsole();
+	
 
 	//// Enable run-time memory check for debug builds.
 	#if defined(DEBUG) | defined(_DEBUG)
