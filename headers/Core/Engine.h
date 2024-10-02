@@ -2,7 +2,7 @@
  * \file   Engine.h
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   11 September 2024
  *********************************************************************/
 

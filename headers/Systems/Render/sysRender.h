@@ -2,7 +2,7 @@
  * \file   sysRender.h
  * \brief
  *
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \co-author g.boonxuensean
  * \date   September 2024
  *********************************************************************/
