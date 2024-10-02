@@ -49,6 +49,14 @@ Vector2& Vector2::operator/=(float rhs) {
 	return *this;
 }
 
+bool Vector2::operator==(const Vector2& rhs) {
+	return (this->x == rhs.x) && (this->y == rhs.y);
+}
+
+bool Vector2::operator!=(const Vector2& rhs) {
+	return (this->x != rhs.x) || (this->y != rhs.y);
+}
+
 float Vector2::dot(const Vector2& rhs) const {
 	return x * rhs.x + y * rhs.y;
 }
