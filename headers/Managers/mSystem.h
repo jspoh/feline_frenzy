@@ -189,9 +189,6 @@ namespace System {
 		//Remove entity from all systems
 		void entityDestroyed(Entity::Type entity);
 
-		// Check for system runtime 
-		void systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times);
-
 		//Update all systems
 		void updateSystems();
 	};
