@@ -27,6 +27,7 @@
     <ClCompile Include="src\Managers\mWindows.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Systems\sysGameLogic.cpp" />
+    <ClCompile Include="src\Managers\mDebug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\sysPhysics.h" />
@@ -64,6 +65,7 @@
     <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Systems\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cScene.h" />
+    <ClInclude Include="headers\Managers\mDebug.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
@@ -79,5 +81,6 @@
     <Text Include="assets\meshes\circle.txt" />
     <Text Include="assets\meshes\square-texture.txt" />
     <Text Include="assets\meshes\triangle.txt" />
+    <Text Include="src\Managers\crash_log.txt" />
   </ItemGroup>
 </Project>

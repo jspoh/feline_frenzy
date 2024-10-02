@@ -67,9 +67,8 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		line_pos >> position.x >> position.y;
 
 		// Add components to the entity
-		NIKEEngine.addEntityComponentObj<Render::Mesh>(entity, { shdr_prgm, model_name, Matrix33::Matrix_33() });
+		NIKEEngine.addEntityComponentObj<Render::Shape>(entity, { model_name, Matrix33::Matrix_33(), { clr_atr, 1.0f } });
 		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, 0.0f }); // 0.0f for rotation
-		NIKEEngine.addEntityComponentObj<Render::Color>(entity, { clr_atr, 1.0f });  // Assuming alpha = 1.0f for now
 
 		// Push the entity into the vector
 		entities.push_back(entity);

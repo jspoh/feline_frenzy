@@ -2,7 +2,7 @@
  * \file   mScene.h
  * \brief  
  * 
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -92,6 +92,11 @@ namespace Scenes {
 
 		//Init
 		void init() override;
+
+		std::string getSysName() override
+		{
+			return "Scene System";
+		}
 
 		//Update
 		void update() override;

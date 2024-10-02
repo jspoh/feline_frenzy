@@ -52,6 +52,11 @@ namespace Audio {
 		// Update Audio system
 		void update() override;
 
+		std::string getSysName() override
+		{
+			return "Audio System";
+		}
+
 		//Default Destructor
 		~Manager() override;
 

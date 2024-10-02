@@ -39,6 +39,9 @@ namespace Shader {
 		void setUniform(const std::string& shader_ref, const std::string& name, float value);
 		void setUniform(const std::string& shader_ref, const std::string& name, const Matrix33::Matrix_33& value);
 		void setUniform(const std::string& shader_ref, const std::string& name, const Vector3& value);
+
+		//Sprite sheet
+		void setUniform(const std::string& shader_ref, const std::string& name, const Vector2& value);
 	};
 }
 

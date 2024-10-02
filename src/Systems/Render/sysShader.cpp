@@ -3,6 +3,7 @@
  * \brief
  *
  * \author g.boonxuensean@digipen.edu
+ * \coauthor Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -131,6 +132,16 @@ void Shader::Manager::setUniform(const std::string& shader_ref, const std::strin
 	int location = glGetUniformLocation(NIKEEngine.accessAssets()->getShader(shader_ref), name.c_str());
 	if (location >= 0) {
 		glUniform3fv(location, 1, &value.x);
+	}
+	else {
+		cerr << "Uniform location not found for: " << name << endl;
+	}
+}
+
+void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector2& value) {
+	int location = glGetUniformLocation(NIKEEngine.accessAssets()->getShader(shader_ref), name.c_str());
+	if (location >= 0) {
+		glUniform2f(location, value.x, value.y);
 	}
 	else {
 		cerr << "Uniform location not found for: " << name << endl;

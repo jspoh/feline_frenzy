@@ -28,7 +28,7 @@ void GameLogic::Manager::update() {
 			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
 
 			if (e_mouse.b_output && (e_mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
-				auto camera_system = NIKEEngine.accessSystem<Render::Manager>()->getCamEntity();
+				auto& camera_system = NIKEEngine.accessSystem<Render::Manager>()->getCamEntity();
 				float ndcX = (2.0f * e_mouse.button_pos.x) / NIKEEngine.accessWindow()->getWindowSize().x - 1.0f;
 				float ndcY = 1.0f - (2.0f * e_mouse.button_pos.y) / NIKEEngine.accessWindow()->getWindowSize().y;
 
@@ -39,9 +39,8 @@ void GameLogic::Manager::update() {
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
 				Entity::Type new_entity = NIKEEngine.createEntity();
-				NIKEEngine.addEntityComponentObj<Render::Mesh>(new_entity, { "tex", "square-texture", Matrix33::Matrix_33::Identity(), "tree" });
+				NIKEEngine.addEntityComponentObj<Render::Texture>(new_entity, { "tree" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
 				NIKEEngine.addEntityComponentObj<Transform::Transform>(new_entity, { {world_coords.x ,world_coords.y}, {200.f, 200.f}, 0.0f });
-				NIKEEngine.addEntityComponentObj<Render::Color>(new_entity, { {1.0f, 1.0f, 1.0f}, 1.0f });
 			}
 		}
 
@@ -53,7 +52,6 @@ void GameLogic::Manager::update() {
 				NIKEEngine.accessEvents()->dispatchEvent(menu_event);
 			}
 		}
-
 		
 		/***********************************************
 		* Check your keypresses here!!!

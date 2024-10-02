@@ -72,6 +72,11 @@ namespace Input {
 		//Init Inputs
 		void init() override;
 
+		std::string getSysName() override
+		{
+			return "Input System";
+		}
+
 		//Update Inputs
 		void update() override;
 

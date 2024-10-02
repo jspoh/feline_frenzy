@@ -46,6 +46,11 @@ namespace Physics {
 		// Runtime scaling and rotation
 		void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
 
+		std::string getSysName() override
+		{
+			return "Physics System";
+		}
+
 		//Update
 		void update() override;
 

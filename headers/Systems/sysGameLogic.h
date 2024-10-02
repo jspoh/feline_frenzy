@@ -30,6 +30,11 @@ namespace GameLogic {
 		//Init Inputs
 		void init() override;
 
+		std::string getSysName() override
+		{
+			return "Game Logic System";
+		}
+
 		//Update Inputs
 		void update() override;
 

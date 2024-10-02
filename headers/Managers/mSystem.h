@@ -43,6 +43,9 @@ namespace System {
 		//Pure virtual function to be implemented in inherited class
 		virtual void update() = 0;
 
+		// Get system name
+		virtual std::string getSysName() = 0;
+
 		//Set components linked mode
 		void setComponentsLinked(bool state);
 
