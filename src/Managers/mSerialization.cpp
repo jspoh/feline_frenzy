@@ -7,8 +7,9 @@
  *********************************************************************/
 #include "../headers/Core/stdafx.h"
 #include "../headers/Managers/mSerialization.h"
+#include "../headers/Systems/sysPhysics.h"
 
-void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities) {
+void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities) {
 	std::ifstream ifs{ scene_filepath, std::ios::in };
 
 	// Open Scene file
@@ -30,7 +31,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 
 		std::string model_name, object_name, shdr_prgm, vert_file, frag_file;
 		Vector3 clr_atr{};
-		Vector2 scaling{}, orientation{}, position{};
+		Vector2 scaling{}, orientation{}, velocity{}, position{};
 
 		// !TODO create a proper system to register mesh data
 		getline(ifs, line); // 1st parameter: model's name
@@ -61,16 +62,30 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		std::istringstream line_orient{ line };
 		line_orient >> orientation.x >> orientation.y;
 
+		// Orientation & rotation
+		getline(ifs, line);
+		std::istringstream line_vel{ line };
+		line_vel >> velocity.x >> velocity.y;
+
 		// Position
 		getline(ifs, line);
 		std::istringstream line_pos{ line };
 		line_pos >> position.x >> position.y;
 
 		// Add components to the entity
-		NIKEEngine.addEntityComponentObj<Render::Shape>(entity, { model_name, Matrix33::Matrix_33(), { clr_atr, 1.0f } });
-		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, 0.0f }); // 0.0f for rotation
+
+		if (shdr_prgm == "base") {
+			NIKEEngine.addEntityComponentObj<Render::Shape>(entity, { model_name, Matrix33::Matrix_33(), { clr_atr, 1.0f } });
+		}
+		else {
+			NIKEEngine.addEntityComponentObj<Render::Texture>(entity, { shdr_prgm ,Matrix33::Matrix_33::Identity(), { clr_atr, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
+		}
+		
+		NIKEEngine.addEntityComponentObj<Transform::Velocity>(entity, { {velocity.x, velocity.y} });
+		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, orientation.x }); // 0.0f for rotation
+		Physics::Manager::getInstance()->collision_manager.setColliderComp(entity);
 
 		// Push the entity into the vector
-		entities.push_back(entity);
+		entities[object_name] = entity;
 	}
 }

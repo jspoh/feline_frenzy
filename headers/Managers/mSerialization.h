@@ -26,7 +26,7 @@ namespace Serialization {
 		Manager() = default;
 
 		// Load Scene from File
-		void loadSceneFromFile(const std::string& scene_filepath, std::vector<Entity::Type>& entities);
+		void loadSceneFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities);
 
 	};
 }
