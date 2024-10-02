@@ -2,7 +2,7 @@
  * \file   Vector4.cpp
  * \brief
  *
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

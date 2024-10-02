@@ -73,7 +73,7 @@ namespace Entity {
     using Type = uint16_t;
 
     //Max number of entities to be created at a single point
-    const Type MAX = 2500;
+    const Type MAX = 5000;
 }
 
 namespace Component {

@@ -2,7 +2,7 @@
  * \file   sysRender.cpp
  * \brief
  *
- * \author jings
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \co-author g.boonxuensean
  * \date   September 2024
  *********************************************************************/
@@ -321,7 +321,6 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 	shader_system->useShader("base");
 
 	//Shader set uniform
-
 	shader_system->setUniform("base", "f_color", e_color.color);
 	shader_system->setUniform("base", "model_to_ndc", e_mesh.x_form);
 
@@ -407,21 +406,6 @@ void Render::Manager::update() {
 		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
 		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
 
-		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
-
-		transformAndRenderEntity(e_transform, e_mesh, e_color, 1);
-	}
-
-	// Update and render cameras last
-	for (auto& camera_entity : entities) {
-		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(camera_entity);
-		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(camera_entity);
-		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(camera_entity);
-
-		if (!NIKEEngine.checkEntityComponent<Render::Cam>(camera_entity))
-			continue;
-
-		// Transform and render the entity
 		transformAndRenderEntity(e_transform, e_mesh, e_color, 1);
 	}
 }
