@@ -143,22 +143,44 @@ void Physics::Manager::update() {
             // For entities without move but still have movement
             if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
                 Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
-                // Adjust velocity based collision flags
-                if (collider.top && (velocity.velocity.y > 0.0f)) {
-                    velocity.velocity.y = 0;
-                }
 
-                if (collider.bottom && (velocity.velocity.y < 0.0f)) {
-                    velocity.velocity.y = 0;
-                }
+                // For entities that bounce
+                if (collider.bounceFlag == true) {
+                    // Adjust velocity based collision flags
+                    if (collider.top && (velocity.velocity.y > 0.0f)) {
+                        velocity.velocity.y *= -1;
+                    }
 
-                if (collider.right && (velocity.velocity.x > 0.0f)) {
-                    velocity.velocity.x = 0;
-                }
+                    if (collider.bottom && (velocity.velocity.y < 0.0f)) {
+                        velocity.velocity.y *= -1;
+                    }
 
-                if (collider.left && (velocity.velocity.x < 0.0f)) {
-                    velocity.velocity.x = 0;
+                    if (collider.right && (velocity.velocity.x > 0.0f)) {
+                        velocity.velocity.x *= -1;
+                    }
+
+                    if (collider.left && (velocity.velocity.x < 0.0f)) {
+                        velocity.velocity.x *= -1;
+                    }
                 }
+                else {
+                    // Adjust velocity based collision flags
+                    if (collider.top && (velocity.velocity.y > 0.0f)) {
+                        velocity.velocity.y = 0;
+                    }
+
+                    if (collider.bottom && (velocity.velocity.y < 0.0f)) {
+                        velocity.velocity.y = 0;
+                    }
+
+                    if (collider.right && (velocity.velocity.x > 0.0f)) {
+                        velocity.velocity.x = 0;
+                    }
+
+                    if (collider.left && (velocity.velocity.x < 0.0f)) {
+                        velocity.velocity.x = 0;
+                    }
+                }  
             }
 
             // Normalize Movement

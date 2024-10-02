@@ -68,7 +68,7 @@ namespace Collision {
         bool detectMClickCircle(const Vector2& center, float radius);
 
         // Set collider component
-        bool setColliderComp(Entity::Type& cEntity);
+        bool setColliderComp(Entity::Type& cEntity, bool bounceFlag = false);
 
         bool detectAABBRectRect(Entity::Type& cEntityA, Entity::Type& cEntityB, float& firstTimeOfCollision);
     };

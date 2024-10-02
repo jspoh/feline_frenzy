@@ -24,6 +24,8 @@ namespace Collision {
         bool top = false;
         bool bottom = false;
 
+        bool bounceFlag = false;
+
         // For bounding sphere...unused for now
         Vector2 cir_min;
         Vector2 cir_max;
