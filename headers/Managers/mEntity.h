@@ -35,6 +35,9 @@ namespace Entity {
 		//Create Entity
 		Entity::Type createEntity();
 
+		//Clone Entity
+		Entity::Type cloneEntity(Entity::Type original_entity);
+
 		//Destroy Entity
 		void destroyEntity(Entity::Type entity);
 

@@ -1,8 +1,9 @@
 /*****************************************************************//**
- * \file   RenderManager.cpp
+ * \file   sysRender.cpp
  * \brief
  *
  * \author jings
+ * \co-author g.boonxuensean
  * \date   September 2024
  *********************************************************************/
 
@@ -12,6 +13,7 @@
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cRender.h"
 #include "../headers/Math/Mtx33.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
 
@@ -70,185 +72,6 @@ void Render::Manager::createTextureBuffers(const std::vector<Vector2>& vertices,
 	glCreateBuffers(1, &model->eboid);
 	glNamedBufferStorage(model->eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 	glVertexArrayElementBuffer(model->vaoid, model->eboid);
-}
-
-bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<Model> model) {
-	std::ifstream mesh_file{ path_to_mesh, std::ios::in };
-	if (!mesh_file.is_open()) {
-		cerr << "Failed to open mesh file: " << path_to_mesh << endl;
-		return false;
-	}
-
-	mesh_file.seekg(0, std::ios::beg);
-
-	std::string line;
-	GLshort index;
-
-	// pos
-	std::vector<Vector2> vertices;
-	std::vector<Vector2> tex_coords;
-
-	// indices (indexed rendering with element buffer object)
-	std::vector<unsigned int> indices;
-
-
-
-	// line data type (eg. vertex, color, indices)
-	char type;
-
-	while (getline(mesh_file, line)) {
-		std::istringstream line_sstm{ line };
-
-		line_sstm >> type;
-
-		switch (type) {
-		case 'n': {// name
-			break;
-		}
-		case 'v': {// vertex
-			float ndc_x, ndc_y;
-			line_sstm >> ndc_x >> ndc_y;
-			vertices.emplace_back(ndc_x, ndc_y);
-			break;
-		}
-		case 't': {// triangle indices
-			if (model->primitive_type == 0) {
-				model->primitive_type = GL_TRIANGLES;
-			}
-			while (line_sstm >> index) { // Grab index position
-				indices.emplace_back(index);
-			}
-			break;
-		}
-		case 'i': {
-			float tex_x, tex_y;
-			line_sstm >> tex_x >> tex_y;
-			tex_coords.emplace_back(tex_x, tex_y);
-			break;
-		}
-		case 'f': {// fan indices
-			if (model->primitive_type == 0) {
-				model->primitive_type = GL_TRIANGLE_FAN;
-			}
-			while (line_sstm >> index) { // Grab index position
-				indices.emplace_back(index);
-			}
-			break;
-		}
-		default:
-			cerr << "Unknown data type in mesh file: " << type << endl;
-			return false;
-		}
-	}
-	mesh_file.close();
-
-	if (tex_coords.size() == 0) {
-		createBaseBuffers(vertices, indices, model);
-	}
-	else {
-		createTextureBuffers(vertices, indices, tex_coords, model);
-	}
-	model->draw_count = static_cast<GLuint>(indices.size());
-
-	return true;
-}
-
-void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
-	//Transform matrix here
-	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
-
-	// Scrap orientation for now
-	// Modulus the object rotation so it doesnt result in a large number overtime
-	// float orientation = fmod(orientation, 360.f);
-	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
-	float angleDisp = xform.rotation;
-
-	Matrix_33Rot(rot_mat, angleDisp);
-	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
-	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
-	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
-
-	// OpenGL requires matrix in col maj so transpose
-	Matrix_33Transpose(mesh.x_form, result);
-}
-
-void Render::Manager::renderObject(const Render::Mesh& e_mesh, Render::Color const& e_color) {
-	//Set polygon mode
-	glPolygonMode(GL_FRONT, GL_FILL);
-
-	// use shader
-	shader_system->useShader(e_mesh.shader_ref);
-	
-	//Texture of shape
-	if (e_mesh.texture_ref == "") {
-		//Shader set uniform
-		shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
-		shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
-	} else {
-		constexpr int texture_unit = 6;
-
-		// set texture
-		glBindTextureUnit(
-			texture_unit, // texture unit (binding index)
-			NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref)
-		);
-
-		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		shader_system->setUniform(e_mesh.shader_ref, "u_tex2d", texture_unit);
-		shader_system->setUniform(e_mesh.shader_ref, "u_transform", e_mesh.x_form);
-	}
-
-	//Get model
-	auto model = NIKEEngine.accessAssets()->getModel(e_mesh.model_ref);
-
-	//Draw
-	glBindVertexArray(model->vaoid);
-	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-
-	//Unuse texture
-	glBindVertexArray(0);
-	shader_system->unuseShader();
-}
-
-void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
-	//Set Polygon Mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	//Use shader
-	shader_system->useShader("base");
-
-	//Shader set uniform
-	//Scale wire frame
-	Matrix33::Matrix_33 scaled_wire_frame = 1.0f * e_mesh.x_form;
-	Matrix_33Transpose(scaled_wire_frame, scaled_wire_frame);
-
-	shader_system->setUniform("base", "f_color", e_color.color);
-	shader_system->setUniform("base", "model_to_ndc", scaled_wire_frame);
-
-	//Get model
-	auto model = NIKEEngine.accessAssets()->getModel(e_mesh.model_ref);
-
-	//Draw model
-	glBindVertexArray(model->vaoid);
-	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
-	glBindVertexArray(0);
-
-	//Unuse shader
-	shader_system->unuseShader();
-
-	//Reset Polygon Mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-std::shared_ptr<Render::Model> Render::Manager::registerModel(const std::string& path_to_mesh) {
-	std::shared_ptr<Model> model = std::make_shared<Model>();
-	if (loadMesh(path_to_mesh, model)) {
-		return model;
-	}
-
-	return nullptr;
 }
 
 char* Render::Manager::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_ext) {
@@ -339,6 +162,201 @@ unsigned int Render::Manager::registerShader(const std::string& shader_ref, cons
 	return shader_system->loadShader(shader_ref, vtx_path, frag_path);
 }
 
+
+bool Render::Manager::loadMesh(const std::string& path_to_mesh, std::shared_ptr<Model> model) {
+	std::ifstream mesh_file{ path_to_mesh, std::ios::in };
+	if (!mesh_file.is_open()) {
+		cerr << "Failed to open mesh file: " << path_to_mesh << endl;
+		return false;
+	}
+
+	mesh_file.seekg(0, std::ios::beg);
+
+	std::string line;
+	GLshort index;
+
+	// pos
+	std::vector<Vector2> vertices;
+	std::vector<Vector2> tex_coords;
+
+	// indices (indexed rendering with element buffer object)
+	std::vector<unsigned int> indices;
+
+
+
+	// line data type (eg. vertex, color, indices)
+	char type;
+
+	while (getline(mesh_file, line)) {
+		std::istringstream line_sstm{ line };
+
+		line_sstm >> type;
+
+		switch (type) {
+		case 'n': {// name
+			break;
+		}
+		case 'v': {// vertex
+			float ndc_x, ndc_y;
+			line_sstm >> ndc_x >> ndc_y;
+			vertices.emplace_back(ndc_x, ndc_y);
+			break;
+		}
+		case 't': {// triangle indices
+			if (model->primitive_type == 0) {
+				model->primitive_type = GL_TRIANGLES;
+			}
+			while (line_sstm >> index) { // Grab index position
+				indices.emplace_back(index);
+			}
+			break;
+		}
+		case 'i': {
+			float tex_x, tex_y;
+			line_sstm >> tex_x >> tex_y;
+			tex_coords.emplace_back(tex_x, tex_y);
+			break;
+		}
+		case 'f': {// fan indices
+			if (model->primitive_type == 0) {
+				model->primitive_type = GL_TRIANGLE_FAN;
+			}
+			while (line_sstm >> index) { // Grab index position
+				indices.emplace_back(index);
+			}
+			break;
+		}
+		default:
+			cerr << "Unknown data type in mesh file: " << type << endl;
+			return false;
+		}
+	}
+	mesh_file.close();
+
+	if (tex_coords.size() == 0) {
+		createBaseBuffers(vertices, indices, model);
+	}
+	else {
+		createTextureBuffers(vertices, indices, tex_coords, model);
+	}
+	model->draw_count = static_cast<GLuint>(indices.size());
+
+	return true;
+}
+
+
+std::shared_ptr<Render::Model> Render::Manager::registerModel(const std::string& path_to_mesh) {
+	std::shared_ptr<Model> model = std::make_shared<Model>();
+	if (loadMesh(path_to_mesh, model)) {
+		return model;
+	}
+
+	return nullptr;
+}
+
+void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
+	//Transform matrix here
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
+
+	// Scrap orientation for now
+	// Modulus the object rotation so it doesnt result in a large number overtime
+	// float orientation = fmod(orientation, 360.f);
+	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
+	float angleDisp = xform.rotation;
+
+	Matrix_33Rot(rot_mat, angleDisp);
+	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
+	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+
+	// OpenGL requires matrix in col maj so transpose
+	Matrix_33Transpose(mesh.x_form, result);
+}
+
+void Render::Manager::renderObject(const Render::Mesh& e_mesh, Render::Color const& e_color) {
+	//Set polygon mode
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	// use shader
+	shader_system->useShader(e_mesh.shader_ref);
+	
+	//Texture of shape
+	if (e_mesh.texture_ref == "") {
+		//Shader set uniform
+		shader_system->setUniform(e_mesh.shader_ref, "f_color", e_color.color);
+		shader_system->setUniform(e_mesh.shader_ref, "model_to_ndc", e_mesh.x_form);
+	} else {
+		constexpr int texture_unit = 6;
+
+		// set texture
+		glBindTextureUnit(
+			texture_unit, // texture unit (binding index)
+			NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref)
+		);
+
+		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_mesh.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		shader_system->setUniform(e_mesh.shader_ref, "u_tex2d", texture_unit);
+		shader_system->setUniform(e_mesh.shader_ref, "u_transform", e_mesh.x_form);
+	}
+
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel(e_mesh.model_ref);
+
+	//Draw
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+	//Unuse texture
+	glBindVertexArray(0);
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color const& e_color) {
+	//Set Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//Use shader
+	shader_system->useShader("base");
+
+	//Shader set uniform
+
+	shader_system->setUniform("base", "f_color", e_color.color);
+	shader_system->setUniform("base", "model_to_ndc", e_mesh.x_form);
+
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel("square");
+
+	//Draw model
+	glBindVertexArray(model->vaoid);
+	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+
+	//Unuse shader
+	shader_system->unuseShader();
+
+	//Reset Polygon Mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void Render::Manager::transformAndRenderEntity(Transform::Transform& e_transform,
+	Render::Mesh& e_mesh,
+	const Render::Color& e_color, bool debugMode) {
+	// Transform matrix here
+	transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
+
+	// Render object
+	renderObject(e_mesh, e_color);
+
+	if (debugMode) {
+		// Render debugging wireframe
+		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
+		renderWireFrame(e_mesh, wire_frame_color);
+	}
+
+}
+
 void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
 	camera_system->trackCamEntity(cam_identifier);
 }
@@ -377,26 +395,33 @@ void Render::Manager::update() {
 		cam_entities.insert(entity);
 	}
 
-	//Update camera with set of cam entities
+	//Update camera with set of cam entitiess
 	camera_system->updateCameraEntities(std::move(cam_entities));
 
 	//Update camera system
 	camera_system->update();
 
-	//Update all entities
+	//Update all and render except camera entities
 	for (auto& entity : entities) {
 		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
 		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(entity);
 		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(entity);
 
-		//Transform matrix here
-		transformMatrix(e_transform, e_mesh, camera_system->getWorldToNDCXform());
+		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
 
-		//Render object
-		renderObject(e_mesh, e_color);
+		transformAndRenderEntity(e_transform, e_mesh, e_color, 1);
+	}
 
-		//Render debugging wireframe
-		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
-		renderWireFrame(e_mesh, wire_frame_color);
+	// Update and render cameras last
+	for (auto& camera_entity : entities) {
+		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(camera_entity);
+		auto& e_mesh = NIKEEngine.getEntityComponent<Render::Mesh>(camera_entity);
+		auto& e_color = NIKEEngine.getEntityComponent<Render::Color>(camera_entity);
+
+		if (!NIKEEngine.checkEntityComponent<Render::Cam>(camera_entity))
+			continue;
+
+		// Transform and render the entity
+		transformAndRenderEntity(e_transform, e_mesh, e_color, 1);
 	}
 }
