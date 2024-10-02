@@ -28,6 +28,9 @@
     <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Systems\sysGameLogic.cpp" />
     <ClCompile Include="src\Managers\mDebug.cpp" />
+    <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
+    <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
+    <ClCompile Include="src\Utility\uSystems.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\sysPhysics.h" />
@@ -66,6 +69,10 @@
     <ClInclude Include="headers\Systems\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cScene.h" />
     <ClInclude Include="headers\Managers\mDebug.h" />
+    <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
+    <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
+    <ClInclude Include="headers\Components\cAnimation.h" />
+    <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
