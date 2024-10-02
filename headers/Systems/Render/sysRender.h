@@ -72,6 +72,9 @@ namespace Render {
 		//Transform matrix
 		void transformMatrix(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
 
+		void transformMatrixDebug(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat);
+
+
 		//Render object
 		void renderObject(Render::Mesh const& e_mesh, Render::Color const& e_color = {{0.0f, 0.0f, 0.0f}, 1.0f});
 

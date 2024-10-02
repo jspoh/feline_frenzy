@@ -273,6 +273,19 @@ void Render::Manager::transformMatrix(Transform::Transform& xform, Render::Mesh&
 	Matrix_33Transpose(mesh.x_form, result);
 }
 
+void Render::Manager::transformMatrixDebug(Transform::Transform& xform, Render::Mesh& mesh, Matrix33::Matrix_33 world_to_ndc_mat) {
+	//Transform matrix here
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
+
+	Matrix_33Rot(rot_mat, 0);
+	Matrix_33Scale(scale_mat, xform.scale.x, xform.scale.y);
+	Matrix_33Translate(trans_mat, xform.position.x, xform.position.y);
+	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+
+	// OpenGL requires matrix in col maj so transpose
+	Matrix_33Transpose(mesh.x_form, result);
+}
+
 void Render::Manager::renderObject(const Render::Mesh& e_mesh, Render::Color const& e_color) {
 	//Set polygon mode
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -330,7 +343,7 @@ void Render::Manager::renderWireFrame(Render::Mesh const& e_mesh, Render::Color 
 
 	//Draw model
 	glBindVertexArray(model->vaoid);
-	glDrawElements(GL_TRIANGLES, model->draw_count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_LINE_LOOP, model->draw_count, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 
 	//Unuse shader
@@ -350,7 +363,8 @@ void Render::Manager::transformAndRenderEntity(Transform::Transform& e_transform
 	renderObject(e_mesh, e_color);
 
 	if (debugMode) {
-		// Render debugging wireframe
+		// Render bounding box
+		transformMatrixDebug(e_transform, e_mesh, camera_system->getWorldToNDCXform());
 		Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
 		renderWireFrame(e_mesh, wire_frame_color);
 	}
