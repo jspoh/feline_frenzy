@@ -260,10 +260,6 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     Collision::Collider& eColliderA = NIKEEngine.getEntityComponent<Collision::Collider>(cEntityA);
     Collision::Collider& eColliderB = NIKEEngine.getEntityComponent<Collision::Collider>(cEntityB);
 
-    // Reset the collision flags for both colliders
-    eColliderA.left = eColliderA.right = eColliderA.top = eColliderA.bottom = false;
-    eColliderB.left = eColliderB.right = eColliderB.top = eColliderB.bottom = false;
-
     // Step 1: Static collision detection
     if (!(eColliderA.rect_max.x < eColliderB.rect_min.x || eColliderA.rect_min.x > eColliderB.rect_max.x ||
         eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y)) {
