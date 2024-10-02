@@ -2,7 +2,7 @@
  * \file   sysCamera.cpp
  * \brief  Implementation of camera system
  *
- * \author g.boonxuensean@digipen.edu
+ * \author Sean Gwee, g.boonxuensean@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

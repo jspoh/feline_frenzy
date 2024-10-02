@@ -3,7 +3,7 @@
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
- * \co-author g.boonxuensean
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -317,7 +317,7 @@ void Render::Manager::renderObject(Render::Texture const& e_texture) {
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	// use shader
-	shader_system->useShader("tex");
+	shader_system->useShader("texture");
 
 	//Texture unit
 	constexpr int texture_unit = 6;
@@ -338,11 +338,11 @@ void Render::Manager::renderObject(Render::Texture const& e_texture) {
 	uv_offset.y = std::abs(1 - uv_offset.y - e_texture.frame_size.y);
 
 	//Set uniforms for texture rendering
-	shader_system->setUniform("tex", "u_tex2d", texture_unit);
-	shader_system->setUniform("tex", "u_opacity", e_texture.color.alpha);
-	shader_system->setUniform("tex", "u_transform", e_texture.x_form);
-	shader_system->setUniform("tex", "uvOffset", uv_offset);
-	shader_system->setUniform("tex", "frameSize", e_texture.frame_size);
+	shader_system->setUniform("texture", "u_tex2d", texture_unit);
+	shader_system->setUniform("texture", "u_opacity", e_texture.color.alpha);
+	shader_system->setUniform("texture", "u_transform", e_texture.x_form);
+	shader_system->setUniform("texture", "uvOffset", uv_offset);
+	shader_system->setUniform("texture", "frameSize", e_texture.frame_size);
 
 	//Get model
 	auto model = NIKEEngine.accessAssets()->getModel("square-texture");

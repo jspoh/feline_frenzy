@@ -3,6 +3,7 @@
  * \brief  game logic system
  *
  * \author ho
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

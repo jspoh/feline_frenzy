@@ -42,7 +42,7 @@ Assets::Manager::~Manager() {
 }
 
  /*****************************************************************//**
- * Texture
+ * Rendering
  *********************************************************************/
 
 void Assets::Manager::registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
@@ -52,6 +52,12 @@ void Assets::Manager::registerShader(std::string const& shader_id, const std::st
 	}
 
 	shaders_list.insert({ shader_id, NIKEEngine.accessSystem<Render::Manager>()->registerShader(shader_id, vtx_path, frag_path) });
+}
+
+bool Assets::Manager::checkShader(std::string const& shader_id) {
+
+	return shaders_list.find(shader_id) != shaders_list.end();
+
 }
 
 unsigned int Assets::Manager::getShader(std::string const& shader_id) {
@@ -70,6 +76,12 @@ void Assets::Manager::registerModel(std::string const& model_id, std::string con
 	}
 
 	models_list.insert({ model_id, NIKEEngine.accessSystem<Render::Manager>()->registerModel(file_path) });
+}
+
+bool Assets::Manager::checkModel(std::string const& model_id) {
+
+	return models_list.find(model_id) != models_list.end();
+
 }
 
 std::shared_ptr<Render::Model> Assets::Manager::getModel(std::string const& model_id) {

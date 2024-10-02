@@ -1,4 +1,4 @@
-// @file	textured_rendering.vert
+// @file	texture.vert
 // @brief	textured vertex shader
 // @author	Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
 // @date	11 Sep 2024

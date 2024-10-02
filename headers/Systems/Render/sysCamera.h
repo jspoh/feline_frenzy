@@ -2,7 +2,7 @@
  * \file   sysCamera.h
  * \brief  
  *
- * \author g.boonxuensean@digipen.edu
+ * \author Sean Gwee, g.boonxuensean@digipen.edu
  * \date   September 2024
  *********************************************************************/
 #pragma once

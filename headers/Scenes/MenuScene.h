@@ -21,6 +21,8 @@ namespace Menu {
 		Entity::Type crash_entity;
 
 	public:
+		// Easy reference to entities types
+		std::unordered_map<std::string, Entity::Type> entities;
 
 		//Dfeault constructor
 		Scene() = default;

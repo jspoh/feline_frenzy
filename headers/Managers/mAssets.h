@@ -31,12 +31,18 @@ namespace Assets
 
 		//Load shaders
 		void registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+		
+		//Check shader exits
+		bool checkShader(std::string const& model_id);
 
-		//Get texture
+		//Get shader
 		unsigned int getShader(std::string const& shader_id);
 
 		//Load model
 		void registerModel(std::string const& model_id, std::string const& file_path);
+
+		//Check model exits
+		bool checkModel(std::string const& model_id);
 
 		//Get model
 		std::shared_ptr<Render::Model> getModel(std::string const& model_id);

@@ -16,7 +16,7 @@
 //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
-	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
+	// Register required components
 	NIKEEngine.registerComponent<Transform::Velocity>();
 	NIKEEngine.registerComponent<Transform::Transform>();
 	NIKEEngine.registerComponent<Transform::Runtime_Transform>();
@@ -59,16 +59,6 @@ void Menu::Scene::load() {
 	//Add event listener for animation system
 	NIKEEngine.accessEvents()->addEventListeners<Animation::AnimationEvent>(NIKEEngine.accessSystem<Animation::Manager>());
 
-	//Register Shaders
-	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
-	NIKEEngine.accessAssets()->registerShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
-
-	//Register models
-	NIKEEngine.accessAssets()->registerModel("square", "assets/meshes/square.txt");
-	NIKEEngine.accessAssets()->registerModel("triangle", "assets/meshes/triangle.txt");
-	NIKEEngine.accessAssets()->registerModel("circle", "assets/meshes/circle.txt");
-	NIKEEngine.accessAssets()->registerModel("square-texture", "assets/meshes/square-texture.txt");
-
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
@@ -79,19 +69,13 @@ void Menu::Scene::load() {
 void Menu::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
-	//Create entity
-	std::unordered_map<std::string, Entity::Type> entities;
-
 	loadFromFile("assets/scenes/mainmenu.scn", entities);
 
+	// Adding rotation control
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["duckobj"], Transform::Runtime_Transform());
 
-	//Create camera
+	// Adding another possible camera object
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["obj1"], { "CAM1", {0.0f, 0.0f}, 1000.0f });
-	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["camera"], { "CAM2", {122.0f, 0.0f}, 1000.0f });
-	NIKEEngine.addEntityComponentObj<Move::Movement>(entities["camera"], { false, false, false, false });
-	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
-
 
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
