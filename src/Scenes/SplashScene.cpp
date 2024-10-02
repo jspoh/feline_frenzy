@@ -38,7 +38,6 @@ void Splash::Scene::init() {
 	//Add component types to system
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Key>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
-	//NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
 
 	//Register audio system
 	NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());

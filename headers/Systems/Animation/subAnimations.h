@@ -55,6 +55,8 @@ namespace Animation {
 		void iterateForward(Animation::cSprite& sprite_component);
 		void iterateBackWard(Animation::cSprite& sprite_component);
 	public:
+		//Default constructor
+		SpriteSheet() = default;
 
 		//animate spritesheet
 		void animateSprite(Animation::cBase& base_component, Animation::cSprite& sprite_component, Render::Texture& sprite_texture);

@@ -136,6 +136,10 @@ char* Render::Manager::prepareImageData(const std::string& path_to_texture, int&
 	return data;
 }
 
+std::unordered_map<unsigned char, Render::Character> Render::Manager::registerFont(std::string const& file_path, Vector2 const& pixel_sizes) {
+	return std::move(font_system->loadFont(file_path, pixel_sizes));
+}
+
 unsigned int Render::Manager::registerTexture(const std::string& path_to_texture) {
 	// find file type
 	std::string junk, filetype;
@@ -356,6 +360,70 @@ void Render::Manager::renderObject(Render::Texture const& e_texture) {
 	shader_system->unuseShader();
 }
 
+void Render::Manager::renderText(Render::Text const& e_text) {
+
+	//Use shader
+	shader_system->useShader("text");
+
+	//Transform matrix here
+	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
+	Matrix_33Rot(rot_mat, 0.0f);
+	Matrix_33Scale(scale_mat, e_text.scale, e_text.scale);
+	Matrix_33Translate(trans_mat, e_text.position.x, e_text.position.y);
+	result = camera_system->getWorldToNDCXform() * trans_mat * rot_mat * scale_mat;
+	Matrix_33Transpose(result, result);
+
+	//Set uniform
+	shader_system->setUniform("text", "u_texture", 6);
+	shader_system->setUniform("text", "u_textColor", e_text.color.color);
+	shader_system->setUniform("text", "u_transform", result);
+
+	//Position
+	Vector2 pos = e_text.position;
+
+	// Iterate through all characters in the string
+	for (char c : e_text.text) {
+		Character ch = NIKEEngine.accessAssets()->getFont(e_text.font_ref).at(c);
+
+		// Calculate the position of the character
+		float xpos = pos.x + ch.bearing.x * e_text.scale;
+		float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
+
+		// Update VBO for the character
+		float w = ch.size.x * e_text.scale;
+		float h = ch.size.y * e_text.scale;
+
+		// Define the vertices for the character quad
+		float vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0f, 0.0f }, // Top-left
+			{ xpos,     ypos,       0.0f, 1.0f }, // Bottom-left
+			{ xpos + w, ypos,       1.0f, 1.0f }, // Bottom-right
+
+			{ xpos,     ypos + h,   0.0f, 0.0f }, // Top-left
+			{ xpos + w, ypos,       1.0f, 1.0f }, // Bottom-right
+			{ xpos + w, ypos + h,   1.0f, 0.0f }  // Top-right
+		};
+
+		// Render the glyph texture over the quad
+		glBindTexture(GL_TEXTURE_2D, ch.texture);
+
+		// Update VBO (assuming you have a VAO and VBO set up)
+		glBindVertexArray(font_system->getVAO());
+		glBindBuffer(GL_ARRAY_BUFFER, font_system->getVBO());
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		// Draw the character quad
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// Advance the cursor for the next character
+		pos.x += (ch.advance >> 6) * e_text.scale; // Bitshift by 6 to convert from 1/64th to 1
+	}
+
+	glBindVertexArray(0); // Unbind VAO
+	shader_system->unuseShader();
+}
+
 void Render::Manager::renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color) {
 	//Set Polygon Mode
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -426,6 +494,9 @@ std::unique_ptr<Camera::System>& Render::Manager::getCamEntity() {
 }
 
 void Render::Manager::init() {
+	//Create font system
+	font_system = std::make_unique<Font::Manager>();
+
 	//Create shader system
 	shader_system = std::make_unique<Shader::Manager>();
 
@@ -467,7 +538,16 @@ void Render::Manager::update() {
 
 	//Update all and render except camera entities
 	for (auto& entity : entities) {
+		//Check for text objects
+		if (NIKEEngine.checkEntityComponent<Render::Text>(entity)) {
+			renderText(NIKEEngine.getEntityComponent<Render::Text>(entity));
+			continue;
+		}
+
+		//Skip camera
 		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
+
+		//Transform and render object
 		transformAndRenderEntity(entity, 1);
 	}
 
@@ -476,6 +556,5 @@ void Render::Manager::update() {
 		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) {
 			transformAndRenderEntity(entity, 1);
 		}
-
 	}
 }
