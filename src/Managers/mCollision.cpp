@@ -33,7 +33,7 @@ void Collision::Manager::registerCollider(const Vector2& position, const Vector2
             collider.rect_min = { position.x - (size.x * 0.5f), position.y - (size.y * 0.5f) };
             collider.rect_max = { position.x + (size.x * 0.5f), position.y + (size.y * 0.5f) };
             return;
-        }
+        }d
     }
     cout << "Error: No available colliders to register!" << endl;
 }
@@ -135,7 +135,7 @@ bool Collision::Manager::setColliderComp(Entity::Type& cEntity) {
     Transform::Transform& eTransform = NIKEEngine.getEntityComponent<Transform::Transform>(cEntity);
 
     // Reference to Velocity component
-    Transform::Velocity& eVelocity = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntity);
+    //Transform::Velocity& eVelocity = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntity);
 
     Vector2 Rect_Min = { eTransform.position.x - (eTransform.scale.x * 0.5f), eTransform.position.y - (eTransform.scale.y * 0.5f) };
     Vector2 Rect_Max = { eTransform.position.x + (eTransform.scale.x * 0.5f), eTransform.position.y + (eTransform.scale.y * 0.5f) };
@@ -249,8 +249,8 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     }
 
     // Reference to Transform components
-    Transform::Transform& eTransformA = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityA);
-    Transform::Transform& eTransformB = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityB);
+    //Transform::Transform& eTransformA = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityA);
+    //Transform::Transform& eTransformB = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityB);
 
     // Reference to Velocity components
     Transform::Velocity& eVelocityA = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntityA);

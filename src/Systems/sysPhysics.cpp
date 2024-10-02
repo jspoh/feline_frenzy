@@ -160,7 +160,7 @@ void Physics::Manager::update() {
                 collider.rect_max = transform.position + (transform.scale * 0.5f);
             }
         }
-        else if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) &&
+        if (NIKEEngine.checkEntityComponent<Transform::Transform>(entity) &&
             NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity)) {
 
             // Reference to transform component
