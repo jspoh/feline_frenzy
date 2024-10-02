@@ -101,7 +101,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		NIKEEngine.addEntityComponentObj<Transform::Velocity>(entity, { {velocity.x, velocity.y} });
 		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, orientation.x });
 
-		// Set collider, currently checks if object name has "bounce" substring to enable bouncing on collision
+		// Set collider, currently checks if object name has "bounce" substring to enable bouncing on collision // Added by MKK
 		if (object_name.find("bounce") != std::string::npos) {
 			// The substring "bounce" is found in object_name
 			Physics::Manager::getInstance()->collision_manager.setColliderComp(entity, true);
