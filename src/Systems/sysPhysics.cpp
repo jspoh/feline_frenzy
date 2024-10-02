@@ -59,11 +59,6 @@ void Physics::Manager::update() {
             NIKEEngine.checkEntityComponent<Transform::Velocity>(entityA) &&
             NIKEEngine.checkEntityComponent<Collision::Collider>(entityA)) {
 
-            // Reference to components of entityA
-            Transform::Transform& transformA = NIKEEngine.getEntityComponent<Transform::Transform>(entityA);
-            Transform::Velocity& velocityA = NIKEEngine.getEntityComponent<Transform::Velocity>(entityA);
-            Collision::Collider& colliderA = NIKEEngine.getEntityComponent<Collision::Collider>(entityA);
-
             // Loop through all other entities for collision detection
             for (Entity::Type entityB : entities) {
                 if (entityA == entityB) {
