@@ -46,7 +46,7 @@ void Menu::Scene::init() {
 
 	//Create text object
 	 Entity::Type basic_text = NIKEEngine.createEntity();
-	 NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "AB C", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.0f, 0.0f}, 1.0f });
+	 NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.1f, 0.1f}, 0.05f });
 }
 
 void Menu::Scene::exit() {

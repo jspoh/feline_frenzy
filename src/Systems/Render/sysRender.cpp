@@ -374,6 +374,9 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 	//Get model
 	const auto& model = NIKEEngine.accessAssets()->getModel("square-texture");
 
+	// num chars counter
+	int i{};
+
 	// Iterate through all characters in the string
 	for (char c : e_text.text) {
 		const Character& ch = NIKEEngine.accessAssets()->getFont(e_text.font_ref).at(c);
@@ -388,11 +391,22 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 		glTextureParameteri(ch_tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(ch_tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+		//Matrix33::Matrix_33 xform, scale_mat, rot_mat, trans_mat;
+		//Matrix_33Rot(rot_mat, 0.0f);
+		//Matrix_33Scale(scale_mat, e_text.scale, e_text.scale);
+		//Matrix_33Translate(trans_mat, e_text.position.x, e_text.position.y);
+		//xform = camera_system->getWorldToNDCXform() * trans_mat * rot_mat * scale_mat;
+		//Matrix_33Transpose(xform, xform);
+
+		// Calculate the position of the character
+		const float xpos = e_text.position.x + e_text.scale * i;
+		const float ypos = e_text.position.y;
+
 		// !TODO: refine this
 		Matrix33::Matrix_33 xform = Matrix33::Matrix_33::Identity();
-		xform *= 0.1f;
-		xform.matrix_33[2][0] = 0.1f;
-		xform.matrix_33[2][1] = 0.1f;
+		xform *= e_text.scale;
+		xform.matrix_33[2][0] = xpos;
+		xform.matrix_33[2][1] = ypos;
 
 		// required to flip around for opengl rendering
 		xform.matrix_33[1][1] *= -1;
@@ -411,6 +425,8 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 		//Draw
 		glBindVertexArray(model->vaoid);
 		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+		i++;
 	}
 
 	//Unuse texture
