@@ -2,7 +2,7 @@
  * \file   mSerialization.h
  * \brief  Serialization manager
  *
- * \author b.soh
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

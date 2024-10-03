@@ -1,3 +1,12 @@
+/*****************************************************************//**
+ * \file   cTransform.h
+ * \brief
+ *
+ * \author Sean Gwee, g.boonxuensean@digipen.edu
+ * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \date   September 2024
+ *********************************************************************/
+
 #pragma once
 
 #ifndef C_TRANSFORM_HPP

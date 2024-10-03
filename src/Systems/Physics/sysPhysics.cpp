@@ -2,7 +2,8 @@
  * \file   PhysicsSystem.cpp
  * \brief  Physics system for engine
  *
- * \author b.soh, ko.m
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \co-author, ko.m
  * \date   September 2024
  *********************************************************************/
 

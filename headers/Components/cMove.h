@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   cMove.h
+ * \brief
+ *
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \date   September 2024
+ *********************************************************************/
+
 #pragma once
 
 #ifndef C_MOVE_HPP
