@@ -56,6 +56,7 @@ void Splash::Scene::registerStaticSystems() {
 	NIKEEngine.accessSystem<Input::Manager>()->setComponentsLinked(false);
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Key>());
 	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
 
 	//Register physics manager
 	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
@@ -116,9 +117,9 @@ void Splash::Scene::load() {
 	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
 
 	//Register game logic system
-	cout << NIKEEngine.getSystemIndex<Render::Manager>() << '\n';
+	cout << NIKEEngine.getSystemIndex<Render::Manager>() << endl;
 	NIKEEngine.registerSystem<GameLogic::Manager>(nullptr, NIKEEngine.getSystemIndex<Render::Manager>());
-	cout << NIKEEngine.getSystemIndex<Render::Manager>() << '\n';
+	cout << NIKEEngine.getSystemIndex<Render::Manager>() << endl;
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Scenes::ChangeSceneEvent>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());

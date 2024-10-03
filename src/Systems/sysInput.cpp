@@ -125,7 +125,7 @@ void Input::Manager::update() {
 			}
 		}
 
-		else if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
+		if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
 		{
 			Transform::Runtime_Transform& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
 			// Check if Z key is pressed for runtime scale up

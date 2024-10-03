@@ -47,7 +47,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		// !TODO create a proper system to register shader files
 		getline(ifs, line); // shader files
 		std::istringstream line_shdrprgm{ line };
-		line_shdrprgm >> shdr_prgm >> tex ;
+		line_shdrprgm >> shdr_prgm >> tex;
 
 		// Color
 		getline(ifs, line);
@@ -89,7 +89,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		else if (shdr_prgm == "texture") {
 			NIKEEngine.addEntityComponentObj<Render::Texture>(entity, { tex ,Matrix33::Matrix_33::Identity(), { clr_atr, 1.0f }, { 1.0f, 1.0f}, {0.0f, 0.0f} });
 		}
-		
+
 		NIKEEngine.addEntityComponentObj<Transform::Velocity>(entity, { {velocity.x, velocity.y} });
 		NIKEEngine.addEntityComponentObj<Transform::Transform>(entity, { position, scaling, orientation.x });
 
@@ -98,14 +98,14 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 			// The substring "bounce" is found in object_name
 			NIKEEngine.accessSystem<Physics::Manager>()->collision_manager.setColliderComp(entity, true);
 		}
-		else if (object_name.find("background") != std::string::npos)
+		else if (object_name.find("background") != std::string::npos || object_name.find("tree") != std::string::npos)
 		{
-			 // Not to add collision to background texture
+			// Not to add collision to background texture
 		}
 		else {
 			NIKEEngine.accessSystem<Physics::Manager>()->collision_manager.setColliderComp(entity);
 		}
-		
+
 
 		// Init Player Camera (ALL SCENE MUST HAVE)
 		if (object_name == "player") {
