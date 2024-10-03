@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Systems/Physics/sysCollision.h"
+#include "../headers/Managers/mCollision.h"
 #include "../headers/Systems/sysInput.h"
 
 Collision::Manager::Manager() {

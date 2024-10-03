@@ -97,7 +97,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 			NIKEEngine.addEntityComponentObj<Render::Shape>(entity, { model_name, Matrix33::Matrix_33(), { clr_atr, 1.0f } });
 		}
 		else if (shdr_prgm == "texture") {
-			NIKEEngine.addEntityComponentObj<Render::Texture>(entity, { tex ,Matrix33::Matrix_33::Identity(), { clr_atr, 1.0f }, { 1.0f / 2.0f, 1.0f / 2.0f}, {0.0f, 0.0f} });
+			NIKEEngine.addEntityComponentObj<Render::Texture>(entity, { tex ,Matrix33::Matrix_33::Identity(), { clr_atr, 1.0f }, { 1.0f, 1.0f }, {0.0f, 0.0f} });
 		}
 		
 		NIKEEngine.addEntityComponentObj<Transform::Velocity>(entity, { {velocity.x, velocity.y} });
