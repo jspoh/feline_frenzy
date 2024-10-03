@@ -17,6 +17,7 @@
 #include "../headers/Components/cScene.h"
 #include "../headers/Managers/mEvents.h"
 #include "../headers/Components/cAnimation.h"
+#include "../headers/Components/cMove.h"
 
 namespace GameLogic {
 

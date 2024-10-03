@@ -9,7 +9,7 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysGameLogic.h"
+#include "../headers/Systems/GameLogic/sysGameLogic.h"
 
 void GameLogic::Manager::init() {
 

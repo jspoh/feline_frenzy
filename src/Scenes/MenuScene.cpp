@@ -17,26 +17,6 @@
 //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
-	// Register required components
-	NIKEEngine.registerComponent<Transform::Transform>();
-	NIKEEngine.registerComponent<Transform::Runtime_Transform>();
-	NIKEEngine.registerComponent<Render::Shape>();
-	NIKEEngine.registerComponent<Render::Texture>();
-	NIKEEngine.registerComponent<Render::Color>();
-	NIKEEngine.registerComponent<Render::Cam>();
-	NIKEEngine.registerComponent<Render::Text>();
-	NIKEEngine.registerComponent<Collision::Collider>(); // Under sysPhysics
-	NIKEEngine.registerComponent<Animation::cBase>();
-	NIKEEngine.registerComponent<Animation::cSprite>();
-
-	//Add Singleton System
-	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
-	NIKEEngine.registerSystem<Animation::Manager>();
-	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
-
-	//Add component types to system
-	//NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
-	//NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
 
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");

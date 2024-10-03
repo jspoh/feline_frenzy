@@ -48,10 +48,7 @@ void Splash::Scene::registerComponents() {
 
 	//Register audio components
 	NIKEEngine.registerComponent<Audio::cAudio>();
-	NIKEEngine.registerComponent<Scenes::ChangeSceneEvent>();
-	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
-	NIKEEngine.registerComponent<Move::Movement>();
-	NIKEEngine.registerComponent<Transform::Velocity>();
+}
 
 void Splash::Scene::registerStaticSystems() {
 	//Register input manager
