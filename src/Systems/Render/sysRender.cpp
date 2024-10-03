@@ -347,6 +347,7 @@ void Render::Manager::renderObject(Render::Texture const& e_texture) {
 	shader_system->setUniform("texture", "u_transform", e_texture.x_form);
 	shader_system->setUniform("texture", "uvOffset", uv_offset);
 	shader_system->setUniform("texture", "frameSize", e_texture.frame_size);
+	shader_system->setUniform("texture", "u_is_font", false);
 
 	//Get model
 	auto model = NIKEEngine.accessAssets()->getModel("square-texture");
@@ -401,9 +402,11 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 
 		//Set uniforms for texture rendering
 		shader_system->setUniform("texture", "u_tex2d", texture_unit);
+		shader_system->setUniform("texture", "u_opacity", 1);
 		shader_system->setUniform("texture", "u_transform", xform);
 		shader_system->setUniform("texture", "uvOffset", uv_offset);
 		shader_system->setUniform("texture", "frameSize", frame_size);
+		shader_system->setUniform("texture", "u_is_font", true);
 
 		//Draw
 		glBindVertexArray(model->vaoid);
