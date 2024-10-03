@@ -37,13 +37,8 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		getline(ifs, line); // 1st parameter: model's name
 		std::istringstream line_modelname{ line };
 		line_modelname >> model_name;
+
 		// Register model
-		if (!NIKEEngine.accessAssets()->checkModel(model_name)) {
-			mesh_file = "assets/meshes/" + model_name + ".txt";
-
-			NIKEEngine.accessAssets()->registerModel(model_name, mesh_file);
-		}
-
 		getline(ifs, line); // object name
 		std::istringstream line_objectname{ line };
 		line_objectname >> object_name;
@@ -52,12 +47,6 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		getline(ifs, line); // shader files
 		std::istringstream line_shdrprgm{ line };
 		line_shdrprgm >> shdr_prgm >> tex ;
-
-		if (!NIKEEngine.accessAssets()->checkShader(shdr_prgm)) {
-			vert_file = "shaders/" + shdr_prgm + ".vert";
-			frag_file = "shaders/" + shdr_prgm + ".frag";
-			NIKEEngine.accessAssets()->registerShader(shdr_prgm, vert_file, frag_file);
-		}
 
 		// Color
 		getline(ifs, line);

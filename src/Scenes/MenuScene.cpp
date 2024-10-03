@@ -63,6 +63,8 @@ void Menu::Scene::load() {
 	NIKEEngine.accessEvents()->addEventListeners<Animation::AnimationEvent>(NIKEEngine.accessSystem<Animation::Manager>());
 
 	//Register shader
+	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
+	NIKEEngine.accessAssets()->registerShader("texture", "shaders/texture.vert", "shaders/texture.frag");
 	NIKEEngine.accessAssets()->registerShader("text", "shaders/text.vert", "shaders/text.frag");
 
 	//Register textures
@@ -71,7 +73,14 @@ void Menu::Scene::load() {
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
 	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
 	NIKEEngine.accessAssets()->registerTexture("player", "assets/textures/player.png");
-	NIKEEngine.accessAssets()->registerTexture("background", "assets/textures/background.jpg");
+	NIKEEngine.accessAssets()->registerTexture("background", "assets/textures/Tileset_Guide.png");
+
+	//Register models
+	NIKEEngine.accessAssets()->registerModel("square", "assets/meshes/square.txt");
+	NIKEEngine.accessAssets()->registerModel("triangle", "assets/meshes/triangle.txt");
+	NIKEEngine.accessAssets()->registerModel("circle", "assets/meshes/circle.txt");
+	NIKEEngine.accessAssets()->registerModel("square-texture", "assets/meshes/square-texture.txt");
+
 
 	//Register font
 	NIKEEngine.accessAssets()->registerFont("basic", "assets/Fonts/Montserrat-Bold.ttf");
