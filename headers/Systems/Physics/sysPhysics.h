@@ -26,7 +26,7 @@ namespace Physics {
 		void operator=(Manager const& copy) = delete;
 
 	public:
-		Collision::Manager collision_manager; // Current one instance of collision manager
+		Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
 
 		//Default Constructor
 		Manager() = default;

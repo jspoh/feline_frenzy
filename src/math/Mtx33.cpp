@@ -2,7 +2,7 @@
  * \file   Mtx33.cpp
  * \brief  Matrix function definitions for Matrix library
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

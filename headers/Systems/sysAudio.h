@@ -2,7 +2,7 @@
  * \file   sysAudio.h
  * \brief  Audio system manager function declarations
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

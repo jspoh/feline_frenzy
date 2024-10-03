@@ -41,7 +41,7 @@ void GameLogic::Manager::update() {
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
 				// Render start from 3
-				Entity::Type new_entity = NIKEEngine.cloneEntity(5);
+				Entity::Type new_entity = NIKEEngine.cloneEntity(5 + std::rand() % 2);
 				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
 			}
 		}

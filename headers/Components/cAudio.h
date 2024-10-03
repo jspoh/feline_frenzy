@@ -2,7 +2,7 @@
  * \file   cAudio.h
  * \brief  Audio components for ecs architecture
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

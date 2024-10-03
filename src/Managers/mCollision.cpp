@@ -2,7 +2,7 @@
 * \file   mCollision.cpp
 * \brief  Implements the collision manager.
 *
-* \author Min Khant Ko
+* \author Min Khant Ko, 2301320, ko.m@digipen.edu
 * \date   September 2024
 *********************************************************************/
 
