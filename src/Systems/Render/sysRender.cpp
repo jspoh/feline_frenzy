@@ -381,8 +381,8 @@ void Render::Manager::renderTextureRaw(unsigned int tex_hdl) {
 
 	Matrix33::Matrix_33 xform = Matrix33::Matrix_33::Identity();
 	xform *= 0.1f;
-	//xform.matrix_33[2][0] = 0.1f;
-	//xform.matrix_33[2][1] = 0.1f;
+	xform.matrix_33[2][0] = 0.1f;
+	xform.matrix_33[2][1] = 0.1f;
 	
 	const Vector2 uv_offset{ 0, 0 };
 	const Vector2 frame_size{ 1, 1 };
@@ -407,7 +407,7 @@ void Render::Manager::renderTextureRaw(unsigned int tex_hdl) {
 }
 
 void Render::Manager::renderText(Render::Text const& e_text) {
-	const unsigned int test_ch_tex_hdl = NIKEEngine.accessAssets()->getFont("basic").at('B').texture;
+	const unsigned int test_ch_tex_hdl = NIKEEngine.accessAssets()->getFont("basic").at('6').texture;
 	renderTextureRaw(test_ch_tex_hdl);
 	return;
 

@@ -14,5 +14,6 @@ uniform float u_opacity;
 
 void main() {
 	vec4 tex_color = texture(u_tex2d, f_texcoord);
-	out_color = vec4(tex_color.rgb, tex_color.a * u_opacity);
+	//out_color = vec4(tex_color.rgb, tex_color.a * u_opacity);
+	out_color = vec4(tex_color.r, tex_color.r, tex_color.r, 1);		// testing for text rendering
 }
