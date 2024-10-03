@@ -2,7 +2,7 @@
  * \file   mDebug.cpp
  * \brief  Debug manager function definitions
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

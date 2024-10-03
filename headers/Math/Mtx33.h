@@ -2,7 +2,7 @@
  * \file   Mtx33.h
  * \brief  Matrix function declarations for Matrix library
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 

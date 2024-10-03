@@ -2,7 +2,7 @@
  * \file   mAssets.cpp
  * \brief  Assets manager function definitions
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
