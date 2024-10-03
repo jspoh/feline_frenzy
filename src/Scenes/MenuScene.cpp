@@ -3,7 +3,7 @@
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
- * \co-author Sean Gwee, g.boonxuensean@digipen.edu, Min Khant Ko, 2301320, ko.m@digipen.edu
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu, Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
@@ -20,7 +20,6 @@ void Menu::Scene::load() {
 
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
-	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/Tree_Orange.png");
 	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
 	NIKEEngine.accessAssets()->registerTexture("player", "assets/textures/player.png");
