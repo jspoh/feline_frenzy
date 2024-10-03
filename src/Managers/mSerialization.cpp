@@ -101,7 +101,6 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		else if (object_name.find("background") != std::string::npos)
 		{
 			 // Not to add collision to background texture
-			 continue;
 		}
 		else {
 			NIKEEngine.accessSystem<Physics::Manager>()->collision_manager.setColliderComp(entity);
@@ -117,7 +116,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		}
 
 
-		// Push the entity into the vector
+		// Map entity into map
 		entities[object_name] = entity;
 	}
 }

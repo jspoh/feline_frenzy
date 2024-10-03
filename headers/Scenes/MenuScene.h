@@ -32,7 +32,7 @@ namespace Menu {
 		void init() override;
 		void exit() override;
 		void unload() override;
-		void loadFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities);
+
 
 		//Default destructor
 		~Scene() override = default;

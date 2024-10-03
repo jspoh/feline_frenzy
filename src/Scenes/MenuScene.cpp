@@ -34,6 +34,7 @@ void Menu::Scene::init() {
 
 	// Adding rotation control
 	//NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["obj4"], Transform::Runtime_Transform());
+	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("background");
 
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
