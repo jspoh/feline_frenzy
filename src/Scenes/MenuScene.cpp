@@ -85,8 +85,8 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["obj4"], Transform::Runtime_Transform());
 
 	// Adding another possible camera object
-	// NIKEEngine.addEntityComponentObj<Render::Cam>(entities["obj1"], { "CAM1", {0.0f, 0.0f}, 1000.0f });
-
+	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["background"], { "background", {0.0f, 0.0f}, 1000.0f });
+	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("background");
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(objSpawner, { Input::TriggerMode::TRIGGERED });
