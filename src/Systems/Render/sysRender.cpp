@@ -548,13 +548,13 @@ void Render::Manager::update() {
 		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
 
 		//Transform and render object
-		transformAndRenderEntity(entity, 1);
+		transformAndRenderEntity(entity, debug_mode);
 	}
 
 	// Render camera above all components
 	for (auto& entity : entities) {
 		if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) {
-			transformAndRenderEntity(entity, 1);
+			transformAndRenderEntity(entity, debug_mode);
 		}
 	}
 }

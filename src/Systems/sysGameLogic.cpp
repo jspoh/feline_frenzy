@@ -40,7 +40,7 @@ void GameLogic::Manager::update() {
 				Vector3 ndc_coords = { ndcX, ndcY, 1.0f }; // NDC in homogeneous coordinates
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
-				Entity::Type new_entity = NIKEEngine.cloneEntity(6);
+				Entity::Type new_entity = NIKEEngine.cloneEntity(5);
 				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
 			}
 		}
@@ -76,6 +76,10 @@ void GameLogic::Manager::update() {
 					NIKEEngine.accessDebug()->logCrash();
 					NIKEEngine.accessWindow()->terminate();
 				}
+			}
+
+			if (e_key.b_output && (e_key.key_type == GLFW_KEY_T)) {
+				NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;;
 			}
 
 			if (e_key.b_output && (e_key.key_type == GLFW_KEY_P))

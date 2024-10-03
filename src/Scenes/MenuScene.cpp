@@ -87,10 +87,15 @@ void Menu::Scene::init() {
 	// Adding another possible camera object
 	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["background"], { "background", {0.0f, 0.0f}, 1000.0f });
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("background");
+
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(objSpawner, { Input::TriggerMode::TRIGGERED });
 	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, {});
+
+	//Toggle debug mode
+	Entity::Type debugMode = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Input::Mouse>(debugMode, { Input::TriggerMode::TRIGGERED });
 
 	//Create text object
 	// Entity::Type basic_text = NIKEEngine.createEntity();

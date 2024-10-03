@@ -100,6 +100,15 @@ namespace Render {
 		//Destructor
 		~Manager() = default;
 
+		// Debug mode for bounding box
+		bool debug_mode = false;
+
+		std::string getSysName()
+		{
+			return "Render System";
+		}
+
+
 		//Singleton Of Manager Class
 		static std::shared_ptr<Manager> getInstance() {
 			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
@@ -136,12 +145,6 @@ namespace Render {
 		 * \return success
 		 */
 		std::shared_ptr<Render::Model> registerModel(const std::string& path_to_mesh);
-
-
-		std::string getSysName()
-		{
-			return "Render System";
-		}
 
 		/**
 		 * registers textures.
