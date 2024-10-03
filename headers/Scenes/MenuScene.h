@@ -20,9 +20,9 @@ namespace Menu {
 		//Create scene specific variables here
 		Entity::Type crash_entity;
 
-	public:
 		// Easy reference to entities types
 		std::unordered_map<std::string, Entity::Type> entities;
+	public:
 
 		//Dfeault constructor
 		Scene() = default;

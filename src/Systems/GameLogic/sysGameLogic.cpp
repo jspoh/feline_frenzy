@@ -15,7 +15,7 @@ void GameLogic::Manager::init() {
 
 }
 
-void GameLogic::Manager::update() {
+bool GameLogic::Manager::update() {
 
 	//Loop through entities
 	for (auto& entity : entities) {
@@ -37,15 +37,6 @@ void GameLogic::Manager::update() {
 				// Render start from 3
 				Entity::Type new_entity = NIKEEngine.cloneEntity(5 + std::rand() % 2);
 				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
-			}
-		}
-
-		//Changing scene to menu
-		if (NIKEEngine.checkEntityComponent<Scenes::ChangeSceneEvent>(entity)) {
-			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
-			if (e_mouse.b_output && (e_mouse.button_type == GLFW_MOUSE_BUTTON_LEFT)) {
-				auto menu_event = std::make_shared<Scenes::ChangeSceneEvent>(Scenes::Actions::CHANGE, "MENU");
-				NIKEEngine.accessEvents()->dispatchEvent(menu_event);
 			}
 		}
 
@@ -77,35 +68,6 @@ void GameLogic::Manager::update() {
 				NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;;
 			}
 
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_P))
-			{
-				NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
-			}
-
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_K))
-			{
-				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::END, "AME-ANIMATOR");
-				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
-			}
-
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_L))
-			{
-				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::RESTART, "AME-ANIMATOR");
-				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
-			}
-
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_I))
-			{
-				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::PAUSE, "AME-ANIMATOR");
-				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
-			}
-
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_J))
-			{
-				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::RESUME, "AME-ANIMATOR");
-				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
-			}
-
 			// Input for Player
 			if (NIKEEngine.checkEntityComponent<Move::Movement>(entity) && NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
 				const float movespeed = 300.0f;
@@ -134,5 +96,7 @@ void GameLogic::Manager::update() {
 			}
 		}
 	}
+
+	return false;
 }
 

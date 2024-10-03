@@ -17,13 +17,7 @@
 namespace Splash {
 	class Scene : public Scenes::IScene {
 	private:
-		//Create scene specific variables here
-		Entity::Type input; 
-		// BGM goes here
-		Entity::Type bg_music;
-
-		//New scene entity
-		Entity::Type next_scene;
+		std::unordered_map<std::string, Entity::Type> entities;
 
 		//Register components
 		void registerComponents();

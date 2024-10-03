@@ -14,7 +14,7 @@
  *********************************************************************/
 
 void Animation::Base::animationEndChecker(Animation::cBase& base_components) {
-	//Incr Completed Animations
+	//Incr Completed Animations ( If animations to complete == 0, animation will keep running ) 
 	if (++base_components.completed_animations >= base_components.animations_to_complete && base_components.animations_to_complete) {
 		base_components.b_animation_stop = true;
 		base_components.b_animation_finished = true;
@@ -50,22 +50,24 @@ void Animation::Base::finishAnimation(Animation::cBase& base_components) {
 *********************************************************************/
 
 int Animation::SpriteSheet::frameCount(Animation::cSprite const& sprite_component) {
-	int num_sprites = 0;
-	//Calculating Num Of Sprites To Animate
-	for (int i = (int)sprite_component.start_index.y; i < (int)sprite_component.sheet_size.y; i++) {
-		for (int j = (int)sprite_component.start_index.x; j < (int)sprite_component.sheet_size.x; j++) {
+    int start_row = (int)sprite_component.start_index.y;
+    int start_col = (int)sprite_component.start_index.x;
+    int end_row = (int)sprite_component.end_index.y;
+    int end_col = (int)sprite_component.end_index.x;
+    int sheet_width = (int)sprite_component.sheet_size.x;  // Number of columns in the sprite sheet
 
-			//Inc Num Of Sprites To Animate
-			num_sprites++;
+    // Calculate number of rows between start and end indices
+    int row_diff = end_row - start_row;
 
-			//Check If End Index Has Been Reached
-			if (i == sprite_component.end_index.y && j == sprite_component.end_index.x) {
-				break;
-			}
-		}
-	}
+    // If the start and end are on the same row, it's just the column difference
+    if (row_diff == 0) {
+        return end_col - start_col + 1;
+    }
 
-	return num_sprites;
+    // Calculate number of sprites
+    int num_sprites = (row_diff * sheet_width) + (end_col + 1) - start_col;             
+
+    return num_sprites;
 }
 
 void Animation::SpriteSheet::iterateForward(Animation::cSprite& sprite_component) {
@@ -118,14 +120,6 @@ void Animation::SpriteSheet::animateSprite(Animation::cBase& base_component, Ani
 		//Reset Timer
 		base_component.timer.restartClock();
 
-		//Iterate Curr Sprite
-		if (!base_component.b_reverse) {
-			iterateForward(sprite_component);
-		}
-		else {
-			iterateBackWard(sprite_component);
-		}
-
 		//If End Has Been Reached
 		if (sprite_component.curr_index == sprite_component.end_index) {
 			//Check If Animation Is Finished
@@ -140,6 +134,14 @@ void Animation::SpriteSheet::animateSprite(Animation::cBase& base_component, Ani
 			else {
 				sprite_component.curr_index = sprite_component.start_index;
 			}
+		}
+
+		//Iterate Curr Sprite
+		if (!base_component.b_reverse) {
+			iterateForward(sprite_component);
+		}
+		else {
+			iterateBackWard(sprite_component);
 		}
 
 		//If CurrSprite Is At Start

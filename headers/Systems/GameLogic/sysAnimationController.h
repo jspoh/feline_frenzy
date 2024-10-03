@@ -1,28 +1,18 @@
 /*****************************************************************//**
- * \file   sysGameLogic.h
- * \brief  game logic system
+ * \file   sysAnimationController.h
+ * \brief  animation controller system
  *
  * \author Ho
  * \date   September 2024
  *********************************************************************/
 #pragma once
 
-#ifndef GAME_LOGIC_HPP
-#define GAME_LOGIC_HPP
+#ifndef ANIMATION_CONTROLLER_HPP
+#define ANIMATION_CONTROLLER_HPP
 
 #include "../headers/Managers/mSystem.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cInput.h"
-#include "../headers/Components/cScene.h"
-#include "../headers/Managers/mEvents.h"
-#include "../headers/Components/cAnimation.h"
-#include "../headers/Components/cMove.h"
 
-namespace GameLogic {
-
-	//Object type
-	struct ObjectSpawner{};
+namespace AnimationController {
 
 	class Manager : public System::ISystem {
 	private:
@@ -39,7 +29,7 @@ namespace GameLogic {
 
 		std::string getSysName() override
 		{
-			return "Game Logic System";
+			return "Animation Controller System";
 		}
 
 		//Update Inputs
@@ -50,4 +40,4 @@ namespace GameLogic {
 	};
 }
 
-#endif //!GAME_LOGIC_HPP
+#endif //!ANIMATION_CONTROLLER_HPP

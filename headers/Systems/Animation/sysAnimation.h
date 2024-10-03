@@ -52,7 +52,7 @@ namespace Animation {
 		void init() override;
 
 		//Override update func
-		void update() override;
+		bool update() override;
 
 		//Execute event
 		void executeEvent(std::shared_ptr<Events::IEvent> event) override;

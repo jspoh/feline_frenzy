@@ -43,7 +43,7 @@ void Audio::Manager::init()
 
 }
 
-void Audio::Manager::update()
+bool Audio::Manager::update()
 {
 	fmod_system->update();
 	// For debug purposes
@@ -61,6 +61,8 @@ void Audio::Manager::update()
 			}
 		}
 	}
+
+	return false;
 }
 
 // Release Fmod system

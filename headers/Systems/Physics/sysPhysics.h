@@ -52,7 +52,7 @@ namespace Physics {
 		}
 
 		//Update
-		void update() override;
+		bool update() override;
 
 		//Move Object
 		//void move(Transform::Transform& transform);

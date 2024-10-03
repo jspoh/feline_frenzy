@@ -65,7 +65,7 @@ bool Input::Manager::keyReleaseCheck() {
 	return false;
 }
 
-void Input::Manager::update() {
+bool Input::Manager::update() {
 
 	//Key trigger mode checking
 	bool key_triggered = keyTriggerCheck();
@@ -136,6 +136,8 @@ void Input::Manager::update() {
 			e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
 		}
 	}
+
+	return false;
 }
 
 void Input::Manager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {

@@ -15,13 +15,15 @@ void Animation::Manager::init() {
 	sprite_animator = std::make_unique<Animation::SpriteSheet>();
 }
 
-void Animation::Manager::update() {
+bool Animation::Manager::update() {
 	for (auto& entity : entities) {
 		//Update camera position
 		if (NIKEEngine.checkEntityComponent<Animation::cSprite>(entity)) {
 			sprite_animator->animateSprite(NIKEEngine.getEntityComponent<Animation::cBase>(entity), NIKEEngine.getEntityComponent<Animation::cSprite>(entity), NIKEEngine.getEntityComponent<Render::Texture>(entity));
 		}
 	}
+
+	return false;
 }
 
 //Execute event
@@ -30,7 +32,11 @@ void Animation::Manager::executeEvent(std::shared_ptr<Events::IEvent> event) {
 
 	//Execute event on animator
 	for (auto& entity : entities) {
-		if (NIKEEngine.getEntityComponent<Animation::cBase>(entity).animator_id == new_event.animator_id)
+		if (NIKEEngine.getEntityComponent<Animation::cBase>(entity).animator_id == new_event.animator_id) {
+			if (new_event.animation_action == Animation::Mode::RESTART) {
+				NIKEEngine.getEntityComponent<Animation::cSprite>(entity).curr_index = NIKEEngine.getEntityComponent<Animation::cSprite>(entity).start_index;
+			}
 			sprite_animator->executeEvent(new_event.animation_action, NIKEEngine.getEntityComponent<Animation::cBase>(entity));
+		}
 	}
 }

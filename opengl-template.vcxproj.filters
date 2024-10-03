@@ -32,6 +32,7 @@
     <ClCompile Include="src\Systems\Render\sysFont.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Managers\mCollision.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="headers\Systems\Render\sysFont.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysAnimationController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />
@@ -82,6 +84,8 @@
     <None Include="db\data.json" />
     <None Include="assets\scenes\mainmenu.scn" />
     <None Include="assets\Scenes\mmCopy.scn" />
+    <None Include="shaders\text.frag" />
+    <None Include="shaders\text.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
   </ItemGroup>

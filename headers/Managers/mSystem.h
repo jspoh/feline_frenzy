@@ -41,7 +41,7 @@ namespace System {
 		virtual void init() {}
 
 		//Pure virtual function to be implemented in inherited class
-		virtual void update() = 0;
+		virtual bool update() = 0;
 
 		// Get system name
 		virtual std::string getSysName() = 0;

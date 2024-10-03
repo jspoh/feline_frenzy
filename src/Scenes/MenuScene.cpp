@@ -21,15 +21,29 @@ void Menu::Scene::load() {
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/Tree_Orange.png");
-	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
 	NIKEEngine.accessAssets()->registerTexture("player", "assets/textures/player.png");
 	NIKEEngine.accessAssets()->registerTexture("background", "assets/textures/Tileset_Guide.png");
+
+	//Register game logic components
+	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
+
+	//Register game logic system
+	NIKEEngine.registerSystem<GameLogic::Manager>();
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.accessSystem<GameLogic::Manager>()->setComponentsLinked(false);
 }
 
 void Menu::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
 	NIKEEngine.accessSeri()->loadSceneFromFile("assets/scenes/mainmenu.scn", entities);
+
+	//Create new scene object
+	entities["next_scene"] = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "MENU", -1, GLFW_KEY_RIGHT });
+	NIKEEngine.addEntityComponentObj<Input::Key>(entities["next_scene"], { Input::TriggerMode::TRIGGERED });
 
 	// Adding rotation control
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["tree"], Transform::Runtime_Transform());
@@ -43,6 +57,10 @@ void Menu::Scene::init() {
 	//Toggle debug mode
 	Entity::Type debugMode = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(debugMode, { Input::TriggerMode::TRIGGERED });
+
+	//Toggle debug mode
+	Entity::Type key = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Input::Key>(key, { Input::TriggerMode::TRIGGERED });
 
 	//Create text object
 	Entity::Type basic_text = NIKEEngine.createEntity();

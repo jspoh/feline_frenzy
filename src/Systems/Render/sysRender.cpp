@@ -478,8 +478,12 @@ void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMo
 	else if (NIKEEngine.checkEntityComponent<Render::Texture>(entity)) {
 		auto& e_texture = NIKEEngine.getEntityComponent<Render::Texture>(entity);
 
+		//Copy transform for texture mapping
+		Transform::Transform copy = e_transform;
+		copy.scale = e_texture.texture_size.normalized() * copy.scale.length();
+
 		// Transform matrix here
-		transformMatrix(e_transform, e_texture.x_form, camera_system->getWorldToNDCXform());
+		transformMatrix(copy, e_texture.x_form, camera_system->getWorldToNDCXform());
 
 		// Render Texture
 		renderObject(e_texture);
@@ -522,7 +526,7 @@ void Render::Manager::init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Render::Manager::update() {
+bool Render::Manager::update() {
 
 	// Before drawing clear screen
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -568,4 +572,6 @@ void Render::Manager::update() {
 			transformAndRenderEntity(entity, debug_mode);
 		}
 	}
+
+	return false;
 }

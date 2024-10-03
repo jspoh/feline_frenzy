@@ -173,7 +173,7 @@ namespace Render {
 		/**
 		* update all object's xform
 		* */
-		void update() override;
+		bool update() override;
 	};
 }
 

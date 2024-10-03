@@ -130,7 +130,11 @@ void System::Manager::updateSystems()
 		if (system->getActiveState())
 		{
 			std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
-			system->update();
+
+			//Break system update loop if system update returns true
+			if(system->update())
+				break;
+
 			std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
 
 			// Calculate the time taken by the system

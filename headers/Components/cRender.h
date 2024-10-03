@@ -53,6 +53,7 @@ namespace Render {
 		std::string texture_ref;
 		Matrix33::Matrix_33 x_form;
 		Color color;
+		Vector2 texture_size;	// Spritesheet size ( before mapping )
 		Vector2 frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
 		Vector2 frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 	};

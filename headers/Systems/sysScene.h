@@ -33,7 +33,7 @@ namespace Scenes {
 	};
 
 	//Scenes manager
-	class Manager : public System::ISystem, public Events::IEventListener {
+	class Manager : public System::ISystem {
 	private:
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
@@ -48,20 +48,28 @@ namespace Scenes {
 		//Prev scene
 		std::shared_ptr<IScene> prev_scene;
 
-		//Change scene event queue
-		ChangeSceneEvent new_scene;
-
 		//Init starting scene
-		void initScene(std::string const& scene_id);
+		void initScene(std::string scene_id);
 
 		//Change scene
-		void changeScene(std::string const& scene_id);
+		void changeScene(std::string scene_id);
 
 		//Restart scene
 		void restartScene();
 
 		//Go To Previous scene
 		void previousScene();
+
+	public:
+
+		//Default Constructor
+		Manager() = default;
+
+		//Singleton Of Manager Class
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			return instance;
+		}
 
 		//Register scenes
 		template<typename T>
@@ -79,17 +87,6 @@ namespace Scenes {
 			}
 		}
 
-	public:
-
-		//Default Constructor
-		Manager() = default;
-
-		//Singleton Of Manager Class
-		static std::shared_ptr<Manager> getInstance() {
-			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
-			return instance;
-		}
-
 		//Init
 		void init() override;
 
@@ -99,10 +96,7 @@ namespace Scenes {
 		}
 
 		//Update
-		void update() override;
-
-		//Execute event
-		void executeEvent(std::shared_ptr<Events::IEvent> event) override;
+		bool update() override;
 	};
 }
 
