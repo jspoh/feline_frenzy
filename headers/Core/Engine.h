@@ -78,6 +78,9 @@ namespace Core {
 		//Destroy Entity
 		void destroyEntity(Entity::Type entity);
 
+		//Destroy Entity
+		void destroyAllEntities();
+
 		/*****************************************************************//**
 		* Component Methods
 		*********************************************************************/
@@ -137,6 +140,12 @@ namespace Core {
 		std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr, int index = -1)
 		{
 			return system_manager->registerSystem<T>(singleton_sys, index);
+		}
+
+		template<typename T>
+		void removeSystem(std::shared_ptr<T> singleton_sys = nullptr)
+		{
+			system_manager->removeSystem<T>();
 		}
 
 		template<typename T>

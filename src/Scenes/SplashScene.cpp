@@ -145,7 +145,7 @@ void Splash::Scene::init() {
 
 	//Create new scene object
 	entities["next_scene"] = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "MENU", -1, GLFW_KEY_RIGHT });
+	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "MENU", -1, GLFW_KEY_ENTER });
 	NIKEEngine.addEntityComponentObj<Input::Key>(entities["next_scene"], { Input::TriggerMode::TRIGGERED });
 
 	//Create animation object
@@ -168,8 +168,8 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
-	NIKEEngine.destroyEntity(entities["next_scene"]);
-	NIKEEngine.destroyEntity(entities["animation"]);
+	NIKEEngine.destroyAllEntities();
+	NIKEEngine.removeSystem<AnimationController::Manager>();
 }
 
 void Splash::Scene::unload() {

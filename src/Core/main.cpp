@@ -11,6 +11,7 @@
 #include "../headers/Systems/sysScene.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Scenes/SplashScene.h"
+#include "../headers/Scenes/PerformanceScene.h"
 
 // debug stuff
 bool DEBUG = true;
@@ -59,6 +60,7 @@ int WINAPI WinMain(
 	NIKEEngine.registerSystem<Scenes::Manager>(Scenes::Manager::getInstance());
 	NIKEEngine.accessSystem<Scenes::Manager>()->registerScenes<Splash::Scene>("SPLASH");
 	NIKEEngine.accessSystem<Scenes::Manager>()->registerScenes<Menu::Scene>("MENU");
+	NIKEEngine.accessSystem<Scenes::Manager>()->registerScenes<Performance::Scene>("PERFORMANCE");
 
 	//Engine Game Loop
 	NIKEEngine.run();

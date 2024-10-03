@@ -42,7 +42,7 @@ void Menu::Scene::init() {
 
 	//Create new scene object
 	entities["next_scene"] = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "MENU", -1, GLFW_KEY_RIGHT });
+	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "PERFORMANCE", -1, GLFW_KEY_ENTER });
 	NIKEEngine.addEntityComponentObj<Input::Key>(entities["next_scene"], { Input::TriggerMode::TRIGGERED });
 
 	// Adding rotation control
@@ -71,7 +71,7 @@ void Menu::Scene::init() {
 }
 
 void Menu::Scene::exit() {
-
+	NIKEEngine.destroyAllEntities();
 }
 
 void Menu::Scene::unload() {

@@ -88,6 +88,12 @@ void Core::Engine::destroyEntity(Entity::Type entity) {
 	system_manager->entityDestroyed(entity);
 }
 
+void Core::Engine::destroyAllEntities() {
+	for (auto entity : entity_manager->getAllEntities()) {
+		destroyEntity(entity);
+	}
+}
+
 /*****************************************************************//**
 * Access Windows
 *********************************************************************/

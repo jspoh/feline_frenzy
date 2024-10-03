@@ -25,6 +25,7 @@
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
+    <ClCompile Include="src\Scenes\PerformanceScene.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
@@ -64,6 +65,7 @@
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
+    <ClInclude Include="headers\Scenes\PerformanceScene.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysAnimationController.h" />

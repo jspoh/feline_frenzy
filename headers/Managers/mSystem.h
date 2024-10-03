@@ -151,6 +151,20 @@ namespace System {
 			return system;
 		}
 
+		//Index for adding system is only if
+		template<typename T>
+		void removeSystem() {
+			std::shared_ptr<System::ISystem> sys = systems_map.at(typeid(T).name());
+			int i = 0;
+			for (; i < systems.size(); i++) {
+				if (systems.at(i) == sys)
+					break;
+			}
+
+			systems.erase(systems.begin() + i);
+			systems_map.erase(typeid(T).name());
+		}
+
 		//Set system state
 		template<typename T>
 		void setSystemState(bool state) {

@@ -48,6 +48,9 @@ namespace Entity {
 
 		//Get number of active entities
 		int getEntityCount() const;
+
+		//Get all entity
+		std::vector<Entity::Type> getAllEntities() const;
 	};
 }
 

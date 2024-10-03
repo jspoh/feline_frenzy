@@ -63,3 +63,11 @@ Component::Signature const& Entity::Manager::getSignature(Entity::Type entity) c
 int Entity::Manager::getEntityCount() const {
 	return static_cast<int>(entities.size());
 }
+
+std::vector<Entity::Type> Entity::Manager::getAllEntities() const {
+	std::vector<Entity::Type> return_vec;
+	for (auto const& entity : entities) {
+		return_vec.push_back(entity.first);
+	}
+	return return_vec;
+}
