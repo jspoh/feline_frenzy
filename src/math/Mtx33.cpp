@@ -115,7 +115,7 @@ Matrix_33& Matrix33::Matrix_33::operator*=(const float scale)
 	{
 		for (size_t j = 0; j < matrix_33.size(); ++j)
 		{
-			matrix_33[i][j] = scale;
+			matrix_33[i][j] *= scale;
 		}
 	}
 
