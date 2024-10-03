@@ -146,6 +146,12 @@ namespace Core {
 		}
 
 		template<typename T>
+		int getSystemIndex()
+		{
+			return system_manager->getSystemIndex<T>();
+		}
+
+		template<typename T>
 		void addSystemComponentType(Component::Type component)
 		{
 			system_manager->addComponentType<T>(component);

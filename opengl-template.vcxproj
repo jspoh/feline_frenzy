@@ -30,7 +30,7 @@
     <ClCompile Include="src\Systems\Render\sysFont.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Managers\mCollision.cpp" />
-    <ClCompile Include="src\Systems\sysGameLogic.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
@@ -70,7 +70,7 @@
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />
     <ClInclude Include="headers\Managers\mCollision.h" />
-    <ClInclude Include="headers\Systems\sysGameLogic.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cRender.h" />

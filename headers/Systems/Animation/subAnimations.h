@@ -12,6 +12,7 @@
 #define SUB_ANIMATIONS_HPP
 
 #include "../headers/Components/cAnimation.h"
+#include "../headers/Components/cRender.h"
 
 namespace Animation {
 	/*****************************************************************//**

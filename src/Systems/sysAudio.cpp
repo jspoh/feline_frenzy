@@ -61,7 +61,6 @@ void Audio::Manager::update()
 			}
 		}
 	}
-
 }
 
 // Release Fmod system

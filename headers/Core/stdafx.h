@@ -78,13 +78,6 @@
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
 
- /*****************************************************************//**
- * Components
- *********************************************************************/
-#include "../headers/Components/cRender.h"
-#include "../headers/Components/cTransform.h"
-#include "../headers/Components/cMove.h"
-
 /*****************************************************************//**
 * Utility
 *********************************************************************/

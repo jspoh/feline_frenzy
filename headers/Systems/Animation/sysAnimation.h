@@ -30,8 +30,14 @@ namespace Animation {
 		std::unique_ptr<Animation::SpriteSheet> sprite_animator;
 
 	public:
-		//Constructor
+		//Default Constructor
 		Manager() = default;
+
+		//Singleton Of Manager Class
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			return instance;
+		}
 
 		//Destructor
 		~Manager() override = default;

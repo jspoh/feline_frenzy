@@ -11,6 +11,7 @@
 #include "../headers/Core/Engine.h"
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Components/cRender.h"
 
 Assets::Manager::~Manager() {
 
@@ -62,7 +63,7 @@ void Assets::Manager::registerFont(std::string const& font_id, std::string const
 	fonts_list.insert({ font_id, NIKEEngine.accessSystem<Render::Manager>()->registerFont(file_path, pixel_sizes) });
 }
 
-std::unordered_map<unsigned char, Render::Character> const& Assets::Manager::getFont(std::string const& font_id) const{
+std::unordered_map<unsigned char, Render::Character> const& Assets::Manager::getFont(std::string const& font_id) const {
 	if (fonts_list.find(font_id) == fonts_list.end())
 	{
 		throw std::runtime_error("FONT DOES NOT EXISTS");

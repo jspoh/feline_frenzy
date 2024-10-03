@@ -10,6 +10,7 @@
 #include "../headers/Core/Engine.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Components/cMove.h"
 
 void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities) {
 	std::ifstream ifs{ scene_filepath, std::ios::in };

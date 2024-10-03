@@ -9,6 +9,7 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Managers/mCollision.h"
 #include "../headers/Systems/sysInput.h"
+#include "../headers/Components/cTransform.h"
 
 Collision::Manager::Manager() {
     /*colliders.resize(100);  // Pre-allocate 100 colliders

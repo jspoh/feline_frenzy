@@ -35,7 +35,7 @@ namespace System {
 	public:
 
 		//Constructor
-		ISystem() : system_signature{}, b_components_linked{ true }, b_system_active { true } {}
+		ISystem() : system_signature {}, b_components_linked{ true }, b_system_active{ true } {}
 
 		//Virtual Init
 		virtual void init() {}
@@ -184,6 +184,20 @@ namespace System {
 		template<typename T>
 		std::shared_ptr<T> accessSystem() {
 			return getSystem<T>();
+		}
+
+		//Get System index
+		template<typename T>
+		int getSystemIndex() {
+			std::shared_ptr<System::ISystem> sys = systems_map.at(typeid(T).name());
+			int i = 0;
+			for (; i < systems.size(); i++) {
+				if (systems.at(i) == sys)
+					return i;
+			}
+
+			assert("System not registered yet!");
+			return -1;
 		}
 
 		//Update entities list based on signature

@@ -25,6 +25,12 @@ namespace Splash {
 		//New scene entity
 		Entity::Type next_scene;
 
+		//Register components
+		void registerComponents();
+
+		//Register static systems
+		void registerStaticSystems();
+
 	public:
 
 		//Dfeault constructor

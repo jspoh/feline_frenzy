@@ -373,8 +373,11 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 	result = camera_system->getWorldToNDCXform() * trans_mat * rot_mat * scale_mat;
 	Matrix_33Transpose(result, result);
 
+	//Texture unit
+	constexpr int texture_unit = 6;
+
 	//Set uniform
-	shader_system->setUniform("text", "u_texture", 6);
+	shader_system->setUniform("text", "u_texture", texture_unit);
 	shader_system->setUniform("text", "u_textColor", e_text.color.color);
 	shader_system->setUniform("text", "u_transform", result);
 
@@ -411,7 +414,7 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 		glBindVertexArray(font_system->getVAO());
 		glBindBuffer(GL_ARRAY_BUFFER, font_system->getVBO());
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);// Unbind VBO
 
 		// Draw the character quad
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -420,6 +423,7 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 		pos.x += (ch.advance >> 6) * e_text.scale; // Bitshift by 6 to convert from 1/64th to 1
 	}
 
+	//Unbind and unsuse shader
 	glBindVertexArray(0); // Unbind VAO
 	shader_system->unuseShader();
 }

@@ -29,17 +29,20 @@ void Font::Manager::configQuadRendering() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 std::unordered_map<unsigned char, Render::Character> Font::Manager::generateGlyphsTex(FT_Face& font_face) {
 
+	//Map of glyph textures
 	std::unordered_map<unsigned char, Render::Character> texture_map;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	for (unsigned char c = 0; c < 128; c++) {
 		if (FT_Load_Char(font_face, c, FT_LOAD_RENDER)) {
-			cerr << "Failed to load glyph." << endl;
+			cerr << "Failed to load glyph: " << c  << "." << endl;
 			continue;
 		}
 
@@ -50,7 +53,6 @@ std::unordered_map<unsigned char, Render::Character> Font::Manager::generateGlyp
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, font_face->glyph->bitmap.width,
 			font_face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
 			font_face->glyph->bitmap.buffer);
-
 
 		// Set texture options
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -70,11 +72,12 @@ std::unordered_map<unsigned char, Render::Character> Font::Manager::generateGlyp
 	//Clean up
 	FT_Done_Face(font_face);
 
+	//Return glpyh textures
 	return texture_map;
 }
 
 std::unordered_map<unsigned char, Render::Character> Font::Manager::loadFont(std::string const& file_path, Vector2 const& pixel_sizes) {
-	//Create free type share pointer
+	//Create free type font face
 	FT_Face face;
 
 	//Load font face

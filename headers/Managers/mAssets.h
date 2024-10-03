@@ -12,6 +12,7 @@
 #define ASSET_MANAGER_HPP
 
 #include "../headers/Systems/sysAudio.h"
+#include "../headers/Components/cRender.h"
 
 namespace Assets
 {
@@ -32,7 +33,7 @@ namespace Assets
 		void registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
 
 		//Get font
-		std::unordered_map<unsigned char, Render::Character>const& getFont(std::string const& font_id) const;
+		std::unordered_map<unsigned char, Render::Character> const& getFont(std::string const& font_id) const;
 
 		/*****************************************************************//**
 		* Render ( Texture, Model, Shaders )

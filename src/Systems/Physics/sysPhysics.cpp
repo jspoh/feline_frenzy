@@ -9,6 +9,7 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Components/cMove.h"
 
 // Forward declaration for Collision
 //namespace Collision {

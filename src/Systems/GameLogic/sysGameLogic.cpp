@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysGameLogic.h"
+#include "../headers/Systems/GameLogic/sysGameLogic.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Core/Engine.h"
 #include "../headers/Components/cInput.h"
