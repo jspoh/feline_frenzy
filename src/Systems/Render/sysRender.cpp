@@ -503,8 +503,8 @@ void Render::Manager::init() {
 	//Create camera system
 	camera_system = std::make_unique<Camera::System>();
 
-	//Init Camera ( Camera height defaulted at 1000.0f )
-	camera_system->init(1000.0f);
+	//Init Camera ( Camera height defaulted at window height )
+	camera_system->init(NIKEEngine.accessWindow()->getWindowSize().y);
 
 	//GL enable opacity blending option
 	glEnable(GL_BLEND);

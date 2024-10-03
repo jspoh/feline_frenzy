@@ -70,6 +70,7 @@ void Menu::Scene::load() {
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
 	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
 	NIKEEngine.accessAssets()->registerTexture("player", "assets/textures/player.png");
+	NIKEEngine.accessAssets()->registerTexture("background", "assets/textures/background.jpg");
 
 	//Register font
 	NIKEEngine.accessAssets()->registerFont("basic", "assets/Fonts/Montserrat-Bold.ttf");
@@ -81,10 +82,10 @@ void Menu::Scene::init() {
 	NIKEEngine.accessSeri()->loadSceneFromFile("assets/scenes/mainmenu.scn", entities);
 
 	// Adding rotation control
-	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["duckobj"], Transform::Runtime_Transform());
+	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["obj4"], Transform::Runtime_Transform());
 
 	// Adding another possible camera object
-	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["obj1"], { "CAM1", {0.0f, 0.0f}, 1000.0f });
+	// NIKEEngine.addEntityComponentObj<Render::Cam>(entities["obj1"], { "CAM1", {0.0f, 0.0f}, 1000.0f });
 
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();

@@ -97,7 +97,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 			NIKEEngine.addEntityComponentObj<Render::Shape>(entity, { model_name, Matrix33::Matrix_33(), { clr_atr, 1.0f } });
 		}
 		else if (shdr_prgm == "texture") {
-			NIKEEngine.addEntityComponentObj<Render::Texture>(entity, { tex ,Matrix33::Matrix_33::Identity(), { clr_atr, 1.0f }, { 1.0f, 1.0f }, {0.0f, 0.0f} });
+			NIKEEngine.addEntityComponentObj<Render::Texture>(entity, { tex ,Matrix33::Matrix_33::Identity(), { clr_atr, 1.0f }, { 1.0f, 1.0f}, {0.0f, 0.0f} });
 		}
 		
 		NIKEEngine.addEntityComponentObj<Transform::Velocity>(entity, { {velocity.x, velocity.y} });
@@ -106,19 +106,25 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		// Set collider, currently checks if object name has "bounce" substring to enable bouncing on collision // Added by MKK
 		if (object_name.find("bounce") != std::string::npos) {
 			// The substring "bounce" is found in object_name
-			Physics::Manager::getInstance()->collision_manager.setColliderComp(entity, true);
+			NIKEEngine.accessSystem<Physics::Manager>()->collision_manager.setColliderComp(entity, true);
+		}
+		else if (object_name.find("background") != std::string::npos)
+		{
+			 // Not to add collision to background texture
+			 continue;
 		}
 		else {
-			Physics::Manager::getInstance()->collision_manager.setColliderComp(entity);
+			NIKEEngine.accessSystem<Physics::Manager>()->collision_manager.setColliderComp(entity);
 		}
 		
 
 		// Init Player Camera (ALL SCENE MUST HAVE)
 		if (object_name == "player") {
-			NIKEEngine.addEntityComponentObj<Render::Cam>(entity, { object_name, {122.0f, 0.0f}, 1000.0f });
+			NIKEEngine.addEntityComponentObj<Render::Cam>(entity, { object_name, {0.0f, 0.0f}, NIKEEngine.accessWindow()->getWindowSize().y });
 			NIKEEngine.addEntityComponentObj<Move::Movement>(entity, { false, false, false, false });
 			NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity(object_name);
 		}
+
 
 		// Push the entity into the vector
 		entities[object_name] = entity;

@@ -1,12 +1,20 @@
-9				  # number of objects in scenenumber of objects in scene
-square		  # name of model
+3				  # number of objects in scenenumber of objects in scene
+square-texture		  # name of model
 player			  # name of game object - this name must be unique in the scene (EACH SCENE MUST HAVE 1 PLAYER OBJECT NAMED "player")
 texture player		  # shader program , tex name (for texture)
-1.0 0.0 0.0		  # (r, g, b) color used for painting object
-50.0 100.0		  # scaling factors of object along horizontal and vertices axes, respectively
+0.0 0.0 0.0		  # (r, g, b) color used for painting object
+100.0 100.0		  # scaling factors of object along horizontal and vertices axes, respectively
 0.0 0.0     	  # orientation factors of object, rotation of object
 0.0 0.0		 	  # velocity of object's x and y
-122.0 0.0		  # object's position in game world
+0.0 0.0		  # object's position in game world
+square-texture
+background
+texture background
+0.0 0.0 0.0
+1600.0 900.0
+0.0 0.0
+0.0 0.0
+0.0 0.0
 square
 obj2
 base null
@@ -15,59 +23,3 @@ base null
 0.0 0.0     
 -0.5 0.0
 322.0 122.0
-square
-obj3
-base null
-1.0 0.0 1.0
-100.0 100.0
-0.0 0.0     
-0.5 0.0
--322.0 122.0
-square
-obj4bounce
-base null
-1.0 0.0 1.0
-100.0 100.0
-0.0 0.0     
--0.5 0.0
-322.0 300.0
-square
-obj5bounce
-base null
-1.0 0.0 1.0
-100.0 100.0
-0.0 0.0     
-0.5 0.0
--322.0 300.0
-square
-obj6bounce
-base null
-1.0 0.0 1.0
-100.0 100.0
-0.0 0.0     
--0.2 -0.3
-500.0 500.0
-square-texture
-duckobj
-texture duck
-0.0 0.0 0.0
-200.0 200.0
-0.0 0.0
-0.0 0.0	
-400.0 -200.0
-square-texture
-waterobj
-texture water 
-0.0 0.0 0.0
-200.0 200.0
-0.0 0.0
-0.0 0.0	
-100.0 -200.0
-square-texture
-treeobj
-texture tree 
-0.0 0.0 0.0
-200.0 200.0
-0.0 0.0
-0.0 0.0	
--200.0 -200.0
