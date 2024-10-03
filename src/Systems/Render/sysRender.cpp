@@ -360,72 +360,66 @@ void Render::Manager::renderObject(Render::Texture const& e_texture) {
 	shader_system->unuseShader();
 }
 
-void Render::Manager::renderText(Render::Text const& e_text) {
+void Render::Manager::renderTextureRaw(unsigned int tex_hdl) {
+	//Set polygon mode
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	//Use shader
-	shader_system->useShader("text");
-
-	//Transform matrix here
-	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
-	Matrix_33Rot(rot_mat, 0.0f);
-	Matrix_33Scale(scale_mat, e_text.scale, e_text.scale);
-	Matrix_33Translate(trans_mat, e_text.position.x, e_text.position.y);
-	result = camera_system->getWorldToNDCXform() * trans_mat * rot_mat * scale_mat;
-	Matrix_33Transpose(result, result);
+	// use shader
+	shader_system->useShader("texture");
 
 	//Texture unit
 	constexpr int texture_unit = 6;
 
-	//Set uniform
-	shader_system->setUniform("text", "u_texture", texture_unit);
-	shader_system->setUniform("text", "u_textColor", e_text.color.color);
-	shader_system->setUniform("text", "u_transform", result);
+	// set texture
+	glBindTextureUnit(
+		texture_unit, // texture unit (binding index)
+		tex_hdl
+	);
 
-	//Position
-	Vector2 pos = e_text.position;
+	glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	Matrix33::Matrix_33 xform = Matrix33::Matrix_33::Identity();
+	xform *= 0.1f;
+	//xform.matrix_33[2][0] = 0.1f;
+	//xform.matrix_33[2][1] = 0.1f;
+	
+	const Vector2 uv_offset{ 0, 0 };
+	const Vector2 frame_size{ 1, 1 };
+
+	//Set uniforms for texture rendering
+	shader_system->setUniform("texture", "u_tex2d", texture_unit);
+	shader_system->setUniform("texture", "u_opacity", 1);
+	shader_system->setUniform("texture", "u_transform", xform);
+	shader_system->setUniform("texture", "uvOffset", uv_offset);
+	shader_system->setUniform("texture", "frameSize", frame_size);
+
+	//Get model
+	auto model = NIKEEngine.accessAssets()->getModel("square-texture");
+
+	//Draw
+	glBindVertexArray(model->vaoid);
+	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+	//Unuse texture
+	glBindVertexArray(0);
+	shader_system->unuseShader();
+}
+
+void Render::Manager::renderText(Render::Text const& e_text) {
+	const unsigned int test_ch_tex_hdl = NIKEEngine.accessAssets()->getFont("basic").at('B').texture;
+	renderTextureRaw(test_ch_tex_hdl);
+	return;
+
 
 	// Iterate through all characters in the string
 	for (char c : e_text.text) {
-		Character ch = NIKEEngine.accessAssets()->getFont(e_text.font_ref).at(c);
+		const Character& ch = NIKEEngine.accessAssets()->getFont(e_text.font_ref).at(c);
+		const unsigned int ch_tex_hdl = ch.texture;
 
-		// Calculate the position of the character
-		float xpos = pos.x + ch.bearing.x * e_text.scale;
-		float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
-
-		// Update VBO for the character
-		float w = ch.size.x * e_text.scale;
-		float h = ch.size.y * e_text.scale;
-
-		// Define the vertices for the character quad
-		float vertices[6][4] = {
-			{ xpos,     ypos + h,   0.0f, 0.0f }, // Top-left
-			{ xpos,     ypos,       0.0f, 1.0f }, // Bottom-left
-			{ xpos + w, ypos,       1.0f, 1.0f }, // Bottom-right
-
-			{ xpos,     ypos + h,   0.0f, 0.0f }, // Top-left
-			{ xpos + w, ypos,       1.0f, 1.0f }, // Bottom-right
-			{ xpos + w, ypos + h,   1.0f, 0.0f }  // Top-right
-		};
-
-		// Render the glyph texture over the quad
-		glBindTexture(GL_TEXTURE_2D, ch.texture);
-
-		// Update VBO (assuming you have a VAO and VBO set up)
-		glBindVertexArray(font_system->getVAO());
-		glBindBuffer(GL_ARRAY_BUFFER, font_system->getVBO());
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);// Unbind VBO
-
-		// Draw the character quad
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		// Advance the cursor for the next character
-		pos.x += (ch.advance >> 6) * e_text.scale; // Bitshift by 6 to convert from 1/64th to 1
+		//renderTextureRaw(NIKEEngine.accessAssets()->getTexture("duck"));
+		renderTextureRaw(ch_tex_hdl);
 	}
-
-	//Unbind and unsuse shader
-	glBindVertexArray(0); // Unbind VAO
-	shader_system->unuseShader();
 }
 
 void Render::Manager::renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color) {

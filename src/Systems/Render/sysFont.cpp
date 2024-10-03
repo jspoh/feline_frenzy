@@ -11,26 +11,10 @@
 #include "../headers/Core/Engine.h"
 
 Font::Manager::Manager() {
-
 	//Init free type library
 	if (FT_Init_FreeType(&ft_lib)) {
 		cerr << "Could not initialize FreeType library!" << endl;
 	}
-
-	//Config fonttype for quad rendering
-	configQuadRendering();
-}
-
-void Font::Manager::configQuadRendering() {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 }
 
 std::unordered_map<unsigned char, Render::Character> Font::Manager::generateGlyphsTex(FT_Face& font_face) {
@@ -40,37 +24,48 @@ std::unordered_map<unsigned char, Render::Character> Font::Manager::generateGlyp
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	for (unsigned char c = 0; c < 128; c++) {
+	constexpr unsigned char MAX_ASCII = 128;
+
+	for (unsigned char c{}; c < MAX_ASCII; c++) {
 		if (FT_Load_Char(font_face, c, FT_LOAD_RENDER)) {
-			cerr << "Failed to load glyph: " << c  << "." << endl;
+			cerr << "Failed to load glyph: " << c << "." << endl;
 			continue;
 		}
 
+		// !TODO: check if font textures are freed
+
 		//Font texture
 		unsigned int texture;
-		glGenTextures(1, &texture);
+		glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, font_face->glyph->bitmap.width,
-			font_face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
-			font_face->glyph->bitmap.buffer);
+		glTexImage2D(GL_TEXTURE_2D,
+			0,		// level
+			GL_RED, // internal format, GL_RED because we only need one channel
+			font_face->glyph->bitmap.width,
+			font_face->glyph->bitmap.rows,
+			0,		// border
+			GL_RED, // format
+			GL_UNSIGNED_BYTE, // type
+			font_face->glyph->bitmap.buffer
+		);
 
 		// Set texture options
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		//Save character textures
-		Render::Character character{ texture, 
-			{(float)font_face->glyph->bitmap.width, (float)font_face->glyph->bitmap.rows},
-			{(float)font_face->glyph->bitmap_left, (float)font_face->glyph->bitmap_top},
-			(unsigned int)font_face->glyph->advance.x };
+		Render::Character character{
+			texture,
+			{static_cast<float>(font_face->glyph->bitmap.width), static_cast<float>(font_face->glyph->bitmap.rows)},
+			{static_cast<float>(font_face->glyph->bitmap_left), static_cast<float>(font_face->glyph->bitmap_top)},
+			static_cast<unsigned int>(font_face->glyph->advance.x)
+		};
 
-		texture_map.insert({ c,  character });
+		texture_map[c] = character;
 	}
 
 	//Clean up
-	FT_Done_Face(font_face);
+	//FT_Done_Face(font_face);
 
 	//Return glpyh textures
 	return texture_map;
@@ -86,18 +81,10 @@ std::unordered_map<unsigned char, Render::Character> Font::Manager::loadFont(std
 	}
 
 	// Set the font size ( width and height of the glyph )
-	FT_Set_Pixel_Sizes(face, (FT_UInt)pixel_sizes.x, (FT_UInt)pixel_sizes.y);
+	FT_Set_Pixel_Sizes(face, 0, static_cast<unsigned int>(pixel_sizes.y));
 
 	//Generate vector of textures
 	return generateGlyphsTex(face);
-}
-
-unsigned int Font::Manager::getVAO() const {
-	return VAO;
-}
-
-unsigned int Font::Manager::getVBO() const {
-	return VBO;
 }
 
 Font::Manager::~Manager() {

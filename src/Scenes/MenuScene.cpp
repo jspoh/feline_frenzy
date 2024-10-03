@@ -49,8 +49,8 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(debugMode, { Input::TriggerMode::TRIGGERED });
 
 	//Create text object
-	// Entity::Type basic_text = NIKEEngine.createEntity();
-	// NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD!", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.0f, 0.0f}, 1.0f });
+	 Entity::Type basic_text = NIKEEngine.createEntity();
+	 NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "A", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.0f, 0.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {

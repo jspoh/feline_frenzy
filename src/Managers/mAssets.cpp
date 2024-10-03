@@ -16,8 +16,8 @@
 Assets::Manager::~Manager() {
 
 	//Clear fonts
-	for (auto font_textures : fonts_list) {
-		for (auto font : font_textures.second) {
+	for (auto& font_textures : fonts_list) {
+		for (auto& font : font_textures.second) {
 			glDeleteTextures(1, &font.second.texture);
 		}
 	}
