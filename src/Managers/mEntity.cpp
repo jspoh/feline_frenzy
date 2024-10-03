@@ -28,6 +28,13 @@ Entity::Type Entity::Manager::createEntity() {
 	return id;
 }
 
+Entity::Type Entity::Manager::cloneEntity(Entity::Type original_entity){
+
+	static_cast<void> (original_entity);
+	assert(entities.find(original_entity) != entities.end() && "Entity not found.");
+	return 0;
+}
+
 void Entity::Manager::destroyEntity(Entity::Type entity) {
 	//Check if entity has alr been created
 	assert(entities.find(entity) != entities.end() && "Entity not found.");

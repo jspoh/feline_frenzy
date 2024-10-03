@@ -92,7 +92,7 @@ void Menu::Scene::unload() {
 
 }
 
-void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities) {
+void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& param_entities) {
 	Serialization::Manager serializationManager;
-    serializationManager.loadSceneFromFile(scene_filepath, entities);
+    serializationManager.loadSceneFromFile(scene_filepath, param_entities);
 }

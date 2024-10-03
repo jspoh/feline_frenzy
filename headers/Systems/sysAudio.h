@@ -70,8 +70,7 @@ namespace Audio {
 		NE_AUDIO_GROUP CreateAudioGroup(std::string const& audio_group_tag);
 
 		// Play music
-		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool 
-		);
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool );
 
 		// Stop sound
 		void NEAudioStopGroup(NE_AUDIO_GROUP group);

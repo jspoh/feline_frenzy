@@ -11,6 +11,8 @@
 
 #define _CRTDBG_MAP_ALLOC
 
+#include <Windows.h>
+
 // graphics headers
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"

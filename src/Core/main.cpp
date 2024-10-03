@@ -29,6 +29,7 @@ static void createConsole() {
 	freopen_s(&fp, "CONIN$", "r", stdin);    
 }
 
+
 int WINAPI WinMain(
 	[[maybe_unused]] _In_ HINSTANCE hInstance,
 	[[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,
