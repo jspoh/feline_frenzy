@@ -1,3 +1,10 @@
+/*****************************************************************//**
+ * \file   cRender.h
+ * \brief
+ *
+ * \author Sean Gwee, g.boonxuensean@digipen.edu
+ * \date   September 2024
+ *********************************************************************/
 #pragma once
 
 #ifndef C_RENDER_HPP

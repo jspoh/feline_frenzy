@@ -3,6 +3,7 @@
  * \brief  
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
