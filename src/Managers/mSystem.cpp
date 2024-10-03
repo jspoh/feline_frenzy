@@ -156,6 +156,4 @@ void System::Manager::updateSystems()
 		// Update the last debug call time to the current time
 		last_call_time = current_time;
 	}
-
-	
 }

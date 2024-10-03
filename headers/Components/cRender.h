@@ -21,6 +21,21 @@ namespace Render {
 		float alpha;
 	};
 
+	struct Character {
+		unsigned int texture;	// Texture ID for the character
+		Vector2 size;			// Size of the character
+		Vector2 bearing;		// Offset from the baseline to the top-left of the character
+		unsigned int advance;   // Horizontal offset to advance to the next character
+	};
+
+	struct Text {
+		std::string font_ref;
+		std::string text;
+		Color color;
+		Vector2 position;
+		float scale;
+	};
+
 	struct Shape {
 		std::string model_ref;
 		Matrix33::Matrix_33 x_form;

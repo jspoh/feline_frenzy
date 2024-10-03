@@ -9,7 +9,7 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Systems/sysPhysics.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
 #include "../headers/Managers/mSerialization.h"
 #include "../headers/Systems/sysGameLogic.h"
 #include "../headers/Systems/Animation/sysAnimation.h"
@@ -25,6 +25,7 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<Render::Texture>();
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
+	NIKEEngine.registerComponent<Render::Text>();
 	NIKEEngine.registerComponent<Collision::Collider>(); // Under sysPhysics
 	NIKEEngine.registerComponent<Animation::cBase>();
 	NIKEEngine.registerComponent<Animation::cSprite>();
@@ -51,6 +52,7 @@ void Menu::Scene::load() {
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Shape>());
 	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Texture>());
+	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Text>());
 
 	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Animation::cBase>());
 	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Animation::cSprite>());
@@ -59,11 +61,17 @@ void Menu::Scene::load() {
 	//Add event listener for animation system
 	NIKEEngine.accessEvents()->addEventListeners<Animation::AnimationEvent>(NIKEEngine.accessSystem<Animation::Manager>());
 
+	//Register shader
+	NIKEEngine.accessAssets()->registerShader("text", "shaders/text.vert", "shaders/text.frag");
+
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
 	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
+
+	//Register font
+	NIKEEngine.accessAssets()->registerFont("basic", "assets/Fonts/Montserrat-Bold.ttf");
 }
 
 void Menu::Scene::init() {
@@ -82,6 +90,9 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(objSpawner, { Input::TriggerMode::TRIGGERED });
 	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, {});
 
+	//Create text object
+	Entity::Type basic_text = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD!", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.0f, 0.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {

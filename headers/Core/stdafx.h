@@ -8,7 +8,6 @@
 
 #pragma once
 
-
 #define _CRTDBG_MAP_ALLOC
 
 #include <Windows.h>
@@ -19,10 +18,14 @@
 
 #undef APIENTRY
 
-//Window header
+ /*****************************************************************//**
+ * Windows
+ *********************************************************************/
 #include <Windows.h>
 
-// Fmod core headers
+ /*****************************************************************//**
+ * FMOD Core
+ *********************************************************************/
 #include "FMOD_CORE/fmod.h"
 #include "FMOD_CORE/fmod.hpp"
 #include "FMOD_CORE/fmod_codec.h"
@@ -32,8 +35,15 @@
 #include "FMOD_CORE/fmod_errors.h"
 #include "FMOD_CORE/fmod_output.h"
 
+ /*****************************************************************//**
+ * Freetype
+ *********************************************************************/
+#include "freetype/freetype.h"
+#include "ft2build.h"
 
-// standard headers
+ /*****************************************************************//**
+ * STL
+ *********************************************************************/
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -55,27 +65,40 @@
 #include <ctime>
 #include <iomanip>
 
-// external headers
+ /*****************************************************************//**
+ * Data (json)
+ *********************************************************************/
 #include "../headers/Data/json.hpp"
 
-// our completed headers
+ /*****************************************************************//**
+ * Math headers
+ *********************************************************************/
 #include "../headers/Math/Mtx33.h"	
 #include "../headers/Math/Vector2.h"
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
 
-// components
+ /*****************************************************************//**
+ * Components
+ *********************************************************************/
 #include "../headers/Components/cRender.h"
 #include "../headers/Components/cTransform.h"
 #include "../headers/Components/cMove.h"
 
-//Utility Systems
+/*****************************************************************//**
+* Utility
+*********************************************************************/
 #include "../headers/Utility/uSystems.h"
 
-//Math defines
+/*****************************************************************//**
+* Math Defines
+*********************************************************************/
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*****************************************************************//**
+* Entity 
+*********************************************************************/
 namespace Entity {
 
     //Entity Type
@@ -85,6 +108,9 @@ namespace Entity {
     const Type MAX = 5000;
 }
 
+/*****************************************************************//**
+* Component
+*********************************************************************/
 namespace Component {
 
     //Component Signature Type
@@ -97,6 +123,9 @@ namespace Component {
     using Signature = std::bitset<MAX>;
 }
 
+/*****************************************************************//**
+* Nullstream for release
+*********************************************************************/
 class NullStream {
 public:
     NullStream() = default;

@@ -13,6 +13,14 @@
 #include "../headers/Systems/Render/sysRender.h"
 
 Assets::Manager::~Manager() {
+
+	//Clear fonts
+	for (auto font_textures : fonts_list) {
+		for (auto font : font_textures.second) {
+			glDeleteTextures(1, &font.second.texture);
+		}
+	}
+
 	//Clear models
 	for (auto& model : models_list) {
 		glDeleteVertexArrays(1, &model.second->vaoid);
@@ -39,6 +47,28 @@ Assets::Manager::~Manager() {
 	for (auto& audio_groups : audio_group_list) {
 		audio_groups.second->release();
 	}
+}
+
+/*****************************************************************//**
+* Font
+*********************************************************************/
+
+void Assets::Manager::registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes) {
+	if (fonts_list.find(font_id) != fonts_list.end())
+	{
+		throw std::runtime_error("FONT ALREADY EXISTS");
+	}
+
+	fonts_list.insert({ font_id, NIKEEngine.accessSystem<Render::Manager>()->registerFont(file_path, pixel_sizes) });
+}
+
+std::unordered_map<unsigned char, Render::Character> const& Assets::Manager::getFont(std::string const& font_id) const{
+	if (fonts_list.find(font_id) == fonts_list.end())
+	{
+		throw std::runtime_error("FONT DOES NOT EXISTS");
+	}
+
+	return fonts_list.at(font_id);
 }
 
  /*****************************************************************//**

@@ -26,6 +26,15 @@ namespace Assets
 		~Manager();
 
 		/*****************************************************************//**
+		* Font
+		*********************************************************************/
+		//Register font
+		void registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
+
+		//Get font
+		std::unordered_map<unsigned char, Render::Character>const& getFont(std::string const& font_id) const;
+
+		/*****************************************************************//**
 		* Render ( Texture, Model, Shaders )
 		*********************************************************************/
 
@@ -76,6 +85,9 @@ namespace Assets
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
+
+		//Maps to fonts
+		std::unordered_map<std::string, std::unordered_map<unsigned char, Render::Character>> fonts_list;
 
 		//Map to models for render
 		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models_list;

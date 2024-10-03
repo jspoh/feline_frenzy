@@ -12,6 +12,7 @@
 #ifndef RENDER_MANAGER_HPP
 #define RENDER_MANAGER_HPP
 
+#include "../headers/Systems/Render/sysFont.h"
 #include "../headers/Systems/Render/sysShader.h"
 #include "../headers/Systems/Render/sysCamera.h"
 #include "../headers/Components/cRender.h"
@@ -28,6 +29,9 @@ namespace Render {
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
+
+		//Font system
+		std::unique_ptr<Font::Manager> font_system;
 
 		//Shader system
 		std::unique_ptr<Shader::Manager> shader_system;
@@ -80,6 +84,9 @@ namespace Render {
 		//Render Texture
 		void renderObject(Render::Texture const& e_texture);
 
+		//Render text
+		void renderText(Render::Text const& e_text);
+
 		//Render debugging wireframe
 		void renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color);
 
@@ -98,6 +105,9 @@ namespace Render {
 			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
 			return instance;
 		}
+
+		//Register free type font
+		std::unordered_map<unsigned char, Render::Character> registerFont(std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
 
 		/**
 		 * creates vertex array object. from mesh data and registers it to meshes.
