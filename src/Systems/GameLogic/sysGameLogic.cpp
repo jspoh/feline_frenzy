@@ -4,17 +4,12 @@
  *
  * \author ho
  * \co-author Sean Gwee, g.boonxuensean@digipen.edu
+ * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/GameLogic/sysGameLogic.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cInput.h"
-#include "../headers/Components/cScene.h"
-#include "../headers/Managers/mEvents.h"
-#include "../headers/Components/cAnimation.h"
 
 void GameLogic::Manager::init() {
 
@@ -24,7 +19,6 @@ void GameLogic::Manager::update() {
 
 	//Loop through entities
 	for (auto& entity : entities) {
-
 		//Object spawning logic
 		if (NIKEEngine.checkEntityComponent<GameLogic::ObjectSpawner>(entity)) {
 			auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
@@ -54,7 +48,7 @@ void GameLogic::Manager::update() {
 				NIKEEngine.accessEvents()->dispatchEvent(menu_event);
 			}
 		}
-		
+
 		/***********************************************
 		* Check your keypresses here!!!
 		************************************************/
@@ -110,6 +104,33 @@ void GameLogic::Manager::update() {
 			{
 				auto animation_event = std::make_shared<Animation::AnimationEvent>(Animation::Mode::RESUME, "AME-ANIMATOR");
 				NIKEEngine.accessEvents()->dispatchEvent(animation_event);
+			}
+
+			// Input for Player
+			if (NIKEEngine.checkEntityComponent<Move::Movement>(entity) && NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
+				const float movespeed = 300.0f;
+				Transform::Velocity& velocity = NIKEEngine.getEntityComponent<Transform::Velocity>(entity);
+				Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
+
+				velocity.velocity.x = 0;
+				velocity.velocity.y = 0;
+
+				// Up
+				if (e_key.b_output && (e_key.key_type == GLFW_KEY_W) && !collider.top) {
+					velocity.velocity.y += movespeed;
+				}
+				// Left
+				if (e_key.b_output && (e_key.key_type == GLFW_KEY_A) && !collider.left) {
+					velocity.velocity.x -= movespeed;
+				}
+				// Down
+				if (e_key.b_output && (e_key.key_type == GLFW_KEY_S) && !collider.bottom) {
+					velocity.velocity.y -= movespeed;
+				}
+				// Right
+				if (e_key.b_output && (e_key.key_type == GLFW_KEY_D) && !collider.right) {
+					velocity.velocity.x += movespeed;
+				}
 			}
 		}
 	}

@@ -125,29 +125,16 @@ void Input::Manager::update() {
 			}
 		}
 
-		//else if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
-		//{
-		//	Transform::Runtime_Transform& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
-		//	// Check if Z key is pressed for runtime scale up
-		//	// X key for runtime scale down
-		//	// R key is pressed for runtime rotate
-		//	e_runtime.runtime_scale_up = key.b_output && (key.key_type == GLFW_KEY_Z);
-		//	e_runtime.runtime_scale_down = key.b_output && (key.key_type == GLFW_KEY_X);
-		//	e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
-		//}
-
-
-		//// Checking for Move component
-		//else if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
-		//	// Ref to Move component
-		//	Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
-
-		//	//Check if escape key is pressed
-		//	move.Up = key.b_output && (key.key_type == GLFW_KEY_W);
-		//	move.Left = key.b_output && (key.key_type == GLFW_KEY_A);
-		//	move.Down = key.b_output && (key.key_type == GLFW_KEY_S);
-		//	move.Right = key.b_output && (key.key_type == GLFW_KEY_D);
-		//}
+		else if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
+		{
+			Transform::Runtime_Transform& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
+			// Check if Z key is pressed for runtime scale up
+			// X key for runtime scale down
+			// R key is pressed for runtime rotate
+			e_runtime.runtime_scale_up = key.b_output && (key.key_type == GLFW_KEY_Z);
+			e_runtime.runtime_scale_down = key.b_output && (key.key_type == GLFW_KEY_X);
+			e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
+		}
 	}
 }
 

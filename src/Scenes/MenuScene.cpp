@@ -18,10 +18,6 @@
 
 void Menu::Scene::load() {
 
-	//Add component types to system
-	//NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
-	//NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
-
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");

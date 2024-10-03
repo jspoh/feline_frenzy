@@ -124,6 +124,8 @@ void Splash::Scene::load() {
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Transform::Velocity>());
 	NIKEEngine.accessSystem<GameLogic::Manager>()->setComponentsLinked(false);
 }
 
