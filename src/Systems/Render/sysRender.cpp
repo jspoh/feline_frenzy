@@ -399,7 +399,8 @@ void Render::Manager::renderText(Render::Text const& e_text) {
 		//Matrix_33Transpose(xform, xform);
 
 		// Calculate the position of the character
-		const float xpos = e_text.position.x + e_text.scale * i;
+		constexpr float offset = 0.01f;
+		const float xpos = e_text.position.x + e_text.scale * i + offset;
 		const float ypos = e_text.position.y;
 
 		// !TODO: refine this
