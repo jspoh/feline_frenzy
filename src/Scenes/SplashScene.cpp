@@ -97,7 +97,6 @@ void Splash::Scene::load() {
 	//Register shader
 	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
 	NIKEEngine.accessAssets()->registerShader("texture", "shaders/texture.vert", "shaders/texture.frag");
-	NIKEEngine.accessAssets()->registerShader("text", "shaders/text.vert", "shaders/text.frag");
 
 	//Register models
 	NIKEEngine.accessAssets()->registerModel("square", "assets/meshes/square.txt");

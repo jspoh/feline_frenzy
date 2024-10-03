@@ -92,12 +92,6 @@ namespace Render {
 
 		//Helper function to encapsulate rendering
 		void transformAndRenderEntity(Entity::Type entity, bool debugMode);
-
-		/// <summary>
-		/// temp fn used to test rendering of text
-		/// </summary>
-		void renderTextureRaw(unsigned int tex_hdl);
-
 	public:
 		//Constructor
 		Manager() = default;

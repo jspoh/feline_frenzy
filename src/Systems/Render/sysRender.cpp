@@ -360,7 +360,7 @@ void Render::Manager::renderObject(Render::Texture const& e_texture) {
 	shader_system->unuseShader();
 }
 
-void Render::Manager::renderTextureRaw(unsigned int tex_hdl) {
+void Render::Manager::renderText(Render::Text const& e_text) {
 	//Set polygon mode
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -370,56 +370,49 @@ void Render::Manager::renderTextureRaw(unsigned int tex_hdl) {
 	//Texture unit
 	constexpr int texture_unit = 6;
 
-	// set texture
-	glBindTextureUnit(
-		texture_unit, // texture unit (binding index)
-		tex_hdl
-	);
-
-	glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	Matrix33::Matrix_33 xform = Matrix33::Matrix_33::Identity();
-	xform *= 0.1f;
-	xform.matrix_33[2][0] = 0.1f;
-	xform.matrix_33[2][1] = 0.1f;
-	
-	const Vector2 uv_offset{ 0, 0 };
-	const Vector2 frame_size{ 1, 1 };
-
-	//Set uniforms for texture rendering
-	shader_system->setUniform("texture", "u_tex2d", texture_unit);
-	shader_system->setUniform("texture", "u_opacity", 1);
-	shader_system->setUniform("texture", "u_transform", xform);
-	shader_system->setUniform("texture", "uvOffset", uv_offset);
-	shader_system->setUniform("texture", "frameSize", frame_size);
-
 	//Get model
-	auto model = NIKEEngine.accessAssets()->getModel("square-texture");
-
-	//Draw
-	glBindVertexArray(model->vaoid);
-	glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-
-	//Unuse texture
-	glBindVertexArray(0);
-	shader_system->unuseShader();
-}
-
-void Render::Manager::renderText(Render::Text const& e_text) {
-	const unsigned int test_ch_tex_hdl = NIKEEngine.accessAssets()->getFont("basic").at('6').texture;
-	renderTextureRaw(test_ch_tex_hdl);
-	return;
-
+	const auto& model = NIKEEngine.accessAssets()->getModel("square-texture");
 
 	// Iterate through all characters in the string
 	for (char c : e_text.text) {
 		const Character& ch = NIKEEngine.accessAssets()->getFont(e_text.font_ref).at(c);
 		const unsigned int ch_tex_hdl = ch.texture;
 
-		//renderTextureRaw(NIKEEngine.accessAssets()->getTexture("duck"));
-		renderTextureRaw(ch_tex_hdl);
+		// set texture
+		glBindTextureUnit(
+			texture_unit, // texture unit (binding index)
+			ch_tex_hdl
+		);
+
+		glTextureParameteri(ch_tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(ch_tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		// !TODO: refine this
+		Matrix33::Matrix_33 xform = Matrix33::Matrix_33::Identity();
+		xform *= 0.1f;
+		xform.matrix_33[2][0] = 0.1f;
+		xform.matrix_33[2][1] = 0.1f;
+
+		// required to flip around for opengl rendering
+		xform.matrix_33[1][1] *= -1;
+
+		const Vector2 uv_offset{ 0, 0 };
+		const Vector2 frame_size{ 1, 1 };
+
+		//Set uniforms for texture rendering
+		shader_system->setUniform("texture", "u_tex2d", texture_unit);
+		shader_system->setUniform("texture", "u_transform", xform);
+		shader_system->setUniform("texture", "uvOffset", uv_offset);
+		shader_system->setUniform("texture", "frameSize", frame_size);
+
+		//Draw
+		glBindVertexArray(model->vaoid);
+		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 	}
+
+	//Unuse texture
+	glBindVertexArray(0);
+	shader_system->unuseShader();
 }
 
 void Render::Manager::renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color) {

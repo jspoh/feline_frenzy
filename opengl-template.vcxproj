@@ -103,8 +103,6 @@
     <None Include="db\data.json" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
-    <None Include="shaders\text.frag" />
-    <None Include="shaders\text.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
   </ItemGroup>
