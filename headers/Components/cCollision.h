@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   cCollision.h
+ * \brief  Defines the components used for Collision
+ *
+ * \author Min Khant Ko, 2301320, ko.m@digipen.edu
+ * \date   September 2024
+ *********************************************************************/
+
 #pragma once
 
 #ifndef C_COLLISION_HPP

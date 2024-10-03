@@ -3,7 +3,7 @@
  * \brief  Physics system for engine
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
- * \co-author, ko.m
+ * \co-author Min Khant Ko, 2301320, ko.m@digipen.edu
  * \date   September 2024
  *********************************************************************/
 
