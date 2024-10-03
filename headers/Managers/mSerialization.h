@@ -11,9 +11,6 @@
 #ifndef M_SERIALIZATION_HPP
 #define M_SERIALIZATION_HPP
 
-#include "../Core/Engine.h"
-#include "../headers/Systems/Physics/sysPhysics.h"
-
 namespace Serialization {
 	class Manager {
 	private:

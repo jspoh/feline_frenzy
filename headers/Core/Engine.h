@@ -19,6 +19,7 @@
 #include "../headers/Systems/Physics/sysCollision.h"
 #include "../headers/Managers/mAssets.h"
 #include "../headers/Managers/mDebug.h"
+#include "../headers/Managers/mSerialization.h"
 
 namespace Core {
 
@@ -45,6 +46,7 @@ namespace Core {
 		std::unique_ptr<Events::Manager> events_manager;
 		std::unique_ptr<Assets::Manager> assets_manager;
 		std::unique_ptr<Debug::Manager> debug_manager;
+		std::unique_ptr<Serialization::Manager> seri_manager;
 
 	public:
 
@@ -164,6 +166,7 @@ namespace Core {
 		*********************************************************************/
 		std::unique_ptr<Assets::Manager>& accessAssets();
 		std::unique_ptr<Debug::Manager>& accessDebug();
+		std::unique_ptr<Serialization::Manager>& accessSeri();
 	};
 
 	//Predefined name for core engine

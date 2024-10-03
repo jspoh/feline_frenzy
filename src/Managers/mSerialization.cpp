@@ -7,7 +7,9 @@
  *********************************************************************/
 #include "../headers/Core/stdafx.h"
 #include "../headers/Managers/mSerialization.h"
-
+#include "../headers/Core/Engine.h"
+#include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
 
 void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities) {
 	std::ifstream ifs{ scene_filepath, std::ios::in };

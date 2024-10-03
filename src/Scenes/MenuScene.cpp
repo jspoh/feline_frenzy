@@ -69,6 +69,7 @@ void Menu::Scene::load() {
 	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
 	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
 	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
+	NIKEEngine.accessAssets()->registerTexture("player", "assets/textures/player.png");
 
 	//Register font
 	NIKEEngine.accessAssets()->registerFont("basic", "assets/Fonts/Montserrat-Bold.ttf");
@@ -77,7 +78,7 @@ void Menu::Scene::load() {
 void Menu::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
-	loadFromFile("assets/scenes/mainmenu.scn", entities);
+	NIKEEngine.accessSeri()->loadSceneFromFile("assets/scenes/mainmenu.scn", entities);
 
 	// Adding rotation control
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["duckobj"], Transform::Runtime_Transform());
@@ -91,8 +92,8 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, {});
 
 	//Create text object
-	Entity::Type basic_text = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD!", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.0f, 0.0f}, 1.0f });
+	// Entity::Type basic_text = NIKEEngine.createEntity();
+	// NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD!", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.0f, 0.0f}, 1.0f });
 }
 
 void Menu::Scene::exit() {
@@ -101,9 +102,4 @@ void Menu::Scene::exit() {
 
 void Menu::Scene::unload() {
 
-}
-
-void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& param_entities) {
-	Serialization::Manager serializationManager;
-    serializationManager.loadSceneFromFile(scene_filepath, param_entities);
 }
