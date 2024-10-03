@@ -48,7 +48,10 @@ void Splash::Scene::registerComponents() {
 
 	//Register audio components
 	NIKEEngine.registerComponent<Audio::cAudio>();
-}
+	NIKEEngine.registerComponent<Scenes::ChangeSceneEvent>();
+	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
+	NIKEEngine.registerComponent<Move::Movement>();
+	NIKEEngine.registerComponent<Transform::Velocity>();
 
 void Splash::Scene::registerStaticSystems() {
 	//Register input manager
@@ -124,6 +127,8 @@ void Splash::Scene::load() {
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Move::Movement>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Transform::Velocity>());
 	NIKEEngine.accessSystem<GameLogic::Manager>()->setComponentsLinked(false);
 }
 

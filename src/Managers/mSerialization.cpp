@@ -64,7 +64,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 		std::istringstream line_orient{ line };
 		line_orient >> orientation.x >> orientation.y;
 
-		// Orientation & rotation
+		// Velocity
 		getline(ifs, line);
 		std::istringstream line_vel{ line };
 		line_vel >> velocity.x >> velocity.y;
@@ -110,6 +110,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 
 		// Init Player Camera (ALL SCENE MUST HAVE)
 		if (object_name == "player") {
+			NIKEEngine.addEntityComponentObj<Input::Key>(entity, { Input::TriggerMode::CHECKED });
 			NIKEEngine.addEntityComponentObj<Render::Cam>(entity, { object_name, {0.0f, 0.0f}, NIKEEngine.accessWindow()->getWindowSize().y });
 			NIKEEngine.addEntityComponentObj<Move::Movement>(entity, { false, false, false, false });
 			NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity(object_name);

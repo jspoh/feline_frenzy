@@ -11,6 +11,12 @@
 #define GAME_LOGIC_HPP
 
 #include "../headers/Managers/mSystem.h"
+#include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Core/Engine.h"
+#include "../headers/Components/cInput.h"
+#include "../headers/Components/cScene.h"
+#include "../headers/Managers/mEvents.h"
+#include "../headers/Components/cAnimation.h"
 
 namespace GameLogic {
 

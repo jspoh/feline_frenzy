@@ -93,55 +93,6 @@ void Physics::Manager::update() {
 
             const float speed = 100.0f;
 
-            // Check if entity contains Move component
-            if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
-                // Reference to Move component
-                Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
-
-                const float movespeed = 300.0f;
-
-                // Reset Velocity
-                velocity.velocity.y = 0.0f;
-                velocity.velocity.x = 0.0f;
-
-                if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
-                    Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
-                    // Adjust movement based on user input and collision flags
-                    if (move.Up && !collider.top) {
-                        velocity.velocity.y += movespeed;
-                    }
-
-                    if (move.Down && !collider.bottom) {
-                        velocity.velocity.y -= movespeed;
-                    }
-
-                    if (move.Left && !collider.left) {
-                        velocity.velocity.x -= movespeed;
-                    }
-
-                    if (move.Right && !collider.right) {
-                        velocity.velocity.x += movespeed;
-                    }
-                }
-                else {
-                    if (move.Up) {
-                        velocity.velocity.y += movespeed;
-                    }
-
-                    if (move.Down) {
-                        velocity.velocity.y -= movespeed;
-                    }
-
-                    if (move.Left) {
-                        velocity.velocity.x -= movespeed;
-                    }
-
-                    if (move.Right) {
-                        velocity.velocity.x += movespeed;
-                    }
-                }
-            }
-
             // For entities without move but still have movement
             if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
                 Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
