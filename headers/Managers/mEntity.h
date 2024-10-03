@@ -41,6 +41,8 @@ namespace Entity {
 		//Set signature
 		void setSignature(Entity::Type entity, Component::Signature signature);
 
+		Entity::Type cloneEntity(Entity::Type original_entity);
+
 		//Get signature
 		Component::Signature const& getSignature(Entity::Type entity) const;
 
