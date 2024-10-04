@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   sysCamera.h
  * \brief  
  *
  * \author Sean Gwee, g.boonxuensean@digipen.edu
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #pragma once
 

@@ -29,6 +29,7 @@
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysObjectSpawner.cpp" />
     <ClCompile Include="src\Systems\Render\sysFont.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Managers\mCollision.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysAnimationController.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysObjectSpawner.h" />
     <ClInclude Include="headers\Systems\Render\sysFont.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />

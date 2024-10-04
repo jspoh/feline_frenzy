@@ -1,3 +1,12 @@
+﻿/*****************************************************************//**
+ * \file   cScene.h
+ * \brief
+ *
+ * \author 
+ * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #pragma once
 
 #ifndef C_SCENES_HPP

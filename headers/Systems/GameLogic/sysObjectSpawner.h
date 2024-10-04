@@ -8,19 +8,32 @@
  *********************************************************************/
 #pragma once
 
-#ifndef ANIMATION_CONTROLLER_HPP
-#define ANIMATION_CONTROLLER_HPP
+#ifndef OBJECT_SPAWNER_HPP
+#define OBJECT_SPAWNER_HPP
 
 #include "../headers/Managers/mSystem.h"
 
-namespace AnimationController {
+namespace ObjectSpawner {
 
+	//Spawn object
+	struct Spawn {
+		int count;
+		int mouse_type;
+		int key_type;
+
+		Spawn(int spawn_count, int mouse_type, int key_type)
+			: count{ spawn_count }, mouse_type { mouse_type }, key_type { key_type } {}
+	};
+
+	//Spawn Manager
 	class Manager : public System::ISystem {
 	private:
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
 
+		//Generate random
+		void generateRandomObject();
 	public:
 		//Default constructor
 		Manager() = default;
@@ -30,7 +43,7 @@ namespace AnimationController {
 
 		std::string getSysName() override
 		{
-			return "Animation Controller System";
+			return "Object Spawner System";
 		}
 
 		//Update Inputs
@@ -41,4 +54,4 @@ namespace AnimationController {
 	};
 }
 
-#endif //!ANIMATION_CONTROLLER_HPP
+#endif //!OBJECT_SPAWNER_HPP

@@ -4,6 +4,7 @@
  * 
  * \author Poh Jing Seng (jingseng.poh@digipen.edu)
  * \date   11 September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -54,7 +55,7 @@ int WINAPI WinMain(
 	#endif
 
 	//Initialize Engine With Config File
-	NIKEEngine.init("src/Core/Config.txt", 60);
+	NIKEEngine.init("src/Core/Config.txt", 200);
 
 	//Register scenes manager
 	NIKEEngine.registerSystem<Scenes::Manager>(Scenes::Manager::getInstance());

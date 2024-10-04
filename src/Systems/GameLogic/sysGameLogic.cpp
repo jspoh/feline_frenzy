@@ -4,6 +4,7 @@
  * \co-author Sean Gwee, g.boonxuensean@digipen.edu (50%)
  * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (50%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -33,8 +34,10 @@ bool GameLogic::Manager::update() {
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
 				// Render start from 3
-				Entity::Type new_entity = NIKEEngine.cloneEntity(8);
-				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
+				for (int i = 0; i < 500; i++) {
+					Entity::Type new_entity = NIKEEngine.cloneEntity(2);
+					NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
+				}
 			}
 		}
 
