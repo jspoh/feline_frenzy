@@ -118,7 +118,6 @@
     <Text Include="assets\meshes\square.txt" />
     <Text Include="assets\meshes\triangle.txt" />
     <Text Include="src\Core\Config.txt" />
-    <Text Include="src\Managers\crash_log.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

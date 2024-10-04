@@ -22,8 +22,10 @@ void Performance::Scene::load() {
 void Performance::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
+	NIKEEngine.accessSystem<Render::Manager>()->debug_mode = false
+		;
 	Entity::Type spawner = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<ObjectSpawner::Spawn>(spawner, ObjectSpawner::Spawn(500, GLFW_MOUSE_BUTTON_LEFT, -1));
+	NIKEEngine.addEntityComponentObj<ObjectSpawner::Spawn>(spawner, ObjectSpawner::Spawn(250, GLFW_MOUSE_BUTTON_LEFT, -1));
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(spawner, {Input::TriggerMode::TRIGGERED});
 
 	glfwSwapInterval(0);

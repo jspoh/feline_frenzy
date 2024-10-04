@@ -19,3 +19,4 @@ Debug
 Release
 
 venv/
+src/Managers/crash_log.txt

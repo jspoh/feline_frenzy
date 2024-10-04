@@ -33,11 +33,11 @@ Animation scene:
 - press space button to show the animations of sprite
 
 Collision Scene: 
-- Press 'T' to toggle to show the AABB binding box around the sprite
+- Press 'T' to toggle to show the object's AABB bounding box
 - showcase of cloning entity with Left mouse click
 - showcase of player controller movement with the WASD keys
 
 Performance scene: 
-- showcase of 2.5k entities, left mouse click will render out 500 entities per click.
-- Cap at 5k entities
+- showcase of 2.5k entities, left mouse click will render out 250 entities per click.
+- Cap at 3k entities
 
