@@ -52,10 +52,6 @@ bool GameLogic::Manager::update() {
 				NIKEEngine.accessWindow()->terminate();
 			}
 
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_T)) {
-				NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;;
-			}
-
 			// Input for Player
 			if (NIKEEngine.checkEntityComponent<Move::Movement>(entity) && NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
 				const float movespeed = 300.0f;
