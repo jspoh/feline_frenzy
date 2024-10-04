@@ -45,12 +45,8 @@ bool GameLogic::Manager::update() {
 		************************************************/
 		if (NIKEEngine.checkEntityComponent<Input::Key>(entity)) {
 			auto& e_key = NIKEEngine.getEntityComponent<Input::Key>(entity);
-			//Check if escape key is pressed
-			//Escape program
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_ESCAPE)) {
-				NIKEEngine.accessWindow()->terminate();
-			}
 
+			//Toggle debug
 			if (NIKEEngine.checkEntityComponent<Render::Debug>(entity)) {
 				if (e_key.b_output && (e_key.key_type == GLFW_KEY_T)) {
 					NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;

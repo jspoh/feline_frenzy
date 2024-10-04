@@ -82,5 +82,8 @@ bool ObjectSpawner::Manager::update() {
 		}
 	}
 
+	//Disable debug mode
+	NIKEEngine.accessSystem<Render::Manager>()->debug_mode = false;
+
 	return false;
 }

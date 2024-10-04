@@ -54,9 +54,6 @@ void Splash::Scene::registerStaticComponents() {
 
 	//Register scene components
 	NIKEEngine.registerComponent<Scenes::ChangeScene>();
-	
-	// Regiser object spawner component
-	NIKEEngine.registerComponent<ObjectSpawner::Spawn>();
 }
 
 void Splash::Scene::registerStaticSystems() {
@@ -94,10 +91,6 @@ void Splash::Scene::registerStaticSystems() {
 	//Register audio manager
 	NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());
 	NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
-
-	//Register spawner system before physics
-	NIKEEngine.registerSystem<ObjectSpawner::Manager>(nullptr, NIKEEngine.getSystemIndex<Physics::Manager>());
-	NIKEEngine.addSystemComponentType<ObjectSpawner::Manager>(NIKEEngine.getComponentType<ObjectSpawner::Spawn>());
 
 	//Add components for scene manager
 	NIKEEngine.addSystemComponentType<Scenes::Manager>(NIKEEngine.getComponentType<Scenes::ChangeScene>());
@@ -186,6 +179,8 @@ void Splash::Scene::exit() {
 
 	//Cleanup
 	NIKEEngine.destroyAllEntities();
+
+	//Remove component and systems that are not in use
 	NIKEEngine.removeComponent<Animation::SpriteEvent>();
 	NIKEEngine.removeSystem<AnimationController::Manager>();
 }

@@ -33,7 +33,7 @@ Animation scene:
 - press space button to show the animations of sprite
 
 Collision Scene: 
-- Press 'T' to toggle to show the object's AABB bounding box
+- Press 'T' to toggle to show the object's AABB bounding box ( Only in scene 2 )
 - showcase of cloning entity with Left mouse click
 - showcase of player controller movement with the WASD keys
 

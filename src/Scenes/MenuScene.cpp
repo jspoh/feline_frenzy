@@ -30,7 +30,7 @@ void Menu::Scene::load() {
 	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
 
 	//Register game logic system
-	NIKEEngine.registerSystem<GameLogic::Manager>();
+	NIKEEngine.registerSystem<GameLogic::Manager>(nullptr, NIKEEngine.getSystemIndex<Physics::Manager>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());
 	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
@@ -72,6 +72,10 @@ void Menu::Scene::init() {
 
 void Menu::Scene::exit() {
 	NIKEEngine.destroyAllEntities();
+
+	//Remove component and systems that are not in use
+	NIKEEngine.removeComponent<GameLogic::ObjectSpawner>();
+	NIKEEngine.removeSystem<GameLogic::Manager>();
 }
 
 void Menu::Scene::unload() {

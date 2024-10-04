@@ -151,7 +151,10 @@ bool Input::Manager::update() {
 			}
 		}
 
-
+		//Escape program
+		if (key.b_output && (key.key_type == GLFW_KEY_ESCAPE)) {
+			NIKEEngine.accessWindow()->terminate();
+		}
 
 		if (key.b_output && (key.key_type == GLFW_KEY_P))
 		{

@@ -16,14 +16,16 @@
 #include "../headers/Systems/Physics/sysPhysics.h"
 
 void Performance::Scene::load() {
-	
+	// Regiser object spawner component
+	NIKEEngine.registerComponent<ObjectSpawner::Spawn>();
+
+	//Register spawner system before physics
+	NIKEEngine.registerSystem<ObjectSpawner::Manager>(nullptr, NIKEEngine.getSystemIndex<Physics::Manager>());
+	NIKEEngine.addSystemComponentType<ObjectSpawner::Manager>(NIKEEngine.getComponentType<ObjectSpawner::Spawn>());
 }
 
 void Performance::Scene::init() {
 	glClearColor(1, 1, 1, 1);
-
-	//Disable debug mode
-	NIKEEngine.accessSystem<Render::Manager>()->debug_mode = false;
 
 	//Increase target FPS for stress test
 	NIKEEngine.accessWindow()->setTargetFPS(150);
@@ -48,6 +50,10 @@ void Performance::Scene::exit() {
 
 	//Enable vsync
 	glfwSwapInterval(1);
+
+	//Remove component and systems that are not in use
+	NIKEEngine.removeComponent<ObjectSpawner::Spawn>();
+	NIKEEngine.removeSystem<ObjectSpawner::Manager>();
 }
 
 void Performance::Scene::unload() {
