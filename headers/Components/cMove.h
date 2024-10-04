@@ -2,7 +2,7 @@
  * \file   cMove.h
  * \brief
  *
- * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   September 2024
  *********************************************************************/
 

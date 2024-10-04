@@ -2,8 +2,9 @@
  * \file   cTransform.h
  * \brief
  *
- * \author Sean Gwee, g.boonxuensean@digipen.edu
- * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \author Sean Gwee, g.boonxuensean@digipen.edu (90%)
+ * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (5%)
+ * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (5%)
  * \date   September 2024
  *********************************************************************/
 

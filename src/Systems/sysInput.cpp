@@ -148,6 +148,11 @@ bool Input::Manager::update() {
 				NIKEEngine.accessWindow()->terminate();
 			}
 		}
+
+		if (key.b_output && (key.key_type == GLFW_KEY_P))
+		{
+			NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
+		}
 	}
 
 	return false;

@@ -2,7 +2,7 @@
  * \file   mCollision.h
  * \brief  Collision manager header for the physics system.
  *
- * \author Min Khant Ko, 2301320, ko.m@digipen.edu
+ * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
  * \date   September 2024
  *********************************************************************/
 

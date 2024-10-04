@@ -2,8 +2,10 @@
  * \file   PhysicsSystem.cpp
  * \brief  Physics system for engine
  *
- * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
- * \co-author Min Khant Ko, 2301320, ko.m@digipen.edu
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (45%)
+ * \co-author Min Khant Ko, 2301320, ko.m@digipen.edu (45%)
+ *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
+ * 
  * \date   September 2024
  *********************************************************************/
 
@@ -11,13 +13,8 @@
 #include "../headers/Systems/Physics/sysPhysics.h"
 #include "../headers/Components/cMove.h"
 
-// Forward declaration for Collision
-//namespace Collision {
-//    class Manager;
-//}
-
 void Physics::Manager::init() {
-    // Add Collider component
+
 }
 
 void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
