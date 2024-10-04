@@ -151,9 +151,7 @@ bool Input::Manager::update() {
 			}
 		}
 
-		if (key.b_output && (key.key_type == GLFW_KEY_T)) {
-			NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;;
-		}
+
 
 		if (key.b_output && (key.key_type == GLFW_KEY_P))
 		{

@@ -47,6 +47,7 @@ void Splash::Scene::registerComponents() {
 	NIKEEngine.registerComponent<Render::Color>();
 	NIKEEngine.registerComponent<Render::Cam>();
 	NIKEEngine.registerComponent<Render::Text>();
+	NIKEEngine.registerComponent<Render::Debug>();
 
 	//Register audio components
 	NIKEEngine.registerComponent<Audio::cAudio>();

@@ -58,12 +58,9 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, GameLogic::ObjectSpawner());
 
 	//Toggle debug mode
-	Entity::Type debugMode = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Input::Mouse>(debugMode, { Input::TriggerMode::TRIGGERED });
-
-	//Toggle debug mode
 	Entity::Type key = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Key>(key, { Input::TriggerMode::TRIGGERED });
+	NIKEEngine.addEntityComponentObj<Render::Debug>(key, Render::Debug());
 
 	//Create text object
 	Entity::Type basic_text = NIKEEngine.createEntity();

@@ -5,6 +5,7 @@
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (50%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \date   September 2024
+ * 
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 

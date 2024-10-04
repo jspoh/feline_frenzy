@@ -4,7 +4,6 @@
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (50%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -51,6 +50,14 @@ bool GameLogic::Manager::update() {
 			if (e_key.b_output && (e_key.key_type == GLFW_KEY_ESCAPE)) {
 				NIKEEngine.accessWindow()->terminate();
 			}
+
+			if (NIKEEngine.checkEntityComponent<Render::Debug>(entity)) {
+				if (e_key.b_output && (e_key.key_type == GLFW_KEY_T)) {
+					NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;
+				}
+				continue;
+			}
+
 
 			// Input for Player
 			if (NIKEEngine.checkEntityComponent<Move::Movement>(entity) && NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {

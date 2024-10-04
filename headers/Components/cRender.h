@@ -68,6 +68,10 @@ namespace Render {
 		unsigned int primitive_type;
 		unsigned int draw_count;
 	};
+
+	struct Debug {
+		// TEMP FIX FOR DEBUG MODE
+	};
 }
 
 #endif // !C_RENDER_HPP
