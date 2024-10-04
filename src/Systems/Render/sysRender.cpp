@@ -265,13 +265,9 @@ void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix33:
 	//Transform matrix here
 	Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
-	// Scrap orientation for now
-	// Modulus the object rotation so it doesnt result in a large number overtime
-	// float orientation = fmod(orientation, 360.f);
-	//float angleDisp = (orientation += xform.rotation * NIKEEngine.getDeltaTime()) * static_cast<float>(M_PI) / 180.f;
 	float angleDisp = obj.rotation;
 
-	Matrix_33Rot(rot_mat, angleDisp);
+	Matrix_33RotDeg(rot_mat, angleDisp);
 	Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 	Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 	result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;

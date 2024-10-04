@@ -99,7 +99,7 @@ void Serialization::Manager::loadSceneFromFile(const std::string& scene_filepath
 			// The substring "bounce" is found in object_name
 			NIKEEngine.accessSystem<Physics::Manager>()->collision_manager.setColliderComp(entity, true);
 		}
-		else if (object_name.find("background") != std::string::npos || object_name.find("tree") != std::string::npos)
+		else if (object_name.find("background") != std::string::npos)
 		{
 			// Not to add collision to background texture
 		}
