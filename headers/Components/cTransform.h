@@ -1,8 +1,8 @@
 /*****************************************************************//**
  * \file   cTransform.h
- * \brief
+ * \brief  
  *
- * \author Sean Gwee, g.boonxuensean@digipen.edu (90%)
+ * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (90%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (5%)
  * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (5%)
  * \date   September 2024
@@ -16,7 +16,6 @@
 #include "../headers/Core/stdafx.h"
 
 namespace Transform {
-	// Maybe a mesh struct?
 
 	struct Transform {
 		Vector2 position;

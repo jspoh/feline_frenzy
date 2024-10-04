@@ -2,7 +2,7 @@
  * \file   cRender.h
  * \brief
  *
- * \author Sean Gwee, g.boonxuensean@digipen.edu
+ * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

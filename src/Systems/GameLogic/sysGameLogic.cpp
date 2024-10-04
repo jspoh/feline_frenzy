@@ -1,7 +1,7 @@
 /*****************************************************************//**
  * \file   sysGameLogic.cpp
  * \brief  game logic system
- * \co-author Sean Gwee, g.boonxuensean@digipen.edu (50%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (50%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
