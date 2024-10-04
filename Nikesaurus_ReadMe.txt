@@ -29,7 +29,7 @@ For all scenes:
 To toggle between scenes: 
 - Press 'Enter' key to go to the next scene
 
-In Performance and Collision scene:
+In Collision scene:
 - Press 'T' to toggle to show the AABB binding box around the sprite
 
 Collision Scene: 
