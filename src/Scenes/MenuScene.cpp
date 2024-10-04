@@ -16,6 +16,7 @@
 #include "../headers/Managers/mSerialization.h"
 #include "../headers/Systems/GameLogic/sysGameLogic.h"
 #include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
  //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
@@ -54,7 +55,7 @@ void Menu::Scene::init() {
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(objSpawner, { Input::TriggerMode::TRIGGERED });
-	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, {});
+	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, GameLogic::ObjectSpawner());
 
 	//Toggle debug mode
 	Entity::Type debugMode = NIKEEngine.createEntity();
@@ -69,7 +70,7 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.4f, 0.9f}, 0.05f });
 
 	Entity::Type pantat_text = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Render::Text>(pantat_text, { "basic", "PANTAT", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.5f, -0.9f}, 0.05f });
+	NIKEEngine.addEntityComponentObj<Render::Text>(pantat_text, { "basic", "TEXT", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.5f, -0.9f}, 0.05f });
 }
 
 void Menu::Scene::exit() {

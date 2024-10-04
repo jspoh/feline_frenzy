@@ -16,11 +16,7 @@
 #include "../headers/Systems/Physics/sysPhysics.h"
 
 void Performance::Scene::load() {
-	NIKEEngine.registerComponent<ObjectSpawner::Spawn>();
-
-	//Register spawner system before physics
-	NIKEEngine.registerSystem<ObjectSpawner::Manager>(nullptr, NIKEEngine.getSystemIndex<Physics::Manager>());
-	NIKEEngine.addSystemComponentType<ObjectSpawner::Manager>(NIKEEngine.getComponentType<ObjectSpawner::Spawn>());
+	
 }
 
 void Performance::Scene::init() {
