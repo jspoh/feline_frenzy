@@ -12,7 +12,6 @@ Demo
 total of 3 scenes
 first scene (animation scene):
 - showcase of animation of spritesheet
-- press space button to show the animations of sprite
 
 second scene (Collision scene):
 - showcase of collision between dynamic and dynamic entities and dynamic and static entities
@@ -26,13 +25,15 @@ Feline Frenzy is a game where you play as a cat hero navigating an abandoned lab
 Input keys: 
 For all scenes: 
 - Press 'P' key to stop Audio
+- Press 'C' key to crash the game and log the crash in src/Managers/crash_log.txt
 To toggle between scenes: 
 - Press 'Enter' key to go to the next scene
 
-In Collision scene:
-- Press 'T' to toggle to show the AABB binding box around the sprite
+Animation scene: 
+- press space button to show the animations of sprite
 
 Collision Scene: 
+- Press 'T' to toggle to show the AABB binding box around the sprite
 - showcase of cloning entity with Left mouse click
 - showcase of player controller movement with the WASD keys
 

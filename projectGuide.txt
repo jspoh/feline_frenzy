@@ -10,6 +10,8 @@ Project Settings:
 To toggle between scenes: 
 - Press 'Enter' key to go to the next scene
 
+- Press 'C' key to crash the game and log the crash in src/Managers/crash_log.txt
+
 Total of 3 scenes: 
 - Animation scnene (press space button to show the animations)
 - Collision scene (Left mouse click to clone entities)
