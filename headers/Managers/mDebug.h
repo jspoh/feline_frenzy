@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   sysDebug.h
+ * \file   mDebug.h
  * \brief  Debug manager function declarations
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)

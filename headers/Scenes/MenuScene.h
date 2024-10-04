@@ -1,8 +1,10 @@
 ﻿/*****************************************************************//**
  * \file   MenuScene.h
- * \brief  
- * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \brief
+ *
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (40%)
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu (30%)
+ *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

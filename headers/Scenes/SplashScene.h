@@ -1,8 +1,8 @@
 ﻿/*****************************************************************//**
  * \file   SplashScene.h
  * \brief
- *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (90%)
+ * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (10%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

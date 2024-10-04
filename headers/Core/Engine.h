@@ -1,9 +1,9 @@
 ﻿/*****************************************************************//**
  * \file   Engine.h
- * \brief  
- * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
- * \date   11 September 2024
+ * \brief  Core engine arhcitecture
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
+ * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
