@@ -44,7 +44,9 @@ void Core::Engine::run() {
 		glfwPollEvents();
 
 		//Set Window Title
-		windows_manager->setWinTitle(windows_manager->getWinTitle() + " | " + std::to_string(windows_manager->getCurrentFPS()) + " fps");
+		windows_manager->setWinTitle(windows_manager->getWinTitle() +
+			" | " + std::to_string(windows_manager->getCurrentFPS()) + " fps" +
+		" | " + std::to_string(entity_manager->getEntityCount()) + " entities");
 
 		//Update all systems
 		system_manager->updateSystems();
@@ -92,6 +94,10 @@ void Core::Engine::destroyAllEntities() {
 	for (auto entity : entity_manager->getAllEntities()) {
 		destroyEntity(entity);
 	}
+}
+
+int Core::Engine::getEntitiesCount() {
+	return entity_manager->getEntityCount();
 }
 
 /*****************************************************************//**

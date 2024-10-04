@@ -81,6 +81,9 @@ namespace Core {
 		//Destroy Entity
 		void destroyAllEntities();
 
+		//Get entity count
+		int getEntitiesCount();
+
 		/*****************************************************************//**
 		* Component Methods
 		*********************************************************************/

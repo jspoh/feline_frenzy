@@ -34,6 +34,9 @@ namespace Utility {
 		//Restart Clock
 		void restartClock();
 	};
+
+	//Generate random float
+	float randFloat();
 }
 
 #endif //!SYSTEM_UTILS_HPP

@@ -54,7 +54,7 @@ int WINAPI WinMain(
 	#endif
 
 	//Initialize Engine With Config File
-	NIKEEngine.init("src/Core/Config.txt", 60);
+	NIKEEngine.init("src/Core/Config.txt", 200);
 
 	//Register scenes manager
 	NIKEEngine.registerSystem<Scenes::Manager>(Scenes::Manager::getInstance());

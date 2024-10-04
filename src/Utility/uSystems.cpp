@@ -22,3 +22,7 @@ float Utility::Clock::getElapsedTime() {
 void Utility::Clock::restartClock() {
 	start = std::chrono::high_resolution_clock::now();
 }
+
+float Utility::randFloat() {
+	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+}
