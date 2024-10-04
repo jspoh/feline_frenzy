@@ -1,8 +1,8 @@
 ﻿/*****************************************************************//**
  * \file   sysAnimationController.h
  * \brief  animation controller system
- *
- * \author Ho
+ * 
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

@@ -2,12 +2,12 @@
  * \file   Vector4.cpp
  * \brief
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Math/Vector4.h"
 
 Vector4 Vector4::operator+(const Vector4& rhs) const {
 	return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
