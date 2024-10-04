@@ -35,7 +35,7 @@ bool GameLogic::Manager::update() {
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
 				// Render start from 3
-				Entity::Type new_entity = NIKEEngine.cloneEntity(5 + std::rand() % 2);
+				Entity::Type new_entity = NIKEEngine.cloneEntity(8);
 				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
 			}
 		}
@@ -49,19 +49,6 @@ bool GameLogic::Manager::update() {
 			//Escape program
 			if (e_key.b_output && (e_key.key_type == GLFW_KEY_ESCAPE)) {
 				NIKEEngine.accessWindow()->terminate();
-			}
-
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_C))
-			{
-				try
-				{
-					throw std::runtime_error("crash");
-				}
-				catch (const std::exception&)
-				{
-					NIKEEngine.accessDebug()->logCrash();
-					NIKEEngine.accessWindow()->terminate();
-				}
 			}
 
 			if (e_key.b_output && (e_key.key_type == GLFW_KEY_T)) {

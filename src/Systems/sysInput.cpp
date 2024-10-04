@@ -135,6 +135,19 @@ bool Input::Manager::update() {
 			e_runtime.runtime_scale_down = key.b_output && (key.key_type == GLFW_KEY_X);
 			e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
 		}
+
+		if (key.b_output && (key.key_type == GLFW_KEY_C))
+		{
+			try
+			{
+				throw std::runtime_error("crash");
+			}
+			catch (const std::exception&)
+			{
+				NIKEEngine.accessDebug()->logCrash();
+				NIKEEngine.accessWindow()->terminate();
+			}
+		}
 	}
 
 	return false;
