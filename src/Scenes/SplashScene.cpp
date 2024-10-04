@@ -2,9 +2,9 @@
  * \file   SplashScene.cpp
  * \brief
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (90%)
- * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (10%)
+ * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (10%)
  * \date   September 2024
- * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
