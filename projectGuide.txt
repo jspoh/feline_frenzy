@@ -1,7 +1,16 @@
-Debug Mode for project:
+Project Settings:
+    Debug Mode for project:
 
-- Able to see systems' time consumption per game loop, in %. 
+    - Able to see systems' time consumption per game loop, in %. 
 
-Release Mode for project:
+    Release Mode for project:
 
-- Able to see 2.5k object rendering with 60 FPS in only release mode
+    - Able to see 2.5k object rendering with 60 FPS in only release mode.
+
+To toggle between scenes: 
+- Press 'Enter' key to go to the next scene
+
+Total of 3 scenes: 
+- Animation scnene (press space button to show the animations)
+- Collision scene (Left mouse click to clone entities)
+- Performance scene (Left click to clone 500 entities at one click)
