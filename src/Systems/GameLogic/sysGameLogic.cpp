@@ -34,10 +34,10 @@ bool GameLogic::Manager::update() {
 				Vector3 world_coords = ndc_coords * ndc_to_world_xform;
 
 				// Render start from 3
-				for (int i = 0; i < 500; i++) {
-					Entity::Type new_entity = NIKEEngine.cloneEntity(2);
-					NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
-				}
+				// Rand between index 7 and 8 (duck objects)
+				Entity::Type new_entity = NIKEEngine.cloneEntity(7 + std::rand() % 2);
+				NIKEEngine.getEntityComponent<Transform::Transform>(new_entity).position = { world_coords.x ,world_coords.y };
+				
 			}
 		}
 
@@ -50,10 +50,6 @@ bool GameLogic::Manager::update() {
 			//Escape program
 			if (e_key.b_output && (e_key.key_type == GLFW_KEY_ESCAPE)) {
 				NIKEEngine.accessWindow()->terminate();
-			}
-
-			if (e_key.b_output && (e_key.key_type == GLFW_KEY_T)) {
-				NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;;
 			}
 
 			// Input for Player

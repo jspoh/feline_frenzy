@@ -11,6 +11,7 @@
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Core/Engine.h"
 #include "../headers/Components/cTransform.h"
+#include "../headers/Systems/Render/sysRender.h"
 
 void Input::Manager::setupEventCallbacks() {
 	glfwSetFramebufferSizeCallback(NIKEEngine.accessWindow()->getWindow(), fbsize_cb);
@@ -148,6 +149,10 @@ bool Input::Manager::update() {
 				NIKEEngine.accessDebug()->logCrash();
 				NIKEEngine.accessWindow()->terminate();
 			}
+		}
+
+		if (key.b_output && (key.key_type == GLFW_KEY_T)) {
+			NIKEEngine.accessSystem<Render::Manager>()->debug_mode = !NIKEEngine.accessSystem<Render::Manager>()->debug_mode;;
 		}
 
 		if (key.b_output && (key.key_type == GLFW_KEY_P))

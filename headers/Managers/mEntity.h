@@ -2,7 +2,7 @@
  * \file   Entity.h
  * \brief  Entity manager for ecs architecture
  *
- * \author ho
+ * \author Ho Shu Hng (100%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

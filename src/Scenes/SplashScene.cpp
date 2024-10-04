@@ -23,6 +23,7 @@
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/GameLogic/sysAnimationController.h"
+#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
 void Splash::Scene::registerComponents() {
 	//Register input components
@@ -52,6 +53,9 @@ void Splash::Scene::registerComponents() {
 
 	//Register scene components
 	NIKEEngine.registerComponent<Scenes::ChangeScene>();
+	
+	// Regiser object spawner component
+	NIKEEngine.registerComponent<ObjectSpawner::Spawn>();
 }
 
 void Splash::Scene::registerStaticSystems() {
@@ -89,6 +93,10 @@ void Splash::Scene::registerStaticSystems() {
 	//Register audio manager
 	NIKEEngine.registerSystem<Audio::Manager>(Audio::Manager::getInstance());
 	NIKEEngine.addSystemComponentType<Audio::Manager>(NIKEEngine.getComponentType<Audio::cAudio>());
+
+	//Register spawner system before physics
+	NIKEEngine.registerSystem<ObjectSpawner::Manager>(nullptr, NIKEEngine.getSystemIndex<Physics::Manager>());
+	NIKEEngine.addSystemComponentType<ObjectSpawner::Manager>(NIKEEngine.getComponentType<ObjectSpawner::Spawn>());
 
 	//Add components for scene manager
 	NIKEEngine.addSystemComponentType<Scenes::Manager>(NIKEEngine.getComponentType<Scenes::ChangeScene>());

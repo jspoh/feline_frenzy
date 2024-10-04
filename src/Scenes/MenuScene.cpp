@@ -2,9 +2,9 @@
  * \file   MenuScene.cpp
  * \brief
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
- * \co-author Sean Gwee, g.boonxuensean@digipen.edu, 
- *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (40%)
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu (30%)
+ *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -16,6 +16,7 @@
 #include "../headers/Managers/mSerialization.h"
 #include "../headers/Systems/GameLogic/sysGameLogic.h"
 #include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
  //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
@@ -54,7 +55,7 @@ void Menu::Scene::init() {
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(objSpawner, { Input::TriggerMode::TRIGGERED });
-	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, {});
+	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, GameLogic::ObjectSpawner());
 
 	//Toggle debug mode
 	Entity::Type debugMode = NIKEEngine.createEntity();
@@ -69,7 +70,7 @@ void Menu::Scene::init() {
 	NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.4f, 0.9f}, 0.05f });
 
 	Entity::Type pantat_text = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Render::Text>(pantat_text, { "basic", "PANTAT", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.5f, -0.9f}, 0.05f });
+	NIKEEngine.addEntityComponentObj<Render::Text>(pantat_text, { "basic", "TEXT", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.5f, -0.9f}, 0.05f });
 }
 
 void Menu::Scene::exit() {
