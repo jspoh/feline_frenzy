@@ -72,6 +72,16 @@ namespace Component {
 			return component_array.find(entity) != component_array.end();
 		}
 
+		//Get all entities with component type T
+		std::vector<Entity::Type> getAllEntities() {
+			std::vector<Entity::Type> temp_vec;
+			for (auto const& entity : component_array) {
+				temp_vec.push_back(entity.first);
+			}
+
+			return temp_vec;
+		}
+
 		//Clone entity
 		void cloneEntity(Entity::Type clone, Entity::Type copy) override {
 			//Clone entity
@@ -128,13 +138,28 @@ namespace Component {
 			std::string type_name{ typeid(T).name() };
 
 			//Check if component has been registered before
-			assert(component_types.find(type_name) == component_types.end() && "Component already registered.");
+			assert(component_types.find(type_name) == component_types.end() && "Component already registered. Register failed.");
 
 			//Add component type
 			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_id++));
 
 			//Add component map
 			component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::make_shared<Array<T>>()));
+		}
+
+		template<typename T>
+		void removeComponent() {
+			//Component type name
+			std::string type_name{ typeid(T).name() };
+
+			//Check if component has been registered before
+			assert(component_types.find(type_name) != component_types.end() && "Component has not been registered before. Deregister failed.");
+
+			//Remove component type
+			component_types.erase(type_name);
+
+			//Remove component array
+			component_arrays.erase(type_name);
 		}
 
 		//Add component associated with entity type
@@ -180,6 +205,12 @@ namespace Component {
 
 			//Return component type
 			return component_types.at(type_name);
+		}
+
+		//Get all entities
+		template<typename T>
+		std::vector<Entity::Type> getAllEntities() {
+			return getComponentArray<T>()->getAllEntities();
 		}
 
 		//Clone entity

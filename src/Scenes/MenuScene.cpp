@@ -40,6 +40,7 @@ void Menu::Scene::load() {
 void Menu::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
+	//Load objects from scene file
 	NIKEEngine.accessSeri()->loadSceneFromFile("assets/scenes/mainmenu.scn", entities);
 
 	//Create new scene object

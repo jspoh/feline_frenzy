@@ -25,7 +25,7 @@
 #include "../headers/Systems/GameLogic/sysAnimationController.h"
 #include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
-void Splash::Scene::registerComponents() {
+void Splash::Scene::registerStaticComponents() {
 	//Register input components
 	NIKEEngine.registerComponent<Input::Key>();
 	NIKEEngine.registerComponent<Input::Mouse>();
@@ -106,14 +106,7 @@ void Splash::Scene::registerStaticSystems() {
 	NIKEEngine.accessSystem<Scenes::Manager>()->setComponentsLinked(false);
 }
 
-void Splash::Scene::load() {
-
-	//Register components
-	registerComponents();
-
-	//Register static systems
-	registerStaticSystems();
-
+void Splash::Scene::registerStaticAssets() {
 	//Register shader
 	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
 	NIKEEngine.accessAssets()->registerShader("texture", "shaders/texture.vert", "shaders/texture.frag");
@@ -124,12 +117,24 @@ void Splash::Scene::load() {
 	NIKEEngine.accessAssets()->registerModel("circle", "assets/meshes/circle.txt");
 	NIKEEngine.accessAssets()->registerModel("square-texture", "assets/meshes/square-texture.txt");
 
+	//Register font
+	NIKEEngine.accessAssets()->registerFont("basic", "assets/Fonts/Montserrat-Bold.ttf");
+}
+
+void Splash::Scene::load() {
+
+	//Register components
+	registerStaticComponents();
+
+	//Register static systems
+	registerStaticSystems();
+
+	//Register static assets
+	registerStaticAssets();
+
 	//Register texture
 	NIKEEngine.accessAssets()->registerTexture("zombie", "assets/textures/ZombieSheet.png");
 	NIKEEngine.accessAssets()->registerTexture("bg", "assets/textures/background.jpg");
-
-	//Register font
-	NIKEEngine.accessAssets()->registerFont("basic", "assets/Fonts/Montserrat-Bold.ttf");
 
 	//Register audio
 	NIKEEngine.accessAssets()->registerMusicAudio("assets/Audio/test_music.wav", "test_music");
@@ -137,7 +142,7 @@ void Splash::Scene::load() {
 
 	//Register animation event components
 	NIKEEngine.registerComponent<Animation::SpriteEvent>();
-	NIKEEngine.registerComponent<Animation::AnimationEvent>();
+	//NIKEEngine.registerComponent<Animation::AnimationEvent>();
 
 	NIKEEngine.registerSystem<AnimationController::Manager>(nullptr, NIKEEngine.getSystemIndex<Animation::Manager>());
 	NIKEEngine.addSystemComponentType<AnimationController::Manager>(NIKEEngine.getComponentType<Animation::SpriteEvent>());
@@ -178,7 +183,10 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
+
+	//Cleanup
 	NIKEEngine.destroyAllEntities();
+	NIKEEngine.removeComponent<Animation::SpriteEvent>();
 	NIKEEngine.removeSystem<AnimationController::Manager>();
 }
 

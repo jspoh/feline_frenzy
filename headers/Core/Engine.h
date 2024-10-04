@@ -94,6 +94,23 @@ namespace Core {
 		}
 
 		template<typename T>
+		void removeComponent() {
+
+			std::vector<Entity::Type> entities = component_manager->getAllEntities<T>();
+			for (Entity::Type entity : entities) {
+				//Set bit signature of component to false
+				Component::Signature sign = entity_manager->getSignature(entity);
+				sign.set(component_manager->getComponentType<T>(), false);
+				entity_manager->setSignature(entity, sign);
+
+				//Update entities list
+				system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), false);
+			}
+
+			component_manager->removeComponent<T>();
+		}
+
+		template<typename T>
 		void addEntityComponentObj(Entity::Type entity, T&& component) {
 
 			//Add component

@@ -21,10 +21,13 @@ namespace Splash {
 		std::unordered_map<std::string, Entity::Type> entities;
 
 		//Register components
-		void registerComponents();
+		static void registerStaticComponents();
 
 		//Register static systems
-		void registerStaticSystems();
+		static void registerStaticSystems();
+
+		//Register static systems
+		static void registerStaticAssets();
 
 	public:
 
