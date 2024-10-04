@@ -1,4 +1,4 @@
-/* Start Header ************************************************************************/
+﻿/* Start Header ************************************************************************/
 /*!
 \file db.cpp
 \author Poh Jing Seng, jingseng.poh, 2301363
@@ -10,6 +10,7 @@ Copyright (C) 2024 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
 without the prior written consent of DigiPen Institute of
 Technology is prohibited.
+All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 */
 /* End Header **************************************************************************/
 

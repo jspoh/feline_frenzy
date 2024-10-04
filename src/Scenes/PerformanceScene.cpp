@@ -4,6 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -26,7 +27,7 @@ void Performance::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
 	Entity::Type spawner = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<ObjectSpawner::Spawn>(spawner, ObjectSpawner::Spawn(100, GLFW_MOUSE_BUTTON_LEFT, -1));
+	NIKEEngine.addEntityComponentObj<ObjectSpawner::Spawn>(spawner, ObjectSpawner::Spawn(500, GLFW_MOUSE_BUTTON_LEFT, -1));
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(spawner, {Input::TriggerMode::TRIGGERED});
 }
 

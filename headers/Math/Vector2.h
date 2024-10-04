@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   Vector2.h
  * \brief  
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   September 2024
+ * \All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once

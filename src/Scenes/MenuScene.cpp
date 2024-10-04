@@ -6,6 +6,7 @@
  * \co-author Sean Gwee, g.boonxuensean@digipen.edu, 
  *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"

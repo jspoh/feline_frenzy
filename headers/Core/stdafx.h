@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   stdafx.h
  * \brief  Precompiled header file for standard application framework extensions
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   11 September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once

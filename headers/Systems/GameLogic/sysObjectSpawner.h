@@ -1,11 +1,12 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   sysAnimationController.h
  * \brief  animation controller system
  *
  * \author Ho
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
-#pragma onces
+#pragma once
 
 #ifndef OBJECT_SPAWNER_HPP
 #define OBJECT_SPAWNER_HPP

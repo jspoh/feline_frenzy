@@ -1,3 +1,13 @@
+﻿/*****************************************************************//**
+ * \file   cInput.h
+ * \brief  Defines the components used for Collision
+ *
+ * \author Bryan Soh, 2301320, ko.m@digipen.edu (100%)
+ * \date   September 2024
+ *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
+
 #pragma once
 
 #ifndef C_INPUT_HPP
