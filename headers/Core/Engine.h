@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   Engine.h
- * \brief  
- * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
- * \date   11 September 2024
+ * \brief  Core engine arhcitecture
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
+ * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -19,6 +20,7 @@
 #include "../headers/Managers/mCollision.h"
 #include "../headers/Managers/mAssets.h"
 #include "../headers/Managers/mDebug.h"
+#include "../headers/Managers/mSerialization.h"
 
 namespace Core {
 
@@ -45,6 +47,7 @@ namespace Core {
 		std::unique_ptr<Events::Manager> events_manager;
 		std::unique_ptr<Assets::Manager> assets_manager;
 		std::unique_ptr<Debug::Manager> debug_manager;
+		std::unique_ptr<Serialization::Manager> seri_manager;
 
 	public:
 
@@ -70,8 +73,17 @@ namespace Core {
 		//Create Entity
 		Entity::Type createEntity();
 
+		//Clone entity ( ID of clone returned )
+		Entity::Type cloneEntity(Entity::Type copy);
+
 		//Destroy Entity
 		void destroyEntity(Entity::Type entity);
+
+		//Destroy Entity
+		void destroyAllEntities();
+
+		//Get entity count
+		int getEntitiesCount();
 
 		/*****************************************************************//**
 		* Component Methods
@@ -79,6 +91,23 @@ namespace Core {
 		template<typename T>
 		void registerComponent() {
 			component_manager->registerComponent<T>();
+		}
+
+		template<typename T>
+		void removeComponent() {
+
+			std::vector<Entity::Type> entities = component_manager->getAllEntities<T>();
+			for (Entity::Type entity : entities) {
+				//Set bit signature of component to false
+				Component::Signature sign = entity_manager->getSignature(entity);
+				sign.set(component_manager->getComponentType<T>(), false);
+				entity_manager->setSignature(entity, sign);
+
+				//Update entities list
+				system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), false);
+			}
+
+			component_manager->removeComponent<T>();
 		}
 
 		template<typename T>
@@ -135,9 +164,21 @@ namespace Core {
 		}
 
 		template<typename T>
+		void removeSystem(std::shared_ptr<T> singleton_sys = nullptr)
+		{
+			system_manager->removeSystem<T>();
+		}
+
+		template<typename T>
 		std::shared_ptr<T> accessSystem()
 		{
 			return system_manager->accessSystem<T>();
+		}
+
+		template<typename T>
+		int getSystemIndex()
+		{
+			return system_manager->getSystemIndex<T>();
 		}
 
 		template<typename T>
@@ -161,6 +202,7 @@ namespace Core {
 		*********************************************************************/
 		std::unique_ptr<Assets::Manager>& accessAssets();
 		std::unique_ptr<Debug::Manager>& accessDebug();
+		std::unique_ptr<Serialization::Manager>& accessSeri();
 	};
 
 	//Predefined name for core engine

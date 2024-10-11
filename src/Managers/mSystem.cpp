@@ -1,9 +1,11 @@
 /*****************************************************************//**
- * \file   System.cpp
- * \brief  System manager for ecs architecture
+ * \file   mSystem.cpp
+ * \brief  System manager for ECS architecture
  *
- * \author ho
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (90%)
+ * \co-author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (10%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -102,6 +104,14 @@ void System::Manager::updateEntitiesList(Entity::Type entity, Component::Signatu
 	}
 }
 
+void System::Manager::cloneEntity(Entity::Type clone, Entity::Type copy) {
+	//Remove entity from all systems
+	for (auto& system : systems) {
+		if (system->checkEntity(copy))
+			system->addEntity(clone);
+	}
+}
+
 void System::Manager::entityDestroyed(Entity::Type entity) {
 
 	//Remove entity from all systems
@@ -118,11 +128,15 @@ void System::Manager::updateSystems()
 	std::vector<double> system_times;
 
 	// Update all systems
-	for (size_t i = 0; i < systems.size(); ++i) {
-		if (systems[i]->getActiveState())
+	for (auto const& system : systems) {
+		if (system->getActiveState())
 		{
 			std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
-			systems[i]->update();
+
+			//Break system update loop if system update returns true
+			if(system->update())
+				break;
+
 			std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
 
 			// Calculate the time taken by the system
@@ -134,7 +148,18 @@ void System::Manager::updateSystems()
 	std::chrono::steady_clock::time_point total_end_time = std::chrono::steady_clock::now();
 	double total_game_loop_time = std::chrono::duration<double, std::milli>(total_end_time - total_start_time).count();
 
-	// Call to calculate and display system runtime percentage
-	NIKEEngine.accessDebug()->systemRuntimePercentage(total_game_loop_time, system_times, systems);
-	// systemRuntimePercentage();
+	// Call runtime percentage function every 30 seconds
+	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
+	double time_since_last_call = std::chrono::duration<double, std::milli>(current_time - last_call_time).count();
+
+	// Every 4 seconds, call function
+	// 4000 miliseconds = 4 seconds
+	if (time_since_last_call >= 4000)
+	{
+		// Call to calculate and display system runtime percentage
+		NIKEEngine.accessDebug()->systemRuntimePercentage(total_game_loop_time, system_times, systems);
+
+		// Update the last debug call time to the current time
+		last_call_time = current_time;
+	}
 }

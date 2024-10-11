@@ -2,23 +2,26 @@
  * \file   StateManager.cpp
  * \brief  
  * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysScene.h"
-#include "../headers/Scenes/MenuScene.h"
-#include "../headers/Scenes/SplashScene.h"
+#include "../headers/Core/Engine.h"
+#include "../headers/Components/cInput.h"
+#include "../headers/Components/cScene.h"
 
-void Scenes::Manager::initScene(std::string const& scene_id) {
+void Scenes::Manager::initScene(std::string scene_id) {
 	curr_scene = states.at(scene_id);
 	prev_scene = curr_scene;
 	curr_scene->load();
 	curr_scene->init();
 }
 
-void Scenes::Manager::changeScene(std::string const& scene_id) {
+void Scenes::Manager::changeScene(std::string scene_id) {
+
 	//Change scene only if its not the same scene
 	if (states.at(scene_id) == curr_scene) {
 		return;
@@ -72,29 +75,61 @@ void Scenes::Manager::previousScene() {
 }
 
 void Scenes::Manager::init() {
-	//Register scene ( First scene registered will be default starting scene )
-	registerScenes<Splash::Scene>("SPLASH");
-	registerScenes<Menu::Scene>("MENU");
 }
 
-void Scenes::Manager::update() {
-	//Switch cases to perform scene management actions
-	switch (new_scene.scene_action) {
-	case Scenes::Actions::CHANGE:
-		changeScene(new_scene.next_scene_id);
-		break;
-	case Scenes::Actions::RESTART:
-		restartScene();
-		break;
-	case Scenes::Actions::PREVIOUS:
-		previousScene();
-		break;
-	default:
-		break;
+bool Scenes::Manager::update() {
+	for (auto& entity : entities) {
+
+		//Looking for key change event
+		if (NIKEEngine.checkEntityComponent<Scenes::ChangeScene>(entity)) {
+			auto& e_event = NIKEEngine.getEntityComponent<Scenes::ChangeScene>(entity);
+
+			if (e_event.mouse_type == -1) {
+				//Assert if key not present
+				assert(NIKEEngine.checkEntityComponent<Input::Key>(entity) && "Key change scene entity created without key object.");
+				auto& e_key = NIKEEngine.getEntityComponent<Input::Key>(entity);
+
+				//Switch cases to perform scene management actions
+				if (e_key.b_output && e_key.key_type == e_event.key_type) {
+					switch (e_event.scene_action) {
+					case Scenes::Actions::CHANGE:
+						changeScene(e_event.next_scene_id);
+						return true;
+					case Scenes::Actions::RESTART:
+						restartScene();
+						return false;
+					case Scenes::Actions::PREVIOUS:
+						previousScene();
+						return true;
+					default:
+						break;
+					}
+				}
+			}
+			if (e_event.key_type == -1) {
+				//Assert if mouse not present
+				assert(NIKEEngine.checkEntityComponent<Input::Mouse>(entity) && "Mouse change scene entity created without mouse object.");
+				auto& e_mouse = NIKEEngine.getEntityComponent<Input::Mouse>(entity);
+
+				//Switch cases to perform scene management actions
+				if (e_mouse.b_output && e_mouse.button_type == e_event.mouse_type) {
+					switch (e_event.scene_action) {
+					case Scenes::Actions::CHANGE:
+						changeScene(e_event.next_scene_id);
+						return true;
+					case Scenes::Actions::RESTART:
+						restartScene();
+						return false;
+					case Scenes::Actions::PREVIOUS:
+						previousScene();
+						return true;
+					default:
+						break;
+					}
+				}
+			}
+		}
 	}
-}
 
-void Scenes::Manager::executeEvent(std::shared_ptr<Events::IEvent> event) {
-	
-	new_scene = *std::dynamic_pointer_cast<Scenes::ChangeSceneEvent>(event);
+	return false;
 }

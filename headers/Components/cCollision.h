@@ -1,3 +1,12 @@
+﻿/*****************************************************************//**
+ * \file   cCollision.h
+ * \brief  Defines the components used for Collision
+ *
+ * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
+ * \date   September 2024
+ *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #pragma once
 
 #ifndef C_COLLISION_HPP
@@ -23,6 +32,8 @@ namespace Collision {
         bool right = false;
         bool top = false;
         bool bottom = false;
+
+        bool bounceFlag = false;
 
         // For bounding sphere...unused for now
         Vector2 cir_min;

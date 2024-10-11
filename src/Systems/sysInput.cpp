@@ -2,14 +2,16 @@
  * \file   sysInput.cpp
  * \brief  input manager for engine
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Core/Engine.h"
 #include "../headers/Components/cTransform.h"
+#include "../headers/Systems/Render/sysRender.h"
 
 void Input::Manager::setupEventCallbacks() {
 	glfwSetFramebufferSizeCallback(NIKEEngine.accessWindow()->getWindow(), fbsize_cb);
@@ -65,7 +67,7 @@ bool Input::Manager::keyReleaseCheck() {
 	return false;
 }
 
-void Input::Manager::update() {
+bool Input::Manager::update() {
 
 	//Key trigger mode checking
 	bool key_triggered = keyTriggerCheck();
@@ -125,7 +127,7 @@ void Input::Manager::update() {
 			}
 		}
 
-		else if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
+		if (NIKEEngine.checkEntityComponent<Transform::Runtime_Transform>(entity))
 		{
 			Transform::Runtime_Transform& e_runtime = NIKEEngine.getEntityComponent<Transform::Runtime_Transform>(entity);
 			// Check if Z key is pressed for runtime scale up
@@ -136,19 +138,31 @@ void Input::Manager::update() {
 			e_runtime.runtime_rotate = key.b_output && (key.key_type == GLFW_KEY_R);
 		}
 
+		if (key.b_output && (key.key_type == GLFW_KEY_C))
+		{
+			try
+			{
+				throw std::runtime_error("crash");
+			}
+			catch (const std::exception&)
+			{
+				NIKEEngine.accessDebug()->logCrash();
+				NIKEEngine.accessWindow()->terminate();
+			}
+		}
 
-		// Checking for Move component
-		else if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
-			// Ref to Move component
-			Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
+		//Escape program
+		if (key.b_output && (key.key_type == GLFW_KEY_ESCAPE)) {
+			NIKEEngine.accessWindow()->terminate();
+		}
 
-			//Check if escape key is pressed
-			move.Up = key.b_output && (key.key_type == GLFW_KEY_W);
-			move.Left = key.b_output && (key.key_type == GLFW_KEY_A);
-			move.Down = key.b_output && (key.key_type == GLFW_KEY_S);
-			move.Right = key.b_output && (key.key_type == GLFW_KEY_D);
+		if (key.b_output && (key.key_type == GLFW_KEY_P))
+		{
+			NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
 		}
 	}
+
+	return false;
 }
 
 void Input::Manager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {

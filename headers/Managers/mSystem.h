@@ -1,9 +1,11 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   mSystem.h
- * \brief  System manager for ecs architecture
+ * \brief  System manager for ECS architecture
  *
- * \author ho
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (90%)
+ * \co-author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (10%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -35,13 +37,13 @@ namespace System {
 	public:
 
 		//Constructor
-		ISystem() : system_signature{}, b_components_linked{ true }, b_system_active { true } {}
+		ISystem() : system_signature {}, b_components_linked{ true }, b_system_active{ true } {}
 
 		//Virtual Init
 		virtual void init() {}
 
 		//Pure virtual function to be implemented in inherited class
-		virtual void update() = 0;
+		virtual bool update() = 0;
 
 		// Get system name
 		virtual std::string getSysName() = 0;
@@ -86,6 +88,9 @@ namespace System {
 	//System Manager
 	class Manager {
 	private:
+
+		// This to track last call time
+		std::chrono::steady_clock::time_point last_call_time = std::chrono::steady_clock::now();
 
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
@@ -148,6 +153,20 @@ namespace System {
 			return system;
 		}
 
+		//Index for adding system is only if
+		template<typename T>
+		void removeSystem() {
+			std::shared_ptr<System::ISystem> sys = systems_map.at(typeid(T).name());
+			int i = 0;
+			for (; i < systems.size(); i++) {
+				if (systems.at(i) == sys)
+					break;
+			}
+
+			systems.erase(systems.begin() + i);
+			systems_map.erase(typeid(T).name());
+		}
+
 		//Set system state
 		template<typename T>
 		void setSystemState(bool state) {
@@ -183,8 +202,25 @@ namespace System {
 			return getSystem<T>();
 		}
 
+		//Get System index
+		template<typename T>
+		int getSystemIndex() {
+			std::shared_ptr<System::ISystem> sys = systems_map.at(typeid(T).name());
+			int i = 0;
+			for (; i < systems.size(); i++) {
+				if (systems.at(i) == sys)
+					return i;
+			}
+
+			assert("System not registered yet!");
+			return -1;
+		}
+
 		//Update entities list based on signature
 		void updateEntitiesList(Entity::Type entity, Component::Signature e_signature, Component::Type component, bool b_component_added);
+
+		//Clone entity for all systems
+		void cloneEntity(Entity::Type clone, Entity::Type copy);
 
 		//Remove entity from all systems
 		void entityDestroyed(Entity::Type entity);

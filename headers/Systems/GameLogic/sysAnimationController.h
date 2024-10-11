@@ -1,21 +1,19 @@
-/*****************************************************************//**
- * \file   sysGameLogic.h
- * \brief  game logic system
+﻿/*****************************************************************//**
+ * \file   sysAnimationController.h
+ * \brief  animation controller system
  *
- * \author Ho
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #pragma once
 
-#ifndef GAME_LOGIC_HPP
-#define GAME_LOGIC_HPP
+#ifndef ANIMATION_CONTROLLER_HPP
+#define ANIMATION_CONTROLLER_HPP
 
 #include "../headers/Managers/mSystem.h"
 
-namespace GameLogic {
-
-	//Object type
-	struct ObjectSpawner{};
+namespace AnimationController {
 
 	class Manager : public System::ISystem {
 	private:
@@ -32,15 +30,15 @@ namespace GameLogic {
 
 		std::string getSysName() override
 		{
-			return "Game Logic System";
+			return "Animation Controller System";
 		}
 
 		//Update Inputs
-		void update() override;
+		bool update() override;
 
 		//Default Destructor
 		~Manager() override = default;
 	};
 }
 
-#endif //!GAME_LOGIC_HPP
+#endif //!ANIMATION_CONTROLLER_HPP

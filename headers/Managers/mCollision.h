@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   mCollision.h
  * \brief  Collision manager header for the physics system.
  *
- * \author Min Khant Ko
+ * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -68,7 +69,7 @@ namespace Collision {
         bool detectMClickCircle(const Vector2& center, float radius);
 
         // Set collider component
-        bool setColliderComp(Entity::Type& cEntity);
+        bool setColliderComp(Entity::Type& cEntity, bool bounceFlag = false);
 
         bool detectAABBRectRect(Entity::Type& cEntityA, Entity::Type& cEntityB, float& firstTimeOfCollision);
     };

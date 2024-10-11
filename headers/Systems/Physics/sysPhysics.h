@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   PhysicsSystem.h
  * \brief  Physics system for engine
  *
- * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -26,7 +27,7 @@ namespace Physics {
 		void operator=(Manager const& copy) = delete;
 
 	public:
-		Collision::Manager collision_manager; // Current one instance of collision manager
+		Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
 
 		//Default Constructor
 		Manager() = default;
@@ -52,7 +53,7 @@ namespace Physics {
 		}
 
 		//Update
-		void update() override;
+		bool update() override;
 
 		//Move Object
 		//void move(Transform::Transform& transform);

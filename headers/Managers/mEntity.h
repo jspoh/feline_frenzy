@@ -1,11 +1,11 @@
-/*****************************************************************//**
- * \file   Entity.h
- * \brief  Entity manager for ecs architecture
+﻿/*****************************************************************//**
+ * \file   mEntity.h
+ * \brief  Entity manager for ECS architecture
  *
- * \author ho
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
-
 #pragma once
 
 #ifndef M_ENTITY_HPP
@@ -35,20 +35,22 @@ namespace Entity {
 		//Create Entity
 		Entity::Type createEntity();
 
-		//Clone Entity
-		Entity::Type cloneEntity(Entity::Type original_entity);
-
 		//Destroy Entity
 		void destroyEntity(Entity::Type entity);
 
 		//Set signature
 		void setSignature(Entity::Type entity, Component::Signature signature);
 
+		Entity::Type cloneEntity(Entity::Type original_entity);
+
 		//Get signature
 		Component::Signature const& getSignature(Entity::Type entity) const;
 
 		//Get number of active entities
 		int getEntityCount() const;
+
+		//Get all entity
+		std::vector<Entity::Type> getAllEntities() const;
 	};
 }
 

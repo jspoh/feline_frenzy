@@ -1,21 +1,32 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   stdafx.h
  * \brief  Precompiled header file for standard application framework extensions
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
  * \date   11 September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
 
-
 #define _CRTDBG_MAP_ALLOC
+
+#include <Windows.h>
 
 // graphics headers
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
-// Fmod core headers
+#undef APIENTRY
+
+ /*****************************************************************//**
+ * Windows
+ *********************************************************************/
+#include <Windows.h>
+
+ /*****************************************************************//**
+ * FMOD Core
+ *********************************************************************/
 #include "FMOD_CORE/fmod.h"
 #include "FMOD_CORE/fmod.hpp"
 #include "FMOD_CORE/fmod_codec.h"
@@ -25,8 +36,15 @@
 #include "FMOD_CORE/fmod_errors.h"
 #include "FMOD_CORE/fmod_output.h"
 
+ /*****************************************************************//**
+ * Freetype
+ *********************************************************************/
+#include "freetype/freetype.h"
+#include "ft2build.h"
 
-// standard headers
+ /*****************************************************************//**
+ * STL
+ *********************************************************************/
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -45,40 +63,48 @@
 #include <bitset>
 #include <queue>
 #include <set>
-#include <Windows.h>
 #include <ctime>
 #include <iomanip>
 
-// external headers
+ /*****************************************************************//**
+ * Data (json)
+ *********************************************************************/
 #include "../headers/Data/json.hpp"
 
-// our completed headers
+ /*****************************************************************//**
+ * Math headers
+ *********************************************************************/
 #include "../headers/Math/Mtx33.h"	
 #include "../headers/Math/Vector2.h"
 #include "../headers/Math/Vector3.h"
 #include "../headers/Math/Vector4.h"
 
-// components
-#include "../headers/Components/cRender.h"
-#include "../headers/Components/cTransform.h"
-#include "../headers/Components/cMove.h"
-
-//Utility Systems
+/*****************************************************************//**
+* Utility
+*********************************************************************/
 #include "../headers/Utility/uSystems.h"
 
-//Math defines
+/*****************************************************************//**
+* Math Defines
+*********************************************************************/
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*****************************************************************//**
+* Entity 
+*********************************************************************/
 namespace Entity {
 
     //Entity Type
     using Type = uint16_t;
 
     //Max number of entities to be created at a single point
-    const Type MAX = 5000;
+    const Type MAX = 3000;
 }
 
+/*****************************************************************//**
+* Component
+*********************************************************************/
 namespace Component {
 
     //Component Signature Type
@@ -91,6 +117,9 @@ namespace Component {
     using Signature = std::bitset<MAX>;
 }
 
+/*****************************************************************//**
+* Nullstream for release
+*********************************************************************/
 class NullStream {
 public:
     NullStream() = default;

@@ -1,9 +1,10 @@
 /*****************************************************************//**
- * \file   Entity.cpp
- * \brief  Entity manager for ecs architecture
+ * \file   mEntity.cpp
+ * \brief  Entity manager for ECS architecture
  *
- * \author ho
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -29,7 +30,8 @@ Entity::Type Entity::Manager::createEntity() {
 }
 
 Entity::Type Entity::Manager::cloneEntity(Entity::Type original_entity){
-	// !TODO
+
+	static_cast<void> (original_entity);
 	assert(entities.find(original_entity) != entities.end() && "Entity not found.");
 	return 0;
 }
@@ -61,4 +63,12 @@ Component::Signature const& Entity::Manager::getSignature(Entity::Type entity) c
 
 int Entity::Manager::getEntityCount() const {
 	return static_cast<int>(entities.size());
+}
+
+std::vector<Entity::Type> Entity::Manager::getAllEntities() const {
+	std::vector<Entity::Type> return_vec;
+	for (auto const& entity : entities) {
+		return_vec.push_back(entity.first);
+	}
+	return return_vec;
 }

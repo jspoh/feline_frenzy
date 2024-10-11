@@ -1,9 +1,10 @@
-/*****************************************************************//**
- * \file   Component.h
- * \brief  Component manager for ecs architecture
+﻿/*****************************************************************//**
+ * \file   mComponent.h
+ * \brief  Component manager for ECS architecture
  *
- * \author ho
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -18,6 +19,9 @@ namespace Component {
 	private:
 	public:
 		virtual ~IArray() = default;
+
+		//Clone entity
+		virtual void cloneEntity(Entity::Type clone, Entity::Type copy) = 0;
 
 		//Remove destroyed entity
 		virtual void entityDestroyed(Entity::Type entity) = 0;
@@ -68,6 +72,27 @@ namespace Component {
 			return component_array.find(entity) != component_array.end();
 		}
 
+		//Get all entities with component type T
+		std::vector<Entity::Type> getAllEntities() {
+			std::vector<Entity::Type> temp_vec;
+			for (auto const& entity : component_array) {
+				temp_vec.push_back(entity.first);
+			}
+
+			return temp_vec;
+		}
+
+		//Clone entity
+		void cloneEntity(Entity::Type clone, Entity::Type copy) override {
+			//Clone entity
+			if (component_array.find(copy) != component_array.end()) {
+				T temp_copy = component_array.at(copy);
+
+				//Emplace component and entity
+				component_array.emplace(std::piecewise_construct, std::forward_as_tuple(clone), std::forward_as_tuple(std::move(temp_copy)));
+			}
+		}
+
 		//Remove destroyed entity
 		void entityDestroyed(Entity::Type entity) override {
 			if(component_array.find(entity) != component_array.end())
@@ -113,13 +138,28 @@ namespace Component {
 			std::string type_name{ typeid(T).name() };
 
 			//Check if component has been registered before
-			assert(component_types.find(type_name) == component_types.end() && "Component already registered.");
+			assert(component_types.find(type_name) == component_types.end() && "Component already registered. Register failed.");
 
 			//Add component type
 			component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_id++));
 
 			//Add component map
 			component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::make_shared<Array<T>>()));
+		}
+
+		template<typename T>
+		void removeComponent() {
+			//Component type name
+			std::string type_name{ typeid(T).name() };
+
+			//Check if component has been registered before
+			assert(component_types.find(type_name) != component_types.end() && "Component has not been registered before. Deregister failed.");
+
+			//Remove component type
+			component_types.erase(type_name);
+
+			//Remove component array
+			component_arrays.erase(type_name);
 		}
 
 		//Add component associated with entity type
@@ -166,6 +206,15 @@ namespace Component {
 			//Return component type
 			return component_types.at(type_name);
 		}
+
+		//Get all entities
+		template<typename T>
+		std::vector<Entity::Type> getAllEntities() {
+			return getComponentArray<T>()->getAllEntities();
+		}
+
+		//Clone entity
+		void cloneEntity(Entity::Type clone, Entity::Type copy);
 
 		//Remove entity from all components
 		void entityDestroyed(Entity::Type entity);

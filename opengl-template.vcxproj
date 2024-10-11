@@ -25,12 +25,16 @@
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
+    <ClCompile Include="src\Scenes\PerformanceScene.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysObjectSpawner.cpp" />
+    <ClCompile Include="src\Systems\Render\sysFont.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Managers\mCollision.cpp" />
-    <ClCompile Include="src\Systems\sysGameLogic.cpp" />
-    <ClCompile Include="src\Systems\sysPhysics.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
+    <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
@@ -62,14 +66,18 @@
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
+    <ClInclude Include="headers\Scenes\PerformanceScene.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysAnimationController.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysObjectSpawner.h" />
+    <ClInclude Include="headers\Systems\Render\sysFont.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />
     <ClInclude Include="headers\Managers\mCollision.h" />
-    <ClInclude Include="headers\Systems\sysGameLogic.h" />
-    <ClInclude Include="headers\Systems\sysPhysics.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
+    <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
@@ -97,11 +105,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\scenes\mainmenu.scn" />
+    <None Include="assets\Scenes\mmCopy.scn" />
     <None Include="db\data.json" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
-    <None Include="shaders\textured_rendering.frag" />
-    <None Include="shaders\textured_rendering.vert" />
+    <None Include="shaders\texture.frag" />
+    <None Include="shaders\texture.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\meshes\circle.txt" />
@@ -109,7 +118,6 @@
     <Text Include="assets\meshes\square.txt" />
     <Text Include="assets\meshes\triangle.txt" />
     <Text Include="src\Core\Config.txt" />
-    <Text Include="src\Managers\crash_log.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -214,7 +222,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -244,7 +252,7 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>

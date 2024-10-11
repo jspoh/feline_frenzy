@@ -1,9 +1,10 @@
 /*****************************************************************//**
  * \file   Engine.cpp
- * \brief  Graphics library manager for engine
+ * \brief  Core engine arhcitecture
  * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -21,6 +22,7 @@ void Core::Engine::init(std::string const& file_path, int fps) {
 	events_manager = std::make_unique<Events::Manager>();
 	assets_manager = std::make_unique<Assets::Manager>();
 	debug_manager = std::make_unique<Debug::Manager>();
+	seri_manager = std::make_unique<Serialization::Manager>();
 
 	//Read config file
 	windows_manager->readConfigFile(file_path);
@@ -43,7 +45,9 @@ void Core::Engine::run() {
 		glfwPollEvents();
 
 		//Set Window Title
-		windows_manager->setWinTitle(windows_manager->getWinTitle() + " | " + std::to_string(windows_manager->getCurrentFPS()) + " fps");
+		windows_manager->setWinTitle(windows_manager->getWinTitle() +
+			" | " + std::to_string(windows_manager->getCurrentFPS()) + " fps" +
+		" | " + std::to_string(entity_manager->getEntityCount()) + " entities");
 
 		//Update all systems
 		system_manager->updateSystems();
@@ -70,12 +74,31 @@ Entity::Type Core::Engine::createEntity() {
 	return entity_manager->createEntity();
 }
 
+Entity::Type Core::Engine::cloneEntity(Entity::Type copy) {
+	Entity::Type new_entity = entity_manager->createEntity();
+	component_manager->cloneEntity(new_entity, copy);
+	entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
+	system_manager->cloneEntity(new_entity, copy);
+
+	return new_entity;
+}
+
 void Core::Engine::destroyEntity(Entity::Type entity) {
 
 	//Destroy all data related to entity
 	entity_manager->destroyEntity(entity);
 	component_manager->entityDestroyed(entity);
 	system_manager->entityDestroyed(entity);
+}
+
+void Core::Engine::destroyAllEntities() {
+	for (auto entity : entity_manager->getAllEntities()) {
+		destroyEntity(entity);
+	}
+}
+
+int Core::Engine::getEntitiesCount() {
+	return entity_manager->getEntityCount();
 }
 
 /*****************************************************************//**
@@ -93,13 +116,22 @@ std::unique_ptr<Events::Manager>& Core::Engine::accessEvents() {
 }
 
 /*****************************************************************//**
-* Assets Assets
+* Access Assets
 *********************************************************************/
 std::unique_ptr<Assets::Manager>& Core::Engine::accessAssets() {
 	return assets_manager;
 }
 
+/*****************************************************************//**
+* Access Debug
+*********************************************************************/
+
 std::unique_ptr<Debug::Manager>& Core::Engine::accessDebug()
 {
 	return debug_manager;
+}
+
+std::unique_ptr<Serialization::Manager>& Core::Engine::accessSeri()
+{
+	return seri_manager;
 }

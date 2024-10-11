@@ -2,12 +2,12 @@
  * \file   Vector2.cpp
  * \brief  
  * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Math/Vector2.h"
 
 Vector2 Vector2::operator+(const Vector2& rhs) const {
 	return Vector2(x + rhs.x, y + rhs.y);

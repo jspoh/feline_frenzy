@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   subAnimations.h
  * \brief	Sprite animation
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
  * \date   October 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -12,6 +13,7 @@
 #define SUB_ANIMATIONS_HPP
 
 #include "../headers/Components/cAnimation.h"
+#include "../headers/Components/cRender.h"
 
 namespace Animation {
 	/*****************************************************************//**
@@ -55,6 +57,8 @@ namespace Animation {
 		void iterateForward(Animation::cSprite& sprite_component);
 		void iterateBackWard(Animation::cSprite& sprite_component);
 	public:
+		//Default constructor
+		SpriteSheet() = default;
 
 		//animate spritesheet
 		void animateSprite(Animation::cBase& base_component, Animation::cSprite& sprite_component, Render::Texture& sprite_texture);

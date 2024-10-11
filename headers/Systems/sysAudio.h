@@ -2,8 +2,9 @@
  * \file   sysAudio.h
  * \brief  Audio system manager function declarations
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   September 2024
+ *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -50,7 +51,7 @@ namespace Audio {
 		void init() override;
 
 		// Update Audio system
-		void update() override;
+		bool update() override;
 
 		std::string getSysName() override
 		{
@@ -70,8 +71,7 @@ namespace Audio {
 		NE_AUDIO_GROUP CreateAudioGroup(std::string const& audio_group_tag);
 
 		// Play music
-		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool 
-		);
+		void NEAudioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool );
 
 		// Stop sound
 		void NEAudioStopGroup(NE_AUDIO_GROUP group);

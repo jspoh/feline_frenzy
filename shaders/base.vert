@@ -1,7 +1,7 @@
 // @file	base.vert
 // @brief	base vertex shader
-// @author	Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
-// @co-author Sean Gwee, g.boonxuensean@digipen.edu
+// @author	Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (10%)
+// @co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (90%)
 // @date	11 Sep 2024
 
 #version 450 core

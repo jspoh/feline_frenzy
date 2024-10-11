@@ -2,8 +2,9 @@
  * \file   sysAudio.cpp
  * \brief  Audio manager function definitions 
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -43,7 +44,7 @@ void Audio::Manager::init()
 
 }
 
-void Audio::Manager::update()
+bool Audio::Manager::update()
 {
 	fmod_system->update();
 	// For debug purposes
@@ -62,6 +63,7 @@ void Audio::Manager::update()
 		}
 	}
 
+	return false;
 }
 
 // Release Fmod system

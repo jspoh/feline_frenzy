@@ -2,8 +2,9 @@
  * \file   mAssets.cpp
  * \brief  Assets manager function definitions
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -11,8 +12,17 @@
 #include "../headers/Core/Engine.h"
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Components/cRender.h"
 
 Assets::Manager::~Manager() {
+
+	//Clear fonts
+	for (auto& font_textures : fonts_list) {
+		for (auto& font : font_textures.second) {
+			glDeleteTextures(1, &font.second.texture);
+		}
+	}
+
 	//Clear models
 	for (auto& model : models_list) {
 		glDeleteVertexArrays(1, &model.second->vaoid);
@@ -41,8 +51,30 @@ Assets::Manager::~Manager() {
 	}
 }
 
+/*****************************************************************//**
+* Font
+*********************************************************************/
+
+void Assets::Manager::registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes) {
+	if (fonts_list.find(font_id) != fonts_list.end())
+	{
+		throw std::runtime_error("FONT ALREADY EXISTS");
+	}
+
+	fonts_list.insert({ font_id, NIKEEngine.accessSystem<Render::Manager>()->registerFont(file_path, pixel_sizes) });
+}
+
+std::unordered_map<unsigned char, Render::Character> const& Assets::Manager::getFont(std::string const& font_id) const {
+	if (fonts_list.find(font_id) == fonts_list.end())
+	{
+		throw std::runtime_error("FONT DOES NOT EXISTS");
+	}
+
+	return fonts_list.at(font_id);
+}
+
  /*****************************************************************//**
- * Texture
+ * Rendering
  *********************************************************************/
 
 void Assets::Manager::registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
@@ -52,6 +84,12 @@ void Assets::Manager::registerShader(std::string const& shader_id, const std::st
 	}
 
 	shaders_list.insert({ shader_id, NIKEEngine.accessSystem<Render::Manager>()->registerShader(shader_id, vtx_path, frag_path) });
+}
+
+bool Assets::Manager::checkShader(std::string const& shader_id) {
+
+	return shaders_list.find(shader_id) != shaders_list.end();
+
 }
 
 unsigned int Assets::Manager::getShader(std::string const& shader_id) {
@@ -70,6 +108,12 @@ void Assets::Manager::registerModel(std::string const& model_id, std::string con
 	}
 
 	models_list.insert({ model_id, NIKEEngine.accessSystem<Render::Manager>()->registerModel(file_path) });
+}
+
+bool Assets::Manager::checkModel(std::string const& model_id) {
+
+	return models_list.find(model_id) != models_list.end();
+
 }
 
 std::shared_ptr<Render::Model> Assets::Manager::getModel(std::string const& model_id) {

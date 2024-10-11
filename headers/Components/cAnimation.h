@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   cAnimation.h
  * \brief	Animation components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
  * \date   October 2024
+ *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -30,16 +31,30 @@ namespace Animation {
 		Mode animation_action;
 		std::string animator_id;
 
-		//Default constructor
-		//AnimationEvent() : animation_action{ Mode::IDLE }, animator_id{ "" } {}
-
 		//Constructor
 		AnimationEvent(Mode action, std::string const& id)
 			: animation_action{ action }, animator_id{ id } {}
 	};
 
+	//Sprite event
+	struct SpriteEvent {
+		Vector2 new_start_index;
+		Vector2 new_end_index;
+		std::string animator_id;
+		int num_animations;
+		int mouse_type; // -1 if using mouse
+		int key_type; // -1 if using key
+
+		//Boolean control
+		bool animation_ongoing;
+
+		//Constructor
+		SpriteEvent(Vector2 const& new_start, Vector2 const& new_end, std::string const& id, int num_animations, int mouse_type, int key_type)
+			: new_start_index{ new_start }, new_end_index{ new_end }, animator_id{ id }, num_animations{ num_animations }, mouse_type{ mouse_type }, key_type{ key_type }, animation_ongoing{ false } {}
+	};
+
 	struct cBase {
-		//Animation Tracker
+		//Animation Tracker ( Infinite number of animations if set to 0 )
 		int animations_to_complete;
 
 		//Completed animations
@@ -88,7 +103,7 @@ namespace Animation {
 
 		//Constructor
 		cSprite(Vector2&& sheet_size, Vector2&& start_index, Vector2&& end_index)
-			: sheet_size{ sheet_size }, start_index{ start_index }, end_index{ end_index } {}
+			: sheet_size{ sheet_size }, curr_index{ start_index}, start_index{ start_index }, end_index{ end_index } {}
 	};
 }
 

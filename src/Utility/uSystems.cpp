@@ -1,9 +1,10 @@
 /*****************************************************************//**
- * \file   uClock.cpp
- * \brief	Clock object class
+ * \file   uSystems.cpp
+ * \brief	Utility systems
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
  * \date   October 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
@@ -21,4 +22,8 @@ float Utility::Clock::getElapsedTime() {
 
 void Utility::Clock::restartClock() {
 	start = std::chrono::high_resolution_clock::now();
+}
+
+float Utility::randFloat() {
+	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }

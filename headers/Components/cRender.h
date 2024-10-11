@@ -1,3 +1,11 @@
+﻿/*****************************************************************//**
+ * \file   cRender.h
+ * \brief
+ *
+ * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
+ * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
 #pragma once
 
 #ifndef C_RENDER_HPP
@@ -21,6 +29,21 @@ namespace Render {
 		float alpha;
 	};
 
+	struct Character {
+		unsigned int texture;	// Texture ID for the character
+		Vector2 size;			// Size of the character
+		Vector2 bearing;		// Offset from the baseline to the top-left of the character
+		unsigned int advance;   // Horizontal offset to advance to the next character
+	};
+
+	struct Text {
+		std::string font_ref;
+		std::string text;
+		Color color;
+		Vector2 position;
+		float scale;
+	};
+
 	struct Shape {
 		std::string model_ref;
 		Matrix33::Matrix_33 x_form;
@@ -31,6 +54,7 @@ namespace Render {
 		std::string texture_ref;
 		Matrix33::Matrix_33 x_form;
 		Color color;
+		Vector2 texture_size;	// Spritesheet size ( before mapping )
 		Vector2 frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
 		Vector2 frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 	};
@@ -43,6 +67,10 @@ namespace Render {
 
 		unsigned int primitive_type;
 		unsigned int draw_count;
+	};
+
+	struct Debug {
+		// TEMP FIX FOR DEBUG MODE
 	};
 }
 

@@ -1,18 +1,16 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   mSerialization.h
  * \brief  Serialization manager
  *
- * \author b.soh
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
 
 #ifndef M_SERIALIZATION_HPP
 #define M_SERIALIZATION_HPP
-
-#include "../Core/Engine.h"
-
 
 namespace Serialization {
 	class Manager {

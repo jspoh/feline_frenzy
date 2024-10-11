@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   mAssets.h
  * \brief  Assets manager function declarations
  *
- * \author Bryan Lim
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -12,6 +13,7 @@
 #define ASSET_MANAGER_HPP
 
 #include "../headers/Systems/sysAudio.h"
+#include "../headers/Components/cRender.h"
 
 namespace Assets
 {
@@ -26,17 +28,32 @@ namespace Assets
 		~Manager();
 
 		/*****************************************************************//**
+		* Font
+		*********************************************************************/
+		//Register font
+		void registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
+
+		//Get font
+		std::unordered_map<unsigned char, Render::Character> const& getFont(std::string const& font_id) const;
+
+		/*****************************************************************//**
 		* Render ( Texture, Model, Shaders )
 		*********************************************************************/
 
 		//Load shaders
 		void registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+		
+		//Check shader exits
+		bool checkShader(std::string const& model_id);
 
-		//Get texture
+		//Get shader
 		unsigned int getShader(std::string const& shader_id);
 
 		//Load model
 		void registerModel(std::string const& model_id, std::string const& file_path);
+
+		//Check model exits
+		bool checkModel(std::string const& model_id);
 
 		//Get model
 		std::shared_ptr<Render::Model> getModel(std::string const& model_id);
@@ -70,6 +87,9 @@ namespace Assets
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
+
+		//Maps to fonts
+		std::unordered_map<std::string, std::unordered_map<unsigned char, Render::Character>> fonts_list;
 
 		//Map to models for render
 		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models_list;

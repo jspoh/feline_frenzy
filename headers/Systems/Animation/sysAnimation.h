@@ -1,9 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   sysAnimation.h
  * \brief	Animation manager
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -30,8 +31,14 @@ namespace Animation {
 		std::unique_ptr<Animation::SpriteSheet> sprite_animator;
 
 	public:
-		//Constructor
+		//Default Constructor
 		Manager() = default;
+
+		//Singleton Of Manager Class
+		static std::shared_ptr<Manager> getInstance() {
+			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			return instance;
+		}
 
 		//Destructor
 		~Manager() override = default;
@@ -46,7 +53,7 @@ namespace Animation {
 		void init() override;
 
 		//Override update func
-		void update() override;
+		bool update() override;
 
 		//Execute event
 		void executeEvent(std::shared_ptr<Events::IEvent> event) override;

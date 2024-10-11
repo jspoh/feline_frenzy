@@ -2,20 +2,20 @@
  * \file   PhysicsSystem.cpp
  * \brief  Physics system for engine
  *
- * \author b.soh, ko.m
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (45%)
+ * \co-author Min Khant Ko, 2301320, ko.m@digipen.edu (45%)
+ *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
+ * 
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysPhysics.h"
-
-// Forward declaration for Collision
-//namespace Collision {
-//    class Manager;
-//}
+#include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Components/cMove.h"
 
 void Physics::Manager::init() {
-    // Add Collider component
+
 }
 
 void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
@@ -40,14 +40,14 @@ void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtim
 
 }
 
-void Physics::Manager::update() {
+bool Physics::Manager::update() {
     float dt = NIKEEngine.accessWindow()->getDeltaTime();
 
     // Loop through all entities to reset collision flags
     for (Entity::Type entity : entities) {
         if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
             Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
-            collider.left = collider.right = collider.top = collider.bottom = false;
+            collider.left = collider.right = collider.top = collider.bottom = false; // Must reset in physics loop
 
             //cout << "E bounding box min: " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_min.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_min.y << endl;
             //cout << "E bounding box max: " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_max.x << ", " << NIKEEngine.getEntityComponent<Collision::Collider>(entity).rect_max.y << endl;
@@ -91,53 +91,47 @@ void Physics::Manager::update() {
 
             const float speed = 100.0f;
 
-            // Check if entity contains Move component
-            if (NIKEEngine.checkEntityComponent<Move::Movement>(entity)) {
-                // Reference to Move component
-                Move::Movement& move = NIKEEngine.getEntityComponent<Move::Movement>(entity);
+            // For entities without move but still have movement
+            if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
+                Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
 
-                const float movespeed = 300.0f;
-
-                // Reset Velocity
-                velocity.velocity.y = 0.0f;
-                velocity.velocity.x = 0.0f;
-
-                if (NIKEEngine.checkEntityComponent<Collision::Collider>(entity)) {
-                    Collision::Collider& collider = NIKEEngine.getEntityComponent<Collision::Collider>(entity);
-                    // Adjust movement based on user input and collision flags
-                    if (move.Up && !collider.top) {
-                        velocity.velocity.y += movespeed;
+                // For entities that bounce
+                if (collider.bounceFlag == true) {
+                    // Adjust velocity based collision flags
+                    if (collider.top && (velocity.velocity.y > 0.0f)) {
+                        velocity.velocity.y *= -1;
                     }
 
-                    if (move.Down && !collider.bottom) {
-                        velocity.velocity.y -= movespeed;
+                    if (collider.bottom && (velocity.velocity.y < 0.0f)) {
+                        velocity.velocity.y *= -1;
                     }
 
-                    if (move.Left && !collider.left) {
-                        velocity.velocity.x -= movespeed;
+                    if (collider.right && (velocity.velocity.x > 0.0f)) {
+                        velocity.velocity.x *= -1;
                     }
 
-                    if (move.Right && !collider.right) {
-                        velocity.velocity.x += movespeed;
+                    if (collider.left && (velocity.velocity.x < 0.0f)) {
+                        velocity.velocity.x *= -1;
                     }
                 }
                 else {
-                    if (move.Up) {
-                        velocity.velocity.y += movespeed;
+                    // Adjust velocity based collision flags
+                    if (collider.top && (velocity.velocity.y > 0.0f)) {
+                        velocity.velocity.y = 0;
                     }
 
-                    if (move.Down) {
-                        velocity.velocity.y -= movespeed;
+                    if (collider.bottom && (velocity.velocity.y < 0.0f)) {
+                        velocity.velocity.y = 0;
                     }
 
-                    if (move.Left) {
-                        velocity.velocity.x -= movespeed;
+                    if (collider.right && (velocity.velocity.x > 0.0f)) {
+                        velocity.velocity.x = 0;
                     }
 
-                    if (move.Right) {
-                        velocity.velocity.x += movespeed;
+                    if (collider.left && (velocity.velocity.x < 0.0f)) {
+                        velocity.velocity.x = 0;
                     }
-                }
+                }  
             }
 
             // Normalize Movement
@@ -166,5 +160,7 @@ void Physics::Manager::update() {
             runtimeScaleOrRotate(c_runtime, c_transform);
         }
     }
+
+    return false;
 }
 

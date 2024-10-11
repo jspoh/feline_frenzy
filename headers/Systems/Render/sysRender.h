@@ -1,10 +1,12 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   sysRender.h
  * \brief
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
- * \co-author g.boonxuensean
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (50%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \date   September 2024
+ * 
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -12,6 +14,7 @@
 #ifndef RENDER_MANAGER_HPP
 #define RENDER_MANAGER_HPP
 
+#include "../headers/Systems/Render/sysFont.h"
 #include "../headers/Systems/Render/sysShader.h"
 #include "../headers/Systems/Render/sysCamera.h"
 #include "../headers/Components/cRender.h"
@@ -28,6 +31,9 @@ namespace Render {
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
+
+		//Font system
+		std::unique_ptr<Font::Manager> font_system;
 
 		//Shader system
 		std::unique_ptr<Shader::Manager> shader_system;
@@ -80,12 +86,14 @@ namespace Render {
 		//Render Texture
 		void renderObject(Render::Texture const& e_texture);
 
+		//Render text
+		void renderText(Render::Text const& e_text);
+
 		//Render debugging wireframe
 		void renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color);
 
 		//Helper function to encapsulate rendering
 		void transformAndRenderEntity(Entity::Type entity, bool debugMode);
-
 	public:
 		//Constructor
 		Manager() = default;
@@ -93,11 +101,23 @@ namespace Render {
 		//Destructor
 		~Manager() = default;
 
+		// Debug mode for bounding box
+		bool debug_mode = false;
+
+		std::string getSysName()
+		{
+			return "Render System";
+		}
+
+
 		//Singleton Of Manager Class
 		static std::shared_ptr<Manager> getInstance() {
 			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
 			return instance;
 		}
+
+		//Register free type font
+		std::unordered_map<unsigned char, Render::Character> registerFont(std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
 
 		/**
 		 * creates vertex array object. from mesh data and registers it to meshes.
@@ -127,12 +147,6 @@ namespace Render {
 		 */
 		std::shared_ptr<Render::Model> registerModel(const std::string& path_to_mesh);
 
-
-		std::string getSysName()
-		{
-			return "Render System";
-		}
-
 		/**
 		 * registers textures.
 		 * 
@@ -161,7 +175,7 @@ namespace Render {
 		/**
 		* update all object's xform
 		* */
-		void update() override;
+		bool update() override;
 	};
 }
 

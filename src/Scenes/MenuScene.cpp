@@ -1,122 +1,83 @@
 /*****************************************************************//**
  * \file   MenuScene.cpp
- * \brief  
- * 
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu
+ * \brief
+ *
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu (50%)
+ *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Systems/sysPhysics.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
 #include "../headers/Managers/mSerialization.h"
-#include "../headers/Systems/sysGameLogic.h"
+#include "../headers/Systems/GameLogic/sysGameLogic.h"
 #include "../headers/Systems/Animation/sysAnimation.h"
-//!TODO Clean up scene parser
+#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
+ //!TODO Clean up scene parser
 
 void Menu::Scene::load() {
-	//obj->setColor(Vector3(0.5f, 0.5f, 0.5f));
-	NIKEEngine.registerComponent<Transform::Velocity>();
-	NIKEEngine.registerComponent<Transform::Transform>();
-	NIKEEngine.registerComponent<Transform::Runtime_Transform>();
-	NIKEEngine.registerComponent<Move::Movement>();
-	NIKEEngine.registerComponent<Render::Shape>();
-	NIKEEngine.registerComponent<Render::Texture>();
-	NIKEEngine.registerComponent<Render::Color>();
-	NIKEEngine.registerComponent<Render::Cam>();
-	NIKEEngine.registerComponent<Collision::Collider>(); // Under sysPhysics
-	NIKEEngine.registerComponent<Animation::cBase>();
-	NIKEEngine.registerComponent<Animation::cSprite>();
-
-	//Add Singleton System
-	NIKEEngine.registerSystem<Physics::Manager>(Physics::Manager::getInstance());
-	NIKEEngine.registerSystem<Animation::Manager>();
-	NIKEEngine.registerSystem<Render::Manager>(Render::Manager::getInstance());
-
-	// Set components link
-	NIKEEngine.accessSystem<Physics::Manager>()->setComponentsLinked(false);
-	NIKEEngine.accessSystem<Render::Manager>()->setComponentsLinked(false);
-
-	//Add component types to system
-	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
-	NIKEEngine.addSystemComponentType<Input::Manager>(NIKEEngine.getComponentType<Move::Movement>());
-
-	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Velocity>());
-	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Runtime_Transform>());
-	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
-	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType<Move::Movement>());
-	NIKEEngine.addSystemComponentType<Physics::Manager>(NIKEEngine.getComponentType <Collision::Collider>()); // Under sysPhysics
-
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Transform::Transform>());
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Shape>());
-	NIKEEngine.addSystemComponentType<Render::Manager>(NIKEEngine.getComponentType<Render::Texture>());
-
-	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Animation::cBase>());
-	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Animation::cSprite>());
-	NIKEEngine.addSystemComponentType<Animation::Manager>(NIKEEngine.getComponentType<Render::Texture>());
-
-	//Add event listener for animation system
-	NIKEEngine.accessEvents()->addEventListeners<Animation::AnimationEvent>(NIKEEngine.accessSystem<Animation::Manager>());
-
-	//Register Shaders
-	NIKEEngine.accessAssets()->registerShader("base", "shaders/base.vert", "shaders/base.frag");
-	NIKEEngine.accessAssets()->registerShader("tex", "shaders/textured_rendering.vert", "shaders/textured_rendering.frag");
-
-	//Register models
-	NIKEEngine.accessAssets()->registerModel("square", "assets/meshes/square.txt");
-	NIKEEngine.accessAssets()->registerModel("triangle", "assets/meshes/triangle.txt");
-	NIKEEngine.accessAssets()->registerModel("circle", "assets/meshes/circle.txt");
-	NIKEEngine.accessAssets()->registerModel("square-texture", "assets/meshes/square-texture.txt");
 
 	//Register textures
 	NIKEEngine.accessAssets()->registerTexture("duck", "assets/textures/duck-rgba-256.tex");
-	NIKEEngine.accessAssets()->registerTexture("water", "assets/textures/water-rgba-256.tex");
-	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/tree.jpg");
-	NIKEEngine.accessAssets()->registerTexture("ame", "assets/textures/ame.png");
+	NIKEEngine.accessAssets()->registerTexture("tree", "assets/textures/Tree_Orange.png");
+	NIKEEngine.accessAssets()->registerTexture("player", "assets/textures/player.png");
+	NIKEEngine.accessAssets()->registerTexture("background", "assets/textures/Tileset_Guide.png");
+
+	//Register game logic components
+	NIKEEngine.registerComponent<GameLogic::ObjectSpawner>();
+
+	//Register game logic system
+	NIKEEngine.registerSystem<GameLogic::Manager>(nullptr, NIKEEngine.getSystemIndex<Physics::Manager>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<GameLogic::ObjectSpawner>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Key>());
+	NIKEEngine.addSystemComponentType<GameLogic::Manager>(NIKEEngine.getComponentType<Input::Mouse>());
+	NIKEEngine.accessSystem<GameLogic::Manager>()->setComponentsLinked(false);
 }
 
 void Menu::Scene::init() {
 	glClearColor(1, 1, 1, 1);
 
-	//Create entity
-	std::unordered_map<std::string, Entity::Type> entities;
+	//Load objects from scene file
+	NIKEEngine.accessSeri()->loadSceneFromFile("assets/scenes/mainmenu.scn", entities);
 
-	loadFromFile("assets/scenes/mainmenu.scn", entities);
+	//Create new scene object
+	entities["next_scene"] = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "PERFORMANCE", -1, GLFW_KEY_ENTER });
+	NIKEEngine.addEntityComponentObj<Input::Key>(entities["next_scene"], { Input::TriggerMode::TRIGGERED });
 
-	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["duckobj"], Transform::Runtime_Transform());
-
-	// Animation test
-	Entity::Type animated = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Render::Texture>(animated, { "ame" ,Matrix33::Matrix_33::Identity(), { {1.0f, 1.0f, 1.0f}, 1.0f }, { 1.0f / 4.0f, 1.0f / 5.0f}, {0.0f, 0.0f} });
-	NIKEEngine.addEntityComponentObj<Transform::Transform>(animated, { {500.0f, 200.0f}, {500.f, 500.f}, 0.0f });
-	NIKEEngine.addEntityComponentObj<Animation::cBase>(animated, Animation::cBase("AME-ANIMATOR", 1, 2.0f, true));
-	NIKEEngine.addEntityComponentObj<Animation::cSprite>(animated, Animation::cSprite({ 4.0f, 5.0f }, { 0.0f, 0.0f }, {2.0f, 4.0f}));
-	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(animated, Transform::Runtime_Transform());
-
-	//Create camera
-	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["obj1"], { "CAM1", {0.0f, 0.0f}, 1000.0f });
-	NIKEEngine.addEntityComponentObj<Render::Cam>(entities["camera"], { "CAM2", {122.0f, 0.0f}, 1000.0f });
-	NIKEEngine.addEntityComponentObj<Move::Movement>(entities["camera"], { false, false, false, false });
-	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("CAM2");
-
+	// Adding rotation control
+	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["tree"], Transform::Runtime_Transform());
+	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("background");
 
 	//Create object spawner
 	Entity::Type objSpawner = NIKEEngine.createEntity();
 	NIKEEngine.addEntityComponentObj<Input::Mouse>(objSpawner, { Input::TriggerMode::TRIGGERED });
-	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, {});
+	NIKEEngine.addEntityComponentObj<GameLogic::ObjectSpawner>(objSpawner, GameLogic::ObjectSpawner());
 
+	//Toggle debug mode
+	Entity::Type key = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Input::Key>(key, { Input::TriggerMode::TRIGGERED });
+	NIKEEngine.addEntityComponentObj<Render::Debug>(key, Render::Debug());
+
+	//Create text object
+	Entity::Type basic_text = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Render::Text>(basic_text, { "basic", "HELLO WORLD", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.4f, 0.9f}, 0.05f });
+
+	Entity::Type pantat_text = NIKEEngine.createEntity();
+	NIKEEngine.addEntityComponentObj<Render::Text>(pantat_text, { "basic", "TEXT", {{0.0f, 0.0f, 0.0f}, 1.0f}, {0.5f, -0.9f}, 0.05f });
 }
 
 void Menu::Scene::exit() {
+	NIKEEngine.destroyAllEntities();
 
+	//Remove component and systems that are not in use
+	NIKEEngine.removeComponent<GameLogic::ObjectSpawner>();
+	NIKEEngine.removeSystem<GameLogic::Manager>();
 }
 
 void Menu::Scene::unload() {
 
-}
-
-void Menu::Scene::loadFromFile(const std::string& scene_filepath, std::unordered_map<std::string, Entity::Type>& entities) {
-	Serialization::Manager serializationManager;
-    serializationManager.loadSceneFromFile(scene_filepath, entities);
 }

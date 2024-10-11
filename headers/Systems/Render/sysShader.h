@@ -1,9 +1,11 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   sysShader.h
  * \brief
  *
- * \author g.boonxuensean@digipen.edu
+ * \author Sean Gwee, g.boonxuensean@digipen.edu (90%)
+ * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (10%)
  * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once

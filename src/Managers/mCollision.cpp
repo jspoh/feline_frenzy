@@ -2,13 +2,15 @@
 * \file   mCollision.cpp
 * \brief  Implements the collision manager.
 *
-* \author Min Khant Ko
+* \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
 * \date   September 2024
+* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Managers/mCollision.h"
 #include "../headers/Systems/sysInput.h"
+#include "../headers/Components/cTransform.h"
 
 Collision::Manager::Manager() {
     /*colliders.resize(100);  // Pre-allocate 100 colliders
@@ -124,7 +126,7 @@ bool Collision::Manager::detectCollision(const Transform::Transform& aT, const T
 */
 
 // Set collider component
-bool Collision::Manager::setColliderComp(Entity::Type& cEntity) {
+bool Collision::Manager::setColliderComp(Entity::Type& cEntity, bool bounceFlag) {
     // Check that entity has Transform component
     if (!NIKEEngine.checkEntityComponent<Transform::Transform>(cEntity)) {
         cout << "Entity's Transform not set" << endl;
@@ -141,7 +143,7 @@ bool Collision::Manager::setColliderComp(Entity::Type& cEntity) {
     Vector2 Rect_Max = { eTransform.position.x + (eTransform.scale.x * 0.5f), eTransform.position.y + (eTransform.scale.y * 0.5f) };
 
     // cCollider.h
-    NIKEEngine.addEntityComponentObj<Collision::Collider>(cEntity, { true, 0.0f, Rect_Min, Rect_Max, false, false, false, false, {0.0f, 0.0f}, {0.0f, 0.0f} });
+    NIKEEngine.addEntityComponentObj<Collision::Collider>(cEntity, { true, 0.0f, Rect_Min, Rect_Max, false, false, false, false, bounceFlag, {0.0f, 0.0f}, {0.0f, 0.0f} });
 
     return true;
 }
@@ -240,65 +242,72 @@ bool Collision::Manager::aabbRectRectCheck(const Vector2& vel_a, const Vector2& 
 }
 
 bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type& cEntityB, float& firstTimeOfCollision) {
-
-    // Check that entity has Transform and Collider component
+    // Check if both entities have the required components
     if (!NIKEEngine.checkEntityComponent<Transform::Transform>(cEntityA) || !NIKEEngine.checkEntityComponent<Collision::Collider>(cEntityA) ||
         !NIKEEngine.checkEntityComponent<Transform::Transform>(cEntityB) || !NIKEEngine.checkEntityComponent<Collision::Collider>(cEntityB)) {
         cout << "Entity's Transform or Collider not set" << endl;
         return false;
     }
 
-    // Reference to Transform components
-    //Transform::Transform& eTransformA = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityA);
-    //Transform::Transform& eTransformB = NIKEEngine.getEntityComponent<Transform::Transform>(cEntityB);
-
-    // Reference to Velocity components
+    // References to components
     Transform::Velocity& eVelocityA = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntityA);
     Transform::Velocity& eVelocityB = NIKEEngine.getEntityComponent<Transform::Velocity>(cEntityB);
-
-    // Reference to Collider components
     Collision::Collider& eColliderA = NIKEEngine.getEntityComponent<Collision::Collider>(cEntityA);
     Collision::Collider& eColliderB = NIKEEngine.getEntityComponent<Collision::Collider>(cEntityB);
 
+    const float deltaTime = NIKEEngine.accessWindow()->getDeltaTime();
+    const float epsilon = 0.0001f;
+
     // Step 1: Static collision detection
-    if (!(eColliderA.rect_max.x < eColliderB.rect_min.x || eColliderA.rect_min.x > eColliderB.rect_max.x ||
-        eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y)) {
+    bool staticCollision = !(eColliderA.rect_max.x < eColliderB.rect_min.x || eColliderA.rect_min.x > eColliderB.rect_max.x ||
+        eColliderA.rect_max.y < eColliderB.rect_min.y || eColliderA.rect_min.y > eColliderB.rect_max.y);
 
-        // If there is an overlap, set the blocking sides based on the relative positions
-        cout << "Collision detected between EntityA and EntityB (Static collision)" << endl;
+    if (staticCollision) {
+        //cout << "Collision detected between EntityA and EntityB (Static collision)" << endl;
 
-        if (eColliderA.rect_max.x > eColliderB.rect_min.x && eColliderA.rect_min.x < eColliderB.rect_min.x) {
-            eColliderA.right = true; // 'a' is blocked on the right by 'b'
-            eColliderB.left = true;  // 'b' is blocked on the left by 'a'
-            cout << "EntityA is blocked on the right by EntityB" << endl;
+        // Calculate overlap in both axes
+        float overlapX = getMin(eColliderA.rect_max.x - eColliderB.rect_min.x, eColliderB.rect_max.x - eColliderA.rect_min.x);
+        float overlapY = getMin(eColliderA.rect_max.y - eColliderB.rect_min.y, eColliderB.rect_max.y - eColliderA.rect_min.y);
+
+        // Determine side of collision based on smallest overlap
+        if (overlapX < overlapY) {
+            if (eColliderA.rect_min.x < eColliderB.rect_max.x && eColliderA.rect_max.x > eColliderB.rect_min.x) {
+                // Collision primarily on the x-axis
+                if (eColliderA.rect_min.x < eColliderB.rect_min.x) {
+                    eColliderA.right = true;
+                    //cout << "EntityA is blocked on the right by EntityB" << endl;
+                }
+                else {
+                    eColliderA.left = true;
+                    //cout << "EntityA is blocked on the left by EntityB" << endl;
+                }
+            }
         }
-        if (eColliderA.rect_min.x < eColliderB.rect_max.x && eColliderA.rect_max.x > eColliderB.rect_max.x) {
-            eColliderA.left = true;  // 'a' is blocked on the left by 'b'
-            eColliderB.right = true; // 'b' is blocked on the right by 'a'
-            cout << "EntityA is blocked on the left by EntityB" << endl;
-        }
-        if (eColliderA.rect_max.y > eColliderB.rect_min.y && eColliderA.rect_min.y < eColliderB.rect_min.y) {
-            eColliderA.top = true;    // 'a' is blocked at the top by 'b'
-            eColliderB.bottom = true; // 'b' is blocked at the bottom by 'a'
-            cout << "EntityA is blocked on the top by EntityB" << endl;
-        }
-        if (eColliderA.rect_min.y < eColliderB.rect_max.y && eColliderA.rect_max.y > eColliderB.rect_max.y) {
-            eColliderA.bottom = true; // 'a' is blocked on the bottom by 'b'
-            eColliderB.top = true;    // 'b' is blocked at the top by 'a'
-            cout << "EntityA is blocked at the bottom by EntityB" << endl;
+        else {
+            if (eColliderA.rect_min.y < eColliderB.rect_max.y && eColliderA.rect_max.y > eColliderB.rect_min.y) {
+                // Collision primarily on the y-axis
+                if (eColliderA.rect_min.y < eColliderB.rect_min.y) {
+                    eColliderA.top = true;
+                    //cout << "EntityA is blocked on the top by EntityB" << endl;
+                }
+                else {
+                    eColliderA.bottom = true;
+                    //cout << "EntityA is blocked at the bottom by EntityB" << endl;
+                }
+            }
         }
         return true;
     }
 
-    // Step 2: Calculate relative velocity for dynamic collision
+    // Step 2: Dynamic collision detection
     Vector2 velRel = { eVelocityA.velocity.x - eVelocityB.velocity.x, eVelocityA.velocity.y - eVelocityB.velocity.y };
 
     // Initialize time of first and last collision along each axis
     Vector2 tFirst = { 0.0f, 0.0f };
-    Vector2 tLast = { NIKEEngine.accessWindow()->getDeltaTime(), NIKEEngine.accessWindow()->getDeltaTime() };
+    Vector2 tLast = { deltaTime, deltaTime };
 
     // Step 3: Check dynamic collision on x-axis
-    if (velRel.x != 0) {
+    if (abs(velRel.x) > epsilon) {
         if (velRel.x > 0) {
             tFirst.x = (eColliderA.rect_min.x - eColliderB.rect_max.x) / velRel.x;
             tLast.x = (eColliderA.rect_max.x - eColliderB.rect_min.x) / velRel.x;
@@ -313,7 +322,7 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     }
 
     // Step 4: Check dynamic collision on y-axis
-    if (velRel.y != 0) {
+    if (abs(velRel.y) > epsilon) {
         if (velRel.y > 0) {
             tFirst.y = (eColliderA.rect_max.y - eColliderB.rect_min.y) / velRel.y;
             tLast.y = (eColliderA.rect_min.y - eColliderB.rect_max.y) / velRel.y;
@@ -331,40 +340,36 @@ bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type
     float tFirstOverall = getMax(tFirst.x, tFirst.y);
     float tLastOverall = getMin(tLast.x, tLast.y);
 
-    if (tFirstOverall > tLastOverall || tFirstOverall > NIKEEngine.accessWindow()->getDeltaTime()) {
+    if (tFirstOverall > tLastOverall || tFirstOverall > deltaTime) {
         return false; // No collision detected
     }
 
-    // If we have a valid time of collision, update the output parameter
+    // Update the time of first collision
     firstTimeOfCollision = tFirstOverall;
 
-    // Determine which side of both entities is being blocked
-    cout << "Collision detected between EntityA and EntityB (Dynamic collision)" << endl;
+    // Step 6: Determine which side of both entities is being blocked based on the primary axis
+    //cout << "Collision detected between EntityA and EntityB (Dynamic collision)" << endl;
 
-    if (tFirst.x > tFirst.y) {
+    if (tFirst.x < tFirst.y) {
         // Collision primarily along the x-axis
         if (velRel.x > 0) {
             eColliderA.right = true; // 'a' is blocked on the right side
-            eColliderB.left = true;  // 'b' is blocked on the left side
-            cout << "EntityA is blocked on the right side by EntityB" << endl;
+            //cout << "EntityA is blocked on the right side by EntityB" << endl;
         }
         else {
             eColliderA.left = true;  // 'a' is blocked on the left side
-            eColliderB.right = true; // 'b' is blocked on the right side
-            cout << "EntityA is blocked on the left side by EntityB" << endl;
+            //cout << "EntityA is blocked on the left side by EntityB" << endl;
         }
     }
     else {
         // Collision primarily along the y-axis
         if (velRel.y > 0) {
-            eColliderA.top = true;    // 'a' is blocked on the top side (inverted Y-axis)
-            eColliderB.bottom = true; // 'b' is blocked on the bottom side
-            cout << "EntityA is blocked on the top by EntityB" << endl;
+            eColliderA.top = true;    // 'a' is blocked on the top side
+            //cout << "EntityA is blocked on the top by EntityB" << endl;
         }
         else {
-            eColliderA.bottom = true; // 'a' is blocked on the bottom side (inverted Y-axis)
-            eColliderB.top = true;    // 'b' is blocked on the top side
-            cout << "EntityA is blocked at the bottom by EntityB" << endl;
+            eColliderA.bottom = true; // 'a' is blocked on the bottom side
+            //cout << "EntityA is blocked at the bottom by EntityB" << endl;
         }
     }
 
