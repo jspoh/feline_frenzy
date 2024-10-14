@@ -21,7 +21,7 @@ namespace Animation {
 	/*****************************************************************//**
 	* Animation manager
 	*********************************************************************/
-	class Manager : public System::ISystem, public Events::IEventListener {
+	class Manager : public System::ISystem, public Events::IEventListener<Animation::AnimationEvent> {
 	private:
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
@@ -41,7 +41,7 @@ namespace Animation {
 		}
 
 		//Destructor
-		~Manager() override = default;
+		~Manager() = default;
 
 		//Animation system
 		std::string getSysName() override
@@ -56,7 +56,7 @@ namespace Animation {
 		bool update() override;
 
 		//Execute event
-		void executeEvent(std::shared_ptr<Events::IEvent> event) override;
+		void executeEvent(std::shared_ptr<Animation::AnimationEvent> event) override;
 	};
 }
 

@@ -49,6 +49,28 @@ namespace Input {
 		//most mousewheels will only scroll on y axis
 		Vector2 scroll;
 	};
+
+	////Key Event
+	//struct KeyEve : public Events::IEvent {
+	//public:
+	//	Mode animation_action;
+	//	std::string animator_id;
+
+	//	//Constructor
+	//	AnimationEvent(Mode action, std::string const& id)
+	//		: animation_action{ action }, animator_id{ id } {}
+	//};
+
+	////Mouse Event
+	//struct AnimationEvent : public Events::IEvent {
+	//public:
+	//	Mode animation_action;
+	//	std::string animator_id;
+
+	//	//Constructor
+	//	AnimationEvent(Mode action, std::string const& id)
+	//		: animation_action{ action }, animator_id{ id } {}
+	//};
 }
 
 #endif // !C_INPUT_HPP

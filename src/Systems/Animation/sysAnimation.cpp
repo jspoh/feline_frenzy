@@ -28,7 +28,7 @@ bool Animation::Manager::update() {
 }
 
 //Execute event
-void Animation::Manager::executeEvent(std::shared_ptr<Events::IEvent> event) {
+void Animation::Manager::executeEvent(std::shared_ptr<Animation::AnimationEvent> event) {
 	Animation::AnimationEvent new_event = *std::dynamic_pointer_cast<Animation::AnimationEvent>(event);
 
 	//Execute event on animator

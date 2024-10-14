@@ -36,6 +36,20 @@ namespace Input {
 		static void mousepos_cb(GLFWwindow* window, double xpos, double ypos);
 		static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
 
+		//struct Mouse {
+		//	//Pos of button
+		//	Vector2 button_pos;
+
+		//	//Button type triggered
+		//	int button_type{};
+
+		//	//Output result
+		//	bool b_output;
+
+		//	//most mousewheels will only scroll on y axis
+		//	Vector2 scroll;
+		//};
+
 		//Mouse input
 		Mouse mouse;
 
@@ -46,6 +60,14 @@ namespace Input {
 		//Input mode checkss
 		bool mouseTriggerCheck();
 		bool mouseReleaseCheck();
+
+		//struct Key {
+		//	//Key type
+		//	int key_type;
+
+		//	//Output result
+		//	bool b_output;
+		//};
 
 		//Key input
 		Key key;
@@ -88,7 +110,6 @@ namespace Input {
 		Mouse getMouse() const {
 			return mouse;
 		}
-
 	};
 }
 
