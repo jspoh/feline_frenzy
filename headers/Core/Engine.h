@@ -16,8 +16,8 @@
 #include "../headers/Managers/mComponent.h"
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Managers/mWindows.h"
+#include "../headers/Managers/mScenes.h"
 #include "../headers/Managers/mEvents.h"
-#include "../headers/Managers/mCollision.h"
 #include "../headers/Managers/mAssets.h"
 #include "../headers/Managers/mDebug.h"
 #include "../headers/Managers/mSerialization.h"
@@ -44,10 +44,20 @@ namespace Core {
 
 		//Standalone Managers
 		std::unique_ptr<Windows::Manager> windows_manager;
+		std::unique_ptr<Scenes::Manager> scenes_manager;
 		std::unique_ptr<Events::Manager> events_manager;
 		std::unique_ptr<Assets::Manager> assets_manager;
 		std::unique_ptr<Debug::Manager> debug_manager;
 		std::unique_ptr<Serialization::Manager> seri_manager;
+
+		//Register default components
+		void registerDefComponents();
+
+		//Register default assets
+		void registerDefSystems();
+
+		//Register default assets
+		void registerDefAssets();
 
 	public:
 
@@ -193,6 +203,11 @@ namespace Core {
 		std::unique_ptr<Windows::Manager>& accessWindow();
 
 		/*****************************************************************//**
+		* Access Scene Functions
+		*********************************************************************/
+		std::unique_ptr<Scenes::Manager>& accessScenes();
+
+		/*****************************************************************//**
 		* Access Events
 		*********************************************************************/
 		std::unique_ptr<Events::Manager>& accessEvents();
@@ -201,7 +216,15 @@ namespace Core {
 		* Assets Methods
 		*********************************************************************/
 		std::unique_ptr<Assets::Manager>& accessAssets();
+
+		/*****************************************************************//**
+		* Debug Methods
+		*********************************************************************/
 		std::unique_ptr<Debug::Manager>& accessDebug();
+
+		/*****************************************************************//**
+		* Serialization Methods
+		*********************************************************************/
 		std::unique_ptr<Serialization::Manager>& accessSeri();
 	};
 

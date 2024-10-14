@@ -12,11 +12,10 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
-
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Core/Engine.h"
-#include "../headers/Managers/mCollision.h"
+#include "../headers/Systems/Physics/sysCollision.h"
 
 namespace Physics {
 
@@ -53,7 +52,7 @@ namespace Physics {
 		}
 
 		//Update
-		bool update() override;
+		void update() override;
 
 		//Move Object
 		//void move(Transform::Transform& transform);

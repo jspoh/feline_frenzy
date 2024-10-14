@@ -101,7 +101,7 @@ namespace Input {
 		}
 
 		//Update Inputs
-		bool update() override;
+		void update() override;
 
 		//Default Destructor
 		~Manager() override = default;

@@ -19,6 +19,7 @@
 #include "../headers/Managers/mEvents.h"
 #include "../headers/Components/cAnimation.h"
 #include "../headers/Components/cMove.h"
+#include "../headers/Systems/Physics/sysCollision.h"
 
 namespace GameLogic {
 
@@ -44,7 +45,7 @@ namespace GameLogic {
 		}
 
 		//Update Inputs
-		bool update() override;
+		void update() override;
 
 		//Default Destructor
 		~Manager() override = default;

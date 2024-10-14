@@ -13,7 +13,7 @@ void GameLogic::Manager::init() {
 
 }
 
-bool GameLogic::Manager::update() {
+void GameLogic::Manager::update() {
 
 	//Loop through entities
 	for (auto& entity : entities) {
@@ -83,7 +83,5 @@ bool GameLogic::Manager::update() {
 			}
 		}
 	}
-
-	return false;
 }
 

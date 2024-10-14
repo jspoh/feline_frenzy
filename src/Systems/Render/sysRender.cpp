@@ -523,7 +523,10 @@ void Render::Manager::init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-bool Render::Manager::update() {
+void Render::Manager::update() {
+
+	//Might move this into render system
+	glfwSwapBuffers(NIKEEngine.accessWindow()->getWindow());
 
 	// Before drawing clear screen
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -569,6 +572,4 @@ bool Render::Manager::update() {
 			transformAndRenderEntity(entity, debug_mode);
 		}
 	}
-
-	return false;
 }

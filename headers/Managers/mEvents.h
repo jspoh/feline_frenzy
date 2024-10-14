@@ -75,13 +75,13 @@ namespace Events {
 
 		//Dispatch event
 		template<typename T>
-		void dispatchEvent(std::shared_ptr<T> event) {
+		void dispatchEvent(std::shared_ptr<T> new_event) {
 			assert(event_listeners.find(typeid(T).name()) != event_listeners.end() && "Event type not found");
 			auto& listeners = event_listeners.at(typeid(T).name());
 
 			//Dispatch to listener
 			for (auto& listener : listeners) {
-				listener->execute(event);
+				listener->execute(new_event);
 			}
 		}
 	};

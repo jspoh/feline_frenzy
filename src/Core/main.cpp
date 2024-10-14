@@ -9,7 +9,7 @@
 
 #include "../headers/Core/stdafx.h"
 #include "../headers/Core/Engine.h"
-#include "../headers/Systems/sysScene.h"
+#include "../headers/Managers/mScenes.h"
 #include "../headers/Scenes/MenuScene.h"
 #include "../headers/Scenes/SplashScene.h"
 #include "../headers/Scenes/PerformanceScene.h"
@@ -20,7 +20,6 @@ NullStream nullstream;
 
 //Create console
 void createConsole() {
-#ifndef NDEBUG
 	// Create a new console window
 	AllocConsole();
 
@@ -33,11 +32,7 @@ void createConsole() {
 	freopen_s(&fp, "CONOUT$", "w", stderr);
 	// Redirect stdin
 	freopen_s(&fp, "CONIN$", "r", stdin);
-#else
-	return;
-#endif
 }
-
 
 int WINAPI WinMain(
 	[[maybe_unused]] _In_ HINSTANCE hInstance,
@@ -46,8 +41,10 @@ int WINAPI WinMain(
 	[[maybe_unused]] _In_ int nCmdShow
 )
 {
-	// Function call to create console, comment out if needed
+	// Function call to create console for debug
+	#ifndef NDEBUG
 	createConsole();
+	#endif
 	
 	//// Enable run-time memory check for debug builds.
 	#if defined(DEBUG) | defined(_DEBUG)
@@ -58,10 +55,9 @@ int WINAPI WinMain(
 	NIKEEngine.init("src/Core/Config.txt", 60);
 
 	//Register scenes manager
-	NIKEEngine.registerSystem<Scenes::Manager>(Scenes::Manager::getInstance());
-	NIKEEngine.accessSystem<Scenes::Manager>()->registerScenes<Splash::Scene>("SPLASH");
-	NIKEEngine.accessSystem<Scenes::Manager>()->registerScenes<Menu::Scene>("MENU");
-	NIKEEngine.accessSystem<Scenes::Manager>()->registerScenes<Performance::Scene>("PERFORMANCE");
+	NIKEEngine.accessScenes()->registerScenes<Splash::Scene>("SPLASH");
+	NIKEEngine.accessScenes()->registerScenes<Menu::Scene>("MENU");
+	NIKEEngine.accessScenes()->registerScenes<Performance::Scene>("PERFORMANCE");
 
 	//Engine Game Loop
 	NIKEEngine.run();

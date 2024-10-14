@@ -41,7 +41,7 @@ void ObjectSpawner::Manager::init() {
 
 }
 
-bool ObjectSpawner::Manager::update() {
+void ObjectSpawner::Manager::update() {
 
 	//Loop through entities
 	for (auto& entity : entities) {
@@ -84,6 +84,4 @@ bool ObjectSpawner::Manager::update() {
 
 	//Disable debug mode
 	NIKEEngine.accessSystem<Render::Manager>()->debug_mode = false;
-
-	return false;
 }

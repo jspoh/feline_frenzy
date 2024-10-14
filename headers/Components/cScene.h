@@ -24,11 +24,9 @@ namespace Scenes {
 	};
 
 	//Change Scene Event
-	struct ChangeScene {
+	struct SceneEvent {
 		Actions scene_action;
 		std::string next_scene_id;
-		int mouse_type;
-		int key_type;
 	};
 }
 

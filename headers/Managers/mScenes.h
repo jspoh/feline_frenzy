@@ -34,20 +34,23 @@ namespace Scenes {
 	};
 
 	//Scenes manager
-	class Manager : public System::ISystem {
+	class Manager {
 	private:
 		//Delete Copy Constructor & Copy Assignment
 		Manager(Manager const& copy) = delete;
 		void operator=(Manager const& copy) = delete;
 
 		//Map of scene files ( To be implemented )
-		std::unordered_map<std::string, std::shared_ptr<IScene>> states;
+		std::unordered_map<std::string, std::shared_ptr<IScene>> scenes;
 
 		//Current scene
 		std::shared_ptr<IScene> curr_scene;
 
 		//Prev scene
 		std::shared_ptr<IScene> prev_scene;
+
+		//Scene event queue
+		std::shared_ptr<Scenes::SceneEvent> event_queue;
 
 		//Init starting scene
 		void initScene(std::string scene_id);
@@ -80,7 +83,7 @@ namespace Scenes {
 			std::shared_ptr<T> scene{ std::make_shared<T>() };
 
 			//Construct scene obj
-			states.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
+			scenes.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
 
 			//Default starting state will be the first state registered
 			if (!curr_scene) {
@@ -88,16 +91,14 @@ namespace Scenes {
 			}
 		}
 
-		//Init
-		void init() override;
+		//Get Current Scene
+		std::string getCurrSceneID() const;
 
-		std::string getSysName() override
-		{
-			return "Scene System";
-		}
+		//Queue scene event
+		void queueSceneEvent(Scenes::SceneEvent event);
 
-		//Update
-		bool update() override;
+		//Update scene event
+		void update();
 	};
 }
 

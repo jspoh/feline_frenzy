@@ -8,7 +8,7 @@
 *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mCollision.h"
+#include "../headers/Systems/Physics/sysCollision.h"
 #include "../headers/Systems/sysInput.h"
 #include "../headers/Components/cTransform.h"
 

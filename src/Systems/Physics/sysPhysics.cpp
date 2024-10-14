@@ -40,7 +40,7 @@ void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtim
 
 }
 
-bool Physics::Manager::update() {
+void Physics::Manager::update() {
     float dt = NIKEEngine.accessWindow()->getDeltaTime();
 
     // Loop through all entities to reset collision flags
@@ -160,7 +160,5 @@ bool Physics::Manager::update() {
             runtimeScaleOrRotate(c_runtime, c_transform);
         }
     }
-
-    return false;
 }
 

@@ -67,7 +67,7 @@ bool Input::Manager::keyReleaseCheck() {
 	return false;
 }
 
-bool Input::Manager::update() {
+void Input::Manager::update() {
 
 	//Key trigger mode checking
 	bool key_triggered = keyTriggerCheck();
@@ -151,6 +151,27 @@ bool Input::Manager::update() {
 			}
 		}
 
+		//Change scene to menu ( temp )
+		if (NIKEEngine.accessScenes()->getCurrSceneID() == "SPLASH") {
+			if (key_triggered && (key.key_type == GLFW_KEY_ENTER))
+			{
+				NIKEEngine.accessScenes()->queueSceneEvent({ Scenes::Actions::CHANGE, "MENU" });
+			}
+		}
+
+		//Change scene to performance ( temp )
+		if (NIKEEngine.accessScenes()->getCurrSceneID() == "MENU") {
+			if (key_triggered && (key.key_type == GLFW_KEY_ENTER))
+			{
+				NIKEEngine.accessScenes()->queueSceneEvent({ Scenes::Actions::CHANGE, "PERFORMANCE" });
+			}
+
+			//if (key_triggered && (key.key_type == GLFW_KEY_LEFT))
+			//{
+			//	NIKEEngine.accessScenes()->queueSceneEvent({ Scenes::Actions::PREVIOUS, "" });
+			//}
+		}
+
 		//Escape program
 		if (key.b_output && (key.key_type == GLFW_KEY_ESCAPE)) {
 			NIKEEngine.accessWindow()->terminate();
@@ -161,8 +182,6 @@ bool Input::Manager::update() {
 			NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
 		}
 	}
-
-	return false;
 }
 
 void Input::Manager::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {

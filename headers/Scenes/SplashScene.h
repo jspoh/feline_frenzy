@@ -12,22 +12,13 @@
 #ifndef SPLASH_SCENE_HPP
 #define SPLASH_SCENE_HPP
 
-#include "../headers/Systems/sysScene.h"
+#include "../headers/Managers/mScenes.h"
 #include "../headers/Core/Engine.h"
 
 namespace Splash {
 	class Scene : public Scenes::IScene {
 	private:
 		std::unordered_map<std::string, Entity::Type> entities;
-
-		//Register components
-		static void registerStaticComponents();
-
-		//Register static systems
-		static void registerStaticSystems();
-
-		//Register static systems
-		static void registerStaticAssets();
 
 	public:
 

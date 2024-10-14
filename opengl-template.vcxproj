@@ -32,7 +32,7 @@
     <ClCompile Include="src\Systems\GameLogic\sysObjectSpawner.cpp" />
     <ClCompile Include="src\Systems\Render\sysFont.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
-    <ClCompile Include="src\Managers\mCollision.cpp" />
+    <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
@@ -46,7 +46,7 @@
     <ClCompile Include="src\Managers\mSystem.cpp" />
     <ClCompile Include="src\Scenes\SplashScene.cpp" />
     <ClCompile Include="src\Systems\sysInput.cpp" />
-    <ClCompile Include="src\Systems\sysScene.cpp" />
+    <ClCompile Include="src\Managers\mScenes.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
@@ -75,7 +75,7 @@
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />
-    <ClInclude Include="headers\Managers\mCollision.h" />
+    <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
@@ -96,7 +96,7 @@
     <ClInclude Include="headers\Data\json.hpp" />
     <ClInclude Include="headers\Scenes\MenuScene.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
-    <ClInclude Include="headers\Systems\sysScene.h" />
+    <ClInclude Include="headers\Managers\mScenes.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />

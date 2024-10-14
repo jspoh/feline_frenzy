@@ -14,7 +14,7 @@
 #ifndef MENU_SCENE_HPP
 #define MENU_SCENE_HPP
 
-#include "../headers/Systems/sysScene.h"
+#include "../headers/Managers/mScenes.h"
 #include "../headers/Core/Engine.h"
 
 namespace Menu {

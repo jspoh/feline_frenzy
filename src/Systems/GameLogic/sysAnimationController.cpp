@@ -17,7 +17,7 @@ void AnimationController::Manager::init() {
 
 }
 
-bool AnimationController::Manager::update() {
+void AnimationController::Manager::update() {
 
 	//Loop through entities
 	for (auto& entity : entities) {
@@ -81,6 +81,4 @@ bool AnimationController::Manager::update() {
 			}
 		}
 	}
-
-	return false;
 }

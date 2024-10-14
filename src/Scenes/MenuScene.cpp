@@ -43,11 +43,6 @@ void Menu::Scene::init() {
 	//Load objects from scene file
 	NIKEEngine.accessSeri()->loadSceneFromFile("assets/scenes/mainmenu.scn", entities);
 
-	//Create new scene object
-	entities["next_scene"] = NIKEEngine.createEntity();
-	NIKEEngine.addEntityComponentObj<Scenes::ChangeScene>(entities["next_scene"], { Scenes::Actions::CHANGE, "PERFORMANCE", -1, GLFW_KEY_ENTER });
-	NIKEEngine.addEntityComponentObj<Input::Key>(entities["next_scene"], { Input::TriggerMode::TRIGGERED });
-
 	// Adding rotation control
 	NIKEEngine.addEntityComponentObj<Transform::Runtime_Transform>(entities["tree"], Transform::Runtime_Transform());
 	NIKEEngine.accessSystem<Render::Manager>()->trackCamEntity("background");

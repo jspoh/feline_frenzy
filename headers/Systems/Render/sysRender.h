@@ -175,7 +175,7 @@ namespace Render {
 		/**
 		* update all object's xform
 		* */
-		bool update() override;
+		void update() override;
 	};
 }
 

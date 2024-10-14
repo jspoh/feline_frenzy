@@ -12,7 +12,7 @@
 #ifndef PERFORMANCE_SCENE_HPP
 #define PERFORMANCE_SCENE_HPP
 
-#include "../headers/Systems/sysScene.h"
+#include "../headers/Managers/mScenes.h"
 
 namespace Performance {
 	class Scene : public Scenes::IScene {

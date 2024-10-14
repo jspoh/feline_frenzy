@@ -134,8 +134,7 @@ void System::Manager::updateSystems()
 			std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
 
 			//Break system update loop if system update returns true
-			if(system->update())
-				break;
+			system->update();
 
 			std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
 

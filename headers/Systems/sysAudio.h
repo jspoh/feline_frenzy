@@ -51,7 +51,7 @@ namespace Audio {
 		void init() override;
 
 		// Update Audio system
-		bool update() override;
+		void update() override;
 
 		std::string getSysName() override
 		{
