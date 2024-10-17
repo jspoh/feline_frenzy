@@ -10,9 +10,8 @@
     <ClCompile Include="src\Systems\Render\sysCamera.cpp" />
     <ClCompile Include="src\Systems\Render\sysRender.cpp" />
     <ClCompile Include="src\Systems\Render\sysShader.cpp" />
-    <ClCompile Include="src\Managers\mComponent.cpp" />
-    <ClCompile Include="src\Managers\mEntity.cpp" />
-    <ClCompile Include="src\Managers\mSystem.cpp" />
+    <ClCompile Include="src\Managers\ECS\mEntity.cpp" />
+    <ClCompile Include="src\Managers\ECS\mSystem.cpp" />
     <ClCompile Include="src\Systems\sysInput.cpp" />
     <ClCompile Include="src\Managers\mScenes.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
@@ -33,6 +32,8 @@
     <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysObjectSpawner.cpp" />
     <ClCompile Include="src\Core\App.cpp" />
+    <ClCompile Include="src\Managers\ECS\mComponent.cpp" />
+    <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
@@ -43,16 +44,16 @@
     <ClInclude Include="headers\RenderManager.h" />
     <ClInclude Include="headers\Systems\Render\sysShader.h" />
     <ClInclude Include="headers\Math\Vector3.h" />
-    <ClInclude Include="headers\Managers\mComponent.h" />
+    <ClInclude Include="headers\Managers\ECS\mComponent.h" />
     <ClInclude Include="headers\Data\db.h" />
     <ClInclude Include="headers\Core\Engine.h" />
-    <ClInclude Include="headers\Managers\mEntity.h" />
+    <ClInclude Include="headers\Managers\ECS\mEntity.h" />
     <ClInclude Include="headers\Systems\sysInput.h" />
     <ClInclude Include="headers\Data\json.hpp" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
     <ClInclude Include="headers\Managers\mScenes.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
-    <ClInclude Include="headers\Managers\mSystem.h" />
+    <ClInclude Include="headers\Managers\ECS\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />
     <ClInclude Include="headers\Math\Vector4.h" />
     <ClInclude Include="headers\Components\cRender.h" />
@@ -79,6 +80,7 @@
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Core\App.h" />
     <ClInclude Include="Nikesaurus.h" />
+    <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

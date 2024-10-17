@@ -92,33 +92,6 @@
 #include <math.h>
 
 /*****************************************************************//**
-* Entity 
-*********************************************************************/
-namespace Entity {
-
-    //Entity Type
-    using Type = uint16_t;
-
-    //Max number of entities to be created at a single point
-    const Type MAX = 3000;
-}
-
-/*****************************************************************//**
-* Component
-*********************************************************************/
-namespace Component {
-
-    //Component Signature Type
-    using Type = uint8_t;
-
-    //Max components to be stored in a signature
-    const Type MAX = 64;
-
-    //Nested components signature
-    using Signature = std::bitset<MAX>;
-}
-
-/*****************************************************************//**
 * Nullstream for release
 *********************************************************************/
 class NullStream {
