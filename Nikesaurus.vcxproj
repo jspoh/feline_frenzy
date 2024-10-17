@@ -122,9 +122,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e1cf69f1-a2be-4049-ba4b-fec67f88145a}</ProjectGuid>
+    <ProjectGuid>{DFCD41A8-723D-41D2-A636-F698FEE1D044}</ProjectGuid>
     <RootNamespace>opengltemplate</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Nikesaurus</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
