@@ -19,13 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\App.cpp" />
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Managers\mAssets.cpp" />
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
-    <ClCompile Include="src\Scenes\PerformanceScene.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
@@ -44,13 +44,11 @@
     <ClCompile Include="src\Managers\mComponent.cpp" />
     <ClCompile Include="src\Managers\mEntity.cpp" />
     <ClCompile Include="src\Managers\mSystem.cpp" />
-    <ClCompile Include="src\Scenes\SplashScene.cpp" />
     <ClCompile Include="src\Systems\sysInput.cpp" />
     <ClCompile Include="src\Managers\mScenes.cpp" />
     <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
-    <ClCompile Include="src\Scenes\MenuScene.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -58,15 +56,17 @@
     <ClCompile Include="src\Utility\uSystems.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\Core\App.h" />
     <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Components\cScene.h" />
+    <ClInclude Include="headers\Core\Core.h" />
+    <ClInclude Include="Nikesaurus.h" />
     <ClInclude Include="headers\Managers\mAssets.h" />
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
-    <ClInclude Include="headers\Scenes\PerformanceScene.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysAnimationController.h" />
@@ -91,10 +91,8 @@
     <ClInclude Include="headers\Data\db.h" />
     <ClInclude Include="headers\Core\Engine.h" />
     <ClInclude Include="headers\Managers\mEntity.h" />
-    <ClInclude Include="headers\Scenes\SplashScene.h" />
     <ClInclude Include="headers\Systems\sysInput.h" />
     <ClInclude Include="headers\Data\json.hpp" />
-    <ClInclude Include="headers\Scenes\MenuScene.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
     <ClInclude Include="headers\Managers\mScenes.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
@@ -104,8 +102,6 @@
     <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\scenes\mainmenu.scn" />
-    <None Include="assets\Scenes\mmCopy.scn" />
     <None Include="db\data.json" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
@@ -113,10 +109,6 @@
     <None Include="shaders\texture.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\meshes\circle.txt" />
-    <Text Include="assets\meshes\square-texture.txt" />
-    <Text Include="assets\meshes\square.txt" />
-    <Text Include="assets\meshes\triangle.txt" />
     <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -142,13 +134,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -173,16 +165,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)dependencies\lib\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)\bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(ProjectName)\dependencies\lib\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)\$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)dependencies\lib\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)\bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(ProjectName)\dependencies\lib\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -216,7 +208,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NIKESAURUS_PLATFORM_WINDOWS;NIKE_BUILD_DLL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -228,15 +220,17 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)\$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)\$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
+xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)\$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
+
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -245,7 +239,7 @@ xcopy "$(SolutionDir)\$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NIKESAURUS_PLATFORM_WINDOWS;NIKE_BUILD_DLL;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -258,15 +252,19 @@ xcopy "$(SolutionDir)\$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)\$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)\$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
+xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)\$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
+
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
+
+xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\$(ProjectName)\$(ProjectName).dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
