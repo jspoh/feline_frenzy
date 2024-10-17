@@ -173,12 +173,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)headers;$(SolutionDir)dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\lib\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)headers;$(SolutionDir)dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\lib\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)\bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -224,15 +228,15 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)assets\*" "$(OutDir)assets\" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)\$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)db\data.json" "$(OutDir)" /s  /r  /y  /q
+xcopy "$(SolutionDir)\$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)\$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -254,15 +258,15 @@ xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)dependencies\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)assets\*" "$(OutDir)assets\" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)\$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)db\data.json" "$(OutDir)" /s  /r  /y  /q
+xcopy "$(SolutionDir)\$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)\$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
