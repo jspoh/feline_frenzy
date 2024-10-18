@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Managers/ECS/mCoordinator.h"
+#include "../headers/Managers/ECS/mEntity.h"
 
 namespace NIKESAURUS {
 	Entity::Manager::Manager() {

@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Managers/ECS/mCoordinator.h"
+#include "../headers/Managers/ECS/mComponent.h"
 
 namespace NIKESAURUS {
 	void Component::Manager::cloneEntity(Entity::Type clone, Entity::Type copy) {

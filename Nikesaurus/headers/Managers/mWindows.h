@@ -12,73 +12,84 @@
 #ifndef WINDOWS_HPP
 #define WINDOWS_HPP
 
-namespace Windows {
-	class Manager {
-	private:
-		//Delete Copy Constructor & Copy Assignment
-		Manager(Manager const& copy) = delete;
-		void operator=(Manager const& copy) = delete;
+namespace NIKESAURUS {
+	namespace Windows {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		//Engine Variables
-		GLFWwindow* ptr_window;
-		Vector2 window_size;
-		std::string window_title;
+		class NIKESAURUS_API Manager {
+		private:
+			//Delete Copy Constructor & Copy Assignment
+			Manager(Manager const& copy) = delete;
+			void operator=(Manager const& copy) = delete;
 
-		//Delta time variables
-		float delta_time;
-		double curr_time;
+			//Engine Variables
+			GLFWwindow* ptr_window;
+			Vector2 window_size;
+			std::string window_title;
 
-		//FPS Variables
-		int target_fps;
-		float actual_fps;
+			//Delta time variables
+			float delta_time;
+			double curr_time;
 
-	public:
-		//Default constructor
-		Manager() : ptr_window{ nullptr }, window_size{}, window_title{ "" }, delta_time{ 0.0f },
-			target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+			//FPS Variables
+			int target_fps;
+			float actual_fps;
 
-		/**
-		 * Read & Deserialize Data From Config File
-		 * Basic Data: Window Dimensions & Title
-		 */
-		void readConfigFile(std::string const& file_path);
+		public:
+			//Default constructor
+			Manager() : ptr_window{ nullptr }, window_size{}, window_title{ "" }, delta_time{ 0.0f },
+				target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
 
-		//Configure systems ( GLFW & GLEW )
-		void configSystem();
+			/**
+			 * Read & Deserialize Data From Config File
+			 * Basic Data: Window Dimensions & Title
+			 */
+			void readConfigFile(std::string const& file_path);
 
-		//Terminate Game Loop
-		void terminate();
+			//Configure systems ( GLFW & GLEW )
+			void configSystem();
 
-		//Get Window
-		GLFWwindow* getWindow() const;
+			//Create Console
+			void createConsole();
 
-		//Set Window Title
-		void setWinTitle(std::string const& title);
+			//Terminate Game Loop
+			void terminate();
 
-		//Get Window Title
-		std::string const& getWinTitle();
+			//Get Window
+			GLFWwindow* getWindow() const;
 
-		//Set Window Size
-		void setWindowSize(float width, float height);
+			//Set Window Title
+			void setWinTitle(std::string const& title);
 
-		//Get Window Size
-		Vector2 const& getWindowSize() const;
+			//Get Window Title
+			std::string const& getWinTitle();
 
-		//Set Target FPS
-		void setTargetFPS(int fps);
+			//Set Window Size
+			void setWindowSize(float width, float height);
 
-		//Get Current FPS
-		float getCurrentFPS() const;
+			//Get Window Size
+			Vector2 const& getWindowSize() const;
 
-		//Get Delta Time
-		float getDeltaTime() const;
+			//Set Target FPS
+			void setTargetFPS(int fps);
 
-		//Calculate Delta Time
-		void calculateDeltaTime();
+			//Get Current FPS
+			float getCurrentFPS() const;
 
-		//FPS control
-		void controlFPS();
-	};
+			//Get Delta Time
+			float getDeltaTime() const;
+
+			//Calculate Delta Time
+			void calculateDeltaTime();
+
+			//FPS control
+			void controlFPS();
+		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif //!WINDOWS_HPP

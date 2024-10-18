@@ -14,14 +14,11 @@
 namespace NIKESAURUS {
 	namespace Entity {
 
-		//Entity Type
-		using Type = uint16_t;
-
-		//Max number of entities to be created at a single point
-		const Type MAX = 3000;
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
 		//Entity Management
-		class Manager {
+		class NIKESAURUS_API Manager {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
@@ -60,6 +57,9 @@ namespace NIKESAURUS {
 			std::vector<Entity::Type> getAllEntities() const;
 		};
 	}
+
+	//Re-enable DLL Export warning
+	#pragma warning(default: 4251)
 }
 
 #endif //!M_ENTITY_HPP

@@ -18,7 +18,10 @@
 
 namespace NIKESAURUS {
 	namespace Coordinator {
-		class Manager {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
+
+		class NIKESAURUS_API Manager {
 		private:
 			//ECS Managers
 			std::unique_ptr<Entity::Manager> entity_manager;
@@ -147,7 +150,11 @@ namespace NIKESAURUS {
 				system_manager->addComponentType<T>(component);
 			}
 
+			void updateSystems();
 		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
 	}
 }
 

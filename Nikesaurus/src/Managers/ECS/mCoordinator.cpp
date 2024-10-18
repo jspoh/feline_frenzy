@@ -35,4 +35,8 @@ namespace NIKESAURUS {
 	int Coordinator::Manager::getEntitiesCount() {
 		return entity_manager->getEntityCount();
 	}
+
+	void Coordinator::Manager::updateSystems() {
+		system_manager->updateSystems();
+	}
 }

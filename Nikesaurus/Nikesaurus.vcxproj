@@ -28,26 +28,12 @@
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
-    <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
-    <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
-    <ClCompile Include="src\Systems\GameLogic\sysAnimationController.cpp" />
-    <ClCompile Include="src\Systems\GameLogic\sysObjectSpawner.cpp" />
-    <ClCompile Include="src\Systems\Render\sysFont.cpp" />
-    <ClCompile Include="src\Systems\sysAudio.cpp" />
-    <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
-    <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
-    <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
-    <ClCompile Include="src\Systems\Render\sysCamera.cpp" />
-    <ClCompile Include="src\Systems\Render\sysRender.cpp" />
-    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
     <ClCompile Include="src\Managers\ECS\mEntity.cpp" />
     <ClCompile Include="src\Managers\ECS\mSystem.cpp" />
-    <ClCompile Include="src\Systems\sysInput.cpp" />
     <ClCompile Include="src\Managers\mScenes.cpp" />
-    <ClCompile Include="src\Core\main.cpp" />
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp">
@@ -69,33 +55,20 @@
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
-    <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
-    <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
-    <ClInclude Include="headers\Systems\GameLogic\sysAnimationController.h" />
-    <ClInclude Include="headers\Systems\GameLogic\sysObjectSpawner.h" />
-    <ClInclude Include="headers\Systems\Render\sysFont.h" />
-    <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Components\cMove.h" />
-    <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
-    <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
-    <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Managers\mSerialization.h" />
-    <ClInclude Include="headers\Systems\Render\sysCamera.h" />
     <ClInclude Include="headers\Math\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
-    <ClInclude Include="headers\Systems\Render\sysShader.h" />
     <ClInclude Include="headers\Math\Vector3.h" />
     <ClInclude Include="headers\Managers\ECS\mComponent.h" />
     <ClInclude Include="headers\Data\db.h" />
     <ClInclude Include="headers\Core\Engine.h" />
     <ClInclude Include="headers\Managers\ECS\mEntity.h" />
-    <ClInclude Include="headers\Systems\sysInput.h" />
     <ClInclude Include="headers\Data\json.hpp" />
-    <ClInclude Include="headers\Systems\Render\sysRender.h" />
     <ClInclude Include="headers\Managers\mScenes.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\ECS\mSystem.h" />
@@ -109,9 +82,6 @@
     <None Include="shaders\base.vert" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

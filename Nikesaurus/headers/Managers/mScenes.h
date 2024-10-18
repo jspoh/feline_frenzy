@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef M_STATE_HPP
-#define M_STATE_HPP
+#ifndef M_SCENE_HPP
+#define M_SCENE_HPP
 
 #include "../headers/Managers/mSystem.h"
 #include "../headers/Components/cScene.h"
@@ -102,4 +102,4 @@ namespace Scenes {
 	};
 }
 
-#endif // !M_STATE_HPP
+#endif // !M_SCENE_HPP

@@ -30,74 +30,74 @@ namespace NIKESAURUS {
 	}
 
 	void Core::Engine::registerDefComponents() {
-		//Register input components
-		registerComponent<Input::Key>();
-		registerComponent<Input::Mouse>();
+		////Register input components
+		//ecs_coordinator->registerComponent<Input::Key>();
+		//ecs_coordinator->registerComponent<Input::Mouse>();
 
-		//Register physics components
-		registerComponent<Transform::Velocity>();
-		registerComponent<Transform::Transform>();
-		registerComponent<Transform::Runtime_Transform>();
-		registerComponent<Move::Movement>();
-		registerComponent<Collision::Collider>();
+		////Register physics components
+		//ecs_coordinator->registerComponent<Transform::Velocity>();
+		//ecs_coordinator->registerComponent<Transform::Transform>();
+		//ecs_coordinator->registerComponent<Transform::Runtime_Transform>();
+		//ecs_coordinator->registerComponent<Move::Movement>();
+		//ecs_coordinator->registerComponent<Collision::Collider>();
 
-		//Register animation components
-		registerComponent<Animation::cBase>();
-		registerComponent<Animation::cSprite>();
+		////Register animation components
+		//ecs_coordinator->registerComponent<Animation::cBase>();
+		//ecs_coordinator->registerComponent<Animation::cSprite>();
 
-		//Register render components
-		registerComponent<Render::Shape>();
-		registerComponent<Render::Texture>();
-		registerComponent<Render::Color>();
-		registerComponent<Render::Cam>();
-		registerComponent<Render::Text>();
-		registerComponent<Render::Debug>();
+		////Register render components
+		//ecs_coordinator->registerComponent<Render::Shape>();
+		//ecs_coordinator->registerComponent<Render::Texture>();
+		//ecs_coordinator->registerComponent<Render::Color>();
+		//ecs_coordinator->registerComponent<Render::Cam>();
+		//ecs_coordinator->registerComponent<Render::Text>();
+		//ecs_coordinator->registerComponent<Render::Debug>();
 
-		//Register audio components
-		registerComponent<Audio::cAudio>();
+		////Register audio components
+		//ecs_coordinator->registerComponent<Audio::cAudio>();
 	}
 
 	void Core::Engine::registerDefSystems() {
-		//Register input manager
-		registerSystem<Input::Manager>(Input::Manager::getInstance());
-		accessSystem<Input::Manager>()->setComponentsLinked(false);
-		addSystemComponentType<Input::Manager>(getComponentType<Input::Key>());
-		addSystemComponentType<Input::Manager>(getComponentType<Input::Mouse>());
-		addSystemComponentType<Input::Manager>(getComponentType<Transform::Runtime_Transform>());
+		////Register input manager
+		//ecs_coordinator->registerSystem<Input::Manager>(Input::Manager::getInstance());
+		//ecs_coordinator->accessSystem<Input::Manager>()->setComponentsLinked(false);
+		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Key>());
+		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Mouse>());
+		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Transform::Runtime_Transform>());
 
-		//Register physics manager
-		registerSystem<Physics::Manager>(Physics::Manager::getInstance());
-		accessSystem<Physics::Manager>()->setComponentsLinked(false);
-		addSystemComponentType<Physics::Manager>(getComponentType<Transform::Velocity>());
-		addSystemComponentType<Physics::Manager>(getComponentType<Transform::Runtime_Transform>());
-		addSystemComponentType<Physics::Manager>(getComponentType<Transform::Transform>());
-		addSystemComponentType<Physics::Manager>(getComponentType<Move::Movement>());
-		addSystemComponentType<Physics::Manager>(getComponentType <Collision::Collider>());
+		////Register physics manager
+		//ecs_coordinator->registerSystem<Physics::Manager>(Physics::Manager::getInstance());
+		//ecs_coordinator->accessSystem<Physics::Manager>()->setComponentsLinked(false);
+		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Transform::Velocity>());
+		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Transform::Runtime_Transform>());
+		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Transform::Transform>());
+		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Move::Movement>());
+		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType <Collision::Collider>());
 
-		//Register animation manager
-		registerSystem<Animation::Manager>(Animation::Manager::getInstance());
-		accessEvents()->addEventListeners<Animation::AnimationEvent>(accessSystem<Animation::Manager>());
-		addSystemComponentType<Animation::Manager>(getComponentType<Animation::cBase>());
-		addSystemComponentType<Animation::Manager>(getComponentType<Animation::cSprite>());
-		addSystemComponentType<Animation::Manager>(getComponentType<Render::Texture>());
+		////Register animation manager
+		//ecs_coordinator->registerSystem<Animation::Manager>(Animation::Manager::getInstance());
+		//accessEvents()->addEventListeners<Animation::AnimationEvent>(accessSystem<Animation::Manager>());
+		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Animation::cBase>());
+		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Animation::cSprite>());
+		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Render::Texture>());
 
-		//Register render manager
-		registerSystem<Render::Manager>(Render::Manager::getInstance());
-		accessSystem<Render::Manager>()->setComponentsLinked(false);
-		addSystemComponentType<Render::Manager>(getComponentType<Transform::Transform>());
-		addSystemComponentType<Render::Manager>(getComponentType<Render::Shape>());
-		addSystemComponentType<Render::Manager>(getComponentType<Render::Texture>());
-		addSystemComponentType<Render::Manager>(getComponentType<Render::Text>());
+		////Register render manager
+		//ecs_coordinator->registerSystem<Render::Manager>(Render::Manager::getInstance());
+		//ecs_coordinator->accessSystem<Render::Manager>()->setComponentsLinked(false);
+		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Transform::Transform>());
+		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Shape>());
+		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Texture>());
+		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Text>());
 
-		//Register audio manager
-		registerSystem<Audio::Manager>(Audio::Manager::getInstance());
-		addSystemComponentType<Audio::Manager>(getComponentType<Audio::cAudio>());
+		////Register audio manager
+		//ecs_coordinator->registerSystem<Audio::Manager>(Audio::Manager::getInstance());
+		//ecs_coordinator->addSystemComponentType<Audio::Manager>(getComponentType<Audio::cAudio>());
 	}
 
 	void Core::Engine::registerDefAssets() {
 		//Register shader
-		assets_manager->registerShader("base", "shaders/base.vert", "shaders/base.frag");
-		assets_manager->registerShader("texture", "shaders/texture.vert", "shaders/texture.frag");
+		//assets_manager->registerShader("base", "shaders/base.vert", "shaders/base.frag");
+		//assets_manager->registerShader("texture", "shaders/texture.vert", "shaders/texture.frag");
 
 		////Register models
 		//assets_manager->registerModel("square", "assets/meshes/square.txt");
@@ -107,15 +107,21 @@ namespace NIKESAURUS {
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps) {
-		entity_manager = std::make_unique<Entity::Manager>();
-		component_manager = std::make_unique<Component::Manager>();
-		system_manager = std::make_unique<System::Manager>();
-		windows_manager = std::make_unique<Windows::Manager>();
-		scenes_manager = std::make_unique<Scenes::Manager>();
-		events_manager = std::make_unique<Events::Manager>();
-		assets_manager = std::make_unique<Assets::Manager>();
-		debug_manager = std::make_unique<Debug::Manager>();
-		seri_manager = std::make_unique<Serialization::Manager>();
+		provideService(std::make_shared<Windows::Manager>());
+		provideService(std::make_shared<Scenes::Manager>());
+		provideService(std::make_shared<Events::Manager>());
+		provideService(std::make_shared<Assets::Manager>());
+		provideService(std::make_shared<Debug::Manager>());
+		provideService(std::make_shared<Coordinator::Manager>());
+
+		windows_manager = getService<Windows::Manager>();
+		scenes_manager = getService<Scenes::Manager>();
+		ecs_coordinator = getService<Coordinator::Manager>();
+
+		//Create console
+		#ifndef NDEBUG
+		windows_manager->createConsole();
+		#endif
 
 		//Read config file
 		windows_manager->readConfigFile(file_path);
@@ -150,10 +156,10 @@ namespace NIKESAURUS {
 			windows_manager->setWinTitle(windows_manager->getWinTitle() +
 				" | " + scenes_manager->getCurrSceneID() +
 				" | " + std::to_string(windows_manager->getCurrentFPS()) + " fps" +
-				" | " + std::to_string(entity_manager->getEntityCount()) + " entities");
+				" | " + std::to_string(ecs_coordinator->getEntitiesCount()) + " entities");
 
 			//Update all systems
-			system_manager->updateSystems();
+			ecs_coordinator->updateSystems();
 
 			//Update scenes manager
 			scenes_manager->update();
@@ -168,51 +174,5 @@ namespace NIKESAURUS {
 			//Control FPS
 			windows_manager->controlFPS();
 		}
-	}
-
-	/*****************************************************************//**
-	* Access Windows
-	*********************************************************************/
-	std::unique_ptr<Windows::Manager>& Core::Engine::accessWindow() {
-		return windows_manager;
-	}
-
-	/*****************************************************************//**
-	* Access Scenes
-	*********************************************************************/
-	std::unique_ptr<Scenes::Manager>& Core::Engine::accessScenes() {
-		return scenes_manager;
-	}
-
-	/*****************************************************************//**
-	* Access Events
-	*********************************************************************/
-	std::unique_ptr<Events::Manager>& Core::Engine::accessEvents() {
-		return events_manager;
-	}
-
-	/*****************************************************************//**
-	* Access Assets
-	*********************************************************************/
-	std::unique_ptr<Assets::Manager>& Core::Engine::accessAssets() {
-		return assets_manager;
-	}
-
-	/*****************************************************************//**
-	* Access Debug
-	*********************************************************************/
-
-	std::unique_ptr<Debug::Manager>& Core::Engine::accessDebug()
-	{
-		return debug_manager;
-	}
-
-	/*****************************************************************//**
-	* Access Serialization
-	*********************************************************************/
-
-	std::unique_ptr<Serialization::Manager>& Core::Engine::accessSeri()
-	{
-		return seri_manager;
 	}
 }

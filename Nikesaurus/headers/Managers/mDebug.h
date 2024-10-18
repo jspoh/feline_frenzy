@@ -12,7 +12,7 @@
 #ifndef DEBUG_MANAGER_HPP
 #define DEBUG_MANAGER_HPP
 
-#include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/ECS/mSystem.h"
 
 namespace Debug
 {

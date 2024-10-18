@@ -12,19 +12,22 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+//Services
 #include "../headers/Managers/mWindows.h"
 #include "../headers/Managers/mScenes.h"
 #include "../headers/Managers/mEvents.h"
 #include "../headers/Managers/mAssets.h"
 #include "../headers/Managers/mDebug.h"
 #include "../headers/Managers/mSerialization.h"
-
 #include "../headers/Managers/ECS/mCoordinator.h"
 
 namespace NIKESAURUS {
 	namespace Core {
 
-		class Engine {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
+
+		class NIKESAURUS_API Engine {
 		private:
 
 			//Default Constructor For Engine
@@ -37,13 +40,13 @@ namespace NIKESAURUS {
 			//Destructor
 			~Engine();
 
-			//Standalone Managers
-			std::unique_ptr<Windows::Manager> windows_manager;
-			std::unique_ptr<Scenes::Manager> scenes_manager;
-			std::unique_ptr<Events::Manager> events_manager;
-			std::unique_ptr<Assets::Manager> assets_manager;
-			std::unique_ptr<Debug::Manager> debug_manager;
-			std::unique_ptr<Serialization::Manager> seri_manager;
+			//Map of services
+			static std::unordered_map<std::string, std::shared_ptr<void>> services;
+
+			//Dependency Managers
+			std::shared_ptr<Windows::Manager> windows_manager;
+			std::shared_ptr<Scenes::Manager> scenes_manager;
+			std::shared_ptr<Coordinator::Manager> ecs_coordinator;
 
 			//Register default components
 			void registerDefComponents();
@@ -75,36 +78,42 @@ namespace NIKESAURUS {
 			/*****************************************************************//**
 			* Access Window Functions
 			*********************************************************************/
-			std::unique_ptr<Windows::Manager>& accessWindow();
+			template<typename T>
+			static void provideService(std::shared_ptr<T> service) {
 
-			/*****************************************************************//**
-			* Access Scene Functions
-			*********************************************************************/
-			std::unique_ptr<Scenes::Manager>& accessScenes();
+				//Get service name for mapping
+				std::string service_name{ typeid(T).name() };
 
-			/*****************************************************************//**
-			* Access Events
-			*********************************************************************/
-			std::unique_ptr<Events::Manager>& accessEvents();
+				//Check if service has been provided before
+				if (services.find(service_name) != services.end()) {
+					throw std::runtime_error("Service already provided.");
+				}
 
-			/*****************************************************************//**
-			* Assets Methods
-			*********************************************************************/
-			std::unique_ptr<Assets::Manager>& accessAssets();
+				//Insert into services map
+				services.insert({ service_name, std::move(service) });
+			}
 
-			/*****************************************************************//**
-			* Debug Methods
-			*********************************************************************/
-			std::unique_ptr<Debug::Manager>& accessDebug();
+			template<typename T>
+			static std::shared_ptr<T> getService() {
 
-			/*****************************************************************//**
-			* Serialization Methods
-			*********************************************************************/
-			std::unique_ptr<Serialization::Manager>& accessSeri();
+				//Get service name for searching
+				std::string service_name{ typeid(T).name() };
+
+				//Check if service exists
+				if (services.find(service_name) == services.end()) {
+					throw std::runtime_error("Service doesnt exist.");
+				}
+
+				//Return service
+				return std::static_pointer_cast<T>(services.at(service_name));
+			}
 		};
 
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+
 		//Predefined name for core engine
-#define NIKEEngine Core::Engine::getInstance()
+		#define NIKEEngine Core::Engine::getInstance()
 	}
 }
 

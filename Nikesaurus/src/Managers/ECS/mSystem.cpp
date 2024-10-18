@@ -9,7 +9,8 @@
  *********************************************************************/
 
 #include "../headers/Core/stdafx.h"
-#include "../headers/Managers/ECS/mCoordinator.h"
+#include "../headers/Managers/ECS/mSystem.h"
+#include "../headers/Core/Engine.h"
 
 /*****************************************************************//**
 * ISystem
@@ -155,7 +156,7 @@ namespace NIKESAURUS {
 		if (time_since_last_call >= 4000)
 		{
 			// Call to calculate and display system runtime percentage
-			NIKEEngine.accessDebug()->systemRuntimePercentage(total_game_loop_time, system_times, systems);
+			NIKEEngine.getService<Debug::Manager>()->systemRuntimePercentage(total_game_loop_time, system_times, systems);
 
 			// Update the last debug call time to the current time
 			last_call_time = current_time;

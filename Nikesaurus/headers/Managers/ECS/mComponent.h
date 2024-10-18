@@ -15,17 +15,11 @@
 namespace NIKESAURUS {
 	namespace Component {
 
-		//Component Signature Type
-		using Type = uint8_t;
-
-		//Max components to be stored in a signature
-		const Type MAX = 64;
-
-		//Nested components signature
-		using Signature = std::bitset<MAX>;
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
 		//Component Array interface
-		class IArray {
+		class NIKESAURUS_API IArray {
 		private:
 		public:
 			virtual ~IArray() = default;
@@ -39,7 +33,7 @@ namespace NIKESAURUS {
 
 		//Component Array ( Entity Map of unique components of type T )
 		template<typename T>
-		class Array : public IArray {
+		class NIKESAURUS_API Array : public IArray {
 		private:
 
 			//Unique component of same type identified by Entity type
@@ -111,7 +105,7 @@ namespace NIKESAURUS {
 		};
 
 		//Manager of the component Array
-		class Manager {
+		class NIKESAURUS_API Manager {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
@@ -229,6 +223,9 @@ namespace NIKESAURUS {
 			//Remove entity from all components
 			void entityDestroyed(Entity::Type entity);
 		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
 	}
 }
 
