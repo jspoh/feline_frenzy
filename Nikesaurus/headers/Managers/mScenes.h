@@ -12,94 +12,102 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
-#include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/ECS/mSystem.h"
 #include "../headers/Components/cScene.h"
 
-namespace Scenes {
+namespace NIKESAURUS {
+	namespace Scenes {
 
-	//Scene interface
-	class IScene {
-	public:
-		//Default constructor
-		IScene() = default;
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		//Phases
-		virtual void load() = 0;
-		virtual void init() = 0;
-		virtual void exit() = 0;
-		virtual void unload() = 0;
+		//Scene interface
+		class NIKESAURUS_API IScene {
+		public:
+			//Default constructor
+			IScene() = default;
 
-		//Default virtual destructor
-		virtual ~IScene() = default;
-	};
+			//Phases
+			virtual void load() = 0;
+			virtual void init() = 0;
+			virtual void exit() = 0;
+			virtual void unload() = 0;
 
-	//Scenes manager
-	class Manager {
-	private:
-		//Delete Copy Constructor & Copy Assignment
-		Manager(Manager const& copy) = delete;
-		void operator=(Manager const& copy) = delete;
+			//Default virtual destructor
+			virtual ~IScene() = default;
+		};
 
-		//Map of scene files ( To be implemented )
-		std::unordered_map<std::string, std::shared_ptr<IScene>> scenes;
+		//Scenes manager
+		class NIKESAURUS_API Manager {
+		private:
+			//Delete Copy Constructor & Copy Assignment
+			Manager(Manager const& copy) = delete;
+			void operator=(Manager const& copy) = delete;
 
-		//Current scene
-		std::shared_ptr<IScene> curr_scene;
+			//Map of scene files ( To be implemented )
+			std::unordered_map<std::string, std::shared_ptr<IScene>> scenes;
 
-		//Prev scene
-		std::shared_ptr<IScene> prev_scene;
+			//Current scene
+			std::shared_ptr<IScene> curr_scene;
 
-		//Scene event queue
-		std::shared_ptr<Scenes::SceneEvent> event_queue;
+			//Prev scene
+			std::shared_ptr<IScene> prev_scene;
 
-		//Init starting scene
-		void initScene(std::string scene_id);
+			//Scene event queue
+			std::shared_ptr<Scenes::SceneEvent> event_queue;
 
-		//Change scene
-		void changeScene(std::string scene_id);
+			//Init starting scene
+			void initScene(std::string scene_id);
 
-		//Restart scene
-		void restartScene();
+			//Change scene
+			void changeScene(std::string scene_id);
 
-		//Go To Previous scene
-		void previousScene();
+			//Restart scene
+			void restartScene();
 
-	public:
+			//Go To Previous scene
+			void previousScene();
 
-		//Default Constructor
-		Manager() = default;
+		public:
 
-		//Singleton Of Manager Class
-		static std::shared_ptr<Manager> getInstance() {
-			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
-			return instance;
-		}
+			//Default Constructor
+			Manager() = default;
 
-		//Register scenes
-		template<typename T>
-		void registerScenes(std::string const& scene_id) {
-
-			//New scene
-			std::shared_ptr<T> scene{ std::make_shared<T>() };
-
-			//Construct scene obj
-			scenes.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
-
-			//Default starting state will be the first state registered
-			if (!curr_scene) {
-				initScene(scene_id);
+			//Singleton Of Manager Class
+			static std::shared_ptr<Manager> getInstance() {
+				static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+				return instance;
 			}
-		}
 
-		//Get Current Scene
-		std::string getCurrSceneID() const;
+			//Register scenes
+			template<typename T>
+			void registerScenes(std::string const& scene_id) {
 
-		//Queue scene event
-		void queueSceneEvent(Scenes::SceneEvent event);
+				//New scene
+				std::shared_ptr<T> scene{ std::make_shared<T>() };
 
-		//Update scene event
-		void update();
-	};
+				//Construct scene obj
+				scenes.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
+
+				//Default starting state will be the first state registered
+				if (!curr_scene) {
+					initScene(scene_id);
+				}
+			}
+
+			//Get Current Scene
+			std::string getCurrSceneID() const;
+
+			//Queue scene event
+			void queueSceneEvent(Scenes::SceneEvent event);
+
+			//Update scene event
+			void update();
+		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif // !M_SCENE_HPP

@@ -14,32 +14,40 @@
 
 #include "../headers/Core/stdafx.h"
 
-namespace Collision {
+namespace NIKESAURUS {
+    namespace Collision {
 
-    struct Collider {
-        bool active = false; // Tracks if collider is in use (collision enabled or not)
-        //Vector2 position;  // Position of the object (X, Y) world coordinates
-        //Vector2 size;      // Size (width, height)
-        float radius = 0.0f; // Optional for circle colliders
-        //Vector2 velocity; // Current velocity
+        //Temporary Disable DLL Export Warning
+        #pragma warning(disable: 4251)
 
-        // For bounding box
-        Vector2 rect_min;
-        Vector2 rect_max;
+        struct NIKESAURUS_API Collider {
+            bool active = false; // Tracks if collider is in use (collision enabled or not)
+            //Vector2 position;  // Position of the object (X, Y) world coordinates
+            //Vector2 size;      // Size (width, height)
+            float radius = 0.0f; // Optional for circle colliders
+            //Vector2 velocity; // Current velocity
 
-        // Which sides of bounding box are colliding/"blocked"
-        bool left = false;
-        bool right = false;
-        bool top = false;
-        bool bottom = false;
+            // For bounding box
+            Vector2 rect_min;
+            Vector2 rect_max;
 
-        bool bounceFlag = false;
+            // Which sides of bounding box are colliding/"blocked"
+            bool left = false;
+            bool right = false;
+            bool top = false;
+            bool bottom = false;
 
-        // For bounding sphere...unused for now
-        Vector2 cir_min;
-        Vector2 cir_max;
-    };
+            bool bounceFlag = false;
 
+            // For bounding sphere...unused for now
+            Vector2 cir_min;
+            Vector2 cir_max;
+        };
+
+        //Re-enable DLL Export warning
+        #pragma warning(default: 4251)
+
+    }
 }
 
 #endif // C_COLLISION_HPP

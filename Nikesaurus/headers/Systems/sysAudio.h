@@ -12,7 +12,7 @@
 #ifndef AUDIOSYS_HPP
 #define AUDIOSYS_HPP
 
-#include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/ECS/mSystem.h"
 
 /************************************
 * SOME NOTES TO TAKE NOTE OF:

@@ -14,20 +14,29 @@
 
 #include "../headers/Core/stdafx.h"
 
-namespace Scenes {
+namespace NIKESAURUS {
+	namespace Scenes {
 
-	//Scene manager actions
-	enum class Actions {
-		CHANGE = 0,
-		RESTART,
-		PREVIOUS,
-	};
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-	//Change Scene Event
-	struct SceneEvent {
-		Actions scene_action;
-		std::string next_scene_id;
-	};
+		//Scene manager actions
+		enum class NIKESAURUS_API Actions {
+			CHANGE = 0,
+			RESTART,
+			PREVIOUS,
+		};
+
+		//Change Scene Event
+		struct NIKESAURUS_API SceneEvent {
+			Actions scene_action;
+			std::string next_scene_id;
+		};
+
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif // !C_SCENES_HPP

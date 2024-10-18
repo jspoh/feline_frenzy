@@ -15,97 +15,105 @@
 #include "../headers/Systems/sysAudio.h"
 #include "../headers/Components/cRender.h"
 
-namespace Assets
-{
-	class Manager
+namespace NIKESAURUS {
+	namespace Assets
 	{
-	public:
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		//Default constructor
-		Manager() = default;
+		class NIKESAURUS_API Manager
+		{
+		public:
 
-		// Dtor
-		~Manager();
+			//Default constructor
+			Manager() = default;
 
-		/*****************************************************************//**
-		* Font
-		*********************************************************************/
-		//Register font
-		void registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
+			// Dtor
+			~Manager();
 
-		//Get font
-		std::unordered_map<unsigned char, Render::Character> const& getFont(std::string const& font_id) const;
+			/*****************************************************************//**
+			* Font
+			*********************************************************************/
+			//Register font
+			void registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
 
-		/*****************************************************************//**
-		* Render ( Texture, Model, Shaders )
-		*********************************************************************/
+			//Get font
+			std::unordered_map<unsigned char, Render::Character> const& getFont(std::string const& font_id) const;
 
-		//Load shaders
-		void registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
-		
-		//Check shader exits
-		bool checkShader(std::string const& model_id);
+			/*****************************************************************//**
+			* Render ( Texture, Model, Shaders )
+			*********************************************************************/
 
-		//Get shader
-		unsigned int getShader(std::string const& shader_id);
+			//Load shaders
+			void registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
 
-		//Load model
-		void registerModel(std::string const& model_id, std::string const& file_path);
+			//Check shader exits
+			bool checkShader(std::string const& model_id);
 
-		//Check model exits
-		bool checkModel(std::string const& model_id);
+			//Get shader
+			unsigned int getShader(std::string const& shader_id);
 
-		//Get model
-		std::shared_ptr<Render::Model> getModel(std::string const& model_id);
+			//Load model
+			void registerModel(std::string const& model_id, std::string const& file_path);
 
-		//Load texture
-		void registerTexture(std::string const& texture_id, std::string const& file_path);
+			//Check model exits
+			bool checkModel(std::string const& model_id);
 
-		//Get texture
-		unsigned int getTexture(std::string const& texture_id);
+			//Get model
+			std::shared_ptr<Render::Model> getModel(std::string const& model_id);
 
-		/*****************************************************************//**
-		* Audio
-		*********************************************************************/
+			//Load texture
+			void registerTexture(std::string const& texture_id, std::string const& file_path);
 
-		// Load sound audio
-		void registerSoundAudio(std::string const& file_path, std::string const& audio_tag);
+			//Get texture
+			unsigned int getTexture(std::string const& texture_id);
 
-		//Load music audio
-		void registerMusicAudio(std::string const& file_path, std::string const& audio_tag);
+			/*****************************************************************//**
+			* Audio
+			*********************************************************************/
 
-		//Create audio group
-		void createAudioGroup(std::string const& audio_group_tag);
+			// Load sound audio
+			void registerSoundAudio(std::string const& file_path, std::string const& audio_tag);
 
-		//Get audio
-		std::shared_ptr<FMOD::Sound> getAudio(std::string const& audio_tag);
+			//Load music audio
+			void registerMusicAudio(std::string const& file_path, std::string const& audio_tag);
 
-		//Get audio group
-		std::shared_ptr<FMOD::ChannelGroup> getAudioGroup(std::string const& tag);
+			//Create audio group
+			void createAudioGroup(std::string const& audio_group_tag);
 
-	private:
-		//Delete Copy Constructor & Copy Assignment
-		Manager(Manager const& copy) = delete;
-		void operator=(Manager const& copy) = delete;
+			//Get audio
+			std::shared_ptr<FMOD::Sound> getAudio(std::string const& audio_tag);
 
-		//Maps to fonts
-		std::unordered_map<std::string, std::unordered_map<unsigned char, Render::Character>> fonts_list;
+			//Get audio group
+			std::shared_ptr<FMOD::ChannelGroup> getAudioGroup(std::string const& tag);
 
-		//Map to models for render
-		std::unordered_map<std::string, std::shared_ptr<Render::Model>> models_list;
+		private:
+			//Delete Copy Constructor & Copy Assignment
+			Manager(Manager const& copy) = delete;
+			void operator=(Manager const& copy) = delete;
 
-		// Map to textures for render
-		std::unordered_map<std::string, unsigned int> textures_list;
+			//Maps to fonts
+			std::unordered_map<std::string, std::unordered_map<unsigned char, Render::Character>> fonts_list;
 
-		//Map to shaders for render
-		std::unordered_map<std::string, unsigned int> shaders_list;
+			//Map to models for render
+			std::unordered_map<std::string, std::shared_ptr<Render::Model>> models_list;
 
-		//Map of audios
-		std::unordered_map<std::string, Audio::NE_AUDIO> audio_list;
+			// Map to textures for render
+			std::unordered_map<std::string, unsigned int> textures_list;
 
-		//Map of audio groups
-		std::unordered_map<std::string, Audio::NE_AUDIO_GROUP> audio_group_list;
-	};
+			//Map to shaders for render
+			std::unordered_map<std::string, unsigned int> shaders_list;
+
+			//Map of audios
+			std::unordered_map<std::string, Audio::NE_AUDIO> audio_list;
+
+			//Map of audio groups
+			std::unordered_map<std::string, Audio::NE_AUDIO_GROUP> audio_group_list;
+		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif

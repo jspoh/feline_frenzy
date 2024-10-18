@@ -11,10 +11,8 @@
     <ClCompile Include="src\Math\Vector2.cpp" />
     <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
-    <ClCompile Include="src\Managers\mAssets.cpp" />
     <ClCompile Include="src\Managers\mEvents.cpp" />
     <ClCompile Include="src\Managers\mWindows.cpp" />
-    <ClCompile Include="src\Managers\mSerialization.cpp" />
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Utility\uSystems.cpp" />
     <ClCompile Include="src\Core\App.cpp" />
@@ -38,13 +36,11 @@
     <ClInclude Include="headers\Math\Vector4.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
-    <ClInclude Include="headers\Managers\mAssets.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cMove.h" />
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
-    <ClInclude Include="headers\Managers\mSerialization.h" />
     <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Components\cScene.h" />
     <ClInclude Include="headers\Managers\mDebug.h" />

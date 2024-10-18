@@ -14,63 +14,49 @@
 
 #include "../headers/Core/stdafx.h"
 
-namespace Input {
-	//Input Mode
-	enum class TriggerMode {
-		CHECKED = 0,
-		TRIGGERED,
-		RELEASED
-	};
+namespace NIKESAURUS {
+	namespace Input {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-	struct Key {
-		//Input trigger mode
-		TriggerMode mode;
+		//Input Mode
+		enum class NIKESAURUS_API TriggerMode {
+			CHECKED = 0,
+			TRIGGERED,
+			RELEASED
+		};
 
-		//Key type
-		int key_type;
+		struct NIKESAURUS_API Key {
+			//Input trigger mode
+			TriggerMode mode;
 
-		//Output result
-		bool b_output;
-	};
+			//Key type
+			int key_type;
 
-	struct Mouse {
-		//Input trigger mode
-		TriggerMode mode{};
+			//Output result
+			bool b_output;
+		};
 
-		//Pos of button
-		Vector2 button_pos;
+		struct NIKESAURUS_API Mouse {
+			//Input trigger mode
+			TriggerMode mode{};
 
-		//Button type triggered
-		int button_type{};
+			//Pos of button
+			Vector2 button_pos;
 
-		//Output result
-		bool b_output = false;
+			//Button type triggered
+			int button_type{};
 
-		//most mousewheels will only scroll on y axis
-		Vector2 scroll;
-	};
+			//Output result
+			bool b_output = false;
 
-	////Key Event
-	//struct KeyEve : public Events::IEvent {
-	//public:
-	//	Mode animation_action;
-	//	std::string animator_id;
+			//most mousewheels will only scroll on y axis
+			Vector2 scroll;
+		};
 
-	//	//Constructor
-	//	AnimationEvent(Mode action, std::string const& id)
-	//		: animation_action{ action }, animator_id{ id } {}
-	//};
-
-	////Mouse Event
-	//struct AnimationEvent : public Events::IEvent {
-	//public:
-	//	Mode animation_action;
-	//	std::string animator_id;
-
-	//	//Constructor
-	//	AnimationEvent(Mode action, std::string const& id)
-	//		: animation_action{ action }, animator_id{ id } {}
-	//};
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif // !C_INPUT_HPP

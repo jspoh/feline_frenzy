@@ -13,65 +13,73 @@
 
 #include "../headers/Core/stdafx.h"
 
-namespace Render {
+namespace NIKESAURUS {
+	namespace Render {
 
-	struct Cam {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		std::string id;
+		struct NIKESAURUS_API Cam {
 
-		Vector2 position;	// Position of camera
+			std::string id;
 
-		float height;	// represents how much of the world is visible vertically (zoom level).
-	};
+			Vector2 position;	// Position of camera
 
-	struct Color {
-		Vector3 color;
-		float alpha;
-	};
+			float height;	// represents how much of the world is visible vertically (zoom level).
+		};
 
-	struct Character {
-		unsigned int texture;	// Texture ID for the character
-		Vector2 size;			// Size of the character
-		Vector2 bearing;		// Offset from the baseline to the top-left of the character
-		unsigned int advance;   // Horizontal offset to advance to the next character
-	};
+		struct NIKESAURUS_API Color {
+			Vector3 color;
+			float alpha;
+		};
 
-	struct Text {
-		std::string font_ref;
-		std::string text;
-		Color color;
-		Vector2 position;
-		float scale;
-	};
+		struct NIKESAURUS_API Character {
+			unsigned int texture;	// Texture ID for the character
+			Vector2 size;			// Size of the character
+			Vector2 bearing;		// Offset from the baseline to the top-left of the character
+			unsigned int advance;   // Horizontal offset to advance to the next character
+		};
 
-	struct Shape {
-		std::string model_ref;
-		Matrix33::Matrix_33 x_form;
-		Color color;
-	};
+		struct NIKESAURUS_API Text {
+			std::string font_ref;
+			std::string text;
+			Color color;
+			Vector2 position;
+			float scale;
+		};
 
-	struct Texture {
-		std::string texture_ref;
-		Matrix33::Matrix_33 x_form;
-		Color color;
-		Vector2 texture_size;	// Spritesheet size ( before mapping )
-		Vector2 frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
-		Vector2 frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
-	};
+		struct NIKESAURUS_API Shape {
+			std::string model_ref;
+			Matrix33::Matrix_33 x_form;
+			Color color;
+		};
 
-	struct Model {
+		struct NIKESAURUS_API Texture {
+			std::string texture_ref;
+			Matrix33::Matrix_33 x_form;
+			Color color;
+			Vector2 texture_size;	// Spritesheet size ( before mapping )
+			Vector2 frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
+			Vector2 frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
+		};
 
-		unsigned int vaoid;
-		unsigned int vboid;
-		unsigned int eboid;
+		struct NIKESAURUS_API Model {
 
-		unsigned int primitive_type;
-		unsigned int draw_count;
-	};
+			unsigned int vaoid;
+			unsigned int vboid;
+			unsigned int eboid;
 
-	struct Debug {
-		// TEMP FIX FOR DEBUG MODE
-	};
+			unsigned int primitive_type;
+			unsigned int draw_count;
+		};
+
+		struct Debug {
+			// TEMP FIX FOR DEBUG MODE
+		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif // !C_RENDER_HPP

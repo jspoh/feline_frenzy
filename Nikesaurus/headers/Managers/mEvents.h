@@ -12,79 +12,87 @@
 #ifndef M_EVENTS_HPP
 #define M_EVENTS_HPP
 
-namespace Events {
+namespace NIKESAURUS {
+	namespace Events {
 
-	//Event interface
-	class IEvent {
-	public:
-		//Default virtual destructor
-		virtual ~IEvent() = default;
-	};
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-	//Base listener class
-	class BaseEventListener {
-	public:
-		//Default virtual destructor
-		virtual ~BaseEventListener() = default;
+		//Event interface
+		class NIKESAURUS_API IEvent {
+		public:
+			//Default virtual destructor
+			virtual ~IEvent() = default;
+		};
 
-		//Event execution
-		virtual void execute(std::shared_ptr<IEvent> event) = 0;
-	};
+		//Base listener class
+		class NIKESAURUS_API BaseEventListener {
+		public:
+			//Default virtual destructor
+			virtual ~BaseEventListener() = default;
 
-	//Event listener
-	template<typename T>
-	class IEventListener : public BaseEventListener {
-	public:
-		//Default virtual destructor
-		virtual ~IEventListener() = default;
+			//Event execution
+			virtual void execute(std::shared_ptr<IEvent> event) = 0;
+		};
 
-		//Virtual execute event
-		void execute(std::shared_ptr<IEvent> event) override {
-			auto casted_event = std::dynamic_pointer_cast<T>(event);
-			if(casted_event)
-			executeEvent(casted_event);
-		}
-
-		//Event execution
-		virtual void executeEvent(std::shared_ptr<T> event) = 0;
-	};
-
-	//Events manager
-	class Manager {
-	public:
-		//Type def container of event listeners
-		using EventListeners = std::vector<std::shared_ptr<BaseEventListener>>;
-
-	private:
-		//Delete Copy Constructor & Copy Assignment
-		Manager(Manager const& copy) = delete;
-		void operator=(Manager const& copy) = delete;
-
-		//Storage of event listeners
-		std::unordered_map<std::string, EventListeners> event_listeners;
-
-	public:
-		//Default constructor
-		Manager() = default;
-		
-		//Add listener
+		//Event listener
 		template<typename T>
-		void addEventListeners(std::shared_ptr<IEventListener<T>> listener) {
-			event_listeners[typeid(T).name()].push_back(listener);
-		}
+		class NIKESAURUS_API IEventListener : public BaseEventListener {
+		public:
+			//Default virtual destructor
+			virtual ~IEventListener() = default;
 
-		//Dispatch event
-		template<typename T>
-		void dispatchEvent(std::shared_ptr<T> new_event) {
-			assert(event_listeners.find(typeid(T).name()) != event_listeners.end() && "Event type not found");
-			auto& listeners = event_listeners.at(typeid(T).name());
-
-			//Dispatch to listener
-			for (auto& listener : listeners) {
-				listener->execute(new_event);
+			//Virtual execute event
+			void execute(std::shared_ptr<IEvent> event) override {
+				auto casted_event = std::dynamic_pointer_cast<T>(event);
+				if (casted_event)
+					executeEvent(casted_event);
 			}
-		}
-	};
+
+			//Event execution
+			virtual void executeEvent(std::shared_ptr<T> event) = 0;
+		};
+
+		//Events manager
+		class NIKESAURUS_API Manager {
+		public:
+			//Type def container of event listeners
+			using EventListeners = std::vector<std::shared_ptr<BaseEventListener>>;
+
+		private:
+			//Delete Copy Constructor & Copy Assignment
+			Manager(Manager const& copy) = delete;
+			void operator=(Manager const& copy) = delete;
+
+			//Storage of event listeners
+			std::unordered_map<std::string, EventListeners> event_listeners;
+
+		public:
+			//Default constructor
+			Manager() = default;
+
+			//Add listener
+			template<typename T>
+			void addEventListeners(std::shared_ptr<IEventListener<T>> listener) {
+				event_listeners[typeid(T).name()].push_back(listener);
+			}
+
+			//Dispatch event
+			template<typename T>
+			void dispatchEvent(std::shared_ptr<T> new_event) {
+				assert(event_listeners.find(typeid(T).name()) != event_listeners.end() && "Event type not found");
+				auto& listeners = event_listeners.at(typeid(T).name());
+
+				//Dispatch to listener
+				for (auto& listener : listeners) {
+					listener->execute(new_event);
+				}
+			}
+		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif // !M_EVENTS_HPP

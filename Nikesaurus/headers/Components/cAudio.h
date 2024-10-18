@@ -23,33 +23,39 @@
 /****************************************/
 
 
-namespace Audio {
+namespace NIKESAURUS {
+	namespace Audio {
 
-	struct cAudio
-	{
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		// Audio and audio group
-		NE_AUDIO audio;
+		struct NIKESAURUS_API cAudio
+		{
+			// Audio and audio group
+			NE_AUDIO audio;
 
-		NE_AUDIO_GROUP audio_group;
+			NE_AUDIO_GROUP audio_group;
 
-		// Bool to check if audio is played
-		bool is_played = false;
+			// Bool to check if audio is played
+			bool is_played = false;
 
-		// Bool to indicate loop
-		bool is_loop;
+			// Bool to indicate loop
+			bool is_loop;
 
-		// Volume 
-		float volume;
+			// Volume 
+			float volume;
 
-		// Pitch
-		float pitch;
+			// Pitch
+			float pitch;
 
-		// Ctor
-		cAudio(NE_AUDIO param_audio, NE_AUDIO_GROUP param_audio_group, float param_volume, float param_pitch, bool param_loop)
-			: audio{ param_audio }, audio_group{ param_audio_group }, is_played{ false }, is_loop{ param_loop }, volume{ param_volume }, pitch{ param_pitch } {}
-	};
+			// Ctor
+			cAudio(NE_AUDIO param_audio, NE_AUDIO_GROUP param_audio_group, float param_volume, float param_pitch, bool param_loop)
+				: audio{ param_audio }, audio_group{ param_audio_group }, is_played{ false }, is_loop{ param_loop }, volume{ param_volume }, pitch{ param_pitch } {}
+		};
 
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif

@@ -132,14 +132,14 @@ namespace NIKESAURUS {
 		//Set Target FPS
 		windows_manager->setTargetFPS(fps);
 
-		//Register Def Component
-		registerDefComponents();
+		////Register Def Component
+		//registerDefComponents();
 
-		//Register Def Systems
-		registerDefSystems();
+		////Register Def Systems
+		//registerDefSystems();
 
-		//Register Def Assets
-		registerDefAssets();
+		////Register Def Assets
+		//registerDefAssets();
 	}
 
 	void Core::Engine::run() {

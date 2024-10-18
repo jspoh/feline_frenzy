@@ -15,23 +15,31 @@
 
 #include "../headers/Core/stdafx.h"
 
-namespace Transform {
+namespace NIKESAURUS {
+	namespace Transform {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-	struct Transform {
-		Vector2 position;
-		Vector2 scale;
-		float rotation;
-	};
+		struct NIKESAURUS_API Transform {
+			Vector2 position;
+			Vector2 scale;
+			float rotation;
+		};
 
-	struct Runtime_Transform {
-		bool runtime_scale_up = false;
-		bool runtime_rotate = false;
-		bool runtime_scale_down = false;
-	};
+		struct NIKESAURUS_API Runtime_Transform {
+			bool runtime_scale_up = false;
+			bool runtime_rotate = false;
+			bool runtime_scale_down = false;
+		};
 
-	struct Velocity {
-		Vector2 velocity;
-	};
+		struct NIKESAURUS_API Velocity {
+			Vector2 velocity;
+		};
+
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif // !C_TRANSFORM_HPP

@@ -14,13 +14,15 @@
 
 #include "../headers/Core/stdafx.h"
 
-namespace Move {
-	struct Movement {
-		bool Up;
-		bool Down;
-		bool Left;
-		bool Right;
-	};
+namespace NIKESAURUS {
+	namespace Move {
+		struct NIKESAURUS_API Movement {
+			bool Up;
+			bool Down;
+			bool Left;
+			bool Right;
+		};
+	}
 }
 
 #endif // !C_MOVE_HPP

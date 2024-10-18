@@ -15,96 +15,104 @@
 #include "../headers/Core/stdafx.h"
 #include "../headers/Managers/mEvents.h"
 
-namespace Animation {
+namespace NIKESAURUS {
+	namespace Animation {
 
-	//Animation Modes
-	enum class Mode {
-		PAUSE = 0,
-		RESUME,
-		RESTART,
-		END
-	};
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-	//Animation Event
-	struct AnimationEvent : public Events::IEvent {
-	public:
-		Mode animation_action;
-		std::string animator_id;
+		//Animation Modes
+		enum class NIKESAURUS_API Mode {
+			PAUSE = 0,
+			RESUME,
+			RESTART,
+			END
+		};
 
-		//Constructor
-		AnimationEvent(Mode action, std::string const& id)
-			: animation_action{ action }, animator_id{ id } {}
-	};
+		//Animation Event
+		struct NIKESAURUS_API AnimationEvent : public Events::IEvent {
+		public:
+			Mode animation_action;
+			std::string animator_id;
 
-	//Sprite event
-	struct SpriteEvent {
-		Vector2 new_start_index;
-		Vector2 new_end_index;
-		std::string animator_id;
-		int num_animations;
-		int mouse_type; // -1 if using mouse
-		int key_type; // -1 if using key
+			//Constructor
+			AnimationEvent(Mode action, std::string const& id)
+				: animation_action{ action }, animator_id{ id } {}
+		};
 
-		//Boolean control
-		bool animation_ongoing;
+		//Sprite event
+		struct NIKESAURUS_API SpriteEvent {
+			Vector2 new_start_index;
+			Vector2 new_end_index;
+			std::string animator_id;
+			int num_animations;
+			int mouse_type; // -1 if using mouse
+			int key_type; // -1 if using key
 
-		//Constructor
-		SpriteEvent(Vector2 const& new_start, Vector2 const& new_end, std::string const& id, int num_animations, int mouse_type, int key_type)
-			: new_start_index{ new_start }, new_end_index{ new_end }, animator_id{ id }, num_animations{ num_animations }, mouse_type{ mouse_type }, key_type{ key_type }, animation_ongoing{ false } {}
-	};
+			//Boolean control
+			bool animation_ongoing;
 
-	struct cBase {
-		//Animation Tracker ( Infinite number of animations if set to 0 )
-		int animations_to_complete;
+			//Constructor
+			SpriteEvent(Vector2 const& new_start, Vector2 const& new_end, std::string const& id, int num_animations, int mouse_type, int key_type)
+				: new_start_index{ new_start }, new_end_index{ new_end }, animator_id{ id }, num_animations{ num_animations }, mouse_type{ mouse_type }, key_type{ key_type }, animation_ongoing{ false } {}
+		};
 
-		//Completed animations
-		int completed_animations;
+		struct NIKESAURUS_API cBase {
+			//Animation Tracker ( Infinite number of animations if set to 0 )
+			int animations_to_complete;
 
-		//Animation state
-		bool b_animation_stop;
+			//Completed animations
+			int completed_animations;
 
-		//Animation state
-		bool b_animation_finished;
+			//Animation state
+			bool b_animation_stop;
 
-		//PingPong animation
-		bool b_pingpong;
+			//Animation state
+			bool b_animation_finished;
 
-		//Reverse animation
-		bool b_reverse;
+			//PingPong animation
+			bool b_pingpong;
 
-		//Animation Speed
-		float animation_speed;
+			//Reverse animation
+			bool b_reverse;
 
-		//Timer
-		Utility::Clock timer;
+			//Animation Speed
+			float animation_speed;
 
-		//Animator identifier
-		std::string animator_id;
+			//Timer
+			Utility::Clock timer;
 
-		//Constructor
-		cBase(std::string const& animator_id, int animations_to_complete, float animation_speed, bool pingpong_mode = false)
-			: animator_id{ animator_id }, animations_to_complete{ animations_to_complete }, completed_animations{ 0 }, b_animation_stop{ false },
-			b_animation_finished{ false }, b_pingpong{ pingpong_mode }, b_reverse{ false }, animation_speed{ animation_speed }, timer() {}
-	};
+			//Animator identifier
+			std::string animator_id;
 
-	struct cSprite {
+			//Constructor
+			cBase(std::string const& animator_id, int animations_to_complete, float animation_speed, bool pingpong_mode = false)
+				: animator_id{ animator_id }, animations_to_complete{ animations_to_complete }, completed_animations{ 0 }, b_animation_stop{ false },
+				b_animation_finished{ false }, b_pingpong{ pingpong_mode }, b_reverse{ false }, animation_speed{ animation_speed }, timer() {}
+		};
 
-		//Sprite sheet Size ( cols x rows )
-		Vector2 sheet_size;
+		struct NIKESAURUS_API cSprite {
 
-		//Index Tracker
-		Vector2 curr_index;
+			//Sprite sheet Size ( cols x rows )
+			Vector2 sheet_size;
 
-		//Start index
-		Vector2 start_index;
+			//Index Tracker
+			Vector2 curr_index;
 
-		//End index
-		Vector2 end_index;
+			//Start index
+			Vector2 start_index;
 
-		//Constructor
-		cSprite(Vector2&& sheet_size, Vector2&& start_index, Vector2&& end_index)
-			: sheet_size{ sheet_size }, curr_index{ start_index}, start_index{ start_index }, end_index{ end_index } {}
-	};
+			//End index
+			Vector2 end_index;
+
+			//Constructor
+			cSprite(Vector2&& sheet_size, Vector2&& start_index, Vector2&& end_index)
+				: sheet_size{ sheet_size }, curr_index{ start_index }, start_index{ start_index }, end_index{ end_index } {}
+		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif //!C_ANIMATION_HPP
