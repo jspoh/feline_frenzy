@@ -10,29 +10,40 @@
 #pragma once
 
 namespace NIKESAURUS {
+	template<typename T>
 	class NIKESAURUS_API Vector3 {
+	private:
+		using type = T;
 	public:
-		float x, y, z;
+		type x, y, z;
 
 		Vector3() : x(0), y(0), z(0) {}
-		Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+		Vector3(type x, type y, type z) : x(x), y(y), z(z) {}
 
 		Vector3 normalize();
 		Vector3 normalized() const;
 
 		Vector3 operator+(const Vector3& rhs) const;
 		Vector3 operator-(const Vector3& rhs) const;
-		Vector3 operator*(float rhs) const;
-		Vector3 operator*(const Matrix33::Matrix_33& mat) const;
-		Vector3 operator/(float rhs) const;
+		Vector3 operator*(type rhs) const;
+		Vector3 operator*(const Matrix_33& mat) const;
+		Vector3 operator/(type rhs) const;
 
 		Vector3& operator+=(const Vector3& rhs);
 		Vector3& operator-=(const Vector3& rhs);
-		Vector3& operator*=(float rhs);
-		Vector3& operator/=(float rhs);
+		Vector3& operator*=(type rhs);
+		Vector3& operator/=(type rhs);
 
-		float dot(const Vector3& rhs) const;
-		float lengthSq() const;
-		float length() const;
+		type dot(const Vector3& rhs) const;
+		type lengthSq() const;
+		type length() const;
 	};
+
+	//Predefine templated types for vector 3
+	using Vector3b = Vector3<bool>;
+	using Vector3s = Vector3<short>;
+	using Vector3i = Vector3<int>;
+	using Vector3u = Vector3<unsigned int>;
+	using Vector3f = Vector3<float>;
+	using Vector3d = Vector3<double>;
 }

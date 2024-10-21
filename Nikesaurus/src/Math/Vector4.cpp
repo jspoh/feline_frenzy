@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   Vector4.cpp
+ * \file   Vector4<T>.cpp
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
@@ -10,23 +10,28 @@
 #include "Core/stdafx.h"
 
 namespace NIKESAURUS {
-	Vector4 Vector4::operator+(const Vector4& rhs) const {
-		return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
+	template<typename T>
+	Vector4<T> Vector4<T>::operator+(const Vector4<T>& rhs) const {
+		return Vector4<T>(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 	}
 
-	Vector4 Vector4::operator-(const Vector4& rhs) const {
-		return Vector4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
+	template<typename T>
+	Vector4<T> Vector4<T>::operator-(const Vector4<T>& rhs) const {
+		return Vector4<T>(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
 	}
 
-	Vector4 Vector4::operator*(float rhs) const {
-		return Vector4(x * rhs, y * rhs, z * rhs, w * rhs);
+	template<typename T>
+	Vector4<T> Vector4<T>::operator*(typename Vector4<T>::type rhs) const {
+		return Vector4<T>(x * rhs, y * rhs, z * rhs, w * rhs);
 	}
 
-	Vector4 Vector4::operator/(float rhs) const {
-		return Vector4(x / rhs, y / rhs, z / rhs, w / rhs);
+	template<typename T>
+	Vector4<T> Vector4<T>::operator/(typename Vector4<T>::type rhs) const {
+		return Vector4<T>(x / rhs, y / rhs, z / rhs, w / rhs);
 	}
 
-	Vector4& Vector4::operator+=(const Vector4& rhs) {
+	template<typename T>
+	Vector4<T>& Vector4<T>::operator+=(const Vector4<T>& rhs) {
 		x += rhs.x;
 		y += rhs.y;
 		z += rhs.z;
@@ -34,7 +39,8 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	Vector4& Vector4::operator-=(const Vector4& rhs) {
+	template<typename T>
+	Vector4<T>& Vector4<T>::operator-=(const Vector4<T>& rhs) {
 		x -= rhs.x;
 		y -= rhs.y;
 		z -= rhs.z;
@@ -42,7 +48,8 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	Vector4& Vector4::operator*=(float rhs) {
+	template<typename T>
+	Vector4<T>& Vector4<T>::operator*=(typename Vector4<T>::type rhs) {
 		x *= rhs;
 		y *= rhs;
 		z *= rhs;
@@ -50,7 +57,8 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	Vector4& Vector4::operator/=(float rhs) {
+	template<typename T>
+	Vector4<T>& Vector4<T>::operator/=(typename Vector4<T>::type rhs) {
 		x /= rhs;
 		y /= rhs;
 		z /= rhs;
@@ -58,25 +66,30 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	float Vector4::dot(const Vector4& rhs) const {
+	template<typename T>
+	typename Vector4<T>::type Vector4<T>::dot(const Vector4<T>& rhs) const {
 		return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
 	}
 
-	float Vector4::length() const {
+	template<typename T>
+	typename Vector4<T>::type Vector4<T>::length() const {
 		return sqrt(lengthSq());
 	}
 
-	float Vector4::lengthSq() const {
+	template<typename T>
+	typename Vector4<T>::type Vector4<T>::lengthSq() const {
 		return x * x + y * y + z * z + w * w;
 	}
 
-	Vector4 Vector4::normalized() const {
-		float len = length();
-		return Vector4(x / len, y / len, z / len, w / len);
+	template<typename T>
+	Vector4<T> Vector4<T>::normalized() const {
+		typename Vector4<T>::type len = length();
+		return Vector4<T>(x / len, y / len, z / len, w / len);
 	}
 
-	Vector4 Vector4::normalize() {
-		float len = length();
+	template<typename T>
+	Vector4<T> Vector4<T>::normalize() {
+		typename Vector4<T>::type len = length();
 		x /= len;
 		y /= len;
 		z /= len;

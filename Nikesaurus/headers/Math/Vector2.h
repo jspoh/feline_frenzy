@@ -41,6 +41,7 @@ namespace NIKESAURUS {
 		type length() const;
 	};
 
+	//Predefine templated types for vector 2
 	using Vector2b = Vector2<bool>;
 	using Vector2s = Vector2<short>;
 	using Vector2i = Vector2<int>;

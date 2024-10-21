@@ -11,8 +11,7 @@
 #include "Math/Mtx33.h"
 
 namespace NIKESAURUS {
-	using namespace Matrix33;
-	constexpr float PI_OVER_180 = 0.0174532925199432f;;
+	constexpr float PI_OVER_180 = 0.0174532925199432f;
 
 	Matrix_33::Matrix_33(float m00, float m01, float m02,
 		float m10, float m11, float m12,
@@ -82,7 +81,7 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	Matrix_33& Matrix33::Matrix_33::operator+=(const Matrix_33& rhs)
+	Matrix_33& Matrix_33::operator+=(const Matrix_33& rhs)
 	{
 		matrix_33[0][0] += rhs(0, 0); matrix_33[0][1] += rhs(0, 1); matrix_33[0][2] += rhs(0, 2);
 		matrix_33[1][0] += rhs(1, 0); matrix_33[1][1] += rhs(1, 1); matrix_33[1][2] += rhs(1, 2);
@@ -91,7 +90,7 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	Matrix_33& Matrix33::Matrix_33::operator-=(const Matrix_33& rhs)
+	Matrix_33& Matrix_33::operator-=(const Matrix_33& rhs)
 	{
 		matrix_33[0][0] -= rhs(0, 0); matrix_33[0][1] -= rhs(0, 1); matrix_33[0][2] -= rhs(0, 2);
 		matrix_33[1][0] -= rhs(1, 0); matrix_33[1][1] -= rhs(1, 1); matrix_33[1][2] -= rhs(1, 2);
@@ -100,17 +99,17 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	float& Matrix33::Matrix_33::operator()(int row, int col)
+	float& Matrix_33::operator()(int row, int col)
 	{
 		return matrix_33[row][col];
 	}
 
-	const float& Matrix33::Matrix_33::operator()(int row, int col) const
+	const float& Matrix_33::operator()(int row, int col) const
 	{
 		return matrix_33[row][col];
 	}
 
-	Matrix_33& Matrix33::Matrix_33::operator*=(const float scale)
+	Matrix_33& Matrix_33::operator*=(const float scale)
 	{
 		for (size_t i = 0; i < matrix_33.size(); ++i)
 		{
@@ -145,7 +144,7 @@ namespace NIKESAURUS {
 		return *this;
 	}
 
-	std::ostream& Matrix33::operator<<(std::ostream& os, const Matrix_33& input)
+	std::ostream& operator<<(std::ostream& os, const Matrix_33& input)
 	{
 		os << "[" << input(0, 0) << ", " << input(0, 1) << ", " << input(0, 2) << "] " << endl
 			<< "[" << input(1, 0) << ", " << input(1, 1) << ", " << input(1, 2) << "] " << endl
@@ -153,7 +152,7 @@ namespace NIKESAURUS {
 		return os;
 	}
 
-	Matrix_33 Matrix33::operator*(const Matrix_33& lhs, const Matrix_33& rhs)
+	Matrix_33 operator*(const Matrix_33& lhs, const Matrix_33& rhs)
 	{
 		Matrix_33 result{ lhs };
 		result *= rhs;
@@ -161,7 +160,7 @@ namespace NIKESAURUS {
 		return result;
 	}
 
-	Matrix_33 Matrix33::operator*(float scalar, const Matrix_33& rhs)
+	Matrix_33 operator*(float scalar, const Matrix_33& rhs)
 	{
 		Matrix_33 result{ rhs };
 		for (int i = 0; i < 3; ++i) {
@@ -173,7 +172,7 @@ namespace NIKESAURUS {
 		return result;
 	}
 
-	float Matrix33::Matrix_33Determinant(const Matrix_33& input)
+	float Matrix_33Determinant(const Matrix_33& input)
 	{
 		float result{};
 		result = input(0, 0) * (input(1, 1) * input(2, 2) - input(1, 2) * input(2, 1))
@@ -182,14 +181,14 @@ namespace NIKESAURUS {
 		return result;
 	}
 
-	void Matrix33::Matrix_33Identitiy(Matrix_33& input)
+	void Matrix_33Identitiy(Matrix_33& input)
 	{
 		input(0, 0) = 1.f; input(0, 1) = 0.f; input(0, 2) = 0.f;
 		input(1, 0) = 0.f; input(1, 1) = 1.f; input(1, 2) = 0.f;
 		input(2, 0) = 0.f; input(2, 1) = 0.f; input(2, 2) = 1.f;
 	}
 
-	void Matrix33::Matrix_33Transpose(Matrix_33& result, const Matrix_33& input)
+	void Matrix_33Transpose(Matrix_33& result, const Matrix_33& input)
 	{
 		// Transpose the matrix by swapping rows and columns
 		result(0, 0) = input(0, 0);
@@ -205,7 +204,7 @@ namespace NIKESAURUS {
 		result(2, 2) = input(2, 2);
 	}
 
-	void Matrix33::Matrix_33Inverse(Matrix_33& result, const Matrix_33& input)
+	void Matrix_33Inverse(Matrix_33& result, const Matrix_33& input)
 	{
 		// Calculations of co factor matrix
 		Matrix_33 adjoint{};
@@ -249,35 +248,35 @@ namespace NIKESAURUS {
 		}
 	}
 
-	void Matrix33::Matrix_33Scale(Matrix_33& result, float const& x, float const& y)
+	void Matrix_33Scale(Matrix_33& result, float const& x, float const& y)
 	{
 		result(0, 0) = x;    result(0, 1) = 0;    result(0, 2) = 0;
 		result(1, 0) = 0;    result(1, 1) = y;    result(1, 2) = 0;
 		result(2, 0) = 0;    result(2, 1) = 0;    result(2, 2) = 1;
 	}
 
-	void Matrix33::Matrix_33Rot(Matrix_33& result, float angle)
+	void Matrix_33Rot(Matrix_33& result, float angle)
 	{
 		result(0, 0) = std::cos(angle);   result(0, 1) = -(std::sin(angle));  result(0, 2) = 0;
 		result(1, 0) = std::sin(angle);   result(1, 1) = std::cos(angle);   result(1, 2) = 0;
 		result(2, 0) = 0;          result(2, 1) = 0;          result(2, 2) = 1;
 	}
 
-	void Matrix33::Matrix_33RotDeg(Matrix_33& result, float angle)
+	void Matrix_33RotDeg(Matrix_33& result, float angle)
 	{
 		result(0, 0) = std::cos(angle * PI_OVER_180);   result(0, 1) = -(std::sin(angle * PI_OVER_180));  result(0, 2) = 0;
 		result(1, 0) = std::sin(angle * PI_OVER_180);   result(1, 1) = std::cos(angle * PI_OVER_180);   result(1, 2) = 0;
 		result(2, 0) = 0;          result(2, 1) = 0;          result(2, 2) = 1;
 	}
 
-	void Matrix33::Matrix_33Translate(Matrix_33& result, float const& x, float const& y)
+	void Matrix_33Translate(Matrix_33& result, float const& x, float const& y)
 	{
 		result(0, 0) = 1;    result(0, 1) = 0;    result(0, 2) = x;
 		result(1, 0) = 0;    result(1, 1) = 1;    result(1, 2) = y;
 		result(2, 0) = 0;    result(2, 1) = 0;    result(2, 2) = 1;
 	}
 
-	void Matrix33::Matrix_33TranslateApply(Matrix_33& result, const Matrix_33& input, float const& x, float const& y)
+	void Matrix_33TranslateApply(Matrix_33& result, const Matrix_33& input, float const& x, float const& y)
 	{
 		// Create a Translate matrix
 		Matrix_33 translate_matrix{};
@@ -300,19 +299,19 @@ namespace NIKESAURUS {
 		result(2, 2) = input(2, 0) * translate_matrix(0, 2) + input(2, 1) * translate_matrix(1, 2) + input(2, 2) * translate_matrix(2, 2);
 	}
 
-	void Matrix33::Matrix_33SetVector2Col(Vector2f& result, const Matrix_33& input, unsigned int const& col)
+	void Matrix_33SetVector2Col(Vector2f& result, const Matrix_33& input, unsigned int const& col)
 	{
 		result.x = input(0, col);
 		result.y = input(1, col);
 	}
 
-	void Matrix33::Matrix_33SetVector2Row(Vector2f& result, const Matrix_33& input, unsigned int const& row)
+	void Matrix_33SetVector2Row(Vector2f& result, const Matrix_33& input, unsigned int const& row)
 	{
 		result.x = input(row, 0);
 		result.y = input(row, 1);
 	}
 
-	void Matrix33::Matrix_33ScaleApply(Matrix_33& result, const Matrix_33& input, float const& x, float const& y)
+	void Matrix_33ScaleApply(Matrix_33& result, const Matrix_33& input, float const& x, float const& y)
 	{
 		// Create a scaling matrix
 		Matrix_33 scale_matrix{};
@@ -335,7 +334,7 @@ namespace NIKESAURUS {
 		result(2, 2) = input(2, 0) * scale_matrix(0, 2) + input(2, 1) * scale_matrix(1, 2) + input(2, 2) * scale_matrix(2, 2);
 	}
 
-	Vector2f Matrix33::operator*(const Vector2f& lhs, const Matrix_33& rhs)
+	Vector2f operator*(const Vector2f& lhs, const Matrix_33& rhs)
 	{
 		Vector2f result{};
 		result.x = rhs(0, 0) * lhs.x + rhs(0, 1) * lhs.y + rhs(0, 2);
@@ -344,7 +343,7 @@ namespace NIKESAURUS {
 		return result;
 	}
 
-	Vector2f Matrix33::operator*(const Matrix_33& lhs, const Vector2f& rhs)
+	Vector2f operator*(const Matrix_33& lhs, const Vector2f& rhs)
 	{
 		Vector2f result{};
 		result.x = lhs(0, 0) * rhs.x + lhs(0, 1) * rhs.y + lhs(0, 2);
