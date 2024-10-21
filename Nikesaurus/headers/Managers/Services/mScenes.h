@@ -13,13 +13,30 @@
 #define M_SCENE_HPP
 
 #include "Managers/ECS/mSystem.h"
-#include "Components/cScene.h"
 
 namespace NIKESAURUS {
 	namespace Scenes {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
+
+		//Scene manager actions
+		enum class NIKESAURUS_API Actions {
+			CHANGE = 0,
+			RESTART,
+			PREVIOUS,
+			CLOSE
+		};
+
+		//Change Scene Event
+		struct NIKESAURUS_API SceneEvent {
+			Actions scene_action;
+			std::string next_scene_id;
+
+			//Constructor
+			SceneEvent(Actions scene_action, std::string next_scene_id)
+				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {}
+		};
 
 		//Scene interface
 		class NIKESAURUS_API IScene {
@@ -99,7 +116,7 @@ namespace NIKESAURUS {
 			std::string getCurrSceneID() const;
 
 			//Queue scene event
-			void queueSceneEvent(Scenes::SceneEvent event);
+			void queueSceneEvent(Scenes::SceneEvent&& event);
 
 			//Update scene event
 			void update();

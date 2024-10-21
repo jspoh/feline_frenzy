@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/mAssets.h"
+#include "Managers/Services/mAssets.h"
 #include "Core/Engine.h"
 #include "Systems/sysAudio.h"
 #include "Systems/Render/sysRender.h"

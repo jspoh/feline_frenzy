@@ -123,9 +123,9 @@ namespace NIKESAURUS {
 			* System Methods
 			*********************************************************************/
 			template<typename T>
-			std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr, int index = -1)
+			std::shared_ptr<T> registerSystem(int index = -1)
 			{
-				return system_manager->registerSystem<T>(singleton_sys, index);
+				return system_manager->registerSystem<T>(index);
 			}
 
 			template<typename T>

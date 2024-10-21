@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/mWindows.h"
+#include "Managers/Services/mWindows.h"
 
 namespace NIKESAURUS {
 	/*****************************************************************//**
@@ -150,7 +150,7 @@ namespace NIKESAURUS {
 	}
 
 	//Create console
-	void Windows::Manager::createConsole() {
+	void Windows::Manager::createConsole(std::string const& custom_welcome) {
 		// Create a new console window
 		AllocConsole();
 
@@ -165,7 +165,7 @@ namespace NIKESAURUS {
 		freopen_s(&fp, "CONIN$", "r", stdin);
 
 		//Welcome Message
-		cout << "Welcome To Nikesaurus." << endl;
+		cout << custom_welcome << endl;
 	}
 
 	void Windows::Manager::setTargetFPS(int fps) {
@@ -195,13 +195,9 @@ namespace NIKESAURUS {
 
 		//Target delta time
 		double target_frame_time = 1.0 / target_fps;
-		//double frame_time = glfwGetTime() - curr_time;
 
-		//Sleep thread for fps
+		//Limit FPS based on target frame time
 		while (glfwGetTime() - curr_time < target_frame_time) {
-			//Current default system timer resolution is around 15.6 ms
-			//Sleeping this thread will lead to inaccurate time control, thread sleeps for too long
-			//std::this_thread::sleep_for(std::chrono::duration<double>(target_frame_time - frame_time));
 		}
 	}
 }

@@ -126,7 +126,7 @@ namespace NIKESAURUS {
 			std::shared_ptr<IWindow> getWindow();
 
 			//Create Console
-			void createConsole();
+			void createConsole(std::string const& custom_welcome);
 
 			//Set Target FPS
 			void setTargetFPS(int fps);

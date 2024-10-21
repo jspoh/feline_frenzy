@@ -162,10 +162,12 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\Core\main.cpp" />
+    <ClCompile Include="src\Scenes\MainMenu.cpp" />
     <ClCompile Include="src\Scenes\SplashScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Core\pch.h" />
+    <ClInclude Include="headers\Scenes\MainMenu.h" />
     <ClInclude Include="headers\Scenes\SplashScene.h" />
   </ItemGroup>
   <ItemGroup>

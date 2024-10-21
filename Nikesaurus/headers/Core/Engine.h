@@ -13,12 +13,12 @@
 #define ENGINE_HPP
 
 //Services
-#include "Managers/mWindows.h"
-#include "Managers/mScenes.h"
-#include "Managers/mEvents.h"
-//#include "Managers/mAssets.h"
-#include "Managers/mDebug.h"
-#include "Managers/mSerialization.h"
+#include "Managers/Services/mWindows.h"
+#include "Managers/Services/mScenes.h"
+#include "Managers/Services/mEvents.h"
+//#include "Managers/Services/mAssets.h"
+#include "Managers/Services/mDebug.h"
+#include "Managers/Services/mSerialization.h"
 #include "Managers/ECS/mCoordinator.h"
 
 namespace NIKESAURUS {
@@ -70,7 +70,7 @@ namespace NIKESAURUS {
 			}
 
 			//Init Window with config file
-			void init(std::string const& file_path, int fps = 60);
+			void init(std::string const& file_path, int fps = 60, std::string const& custom_welcome = "Welcome.");
 
 			//Run Game Loop
 			void run();

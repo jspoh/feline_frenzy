@@ -47,7 +47,9 @@ namespace NIKESAURUS {
 			//Add new component
 			void addComponent(Entity::Type entity, T&& component) {
 				//Check if entity has already been added
-				assert(component_array.find(entity) == component_array.end() && "Entity has already been added for this component.");
+				if (component_array.find(entity) != component_array.end()) {
+					throw std::runtime_error("Entity has already been added for this component.");
+				}
 
 				//Emplace component and entity
 				component_array.emplace(std::piecewise_construct, std::forward_as_tuple(entity), std::forward_as_tuple(std::move(component)));
@@ -56,7 +58,9 @@ namespace NIKESAURUS {
 			//Remove existing component
 			void removeComponent(Entity::Type entity) {
 				//Check if entity is present within components to delete
-				assert(component_array.find(entity) != component_array.end() && "Entity not found. Unable to remove.");
+				if (component_array.find(entity) == component_array.end()) {
+					throw std::runtime_error("Entity not found. Unable to remove.");
+				}
 
 				//Remove entitys
 				component_array.erase(entity);
@@ -65,7 +69,9 @@ namespace NIKESAURUS {
 			//Get entity component data
 			T& getComponent(Entity::Type entity) {
 				//Check if entity is present within components
-				assert(component_array.find(entity) != component_array.end() && "Entity not found. Unable to retrieve component array.");
+				if (component_array.find(entity) == component_array.end()) {
+					throw std::runtime_error("Entity not found. Unable to retrieve component array.");
+				}
 
 				//Return component array
 				return component_array.at(entity);
@@ -142,7 +148,9 @@ namespace NIKESAURUS {
 				std::string type_name{ typeid(T).name() };
 
 				//Check if component has been registered before
-				assert(component_types.find(type_name) == component_types.end() && "Component already registered. Register failed.");
+				if (component_types.find(type_name) != component_types.end()) {
+					throw std::runtime_error("Component already registered. Register failed.");
+				}
 
 				//Add component type
 				component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_id++));
@@ -157,7 +165,9 @@ namespace NIKESAURUS {
 				std::string type_name{ typeid(T).name() };
 
 				//Check if component has been registered before
-				assert(component_types.find(type_name) != component_types.end() && "Component has not been registered before. Deregister failed.");
+				if (component_types.find(type_name) == component_types.end()) {
+					throw std::runtime_error("Component has not been registered before. Deregister failed.");
+				}
 
 				//Remove component type
 				component_types.erase(type_name);
@@ -205,7 +215,9 @@ namespace NIKESAURUS {
 				std::string type_name{ typeid(T).name() };
 
 				//Check if component has been registered
-				assert(component_types.find(type_name) != component_types.end() && "Component not yet registered.");
+				if (component_types.find(type_name) == component_types.end()) {
+					throw std::runtime_error("Component not yet registered.");
+				}
 
 				//Return component type
 				return component_types.at(type_name);

@@ -9,13 +9,6 @@
 
 #pragma once
 
-#define _CRTDBG_MAP_ALLOC
-
-//Include windows for windows platform
-#ifdef NIKESAURUS_PLATFORM_WINDOWS
-    #include <Windows.h>
-#endif
-
  /*****************************************************************//**
  * Engine Specific Library
  *********************************************************************/
@@ -47,7 +40,19 @@
 
 #endif //!!!Nest Engine specific includes within
 
-//Core For Exporting & Importing
+//Memory
+#define _CRTDBG_MAP_ALLOC
+
+ /*****************************************************************//**
+ * Windows Application
+ *********************************************************************/
+#ifdef NIKESAURUS_PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
+ /*****************************************************************//**
+ * For exporting and importing DLLs
+ *********************************************************************/
 #include "Core.h"
 
  /*****************************************************************//**
@@ -74,6 +79,7 @@
 #include <ctime>
 #include <iomanip>
 #include <chrono>
+#include <thread>
 
  /*****************************************************************//**
  * Data (json)

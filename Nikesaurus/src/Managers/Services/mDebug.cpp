@@ -8,14 +8,14 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/mDebug.h"
+#include "Managers/Services/mDebug.h"
 
 namespace NIKESAURUS {
 	namespace Debug
 	{
 		void Manager::logCrash()
 		{
-			std::ofstream log_file("src/Managers/crash_log.txt", std::ios::app);
+			std::ofstream log_file("src/Managers/Services/crash_log.txt", std::ios::app);
 			if (!log_file.is_open())
 			{
 				cout << "file not found" << endl;

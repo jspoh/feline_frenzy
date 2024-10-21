@@ -21,7 +21,9 @@ namespace NIKESAURUS {
 	Entity::Type Entity::Manager::createEntity() {
 
 		//Check if entity has reached the max limit
-		assert(!avail_entities.empty() && "Too many entities created.");
+		if (avail_entities.empty()) {
+			throw std::runtime_error("Too many entities created.");
+		}
 
 		//Construct a new entity into entities map
 		Entity::Type id{ avail_entities.front() };
@@ -33,13 +35,17 @@ namespace NIKESAURUS {
 	Entity::Type Entity::Manager::cloneEntity(Entity::Type original_entity) {
 
 		static_cast<void> (original_entity);
-		assert(entities.find(original_entity) != entities.end() && "Entity not found.");
+		if (entities.find(original_entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
 		return 0;
 	}
 
 	void Entity::Manager::destroyEntity(Entity::Type entity) {
 		//Check if entity has alr been created
-		assert(entities.find(entity) != entities.end() && "Entity not found.");
+		if (entities.find(entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
 
 		//Erase entity and push into avail entities
 		entities.erase(entity);
@@ -48,7 +54,9 @@ namespace NIKESAURUS {
 
 	void Entity::Manager::setSignature(Entity::Type entity, Component::Signature signature) {
 		//Check if entity has alr been created
-		assert(entities.find(entity) != entities.end() && "Entity not found.");
+		if (entities.find(entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
 
 		//Set Signature
 		entities.at(entity) = signature;
@@ -56,7 +64,9 @@ namespace NIKESAURUS {
 
 	Component::Signature const& Entity::Manager::getSignature(Entity::Type entity) const {
 		//Check if entity has alr been created
-		assert(entities.find(entity) != entities.end() && "Entity not found.");
+		if (entities.find(entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
 
 		//Get Signature
 		return entities.at(entity);

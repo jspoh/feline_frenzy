@@ -2,6 +2,7 @@
 
 //Splash Scene
 #include "Scenes/SplashScene.h"
+#include "Scenes/MainMenu.h"
 
 // debug stuff
 bool DEBUG = true;
@@ -20,10 +21,13 @@ int WINAPI WinMain(
 	#endif
  
 	//Init Engine
-	NIKEEngine.init("src/Core/Config.txt", 60);
+	NIKEEngine.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
 
 	//Register Scenes
 	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->registerScene<Splash::Scene>("SPLASH");
+	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->registerScene<Menu::Scene>("MENU");
+
+	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
 
 	//Run Engine
 	NIKEEngine.run();

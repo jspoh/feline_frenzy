@@ -116,43 +116,34 @@ namespace NIKESAURUS {
 			}
 
 		public:
-
 			//Default Constructor
 			Manager() = default;
 
 			//Index for adding system is only if
 			template<typename T>
-			std::shared_ptr<T> registerSystem(std::shared_ptr<T> singleton_sys = nullptr, int index = -1) {
-
-				//System type name
-				std::string sys_name{ typeid(T).name() };
+			std::shared_ptr<T> registerSystem(int index = -1) {
 
 				//Check if system has already been added
-				assert(systems_map.find(sys_name) == systems_map.end() && "System already registered.");
+				if (systems_map.find(typeid(T).name()) != systems_map.end()) {
+					throw std::runtime_error("System already registered.");
+				}
 
 				//System object
-				std::shared_ptr<T> system;
-			
-				if (singleton_sys) {
-					system = singleton_sys;
-				}
-				else {
-					system = std::make_shared<T>();
-				}
+				std::shared_ptr<T> system = std::make_shared<T>();
 
 				//Init system
 				system->init();
 
 				//Insert system at back
 				if (index >= 0) {
-					systems.insert(systems.begin() + index, system);
+					systems.emplace(systems.begin() + index, system);
 				}
 				else {
 					systems.push_back(system);
 				}
 
 				//Emplace shared pointer to system in map
-				systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(sys_name), std::forward_as_tuple(system));
+				systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(typeid(T).name()), std::forward_as_tuple(system));
 
 				//Return system created
 				return system;
@@ -179,7 +170,9 @@ namespace NIKESAURUS {
 				std::string sys_name{ typeid(T).name() };
 
 				//Check if system is present
-				assert(systems_map.find(sys_name) != systems_map.end() && "System not registered. Setting of state failed");
+				if (systems_map.find(sys_name) == systems_map.end()) {
+					throw std::runtime_error("System not registered. Setting of state failed");
+				}
 
 				//Remove system
 				systems_map.at(sys_name)->setActiveState(state);
@@ -217,7 +210,7 @@ namespace NIKESAURUS {
 						return i;
 				}
 
-				assert("System not registered yet!");
+				throw std::runtime_error("System not registered yet!");
 				return -1;
 			}
 

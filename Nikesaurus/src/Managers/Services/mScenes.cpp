@@ -8,10 +8,8 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/mScenes.h"
+#include "Managers/Services/mScenes.h"
 #include "Core/Engine.h"
-#include "Components/cInput.h"
-#include "Components/cScene.h"
 
 namespace NIKESAURUS {
 	void Scenes::Manager::initScene(std::string scene_id) {
@@ -22,6 +20,11 @@ namespace NIKESAURUS {
 	}
 
 	void Scenes::Manager::changeScene(std::string scene_id) {
+
+		//Check if scene has been registered
+		if (scenes.find(scene_id) == scenes.end()) {
+			throw std::runtime_error("Scene Not Registered Yet.");
+		}
 
 		//Change scene only if its not the same scene
 		if (scenes.at(scene_id) == curr_scene) {
@@ -87,8 +90,9 @@ namespace NIKESAURUS {
 		return "";
 	}
 
-	void Scenes::Manager::queueSceneEvent(Scenes::SceneEvent new_event) {
-		event_queue = std::make_shared<Scenes::SceneEvent>(new_event);
+	void Scenes::Manager::queueSceneEvent(Scenes::SceneEvent&& new_event) {
+		if(event_queue == nullptr)
+		event_queue = std::make_shared<Scenes::SceneEvent>(std::move(new_event));
 	}
 
 	void Scenes::Manager::update() {
@@ -102,6 +106,9 @@ namespace NIKESAURUS {
 				break;
 			case Scenes::Actions::RESTART:
 				restartScene();
+				break;
+			case Scenes::Actions::CLOSE:
+				NIKEEngine.getService<Windows::Manager>()->getWindow()->terminate();
 				break;
 			default:
 				break;
