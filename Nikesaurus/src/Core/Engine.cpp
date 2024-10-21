@@ -110,7 +110,7 @@ namespace NIKESAURUS {
 		//assets_manager->registerModel("square-texture", "assets/meshes/square-texture.txt");
 	}
 
-	void Core::Engine::init(std::string const& file_path, int fps, std::string const& custom_welcome) {
+	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
 		provideService(std::make_shared<Windows::Manager>());
 		provideService(std::make_shared<Scenes::Manager>());
 		provideService(std::make_shared<Events::Manager>());

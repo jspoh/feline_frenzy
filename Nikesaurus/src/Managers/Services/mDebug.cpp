@@ -10,6 +10,9 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/mDebug.h"
 
+//Definition of nullstream for debugging
+NullStream nullstream;
+
 namespace NIKESAURUS {
 	namespace Debug
 	{

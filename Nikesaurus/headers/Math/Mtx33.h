@@ -63,8 +63,8 @@ namespace NIKESAURUS {
 		//Matrix scalar
 		Matrix_33 NIKESAURUS_API operator* (float scalar, const Matrix_33& rhs);
 
-		Vector2 NIKESAURUS_API operator* (const Vector2& lhs, const Matrix_33& rhs);
-		Vector2 NIKESAURUS_API operator* (const Matrix_33& lhs, const Vector2& rhs);
+		Vector2f NIKESAURUS_API operator* (const Vector2f& lhs, const Matrix_33& rhs);
+		Vector2f NIKESAURUS_API operator* (const Matrix_33& lhs, const Vector2f& rhs);
 
 		// Matrix stuff
 
@@ -91,9 +91,9 @@ namespace NIKESAURUS {
 		// Set result to the multiplication of translation matrix of x and y with input.
 		void NIKESAURUS_API Matrix_33TranslateApply(Matrix_33& result, const Matrix_33& input, float const& x, float const& y);
 		// Set vector2 result with first and second elem of selected column from input matrix
-		void NIKESAURUS_API Matrix_33SetVector2Col(Vector2& result, const Matrix_33& input, unsigned int const& col);
+		void NIKESAURUS_API Matrix_33SetVector2Col(Vector2f& result, const Matrix_33& input, unsigned int const& col);
 		// Set vector2 result with first and second elem of selected row from input matrix
-		void NIKESAURUS_API Matrix_33SetVector2Row(Vector2& result, const Matrix_33& input, unsigned int const& row);
+		void NIKESAURUS_API Matrix_33SetVector2Row(Vector2f& result, const Matrix_33& input, unsigned int const& row);
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)

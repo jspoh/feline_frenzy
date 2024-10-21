@@ -44,7 +44,7 @@ namespace NIKESAURUS {
 			virtual void setWindowSize(float width, float height) = 0;
 
 			//Get window size
-			virtual Vector2 getWindowSize() const = 0;
+			virtual Vector2f getWindowSize() const = 0;
 
 			//Check window state
 			virtual bool windowState() const = 0;
@@ -62,11 +62,11 @@ namespace NIKESAURUS {
 		class NIKEWindow : public IWindow {
 		private:
 			GLFWwindow* ptr_window;
-			Vector2 window_size;
+			Vector2f window_size;
 			std::string window_title;
 		public:
 
-			NIKEWindow(Vector2 window_size, std::string window_title);
+			NIKEWindow(Vector2f window_size, std::string window_title);
 
 			NIKEWindow(std::string const& file_path);
 
@@ -82,7 +82,7 @@ namespace NIKESAURUS {
 
 			void setWindowSize(float width, float height) override;
 
-			Vector2 getWindowSize() const override;
+			Vector2f getWindowSize() const override;
 
 			bool windowState() const override;
 

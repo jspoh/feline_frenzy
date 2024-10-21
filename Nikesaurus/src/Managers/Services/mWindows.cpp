@@ -14,7 +14,7 @@ namespace NIKESAURUS {
 	/*****************************************************************//**
 	* NIKE Window
 	*********************************************************************/
-	Windows::NIKEWindow::NIKEWindow(Vector2 window_size, std::string window_title)
+	Windows::NIKEWindow::NIKEWindow(Vector2f window_size, std::string window_title)
 		: ptr_window{ nullptr }, window_size{ window_size }, window_title{ window_title }
 	{
 	}
@@ -110,7 +110,7 @@ namespace NIKESAURUS {
 		glfwSetWindowSize(ptr_window, static_cast<int>(window_size.x), static_cast<int>(window_size.y));
 	}
 
-	Vector2 Windows::NIKEWindow::getWindowSize() const {
+	Vector2f Windows::NIKEWindow::getWindowSize() const {
 		return window_size;
 	}
 

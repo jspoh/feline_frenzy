@@ -10,72 +10,87 @@
 #include "Core/stdafx.h"
 
 namespace NIKESAURUS {
-	Vector2 Vector2::operator+(const Vector2& rhs) const {
+	template<typename T>
+	Vector2<T> Vector2<T>::operator+(const Vector2<T>& rhs) const {
 		return Vector2(x + rhs.x, y + rhs.y);
 	}
 
-	Vector2 Vector2::operator-(const Vector2& rhs) const {
+	template<typename T>
+	Vector2<T> Vector2<T>::operator-(const Vector2<T>& rhs) const {
 		return Vector2(x - rhs.x, y - rhs.y);
 	}
 
-	Vector2 Vector2::operator*(float rhs) const {
+	template<typename T>
+	Vector2<T> Vector2<T>::operator*(typename Vector2<T>::type rhs) const {
 		return Vector2(x * rhs, y * rhs);
 	}
 
-	Vector2 Vector2::operator/(float rhs) const {
+	template<typename T>
+	Vector2<T> Vector2<T>::operator/(typename Vector2<T>::type rhs) const {
 		return Vector2(x / rhs, y / rhs);
 	}
 
-	Vector2& Vector2::operator+=(const Vector2& rhs) {
+	template<typename T>
+	Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& rhs) {
 		x += rhs.x;
 		y += rhs.y;
 		return *this;
 	}
 
-	Vector2& Vector2::operator-=(const Vector2& rhs) {
+	template<typename T>
+	Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& rhs) {
 		x -= rhs.x;
 		y -= rhs.y;
 		return *this;
 	}
 
-	Vector2& Vector2::operator*=(float rhs) {
+	template<typename T>
+	Vector2<T>& Vector2<T>::operator*=(typename Vector2<T>::type rhs) {
 		x *= rhs;
 		y *= rhs;
 		return *this;
 	}
 
-	Vector2& Vector2::operator/=(float rhs) {
+	template<typename T>
+	Vector2<T>& Vector2<T>::operator/=(typename Vector2<T>::type rhs) {
 		x /= rhs;
 		y /= rhs;
 		return *this;
 	}
 
-	bool Vector2::operator==(const Vector2& rhs) {
+	template<typename T>
+	bool Vector2<T>::operator==(const Vector2<T>& rhs) {
 		return (this->x == rhs.x) && (this->y == rhs.y);
 	}
 
-	bool Vector2::operator!=(const Vector2& rhs) {
+	template<typename T>
+	bool Vector2<T>::operator!=(const Vector2<T>& rhs) {
 		return (this->x != rhs.x) || (this->y != rhs.y);
 	}
 
-	float Vector2::dot(const Vector2& rhs) const {
+	template<typename T>
+	typename Vector2<T>::type Vector2<T>::dot(const Vector2<T>& rhs) const {
 		return x * rhs.x + y * rhs.y;
 	}
 
-	float Vector2::length() const {
+	template<typename T>
+	typename Vector2<T>::type Vector2<T>::length() const {
 		return sqrt(lengthSq());
 	}
 
-	float Vector2::lengthSq() const {
+	template<typename T>
+	typename Vector2<T>::type Vector2<T>::lengthSq() const {
 		return x * x + y * y;
 	}
 
-	Vector2 Vector2::normalized() const {
+	template<typename T>
+	Vector2<T> Vector2<T>::normalized() const {
 		float len = length();
 		return Vector2(x / len, y / len);
 	}
 
-	Vector2 Vector2::normalize() {
+	template<typename T>
+	Vector2<T> Vector2<T>::normalize() {
 		float len = length();
 		x /= len;
 		y /= len;

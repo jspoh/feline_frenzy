@@ -4,10 +4,6 @@
 #include "Scenes/SplashScene.h"
 #include "Scenes/MainMenu.h"
 
-// debug stuff
-bool DEBUG = true;
-NullStream nullstream;
-
 int WINAPI WinMain(
 	[[maybe_unused]] _In_ HINSTANCE hInstance,
 	[[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,

@@ -300,13 +300,13 @@ namespace NIKESAURUS {
 		result(2, 2) = input(2, 0) * translate_matrix(0, 2) + input(2, 1) * translate_matrix(1, 2) + input(2, 2) * translate_matrix(2, 2);
 	}
 
-	void Matrix33::Matrix_33SetVector2Col(Vector2& result, const Matrix_33& input, unsigned int const& col)
+	void Matrix33::Matrix_33SetVector2Col(Vector2f& result, const Matrix_33& input, unsigned int const& col)
 	{
 		result.x = input(0, col);
 		result.y = input(1, col);
 	}
 
-	void Matrix33::Matrix_33SetVector2Row(Vector2& result, const Matrix_33& input, unsigned int const& row)
+	void Matrix33::Matrix_33SetVector2Row(Vector2f& result, const Matrix_33& input, unsigned int const& row)
 	{
 		result.x = input(row, 0);
 		result.y = input(row, 1);
@@ -335,18 +335,18 @@ namespace NIKESAURUS {
 		result(2, 2) = input(2, 0) * scale_matrix(0, 2) + input(2, 1) * scale_matrix(1, 2) + input(2, 2) * scale_matrix(2, 2);
 	}
 
-	Vector2 Matrix33::operator*(const Vector2& lhs, const Matrix_33& rhs)
+	Vector2f Matrix33::operator*(const Vector2f& lhs, const Matrix_33& rhs)
 	{
-		Vector2 result{};
+		Vector2f result{};
 		result.x = rhs(0, 0) * lhs.x + rhs(0, 1) * lhs.y + rhs(0, 2);
 		result.y = rhs(1, 0) * lhs.x + rhs(1, 1) * lhs.y + rhs(1, 2);
 
 		return result;
 	}
 
-	Vector2 Matrix33::operator*(const Matrix_33& lhs, const Vector2& rhs)
+	Vector2f Matrix33::operator*(const Matrix_33& lhs, const Vector2f& rhs)
 	{
-		Vector2 result{};
+		Vector2f result{};
 		result.x = lhs(0, 0) * rhs.x + lhs(0, 1) * rhs.y + lhs(0, 2);
 		result.y = lhs(1, 0) * rhs.x + lhs(1, 1) * rhs.y + lhs(1, 2);
 
