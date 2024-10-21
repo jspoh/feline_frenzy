@@ -13,7 +13,7 @@
 #ifndef C_TRANSFORM_HPP
 #define C_TRANSFORM_HPP
 
-#include "../headers/Core/stdafx.h"
+#include "Core/stdafx.h"
 
 namespace NIKESAURUS {
 	namespace Transform {

@@ -12,9 +12,9 @@
 #ifndef M_COORDINATOR_H
 #define M_COORDINATOR_H
 
-#include "../headers/Managers/ECS/mEntity.h"
-#include "../headers/Managers/ECS/mComponent.h"
-#include "../headers/Managers/ECS/mSystem.h"
+#include "Managers/ECS/mEntity.h"
+#include "Managers/ECS/mComponent.h"
+#include "Managers/ECS/mSystem.h"
 
 namespace NIKESAURUS {
 	namespace Coordinator {
@@ -29,10 +29,12 @@ namespace NIKESAURUS {
 			std::unique_ptr<System::Manager> system_manager;
 		public:
 
+			//Default constructor
+			Manager();
+
 			/*****************************************************************//**
 			* Entity Methods
 			*********************************************************************/
-
 			//Create Entity
 			Entity::Type createEntity();
 

@@ -15,7 +15,6 @@
     <ClCompile Include="src\Managers\mWindows.cpp" />
     <ClCompile Include="src\Managers\mDebug.cpp" />
     <ClCompile Include="src\Utility\uSystems.cpp" />
-    <ClCompile Include="src\Core\App.cpp" />
     <ClCompile Include="src\Managers\ECS\mComponent.cpp" />
     <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
   </ItemGroup>
@@ -47,8 +46,7 @@
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Utility\uSystems.h" />
     <ClInclude Include="headers\Core\Core.h" />
-    <ClInclude Include="headers\Core\App.h" />
-    <ClInclude Include="Nikesaurus.h" />
+    <ClInclude Include="headers\Nikesaurus.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
   </ItemGroup>
   <ItemGroup>

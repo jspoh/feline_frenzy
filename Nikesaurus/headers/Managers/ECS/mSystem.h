@@ -38,6 +38,7 @@ namespace NIKESAURUS {
 
 			//System active
 			bool b_system_active;
+
 		public:
 
 			//Constructor

@@ -7,24 +7,28 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Core/Engine.h"
+#include "Core/stdafx.h"
+#include "Core/Engine.h"
 
-//Registerd Components
-#include "../headers/Components/cInput.h"
-#include "../headers/Components/cRender.h"
-#include "../headers/Components/cAudio.h"
-#include "../headers/Components/cMove.h"
-
- //Registered Systems
-#include "../headers/Systems/sysInput.h"
-#include "../headers/Systems/Physics/sysPhysics.h"
-#include "../headers/Systems/Animation/sysAnimation.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Systems/sysAudio.h"
-#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
+////Registerd Components
+//#include "../headers/Components/cInput.h"
+//#include "../headers/Components/cRender.h"
+//#include "../headers/Components/cAudio.h"
+//#include "../headers/Components/cMove.h"
+//
+// //Registered Systems
+//#include "../headers/Systems/sysInput.h"
+//#include "../headers/Systems/Physics/sysPhysics.h"
+//#include "../headers/Systems/Animation/sysAnimation.h"
+//#include "../headers/Systems/Render/sysRender.h"
+//#include "../headers/Systems/sysAudio.h"
+//#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
 namespace NIKESAURUS {
+
+	//Defintion of the static services member variable
+	std::unordered_map<std::string, std::shared_ptr<void>> NIKESAURUS::Core::Engine::services;
+
 	Core::Engine::~Engine() {
 		glfwTerminate();
 	}
@@ -110,7 +114,7 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Windows::Manager>());
 		provideService(std::make_shared<Scenes::Manager>());
 		provideService(std::make_shared<Events::Manager>());
-		provideService(std::make_shared<Assets::Manager>());
+		//provideService(std::make_shared<Assets::Manager>());
 		provideService(std::make_shared<Debug::Manager>());
 		provideService(std::make_shared<Coordinator::Manager>());
 
@@ -123,11 +127,11 @@ namespace NIKESAURUS {
 		windows_manager->createConsole();
 		#endif
 
-		//Read config file
-		windows_manager->readConfigFile(file_path);
+		//Setup window with config file
+		windows_manager->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
 
 		//Config glfw window system
-		windows_manager->configSystem();
+		windows_manager->getWindow()->configWindow();
 
 		//Set Target FPS
 		windows_manager->setTargetFPS(fps);
@@ -144,16 +148,16 @@ namespace NIKESAURUS {
 
 	void Core::Engine::run() {
 
-		while (!glfwWindowShouldClose(windows_manager->getWindow())) {
+		while (windows_manager->getWindow()->windowState()) {
 
 			//Calculate Delta Time
 			windows_manager->calculateDeltaTime();
 
-			//Poll system events ( Interativity with app )
-			glfwPollEvents();
+			//Poll system events
+			windows_manager->getWindow()->pollEvents();
 
 			//Set Window Title
-			windows_manager->setWinTitle(windows_manager->getWinTitle() +
+			windows_manager->getWindow()->setWindowTitle(windows_manager->getWindow()->getWindowTitle() +
 				" | " + scenes_manager->getCurrSceneID() +
 				" | " + std::to_string(windows_manager->getCurrentFPS()) + " fps" +
 				" | " + std::to_string(ecs_coordinator->getEntitiesCount()) + " entities");
@@ -164,15 +168,11 @@ namespace NIKESAURUS {
 			//Update scenes manager
 			scenes_manager->update();
 
-			//Check if window is open
-			if (glfwWindowShouldClose(windows_manager->getWindow())) {
-
-				//Terminate window
-				windows_manager->terminate();
-			}
-
 			//Control FPS
 			windows_manager->controlFPS();
 		}
+
+		//Clean up window resources
+		windows_manager->getWindow()->cleanUp();
 	}
 }

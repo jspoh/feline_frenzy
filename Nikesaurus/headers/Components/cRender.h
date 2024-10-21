@@ -11,7 +11,7 @@
 #ifndef C_RENDER_HPP
 #define C_RENDER_HPP
 
-#include "../headers/Core/stdafx.h"
+#include "Core/stdafx.h"
 
 namespace NIKESAURUS {
 	namespace Render {

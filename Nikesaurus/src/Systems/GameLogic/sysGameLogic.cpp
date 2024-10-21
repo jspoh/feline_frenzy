@@ -6,8 +6,8 @@
  * \date   September 2024
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/GameLogic/sysGameLogic.h"
+#include "Core/stdafx.h"
+#include "Systems/GameLogic/sysGameLogic.h"
 
 void GameLogic::Manager::init() {
 

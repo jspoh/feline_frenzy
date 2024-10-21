@@ -8,9 +8,9 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/Render/sysShader.h"
-#include "../headers/Core/Engine.h"
+#include "Core/stdafx.h"
+#include "Systems/Render/sysShader.h"
+#include "Core/Engine.h"
 
 unsigned int Shader::Manager::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
 	// read and compile vertex shader

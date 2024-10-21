@@ -7,8 +7,8 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/ECS/mEntity.h"
+#include "Core/stdafx.h"
+#include "Managers/ECS/mEntity.h"
 
 namespace NIKESAURUS {
 	Entity::Manager::Manager() {

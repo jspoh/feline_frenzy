@@ -12,8 +12,8 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
-#include "../headers/Managers/ECS/mSystem.h"
-#include "../headers/Components/cScene.h"
+#include "Managers/ECS/mSystem.h"
+#include "Components/cScene.h"
 
 namespace NIKESAURUS {
 	namespace Scenes {
@@ -81,7 +81,7 @@ namespace NIKESAURUS {
 
 			//Register scenes
 			template<typename T>
-			void registerScenes(std::string const& scene_id) {
+			void registerScene(std::string const& scene_id) {
 
 				//New scene
 				std::shared_ptr<T> scene{ std::make_shared<T>() };

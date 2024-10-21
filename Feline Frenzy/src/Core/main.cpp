@@ -1,5 +1,7 @@
-#include "../headers/Core/pch.h"
-#include <Nikesaurus.h>
+#include "Core/pch.h"
+
+//Splash Scene
+#include "Scenes/SplashScene.h"
 
 // debug stuff
 bool DEBUG = true;
@@ -18,10 +20,13 @@ int WINAPI WinMain(
 	#endif
  
 	//Init Engine
-	NIKESAURUS::NIKEEngine.init("src/Core/Config.txt", 60);
+	NIKEEngine.init("src/Core/Config.txt", 60);
+
+	//Register Scenes
+	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->registerScene<Splash::Scene>("SPLASH");
 
 	//Run Engine
-	NIKESAURUS::NIKEEngine.run();
+	NIKEEngine.run();
 
 	return 0;
 }

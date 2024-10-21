@@ -7,8 +7,8 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/ECS/mComponent.h"
+#include "Core/stdafx.h"
+#include "Managers/ECS/mComponent.h"
 
 namespace NIKESAURUS {
 	void Component::Manager::cloneEntity(Entity::Type clone, Entity::Type copy) {

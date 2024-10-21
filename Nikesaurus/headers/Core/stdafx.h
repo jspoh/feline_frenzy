@@ -11,21 +11,21 @@
 
 #define _CRTDBG_MAP_ALLOC
 
-//Windows header
-#include <Windows.h>
+//Include windows for windows platform
+#ifdef NIKESAURUS_PLATFORM_WINDOWS
+    #include <Windows.h>
+#endif
+
+ /*****************************************************************//**
+ * Engine Specific Library
+ *********************************************************************/
+#ifdef NIKE_BUILD_DLL
 
 // graphics headers
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
 #undef APIENTRY
-
-#include "Core.h"
-
- /*****************************************************************//**
- * Windows
- *********************************************************************/
-#include <Windows.h>
 
  /*****************************************************************//**
  * FMOD Core
@@ -44,6 +44,11 @@
  *********************************************************************/
 #include "freetype/freetype.h"
 #include "ft2build.h"
+
+#endif //!!!Nest Engine specific includes within
+
+//Core For Exporting & Importing
+#include "Core.h"
 
  /*****************************************************************//**
  * STL
@@ -68,24 +73,25 @@
 #include <set>
 #include <ctime>
 #include <iomanip>
+#include <chrono>
 
  /*****************************************************************//**
  * Data (json)
  *********************************************************************/
-#include "../headers/Data/json.hpp"
+#include "Data/json.hpp"
 
  /*****************************************************************//**
  * Math headers
  *********************************************************************/
-#include "../headers/Math/Mtx33.h"	
-#include "../headers/Math/Vector2.h"
-#include "../headers/Math/Vector3.h"
-#include "../headers/Math/Vector4.h"
+#include "Math/Mtx33.h"	
+#include "Math/Vector2.h"
+#include "Math/Vector3.h"
+#include "Math/Vector4.h"
 
 /*****************************************************************//**
 * Utility
 *********************************************************************/
-#include "../headers/Utility/uSystems.h"
+#include "Utility/uSystems.h"
 
 /*****************************************************************//**
 * Math Defines

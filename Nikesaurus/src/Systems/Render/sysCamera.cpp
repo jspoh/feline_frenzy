@@ -7,9 +7,9 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/Render/sysCamera.h"
-#include "../headers/Core/Engine.h"
+#include "Core/stdafx.h"
+#include "Systems/Render/sysCamera.h"
+#include "Core/Engine.h"
 
 Camera::System::System() : target(Vector2(0, 0)), up(Vector2(0, 1)) {
 	// Set default matrices as identity

@@ -7,11 +7,11 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/GameLogic/sysAnimationController.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cAnimation.h"
-#include "../headers/Components/cInput.h"
+#include "Core/stdafx.h"
+#include "Systems/GameLogic/sysAnimationController.h"
+#include "Core/Engine.h"
+#include "Components/cAnimation.h"
+#include "Components/cInput.h"
 
 void AnimationController::Manager::init() {
 

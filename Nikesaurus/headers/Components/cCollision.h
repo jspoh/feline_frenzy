@@ -12,7 +12,7 @@
 #ifndef C_COLLISION_HPP
 #define C_COLLISION_HPP
 
-#include "../headers/Core/stdafx.h"
+#include "Core/stdafx.h"
 
 namespace NIKESAURUS {
     namespace Collision {

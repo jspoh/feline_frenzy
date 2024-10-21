@@ -11,8 +11,8 @@
 #ifndef CAMERA_SYSTEM_HPP
 #define CAMERA_SYSTEM_HPP
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Components/cRender.h"
+#include "Core/stdafx.h"
+#include "Components/cRender.h"
 
 namespace Camera {
 

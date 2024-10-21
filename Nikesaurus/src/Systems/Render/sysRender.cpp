@@ -8,12 +8,12 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Components/cTransform.h"
-#include "../headers/Components/cRender.h"
-#include "../headers/Math/Mtx33.h"
+#include "Core/stdafx.h"
+#include "Core/Engine.h"
+#include "Systems/Render/sysRender.h"
+#include "Components/cTransform.h"
+#include "Components/cRender.h"
+#include "Math/Mtx33.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
@@ -525,8 +525,8 @@ void Render::Manager::init() {
 
 void Render::Manager::update() {
 
-	//Might move this into render system
-	glfwSwapBuffers(NIKEEngine.accessWindow()->getWindow());
+	//Swap buffers
+	NIKEEngine.getService<Windows::Manager>()->swapBuffers();
 
 	// Before drawing clear screen
 	glClear(GL_COLOR_BUFFER_BIT);

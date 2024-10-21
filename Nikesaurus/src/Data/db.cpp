@@ -7,8 +7,8 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Data/db.h"
+#include "Core/stdafx.h"
+#include "Data/db.h"
 
 using json = nlohmann::json;
 

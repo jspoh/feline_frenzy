@@ -7,12 +7,12 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mAssets.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Systems/sysAudio.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Components/cRender.h"
+#include "Core/stdafx.h"
+#include "Managers/mAssets.h"
+#include "Core/Engine.h"
+#include "Systems/sysAudio.h"
+#include "Systems/Render/sysRender.h"
+#include "Components/cRender.h"
 
 namespace NIKESAURUS {
 	Assets::Manager::~Manager() {

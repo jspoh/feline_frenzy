@@ -11,8 +11,8 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include "../headers/Managers/mSystem.h"
-#include "../headers/Components/cInput.h"
+#include "Managers/ECS/mSystem.h"
+#include "Components/cInput.h"
 
 namespace Input {
 

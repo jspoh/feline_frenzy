@@ -12,7 +12,7 @@
 #ifndef FONT_SYSTEM_HPP
 #define FONT_SYSTEM_HPP
 
-#include "../headers/Components/cRender.h"
+#include "Components/cRender.h"
 
 namespace Font {
 

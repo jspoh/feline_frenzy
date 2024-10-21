@@ -7,33 +7,29 @@
 // * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 // *********************************************************************/
 //
-//#pragma once
-//
-//#ifndef SPLASH_SCENE_HPP
-//#define SPLASH_SCENE_HPP
-//
-//#include "../headers/Managers/mScenes.h"
-//#include "../headers/Core/Engine.h"
-//
-//namespace Splash {
-//	class Scene : public Scenes::IScene {
-//	private:
-//		std::unordered_map<std::string, Entity::Type> entities;
-//
-//	public:
-//
-//		//Dfeault constructor
-//		Scene() = default;
-//
-//		//Scene phases
-//		void load() override;
-//		void init() override;
-//		void exit() override;
-//		void unload() override;
-//
-//		//Default destructor
-//		~Scene() override = default;
-//	};
-//}
-//
-//#endif // !SPLASH_SCENE_HPP
+#pragma once
+
+#ifndef SPLASH_SCENE_HPP
+#define SPLASH_SCENE_HPP
+
+namespace Splash {
+	class Scene : public NIKESAURUS::Scenes::IScene {
+	private:
+
+	public:
+
+		//Dfeault constructor
+		Scene() = default;
+
+		//Scene phases
+		void load() override;
+		void init() override;
+		void exit() override;
+		void unload() override;
+
+		//Default destructor
+		~Scene() override = default;
+	};
+}
+
+#endif // !SPLASH_SCENE_HPP

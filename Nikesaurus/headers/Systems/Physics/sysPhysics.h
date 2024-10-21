@@ -12,51 +12,51 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
-#include "../headers/Systems/sysInput.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Systems/Physics/sysCollision.h"
+#include "Systems/Physics/sysCollision.h"
+#include "Managers/ECS/mSystem.h"
 
-namespace Physics {
+namespace NIKESAURUS {
+	namespace Physics {
 
-	class Manager : public System::ISystem {
-	private:
-		//Delete Copy Constructor & Copy Assignment
-		Manager(Manager const& copy) = delete;
-		void operator=(Manager const& copy) = delete;
+		class Manager : public System::ISystem {
+		private:
+			//Delete Copy Constructor & Copy Assignment
+			Manager(Manager const& copy) = delete;
+			void operator=(Manager const& copy) = delete;
 
-	public:
-		Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
+		public:
+			Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
 
-		//Default Constructor
-		Manager() = default;
+			//Default Constructor
+			Manager() = default;
 
-		//Default Destructor
-		~Manager() override = default;
+			//Default Destructor
+			~Manager() override = default;
 
-		//Singleton Of Manager Class
-		static std::shared_ptr<Manager> getInstance() {
-			static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
-			return instance;
-		}
+			//Singleton Of Manager Class
+			static std::shared_ptr<Manager> getInstance() {
+				static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+				return instance;
+			}
 
-		//Init
-		void init() override;
+			//Init
+			void init() override;
 
-		// Runtime scaling and rotation
-		void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
+			// Runtime scaling and rotation
+			void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
 
-		std::string getSysName() override
-		{
-			return "Physics System";
-		}
+			std::string getSysName() override
+			{
+				return "Physics System";
+			}
 
-		//Update
-		void update() override;
+			//Update
+			void update() override;
 
-		//Move Object
-		//void move(Transform::Transform& transform);
-	};
+			//Move Object
+			//void move(Transform::Transform& transform);
+		};
+	}
 }
 
 #endif //!INPUT_HPP

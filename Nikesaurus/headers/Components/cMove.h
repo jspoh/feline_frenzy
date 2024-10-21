@@ -12,7 +12,7 @@
 #ifndef C_MOVE_HPP
 #define C_MOVE_HPP
 
-#include "../headers/Core/stdafx.h"
+#include "Core/stdafx.h"
 
 namespace NIKESAURUS {
 	namespace Move {

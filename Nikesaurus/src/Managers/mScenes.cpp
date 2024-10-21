@@ -7,11 +7,11 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mScenes.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cInput.h"
-#include "../headers/Components/cScene.h"
+#include "Core/stdafx.h"
+#include "Managers/mScenes.h"
+#include "Core/Engine.h"
+#include "Components/cInput.h"
+#include "Components/cScene.h"
 
 namespace NIKESAURUS {
 	void Scenes::Manager::initScene(std::string scene_id) {

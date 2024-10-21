@@ -12,7 +12,7 @@
 #ifndef C_INPUT_HPP
 #define C_INPUT_HPP
 
-#include "../headers/Core/stdafx.h"
+#include "Core/stdafx.h"
 
 namespace NIKESAURUS {
 	namespace Input {

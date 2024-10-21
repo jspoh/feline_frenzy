@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\App.cpp" />
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
@@ -41,14 +40,13 @@
     <ClCompile Include="src\Utility\uSystems.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Core\App.h" />
     <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Components\cScene.h" />
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
-    <ClInclude Include="Nikesaurus.h" />
+    <ClInclude Include="headers\Nikesaurus.h" />
     <ClInclude Include="headers\Managers\mDebug.h" />
     <ClInclude Include="headers\Managers\mEvents.h" />
     <ClInclude Include="headers\Managers\mWindows.h" />
@@ -133,13 +131,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)$(ProjectName)\headers;$(SolutionDir)$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(ProjectName)\dependencies\lib\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)$(ProjectName)\headers;$(SolutionDir)\$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)$(ProjectName)\headers;$(SolutionDir)$(ProjectName)\dependencies\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(ProjectName)\dependencies\lib\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\output\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin\intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
@@ -180,7 +178,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../headers/Core/stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Core/stdafx.h</PrecompiledHeaderFile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -198,7 +196,9 @@ xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
+
+xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -211,7 +211,7 @@ xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\ou
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../headers/Core/stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Core/stdafx.h</PrecompiledHeaderFile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -232,7 +232,7 @@ xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\$(ProjectName)\$(ProjectName).dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

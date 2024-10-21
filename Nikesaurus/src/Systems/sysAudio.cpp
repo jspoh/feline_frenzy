@@ -7,10 +7,10 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysAudio.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cAudio.h"
+#include "Core/stdafx.h"
+#include "Systems/sysAudio.h"
+#include "Core/Engine.h"
+#include "Components/cAudio.h"
 
 // Create Fmod instance
 Audio::Manager::Manager()

@@ -7,11 +7,11 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysInput.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cTransform.h"
-#include "../headers/Systems/Render/sysRender.h"
+#include "Core/stdafx.h"
+#include "Systems/sysInput.h"
+#include "Core/Engine.h"
+#include "Components/cTransform.h"
+#include "Systems/Render/sysRender.h"
 
 void Input::Manager::setupEventCallbacks() {
 	glfwSetFramebufferSizeCallback(NIKEEngine.accessWindow()->getWindow(), fbsize_cb);

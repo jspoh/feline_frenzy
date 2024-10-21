@@ -12,8 +12,8 @@
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
 
-#include "../headers/Systems/sysAudio.h"
-#include "../headers/Components/cRender.h"
+#include "Systems/sysAudio.h"
+#include "Components/cRender.h"
 
 namespace NIKESAURUS {
 	namespace Assets

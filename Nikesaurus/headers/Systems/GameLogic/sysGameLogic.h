@@ -11,7 +11,7 @@
 #ifndef GAME_LOGIC_HPP
 #define GAME_LOGIC_HPP
 
-#include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/ECS/mSystem.h"
 #include "../headers/Systems/Render/sysRender.h"
 #include "../headers/Core/Engine.h"
 #include "../headers/Components/cInput.h"

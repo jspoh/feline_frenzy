@@ -7,13 +7,13 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cRender.h"
-#include "../headers/Components/cInput.h"
-#include "../headers/Components/cTransform.h"
+#include "Core/stdafx.h"
+#include "Systems/GameLogic/sysObjectSpawner.h"
+#include "Systems/Render/sysRender.h"
+#include "Core/Engine.h"
+#include "Components/cRender.h"
+#include "Components/cInput.h"
+#include "Components/cTransform.h"
 
 void ObjectSpawner::Manager::generateRandomObject() {
 	Entity::Type new_entity = NIKEEngine.createEntity();

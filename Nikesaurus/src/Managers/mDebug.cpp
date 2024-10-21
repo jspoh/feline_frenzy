@@ -7,8 +7,8 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mDebug.h"
+#include "Core/stdafx.h"
+#include "Managers/mDebug.h"
 
 namespace NIKESAURUS {
 	namespace Debug

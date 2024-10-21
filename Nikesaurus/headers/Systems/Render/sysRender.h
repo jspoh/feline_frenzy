@@ -14,13 +14,13 @@
 #ifndef RENDER_MANAGER_HPP
 #define RENDER_MANAGER_HPP
 
-#include "../headers/Systems/Render/sysFont.h"
-#include "../headers/Systems/Render/sysShader.h"
-#include "../headers/Systems/Render/sysCamera.h"
-#include "../headers/Components/cRender.h"
-#include "../headers/Components/cTransform.h"
-#include "../headers/Managers/ECS/mSystem.h"
-#include "../headers/Core/Engine.h"
+#include "Systems/Render/sysFont.h"
+#include "Systems/Render/sysShader.h"
+#include "Systems/Render/sysCamera.h"
+#include "Components/cRender.h"
+#include "Components/cTransform.h"
+#include "Managers/ECS/mSystem.h"
+#include "Core/Engine.h"
 
 namespace Render {
 

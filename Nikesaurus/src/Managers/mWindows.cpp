@@ -7,12 +7,21 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mWindows.h"
+#include "Core/stdafx.h"
+#include "Managers/mWindows.h"
 
 namespace NIKESAURUS {
-	void Windows::Manager::readConfigFile(std::string const& file_path) {
+	/*****************************************************************//**
+	* NIKE Window
+	*********************************************************************/
+	Windows::NIKEWindow::NIKEWindow(Vector2 window_size, std::string window_title)
+		: ptr_window{ nullptr }, window_size{ window_size }, window_title{ window_title }
+	{
+	}
 
+	Windows::NIKEWindow::NIKEWindow(std::string const& file_path) 
+		: ptr_window{nullptr}
+	{
 		//Get file stream
 		std::fstream fileStream;
 		fileStream.open(file_path, std::ios::in);
@@ -35,7 +44,7 @@ namespace NIKESAURUS {
 		fileStream.close();
 	}
 
-	void Windows::Manager::configSystem() {
+	void Windows::NIKEWindow::configWindow() {
 		if (!glfwInit()) {
 			cerr << "Failed to initialize GLFW\n";
 			throw std::exception();
@@ -75,7 +84,69 @@ namespace NIKESAURUS {
 
 		//Engine Init Successful
 		cout << "GL init success" << endl;
+	}
 
+	void Windows::NIKEWindow::pollEvents() {
+		//Poll system events ( Interativity with app )
+		glfwPollEvents();
+	}
+
+	void Windows::NIKEWindow::swapBuffers() {
+		glfwSwapBuffers(ptr_window);
+	}
+
+	void Windows::NIKEWindow::setWindowTitle(const std::string& title) {
+		glfwSetWindowTitle(ptr_window, title.c_str());
+	}
+
+	std::string Windows::NIKEWindow::getWindowTitle() const {
+		return window_title;
+	}
+
+	void Windows::NIKEWindow::setWindowSize(float width, float height) {
+		window_size.x = width;
+		window_size.y = height;
+
+		glfwSetWindowSize(ptr_window, static_cast<int>(window_size.x), static_cast<int>(window_size.y));
+	}
+
+	Vector2 Windows::NIKEWindow::getWindowSize() const {
+		return window_size;
+	}
+
+	bool Windows::NIKEWindow::windowState() const {
+		return !glfwWindowShouldClose(ptr_window);
+	}
+
+	void Windows::NIKEWindow::terminate() {
+		//Close Window
+		glfwSetWindowShouldClose(ptr_window, GLFW_TRUE);
+	}
+
+	void Windows::NIKEWindow::cleanUp() {
+		//Clean up window
+		glfwDestroyWindow(ptr_window);
+		glfwTerminate();
+	}
+
+	Windows::NIKEWindow::~NIKEWindow() {
+		// When the window closes, wait for user input before closing the console
+		cout << "Press any key to close the console..." << endl;
+		std::cin.get();
+	}
+
+	/*****************************************************************//**
+	* Window Manager
+	*********************************************************************/
+	Windows::Manager::Manager(std::shared_ptr<IWindow> window) 
+		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+
+	void Windows::Manager::setWindow(std::shared_ptr<IWindow> window) {
+		ptr_window = window;
+	}
+
+	std::shared_ptr<Windows::IWindow> Windows::Manager::getWindow() {
+		return ptr_window;
 	}
 
 	//Create console
@@ -92,33 +163,9 @@ namespace NIKESAURUS {
 		freopen_s(&fp, "CONOUT$", "w", stderr);
 		// Redirect stdin
 		freopen_s(&fp, "CONIN$", "r", stdin);
-	}
 
-	void Windows::Manager::terminate() {
-		glfwSetWindowShouldClose(ptr_window, GLFW_TRUE);
-	}
-
-	void Windows::Manager::setWinTitle(std::string const& title) {
-		glfwSetWindowTitle(ptr_window, title.c_str());
-	}
-
-	std::string const& Windows::Manager::getWinTitle() {
-		return window_title;
-	}
-
-	GLFWwindow* Windows::Manager::getWindow() const {
-		return ptr_window;
-	}
-
-	void Windows::Manager::setWindowSize(float width, float height) {
-		window_size.x = width;
-		window_size.y = height;
-
-		glfwSetWindowSize(ptr_window, static_cast<int>(window_size.x), static_cast<int>(window_size.y));
-	}
-
-	Vector2 const& Windows::Manager::getWindowSize() const {
-		return window_size;
+		//Welcome Message
+		cout << "Welcome To Nikesaurus." << endl;
 	}
 
 	void Windows::Manager::setTargetFPS(int fps) {

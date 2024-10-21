@@ -1,3 +1,3 @@
-#include "../headers/Core/pch.h"
+#include "Core/pch.h"
 
 //Creation point for precompiled headers

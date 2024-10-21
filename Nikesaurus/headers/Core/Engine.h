@@ -13,13 +13,13 @@
 #define ENGINE_HPP
 
 //Services
-#include "../headers/Managers/mWindows.h"
-#include "../headers/Managers/mScenes.h"
-#include "../headers/Managers/mEvents.h"
-#include "../headers/Managers/mAssets.h"
-#include "../headers/Managers/mDebug.h"
-#include "../headers/Managers/mSerialization.h"
-#include "../headers/Managers/ECS/mCoordinator.h"
+#include "Managers/mWindows.h"
+#include "Managers/mScenes.h"
+#include "Managers/mEvents.h"
+//#include "Managers/mAssets.h"
+#include "Managers/mDebug.h"
+#include "Managers/mSerialization.h"
+#include "Managers/ECS/mCoordinator.h"
 
 namespace NIKESAURUS {
 	namespace Core {
@@ -111,10 +111,10 @@ namespace NIKESAURUS {
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)
-
-		//Predefined name for core engine
-		#define NIKEEngine Core::Engine::getInstance()
 	}
 }
+
+//Predefined variable for the core engine
+static NIKESAURUS::Core::Engine& NIKEEngine = NIKESAURUS::Core::Engine::getInstance();
 
 #endif // !ENGINE_HPP

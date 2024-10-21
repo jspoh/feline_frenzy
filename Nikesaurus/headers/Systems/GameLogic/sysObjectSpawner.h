@@ -11,7 +11,7 @@
 #ifndef OBJECT_SPAWNER_HPP
 #define OBJECT_SPAWNER_HPP
 
-#include "../headers/Managers/mSystem.h"
+#include "../headers/Managers/ECS/mSystem.h"
 
 namespace ObjectSpawner {
 

@@ -13,8 +13,8 @@
 #define C_AUDIO_HPP
 
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/sysAudio.h"
+#include "Core/stdafx.h"
+#include "Systems/sysAudio.h"
 
 /************************************
 * SOME NOTES TO TAKE NOTE OF: 

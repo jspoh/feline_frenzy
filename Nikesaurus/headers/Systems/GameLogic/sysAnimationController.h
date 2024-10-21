@@ -11,7 +11,7 @@
 #ifndef ANIMATION_CONTROLLER_HPP
 #define ANIMATION_CONTROLLER_HPP
 
-#include "../headers/Managers/mSystem.h"
+#include "Managers/ECS/mSystem.h"
 
 namespace AnimationController {
 

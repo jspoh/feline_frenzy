@@ -12,8 +12,8 @@
 #ifndef C_ANIMATION_HPP
 #define C_ANIMATION_HPP
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/mEvents.h"
+#include "Core/stdafx.h"
+#include "Managers/mEvents.h"
 
 namespace NIKESAURUS {
 	namespace Animation {

@@ -7,9 +7,9 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-#include "../headers/Core/stdafx.h"
-#include "../headers/Systems/Render/sysFont.h"
-#include "../headers/Core/Engine.h"
+#include "Core/stdafx.h"
+#include "Systems/Render/sysFont.h"
+#include "Core/Engine.h"
 
 Font::Manager::Manager() {
 	//Init free type library

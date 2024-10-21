@@ -12,7 +12,7 @@
 #ifndef C_SCENES_HPP
 #define C_SCENES_HPP
 
-#include "../headers/Core/stdafx.h"
+#include "Core/stdafx.h"
 
 namespace NIKESAURUS {
 	namespace Scenes {

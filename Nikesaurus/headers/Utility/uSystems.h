@@ -12,32 +12,40 @@
 #ifndef SYSTEM_UTILS_HPP
 #define SYSTEM_UTILS_HPP
 
-namespace Utility {
+namespace NIKESAURUS {
+	namespace Utility {
 
-	/*****************************************************************//**
-	* Clock object
-	*********************************************************************/
-	class Clock {
-	private:
-		//Start Time
-		std::chrono::time_point<std::chrono::high_resolution_clock> start;
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		//Current Duration
-		std::chrono::duration<float> duration;
+		/*****************************************************************//**
+		* Clock object
+		*********************************************************************/
+		class NIKESAURUS_API Clock {
+		private:
+			//Start Time
+			std::chrono::time_point<std::chrono::high_resolution_clock> start;
 
-	public:
-		//Default Constructor
-		Clock();
+			//Current Duration
+			std::chrono::duration<float> duration;
 
-		//Get Current Elapsed Time
-		float getElapsedTime();
+		public:
+			//Default Constructor
+			Clock();
 
-		//Restart Clock
-		void restartClock();
-	};
+			//Get Current Elapsed Time
+			float getElapsedTime();
 
-	//Generate random float
-	float randFloat();
+			//Restart Clock
+			void restartClock();
+		};
+
+		//Generate random float
+		float NIKESAURUS_API randFloat();
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
+	}
 }
 
 #endif //!SYSTEM_UTILS_HPP

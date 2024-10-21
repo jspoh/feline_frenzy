@@ -1,7 +1,13 @@
-#include "../headers/Core/stdafx.h"
-#include "../headers/Managers/ECS/mCoordinator.h"
+#include "Core/stdafx.h"
+#include "Managers/ECS/mCoordinator.h"
 
 namespace NIKESAURUS {
+	//Default constructor
+	Coordinator::Manager::Manager()
+		: entity_manager{ std::make_unique<Entity::Manager>() },
+		component_manager{ std::make_unique<Component::Manager>() },
+		system_manager{ std::make_unique<System::Manager>() } {}
+
 	/*****************************************************************//**
 	* Entity Methods
 	*********************************************************************/
