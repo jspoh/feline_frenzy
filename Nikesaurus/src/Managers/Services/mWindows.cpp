@@ -9,18 +9,19 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/mWindows.h"
+#include "Managers/Services/mEvents.h"
 
 namespace NIKESAURUS {
 	/*****************************************************************//**
 	* NIKE Window
 	*********************************************************************/
-	Windows::NIKEWindow::NIKEWindow(Vector2f window_size, std::string window_title)
-		: ptr_window{ nullptr }, window_size{ window_size }, window_title{ window_title }
+	Windows::NIKEWindow::NIKEWindow(Vector2i window_size, std::string window_title)
+		: ptr_window{ nullptr }, window_pos(), window_size{window_size}, window_title{window_title}, b_full_screen{false}
 	{
 	}
 
 	Windows::NIKEWindow::NIKEWindow(std::string const& file_path) 
-		: ptr_window{nullptr}
+		: ptr_window{nullptr}, b_full_screen{ false }
 	{
 		//Get file stream
 		std::fstream fileStream;
@@ -86,6 +87,63 @@ namespace NIKESAURUS {
 		cout << "GL init success" << endl;
 	}
 
+	void Windows::NIKEWindow::setWindowMode(int mode, int value) {
+		glfwSetWindowAttrib(ptr_window, mode, value);
+	}
+
+	int Windows::NIKEWindow::queryWindowMode(int mode) {
+		return glfwGetWindowAttrib(ptr_window, mode);
+	}
+
+	void Windows::NIKEWindow::setFullScreen(int value) {
+
+		//Attributes
+		GLFWmonitor * monitor;
+		const GLFWvidmode* mode;
+
+		//Static Window Size For Remembering Size Before FullScreen
+		static Vector2i win_size;
+
+		if (value == GLFW_TRUE && !b_full_screen) {
+			//Get FullScreen Attributes
+			monitor = glfwGetPrimaryMonitor();
+			mode = glfwGetVideoMode(monitor);
+
+			// Get the window position and size
+			glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
+			glfwGetWindowSize(ptr_window, &win_size.x, &win_size.y);
+
+			// Recreate the window in fullscreen mode
+			glfwSetWindowMonitor(ptr_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+
+			//Set Full Screen Mode True
+			b_full_screen = true;
+		}
+		
+		if(value == GLFW_FALSE && b_full_screen) {
+			// Go to windowed mode
+			monitor = nullptr;
+
+			// Recreate the window in windowed mode at the stored position and size
+			glfwSetWindowMonitor(ptr_window, nullptr, window_pos.x, window_pos.y, win_size.x, win_size.y, 0);
+
+			//Set Full Screen Mode False
+			b_full_screen = false;
+		}
+	}
+
+	void Windows::NIKEWindow::setupEventCallbacks() {
+		glfwSetFramebufferSizeCallback(ptr_window, Events::Manager::fbsize_cb);
+		//glfwSetKeyCallback(ptr_window, Events::Manager::key_cb);
+		//glfwSetMouseButtonCallback(ptr_window, Events::Manager::mousebutton_cb);
+		//glfwSetCursorPosCallback(ptr_window, Events::Manager::mousepos_cb);
+		//glfwSetScrollCallback(ptr_window, Events::Manager::mousescroll_cb);
+	}
+
+	void Windows::NIKEWindow::setInputMode(int mode, int value){
+		glfwSetInputMode(ptr_window, mode, value);
+	}
+
 	void Windows::NIKEWindow::pollEvents() {
 		//Poll system events ( Interativity with app )
 		glfwPollEvents();
@@ -103,15 +161,20 @@ namespace NIKESAURUS {
 		return window_title;
 	}
 
-	void Windows::NIKEWindow::setWindowSize(float width, float height) {
+	void Windows::NIKEWindow::setWindowSize(int width, int height) {
 		window_size.x = width;
 		window_size.y = height;
 
 		glfwSetWindowSize(ptr_window, static_cast<int>(window_size.x), static_cast<int>(window_size.y));
 	}
 
-	Vector2f Windows::NIKEWindow::getWindowSize() const {
+	Vector2i Windows::NIKEWindow::getWindowSize() const {
 		return window_size;
+	}
+
+	Vector2i Windows::NIKEWindow::getWindowPos() {
+		glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
+		return window_pos;
 	}
 
 	bool Windows::NIKEWindow::windowState() const {
@@ -133,6 +196,11 @@ namespace NIKESAURUS {
 		// When the window closes, wait for user input before closing the console
 		cout << "Press any key to close the console..." << endl;
 		std::cin.get();
+	}
+
+	void Windows::NIKEWindow::executeEvent(std::shared_ptr<WindowResized> event) {
+		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
+		window_size = event->frame_buffer;
 	}
 
 	/*****************************************************************//**

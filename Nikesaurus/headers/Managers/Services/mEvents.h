@@ -71,6 +71,17 @@ namespace NIKESAURUS {
 			//Default constructor
 			Manager() = default;
 
+			#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
+
+			//Event Callbacks
+			static void fbsize_cb(GLFWwindow* window, int width, int height);
+			static void key_cb(GLFWwindow* window, int key, int scancode, int action, int mods);
+			static void mousebutton_cb(GLFWwindow* window, int button, int action, int mods);
+			static void mousepos_cb(GLFWwindow* window, double xpos, double ypos);
+			static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
+
+			#endif //Expose implementation only to NIKE Engine
+
 			//Add listener
 			template<typename T>
 			void addEventListeners(std::shared_ptr<IEventListener<T>> listener) {

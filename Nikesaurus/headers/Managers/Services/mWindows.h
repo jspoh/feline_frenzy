@@ -12,13 +12,24 @@
 #ifndef WINDOWS_HPP
 #define WINDOWS_HPP
 
+#include "mEvents.h"
+
 namespace NIKESAURUS {
 	namespace Windows {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		//Window Resize Event
+		struct WindowResized : Events::IEvent {
+			Vector2i frame_buffer;
+
+			WindowResized(int width, int height)
+				:frame_buffer{ width, height } {}
+		};
+
+
 		//Abstract Window Class
-		class NIKESAURUS_API IWindow {
+		class NIKESAURUS_API IWindow : public Events::IEventListener<WindowResized> {
 		private:
 		public:
 			//Defaults
@@ -27,6 +38,21 @@ namespace NIKESAURUS {
 
 			//Configure Window Setup
 			virtual void configWindow() = 0;
+
+			//Set Window Mode
+			virtual void setWindowMode(int mode, int value) = 0;
+
+			//Query Window Mode
+			virtual int queryWindowMode(int mode) = 0;
+
+			//Toggle Full Screen Mode
+			virtual void setFullScreen(int value) = 0;
+
+			//Setup Event Callbacks
+			virtual void setupEventCallbacks() = 0;
+
+			//Set input modes
+			virtual void setInputMode(int mode, int value) = 0;
 
 			//Poll window events
 			virtual void pollEvents() = 0;
@@ -41,10 +67,13 @@ namespace NIKESAURUS {
 			virtual std::string getWindowTitle() const = 0;
 
 			//Set window size
-			virtual void setWindowSize(float width, float height) = 0;
+			virtual void setWindowSize(int width, int height) = 0;
 
 			//Get window size
-			virtual Vector2f getWindowSize() const = 0;
+			virtual Vector2i getWindowSize() const = 0;
+
+			//Get window pos
+			virtual Vector2i getWindowPos() = 0;
 
 			//Check window state
 			virtual bool windowState() const = 0;
@@ -54,6 +83,9 @@ namespace NIKESAURUS {
 
 			//Clean up window resources
 			virtual void cleanUp() = 0;
+
+			//Window Event
+			virtual void executeEvent(std::shared_ptr<WindowResized> event) override = 0;
 		};
 
 		#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
@@ -61,16 +93,30 @@ namespace NIKESAURUS {
 		//Nike Engine Window
 		class NIKEWindow : public IWindow {
 		private:
+
+			//Window Variables
 			GLFWwindow* ptr_window;
-			Vector2f window_size;
+			Vector2i window_pos;
+			Vector2i window_size;
 			std::string window_title;
+			bool b_full_screen;
 		public:
 
-			NIKEWindow(Vector2f window_size, std::string window_title);
+			NIKEWindow(Vector2i window_size, std::string window_title);
 
 			NIKEWindow(std::string const& file_path);
 
 			void configWindow() override;
+
+			void setWindowMode(int mode, int value) override;
+
+			int queryWindowMode(int mode) override;
+
+			void setFullScreen(int value) override;
+
+			void setupEventCallbacks() override;
+
+			void setInputMode(int mode, int value) override;
 
 			void pollEvents() override;
 
@@ -80,9 +126,11 @@ namespace NIKESAURUS {
 
 			std::string getWindowTitle() const override;
 
-			void setWindowSize(float width, float height) override;
+			void setWindowSize(int width, int height) override;
 
-			Vector2f getWindowSize() const override;
+			Vector2i getWindowSize() const override;
+
+			Vector2i getWindowPos() override;
 
 			bool windowState() const override;
 
@@ -91,10 +139,13 @@ namespace NIKESAURUS {
 			void cleanUp() override;
 
 			~NIKEWindow() override;
+
+			void executeEvent(std::shared_ptr<WindowResized> event) override;
 		};
 
 		#endif //Expose implementation only to NIKE Engine
 
+		//Window Manager
 		class NIKESAURUS_API Manager {
 		private:
 			//Delete Copy Constructor & Copy Assignment

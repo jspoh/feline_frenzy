@@ -37,7 +37,6 @@
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cMove.h" />
-    <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Managers\Services\mEvents.h" />
     <ClInclude Include="headers\Managers\Services\mWindows.h" />
     <ClInclude Include="headers\Components\cCollision.h" />

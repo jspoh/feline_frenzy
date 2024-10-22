@@ -136,6 +136,12 @@ namespace NIKESAURUS {
 		//Set Target FPS
 		windows_manager->setTargetFPS(fps);
 
+		//Set up event callbacks
+		windows_manager->getWindow()->setupEventCallbacks();
+
+		//Add Event Listeners
+		getService<Events::Manager>()->addEventListeners<Windows::WindowResized>(NIKEEngine.getService<Windows::Manager>()->getWindow());
+
 		////Register Def Component
 		//registerDefComponents();
 

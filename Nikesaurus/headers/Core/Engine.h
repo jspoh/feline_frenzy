@@ -105,7 +105,7 @@ namespace NIKESAURUS {
 				}
 
 				//Return service
-				return std::static_pointer_cast<T>(services.at(service_name));
+				return std::static_pointer_cast<T>(services.find(service_name)->second);
 			}
 		};
 

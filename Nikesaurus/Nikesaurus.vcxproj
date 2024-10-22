@@ -42,7 +42,6 @@
   <ItemGroup>
     <ClInclude Include="headers\Components\cCollision.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
-    <ClInclude Include="headers\Components\cInput.h" />
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
     <ClInclude Include="headers\Nikesaurus.h" />
