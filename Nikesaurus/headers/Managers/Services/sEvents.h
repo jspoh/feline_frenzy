@@ -46,30 +46,31 @@ namespace NIKESAURUS {
 			void execute(std::shared_ptr<IEvent> event) override {
 				auto casted_event = std::dynamic_pointer_cast<T>(event);
 				if (casted_event)
-					executeEvent(casted_event);
+					onEvent(casted_event);
 			}
 
+		protected:
 			//Event execution
-			virtual void executeEvent(std::shared_ptr<T> event) = 0;
+			virtual void onEvent(std::shared_ptr<T> event) = 0;
 		};
 
 		//Events manager
-		class NIKESAURUS_API Manager {
+		class NIKESAURUS_API Service {
 		public:
 			//Type def container of event listeners
 			using EventListeners = std::vector<std::shared_ptr<BaseEventListener>>;
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete;
-			void operator=(Manager const& copy) = delete;
+			Service(Service const& copy) = delete;
+			void operator=(Service const& copy) = delete;
 
 			//Storage of event listeners
 			std::unordered_map<std::string, EventListeners> event_listeners;
 
 		public:
 			//Default constructor
-			Manager() = default;
+			Service() = default;
 
 			#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
 

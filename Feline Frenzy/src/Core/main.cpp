@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   main.cpp
+ * \brief  Main entry point for Demo
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \date   October 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
 #include "Core/pch.h"
 
 //Splash Scene
@@ -20,11 +28,11 @@ int WINAPI WinMain(
 	NIKEEngine.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
 
 	//Register Scenes
-	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->registerScene<Splash::Scene>("SPLASH");
-	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->registerScene<Menu::Scene>("MENU");
+	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Splash::Scene>("SPLASH");
+	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Menu::Scene>("MENU");
 
 	//Change Scene To Main Menu
-	NIKEEngine.getService<NIKESAURUS::Scenes::Manager>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
+	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
 
 	//Run Engine
 	NIKEEngine.run();

@@ -1,46 +1,124 @@
 /*****************************************************************//**
- * \file   sysInput.cpp
+ * \file   mInput.cpp
  * \brief  input manager for engine
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/Input/mInput.h"
 #include "Core/Engine.h"
-#include "Components/cTransform.h"
-#include "Systems/Render/sysRender.h"
+#include "Managers/Services/sInput.h"
 
 namespace NIKESAURUS {
 
-	Input::Manager::Manager()
-	{
-		//Setup event callbacks
-		NIKEEngine.getService<Windows::Manager>()->getWindow()->setupEventCallbacks();
+	void Input::Service::onEvent(std::shared_ptr<KeyEvent> event) {
 
-		//Setup input modes
-		NIKEEngine.getService<Windows::Manager>()->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
+		//Reset all release events upon new event
+		for (auto& input : input_events) {
+			input.second.released = false;
+		}
+
+		//Handle event states
+		switch (event->state) {
+		case States::PRESS:
+			input_events[event->code].pressed = true;
+			input_events[event->code].triggered = true;
+			input_events[event->code].released = false;
+			break;
+		case States::REPEAT:
+			input_events[event->code].pressed = true;
+			input_events[event->code].triggered = false;
+			input_events[event->code].released = false;
+			break;
+		case States::RELEASE:
+			input_events[event->code].pressed = false;
+			input_events[event->code].triggered = false;
+			input_events[event->code].released = true;
+			break;
+		default:
+			break;
+		}
 	}
 
-	void Input::Manager::executeEvent(std::shared_ptr<KeyEvent> event) {
+	void Input::Service::onEvent(std::shared_ptr<MouseBtnEvent> event) {
+		//Reset all release events upon new event
+		for (auto& input : input_events) {
+			input.second.released = false;
+		}
 
+		//Handle event states
+		switch (event->state) {
+		case States::PRESS:
+			input_events[event->code].pressed = true;
+			input_events[event->code].triggered = true;
+			input_events[event->code].released = false;
+			break;
+		case States::REPEAT:
+			input_events[event->code].pressed = true;
+			input_events[event->code].triggered = false;
+			input_events[event->code].released = false;
+			break;
+		case States::RELEASE:
+			input_events[event->code].pressed = false;
+			input_events[event->code].triggered = false;
+			input_events[event->code].released = true;
+			break;
+		default:
+			break;
+		}
 	}
 
-	void Input::Manager::executeEvent(std::shared_ptr<MouseBtnEvent> event) {
-
+	void Input::Service::onEvent(std::shared_ptr<MouseMovedEvent> event) {
+		mouse.pos = event->pos;
 	}
 
-	void Input::Manager::executeEvent(std::shared_ptr<MouseMovedEvent> event) {
-
+	void Input::Service::onEvent(std::shared_ptr<MouseScrollEvent> event) {
+		mouse.offset = event->offset;
 	}
 
-	void Input::Manager::executeEvent(std::shared_ptr<MouseScrollEvent> event) {
-
+	bool Input::Service::isKeyPressed(int key) {
+		return input_events[key].pressed;
 	}
 
-	//bool Input::Manager::mouseTriggerCheck() {
+	bool Input::Service::isKeyTriggered(int key) {
+		bool return_state = input_events[key].triggered;
+		input_events[key].triggered = false;
+		return return_state;
+	}
+
+	bool Input::Service::isKeyReleased(int key) {
+		bool return_state = input_events[key].released;
+		input_events[key].released = false;
+		return return_state;
+	}
+
+	bool Input::Service::isMousePressed(int btn) {
+		return input_events[btn].pressed;
+	}
+
+	bool Input::Service::isMouseTriggered(int btn) {
+		bool return_state = input_events[btn].triggered;
+		input_events[btn].triggered = false;
+		return return_state;
+	}
+
+	bool Input::Service::isMouseReleased(int btn) {
+		bool return_state = input_events[btn].released;
+		input_events[btn].released = false;
+		return return_state;
+	}
+
+	Vector2f Input::Service::getMousePos() const {
+		return mouse.pos;
+	}
+
+	Vector2f Input::Service::getMouseScroll() const {
+		return mouse.offset;
+	}
+
+	//bool Input::Service::mouseTriggerCheck() {
 	//	if (mouse.b_output && !b_mouse_triggered) {
 	//		b_mouse_triggered = true;
 	//		return true;
@@ -49,7 +127,7 @@ namespace NIKESAURUS {
 	//	return false;
 	//}
 
-	//bool Input::Manager::mouseReleaseCheck() {
+	//bool Input::Service::mouseReleaseCheck() {
 	//	if (!mouse.b_output && !b_mouse_released) {
 	//		b_mouse_released = true;
 	//		return true;
@@ -58,7 +136,7 @@ namespace NIKESAURUS {
 	//	return false;
 	//}
 
-	//bool Input::Manager::keyTriggerCheck() {
+	//bool Input::Service::keyTriggerCheck() {
 	//	if (key.b_output && !b_key_triggered) {
 	//		b_key_triggered = true;
 	//		return true;
@@ -67,7 +145,7 @@ namespace NIKESAURUS {
 	//	return false;
 	//}
 
-	//bool Input::Manager::keyReleaseCheck() {
+	//bool Input::Service::keyReleaseCheck() {
 	//	if (!key.b_output && !b_key_released) {
 	//		b_key_released = true;
 	//		return true;
@@ -76,7 +154,7 @@ namespace NIKESAURUS {
 	//	return false;
 	//}
 
-	//void Input::Manager::update() {
+	//void Input::Service::update() {
 
 	//	//Key trigger mode checking
 	//	bool key_triggered = keyTriggerCheck();
@@ -188,7 +266,7 @@ namespace NIKESAURUS {
 
 	//		if (key.b_output && (key.key_type == GLFW_KEY_P))
 	//		{
-	//			NIKEEngine.accessSystem<Audio::Manager>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
+	//			NIKEEngine.accessSystem<Audio::Service>()->NEAudioStopGroup(NIKEEngine.accessAssets()->getAudioGroup("test_group"));
 	//		}
 	//	}
 	//}

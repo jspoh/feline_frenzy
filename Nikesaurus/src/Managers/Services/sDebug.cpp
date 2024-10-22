@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/mDebug.h"
+#include "Managers/Services/sDebug.h"
 
 //Definition of nullstream for debugging
 NullStream nullstream;
@@ -16,9 +16,9 @@ NullStream nullstream;
 namespace NIKESAURUS {
 	namespace Debug
 	{
-		void Manager::logCrash()
+		void Service::logCrash()
 		{
-			std::ofstream log_file("src/Managers/Services/crash_log.txt", std::ios::app);
+			std::ofstream log_file("src/Services/Services/crash_log.txt", std::ios::app);
 			if (!log_file.is_open())
 			{
 				cout << "file not found" << endl;
@@ -37,7 +37,7 @@ namespace NIKESAURUS {
 			log_file.close();
 		}
 
-		void Manager::systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times, std::vector<std::shared_ptr<System::ISystem>> systems)
+		void Service::systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times, std::vector<std::shared_ptr<System::ISystem>> systems)
 		{
 			if (system_times.empty()) {
 				cout << "No active systems to report on." << endl;

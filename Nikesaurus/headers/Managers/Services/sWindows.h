@@ -2,7 +2,8 @@
  * \file   mWindows.h
  * \brief  Window functions
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
+ * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -12,7 +13,7 @@
 #ifndef WINDOWS_HPP
 #define WINDOWS_HPP
 
-#include "mEvents.h"
+#include "sEvents.h"
 
 namespace NIKESAURUS {
 	namespace Windows {
@@ -84,8 +85,9 @@ namespace NIKESAURUS {
 			//Clean up window resources
 			virtual void cleanUp() = 0;
 
+		private:
 			//Window Event
-			virtual void executeEvent(std::shared_ptr<WindowResized> event) override = 0;
+			virtual void onEvent(std::shared_ptr<WindowResized> event) override = 0;
 		};
 
 		#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
@@ -140,17 +142,17 @@ namespace NIKESAURUS {
 
 			~NIKEWindow() override;
 
-			void executeEvent(std::shared_ptr<WindowResized> event) override;
+			void onEvent(std::shared_ptr<WindowResized> event) override;
 		};
 
 		#endif //Expose implementation only to NIKE Engine
 
-		//Window Manager
-		class NIKESAURUS_API Manager {
+		//Window Service
+		class NIKESAURUS_API Service {
 		private:
 			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete;
-			void operator=(Manager const& copy) = delete;
+			Service(Service const& copy) = delete;
+			void operator=(Service const& copy) = delete;
 
 			//Engine Variables
 			std::shared_ptr<IWindow> ptr_window;
@@ -165,10 +167,10 @@ namespace NIKESAURUS {
 
 		public:
 			//Default constructor
-			Manager() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+			Service() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
 
 			//Arguement Constructor
-			Manager(std::shared_ptr<IWindow> window);
+			Service(std::shared_ptr<IWindow> window);
 
 			//Set Window
 			void setWindow(std::shared_ptr<IWindow> window);

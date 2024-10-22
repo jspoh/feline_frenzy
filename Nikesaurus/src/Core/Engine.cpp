@@ -111,36 +111,42 @@ namespace NIKESAURUS {
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
-		provideService(std::make_shared<Windows::Manager>());
-		provideService(std::make_shared<Scenes::Manager>());
-		provideService(std::make_shared<Events::Manager>());
-		//provideService(std::make_shared<Assets::Manager>());
-		provideService(std::make_shared<Debug::Manager>());
-		provideService(std::make_shared<Coordinator::Manager>());
 
-		windows_manager = getService<Windows::Manager>();
-		scenes_manager = getService<Scenes::Manager>();
-		ecs_coordinator = getService<Coordinator::Manager>();
+		//Provide Services
+		provideService(std::make_shared<Windows::Service>());
+		provideService(std::make_shared<Scenes::Service>());
+		provideService(std::make_shared<Events::Service>());
+		provideService(std::make_shared<Input::Service>());
+		//provideService(std::make_shared<Assets::Manager>());
+		provideService(std::make_shared<Debug::Service>());
+		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Create console
 		#ifndef NDEBUG
-		windows_manager->createConsole(custom_welcome);
+		getService<Windows::Service>()->createConsole(custom_welcome);
 		#endif
 
 		//Setup window with config file
-		windows_manager->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
+		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
 
 		//Config glfw window system
-		windows_manager->getWindow()->configWindow();
+		getService<Windows::Service>()->getWindow()->configWindow();
 
 		//Set Target FPS
-		windows_manager->setTargetFPS(fps);
+		getService<Windows::Service>()->setTargetFPS(fps);
 
 		//Set up event callbacks
-		windows_manager->getWindow()->setupEventCallbacks();
+		getService<Windows::Service>()->getWindow()->setupEventCallbacks();
+
+		//Setup input modes
+		NIKEEngine.getService<Windows::Service>()->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
 		//Add Event Listeners
-		getService<Events::Manager>()->addEventListeners<Windows::WindowResized>(NIKEEngine.getService<Windows::Manager>()->getWindow());
+		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKEEngine.getService<Windows::Service>()->getWindow());
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKEEngine.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKEEngine.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKEEngine.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKEEngine.getService<Input::Service>());
 
 		////Register Def Component
 		//registerDefComponents();
@@ -154,31 +160,31 @@ namespace NIKESAURUS {
 
 	void Core::Engine::run() {
 
-		while (windows_manager->getWindow()->windowState()) {
+		while (getService<Windows::Service>()->getWindow()->windowState()) {
 
 			//Calculate Delta Time
-			windows_manager->calculateDeltaTime();
+			getService<Windows::Service>()->calculateDeltaTime();
 
 			//Poll system events
-			windows_manager->getWindow()->pollEvents();
+			getService<Windows::Service>()->getWindow()->pollEvents();
 
 			//Set Window Title
-			windows_manager->getWindow()->setWindowTitle(windows_manager->getWindow()->getWindowTitle() +
-				" | " + scenes_manager->getCurrSceneID() +
-				" | " + std::to_string(windows_manager->getCurrentFPS()) + " fps" +
-				" | " + std::to_string(ecs_coordinator->getEntitiesCount()) + " entities");
+			getService<Windows::Service>()->getWindow()->setWindowTitle(getService<Windows::Service>()->getWindow()->getWindowTitle() +
+				" | " + getService<Scenes::Service>()->getCurrSceneID() +
+				" | " + std::to_string(getService<Windows::Service>()->getCurrentFPS()) + " fps" +
+				" | " + std::to_string(getService<Coordinator::Manager>()->getEntitiesCount()) + " entities");
 
 			//Update all systems
-			ecs_coordinator->updateSystems();
+			getService<Coordinator::Manager>()->updateSystems();
 
 			//Update scenes manager
-			scenes_manager->update();
+			getService<Scenes::Service>()->update();
 
 			//Control FPS
-			windows_manager->controlFPS();
+			getService<Windows::Service>()->controlFPS();
 		}
 
 		//Clean up window resources
-		windows_manager->getWindow()->cleanUp();
+		getService<Windows::Service>()->getWindow()->cleanUp();
 	}
 }

@@ -2,14 +2,15 @@
  * \file   mWindows.cpp
  * \brief  Windows manager
  *
- * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
+ * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/mWindows.h"
-#include "Managers/Services/mEvents.h"
+#include "Managers/Services/sWindows.h"
+#include "Managers/Services/sEvents.h"
 
 namespace NIKESAURUS {
 	/*****************************************************************//**
@@ -133,11 +134,11 @@ namespace NIKESAURUS {
 	}
 
 	void Windows::NIKEWindow::setupEventCallbacks() {
-		glfwSetFramebufferSizeCallback(ptr_window, Events::Manager::fbsize_cb);
-		//glfwSetKeyCallback(ptr_window, Events::Manager::key_cb);
-		//glfwSetMouseButtonCallback(ptr_window, Events::Manager::mousebutton_cb);
-		//glfwSetCursorPosCallback(ptr_window, Events::Manager::mousepos_cb);
-		//glfwSetScrollCallback(ptr_window, Events::Manager::mousescroll_cb);
+		glfwSetFramebufferSizeCallback(ptr_window, Events::Service::fbsize_cb);
+		glfwSetKeyCallback(ptr_window, Events::Service::key_cb);
+		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
+		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
+		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value){
@@ -198,27 +199,27 @@ namespace NIKESAURUS {
 		std::cin.get();
 	}
 
-	void Windows::NIKEWindow::executeEvent(std::shared_ptr<WindowResized> event) {
+	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowResized> event) {
 		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
 		window_size = event->frame_buffer;
 	}
 
 	/*****************************************************************//**
-	* Window Manager
+	* Window Service
 	*********************************************************************/
-	Windows::Manager::Manager(std::shared_ptr<IWindow> window) 
+	Windows::Service::Service(std::shared_ptr<IWindow> window) 
 		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
 
-	void Windows::Manager::setWindow(std::shared_ptr<IWindow> window) {
+	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {
 		ptr_window = window;
 	}
 
-	std::shared_ptr<Windows::IWindow> Windows::Manager::getWindow() {
+	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
 		return ptr_window;
 	}
 
 	//Create console
-	void Windows::Manager::createConsole(std::string const& custom_welcome) {
+	void Windows::Service::createConsole(std::string const& custom_welcome) {
 		// Create a new console window
 		AllocConsole();
 
@@ -236,19 +237,19 @@ namespace NIKESAURUS {
 		cout << custom_welcome << endl;
 	}
 
-	void Windows::Manager::setTargetFPS(int fps) {
+	void Windows::Service::setTargetFPS(int fps) {
 		target_fps = fps;
 	}
 
-	float Windows::Manager::getCurrentFPS() const {
+	float Windows::Service::getCurrentFPS() const {
 		return actual_fps;
 	}
 
-	float Windows::Manager::getDeltaTime() const {
+	float Windows::Service::getDeltaTime() const {
 		return delta_time;
 	}
 
-	void Windows::Manager::calculateDeltaTime() {
+	void Windows::Service::calculateDeltaTime() {
 		//Static prev time
 		static double prev_time = glfwGetTime();
 
@@ -259,7 +260,7 @@ namespace NIKESAURUS {
 		prev_time = curr_time;
 	}
 
-	void Windows::Manager::controlFPS() {
+	void Windows::Service::controlFPS() {
 
 		//Target delta time
 		double target_frame_time = 1.0 / target_fps;

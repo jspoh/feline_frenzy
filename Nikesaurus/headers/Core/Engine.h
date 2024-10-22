@@ -13,12 +13,13 @@
 #define ENGINE_HPP
 
 //Services
-#include "Managers/Services/mWindows.h"
-#include "Managers/Services/mScenes.h"
-#include "Managers/Services/mEvents.h"
-//#include "Managers/Services/mAssets.h"
-#include "Managers/Services/mDebug.h"
-#include "Managers/Services/mSerialization.h"
+#include "Managers/Services/sWindows.h"
+#include "Managers/Services/sScenes.h"
+#include "Managers/Services/sEvents.h"
+#include "Managers/Services/sInput.h"
+//#include "Managers/Services/sAssets.h"
+#include "Managers/Services/sDebug.h"
+#include "Managers/Services/sSerialization.h"
 #include "Managers/ECS/mCoordinator.h"
 
 namespace NIKESAURUS {
@@ -42,11 +43,6 @@ namespace NIKESAURUS {
 
 			//Map of services
 			static std::unordered_map<std::string, std::shared_ptr<void>> services;
-
-			//Dependency Managers
-			std::shared_ptr<Windows::Manager> windows_manager;
-			std::shared_ptr<Scenes::Manager> scenes_manager;
-			std::shared_ptr<Coordinator::Manager> ecs_coordinator;
 
 			//Register default components
 			void registerDefComponents();

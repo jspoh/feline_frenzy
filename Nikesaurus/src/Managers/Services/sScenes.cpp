@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   StateManager.cpp
+ * \file   StateService.cpp
  * \brief  
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
@@ -8,18 +8,18 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/mScenes.h"
+#include "Managers/Services/sScenes.h"
 #include "Core/Engine.h"
 
 namespace NIKESAURUS {
-	void Scenes::Manager::initScene(std::string scene_id) {
+	void Scenes::Service::initScene(std::string scene_id) {
 		curr_scene = scenes.at(scene_id);
 		prev_scene = curr_scene;
 		curr_scene->load();
 		curr_scene->init();
 	}
 
-	void Scenes::Manager::changeScene(std::string scene_id) {
+	void Scenes::Service::changeScene(std::string scene_id) {
 
 		//Check if scene has been registered
 		if (scenes.find(scene_id) == scenes.end()) {
@@ -48,14 +48,14 @@ namespace NIKESAURUS {
 		}
 	}
 
-	void Scenes::Manager::restartScene() {
+	void Scenes::Service::restartScene() {
 		if (curr_scene) {
 			curr_scene->exit();
 			curr_scene->init();
 		}
 	}
 
-	void Scenes::Manager::previousScene() {
+	void Scenes::Service::previousScene() {
 		//If prev scene is same as curr scene, restart curr scene
 		if (prev_scene == curr_scene) {
 			restartScene();
@@ -78,7 +78,7 @@ namespace NIKESAURUS {
 		}
 	}
 
-	std::string Scenes::Manager::getCurrSceneID() const {
+	std::string Scenes::Service::getCurrSceneID() const {
 
 		//Return curr scene id
 		for (auto const& scene : scenes) {
@@ -90,12 +90,12 @@ namespace NIKESAURUS {
 		return "";
 	}
 
-	void Scenes::Manager::queueSceneEvent(Scenes::SceneEvent&& new_event) {
+	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent&& new_event) {
 		if(event_queue == nullptr)
 		event_queue = std::make_shared<Scenes::SceneEvent>(std::move(new_event));
 	}
 
-	void Scenes::Manager::update() {
+	void Scenes::Service::update() {
 		if (event_queue) {
 			switch (event_queue->scene_action) {
 			case Scenes::Actions::CHANGE:
@@ -108,7 +108,7 @@ namespace NIKESAURUS {
 				restartScene();
 				break;
 			case Scenes::Actions::CLOSE:
-				NIKEEngine.getService<Windows::Manager>()->getWindow()->terminate();
+				NIKEEngine.getService<Windows::Service>()->getWindow()->terminate();
 				break;
 			default:
 				break;

@@ -12,8 +12,6 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
-#include "Managers/ECS/mSystem.h"
-
 namespace NIKESAURUS {
 	namespace Scenes {
 
@@ -55,11 +53,11 @@ namespace NIKESAURUS {
 		};
 
 		//Scenes manager
-		class NIKESAURUS_API Manager {
+		class NIKESAURUS_API Service {
 		private:
 			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete;
-			void operator=(Manager const& copy) = delete;
+			Service(Service const& copy) = delete;
+			void operator=(Service const& copy) = delete;
 
 			//Map of scene files ( To be implemented )
 			std::unordered_map<std::string, std::shared_ptr<IScene>> scenes;
@@ -88,11 +86,11 @@ namespace NIKESAURUS {
 		public:
 
 			//Default Constructor
-			Manager() = default;
+			Service() = default;
 
-			//Singleton Of Manager Class
-			static std::shared_ptr<Manager> getInstance() {
-				static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
+			//Singleton Of Service Class
+			static std::shared_ptr<Service> getInstance() {
+				static std::shared_ptr<Service> instance{ std::make_shared<Service>() };
 				return instance;
 			}
 
