@@ -20,6 +20,9 @@ namespace NIKESAURUS {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		/*****************************************************************//**
+		* Window Abstract Classes
+		*********************************************************************/
 		//Window Resize Event
 		struct WindowResized : Events::IEvent {
 			Vector2i frame_buffer;
@@ -28,7 +31,6 @@ namespace NIKESAURUS {
 				:frame_buffer{ width, height } {}
 		};
 
-
 		//Abstract Window Class
 		class NIKESAURUS_API IWindow : public Events::IEventListener<WindowResized> {
 		private:
@@ -36,9 +38,6 @@ namespace NIKESAURUS {
 			//Defaults
 			IWindow() = default;
 			virtual ~IWindow() = default;
-
-			//Configure Window Setup
-			virtual void configWindow() = 0;
 
 			//Set Window Mode
 			virtual void setWindowMode(int mode, int value) = 0;
@@ -90,6 +89,10 @@ namespace NIKESAURUS {
 			virtual void onEvent(std::shared_ptr<WindowResized> event) override = 0;
 		};
 
+		/*****************************************************************//**
+		* DLL Build Implementation
+		*********************************************************************/
+
 		#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
 
 		//Nike Engine Window
@@ -102,13 +105,14 @@ namespace NIKESAURUS {
 			Vector2i window_size;
 			std::string window_title;
 			bool b_full_screen;
+
+			//Configure Window
+			void configWindow();
 		public:
 
 			NIKEWindow(Vector2i window_size, std::string window_title);
 
 			NIKEWindow(std::string const& file_path);
-
-			void configWindow() override;
 
 			void setWindowMode(int mode, int value) override;
 
@@ -147,7 +151,9 @@ namespace NIKESAURUS {
 
 		#endif //Expose implementation only to NIKE Engine
 
-		//Window Service
+		/*****************************************************************//**
+		* Window Service
+		*********************************************************************/
 		class NIKESAURUS_API Service {
 		private:
 			//Delete Copy Constructor & Copy Assignment

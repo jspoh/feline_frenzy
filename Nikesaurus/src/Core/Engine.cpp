@@ -129,9 +129,6 @@ namespace NIKESAURUS {
 		//Setup window with config file
 		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
 
-		//Config glfw window system
-		getService<Windows::Service>()->getWindow()->configWindow();
-
 		//Set Target FPS
 		getService<Windows::Service>()->setTargetFPS(fps);
 

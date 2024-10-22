@@ -246,3 +246,50 @@
 #define NIKE_MOUSE_BUTTON_LEFT      NIKE_MOUSE_BUTTON_1
 #define NIKE_MOUSE_BUTTON_RIGHT     NIKE_MOUSE_BUTTON_2
 #define NIKE_MOUSE_BUTTON_MIDDLE    NIKE_MOUSE_BUTTON_3
+
+/*****************************************************************//**
+* AUDIO DEFINES TYPES
+*********************************************************************/
+typedef unsigned int NIKE_AUDIO_TIMEUNIT;
+#define NIKE_AUDIO_TIMEUNIT_MS                            0x00000001
+#define NIKE_AUDIO_TIMEUNIT_PCM                           0x00000002
+#define NIKE_AUDIO_TIMEUNIT_PCMBYTES                      0x00000004
+#define NIKE_AUDIO_TIMEUNIT_RAWBYTES                      0x00000008
+#define NIKE_AUDIO_TIMEUNIT_PCMFRACTION                   0x00000010
+#define NIKE_AUDIO_TIMEUNIT_MODORDER                      0x00000100
+#define NIKE_AUDIO_TIMEUNIT_MODROW                        0x00000200
+#define NIKE_AUDIO_TIMEUNIT_MODPATTERN                    0x00000400
+
+typedef unsigned int NIKE_AUDIO_MODE;
+#define NIKE_AUDIO_DEFAULT                                0x00000000
+#define NIKE_AUDIO_LOOP_OFF                               0x00000001
+#define NIKE_AUDIO_LOOP_NORMAL                            0x00000002
+#define NIKE_AUDIO_LOOP_BIDI                              0x00000004
+
+
+
+/*****************************************************************//**
+* ENTITY & COMPONENT DEFINE TYPES
+*********************************************************************/
+#include <bitset>
+
+namespace NIKESAURUS {
+    namespace Entity {
+        //Entity Type
+        using Type = uint16_t;
+
+        //Max number of entities to be created at a single point
+        const Type MAX = 3000;
+    }
+
+    namespace Component {
+        //Component Signature Type
+        using Type = uint8_t;
+
+        //Max components to be stored in a signature
+        const Type MAX = 64;
+
+        //Nested components signature
+        using Signature = std::bitset<MAX>;
+    }
+}

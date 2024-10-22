@@ -44,6 +44,9 @@ namespace NIKESAURUS {
 
 		//Close file stream
 		fileStream.close();
+
+		//Configure Window Setup
+		configWindow();
 	}
 
 	void Windows::NIKEWindow::configWindow() {
