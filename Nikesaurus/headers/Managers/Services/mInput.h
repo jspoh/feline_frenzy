@@ -16,24 +16,45 @@
 namespace NIKESAURUS {
 	namespace Input {
 
+		//Key States
+		enum class States {
+			PRESS = NIKE_PRESS,
+			RELEASE = NIKE_RELEASE,
+			REPEAT = NIKE_REPEAT
+		};
+
 		//Key Event
 		struct KeyEvent : public Events::IEvent {
+			int code;
+			States state;
 
+			KeyEvent(int code, int keystate)
+				: code{ code }, state{ static_cast<States>(keystate) } {}
 		};
 
 		//Mouse Pressed Event
 		struct MouseBtnEvent : public Events::IEvent {
+			int code;
+			States state;
 
+			MouseBtnEvent(int code, int btnstate)
+				: code{ code }, state{ static_cast<States>(btnstate) } {}
 		};
 
 		//Mouse Moved Event
 		struct MouseMovedEvent : public Events::IEvent {
+			Vector2f pos;
 
+			MouseMovedEvent(Vector2f pos)
+				: pos{ pos } {}
 		};
 
 		//Mouse Scroll Event
 		struct MouseScrollEvent : public Events::IEvent {
+			Vector2f offset;
 
+			MouseScrollEvent(Vector2f offset)
+				: offset{ offset } {}
 		};
 
 		class NIKESAURUS_API Manager 
