@@ -198,7 +198,7 @@ namespace NIKESAURUS {
 
 	Windows::NIKEWindow::~NIKEWindow() {
 		// When the window closes, wait for user input before closing the console
-		cout << "Press any key to close the console..." << endl;
+		cout << "Press enter to close the console..." << endl;
 		std::cin.get();
 	}
 

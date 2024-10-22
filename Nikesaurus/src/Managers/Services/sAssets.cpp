@@ -40,18 +40,11 @@ namespace NIKESAURUS {
 		//}
 
 		//Clear audios
-		for (auto& audio : audio_list) {
-			audio.second->release();
-		}
-
-		//Clear audio groups
-		for (auto& audio_groups : audio_group_list) {
-			audio_groups.second->release();
-		}
+		audio_system = nullptr;
 	}
 
-	void Assets::Service::configAssets(FMOD::System* fmod_sys) {
-		fmod_system = fmod_sys;
+	void Assets::Service::configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
+		audio_system = audio_sys;
 	}
 
 	///*****************************************************************//**
@@ -184,20 +177,13 @@ namespace NIKESAURUS {
 
 		//Unload audio here
 		//! STOP AUDIO HERE
-		FMOD::SoundGroup* sound_group;
-		FMOD_RESULT result;
-		result = it->second->getSoundGroup(&sound_group);
-
-		//Stop sound group if part of a group
-		if (result == FMOD_OK)
-			sound_group->stop();
 		
 		//Unload audio
 		it->second->release();
 		audio_list.erase(it);
 	}
 
-	std::shared_ptr<FMOD::Sound> Assets::Service::getAudio(std::string const& audio_tag)
+	std::shared_ptr<Audio::IAudio> Assets::Service::getAudio(std::string const& audio_tag)
 	{
 		//Find audio
 		auto it = audio_list.find(audio_tag);
@@ -206,41 +192,6 @@ namespace NIKESAURUS {
 		if (it == audio_list.end())
 		{
 			throw std::runtime_error("AUDIO DOES NOT EXISTS");
-		}
-
-		return it->second;
-	}
-
-	void Assets::Service::createAudioGroup(std::string const& audio_group_tag)
-	{
-		// Check if the group already exists in the map
-		if (audio_group_list.find(audio_group_tag) != audio_group_list.end())
-		{
-			throw std::runtime_error("AUDIO GROUP ALREADY EXISTS");
-		}
-
-		//FMOD Group loading Variables
-		FMOD::ChannelGroup* temp = nullptr;
-		FMOD_RESULT result;
-		result = fmod_system->createChannelGroup(audio_group_tag.c_str(), &temp);
-		if (result != FMOD_OK)
-		{
-			throw std::runtime_error("AUDIO GROUP NOT INITIALIZED");
-		}
-
-		//Emplace into audio group list
-		audio_group_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_group_tag), std::forward_as_tuple(std::move(std::make_shared<FMOD::ChannelGroup>(temp, [](FMOD::ChannelGroup*) {}))));
-	}
-
-	std::shared_ptr<FMOD::ChannelGroup> Assets::Service::getAudioGroup(std::string const& audio_group_tag)
-	{
-		//Find Audio Group
-		auto it = audio_group_list.find(audio_group_tag);
-
-		// Check if the group already exists in the map
-		if (it == audio_group_list.end())
-		{
-			throw std::runtime_error("AUDIO GROUP DOES NOT EXISTS");
 		}
 
 		return it->second;

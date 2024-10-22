@@ -20,6 +20,9 @@
 
 namespace NIKESAURUS {
 	namespace Audio {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
+
 		/*****************************************************************//**
 		* Abstract Audio Classes
 		*********************************************************************/
@@ -55,6 +58,63 @@ namespace NIKESAURUS {
 
 			//Get audio loop point ( Milliseconds )
 			virtual Vector2<unsigned int> getLoopPoints() const = 0;
+		};
+
+		//Abstract channel group class
+		class NIKESAURUS_API IChannelGroup {
+		private:
+		public:
+			//Defaults
+			IChannelGroup() = default;
+			virtual ~IChannelGroup() = default;
+
+			//Stop audio playing in channel group
+			virtual void stop() = 0;
+
+			//Set state of channel group
+			virtual void setPaused(bool state) = 0;
+
+			//Get state of channel group
+			virtual bool getPaused() = 0;
+
+			//Check if channel group is playing
+			virtual bool isPlaying() = 0;
+
+			//Set channel group volume
+			virtual void setVolume(float vol) = 0;
+
+			//Get channel group volume
+			virtual float getVolume() const = 0;
+
+			//Set channel group pitch
+			virtual void setPitch(float vol) = 0;
+
+			//Get channel group pitch
+			virtual float getPitch() const = 0;
+
+			//Set channel group vol ramp
+			virtual void setVolumeRamp(bool ramp) = 0;
+
+			//Get channel group vol ramp
+			virtual bool getVolumeRamp() const = 0;
+
+			//Set channel group mute
+			virtual void setMute(bool state) = 0;
+
+			//Get channel group mute state
+			virtual bool getMute() const = 0;
+
+			//Set channel group mode
+			virtual void setMode(NIKE_AUDIO_MODE mode) = 0;
+
+			//Get channel group mode
+			virtual NIKE_AUDIO_MODE getMode() const = 0;
+
+			//Add child channel group
+			virtual void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) = 0;
+
+			//Get parent channel group
+			virtual std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const = 0;
 		};
 
 		//Abstract channel class
@@ -114,55 +174,10 @@ namespace NIKESAURUS {
 			virtual NIKE_AUDIO_MODE getMode() const = 0;
 
 			//Set channel group
-			virtual void setChannelGroup(Audio::IChannelGroup* group) = 0;
+			virtual void setChannelGroup(std::shared_ptr<Audio::IChannelGroup> group) = 0;
 
 			//Get channel group
-			virtual Audio::IChannelGroup getChannelGroup() const = 0;
-		};
-
-		//Abstract channel group class
-		class NIKESAURUS_API IChannelGroup {
-		private:
-		public:
-			//Defaults
-			IChannelGroup() = default;
-			virtual ~IChannelGroup() = default;
-
-			//Stop audio playing in channel group
-			virtual void stop() = 0;
-
-			//Set state of channel group
-			virtual void setPaused(bool state) = 0;
-
-			//Get state of channel group
-			virtual bool getPaused() = 0;
-
-			//Check if channel group is playing
-			virtual bool isPlaying() = 0;
-
-			//Set channel group volume
-			virtual void setVolume(float vol) = 0;
-
-			//Get channel group volume
-			virtual float getVolume() const = 0;
-
-			//Set channel group pitch
-			virtual void setPitch(float vol) = 0;
-
-			//Get channel group pitch
-			virtual float getPitch() const = 0;
-
-			//Set channel group vol ramp
-			virtual void setVolumeRamp(bool ramp) = 0;
-
-			//Get channel group vol ramp
-			virtual bool getVolumeRamp() const = 0;
-
-			//Add child channel group
-			virtual void addChildGroup(std::shared_ptr<FMOD::ChannelGroup> group) = 0;
-
-			//Get parent channel group
-			virtual std::shared_ptr<FMOD::ChannelGroup> getChildGroup(int index) const = 0;
+			virtual std::shared_ptr<Audio::IChannelGroup> getChannelGroup() const = 0;
 		};
 
 		//Abstract audio system class
@@ -178,6 +193,18 @@ namespace NIKESAURUS {
 
 			//Create Stream Audio ( For music )
 			virtual std::shared_ptr<Audio::IAudio> createStream(std::string const& file_path) = 0;
+
+			//Create channel group
+			virtual std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) = 0;
+
+			//Play audio
+			virtual bool playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused = false, std::shared_ptr<Audio::IChannel> channel = nullptr) = 0;
+
+			//Update audio system regularly
+			virtual void update() = 0;
+
+			//Close & release audio system resources
+			virtual void shutdown() = 0;
 		};
 
 		/*****************************************************************//**
@@ -191,16 +218,17 @@ namespace NIKESAURUS {
 			FMOD::Sound* sound{ nullptr };
 		public:
 			NIKEAudio(FMOD::Sound* sound);
+			~NIKEAudio();
 
-			FMOD::Sound* getSound();
+			FMOD::Sound* getAudio();
 
 			void release() override;
 
 			unsigned int getLength() const override;
 
-			void setMode(FMOD_MODE) override;
+			void setMode(NIKE_AUDIO_MODE) override;
 
-			FMOD_MODE getMode() const override;
+			NIKE_AUDIO_MODE getMode() const override;
 
 			void setLoopCount(int count) override;
 
@@ -209,6 +237,49 @@ namespace NIKESAURUS {
 			void setLoopPoints(unsigned int start, unsigned int end) override;
 
 			Vector2<unsigned int> getLoopPoints() const override;
+		};
+
+		//NIKE Audio Group
+		class NIKEChannelGroup : public IChannelGroup {
+		private:
+			FMOD::ChannelGroup* group{ nullptr };
+		public:
+			NIKEChannelGroup(FMOD::ChannelGroup* group);
+			~NIKEChannelGroup();
+
+			FMOD::ChannelGroup* getChannelGroup();
+
+			void stop() override;
+
+			void setPaused(bool state) override;
+
+			bool getPaused() override;
+
+			bool isPlaying() override;
+
+			void setVolume(float vol) override;
+
+			float getVolume() const override;
+
+			void setPitch(float pitch) override;
+
+			float getPitch() const override;
+
+			void setVolumeRamp(bool ramp) override;
+
+			bool getVolumeRamp() const override;
+
+			void setMute(bool state) override;
+
+			bool getMute() const override;
+
+			void setMode(NIKE_AUDIO_MODE mode) override;
+
+			NIKE_AUDIO_MODE getMode() const override;
+
+			void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) override;
+
+			std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const override;
 		};
 
 		//NIKE Audio Group
@@ -252,43 +323,9 @@ namespace NIKESAURUS {
 
 			NIKE_AUDIO_MODE getMode() const override;
 
-			void setChannelGroup(Audio::IChannelGroup* group) override;
+			void setChannelGroup(std::shared_ptr<Audio::IChannelGroup> group) override;
 
-			Audio::IChannelGroup getChannelGroup() const override;
-		};
-
-		//NIKE Audio Group
-		class NIKEChannelGroup : public IChannelGroup {
-		private:
-			FMOD::ChannelGroup* group{ nullptr };
-		public:
-			NIKEChannelGroup(FMOD::ChannelGroup* group);
-
-			FMOD::ChannelGroup* getChannelGroup();
-			
-			void stop() override;
-
-			void setPaused(bool state) override;
-
-			bool getPaused() override;
-
-			bool isPlaying() override;
-
-			void setVolume(float vol) override;
-
-			float getVolume() const override;
-
-			void setPitch(float pitch) override;
-
-			float getPitch() const override;
-
-			void setVolumeRamp(bool ramp) override;
-
-			bool getVolumeRamp() const override;
-
-			void addChildGroup(std::shared_ptr<FMOD::ChannelGroup> group) override;
-
-			std::shared_ptr<FMOD::ChannelGroup> getChildGroup(int index) const override;
+			std::shared_ptr<Audio::IChannelGroup> getChannelGroup() const override;
 		};
 
 		//NIKE Audio System
@@ -306,6 +343,14 @@ namespace NIKESAURUS {
 			std::shared_ptr<Audio::IAudio> createSound(std::string const& file_path) override;
 
 			std::shared_ptr<Audio::IAudio> createStream(std::string const& file_path) override;
+
+			std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) override;
+
+			bool playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused, std::shared_ptr<Audio::IChannel> channel) override;
+
+			void update() override;
+
+			void shutdown() override;
 		};
 
 		#endif //Expose implementation only to NIKE Engine
@@ -321,48 +366,46 @@ namespace NIKESAURUS {
 			Service(Service const& rhs) = delete;
 			void operator=(Service const& copy) = delete;
 
+			//Audio System
+			std::shared_ptr<Audio::IAudioSystem> audio_system;
+
 			//Map of groups
-			static std::unordered_map<std::string, std::shared_ptr<Audio::NIKEChannelGroup>> groups;
+			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 		public:
 
 			//Default Constructor
 			Service() = default;
 
-			//Destructor
-			~Service();
+			////Destructor
+			~Service() = default;
+
+			//Set Audio system
+			void setAudioSystem(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+
+			//Get Audio System
+			std::shared_ptr<Audio::IAudioSystem> getAudioSystem() const;
+
+			//Create channel group
+			void createChannelGroup(std::string const& channel_group_id);
+
+			//Unload channel group
+			void unloadChannelGroup(std::string const& channel_group_id);
+
+			//Clean channel groups
+			void destroyChannelGroups();
 
 			//Conversion from raw to shared pointer
-			static std::shared_ptr<Audio::NIKEChannelGroup> convertToShared(Audio::NIKEChannelGroup*);
+			static std::shared_ptr<Audio::IChannelGroup> convertChannelGroup(Audio::IChannelGroup*&& group);
 
-			std::shared_ptr<Audio::NIKEChannelGroup> getGroup() const;
+			//Get audio group
+			std::shared_ptr<Audio::IChannelGroup> getChannelGroup(std::string const& channel_group_id);
 
-			// Play music
-			void audioPlay(NE_AUDIO audio, NE_AUDIO_GROUP, float vol, float pitch, bool);
-
-			// Stop sound
-			void audioStopGroup(NE_AUDIO_GROUP group);
-
-			// Play sound
-			void audioPauseGroup(NE_AUDIO_GROUP group);
-
-			// Resume music
-			void audioResumeGroup(NE_AUDIO_GROUP group);
-
-			// Set pitch
-			void audioSetGroupPitch(NE_AUDIO_GROUP group, float pitch);
-
-			// Set volume
-			void audioSetGroupVolume(NE_AUDIO_GROUP group, float vol);
-
-			// Unload audio group
-			void audioUnloadGroup(NE_AUDIO_GROUP group);
-
-			// Unload audio
-			void audioUnloadAudio(NE_AUDIO audio);
-
-			// Check if audio playimg
-			void IsPlaying(NE_AUDIO audio);
+			//Play Audio
+			void playAudio(std::string const& audio_id, std::string const& channel_group_id, float vol, float pitch, bool loop);
 		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
 	}
 }
 

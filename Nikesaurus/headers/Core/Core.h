@@ -266,8 +266,6 @@ typedef unsigned int NIKE_AUDIO_MODE;
 #define NIKE_AUDIO_LOOP_NORMAL                            0x00000002
 #define NIKE_AUDIO_LOOP_BIDI                              0x00000004
 
-
-
 /*****************************************************************//**
 * ENTITY & COMPONENT DEFINE TYPES
 *********************************************************************/

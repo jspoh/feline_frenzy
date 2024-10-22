@@ -43,9 +43,6 @@ namespace NIKESAURUS {
 
 			//Map of audios
 			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> audio_list;
-
-			//Map of audio groups
-			std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> audio_group_list;
 		public:
 
 			//Default constructor
@@ -55,7 +52,7 @@ namespace NIKESAURUS {
 			~Service();
 
 			//Configure Assets Manager
-			void configAssets(FMOD::System* fmod_sys);
+			void configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
 			///*****************************************************************//**
 			//* Font
@@ -107,13 +104,7 @@ namespace NIKESAURUS {
 			void unloadAudio(std::string const& audio_tag);
 
 			//Get audio
-			std::shared_ptr<FMOD::Sound> getAudio(std::string const& audio_tag);
-
-			//Create audio group
-			void createAudioGroup(std::string const& audio_group_tag);
-
-			//Get audio group
-			std::shared_ptr<FMOD::ChannelGroup> getAudioGroup(std::string const& audio_group_tag);
+			std::shared_ptr<Audio::IAudio> getAudio(std::string const& audio_tag);
 		};
 
 		//Re-enable DLL Export warning

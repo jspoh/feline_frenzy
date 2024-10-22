@@ -117,7 +117,8 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Scenes::Service>());
 		provideService(std::make_shared<Events::Service>());
 		provideService(std::make_shared<Input::Service>());
-		//provideService(std::make_shared<Assets::Manager>());
+		provideService(std::make_shared<Audio::Service>());
+		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<Coordinator::Manager>());
 
@@ -145,14 +146,11 @@ namespace NIKESAURUS {
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKEEngine.getService<Input::Service>());
 		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKEEngine.getService<Input::Service>());
 
-		////Register Def Component
-		//registerDefComponents();
+		//Setup Audio
+		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
 
-		////Register Def Systems
-		//registerDefSystems();
-
-		////Register Def Assets
-		//registerDefAssets();
+		//Setup assets loading with systems for loading
+		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
 	}
 
 	void Core::Engine::run() {
@@ -176,6 +174,21 @@ namespace NIKESAURUS {
 
 			//Update scenes manager
 			getService<Scenes::Service>()->update();
+
+			//Escape Key Testing //!MOVE OUT SOON
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				getService<Windows::Service>()->getWindow()->terminate();
+			}
+
+			//Audio Testing //!MOVE OUT SOON
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ENTER)) {
+				if (getService<Audio::Service>()->getChannelGroup("MASTER")->getPaused()) {
+					getService<Audio::Service>()->getChannelGroup("MASTER")->setPaused(false);
+				}
+				else {
+					getService<Audio::Service>()->getChannelGroup("MASTER")->setPaused(true);
+				}
+			}
 
 			//Control FPS
 			getService<Windows::Service>()->controlFPS();
