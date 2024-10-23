@@ -21,7 +21,7 @@ namespace NIKESAURUS {
 			std::ofstream log_file("src/Services/Services/crash_log.txt", std::ios::app);
 			if (!log_file.is_open())
 			{
-				cout << "file not found" << endl;
+				NIKEE_CORE_ERROR("file not found");
 			}
 			// Get current log crash time
 			std::chrono::system_clock::time_point current_time = std::chrono::system_clock::now();
@@ -40,7 +40,7 @@ namespace NIKESAURUS {
 		void Service::systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times, std::vector<std::shared_ptr<System::ISystem>> systems)
 		{
 			if (system_times.empty()) {
-				cout << "No active systems to report on." << endl;
+				NIKEE_CORE_INFO("No active systems to report on.");
 				return;
 			}
 

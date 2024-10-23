@@ -88,7 +88,7 @@ namespace NIKESAURUS {
 		}
 
 		//Engine Init Successful
-		cout << "GL init success" << endl;
+		NIKEE_CORE_INFO("GL init success");
 	}
 
 	void Windows::NIKEWindow::setWindowMode(int mode, int value) {
@@ -197,6 +197,10 @@ namespace NIKESAURUS {
 
 	void Windows::NIKEWindow::cleanUp() {
 		//Clean up window
+		// These 3 functions are from cleanup() in imgui sys, this is temp, theres no accessSys anymore sadly
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 		glfwDestroyWindow(ptr_window);
 		glfwTerminate();
 	}

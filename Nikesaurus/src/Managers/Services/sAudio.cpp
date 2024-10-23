@@ -291,7 +291,7 @@ namespace NIKESAURUS {
 			exit(-1);
 		}
 		else {
-			cout << "FMOD init success" << endl;
+			NIKEE_CORE_INFO("FMOD init success");
 		}
 	}
 

@@ -133,6 +133,9 @@ namespace NIKESAURUS {
 		getService<Windows::Service>()->createConsole(custom_welcome);
 		#endif
 
+		//Init Logger
+		NIKESAURUS::Log::Init();
+
 		//Setup window with config file
 		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
 
@@ -206,6 +209,7 @@ namespace NIKESAURUS {
 			// Temp
 			NIKEEngine.getService<Windows::Service>()->getWindow()->swapBuffers();
 		}
+
 
 		//Clean up window resources
 		getService<Windows::Service>()->getWindow()->cleanUp();

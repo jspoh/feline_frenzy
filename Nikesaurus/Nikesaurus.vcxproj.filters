@@ -20,6 +20,7 @@
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sAssets.cpp" />
+    <ClCompile Include="src\Utility\sLogger.cpp" />
     <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Imgui\imgui.cpp" />
     <ClCompile Include="src\Imgui\imgui_widgets.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
+    <ClInclude Include="headers\Utility\sLogger.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="imgui_headers\imconfig.h" />
     <ClInclude Include="imgui_headers\imstb_truetype.h" />
