@@ -15,10 +15,6 @@
 
 #include "sEvents.h"
 
-// This is needed to error fix the virtual thinking GLFW* is a data type
-// When i wan declare as function
-struct GLFWwindow;
-
 namespace NIKESAURUS {
 	namespace Windows {
 		//Temporary Disable DLL Export Warning
@@ -64,6 +60,9 @@ namespace NIKESAURUS {
 			//Swap buffers
 			virtual void swapBuffers() = 0;
 
+			//Clear buffer
+			virtual void clearBuffer() = 0;
+
 			//Set window title
 			virtual void setWindowTitle(const std::string& title) = 0;
 
@@ -75,9 +74,6 @@ namespace NIKESAURUS {
 
 			//Get window size
 			virtual Vector2i getWindowSize() const = 0;
-
-			// Needed for imgui - lim
-			virtual GLFWwindow* getWindowPtr() const = 0;
 
 			//Get window pos
 			virtual Vector2i getWindowPos() = 0;
@@ -121,6 +117,8 @@ namespace NIKESAURUS {
 
 			NIKEWindow(std::string const& file_path);
 
+			GLFWwindow* getWindowPtr() const;
+
 			void setWindowMode(int mode, int value) override;
 
 			int queryWindowMode(int mode) override;
@@ -135,6 +133,8 @@ namespace NIKESAURUS {
 
 			void swapBuffers() override;
 
+			void clearBuffer() override;
+
 			void setWindowTitle(const std::string& title) override;
 
 			std::string getWindowTitle() const override;
@@ -142,8 +142,6 @@ namespace NIKESAURUS {
 			void setWindowSize(int width, int height) override;
 
 			Vector2i getWindowSize() const override;
-
-			GLFWwindow* getWindowPtr() const override;
 
 			Vector2i getWindowPos() override;
 

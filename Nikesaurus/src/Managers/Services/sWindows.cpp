@@ -90,6 +90,10 @@ namespace NIKESAURUS {
 		//Engine Init Successful
 		NIKEE_CORE_INFO("GL init success");
 	}
+	
+	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
+		return ptr_window;
+	}
 
 	void Windows::NIKEWindow::setWindowMode(int mode, int value) {
 		glfwSetWindowAttrib(ptr_window, mode, value);
@@ -157,6 +161,10 @@ namespace NIKESAURUS {
 		glfwSwapBuffers(ptr_window);
 	}
 
+	void Windows::NIKEWindow::clearBuffer() {
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
 	void Windows::NIKEWindow::setWindowTitle(const std::string& title) {
 		glfwSetWindowTitle(ptr_window, title.c_str());
 	}
@@ -176,8 +184,7 @@ namespace NIKESAURUS {
 		return window_size;
 	}
 
-	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const
-	{
+	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const {
 		return ptr_window;
 	}
 
@@ -224,10 +231,6 @@ namespace NIKESAURUS {
 
 	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {
 		ptr_window = window;
-	}
-
-	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
-		return ptr_window;
 	}
 
 	//Create console

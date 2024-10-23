@@ -31,7 +31,7 @@ void IMGUI::Manager::init()
 	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowPtr(), true);
+	ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKEEngine.getService<Windows::Service>()->getWindow())->getWindowPtr(), true);
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 

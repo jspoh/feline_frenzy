@@ -187,6 +187,9 @@ namespace NIKESAURUS {
 			//Update all audio pending actions
 			getService<Audio::Service>()->getAudioSystem()->update();
 
+			//Clear buffer ( Temp )
+			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
+
 			//Update all systems
 			getService<Coordinator::Manager>()->updateSystems();
 
@@ -206,7 +209,7 @@ namespace NIKESAURUS {
 			//Control FPS
 			getService<Windows::Service>()->controlFPS();
 
-			// Temp
+			//Swap Buffers
 			NIKEEngine.getService<Windows::Service>()->getWindow()->swapBuffers();
 		}
 
