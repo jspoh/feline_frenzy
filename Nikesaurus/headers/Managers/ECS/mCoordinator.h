@@ -6,7 +6,6 @@
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
-
 #pragma once
 
 #ifndef M_COORDINATOR_H

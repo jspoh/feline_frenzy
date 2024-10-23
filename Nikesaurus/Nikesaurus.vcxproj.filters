@@ -20,6 +20,7 @@
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sAssets.cpp" />
+    <ClCompile Include="src\Systems\sysAudio.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -52,6 +53,7 @@
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
+    <ClInclude Include="headers\Systems\sysAudio.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

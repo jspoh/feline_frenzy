@@ -33,14 +33,12 @@ namespace NIKESAURUS {
 
 		//Component Array ( Entity Map of unique components of type T )
 		template<typename T>
-		class NIKESAURUS_API Array : public IArray {
+		class Array : public IArray {
 		private:
 
 			//Unique component of same type identified by Entity type
 			std::unordered_map<Entity::Type, T> component_array;
-
 		public:
-
 			//Default constructor
 			Array() = default;
 
@@ -156,7 +154,7 @@ namespace NIKESAURUS {
 				component_types.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(component_id++));
 
 				//Add component map
-				component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::make_shared<Array<T>>()));
+				component_arrays.emplace(std::piecewise_construct, std::forward_as_tuple(type_name), std::forward_as_tuple(std::move(std::make_shared<Array<T>>())));
 			}
 
 			template<typename T>

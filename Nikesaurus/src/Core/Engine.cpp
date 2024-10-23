@@ -11,17 +11,16 @@
 #include "Core/Engine.h"
 
 ////Registerd Components
-//#include "../headers/Components/cInput.h"
-//#include "../headers/Components/cRender.h"
-//#include "../headers/Components/cAudio.h"
+#include "Components/cAudio.h"
 //#include "../headers/Components/cMove.h"
+// //#include "../headers/Components/cRender.h"
 //
-// //Registered Systems
+//Registered Systems
+#include "Systems/sysAudio.h"
 //#include "../headers/Systems/sysInput.h"
 //#include "../headers/Systems/Physics/sysPhysics.h"
 //#include "../headers/Systems/Animation/sysAnimation.h"
 //#include "../headers/Systems/Render/sysRender.h"
-//#include "../headers/Systems/sysAudio.h"
 //#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
 namespace NIKESAURUS {
@@ -34,6 +33,9 @@ namespace NIKESAURUS {
 	}
 
 	void Core::Engine::registerDefComponents() {
+		//Register Audio Components
+		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();
+
 		////Register input components
 		//ecs_coordinator->registerComponent<Input::Key>();
 		//ecs_coordinator->registerComponent<Input::Mouse>();
@@ -62,6 +64,10 @@ namespace NIKESAURUS {
 	}
 
 	void Core::Engine::registerDefSystems() {
+		////Register audio system
+		getService<Coordinator::Manager>()->registerSystem<Audio::Manager>();
+		getService<Coordinator::Manager>()->addSystemComponentType<Audio::Manager>(getService<Coordinator::Manager>()->getComponentType<Audio::SFX>());
+
 		////Register input manager
 		//ecs_coordinator->registerSystem<Input::Manager>(Input::Manager::getInstance());
 		//ecs_coordinator->accessSystem<Input::Manager>()->setComponentsLinked(false);
@@ -92,10 +98,6 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Shape>());
 		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Texture>());
 		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Text>());
-
-		////Register audio manager
-		//ecs_coordinator->registerSystem<Audio::Manager>(Audio::Manager::getInstance());
-		//ecs_coordinator->addSystemComponentType<Audio::Manager>(getComponentType<Audio::cAudio>());
 	}
 
 	void Core::Engine::registerDefAssets() {
@@ -151,6 +153,12 @@ namespace NIKESAURUS {
 
 		//Setup assets loading with systems for loading
 		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
+
+		//Register Def Components
+		registerDefComponents();
+		
+		//Register Def Managers
+		registerDefSystems();
 	}
 
 	void Core::Engine::run() {

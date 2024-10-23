@@ -29,7 +29,7 @@ namespace NIKESAURUS {
 		*********************************************************************/
 
 		//Abstract audio class
-		class NIKESAURUS_API IAudio {
+		class IAudio {
 		private:
 		public:
 			//Defaults
@@ -62,7 +62,7 @@ namespace NIKESAURUS {
 		};
 
 		//Abstract channel group class
-		class NIKESAURUS_API IChannelGroup {
+		class IChannelGroup {
 		private:
 		public:
 			//Defaults
@@ -122,7 +122,7 @@ namespace NIKESAURUS {
 		};
 
 		//Abstract channel class
-		class NIKESAURUS_API IChannel {
+		class IChannel {
 		private:
 		public:
 			//Defaults
@@ -188,7 +188,7 @@ namespace NIKESAURUS {
 		};
 
 		//Abstract audio system class
-		class NIKESAURUS_API IAudioSystem {
+		class IAudioSystem {
 		private:
 		public:
 			//Defaults

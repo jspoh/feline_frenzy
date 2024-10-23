@@ -40,6 +40,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Systems\sysAudio.cpp" />
     <ClCompile Include="src\Utility\uSystems.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +73,7 @@
     <ClInclude Include="headers\Managers\ECS\mSystem.h" />
     <ClInclude Include="headers\Math\Vector2.h" />
     <ClInclude Include="headers\Math\Vector4.h" />
+    <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>

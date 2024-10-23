@@ -21,11 +21,19 @@ void Splash::Scene::init() {
 	//glClearColor(0, 0, 0, 0);
 	//glClear(GL_COLOR_BUFFER_BIT);
 
-	//Creat audio channel group
+	//Creat Channel Group
 	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->createChannelGroup("MASTER");
 
-	//Play audio
+	//Play Music
 	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->playAudio("MUSIC", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
+
+	//Set Music Volume
+	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->getChannelGroup("MASTER")->setVolume(0.5f);
+
+	//Create entity
+	//NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Manager>()->createEntity();
+	//NIKEEngine.getService<NIKESAURUS::Coordinator::Manager>()->addEntityComponentObj<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 1.0f, 1.0f));
+	//cout << NIKEEngine.getService<NIKESAURUS::Coordinator::Manager>()->getEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1).channel_group_id << endl;
 }
 
 void Splash::Scene::exit() {
