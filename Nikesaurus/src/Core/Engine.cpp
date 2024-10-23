@@ -17,6 +17,7 @@
 //
 //Registered Systems
 #include "Systems/sysAudio.h"
+#include "Systems/sysImgui.h"
 //#include "../headers/Systems/sysInput.h"
 //#include "../headers/Systems/Physics/sysPhysics.h"
 //#include "../headers/Systems/Animation/sysAnimation.h"
@@ -74,6 +75,9 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Key>());
 		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Mouse>());
 		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Transform::Runtime_Transform>());
+
+		// Regiser imgui manager here, After input before render
+		getService<Coordinator::Manager>()->registerSystem<IMGUI::Manager>();
 
 		////Register physics manager
 		//ecs_coordinator->registerSystem<Physics::Manager>(Physics::Manager::getInstance());
@@ -198,6 +202,9 @@ namespace NIKESAURUS {
 
 			//Control FPS
 			getService<Windows::Service>()->controlFPS();
+
+			// Temp
+			NIKEEngine.getService<Windows::Service>()->getWindow()->swapBuffers();
 		}
 
 		//Clean up window resources

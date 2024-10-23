@@ -15,6 +15,10 @@
 
 #include "sEvents.h"
 
+// This is needed to error fix the virtual thinking GLFW* is a data type
+// When i wan declare as function
+struct GLFWwindow;
+
 namespace NIKESAURUS {
 	namespace Windows {
 		//Temporary Disable DLL Export Warning
@@ -71,6 +75,9 @@ namespace NIKESAURUS {
 
 			//Get window size
 			virtual Vector2i getWindowSize() const = 0;
+
+			// Needed for imgui - lim
+			virtual GLFWwindow* getWindowPtr() const = 0;
 
 			//Get window pos
 			virtual Vector2i getWindowPos() = 0;
@@ -135,6 +142,8 @@ namespace NIKESAURUS {
 			void setWindowSize(int width, int height) override;
 
 			Vector2i getWindowSize() const override;
+
+			GLFWwindow* getWindowPtr() const override;
 
 			Vector2i getWindowPos() override;
 

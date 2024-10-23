@@ -176,6 +176,11 @@ namespace NIKESAURUS {
 		return window_size;
 	}
 
+	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const
+	{
+		return ptr_window;
+	}
+
 	Vector2i Windows::NIKEWindow::getWindowPos() {
 		glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
 		return window_pos;
