@@ -176,6 +176,11 @@ namespace NIKESAURUS {
 		return window_size;
 	}
 
+	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const
+	{
+		return ptr_window;
+	}
+
 	Vector2i Windows::NIKEWindow::getWindowPos() {
 		glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
 		return window_pos;
@@ -192,6 +197,10 @@ namespace NIKESAURUS {
 
 	void Windows::NIKEWindow::cleanUp() {
 		//Clean up window
+		// These 3 functions are from cleanup() in imgui sys, this is temp, theres no accessSys anymore sadly
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 		glfwDestroyWindow(ptr_window);
 		glfwTerminate();
 	}
