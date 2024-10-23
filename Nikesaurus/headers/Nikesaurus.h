@@ -5,3 +5,6 @@
 
 //Core Engine
 #include "Core/Engine.h"
+
+//Components
+#include "Components/cAudio.h"

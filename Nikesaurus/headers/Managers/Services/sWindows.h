@@ -32,7 +32,7 @@ namespace NIKESAURUS {
 		};
 
 		//Abstract Window Class
-		class NIKESAURUS_API IWindow : public Events::IEventListener<WindowResized> {
+		class IWindow : public Events::IEventListener<WindowResized> {
 		private:
 		public:
 			//Defaults

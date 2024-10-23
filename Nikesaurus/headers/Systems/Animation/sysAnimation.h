@@ -13,7 +13,7 @@
 #define ANIMATION_SYSTEM_HPP
 
 #include "Managers/ECS/mSystem.h"
-#include "Managers/mEvents.h"
+#include "Managers/Services/sEvents.h"
 #include "Systems/Animation/subAnimations.h"
 
 namespace NIKESAURUS {

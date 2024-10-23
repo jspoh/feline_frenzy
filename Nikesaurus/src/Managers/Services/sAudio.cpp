@@ -1,8 +1,9 @@
 /*****************************************************************//**
- * \file   sysAudio.cpp
+ * \file   sAudio.cpp
  * \brief  Audio manager function definitions 
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
+ * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -18,12 +19,6 @@ namespace NIKESAURUS {
 	*********************************************************************/
 	Audio::NIKEAudio::NIKEAudio(FMOD::Sound* sound)
 		:sound{ sound } {}
-
-	Audio::NIKEAudio::~NIKEAudio() {
-
-
-
-	}
 
 	FMOD::Sound* Audio::NIKEAudio::getAudio() {
 		return sound;
@@ -43,8 +38,8 @@ namespace NIKESAURUS {
 		sound->setMode(mode);
 	}
 
-	unsigned int Audio::NIKEAudio::getMode() const{
-		NIKE_AUDIO_MODE mode;
+	NIKE_AUDIO_MODE Audio::NIKEAudio::getMode() const{
+		FMOD_MODE mode;
 		sound->getMode(&mode);
 		return mode;
 	}
@@ -72,8 +67,8 @@ namespace NIKESAURUS {
 	/*****************************************************************//**
 	* NIKE CHANNEL
 	*********************************************************************/
-	Audio::NIKEChannel::NIKEChannel(FMOD::Channel* channel)
-		: channel{channel} {}
+	Audio::NIKEChannel::NIKEChannel(FMOD::Channel* channel, std::shared_ptr<IAudio> sound)
+		: channel{ channel }, sound{ sound } {}
 
 	FMOD::Channel* Audio::NIKEChannel::getChannel() {
 		return channel;
@@ -149,6 +144,10 @@ namespace NIKESAURUS {
 		return state;
 	}
 
+	std::shared_ptr<Audio::IAudio> Audio::NIKEChannel::getSound() const {
+		return sound;
+	}
+
 	void Audio::NIKEChannel::setMode(NIKE_AUDIO_MODE mode) {
 		channel->setMode(mode);
 	}
@@ -175,11 +174,6 @@ namespace NIKESAURUS {
 	*********************************************************************/
 	Audio::NIKEChannelGroup::NIKEChannelGroup(FMOD::ChannelGroup* group) 
 		: group{ group } {}
-
-	Audio::NIKEChannelGroup::~NIKEChannelGroup() {
-		//group->release();
-		//group = nullptr;
-	}
 
 	FMOD::ChannelGroup* Audio::NIKEChannelGroup::getChannelGroup() {
 		return group;
@@ -255,6 +249,12 @@ namespace NIKESAURUS {
 		return mode;
 	}
 
+	int Audio::NIKEChannelGroup::getNumChannels() const {
+		int channel_count;
+		group->getNumChannels(&channel_count);
+		return channel_count;
+	}
+
 	void Audio::NIKEChannelGroup::addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) {
 		group->addGroup(std::static_pointer_cast<Audio::NIKEChannelGroup>(child_group)->getChannelGroup(), false);
 	}
@@ -283,7 +283,7 @@ namespace NIKESAURUS {
 			exit(-1);
 		}
 
-		result = fmod_system->init(512, FMOD_INIT_NORMAL, 0);
+		result = fmod_system->init(512, FMOD_INIT_NORMAL, nullptr);
 		// Check if fmod studio system is initialized
 		if (result != FMOD_OK)
 		{
@@ -302,7 +302,7 @@ namespace NIKESAURUS {
 		FMOD_RESULT result;
 
 		// Create sound to be pushed into container
-		result = fmod_system->createSound(file_path.c_str(), FMOD_DEFAULT, nullptr, &temp_audio);
+		result = fmod_system->createSound(file_path.c_str(), NIKE_AUDIO_DEFAULT, nullptr, &temp_audio);
 
 		// Check for audio file validadity
 		if (result != FMOD_OK)
@@ -320,7 +320,7 @@ namespace NIKESAURUS {
 
 		// Create sound to be pushed into container
 		// !!! FMOD will handle the reading from file using createStream function
-		result = fmod_system->createStream(file_path.c_str(), FMOD_CREATESTREAM, nullptr, &temp_audio);
+		result = fmod_system->createStream(file_path.c_str(), NIKE_AUDIO_CREATESTREAM, nullptr, &temp_audio);
 
 		// Check for audio file validadity
 		if (result != FMOD_OK)
@@ -344,26 +344,25 @@ namespace NIKESAURUS {
 		return std::make_shared<Audio::NIKEChannelGroup>(temp);
 	}
 
-	bool Audio::NIKEAudioSystem::playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused, std::shared_ptr<Audio::IChannel> channel) {
+	std::shared_ptr<Audio::IChannel> Audio::NIKEAudioSystem::playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused) {
 		
+		//Channel & Audio Result checking
 		FMOD::Channel* temp_channel = nullptr;
-		if (channel) {
-			temp_channel = std::static_pointer_cast<NIKEChannel>(channel)->getChannel();
-		}
-
 		FMOD_RESULT result;
+
+		//Play audio
 		result = fmod_system->playSound(
 				std::static_pointer_cast<NIKEAudio>(audio)->getAudio(),
 				std::static_pointer_cast<NIKEChannelGroup>(channel_group)->getChannelGroup(),
 				start_paused,
 				&temp_channel);
 
+		//Check if audio successfully played and added to relevant channels & channel groups
 		if (result == FMOD_OK) {
-			return true;
+			return std::make_shared<NIKEChannel>(temp_channel, audio);
 		}
 		else {
-			cout << "Error Playing Audio" << endl;
-			return false;
+			return nullptr;
 		}
 	}
 
@@ -373,14 +372,10 @@ namespace NIKESAURUS {
 
 	void Audio::NIKEAudioSystem::shutdown() {
 		if (fmod_system) {
-			fmod_system->release();
 			fmod_system->close();
+			fmod_system->release();
 			fmod_system = nullptr;
 		}
-	}
-
-	Audio::NIKEAudioSystem::~NIKEAudioSystem() {
-		//shutdown();
 	}
 
 	/*****************************************************************//**
@@ -417,25 +412,29 @@ namespace NIKESAURUS {
 			throw std::runtime_error("AUDIO GROUP DOES NOT EXISTS");
 		}
 
+		//Unload channel group
 		auto group = std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup();
 		if (group) {
 			group->stop();
 			group->release();
 		}
+		//Erase channel group from map
 		channel_groups.erase(it);
 	}
 
 	void Audio::Service::destroyChannelGroups() {
 		//Clear channel groups
-		for (auto& grp : channel_groups) {
-			std::static_pointer_cast<Audio::NIKEChannelGroup>(grp.second)->getChannelGroup()->stop();
-			std::static_pointer_cast<Audio::NIKEChannelGroup>(grp.second)->getChannelGroup()->release();
+		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
+			std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup()->stop();
+			std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup()->release();
 		}
 
+		//Clear groups
 		channel_groups.clear();
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::Service::convertChannelGroup(Audio::IChannelGroup*&& group) {
+		//Find channel group shared pointer & return the valid group shared pointer ( For usage within derived audio classes )
 		for (auto& grp : channel_groups) {
 			if (std::static_pointer_cast<Audio::NIKEChannelGroup>(grp.second)->getChannelGroup() == static_cast<Audio::NIKEChannelGroup*>(group)->getChannelGroup()) {
 				delete group;
@@ -448,7 +447,7 @@ namespace NIKESAURUS {
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::Service::getChannelGroup(std::string const& channel_group_id) {
-		//Find Audio Group
+		//Find Channel Group
 		auto it = channel_groups.find(channel_group_id);
 
 		// Check if the group already exists in the map
@@ -457,21 +456,62 @@ namespace NIKESAURUS {
 			throw std::runtime_error("AUDIO GROUP DOES NOT EXISTS");
 		}
 
+		//Return channel group
 		return it->second;
 	}
 
-	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_group_id, float vol, float pitch, bool loop) {
-		auto assets_service = NIKEEngine.getService<Assets::Service>();
-		audio_system->playSound(assets_service->getAudio(audio_id), getChannelGroup(channel_group_id), false);
+	std::shared_ptr<Audio::IChannel> Audio::Service::getChannel(std::string const& channel_id) {
+		//Find channel
+		auto it = channels.find(channel_id);
 
-		getChannelGroup(channel_group_id)->setVolume(vol);
-		getChannelGroup(channel_group_id)->setPitch(pitch);
-		if (loop)
+		// Check if the group already exists in the map
+		if (it == channels.end())
 		{
-			getChannelGroup(channel_group_id)->setMode(NIKE_AUDIO_LOOP_NORMAL);
+			throw std::runtime_error("CHANNEL DOES NOT EXISTS, OR HAS BEEN DELETED");
+		}
+
+		//Return channel group
+		return it->second;
+	}
+
+	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused) {
+		
+		//Get assets services
+		auto assets_service = NIKEEngine.getService<Assets::Service>();
+
+		//Play sound & get channel that sound is playing under
+		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(assets_service->getAudio(audio_id), getChannelGroup(channel_group_id), start_paused);
+
+		//Add channel to the channel map
+		if (new_channel) {
+			//Set channel group pitch & volume
+			new_channel->setVolume(vol);
+			new_channel->setPitch(pitch);
+
+			//Set channel looping mode
+			loop ? new_channel->setMode(NIKE_AUDIO_LOOP_NORMAL) : new_channel->setMode(NIKE_AUDIO_LOOP_OFF);
+
+			//Add channel into channel map if channel id path is specified & channel is in looping mode
+			if(channel_id != "" && (new_channel->getMode() & NIKE_AUDIO_LOOP_NORMAL))
+			channels[channel_id] = std::move(new_channel);
 		}
 		else {
-			getChannelGroup(channel_group_id)->setMode(NIKE_AUDIO_LOOP_OFF);
+			cout << "Error playing audio in channel!" << endl;
+		}
+	}
+
+	void Audio::Service::update() {
+		audio_system->update();
+
+		//Iterate through the map and remove inactive channels
+		for (auto it = channels.begin(); it != channels.end(); ) {
+			if (!it->second->isPlaying()) {
+				//Erase the inactive channel
+				it = channels.erase(it);
+			}
+			else {
+				++it;
+			}
 		}
 	}
 }

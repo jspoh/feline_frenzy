@@ -12,49 +12,22 @@
 #ifndef C_AUDIO_HPP
 #define C_AUDIO_HPP
 
-
 #include "Core/stdafx.h"
-#include "Systems/sysAudio.h"
-
-/************************************
-* SOME NOTES TO TAKE NOTE OF: 
-* - AUDIO WILL BE PLAYED LIKE AE
-* - THERE WILL BE AUIDIO GROUP AND AUDIO
-/****************************************/
-
 
 namespace NIKESAURUS {
 	namespace Audio {
 
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
-
-		struct NIKESAURUS_API cAudio
-		{
-			// Audio and audio group
-			NE_AUDIO audio;
-
-			NE_AUDIO_GROUP audio_group;
-
-			// Bool to check if audio is played
-			bool is_played = false;
-
-			// Bool to indicate loop
-			bool is_loop;
-
-			// Volume 
+		//SFX Struct
+		struct SFX {
+			bool play_sfx;
+			std::string const& audio_id;
+			std::string const& channel_group_id;
 			float volume;
-
-			// Pitch
 			float pitch;
 
-			// Ctor
-			cAudio(NE_AUDIO param_audio, NE_AUDIO_GROUP param_audio_group, float param_volume, float param_pitch, bool param_loop)
-				: audio{ param_audio }, audio_group{ param_audio_group }, is_played{ false }, is_loop{ param_loop }, volume{ param_volume }, pitch{ param_pitch } {}
+			SFX(bool play_sfx, std::string const& audio_id, std::string const& channel_group_id, float volume, float pitch)
+				:play_sfx{ play_sfx }, audio_id{ audio_id }, channel_group_id{ channel_group_id }, volume{ volume }, pitch{ pitch } {}
 		};
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

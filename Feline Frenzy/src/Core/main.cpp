@@ -37,16 +37,7 @@ int WINAPI WinMain(
 	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Menu::Scene>("MENU");
 
 	//Change Scene To Main Menu
-	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
-
-	//Load music
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadMusic("assets/Audio/test_music.wav", "TEST");
-
-	//Creat audio channel group
-	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->createChannelGroup("MASTER");
-
-	//Play audio
-	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->playAudio("TEST", "MASTER", 1.0f, 1.0f, false);
+	//NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
 
 	//Run Engine
 	NIKEEngine.run();

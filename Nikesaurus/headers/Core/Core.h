@@ -265,6 +265,31 @@ typedef unsigned int NIKE_AUDIO_MODE;
 #define NIKE_AUDIO_LOOP_OFF                               0x00000001
 #define NIKE_AUDIO_LOOP_NORMAL                            0x00000002
 #define NIKE_AUDIO_LOOP_BIDI                              0x00000004
+#define NIKE_AUDIO_2D                                     0x00000008
+#define NIKE_AUDIO_3D                                     0x00000010
+#define NIKE_AUDIO_CREATESTREAM                           0x00000080
+#define NIKE_AUDIO_CREATESAMPLE                           0x00000100
+#define NIKE_AUDIO_CREATECOMPRESSEDSAMPLE                 0x00000200
+#define NIKE_AUDIO_OPENUSER                               0x00000400
+#define NIKE_AUDIO_OPENMEMORY                             0x00000800
+#define NIKE_AUDIO_OPENMEMORY_POINT                       0x10000000
+#define NIKE_AUDIO_OPENRAW                                0x00001000
+#define NIKE_AUDIO_OPENONLY                               0x00002000
+#define NIKE_AUDIO_ACCURATETIME                           0x00004000
+#define NIKE_AUDIO_MPEGSEARCH                             0x00008000
+#define NIKE_AUDIO_NONBLOCKING                            0x00010000
+#define NIKE_AUDIO_UNIQUE                                 0x00020000 //! Sets audio to be unique, disabling the ability to play this audio in multiple channels
+#define NIKE_AUDIO_3D_HEADRELATIVE                        0x00040000
+#define NIKE_AUDIO_3D_WORLDRELATIVE                       0x00080000
+#define NIKE_AUDIO_3D_INVERSEROLLOFF                      0x00100000
+#define NIKE_AUDIO_3D_LINEARROLLOFF                       0x00200000
+#define NIKE_AUDIO_3D_LINEARSQUAREROLLOFF                 0x00400000
+#define NIKE_AUDIO_3D_INVERSETAPEREDROLLOFF               0x00800000
+#define NIKE_AUDIO_3D_CUSTOMROLLOFF                       0x04000000
+#define NIKE_AUDIO_3D_IGNOREGEOMETRY                      0x40000000
+#define NIKE_AUDIO_IGNORETAGS                             0x02000000
+#define NIKE_AUDIO_LOWMEM                                 0x08000000
+#define NIKE_AUDIO_VIRTUAL_PLAYFROMSTART                  0x80000000
 
 /*****************************************************************//**
 * ENTITY & COMPONENT DEFINE TYPES
