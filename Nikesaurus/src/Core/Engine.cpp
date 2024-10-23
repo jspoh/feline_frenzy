@@ -120,6 +120,7 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Debug::Service>());
+		provideService(std::make_shared<Logging::Service>());
 		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Create console

@@ -28,6 +28,7 @@
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
+    <ClCompile Include="src\Managers\Services\sLogger.cpp" />
     <ClCompile Include="src\Managers\Services\sWindows.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
     <ClCompile Include="src\Math\Vector3.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="headers\Managers\Services\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
+    <ClInclude Include="headers\Managers\Services\sLogger.h" />
     <ClInclude Include="headers\Nikesaurus.h" />
     <ClInclude Include="headers\Managers\Services\sDebug.h" />
     <ClInclude Include="headers\Managers\Services\sEvents.h" />
@@ -185,6 +187,7 @@
       <PrecompiledHeaderFile>Core/stdafx.h</PrecompiledHeaderFile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)Nikesaurus\dependencies\include;$(SolutionDir)Nikesaurus\dependencies\submodules\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -217,6 +220,7 @@ xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Pla
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/stdafx.h</PrecompiledHeaderFile>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)Nikesaurus\dependencies\include;$(SolutionDir)Nikesaurus\dependencies\submodules\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
