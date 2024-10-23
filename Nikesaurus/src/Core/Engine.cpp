@@ -122,13 +122,15 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Debug::Service>());
-		provideService(std::make_shared<Logging::Service>());
 		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Create console
 		#ifndef NDEBUG
 		getService<Windows::Service>()->createConsole(custom_welcome);
 		#endif
+
+		//Init Logger
+		NIKESAURUS::Log::Init();
 
 		//Setup window with config file
 		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));

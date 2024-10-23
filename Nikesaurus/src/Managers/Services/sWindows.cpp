@@ -88,7 +88,7 @@ namespace NIKESAURUS {
 		}
 
 		//Engine Init Successful
-		cout << "GL init success" << endl;
+		NIKEE_CORE_INFO("GL init success");
 	}
 
 	void Windows::NIKEWindow::setWindowMode(int mode, int value) {

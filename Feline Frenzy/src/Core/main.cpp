@@ -27,11 +27,6 @@ int WINAPI WinMain(
 	//Init Engine
 	NIKEEngine.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
 
-	//Logging System Test
-	NIKEEngine.getService<NIKESAURUS::Logging::Service>()->Init();
-	NIKEEngine.getService<NIKESAURUS::Logging::Service>()->GetCoreLogger()->warn("Error Logged");
-	NIKEEngine.getService<NIKESAURUS::Logging::Service>()->GetClientLogger()->info("Message");
-
 	//Register Scenes
 	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Splash::Scene>("SPLASH");
 	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Menu::Scene>("MENU");
