@@ -160,14 +160,17 @@ namespace NIKESAURUS {
 			//Calculate Delta Time
 			getService<Windows::Service>()->calculateDeltaTime();
 
-			//Poll system events
-			getService<Windows::Service>()->getWindow()->pollEvents();
-
 			//Set Window Title
 			getService<Windows::Service>()->getWindow()->setWindowTitle(getService<Windows::Service>()->getWindow()->getWindowTitle() +
 				" | " + getService<Scenes::Service>()->getCurrSceneID() +
 				" | " + std::to_string(getService<Windows::Service>()->getCurrentFPS()) + " fps" +
 				" | " + std::to_string(getService<Coordinator::Manager>()->getEntitiesCount()) + " entities");
+
+			//Poll system events
+			getService<Windows::Service>()->getWindow()->pollEvents();
+
+			//Update all audio pending actions
+			getService<Audio::Service>()->getAudioSystem()->update();
 
 			//Update all systems
 			getService<Coordinator::Manager>()->updateSystems();
@@ -182,12 +185,7 @@ namespace NIKESAURUS {
 
 			//Audio Testing //!MOVE OUT SOON
 			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ENTER)) {
-				if (getService<Audio::Service>()->getChannelGroup("MASTER")->getPaused()) {
-					getService<Audio::Service>()->getChannelGroup("MASTER")->setPaused(false);
-				}
-				else {
-					getService<Audio::Service>()->getChannelGroup("MASTER")->setPaused(true);
-				}
+				getService<Audio::Service>()->playAudio("SFX", "", "MASTER", 1.0f, 1.0f, false);
 			}
 
 			//Control FPS

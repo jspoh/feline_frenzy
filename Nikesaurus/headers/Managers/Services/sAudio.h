@@ -1,8 +1,9 @@
 /*****************************************************************//**
- * \file   sysAudio.h
+ * \file   sAudio.h
  * \brief  Audio system manager function declarations
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
+ * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
  * \date   September 2024
  *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -110,6 +111,9 @@ namespace NIKESAURUS {
 			//Get channel group mode
 			virtual NIKE_AUDIO_MODE getMode() const = 0;
 
+			//Get number of channels in channel group
+			virtual int getNumChannels() const = 0;
+
 			//Add child channel group
 			virtual void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) = 0;
 
@@ -173,6 +177,9 @@ namespace NIKESAURUS {
 			//Get channel mode
 			virtual NIKE_AUDIO_MODE getMode() const = 0;
 
+			//Get sound in channel
+			virtual std::shared_ptr<IAudio> getSound() const = 0;
+
 			//Set channel group
 			virtual void setChannelGroup(std::shared_ptr<Audio::IChannelGroup> group) = 0;
 
@@ -198,7 +205,7 @@ namespace NIKESAURUS {
 			virtual std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) = 0;
 
 			//Play audio
-			virtual bool playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused = false, std::shared_ptr<Audio::IChannel> channel = nullptr) = 0;
+			virtual std::shared_ptr<Audio::IChannel> playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused = false) = 0;
 
 			//Update audio system regularly
 			virtual void update() = 0;
@@ -218,7 +225,7 @@ namespace NIKESAURUS {
 			FMOD::Sound* sound{ nullptr };
 		public:
 			NIKEAudio(FMOD::Sound* sound);
-			~NIKEAudio();
+			~NIKEAudio() = default;
 
 			FMOD::Sound* getAudio();
 
@@ -245,7 +252,7 @@ namespace NIKESAURUS {
 			FMOD::ChannelGroup* group{ nullptr };
 		public:
 			NIKEChannelGroup(FMOD::ChannelGroup* group);
-			~NIKEChannelGroup();
+			~NIKEChannelGroup() = default;
 
 			FMOD::ChannelGroup* getChannelGroup();
 
@@ -277,6 +284,8 @@ namespace NIKESAURUS {
 
 			NIKE_AUDIO_MODE getMode() const override;
 
+			int getNumChannels() const override;
+
 			void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) override;
 
 			std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const override;
@@ -286,8 +295,11 @@ namespace NIKESAURUS {
 		class NIKEChannel : public IChannel {
 		private:
 			FMOD::Channel* channel{ nullptr };
+
+			//Pointer to sound its currently playing
+			std::shared_ptr<IAudio> sound;
 		public:
-			NIKEChannel(FMOD::Channel* channel);
+			NIKEChannel(FMOD::Channel* channel, std::shared_ptr<IAudio> sound);
 
 			FMOD::Channel* getChannel();
 
@@ -323,6 +335,8 @@ namespace NIKESAURUS {
 
 			NIKE_AUDIO_MODE getMode() const override;
 
+			std::shared_ptr<IAudio> getSound() const override;
+
 			void setChannelGroup(std::shared_ptr<Audio::IChannelGroup> group) override;
 
 			std::shared_ptr<Audio::IChannelGroup> getChannelGroup() const override;
@@ -338,7 +352,7 @@ namespace NIKESAURUS {
 			void configAudio();
 		public:
 			NIKEAudioSystem();
-			~NIKEAudioSystem();
+			~NIKEAudioSystem() = default;
 
 			std::shared_ptr<Audio::IAudio> createSound(std::string const& file_path) override;
 
@@ -346,7 +360,7 @@ namespace NIKESAURUS {
 
 			std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) override;
 
-			bool playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused, std::shared_ptr<Audio::IChannel> channel) override;
+			std::shared_ptr<Audio::IChannel> playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused) override;
 
 			void update() override;
 
@@ -368,6 +382,9 @@ namespace NIKESAURUS {
 
 			//Audio System
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
+
+			//Map of channels
+			std::unordered_map<std::string, std::shared_ptr<Audio::IChannel>> channels;
 
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
@@ -397,11 +414,19 @@ namespace NIKESAURUS {
 			//Conversion from raw to shared pointer
 			static std::shared_ptr<Audio::IChannelGroup> convertChannelGroup(Audio::IChannelGroup*&& group);
 
-			//Get audio group
+			//Get channel group
 			std::shared_ptr<Audio::IChannelGroup> getChannelGroup(std::string const& channel_group_id);
 
+			//Get channel
+			std::shared_ptr<Audio::IChannel> getChannel(std::string const& channel_id);
+
 			//Play Audio
-			void playAudio(std::string const& audio_id, std::string const& channel_group_id, float vol, float pitch, bool loop);
+			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
+			//Channel ID will override each other if the same id is specified more than once
+			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused = false);
+
+			//Update Loop
+			void update();
 		};
 
 		//Re-enable DLL Export warning

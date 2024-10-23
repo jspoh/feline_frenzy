@@ -11,13 +11,21 @@
 #include "Scenes/SplashScene.h"
 
 void Splash::Scene::load() {
-
+	//Load music
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadMusic("assets/Audio/test_music.wav", "MUSIC");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadSound("assets/Audio/test_sound.wav", "SFX");
 }
 
 void Splash::Scene::init() {
 	//!TODO SET BACKGROUND COLOR IN RENDER MANAGER
 	//glClearColor(0, 0, 0, 0);
 	//glClear(GL_COLOR_BUFFER_BIT);
+
+	//Creat audio channel group
+	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->createChannelGroup("MASTER");
+
+	//Play audio
+	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->playAudio("MUSIC", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
 }
 
 void Splash::Scene::exit() {
