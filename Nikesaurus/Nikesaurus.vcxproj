@@ -60,12 +60,9 @@
     <ClCompile Include="src\Utility\sLogger.cpp" />
     <ClCompile Include="src\Managers\Services\sWindows.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
-    <ClCompile Include="src\Math\Vector3.cpp" />
     <ClCompile Include="src\Managers\ECS\mEntity.cpp" />
     <ClCompile Include="src\Managers\ECS\mSystem.cpp" />
     <ClCompile Include="src\Managers\Services\sScenes.cpp" />
-    <ClCompile Include="src\Math\Vector2.cpp" />
-    <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -104,7 +101,7 @@
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Math\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
-    <ClInclude Include="headers\Math\Vector3.h" />
+    <ClInclude Include="headers\Math\Vector3\Vector3.h" />
     <ClInclude Include="headers\Managers\ECS\mComponent.h" />
     <ClInclude Include="headers\Data\db.h" />
     <ClInclude Include="headers\Core\Engine.h" />
@@ -113,14 +110,17 @@
     <ClInclude Include="headers\Managers\Services\sScenes.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\ECS\mSystem.h" />
-    <ClInclude Include="headers\Math\Vector2.h" />
-    <ClInclude Include="headers\Math\Vector4.h" />
+    <ClInclude Include="headers\Math\Vector2\Vector2.h" />
+    <ClInclude Include="headers\Math\Vector4\Vector4.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\sImgui.h" />
     <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
+    <None Include="headers\Math\Vector2\Vector2.inl" />
+    <None Include="headers\Math\Vector3\Vector3.inl" />
+    <None Include="headers\Math\Vector4\Vector4.inl" />
     <None Include="shaders\base.frag" />
     <None Include="shaders\base.vert" />
     <None Include="shaders\texture.frag" />

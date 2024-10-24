@@ -13,7 +13,7 @@
 #define MTX33
 
 
-#include "Vector2.h"
+#include "Vector2/Vector2.h"
 
 // Foward declaration
 class Vector3;

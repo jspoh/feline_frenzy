@@ -100,9 +100,9 @@
  * Math headers
  *********************************************************************/
 #include "Math/Mtx33.h"	
-#include "Math/Vector2.h"
-#include "Math/Vector3.h"
-#include "Math/Vector4.h"
+#include "Math/Vector2/Vector2.h"
+#include "Math/Vector3/Vector3.h"
+#include "Math/Vector4/Vector4.h"
 
 //Using math namespace
 using namespace NIKESAURUS::Math;

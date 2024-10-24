@@ -14,7 +14,7 @@
 namespace NIKESAURUS {
 	namespace Math {
 		template<typename T>
-		class NIKESAURUS_API Vector4 {
+		class Vector4 {
 		private:
 			using type = T;
 		public:
@@ -45,6 +45,8 @@ namespace NIKESAURUS {
 			type lengthSq() const;
 			type length() const;
 		};
+
+		#include "Vector4.inl"
 
 		//Predefine templated types for vector 3
 		using Vector4b = Vector4<bool>;

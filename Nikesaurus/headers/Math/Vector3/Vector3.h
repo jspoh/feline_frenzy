@@ -12,7 +12,7 @@
 namespace NIKESAURUS {
 	namespace Math {
 		template<typename T>
-		class NIKESAURUS_API Vector3 {
+		class Vector3 {
 		private:
 			using type = T;
 		public:
@@ -24,7 +24,9 @@ namespace NIKESAURUS {
 			Vector3 normalize();
 			Vector3 normalized() const;
 
-			Vector3 operator+(const Vector3& rhs) const;
+			Vector3 operator+(const Vector3& rhs) const {
+				return Vector3<T>(x + rhs.x, y + rhs.y, z + rhs.z);
+			}
 			Vector3 operator-(const Vector3& rhs) const;
 			Vector3 operator*(type rhs) const;
 			Vector3 operator*(const Matrix_33& mat) const;
@@ -39,6 +41,8 @@ namespace NIKESAURUS {
 			type lengthSq() const;
 			type length() const;
 		};
+
+		#include "Vector3.h"
 
 		//Predefine templated types for vector 3
 		using Vector3b = Vector3<bool>;

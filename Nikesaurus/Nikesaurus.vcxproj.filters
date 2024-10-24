@@ -4,12 +4,9 @@
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
-    <ClCompile Include="src\Math\Vector3.cpp" />
     <ClCompile Include="src\Managers\ECS\mEntity.cpp" />
     <ClCompile Include="src\Managers\ECS\mSystem.cpp" />
     <ClCompile Include="src\Managers\Services\sScenes.cpp" />
-    <ClCompile Include="src\Math\Vector2.cpp" />
-    <ClCompile Include="src\Math\Vector4.cpp" />
     <ClCompile Include="src\Core\stdafx.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sWindows.cpp" />
@@ -30,14 +27,13 @@
     <ClCompile Include="dependencies\include\ImGui\src\imgui_impl_opengl3.cpp" />
     <ClCompile Include="dependencies\include\ImGui\src\imgui_tables.cpp" />
     <ClCompile Include="dependencies\include\ImGui\src\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\..\..\Users\zen\Downloads\Telegram Desktop\ImguiUtils.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
     <ClInclude Include="headers\Math\Mtx33.h" />
     <ClInclude Include="headers\RenderManager.h" />
-    <ClInclude Include="headers\Math\Vector3.h" />
+    <ClInclude Include="headers\Math\Vector3\Vector3.h" />
     <ClInclude Include="headers\Managers\ECS\mComponent.h" />
     <ClInclude Include="headers\Data\db.h" />
     <ClInclude Include="headers\Core\Engine.h" />
@@ -46,8 +42,8 @@
     <ClInclude Include="headers\Managers\Services\sScenes.h" />
     <ClInclude Include="headers\Core\stdafx.h" />
     <ClInclude Include="headers\Managers\ECS\mSystem.h" />
-    <ClInclude Include="headers\Math\Vector2.h" />
-    <ClInclude Include="headers\Math\Vector4.h" />
+    <ClInclude Include="headers\Math\Vector2\Vector2.h" />
+    <ClInclude Include="headers\Math\Vector4\Vector4.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
@@ -84,5 +80,8 @@
     <None Include="db\data.json" />
     <None Include="shaders\texture.frag" />
     <None Include="shaders\texture.vert" />
+    <None Include="headers\Math\Vector2\Vector2.inl" />
+    <None Include="headers\Math\Vector3\Vector3.inl" />
+    <None Include="headers\Math\Vector4\Vector4.inl" />
   </ItemGroup>
 </Project>

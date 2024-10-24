@@ -18,7 +18,7 @@ namespace NIKESAURUS {
 	namespace Audio {
 
 		//SFX Struct
-		struct SFX {
+		struct NIKESAURUS_API SFX {
 			bool play_sfx;
 			std::string const& audio_id;
 			std::string const& channel_group_id;
