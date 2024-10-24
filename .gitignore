@@ -22,3 +22,4 @@ venv/
 src/Managers/crash_log.txt
 imgui.ini
 *.ini
+Feline Frenzy/logs/crash-log.txt
