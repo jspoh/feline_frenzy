@@ -12,7 +12,9 @@
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
 
-#include "sAudio.h"
+#include "sFont.h"
+#include "Managers/Services/sAudio.h"
+#include "Components/cRender.h"
 
 namespace NIKESAURUS {
 	namespace Assets
@@ -26,8 +28,19 @@ namespace NIKESAURUS {
 			Service(Service const& copy) = delete;
 			void operator=(Service const& copy) = delete;
 
-			////Maps to fonts
-			//std::unordered_map<std::string, std::unordered_map<unsigned char, Render::Character>> fonts_list;
+			/*****************************************************************//**
+			* Font Private Members
+			*********************************************************************/
+
+			//Free type lib
+			std::unique_ptr<Font::Service> font_system;
+
+			//Maps to fonts
+			std::unordered_map<std::string, Render::Font> fonts_list;
+
+			/*****************************************************************//**
+			* Render Private Members
+			*********************************************************************/
 
 			////Map to models for render
 			//std::unordered_map<std::string, std::shared_ptr<Render::Model>> models_list;
@@ -35,8 +48,25 @@ namespace NIKESAURUS {
 			//// Map to textures for render
 			//std::unordered_map<std::string, unsigned int> textures_list;
 
-			////Map to shaders for render
-			//std::unordered_map<std::string, unsigned int> shaders_list;
+			/*****************************************************************//**
+			*  Shaders Private Members
+			*********************************************************************/
+
+			/**
+			 * compiles shader and adds to shader_programs.
+			 *
+			 * \param shader_ref	shader program's reference string
+			 * \param vtx_path		path to vertex shader
+			 * \param frag_path		path to fragment shader
+			 */
+			unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
+
+			//Map to shaders for render
+			std::unordered_map<std::string, unsigned int> shaders_list;
+
+			/*****************************************************************//**
+			* Audio Private Members
+			*********************************************************************/
 
 			//Fmod System
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
@@ -54,33 +84,33 @@ namespace NIKESAURUS {
 			//Configure Assets Manager
 			void configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
-			///*****************************************************************//**
-			//* Font
-			//*********************************************************************/
-			////Register font
-			//void registerFont(std::string const& font_id, std::string const& file_path, Vector2 const& pixel_sizes = { 0.0f, 48.0f });
+			/*****************************************************************//**
+			* Font
+			*********************************************************************/
+			//Register font
+			void loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
-			////Get font
-			//std::unordered_map<unsigned char, Render::Character> const& getFont(std::string const& font_id) const;
+			//Unload font
+			void unloadFont(std::string const& fond_id);
 
-			///*****************************************************************//**
-			//* Render ( Texture, Model, Shaders )
-			//*********************************************************************/
+			//Get font
+			Render::Font const& getFont(std::string const& font_id) const;
 
-			////Load shaders
-			//void registerShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+			/*****************************************************************//**
+			* Render ( Texture, Model, Shaders )
+			*********************************************************************/
 
-			////Check shader exits
-			//bool checkShader(std::string const& model_id);
+			//Load shader
+			void loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
 
-			////Get shader
-			//unsigned int getShader(std::string const& shader_id);
+			//Unload shader
+			void unloadShader(std::string const& shader_id);
+
+			//Get shader
+			unsigned int getShader(std::string const& shader_id);
 
 			////Load model
 			//void registerModel(std::string const& model_id, std::string const& file_path);
-
-			////Check model exits
-			//bool checkModel(std::string const& model_id);
 
 			////Get model
 			//std::shared_ptr<Render::Model> getModel(std::string const& model_id);

@@ -19,7 +19,7 @@
 #include "Managers/Services/sDebug.h"
 #include "Managers/Services/sSerialization.h"
 #include "Managers/Services/sAudio.h"
-#include "Managers/Services/sAssets.h"
+#include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/sCoordinator.h"
 

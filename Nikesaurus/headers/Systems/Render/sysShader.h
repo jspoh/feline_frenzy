@@ -17,20 +17,12 @@ namespace NIKESAURUS {
 	namespace Shader {
 		class Manager {
 		private:
-			/**
-			 * compiles shader and adds to shader_programs.
-			 *
-			 * \param shader_ref	shader program's reference string
-			 * \param vtx_path		path to vertex shader
-			 * \param frag_path		path to fragment shader
-			 */
-			unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 
 		public:
 			Manager() = default;
 			~Manager() = default;
 
-			unsigned int loadShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
+			//Use shader program
 			void useShader(const std::string& shader_ref);
 			/**
 			* Unbind the active shader program.

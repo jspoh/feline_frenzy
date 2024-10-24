@@ -13,7 +13,7 @@ inline Vector3<T> Vector3<T>::operator-(const Vector3<T>& rhs) const {
 }
 
 template<typename T>
-Vector3<T> Vector3<T>::operator*(typename Vector3<T>::type rhs) const {
+inline Vector3<T> Vector3<T>::operator*(typename Vector3<T>::type rhs) const {
 	return Vector3<T>(x * rhs, y * rhs, z * rhs);
 }
 

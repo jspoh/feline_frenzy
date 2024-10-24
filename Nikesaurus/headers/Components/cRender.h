@@ -19,51 +19,52 @@ namespace NIKESAURUS {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		struct NIKESAURUS_API Cam {
-
+		struct Cam {
 			std::string id;
-
-			Vector2 position;	// Position of camera
-
+			Vector2f position;	// Position of camera
 			float height;	// represents how much of the world is visible vertically (zoom level).
 		};
 
-		struct NIKESAURUS_API Color {
-			Vector3 color;
+		struct Color {
+			Vector3f color;
 			float alpha;
 		};
 
-		struct NIKESAURUS_API Character {
-			unsigned int texture;	// Texture ID for the character
-			Vector2 size;			// Size of the character
-			Vector2 bearing;		// Offset from the baseline to the top-left of the character
-			unsigned int advance;   // Horizontal offset to advance to the next character
+		struct Font {
+			struct Character {
+				unsigned int texture;	// Texture ID for the character
+				Vector2f size;			// Size of the character
+				Vector2f bearing;		// Offset from the baseline to the top-left of the character
+				unsigned int advance;   // Horizontal offset to advance to the next character
+			};
+
+			std::unordered_map<unsigned char, Character> char_map;
 		};
 
-		struct NIKESAURUS_API Text {
+		struct Text {
 			std::string font_ref;
 			std::string text;
 			Color color;
-			Vector2 position;
+			Vector2f position;
 			float scale;
 		};
 
-		struct NIKESAURUS_API Shape {
+		struct Shape {
 			std::string model_ref;
-			Matrix33::Matrix_33 x_form;
+			Matrix_33 x_form;
 			Color color;
 		};
 
-		struct NIKESAURUS_API Texture {
+		struct Texture {
 			std::string texture_ref;
-			Matrix33::Matrix_33 x_form;
+			Matrix_33 x_form;
 			Color color;
-			Vector2 texture_size;	// Spritesheet size ( before mapping )
-			Vector2 frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
-			Vector2 frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
+			Vector2f texture_size;	// Spritesheet size ( before mapping )
+			Vector2f frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
+			Vector2f frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 		};
 
-		struct NIKESAURUS_API Model {
+		struct Model {
 
 			unsigned int vaoid;
 			unsigned int vboid;

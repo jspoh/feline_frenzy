@@ -116,8 +116,7 @@ using namespace NIKESAURUS::Math;
 /*****************************************************************//**
 * Math Defines
 *********************************************************************/
-#define _USE_Math_DEFINES
-#include <math.h>
+#include <corecrt_math_defines.h>
 
 /*****************************************************************//**
 * Nullstream for release

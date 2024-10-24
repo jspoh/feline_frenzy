@@ -14,57 +14,59 @@
 #include "Core/stdafx.h"
 #include "Components/cRender.h"
 
-namespace Camera {
+namespace NIKESAURUS {
+	namespace Camera {
 
-	class System {
-	public:
-		System();
+		class System {
+		public:
+			System();
 
-		//Init camera
-		void init(float camera_height);
+			//Init camera
+			void init(float camera_height);
 
-		//Update camera
-		void update();
+			//Update camera
+			void update();
 
-		//Get matrix
-		const Matrix33::Matrix_33& getWorldToNDCXform() const;
+			//Get matrix
+			const Matrix_33& getWorldToNDCXform() const;
 
-		// Get Pos to World coordinates
-		const Vector3 getPosToWorld(const Vector2& pos) const;
-		//Get cam pos
-		const Vector2& getCamPos() const;
+			// Get Pos to World coordinates
+			const Vector3f getPosToWorld(const Vector2f& pos) const;
+			//Get cam pos
+			const Vector2f& getCamPos() const;
 
-		//Update camera entities
-		void updateCameraEntities(std::set<Entity::Type>&& entities);
+			//Update camera entities
+			void updateCameraEntities(std::set<Entity::Type>&& entities);
 
-		//Track camera entity
-		void trackCamEntity(std::string const& cam_identifier);
+			//Track camera entity
+			void trackCamEntity(std::string const& cam_identifier);
 
-	private:
-		//Camera entity
-		std::set<Entity::Type> cam_entities;
+		private:
+			//Camera entity
+			std::set<Entity::Type> cam_entities;
 
-		//Current tracked cam
-		std::string cam_id;
+			//Current tracked cam
+			std::string cam_id;
 
-		//Targets
-		Vector2 target;
-		Vector2 up;
+			//Targets
+			Vector2f target;
+			Vector2f up;
 
-		//Camera aspect ratio
-		float aspect_ratio;
+			//Camera aspect ratio
+			float aspect_ratio;
 
-		//Camera height
-		float cam_height;
+			//Camera height
+			float cam_height;
 
-		//Camera position
-		Vector2 cam_pos;
+			//Camera position
+			Vector2f cam_pos;
 
-		// Matrix transformation
-		Matrix33::Matrix_33 view_xform;
-		Matrix33::Matrix_33 cam_to_ndc_xform;
-		Matrix33::Matrix_33 world_to_ndc_xform;
-	};
+			// Matrix transformation
+			Matrix_33 view_xform;
+			Matrix_33 cam_to_ndc_xform;
+			Matrix_33 world_to_ndc_xform;
+		};
+	}
 }
 
 #endif // !CAMERA_SYSTEM_HPP

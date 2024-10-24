@@ -11,7 +11,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/sAudio.h"
-#include "Managers/Services/sAssets.h"
+#include "Managers/Services/Assets/sAssets.h"
 
 namespace NIKESAURUS {
 	/*****************************************************************//**

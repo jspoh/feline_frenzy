@@ -42,7 +42,7 @@ namespace NIKESAURUS {
 			type length() const;
 		};
 
-		#include "Vector3.h"
+		#include "Vector3.inl"
 
 		//Predefine templated types for vector 3
 		using Vector3b = Vector3<bool>;
