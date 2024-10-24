@@ -17,17 +17,23 @@
 namespace NIKESAURUS {
 	namespace Audio {
 
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
+
 		//SFX Struct
 		struct NIKESAURUS_API SFX {
 			bool play_sfx;
-			std::string const& audio_id;
-			std::string const& channel_group_id;
+			std::string audio_id;
+			std::string channel_group_id;
 			float volume;
 			float pitch;
 
 			SFX(bool play_sfx, std::string const& audio_id, std::string const& channel_group_id, float volume, float pitch)
 				:play_sfx{ play_sfx }, audio_id{ audio_id }, channel_group_id{ channel_group_id }, volume{ volume }, pitch{ pitch } {}
 		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
 	}
 }
 

@@ -20,8 +20,13 @@
 #include "Managers/Services/sSerialization.h"
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/sAssets.h"
-#include "Managers/ECS/mCoordinator.h"
 #include "Managers/Services/Imgui/sImgui.h"
+#include "Managers/Services/sCoordinator.h"
+
+//ECS manager for internal usage
+#ifdef NIKE_BUILD_DLL
+#include "Managers/ECS/mCoordinator.h"
+#endif
 
 namespace NIKESAURUS {
 	namespace Core {

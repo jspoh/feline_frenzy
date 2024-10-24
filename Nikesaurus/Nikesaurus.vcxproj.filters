@@ -28,6 +28,7 @@
     <ClCompile Include="dependencies\include\ImGui\src\imgui_tables.cpp" />
     <ClCompile Include="dependencies\include\ImGui\src\imgui_widgets.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
+    <ClCompile Include="src\Managers\Services\sCoordinator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -73,6 +74,7 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiUtils.h" />
+    <ClInclude Include="headers\Managers\Services\sCoordinator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

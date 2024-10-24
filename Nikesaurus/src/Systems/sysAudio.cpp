@@ -23,10 +23,9 @@ namespace NIKESAURUS {
 			if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Audio::SFX>(entity)) {
 				auto& e_sfx = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Audio::SFX>(entity);
 
-				cout << e_sfx.channel_group_id << '\n';
-
 				if (e_sfx.play_sfx) {
 					NIKEEngine.getService<Audio::Service>()->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false);
+					e_sfx.play_sfx = false;
 				}
 			}
 		}

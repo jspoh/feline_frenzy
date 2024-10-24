@@ -189,17 +189,6 @@ namespace NIKESAURUS {
 				systems_map.at(sys_name)->addComponentType(component);
 			}
 
-			/**
-			 * Access system already within core engine
-			 *
-			 * \param sys_identifier	system identifier ( eg. PhysicsSystem = "PhysicsSystem" )
-			 *
-			 */
-			template<typename T>
-			std::shared_ptr<T> accessSystem() {
-				return getSystem<T>();
-			}
-
 			//Get System index
 			template<typename T>
 			int getSystemIndex() {

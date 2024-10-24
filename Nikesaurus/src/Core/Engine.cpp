@@ -23,6 +23,8 @@
 //#include "../headers/Systems/Render/sysRender.h"
 //#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
+//ECS coordinator for engine internal usage
+
 namespace NIKESAURUS {
 
 	//Defintion of the static services member variable
@@ -122,8 +124,11 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Debug::Service>());
-		provideService(std::make_shared<Coordinator::Manager>());
 		provideService(std::make_shared<IMGUI::Service>());
+		provideService(std::make_shared<Coordinator::Service>());
+
+		//Provide ecs coordinator service for internal engine usage
+		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Create console
 		#ifndef NDEBUG

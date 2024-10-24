@@ -75,10 +75,10 @@ namespace NIKESAURUS {
 			}
 
 			template<typename T>
-			void addEntityComponentObj(Entity::Type entity, T&& component) {
+			void addEntityComponent(Entity::Type entity, T&& component) {
 
 				//Add component
-				component_manager->addEntityComponentObj<T>(entity, std::move(component));
+				component_manager->addEntityComponent<T>(entity, std::move(component));
 
 				//Set bit signature of component to true
 				Component::Signature sign = entity_manager->getSignature(entity);
@@ -131,12 +131,6 @@ namespace NIKESAURUS {
 			void removeSystem(std::shared_ptr<T> singleton_sys = nullptr)
 			{
 				system_manager->removeSystem<T>();
-			}
-
-			template<typename T>
-			std::shared_ptr<T> accessSystem()
-			{
-				return system_manager->accessSystem<T>();
 			}
 
 			template<typename T>

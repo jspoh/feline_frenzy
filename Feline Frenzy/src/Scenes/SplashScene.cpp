@@ -38,9 +38,8 @@ void Splash::Scene::init() {
 
 
 	//Create entity
-	//NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Manager>()->createEntity();
-	//NIKEEngine.getService<NIKESAURUS::Coordinator::Manager>()->addEntityComponentObj<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 1.0f, 1.0f));
-	//cout << NIKEEngine.getService<NIKESAURUS::Coordinator::Manager>()->getEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1).channel_group_id << endl;
+	NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 }
 
 void Splash::Scene::exit() {

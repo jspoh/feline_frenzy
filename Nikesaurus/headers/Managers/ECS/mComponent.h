@@ -176,7 +176,7 @@ namespace NIKESAURUS {
 
 			//Add component associated with entity type
 			template<typename T>
-			void addEntityComponentObj(Entity::Type entity, T&& component) {
+			void addEntityComponent(Entity::Type entity, T&& component) {
 				//Component type name
 				std::string type_name{ typeid(T).name() };
 
