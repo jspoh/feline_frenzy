@@ -22,7 +22,7 @@
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/sAssets.h"
 #include "Managers/ECS/mCoordinator.h"
-#include "Managers/Services/sImgui.h"
+#include "Managers/Services/Imgui/sImgui.h"
 
 namespace NIKESAURUS {
 	namespace Core {
