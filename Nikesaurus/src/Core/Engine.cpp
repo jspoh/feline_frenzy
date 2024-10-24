@@ -136,9 +136,6 @@ namespace NIKESAURUS {
 		//Setup window with config file
 		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
 
-		// Init imgui
-		getService<IMGUI::Service>()->init();
-
 		//Set Target FPS
 		getService<Windows::Service>()->setTargetFPS(fps);
 
@@ -160,6 +157,9 @@ namespace NIKESAURUS {
 
 		//Setup assets loading with systems for loading
 		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
+
+		//Init imgui
+		getService<IMGUI::Service>()->init();
 
 		//Register Def Components
 		registerDefComponents();

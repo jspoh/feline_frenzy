@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/sImgui.h"
+#include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
 
 namespace NIKESAURUS {
