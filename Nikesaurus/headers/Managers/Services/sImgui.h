@@ -11,40 +11,37 @@
 #ifndef IMGUI_HPP
 #define IMGUI_HPP
 
-#include "Managers/ECS/mSystem.h"
-
 namespace NIKESAURUS {
 	// All Caps to differentiate from imgui includes
 	namespace IMGUI {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
 
-		class Manager : public System::ISystem
+		class Service
 		{
 		public:
-			Manager() = default;
-			// Manager(GLFWwindow* window);
+			Service() = default;
 			//Update
-			void update() override;
+			void update();
 
 			//Default Destructor
-			~Manager() override = default;
+			~Service() = default;
 
 			//Init
-			void init() override;
+			void init();
 
 			// Clean up
 			void cleanUp();
 
-			std::string getSysName() override
-			{
-				return "Imgui System";
-			}
-
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete;
-			void operator=(Manager const& copy) = delete;
+			Service(Service const& copy) = delete;
+			void operator=(Service const& copy) = delete;
 		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
 	}
 }
 

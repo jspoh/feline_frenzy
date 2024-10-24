@@ -29,7 +29,7 @@
     <ClCompile Include="src\Imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\Imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\Systems\sysImgui.cpp" />
+    <ClCompile Include="src\Managers\Services\sImgui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -73,7 +73,7 @@
     <ClInclude Include="imgui_headers\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui_headers\imgui_impl_glfw.h" />
     <ClInclude Include="imgui_headers\imgui.h" />
-    <ClInclude Include="headers\Systems\sysImgui.h" />
+    <ClInclude Include="headers\Managers\Services\sImgui.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\base.frag" />

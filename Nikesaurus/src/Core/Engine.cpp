@@ -17,7 +17,6 @@
 //
 //Registered Systems
 #include "Systems/sysAudio.h"
-#include "Systems/sysImgui.h"
 //#include "../headers/Systems/sysInput.h"
 //#include "../headers/Systems/Physics/sysPhysics.h"
 //#include "../headers/Systems/Animation/sysAnimation.h"
@@ -76,9 +75,6 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Mouse>());
 		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Transform::Runtime_Transform>());
 
-		// Regiser imgui manager here, After input before render
-		getService<Coordinator::Manager>()->registerSystem<IMGUI::Manager>();
-
 		////Register physics manager
 		//ecs_coordinator->registerSystem<Physics::Manager>(Physics::Manager::getInstance());
 		//ecs_coordinator->accessSystem<Physics::Manager>()->setComponentsLinked(false);
@@ -127,6 +123,7 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<Coordinator::Manager>());
+		provideService(std::make_shared<IMGUI::Service>());
 
 		//Create console
 		#ifndef NDEBUG
@@ -138,6 +135,9 @@ namespace NIKESAURUS {
 
 		//Setup window with config file
 		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
+
+		// Init imgui
+		getService<IMGUI::Service>()->init();
 
 		//Set Target FPS
 		getService<Windows::Service>()->setTargetFPS(fps);
@@ -189,6 +189,9 @@ namespace NIKESAURUS {
 
 			//Clear buffer ( Temp )
 			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
+
+			// Call update imgui
+			getService<IMGUI::Service>()->update();
 
 			//Update all systems
 			getService<Coordinator::Manager>()->updateSystems();
