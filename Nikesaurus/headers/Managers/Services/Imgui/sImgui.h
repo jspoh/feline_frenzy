@@ -11,6 +11,9 @@
 #ifndef IMGUI_HPP
 #define IMGUI_HPP
 
+#include "Managers/Services/Imgui/ImguiUtils.h"
+#include "Managers/Services/Imgui/ImguiWindows.h"
+
 namespace NIKESAURUS {
 	// All Caps to differentiate from imgui includes
 	namespace IMGUI {
@@ -33,11 +36,16 @@ namespace NIKESAURUS {
 			// Clean up
 			void cleanUp();
 
+			// Assets file path
+			std::filesystem::path assets_path = "C:\\Users\\User\\feline_frenzy\\Feline Frenzy\\assets";
+
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
 			void operator=(Service const& copy) = delete;
+
+
 		};
 
 		//Re-enable DLL Export warning

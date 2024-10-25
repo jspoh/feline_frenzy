@@ -46,45 +46,21 @@ namespace NIKESAURUS {
 
 	void IMGUI::Service::update()
 	{
-		float slider_value = 0.0f;
-		// Middle is main game loop, watever shit we want to render
+		// Main IMGUI loop
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGuiIO& io = ImGui::GetIO();
-		// Seting imgui IO stuff
-		io.DeltaTime = NIKEEngine.getService<Windows::Service>()->getDeltaTime();
-		io.DisplaySize = ImVec2(static_cast<float>(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowPos().x),
-			static_cast<float>(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowPos().y));
+		imguiInputUpdate();
 
-		// Create a new ImGui window
-		static bool show = 1;
-		if (show)
-		{
-			ImGui::ShowDemoWindow(&show);
-		}
+		// Window UI functions goes here
+		imguiFileSystemWindow();
+		imguiEntityWindow();
 
-
-		//// Begin the window with a title
-		ImGui::Begin("Simple ImGui Window");
-		//// Add some text to the window
-		ImGui::Text("Hello from ImGui!");
-		//// Add a slider
-		ImGui::SliderFloat("float", &slider_value, 0.0f, 1.0f);
-
-		// Add a button
-		if (ImGui::Button("Click me")) {
-			// Handle button click event
-		}
-
-		ImGui::End(); // End the window
 
 		// THIS 2 CALL THE OPENGL DRAWING
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		// glfwSwapBuffers(NIKEEngine.accessWindow()->getWindow());
 	}
 
 }

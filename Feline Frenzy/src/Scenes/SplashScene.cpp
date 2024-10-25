@@ -41,7 +41,7 @@ void Splash::Scene::init() {
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 	
 	// Test crash logger
-	LOG_CRASH("This is a test crash");
+	// LOG_CRASH("This is a test crash");
 }
 
 void Splash::Scene::exit() {
