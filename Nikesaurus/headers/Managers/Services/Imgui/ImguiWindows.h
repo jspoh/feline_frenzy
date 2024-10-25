@@ -14,10 +14,16 @@
 #define IMGUI_WINDOWS
 
 namespace NIKESAURUS {
+
+	/*!********************************************************************
+	* Window UI
+	**********************************************************************/
 	// This function will design the UI for the file system window
 	void imguiFileSystemWindow();
 	// This function will design the UI to show all the components available
 	void imguiEntityWindow();
+	// This function will design the UI to show all the components available
+	void imguiEntityComponentManagementWindow();
 }
 
 

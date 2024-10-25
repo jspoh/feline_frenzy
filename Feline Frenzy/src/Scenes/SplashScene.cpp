@@ -37,8 +37,8 @@ void Splash::Scene::init() {
 	NIKEE_WARN("This is a warning message");
 
 	//Create entity
-	NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
-	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
+	// NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	// NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 	
 	// Test crash logger
 	// LOG_CRASH("This is a test crash");

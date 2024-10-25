@@ -13,18 +13,6 @@
 
 namespace NIKESAURUS {
 
-	//IMGUI::Service::Service()
-	//{
-
-	//}
-
-	//Imgui::Manager::~Manager()
-	//{
-	//	//ImGui_ImplOpenGL3_Shutdown();
-	//	//ImGui_ImplGlfw_Shutdown();
-	//	//ImGui::DestroyContext();
-	//}
-
 	void IMGUI::Service::init()
 	{
 		IMGUI_CHECKVERSION();
@@ -44,6 +32,36 @@ namespace NIKESAURUS {
 		ImGui::DestroyContext();
 	}
 
+	std::filesystem::path IMGUI::Service::getAssetsPath()
+	{
+		return assets_path;
+	}
+
+	void IMGUI::Service::setFilePath(const std::filesystem::path& path)
+	{
+		assets_path = path;
+	}
+
+	void IMGUI::Service::addEntityRef(const std::string& name, Entity::Type entity_type)
+	{
+		entities_ref[name] = entity_type;
+	}
+
+	const std::unordered_map<std::string, Entity::Type>& IMGUI::Service::getEntityRef() const
+	{
+		return entities_ref;
+	}
+
+	std::string& IMGUI::Service::getSelectedEntityName()
+	{
+		return selected_entity_name;
+	}
+
+	Entity::Type IMGUI::Service::getEntityByName(std::string const& input)
+	{
+		return entities_ref[input];
+	}
+
 	void IMGUI::Service::update()
 	{
 		// Main IMGUI loop
@@ -54,8 +72,9 @@ namespace NIKESAURUS {
 		imguiInputUpdate();
 
 		// Window UI functions goes here
-		imguiFileSystemWindow();
 		imguiEntityWindow();
+		imguiFileSystemWindow();
+		imguiEntityComponentManagementWindow();
 
 
 		// THIS 2 CALL THE OPENGL DRAWING

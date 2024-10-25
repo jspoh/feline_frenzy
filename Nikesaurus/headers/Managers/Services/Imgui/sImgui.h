@@ -13,6 +13,7 @@
 
 #include "Managers/Services/Imgui/ImguiUtils.h"
 #include "Managers/Services/Imgui/ImguiWindows.h"
+#include "Managers/Services/Imgui/ImguiPopUps.h"
 
 namespace NIKESAURUS {
 	// All Caps to differentiate from imgui includes
@@ -36,17 +37,35 @@ namespace NIKESAURUS {
 			// Clean up
 			void cleanUp();
 
-			// Assets file path
-			std::filesystem::path assets_path = "C:\\Users\\User\\feline_frenzy\\Feline Frenzy\\assets";
+			// Asset file path manipulation
+			std::filesystem::path getAssetsPath();
+			void setFilePath(const std::filesystem::path& path);
 
+			// Settor to add an entity reference
+			void addEntityRef(const std::string& name, Entity::Type entityType);
+
+			// Gettors
+			const std::unordered_map<std::string, Entity::Type>& getEntityRef() const;
+			std::string& getSelectedEntityName();
+			Entity::Type getEntityByName(std::string const& input);
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
 			void operator=(Service const& copy) = delete;
 
+			// Assets file path
+			std::filesystem::path assets_path = "C:\\Users\\User\\feline_frenzy\\Feline Frenzy\\assets";
+			// Container to store the entities created with string ref
+			std::unordered_map<std::string, Entity::Type> entities_ref;
+			// Variable to hold the selected entity name
+			std::string selected_entity_name;
 
 		};
+
+		// Defines to reduce the long line
+		#define GET_ASSETS_PATH() NIKEEngine.getService<IMGUI::Service>()->getAssetsPath()
+		#define SET_ASSETS_PATH(path) NIKEEngine.getService<IMGUI::Service>()->setFilePath(path)
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)

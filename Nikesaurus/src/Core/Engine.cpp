@@ -13,7 +13,7 @@
 ////Registerd Components
 #include "Components/cAudio.h"
 //#include "../headers/Components/cMove.h"
-// //#include "../headers/Components/cRender.h"
+//#include "../headers/Components/cTransform.h"
 //
 //Registered Systems
 #include "Systems/sysAudio.h"
@@ -44,6 +44,7 @@ namespace NIKESAURUS {
 
 		////Register physics components
 		//ecs_coordinator->registerComponent<Transform::Velocity>();
+		//getService<Coordinator::Manager>()->registerComponent<Transform::Velocity>();
 		//ecs_coordinator->registerComponent<Transform::Transform>();
 		//ecs_coordinator->registerComponent<Transform::Runtime_Transform>();
 		//ecs_coordinator->registerComponent<Move::Movement>();

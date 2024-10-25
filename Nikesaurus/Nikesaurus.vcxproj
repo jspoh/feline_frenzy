@@ -52,6 +52,7 @@
     <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
     <ClCompile Include="src\Managers\ECS\mComponent.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sAssets.cpp" />
+    <ClCompile Include="src\Managers\Services\Imgui\ImguiPopUps.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiWindows.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
+    <ClInclude Include="headers\Managers\Services\Imgui\ImguiPopUps.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiUtils.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiWindows.h" />
