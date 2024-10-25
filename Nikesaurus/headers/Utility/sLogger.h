@@ -46,5 +46,6 @@ namespace NIKESAURUS {
 #define LOG_CRASH(message) \
     do { \
         NIKESAURUS::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \
-        throw std::runtime_error(message); \
+		NIKEEngine.getService<NIKESAURUS::Windows::Service>()->getWindow()->cleanUp(); \
+		assert(false && message); \
     } while (0)

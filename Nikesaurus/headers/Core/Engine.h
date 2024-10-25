@@ -31,7 +31,7 @@
 namespace NIKESAURUS {
 	namespace Core {
 
-		//Temporary Disable DLL Export Warning
+		//Disable DLL Export warning
 		#pragma warning(disable: 4251)
 
 		class NIKESAURUS_API Engine {

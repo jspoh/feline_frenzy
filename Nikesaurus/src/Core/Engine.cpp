@@ -28,7 +28,7 @@
 namespace NIKESAURUS {
 
 	//Defintion of the static services member variable
-	std::unordered_map<std::string, std::shared_ptr<void>> NIKESAURUS::Core::Engine::services;
+	std::unordered_map<std::string, std::shared_ptr<void>> Core::Engine::services;
 
 	Core::Engine::~Engine() {
 		glfwTerminate();
