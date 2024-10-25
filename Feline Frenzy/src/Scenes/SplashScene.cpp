@@ -12,8 +12,11 @@
 
 void Splash::Scene::load() {
 	//Load music
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadMusic("assets/Audio/test_music.wav", "MUSIC");
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadSound("assets/Audio/test_sound.wav", "SFX");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadMusic("MUSIC", "assets/Audio/test_music.wav");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadSound("SFX", "assets/Audio/test_sound.wav");
+
+	//Load Texture
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("PLAYER", "assets/textures/player.png");
 }
 
 void Splash::Scene::init() {
