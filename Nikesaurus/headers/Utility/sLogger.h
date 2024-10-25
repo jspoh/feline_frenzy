@@ -43,4 +43,8 @@ namespace NIKESAURUS {
 #define NIKEE_ERROR(...)		NIKESAURUS::Log::GetClientLogger()->error(__VA_ARGS__)
 
 // CRASH LOGGER
-#define CRASH_LOG(message)		NIKESAURUS::Log::GetCrashFileLogger()->error("{} (crash occured in file : {} line :{} in function {}())", message, __FILE__, __LINE__, __func__)
+#define LOG_CRASH(message) \
+    do { \
+        NIKESAURUS::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \
+        throw std::runtime_error(message); \
+    } while (0)

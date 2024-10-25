@@ -23,21 +23,34 @@ int WINAPI WinMain(
 	#if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	#endif
-	
-	//Init Engine
-	NIKEEngine.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
 
-	//Register Scenes
-	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Splash::Scene>("SPLASH");
-	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Menu::Scene>("MENU");
+	try
+	{
+		//Init Engine
+		NIKEEngine.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
 
-	//NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->
+		//Register Scenes
+		NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Splash::Scene>("SPLASH");
+		NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Menu::Scene>("MENU");
 
-	//Change Scene To Main Menu
-	//NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
+		//NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->
 
-	//Run Engine
-	NIKEEngine.run();
+		//Change Scene To Main Menu
+		//NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
 
-	return 0;
+		//Run Engine
+		NIKEEngine.run();
+
+		return 0;
+	}
+	catch (const std::exception& e)
+	{
+		std::string message = std::string(e.what()) + " : the crash has been logged to 'logs/crash-log.txt'"; // Crash Message
+
+		NIKESAURUS::Log::GetCrashFileLogger()->flush(); // Flush output
+
+		MessageBoxA(nullptr, message.c_str(), "Crash Occured", MB_ICONERROR | MB_OK); // Message box popup
+
+		return -1; 
+	}
 }
