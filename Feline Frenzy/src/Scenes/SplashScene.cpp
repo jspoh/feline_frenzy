@@ -51,10 +51,21 @@ void Splash::Scene::init() {
 	NIKESAURUS::Entity::Type shape_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Texture>(shape_1, NIKESAURUS::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}, {256.0f, 256.0f}));
+	
+	//Method 1
+	 //NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	 //NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 
-	//Create entity
-	// NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
-	// NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
+	//FOR LEE
+	for (auto& types : NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes()) {
+		//IMGUI STUFF PRINT OUT BUTTON WITH STRING TYPE
+		cout << types.first << endl;
+	}
+
+	//IF IMGUI AUDIO::SFX BTN TRIGGERED
+	NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(sfx_1, NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Audio::SFX"));
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 	
 	// Test crash logger
 	//LOG_CRASH("This is a test crash");

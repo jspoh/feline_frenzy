@@ -36,10 +36,13 @@ namespace NIKESAURUS {
 			//Destroy Entity
 			void destroyEntity(Entity::Type entity);
 
+			//Get entity component count
+			int getEntityComponentCount(Entity::Type entity) const;
+
 			//Destroy Entity
 			void destroyAllEntities();
 
-			//Get entity count
+			//Get total entities count
 			int getEntitiesCount();
 
 			/*****************************************************************//**
@@ -48,11 +51,18 @@ namespace NIKESAURUS {
 			template<typename T>
 			void addEntityComponent(Entity::Type entity, T&& component);
 
+			void addDefEntityComponent(Entity::Type entity, Component::Type type);
+
 			template<typename T>
 			void removeEntityComponent(Entity::Type entity);
 
 			template<typename T>
 			T& getEntityComponent(Entity::Type entity);
+
+			template<typename T>
+			Component::Type getComponentType();
+
+			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
 		};
 	}
 }

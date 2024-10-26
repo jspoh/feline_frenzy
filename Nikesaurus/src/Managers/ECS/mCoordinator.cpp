@@ -29,7 +29,11 @@ namespace NIKESAURUS {
 		//Destroy all data related to entity
 		entity_manager->destroyEntity(entity);
 		component_manager->entityDestroyed(entity);
-		system_manager->entityDestroyed(entity);
+		system_manager->entityDestroyed(entity); 
+	}
+
+	int Coordinator::Manager::getEntityComponentCount(Entity::Type entity) const{
+		return entity_manager->getEntityComponentCount(entity);
 	}
 
 	void Coordinator::Manager::destroyAllEntities() {
@@ -39,10 +43,30 @@ namespace NIKESAURUS {
 	}
 
 	int Coordinator::Manager::getEntitiesCount() {
-		return entity_manager->getEntityCount();
+		return entity_manager->getEntitiesCount();
 	}
 
 	void Coordinator::Manager::updateSystems() {
 		system_manager->updateSystems();
+	}
+
+	/*****************************************************************//**
+	* Component Methods
+	*********************************************************************/
+	void Coordinator::Manager::addDefEntityComponent(Entity::Type entity, Component::Type type) {
+		//Add component
+		component_manager->addDefEntityComponent(entity, type);
+
+		//Set bit signature of component to true
+		Component::Signature sign = entity_manager->getSignature(entity);
+		sign.set(type, true);
+		entity_manager->setSignature(entity, sign);
+
+		//Update entities list
+		system_manager->updateEntitiesList(entity, sign, type, true);
+	}
+
+	std::unordered_map<std::string, Component::Type> Coordinator::Manager::getAllComponentTypes() const {
+		return component_manager->getAllComponentTypes();
 	}
 }

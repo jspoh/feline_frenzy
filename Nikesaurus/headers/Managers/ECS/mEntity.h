@@ -42,13 +42,14 @@ namespace NIKESAURUS {
 			//Set signature
 			void setSignature(Entity::Type entity, Component::Signature signature);
 
-			Entity::Type cloneEntity(Entity::Type original_entity);
-
 			//Get signature
 			Component::Signature const& getSignature(Entity::Type entity) const;
 
+			//Get entity component count
+			int getEntityComponentCount(Entity::Type entity) const;
+
 			//Get number of active entities
-			int getEntityCount() const;
+			int getEntitiesCount() const;
 
 			//Get all entity
 			std::vector<Entity::Type> getAllEntities() const;

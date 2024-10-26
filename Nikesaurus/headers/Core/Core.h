@@ -310,7 +310,7 @@ namespace NIKESAURUS {
         using Type = uint8_t;
 
         //Max components to be stored in a signature
-        const Type MAX = 64;
+        const Type MAX = INT8_MAX;
 
         //Nested components signature
         using Signature = std::bitset<MAX>;

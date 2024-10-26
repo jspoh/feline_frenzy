@@ -25,7 +25,7 @@ namespace NIKESAURUS {
 
 	void Core::Engine::registerDefComponents() {
 		//Register Audio Components
-		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();\
+		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();
 
 		////Register physics components
 		//ecs_coordinator->registerComponent<Transform::Velocity>();
