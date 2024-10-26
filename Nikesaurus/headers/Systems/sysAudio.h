@@ -12,6 +12,7 @@
 #define AUDIO_SYSTEM_HPP
 
 #include "Managers/ECS/mSystem.h"
+#include "Components/cAudio.h"
 
 namespace NIKESAURUS {
 	namespace Audio {

@@ -17,7 +17,7 @@ namespace NIKESAURUS {
 
 		//Clear fonts
 		for (auto& font : fonts_list) {
-			for (auto& chars : font.second.char_map) {
+			for (auto& chars : font.second->char_map) {
 				glDeleteTextures(1, &chars.second.texture);
 			}
 		}
@@ -35,7 +35,7 @@ namespace NIKESAURUS {
 		}
 
 		//Clear textures
-		for (std::pair<std::string, unsigned int> texture : textures_list) {
+		for (auto& texture : textures_list) {
 			glDeleteTextures(1, &texture.second);
 		}
 
@@ -58,7 +58,8 @@ namespace NIKESAURUS {
 			throw std::runtime_error("FONT ALREADY EXISTS");
 		}
 
-		fonts_list.emplace(std::piecewise_construct, std::forward_as_tuple(font_id), std::forward_as_tuple(std::static_pointer_cast<Font::NIKFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes)));
+		NIKEE_CORE_INFO("Loading font to '" + font_id + "'");
+		fonts_list.emplace(std::piecewise_construct, std::forward_as_tuple(font_id), std::forward_as_tuple(std::make_shared<Render::Font>(std::static_pointer_cast<Font::NIKEFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes))));
 	}
 
 	void Assets::Service::unloadFont(std::string const& font_id) {
@@ -72,13 +73,13 @@ namespace NIKESAURUS {
 		}
 
 		//Unload font
-		for (auto& chars : it->second.char_map) {
+		for (auto& chars : it->second->char_map) {
 			glDeleteTextures(1, &chars.second.texture);
 		}
 		fonts_list.erase(it);
 	}
 
-	Render::Font const& Assets::Service::getFont(std::string const& font_id) const {
+	std::shared_ptr<Render::Font> const& Assets::Service::getFont(std::string const& font_id) const {
 		//Find shader
 		auto it = fonts_list.find(font_id);
 
@@ -100,6 +101,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("MODELS ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading shader to '" + shader_id + "'");
 		shaders_list.emplace(std::piecewise_construct, std::forward_as_tuple(shader_id), std::forward_as_tuple(render_loader->compileShader(shader_id, vtx_path, frag_path)));
 	}
 
@@ -137,7 +139,8 @@ namespace NIKESAURUS {
 			throw std::runtime_error("MODELS ALREADY EXISTS");
 		}
 
-		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Render::Model>(render_loader->compileMesh(file_path))));
+		NIKEE_CORE_INFO("Loading model to '" + model_id + "'");
+		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Render::Model>(render_loader->compileModel(file_path))));
 	}
 
 	void Assets::Service::unloadModel(std::string const& model_id) {
@@ -176,6 +179,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("TEXTURES ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading texture to '" + texture_id + "'");
 		textures_list.emplace(std::piecewise_construct, std::forward_as_tuple(texture_id), std::forward_as_tuple(render_loader->compileTexture(file_path)));
 	}
 
@@ -214,6 +218,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("AUDIO ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading sound to '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createSound(file_path))));
 	}
@@ -226,6 +231,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("AUDIO ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading music to '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createStream(file_path))));
 	}

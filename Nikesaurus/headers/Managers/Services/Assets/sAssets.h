@@ -36,7 +36,7 @@ namespace NIKESAURUS {
 			std::unique_ptr<Font::Loader> font_loader;
 
 			//Maps to fonts
-			std::unordered_map<std::string, Render::Font> fonts_list;
+			std::unordered_map<std::string, std::shared_ptr<Render::Font>> fonts_list;
 
 			/*****************************************************************//**
 			* Render Private Members
@@ -82,7 +82,7 @@ namespace NIKESAURUS {
 			void unloadFont(std::string const& fond_id);
 
 			//Get font
-			Render::Font const& getFont(std::string const& font_id) const;
+			std::shared_ptr<Render::Font> const& getFont(std::string const& font_id) const;
 
 			/*****************************************************************//**
 			* Render ( Texture, Model, Shaders )

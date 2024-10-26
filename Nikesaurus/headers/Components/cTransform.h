@@ -17,28 +17,26 @@
 
 namespace NIKESAURUS {
 	namespace Transform {
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
 
-		struct NIKESAURUS_API Transform {
-			Vector2 position;
-			Vector2 scale;
+		struct Transform {
+			Vector2f position;
+			Vector2f scale;
 			float rotation;
+
+			Transform() : position(), scale(), rotation{ 0.0f } {}
+			Transform(Vector2f const& position, Vector2f const& scale, float rotation)
+				: position{ position }, scale{ scale }, rotation{ rotation } {}
 		};
 
-		struct NIKESAURUS_API Runtime_Transform {
-			bool runtime_scale_up = false;
-			bool runtime_rotate = false;
-			bool runtime_scale_down = false;
+		//struct Runtime_Transform {
+		//	bool runtime_scale_up = false;
+		//	bool runtime_rotate = false;
+		//	bool runtime_scale_down = false;
+		//};
+
+		struct Velocity {
+			Vector2f velocity;
 		};
-
-		struct NIKESAURUS_API Velocity {
-			Vector2 velocity;
-		};
-
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

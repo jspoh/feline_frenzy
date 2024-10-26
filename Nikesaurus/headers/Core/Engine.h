@@ -45,7 +45,7 @@ namespace NIKESAURUS {
 			void operator=(Engine const& copy) = delete;
 
 			//Destructor
-			~Engine();
+			~Engine() = default;
 
 			//Map of services
 			static std::unordered_map<std::string, std::shared_ptr<void>> services;

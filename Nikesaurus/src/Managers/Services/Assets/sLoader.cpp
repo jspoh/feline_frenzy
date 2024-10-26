@@ -17,14 +17,16 @@ namespace NIKESAURUS {
 	/*****************************************************************//**
 	* NIKE FONT LIB
 	*********************************************************************/
-	Font::NIKFontLib::NIKFontLib() {
+	Font::NIKEFontLib::NIKEFontLib() {
 		//Init free type library
 		if (FT_Init_FreeType(&ft_lib)) {
 			cerr << "Could not initialize FreeType library!" << endl;
 		}
+
+		NIKEE_CORE_INFO("Free Type init success");
 	}
 
-	Render::Font Font::NIKFontLib::generateGlyphsTex(FT_Face& font_face) {
+	Render::Font Font::NIKEFontLib::generateGlyphsTex(std::string const& file_path, FT_Face& font_face) {
 
 		//Map of glyph textures
 		Render::Font font;
@@ -72,13 +74,17 @@ namespace NIKESAURUS {
 		}
 
 		//Clean up
-		//FT_Done_Face(font_face);
+		FT_Done_Face(font_face);
+		font_face = nullptr;
+
+		//Log
+		NIKEE_CORE_INFO("Sucessfully loaded font from " + file_path);
 
 		//Return glpyh textures
 		return font;
 	}
 
-	Render::Font Font::NIKFontLib::generateFont(std::string const& file_path, Vector2f const& pixel_sizes) {
+	Render::Font Font::NIKEFontLib::generateFont(std::string const& file_path, Vector2f const& pixel_sizes) {
 		//Create free type font face
 		FT_Face face;
 
@@ -91,10 +97,10 @@ namespace NIKESAURUS {
 		FT_Set_Pixel_Sizes(face, 0, static_cast<unsigned int>(pixel_sizes.y));
 
 		//Generate vector of textures
-		return generateGlyphsTex(face);
+		return generateGlyphsTex(file_path, face);
 	}
 
-	Font::NIKFontLib::~NIKFontLib() {
+	Font::NIKEFontLib::~NIKEFontLib() {
 		FT_Done_FreeType(ft_lib);
 	}
 
@@ -102,7 +108,7 @@ namespace NIKESAURUS {
 	* FONT LOADER
 	*********************************************************************/
 	Font::Loader::Loader() {
-		font_lib = std::make_shared<IFontLib>();
+		font_lib = std::make_shared<NIKEFontLib>();
 	}
 
 	std::shared_ptr<Font::IFontLib> Font::Loader::getFontLib() const {
@@ -301,15 +307,17 @@ namespace NIKESAURUS {
 		glDeleteShader(vtx_handle);
 		glDeleteShader(frag_handle);
 
+		NIKEE_CORE_INFO("Sucessfully loaded shader from " + vtx_path + " " + frag_path);
+
 		return shader_handle;
 	}
 
-	Render::Model Render::Loader::compileMesh(const std::string& path_to_mesh) {
+	Render::Model Render::Loader::compileModel(const std::string& path_to_mesh) {
 		Render::Model model;
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
 		if (!mesh_file.is_open()) {
-			throw std::exception("Failed to open mesh file.");
+			throw std::exception("Failed to open model file.");
 		}
 
 		mesh_file.seekg(0, std::ios::beg);
@@ -381,6 +389,8 @@ namespace NIKESAURUS {
 		}
 		model.draw_count = static_cast<GLuint>(indices.size());
 
+		NIKEE_CORE_INFO("Sucessfully loaded model from " + path_to_mesh);
+
 		return model;
 	}
 
@@ -404,9 +414,11 @@ namespace NIKESAURUS {
 		// no longer needed
 		delete[] tex_data;
 
-		cout << "Successfully registered texture from " << path_to_texture << endl;
+		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
 
 		// Return texture
 		return tex_id;
 	}
 }
+
+#undef STB_IMAGE_IMPLEMENTATION

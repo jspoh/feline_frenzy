@@ -16,11 +16,8 @@
 namespace NIKESAURUS {
 	namespace System {
 
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
-
 		//System interface
-		class NIKESAURUS_API ISystem {
+		class ISystem {
 		protected:
 			//System signature
 			Component::Signature system_signature;
@@ -91,7 +88,7 @@ namespace NIKESAURUS {
 		};
 
 		//System Manager
-		class NIKESAURUS_API Manager {
+		class Manager {
 		private:
 
 			// This to track last call time
@@ -215,9 +212,6 @@ namespace NIKESAURUS {
 			//Update all systems
 			void updateSystems();
 		};
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

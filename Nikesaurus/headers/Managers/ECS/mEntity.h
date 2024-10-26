@@ -14,11 +14,8 @@
 namespace NIKESAURUS {
 	namespace Entity {
 
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
-
 		//Entity Management
-		class NIKESAURUS_API Manager {
+		class Manager {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
@@ -57,9 +54,6 @@ namespace NIKESAURUS {
 			std::vector<Entity::Type> getAllEntities() const;
 		};
 	}
-
-	//Re-enable DLL Export warning
-	#pragma warning(default: 4251)
 }
 
 #endif //!M_ENTITY_HPP

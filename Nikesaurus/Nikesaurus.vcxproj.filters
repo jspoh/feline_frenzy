@@ -34,6 +34,7 @@
     <ClCompile Include="src\Managers\Services\Imgui\ImguiWindows.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiPopUps.cpp" />
+    <ClCompile Include="src\Systems\Render\sysRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -85,13 +86,10 @@
     <ClInclude Include="headers\Systems\Render\sysCamera.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiWindows.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiPopUps.h" />
+    <ClInclude Include="headers\Systems\Render\sysRender.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\base.frag" />
-    <None Include="shaders\base.vert" />
     <None Include="db\data.json" />
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\texture.vert" />
     <None Include="headers\Math\Vector2\Vector2.inl" />
     <None Include="headers\Math\Vector3\Vector3.inl" />
     <None Include="headers\Math\Vector4\Vector4.inl" />

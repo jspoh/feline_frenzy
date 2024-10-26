@@ -57,7 +57,9 @@ namespace NIKESAURUS {
 	* Explicit Template Instantiations For Template Functions
 	*********************************************************************/
 	#define COMPONENT_TYPES \
-		X(Audio::SFX)			
+		X(Audio::SFX) \
+		X(Render::Shape) \
+		X(Transform::Transform)
 
 	#define X(type) template NIKESAURUS_API void Coordinator::Service::addEntityComponent<type>(Entity::Type entity, type&& component);
 	COMPONENT_TYPES

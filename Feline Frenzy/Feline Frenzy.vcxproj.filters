@@ -40,13 +40,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\meshes\circle.txt" />
-    <Text Include="assets\meshes\square.txt" />
-    <Text Include="assets\meshes\square-texture.txt" />
-    <Text Include="assets\meshes\triangle.txt" />
+    <Text Include="assets\Models\circle.txt" />
+    <Text Include="assets\Models\square.txt" />
+    <Text Include="assets\Models\square-texture.txt" />
+    <Text Include="assets\Models\triangle.txt" />
     <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
+    <None Include="assets\Shaders\base.frag" />
+    <None Include="assets\Shaders\base.vert" />
+    <None Include="assets\Shaders\texture.frag" />
+    <None Include="assets\Shaders\texture.vert" />
   </ItemGroup>
 </Project>

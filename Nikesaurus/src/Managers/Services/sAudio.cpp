@@ -310,6 +310,8 @@ namespace NIKESAURUS {
 			throw std::runtime_error("INVALID FILE PATH.");
 		}
 
+		NIKEE_CORE_INFO("Sucessfully loaded sound from " + file_path);
+
 		return std::make_shared<Audio::NIKEAudio>(temp_audio);
 	}
 
@@ -327,6 +329,8 @@ namespace NIKESAURUS {
 		{
 			throw std::runtime_error("INVALID FILE PATH.");
 		}
+
+		NIKEE_CORE_INFO("Sucessfully loaded music from " + file_path);
 
 		return std::make_shared<Audio::NIKEAudio>(temp_audio);
 	}
