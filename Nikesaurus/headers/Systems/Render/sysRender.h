@@ -25,16 +25,13 @@
 namespace NIKESAURUS {
 	namespace Render {
 
+		//Render Manager
 		class Manager : public System::ISystem {
-
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
-
-			//Font system
-			std::unique_ptr<Font::Manager> font_system;
 
 			//Shader system
 			std::unique_ptr<Shader::Manager> shader_system;
@@ -43,9 +40,10 @@ namespace NIKESAURUS {
 			std::unique_ptr<Camera::System> camera_system; // smart ptr to camera
 
 			//Transform matrix
-			void transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
+			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
 
-			void transformMatrixDebug(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat);
+			//Debug Mode Transform Matrix
+			void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
 
 			//Render Shape
 			void renderObject(Render::Shape const& e_shape);
@@ -57,7 +55,7 @@ namespace NIKESAURUS {
 			void renderText(Render::Text const& e_text);
 
 			//Render debugging wireframe
-			void renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color);
+			void renderWireFrame(Matrix_33 const& x_form, Render::Color const& e_color);
 
 			//Helper function to encapsulate rendering
 			void transformAndRenderEntity(Entity::Type entity, bool debugMode);
@@ -68,26 +66,19 @@ namespace NIKESAURUS {
 			//Destructor
 			~Manager() = default;
 
-			// Debug mode for bounding box
-			bool debug_mode = false;
+			//// Debug mode for bounding box
+			//bool debug_mode = false;
 
 			std::string getSysName()
 			{
 				return "Render System";
 			}
 
+			////Track camera entity
+			//void trackCamEntity(std::string const& cam_identifier);
 
-			//Singleton Of Manager Class
-			static std::shared_ptr<Manager> getInstance() {
-				static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
-				return instance;
-			}
-
-			//Track camera entity
-			void trackCamEntity(std::string const& cam_identifier);
-
-			//Get camera entity
-			std::unique_ptr<Camera::System>& getCamEntity();
+			////Get camera entity
+			//std::unique_ptr<Camera::System>& getCamEntity();
 
 			/**
 			* update all object's xform

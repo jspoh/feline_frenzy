@@ -11,12 +11,26 @@
 #include "Scenes/SplashScene.h"
 
 void Splash::Scene::load() {
-	//Load music
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadMusic("MUSIC", "assets/Audio/test_music.wav");
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadSound("SFX", "assets/Audio/test_sound.wav");
+
+	//Load Shaders
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("BASE", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("TEXTURE", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
+
+	//Load Models
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("SQUARE", "assets/Models/square.txt");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("TRIANGLE", "assets/Models/triangle.txt");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("CIRCLE", "assets/Models/circle.txt");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("SQUARE_TEXTURE", "assets/Models/square-texture.txt");
 
 	//Load Texture
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("PLAYER", "assets/textures/player.png");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("PLAYER", "assets/Textures/player.png");
+
+	//Load Font
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
+
+	//Load music
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadMusic("MUSIC", "assets/Audios/test_music.wav");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadSound("SFX", "assets/Audios/test_sound.wav");
 }
 
 void Splash::Scene::init() {
@@ -41,7 +55,7 @@ void Splash::Scene::init() {
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 	
 	// Test crash logger
-	// LOG_CRASH("This is a test crash");
+	//LOG_CRASH("This is a test crash");
 }
 
 void Splash::Scene::exit() {

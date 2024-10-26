@@ -17,10 +17,8 @@
 
 namespace NIKESAURUS {
 	namespace Coordinator {
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
 
-		class NIKESAURUS_API Manager {
+		class Manager {
 		private:
 			//ECS Managers
 			std::unique_ptr<Entity::Manager> entity_manager;
@@ -147,9 +145,6 @@ namespace NIKESAURUS {
 
 			void updateSystems();
 		};
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

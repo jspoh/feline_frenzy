@@ -17,7 +17,7 @@
 
 namespace NIKESAURUS {
 
-	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat) {
+	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
 		Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
@@ -32,7 +32,7 @@ namespace NIKESAURUS {
 		Matrix_33Transpose(x_form, result);
 	}
 
-	void Render::Manager::transformMatrixDebug(Transform::Transform const& obj, Matrix33::Matrix_33& x_form, Matrix33::Matrix_33 world_to_ndc_mat) {
+	void Render::Manager::transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
 		Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
@@ -188,7 +188,7 @@ namespace NIKESAURUS {
 		shader_system->unuseShader();
 	}
 
-	void Render::Manager::renderWireFrame(Matrix33::Matrix_33 const& x_form, Render::Color const& e_color) {
+	void Render::Manager::renderWireFrame(Matrix_33 const& x_form, Render::Color const& e_color) {
 		//Set Polygon Mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -253,17 +253,15 @@ namespace NIKESAURUS {
 		}
 	}
 
-	void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
-		camera_system->trackCamEntity(cam_identifier);
-	}
+	//void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
+	//	camera_system->trackCamEntity(cam_identifier);
+	//}
 
-	std::unique_ptr<Camera::System>& Render::Manager::getCamEntity() {
-		return camera_system;
-	}
+	//std::unique_ptr<Camera::System>& Render::Manager::getCamEntity() {
+	//	return camera_system;
+	//}
 
 	void Render::Manager::init() {
-		//Create font system
-		font_system = std::make_unique<Font::Manager>();
 
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();

@@ -23,16 +23,10 @@
 //#include "../headers/Systems/Render/sysRender.h"
 //#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
-//ECS coordinator for engine internal usage
-
 namespace NIKESAURUS {
 
 	//Defintion of the static services member variable
 	std::unordered_map<std::string, std::shared_ptr<void>> Core::Engine::services;
-
-	Core::Engine::~Engine() {
-		glfwTerminate();
-	}
 
 	void Core::Engine::registerDefComponents() {
 		//Register Audio Components
@@ -100,18 +94,6 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Shape>());
 		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Texture>());
 		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Text>());
-	}
-
-	void Core::Engine::registerDefAssets() {
-		//Register shader
-		//assets_manager->registerShader("base", "shaders/base.vert", "shaders/base.frag");
-		//assets_manager->registerShader("texture", "shaders/texture.vert", "shaders/texture.frag");
-
-		////Register models
-		//assets_manager->registerModel("square", "assets/meshes/square.txt");
-		//assets_manager->registerModel("triangle", "assets/meshes/triangle.txt");
-		//assets_manager->registerModel("circle", "assets/meshes/circle.txt");
-		//assets_manager->registerModel("square-texture", "assets/meshes/square-texture.txt");
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
@@ -220,7 +202,6 @@ namespace NIKESAURUS {
 			//Swap Buffers
 			NIKEEngine.getService<Windows::Service>()->getWindow()->swapBuffers();
 		}
-
 
 		//Clean up window resources
 		getService<Windows::Service>()->getWindow()->cleanUp();

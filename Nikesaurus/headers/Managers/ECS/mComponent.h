@@ -15,11 +15,8 @@
 namespace NIKESAURUS {
 	namespace Component {
 
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
-
 		//Component Array interface
-		class NIKESAURUS_API IArray {
+		class IArray {
 		private:
 		public:
 			virtual ~IArray() = default;
@@ -109,7 +106,7 @@ namespace NIKESAURUS {
 		};
 
 		//Manager of the component Array
-		class NIKESAURUS_API Manager {
+		class Manager {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
@@ -233,9 +230,6 @@ namespace NIKESAURUS {
 			//Remove entity from all components
 			void entityDestroyed(Entity::Type entity);
 		};
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

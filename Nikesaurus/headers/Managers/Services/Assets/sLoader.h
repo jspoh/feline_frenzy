@@ -28,23 +28,23 @@ namespace NIKESAURUS {
 		#ifdef NIKE_BUILD_DLL //!EXPOSE TO ENGINE ONLY
 
 		//Font Service
-		class NIKFontLib : public IFontLib {
+		class NIKEFontLib : public IFontLib {
 		private:
 			//Free type lib
 			FT_Library ft_lib;
 
 			//Generate texture from glyphs for rendering
-			Render::Font generateGlyphsTex(FT_Face& font_face);
+			Render::Font generateGlyphsTex(std::string const& file_path, FT_Face& font_face);
 
 		public:
 			//Default constructor
-			NIKFontLib();
+			NIKEFontLib();
 
 			//Load free type font
 			Render::Font generateFont(std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
 			//Default destructor
-			~NIKFontLib();
+			~NIKEFontLib();
 		};
 
 		#endif //!EXPOSE TO ENGINE ONLY
@@ -134,7 +134,7 @@ namespace NIKESAURUS {
 			 * \param path_to_mesh
 			 * \return success
 			 */
-			Render::Model compileMesh(const std::string& path_to_mesh);
+			Render::Model compileModel(const std::string& path_to_mesh);
 
 			/**
 			 * registers textures.

@@ -131,10 +131,6 @@
     <None Include="headers\Math\Vector2\Vector2.inl" />
     <None Include="headers\Math\Vector3\Vector3.inl" />
     <None Include="headers\Math\Vector4\Vector4.inl" />
-    <None Include="shaders\base.frag" />
-    <None Include="shaders\base.vert" />
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\texture.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

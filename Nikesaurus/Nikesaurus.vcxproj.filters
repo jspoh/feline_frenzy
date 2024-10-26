@@ -85,11 +85,7 @@
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiWindows.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\base.frag" />
-    <None Include="shaders\base.vert" />
     <None Include="db\data.json" />
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\texture.vert" />
     <None Include="headers\Math\Vector2\Vector2.inl" />
     <None Include="headers\Math\Vector3\Vector3.inl" />
     <None Include="headers\Math\Vector4\Vector4.inl" />
