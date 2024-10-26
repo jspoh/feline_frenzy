@@ -71,12 +71,6 @@ namespace NIKESAURUS {
 		// Display the Create Entity Popup if open
 		open_popup = showCreateEntityPopUp(open_popup);
 
-		ImGui::SameLine();
-		if (ImGui::Button("Clone Entity")) {
-			// Clone entity logic
-			// NIKEEngine.getService<Coordinator::Service>()->cloneEntity();
-		}
-
 		// Show number of entities in the level
 		ImGui::Text("Number of entities in level: %d", NIKEEngine.getService<Coordinator::Service>()->getEntitiesCount());
 
@@ -95,36 +89,54 @@ namespace NIKESAURUS {
 
 	void imguiEntityComponentManagementWindow()
 	{
+		static bool open_component_popup = false;
+
 		std::string selected_entity = NIKEEngine.getService<IMGUI::Service>()->getSelectedEntityName();
 		ImGui::Begin("Entity Component Management");
 
-		//// Check if an entity is selected
-		//if (!selected_entity.empty()) {
-		//	ImGui::Text("Selected Entity: %s", selected_entity.c_str());
+		// Check if an entity is selected
+		if (!selected_entity.empty()) {
+			ImGui::Text("Selected Entity: %s", selected_entity.c_str());
 
-		//	Entity::Type entity = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity);
+			Entity::Type entity = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity);
 
-		//	// Display number of components
-		//	NIKEEngine.getService<Component::Manager>()->getEntityComponent(entity);
-		//	auto components = selectedEntity.getComponents(); 
-		//	ImGui::Text("Number of Components: %d", components.size());
+			//// For easier typing
+			//auto component_manager = NIKEEngine.getService<Component::Manager>();
 
-		//	// Display existing components
-		//	for (const auto& component : components) {
-		//		ImGui::Text("Component: %s", component.getName().c_str()); // Assuming each component has a getName() method
-		//	}
+			//// Retrieve all registered component types
+			//for (const auto& elem : NIKEEngine.getService<Component::Manager>()->getComponentTypes()) {
+			//	// Check if the component type exists for the selected entity
+			//	if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<std::any>(entity)) {
+			//		// Retrieve and display the component using ImGui
+			//		auto& component = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<std::any>(entity);
+			//		ImGui::Text("Component: %s", elem.first.c_str());
+			//	}
+			//}
 
-		//	// Option to add a new component
-		//	if (ImGui::Button("Add Component")) {
-		//		// Logic to add a component to the entity
-		//		// For example, you could open another popup to choose which component to add
-		//		openAddComponentPopup(selectedEntity);
-		//	}
-		//}
-		//else {
-		//	ImGui::Text("No entity selected.");
-		//}
-		//
+			// Option to add a new component
+			if (ImGui::Button("Add Component")) {
+				// Logic to add a component to the entity
+				open_component_popup = true;
+				ImGui::OpenPopup("Add Component");
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Clone Entity")) {
+				// Clone entity logic
+				// TODO: Create pop up to choose which entity to clone
+				// NIKEEngine.getService<Coordinator::Service>()->cloneEntity();
+			}
+
+			open_component_popup = showAddComponentPopup(entity, open_component_popup);
+			
+			
+		}
+		else {
+			ImGui::Text("No entity selected.");
+		}
+
+		
 		ImGui::End();
 	}
 }

@@ -218,7 +218,7 @@ namespace NIKESAURUS {
 				return component_types.at(type_name);
 			}
 
-			//Get all entities
+			// Get all entities with that component
 			template<typename T>
 			std::vector<Entity::Type> getAllEntities() {
 				return getComponentArray<T>()->getAllEntities();

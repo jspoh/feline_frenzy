@@ -17,7 +17,9 @@ namespace NIKESAURUS {
 	**********************************************************************/
 	// This function will create a pop up for user to input their entity name for easier UI
 	bool showCreateEntityPopUp(bool pop_up);
-	void showAddComponentPopup(Entity::Type& entity);
+	// This function will create a pop up for user to choose which component to add 
+	bool showAddComponentPopup(Entity::Type& entity, bool pop_up);
+	bool showComponentExistsPopup();
 }
 
 #endif

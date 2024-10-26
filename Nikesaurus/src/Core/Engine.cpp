@@ -25,7 +25,7 @@ namespace NIKESAURUS {
 
 	void Core::Engine::registerDefComponents() {
 		//Register Audio Components
-		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();\
+		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();
 
 		////Register physics components
 		//ecs_coordinator->registerComponent<Transform::Velocity>();
@@ -80,12 +80,15 @@ namespace NIKESAURUS {
 		//Register render manager
 		getService<Coordinator::Manager>()->registerSystem<Render::Manager>();
 		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
-		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
+		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
 		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Texture>());
 		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Text>());
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
+
+		//Provide ecs coordinator service for internal engine usage
+		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Provide Services
 		provideService(std::make_shared<Windows::Service>());
@@ -98,8 +101,7 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Coordinator::Service>());
 
-		//Provide ecs coordinator service for internal engine usage
-		provideService(std::make_shared<Coordinator::Manager>());
+
 
 		//Create console
 		#ifndef NDEBUG
