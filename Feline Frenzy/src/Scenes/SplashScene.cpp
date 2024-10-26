@@ -14,13 +14,13 @@ void Splash::Scene::load() {
 
 	//Load Shaders
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("base", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("TEXTURE", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("texture", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
 
 	//Load Models
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("square", "assets/Models/square.txt");
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("TRIANGLE", "assets/Models/triangle.txt");
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("CIRCLE", "assets/Models/circle.txt");
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("SQUARE_TEXTURE", "assets/Models/square-texture.txt");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("square-texture", "assets/Models/square-texture.txt");
 
 	//Load Texture
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("PLAYER", "assets/Textures/player.png");
@@ -50,7 +50,7 @@ void Splash::Scene::init() {
 	//Create Shape
 	NIKESAURUS::Entity::Type shape_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
-	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Shape>(shape_1, NIKESAURUS::Render::Shape("TRIANGLE", {1.0f, 0.0f, 0.0f, 1.0f}));
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Texture>(shape_1, NIKESAURUS::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}, {256.0f, 256.0f}));
 
 	//Create entity
 	// NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();

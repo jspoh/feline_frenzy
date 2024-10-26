@@ -58,4 +58,3 @@ namespace NIKESAURUS {
 }
 
 #endif // !S_COORDINATOR_ECS_H
-

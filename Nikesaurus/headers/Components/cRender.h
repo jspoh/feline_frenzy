@@ -65,10 +65,12 @@ namespace NIKESAURUS {
 			Matrix_33 x_form;
 			Color color;
 			Vector2f texture_size;	// Spritesheet size ( before mapping )
-			Vector2f frame_size;		// x: 1 / frames in col,  y: 1 / frames in row
-			Vector2f frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
+			Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
+			Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 
 			Texture() : texture_ref{ "" }, x_form(), color(), texture_size(), frame_size(), frame_index() {}
+			Texture(std::string const& texture_ref, Color const& color, Vector2f const& texture_size, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
+				:texture_ref{ texture_ref }, x_form(), color{ color }, texture_size{ texture_size }, frame_size{ frame_size }, frame_index{ frame_index }{}
 		};
 
 		struct Model {

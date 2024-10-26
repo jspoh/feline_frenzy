@@ -56,22 +56,23 @@ namespace NIKESAURUS {
 	/*****************************************************************//**
 	* Explicit Template Instantiations For Template Functions
 	*********************************************************************/
-	#define COMPONENT_TYPES \
-		X(Audio::SFX) \
-		X(Render::Shape) \
-		X(Transform::Transform)
+	#define ECS_DEFINE_TYPES(type)    \
+	template NIKESAURUS_API void Coordinator::Service::addEntityComponent<type>(Entity::Type entity, type&& component); \
+	template NIKESAURUS_API void Coordinator::Service::removeEntityComponent<type>(Entity::Type entity); \
+	template NIKESAURUS_API type& Coordinator::Service::getEntityComponent<type>(Entity::Type entity);
 
-	#define X(type) template NIKESAURUS_API void Coordinator::Service::addEntityComponent<type>(Entity::Type entity, type&& component);
-	COMPONENT_TYPES
-	#undef X
+	//Define Audio Types
+	ECS_DEFINE_TYPES(Audio::SFX)
 
-	#define X(type) template NIKESAURUS_API void Coordinator::Service::removeEntityComponent<type>(Entity::Type entity);
-	COMPONENT_TYPES
-	#undef X
+	//Define Transform Types
+	ECS_DEFINE_TYPES(Transform::Transform)
 
-	#define X(type) template NIKESAURUS_API type& Coordinator::Service::getEntityComponent<type>(Entity::Type entity);
-	COMPONENT_TYPES
-	#undef X
-
-	#undef COMPONENT_TYPES
+	//Define Render Types
+	ECS_DEFINE_TYPES(Render::Cam)
+	ECS_DEFINE_TYPES(Render::Font)
+	ECS_DEFINE_TYPES(Render::Model)
+	ECS_DEFINE_TYPES(Render::Model)
+	ECS_DEFINE_TYPES(Render::Shape)
+	ECS_DEFINE_TYPES(Render::Text)
+	ECS_DEFINE_TYPES(Render::Texture)
 }
