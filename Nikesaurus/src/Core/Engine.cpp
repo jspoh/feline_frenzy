@@ -157,14 +157,21 @@ namespace NIKESAURUS {
 				" | " + std::to_string(getService<Windows::Service>()->getCurrentFPS()) + " fps" +
 				" | " + std::to_string(getService<Coordinator::Manager>()->getEntitiesCount()) + " entities");
 
-			//Poll system events
-			getService<Windows::Service>()->getWindow()->pollEvents();
-
 			//Update all audio pending actions
 			getService<Audio::Service>()->getAudioSystem()->update();
 
+			//Poll system events
+			getService<Windows::Service>()->getWindow()->pollEvents();
+
 			//Clear buffer ( Temp )
 			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
+
+			//Update all systems
+			getService<Coordinator::Manager>()->updateSystems();
+
+			// Call update imgui
+			// getService<IMGUI::Service>()->update();
+
 
 			static bool imgui_overlay_enable = true;
 
@@ -177,12 +184,6 @@ namespace NIKESAURUS {
 			if (imgui_overlay_enable) {
 				getService<IMGUI::Service>()->update();
 			}
-
-			//Update all systems
-			getService<Coordinator::Manager>()->updateSystems();
-
-			// Call update imgui
-			getService<IMGUI::Service>()->update();
 
 			//Update scenes manager
 			getService<Scenes::Service>()->update();
