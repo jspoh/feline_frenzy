@@ -17,26 +17,18 @@
 
 namespace NIKESAURUS {
 
-	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
+	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe) {
 		//Transform matrix here
-		Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
+		Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
-		float angleDisp = obj.rotation;
+		if (!render_wireframe) {
+			float angleDisp = obj.rotation;
+			Matrix_33RotDeg(rot_mat, angleDisp);
+		}
+		else {
+			Matrix_33RotDeg(rot_mat, 0);
+		}
 
-		Matrix_33RotDeg(rot_mat, angleDisp);
-		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
-		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
-
-		// OpenGL requires matrix in col maj so transpose
-		Matrix_33Transpose(x_form, result);
-	}
-
-	void Render::Manager::transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
-		//Transform matrix here
-		Matrix33::Matrix_33 result, scale_mat, rot_mat, trans_mat;
-
-		Matrix_33Rot(rot_mat, 0);
 		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
@@ -53,12 +45,12 @@ namespace NIKESAURUS {
 		shader_system->useShader("base");
 
 		//Shader set uniform
-		shader_system->setUniform("base", "f_color", e_shape.color.color);
-		shader_system->setUniform("base", "f_opacity", e_shape.color.alpha);
+		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
+		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
 		shader_system->setUniform("base", "model_to_ndc", e_shape.x_form);
 
 		//Get model
-		auto model = NIKEEngine.accessAssets()->getModel(e_shape.model_ref);
+		auto model = NIKEEngine.getService<Assets::Service>()->getModel(e_shape.model_ref);
 
 		//Draw
 		glBindVertexArray(model->vaoid);
@@ -82,11 +74,11 @@ namespace NIKESAURUS {
 		// set texture
 		glBindTextureUnit(
 			texture_unit, // texture unit (binding index)
-			NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref)
+			NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)
 		);
 
-		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKEEngine.accessAssets()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Caculate UV Offset
 		Vector2 uv_offset{ e_texture.frame_index.x * e_texture.frame_size.x, e_texture.frame_index.y * e_texture.frame_size.y };
@@ -96,14 +88,14 @@ namespace NIKESAURUS {
 
 		//Set uniforms for texture rendering
 		shader_system->setUniform("texture", "u_tex2d", texture_unit);
-		shader_system->setUniform("texture", "u_opacity", e_texture.color.alpha);
+		shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
 		shader_system->setUniform("texture", "u_transform", e_texture.x_form);
 		shader_system->setUniform("texture", "uvOffset", uv_offset);
 		shader_system->setUniform("texture", "frameSize", e_texture.frame_size);
 		shader_system->setUniform("texture", "u_is_font", false);
 
 		//Get model
-		auto model = NIKEEngine.accessAssets()->getModel("square-texture");
+		auto model = NIKEEngine.getService<Assets::Service>()->getModel("square-texture");
 
 		//Draw
 		glBindVertexArray(model->vaoid);
@@ -125,14 +117,14 @@ namespace NIKESAURUS {
 		constexpr int texture_unit = 6;
 
 		//Get model
-		const auto& model = NIKEEngine.accessAssets()->getModel("square-texture");
+		const auto& model = NIKEEngine.getService<Assets::Service>()->getModel("square-texture");
 
 		// num chars counter
 		int i{};
 
 		// Iterate through all characters in the string
 		for (char c : e_text.text) {
-			const Character& ch = NIKEEngine.accessAssets()->getFont(e_text.font_ref).at(c);
+			const Render::Font::Character& ch = NIKEEngine.getService<Assets::Service>()->getFont(e_text.font_ref)->char_map.at(c);
 			const unsigned int ch_tex_hdl = ch.texture;
 
 			// set texture
@@ -157,7 +149,7 @@ namespace NIKESAURUS {
 			const float ypos = e_text.position.y;
 
 			// !TODO: refine this
-			Matrix33::Matrix_33 xform = Matrix33::Matrix_33::Identity();
+			Matrix_33 xform = Matrix_33::Identity();
 			xform *= e_text.scale;
 			xform.matrix_33[2][0] = xpos;
 			xform.matrix_33[2][1] = ypos;
@@ -165,8 +157,8 @@ namespace NIKESAURUS {
 			// required to flip around for opengl rendering
 			xform.matrix_33[1][1] *= -1;
 
-			const Vector2 uv_offset{ 0, 0 };
-			const Vector2 frame_size{ 1, 1 };
+			const Vector2f uv_offset{ 0, 0 };
+			const Vector2f frame_size{ 1, 1 };
 
 			//Set uniforms for texture rendering
 			shader_system->setUniform("texture", "u_tex2d", texture_unit);
@@ -196,12 +188,12 @@ namespace NIKESAURUS {
 		shader_system->useShader("base");
 
 		//Shader set uniform
-		shader_system->setUniform("base", "f_color", e_color.color);
-		shader_system->setUniform("base", "f_opacity", e_color.alpha);
+		shader_system->setUniform("base", "f_color", Vector3f(e_color.r, e_color.g, e_color.b));
+		shader_system->setUniform("base", "f_opacity", e_color.a);
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
-		auto model = NIKEEngine.accessAssets()->getModel("square");
+		auto model = NIKEEngine.getService<Assets::Service>()->getModel("square");
 
 		//Draw model
 		glBindVertexArray(model->vaoid);
@@ -216,39 +208,39 @@ namespace NIKESAURUS {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-		auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
+		auto& e_transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
 
 		//Check If Shape
-		if (NIKEEngine.checkEntityComponent<Render::Shape>(entity)) {
-			auto& e_shape = NIKEEngine.getEntityComponent<Render::Shape>(entity);
+		if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Shape>(entity)) {
+			auto& e_shape = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Shape>(entity);
 
 			// Transform matrix here
-			transformMatrix(e_transform, e_shape.x_form, camera_system->getWorldToNDCXform());
+			transformMatrix(e_transform, e_shape.x_form, camera_system->getWorldToNDCXform(), false);
 
 			//Render Shape
 			renderObject(e_shape);
 		}
-		else if (NIKEEngine.checkEntityComponent<Render::Texture>(entity)) {
-			auto& e_texture = NIKEEngine.getEntityComponent<Render::Texture>(entity);
+		else if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Texture>(entity)) {
+			auto& e_texture = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Texture>(entity);
 
 			//Copy transform for texture mapping
 			Transform::Transform copy = e_transform;
 			copy.scale = e_texture.texture_size.normalized() * copy.scale.length();
 
 			// Transform matrix here
-			transformMatrix(copy, e_texture.x_form, camera_system->getWorldToNDCXform());
+			transformMatrix(copy, e_texture.x_form, camera_system->getWorldToNDCXform(), false);
 
 			// Render Texture
 			renderObject(e_texture);
 		}
 
 		if (debugMode) {
-			Matrix33::Matrix_33 mtx_wireframe;
+			Matrix_33 mtx_wireframe;
 			//Calculate wireframe matrix
-			transformMatrixDebug(e_transform, mtx_wireframe, camera_system->getWorldToNDCXform());
+			transformMatrix(e_transform, mtx_wireframe, camera_system->getWorldToNDCXform(), true);
 
 			// Render debugging wireframe
-			Render::Color wire_frame_color{ { 1.0f, 0.0f, 0.0f }, 1.0f };
+			Render::Color wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
 			renderWireFrame(mtx_wireframe, wire_frame_color);
 		}
 	}
@@ -270,7 +262,7 @@ namespace NIKESAURUS {
 		camera_system = std::make_unique<Camera::System>();
 
 		//Init Camera ( Camera height defaulted at window height )
-		camera_system->init(NIKEEngine.accessWindow()->getWindowSize().y);
+		camera_system->init(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().y);
 
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);
@@ -279,22 +271,20 @@ namespace NIKESAURUS {
 
 	void Render::Manager::update() {
 
-		//Swap buffers
-		NIKEEngine.getService<Windows::Manager>()->swapBuffers();
-
-		// Before drawing clear screen
+		//Before drawing clear screen
+		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Update set of cameras
 		std::set<Entity::Type> cam_entities;
 		for (auto& entity : entities) {
 			//Update camera position
-			if (!NIKEEngine.checkEntityComponent<Render::Cam>(entity))
+			if (!NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(entity))
 				continue;
 
 			//Update camera and push to list
-			auto& e_transform = NIKEEngine.getEntityComponent<Transform::Transform>(entity);
-			auto& e_camera = NIKEEngine.getEntityComponent<Render::Cam>(entity);
+			auto& e_transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
+			auto& e_camera = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Cam>(entity);
 			e_camera.position = e_transform.position;
 			cam_entities.insert(entity);
 		}
@@ -308,22 +298,22 @@ namespace NIKESAURUS {
 		//Update all and render except camera entities
 		for (auto& entity : entities) {
 			//Check for text objects
-			if (NIKEEngine.checkEntityComponent<Render::Text>(entity)) {
-				renderText(NIKEEngine.getEntityComponent<Render::Text>(entity));
+			if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Text>(entity)) {
+				renderText(NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Text>(entity));
 				continue;
 			}
 
 			//Skip camera
-			if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) continue;
+			if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(entity)) continue;
 
 			//Transform and render object
-			transformAndRenderEntity(entity, debug_mode);
+			transformAndRenderEntity(entity, true);
 		}
 
 		// Render camera above all components
 		for (auto& entity : entities) {
-			if (NIKEEngine.checkEntityComponent<Render::Cam>(entity)) {
-				transformAndRenderEntity(entity, debug_mode);
+			if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(entity)) {
+				transformAndRenderEntity(entity, true);
 			}
 		}
 	}

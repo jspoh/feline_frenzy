@@ -9,18 +9,13 @@
 
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
-
-////Registerd Components
-#include "Components/cAudio.h"
-//#include "../headers/Components/cMove.h"
-// //#include "../headers/Components/cRender.h"
 //
 //Registered Systems
 #include "Systems/sysAudio.h"
 //#include "../headers/Systems/sysInput.h"
 //#include "../headers/Systems/Physics/sysPhysics.h"
 //#include "../headers/Systems/Animation/sysAnimation.h"
-//#include "../headers/Systems/Render/sysRender.h"
+#include "../headers/Systems/Render/sysRender.h"
 //#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
 namespace NIKESAURUS {
@@ -30,15 +25,11 @@ namespace NIKESAURUS {
 
 	void Core::Engine::registerDefComponents() {
 		//Register Audio Components
-		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();
-
-		////Register input components
-		//ecs_coordinator->registerComponent<Input::Key>();
-		//ecs_coordinator->registerComponent<Input::Mouse>();
+		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();\
 
 		////Register physics components
 		//ecs_coordinator->registerComponent<Transform::Velocity>();
-		//ecs_coordinator->registerComponent<Transform::Transform>();
+		getService<Coordinator::Manager>()->registerComponent<Transform::Transform>();
 		//ecs_coordinator->registerComponent<Transform::Runtime_Transform>();
 		//ecs_coordinator->registerComponent<Move::Movement>();
 		//ecs_coordinator->registerComponent<Collision::Collider>();
@@ -48,12 +39,11 @@ namespace NIKESAURUS {
 		//ecs_coordinator->registerComponent<Animation::cSprite>();
 
 		////Register render components
-		//ecs_coordinator->registerComponent<Render::Shape>();
-		//ecs_coordinator->registerComponent<Render::Texture>();
-		//ecs_coordinator->registerComponent<Render::Color>();
-		//ecs_coordinator->registerComponent<Render::Cam>();
-		//ecs_coordinator->registerComponent<Render::Text>();
-		//ecs_coordinator->registerComponent<Render::Debug>();
+		getService<Coordinator::Manager>()->registerComponent<Render::Shape>();
+		getService<Coordinator::Manager>()->registerComponent<Render::Texture>();
+		getService<Coordinator::Manager>()->registerComponent<Render::Color>();
+		getService<Coordinator::Manager>()->registerComponent<Render::Cam>();
+		getService<Coordinator::Manager>()->registerComponent<Render::Text>();
 
 		////Register audio components
 		//ecs_coordinator->registerComponent<Audio::cAudio>();
@@ -87,13 +77,12 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Animation::cSprite>());
 		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Render::Texture>());
 
-		////Register render manager
-		//ecs_coordinator->registerSystem<Render::Manager>(Render::Manager::getInstance());
-		//ecs_coordinator->accessSystem<Render::Manager>()->setComponentsLinked(false);
-		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Transform::Transform>());
-		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Shape>());
-		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Texture>());
-		//ecs_coordinator->addSystemComponentType<Render::Manager>(getComponentType<Render::Text>());
+		//Register render manager
+		getService<Coordinator::Manager>()->registerSystem<Render::Manager>();
+		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
+		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
+		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Texture>());
+		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Text>());
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
@@ -177,11 +166,11 @@ namespace NIKESAURUS {
 			//Clear buffer ( Temp )
 			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
 
-			// Call update imgui
-			getService<IMGUI::Service>()->update();
-
 			//Update all systems
 			getService<Coordinator::Manager>()->updateSystems();
+
+			// Call update imgui
+			getService<IMGUI::Service>()->update();
 
 			//Update scenes manager
 			getService<Scenes::Service>()->update();

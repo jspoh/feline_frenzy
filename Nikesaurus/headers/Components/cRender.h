@@ -57,6 +57,7 @@ namespace NIKESAURUS {
 			Color color;
 
 			Shape() : model_ref{ "" }, x_form(), color() {}
+			Shape(std::string const& model_ref, Color const& color) : model_ref{ model_ref }, color{ color } {};
 		};
 
 		struct Texture {

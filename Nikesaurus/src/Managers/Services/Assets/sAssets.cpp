@@ -58,6 +58,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("FONT ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading font to '" + font_id + "'");
 		fonts_list.emplace(std::piecewise_construct, std::forward_as_tuple(font_id), std::forward_as_tuple(std::make_shared<Render::Font>(std::static_pointer_cast<Font::NIKEFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes))));
 	}
 
@@ -100,6 +101,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("MODELS ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading shader to '" + shader_id + "'");
 		shaders_list.emplace(std::piecewise_construct, std::forward_as_tuple(shader_id), std::forward_as_tuple(render_loader->compileShader(shader_id, vtx_path, frag_path)));
 	}
 
@@ -137,6 +139,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("MODELS ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading model to '" + model_id + "'");
 		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Render::Model>(render_loader->compileModel(file_path))));
 	}
 
@@ -176,6 +179,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("TEXTURES ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading texture to '" + texture_id + "'");
 		textures_list.emplace(std::piecewise_construct, std::forward_as_tuple(texture_id), std::forward_as_tuple(render_loader->compileTexture(file_path)));
 	}
 
@@ -214,6 +218,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("AUDIO ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading sound to '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createSound(file_path))));
 	}
@@ -226,6 +231,7 @@ namespace NIKESAURUS {
 			throw std::runtime_error("AUDIO ALREADY EXISTS");
 		}
 
+		NIKEE_CORE_INFO("Loading music to '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createStream(file_path))));
 	}

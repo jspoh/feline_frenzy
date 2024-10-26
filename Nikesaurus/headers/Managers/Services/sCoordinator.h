@@ -11,8 +11,10 @@
 #ifndef S_COORDINATOR_ECS_H
 #define S_COORDINATOR_ECS_H
 
- //Components
+ //Include all components here
 #include "Components/cAudio.h"
+#include "Components/cRender.h"
+#include "Components/cTransform.h"
 
 namespace NIKESAURUS {
 	namespace Coordinator {

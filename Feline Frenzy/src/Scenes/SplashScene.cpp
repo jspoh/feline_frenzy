@@ -13,11 +13,11 @@
 void Splash::Scene::load() {
 
 	//Load Shaders
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("BASE", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("base", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadShader("TEXTURE", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
 
 	//Load Models
-	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("SQUARE", "assets/Models/square.txt");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("square", "assets/Models/square.txt");
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("TRIANGLE", "assets/Models/triangle.txt");
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("CIRCLE", "assets/Models/circle.txt");
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadModel("SQUARE_TEXTURE", "assets/Models/square-texture.txt");
@@ -34,9 +34,6 @@ void Splash::Scene::load() {
 }
 
 void Splash::Scene::init() {
-	//!TODO SET BACKGROUND COLOR IN RENDER MANAGER
-	//glClearColor(0, 0, 0, 0);
-	//glClear(GL_COLOR_BUFFER_BIT);
 
 	//Creat Channel Group
 	NIKEEngine.getService<NIKESAURUS::Audio::Service>()->createChannelGroup("MASTER");
@@ -49,6 +46,11 @@ void Splash::Scene::init() {
 
 	// Test Logger
 	NIKEE_WARN("This is a warning message");
+
+	//Create Shape
+	NIKESAURUS::Entity::Type shape_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Shape>(shape_1, NIKESAURUS::Render::Shape("TRIANGLE", {1.0f, 0.0f, 0.0f, 1.0f}));
 
 	//Create entity
 	NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();

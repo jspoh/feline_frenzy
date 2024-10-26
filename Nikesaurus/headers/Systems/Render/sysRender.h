@@ -14,12 +14,13 @@
 #ifndef RENDER_MANAGER_HPP
 #define RENDER_MANAGER_HPP
 
-#include "Systems/Render/sysFont.h"
+#include "Managers/ECS/mSystem.h"
+
 #include "Systems/Render/sysShader.h"
 #include "Systems/Render/sysCamera.h"
+
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
-#include "Managers/ECS/mSystem.h"
 #include "Core/Engine.h"
 
 namespace NIKESAURUS {
@@ -37,13 +38,10 @@ namespace NIKESAURUS {
 			std::unique_ptr<Shader::Manager> shader_system;
 
 			//Camera System
-			std::unique_ptr<Camera::System> camera_system; // smart ptr to camera
+			std::unique_ptr<Camera::System> camera_system;
 
 			//Transform matrix
-			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
-
-			//Debug Mode Transform Matrix
-			void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
+			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
 
 			//Render Shape
 			void renderObject(Render::Shape const& e_shape);
