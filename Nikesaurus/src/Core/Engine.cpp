@@ -196,8 +196,17 @@ namespace NIKESAURUS {
 			//Clear buffer ( Temp )
 			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
 
-			// Call update imgui
-			getService<IMGUI::Service>()->update();
+			static bool imgui_overlay_enable = true;
+
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_I)) {
+				// Toggle ImGui overlay visibility
+				imgui_overlay_enable = !imgui_overlay_enable;
+			}
+
+			// Toggle imgui windows to show or not
+			if (imgui_overlay_enable) {
+				getService<IMGUI::Service>()->update();
+			}
 
 			//Update all systems
 			getService<Coordinator::Manager>()->updateSystems();

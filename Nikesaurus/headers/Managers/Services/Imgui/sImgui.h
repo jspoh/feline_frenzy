@@ -21,7 +21,7 @@ namespace NIKESAURUS {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class Service
+		class NIKESAURUS_API Service
 		{
 		public:
 			Service() = default;
