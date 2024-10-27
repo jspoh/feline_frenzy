@@ -163,5 +163,12 @@ namespace NIKESAURUS {
 		
 		ImGui::End();
 	}
+
+	void imguiRenderEntityWindow()
+	{
+		ImGui::Begin("Levels Management");
+
+		ImGui::End();
+	}
 }
 

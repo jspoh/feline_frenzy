@@ -91,6 +91,7 @@
 #include <iomanip>
 #include <chrono>
 #include <thread>
+#include <optional>
 
  /*****************************************************************//**
  * Data (json)

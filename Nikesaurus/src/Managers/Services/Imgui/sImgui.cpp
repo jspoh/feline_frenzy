@@ -75,6 +75,7 @@ namespace NIKESAURUS {
 		imguiEntityWindow();
 		imguiFileSystemWindow();
 		imguiEntityComponentManagementWindow();
+		imguiRenderEntityWindow();
 
 
 		// THIS 2 CALL THE OPENGL DRAWING

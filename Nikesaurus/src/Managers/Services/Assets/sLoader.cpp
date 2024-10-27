@@ -394,14 +394,19 @@ namespace NIKESAURUS {
 		return model;
 	}
 
-	unsigned int Render::Loader::compileTexture(const std::string& path_to_texture) {
+	unsigned int Render::Loader::compileTexture(const std::string& path_to_texture, int* out_width, int* out_height) {
 		// find file type
 		std::string junk, filetype;
 		std::stringstream ss{ path_to_texture };
 		std::getline(ss, junk, '.');
 		std::getline(ss, filetype, '.');
 
-		int tex_width, tex_height, tex_size;
+		int tex_width{};
+		int tex_height{};
+		// For lim to retrieve texture height and width
+		if (out_width) *out_width = tex_width;
+		if (out_height) *out_height = tex_height;
+		int tex_size{};
 		bool is_tex_or_png_ext = false;
 		const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
 

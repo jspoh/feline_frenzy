@@ -145,7 +145,7 @@ namespace NIKESAURUS {
 			 * \param texture_ref
 			 * \param path_to_texture
 			 */
-			unsigned int compileTexture(const std::string& path_to_texture);
+			unsigned int compileTexture(const std::string& path_to_texture, int* out_width = nullptr, int* out_height = nullptr);
 		};
 	}
 }
