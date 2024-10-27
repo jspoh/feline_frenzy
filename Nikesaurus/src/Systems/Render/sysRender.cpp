@@ -74,11 +74,11 @@ namespace NIKESAURUS {
 		// set texture
 		glBindTextureUnit(
 			texture_unit, // texture unit (binding index)
-			NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)
+			NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)->gl_data
 		);
 
-		glTextureParameteri(NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref), GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Caculate UV Offset
 		Vector2 uv_offset{ e_texture.frame_index.x * e_texture.frame_size.x, e_texture.frame_index.y * e_texture.frame_size.y };
@@ -124,7 +124,7 @@ namespace NIKESAURUS {
 
 		// Iterate through all characters in the string
 		for (char c : e_text.text) {
-			const Render::Font::Character& ch = NIKEEngine.getService<Assets::Service>()->getFont(e_text.font_ref)->char_map.at(c);
+			const Assets::Font::Character& ch = NIKEEngine.getService<Assets::Service>()->getFont(e_text.font_ref)->char_map.at(c);
 			const unsigned int ch_tex_hdl = ch.texture;
 
 			// set texture

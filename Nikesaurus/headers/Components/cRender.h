@@ -32,20 +32,6 @@ namespace NIKESAURUS {
 			Color(float r, float g, float b, float a) : r{ r }, g{ g }, b{ b }, a{ a } {}
 		};
 
-		struct Font {
-			struct Character {
-				unsigned int texture;	// Texture ID for the character
-				Vector2f size;			// Size of the character
-				Vector2f bearing;		// Offset from the baseline to the top-left of the character
-				unsigned int advance;   // Horizontal offset to advance to the next character
-
-				Character() : texture{ 0 }, size(), bearing(), advance{ 0 } {}
-				Character(unsigned int texture, Vector2f const& size, Vector2f const& bearing, unsigned int advance) : texture{ texture }, size{ size }, bearing{ bearing }, advance{ advance } {}
-			};
-
-			std::unordered_map<unsigned char, Character> char_map;
-		};
-
 		struct Text {
 			std::string font_ref;
 			std::string text;
@@ -76,17 +62,6 @@ namespace NIKESAURUS {
 			Texture() : texture_ref{ "" }, x_form(), color(), texture_size(), frame_size(), frame_index() {}
 			Texture(std::string const& texture_ref, Color const& color, Vector2f const& texture_size, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
 				:texture_ref{ texture_ref }, x_form(), color{ color }, texture_size{ texture_size }, frame_size{ frame_size }, frame_index{ frame_index }{}
-		};
-
-		struct Model {
-			unsigned int vaoid;
-			unsigned int vboid;
-			unsigned int eboid;
-
-			unsigned int primitive_type;
-			unsigned int draw_count;
-
-			Model() : vaoid{ 0 }, vboid{ 0 }, eboid{ 0 }, primitive_type{ 0 }, draw_count{ 0 } {}
 		};
 	}
 }

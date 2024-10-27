@@ -17,7 +17,7 @@ namespace NIKESAURUS {
 	/*****************************************************************//**
 	* NIKE FONT LIB
 	*********************************************************************/
-	Font::NIKEFontLib::NIKEFontLib() {
+	Assets::NIKEFontLib::NIKEFontLib() {
 		//Init free type library
 		if (FT_Init_FreeType(&ft_lib)) {
 			cerr << "Could not initialize FreeType library!" << endl;
@@ -26,10 +26,10 @@ namespace NIKESAURUS {
 		NIKEE_CORE_INFO("Free Type init success");
 	}
 
-	Render::Font Font::NIKEFontLib::generateGlyphsTex(std::string const& file_path, FT_Face& font_face) {
+	Assets::Font Assets::NIKEFontLib::generateGlyphsTex(std::string const& file_path, FT_Face& font_face) {
 
 		//Map of glyph textures
-		Render::Font font;
+		Assets::Font font;
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -84,7 +84,7 @@ namespace NIKESAURUS {
 		return font;
 	}
 
-	Render::Font Font::NIKEFontLib::generateFont(std::string const& file_path, Vector2f const& pixel_sizes) {
+	Assets::Font Assets::NIKEFontLib::generateFont(std::string const& file_path, Vector2f const& pixel_sizes) {
 		//Create free type font face
 		FT_Face face;
 
@@ -100,25 +100,25 @@ namespace NIKESAURUS {
 		return generateGlyphsTex(file_path, face);
 	}
 
-	Font::NIKEFontLib::~NIKEFontLib() {
+	Assets::NIKEFontLib::~NIKEFontLib() {
 		FT_Done_FreeType(ft_lib);
 	}
 
 	/*****************************************************************//**
 	* FONT LOADER
 	*********************************************************************/
-	Font::Loader::Loader() {
+	Assets::FontLoader::FontLoader() {
 		font_lib = std::make_shared<NIKEFontLib>();
 	}
 
-	std::shared_ptr<Font::IFontLib> Font::Loader::getFontLib() const {
+	std::shared_ptr<Assets::IFontLib> Assets::FontLoader::getFontLib() const {
 		return font_lib;
 	}
 
 	/*****************************************************************//**
 	* RENDER LOADER
 	*********************************************************************/
-	void Render::Loader::createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Render::Model& model) {
+	void Assets::RenderLoader::createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Assets::Model& model) {
 		// VBO (Vertex Buffer Object)
 		glCreateBuffers(1, &model.vboid);
 		glNamedBufferStorage(model.vboid,
@@ -142,7 +142,7 @@ namespace NIKESAURUS {
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
 
-	void Render::Loader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Render::Model& model) {
+	void Assets::RenderLoader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Assets::Model& model) {
 		// VBO (Vertex Buffer Object)
 		glCreateBuffers(1, &model.vboid);
 		glNamedBufferStorage(model.vboid,
@@ -173,7 +173,7 @@ namespace NIKESAURUS {
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
 
-	char* Render::Loader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
+	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
 		std::string junk, filetype;
 		std::stringstream ss{ path_to_texture };
@@ -194,6 +194,8 @@ namespace NIKESAURUS {
 
 			// get tex_size of texture file
 			tex_size = static_cast<int>(texture_file.tellg());
+
+			cout << "HERE: " <<  tex_size << '\n';
 
 			// return to beginning of file
 			texture_file.seekg(0, std::ios::beg);
@@ -237,7 +239,7 @@ namespace NIKESAURUS {
 		return data;
 	}
 
-	unsigned int Render::Loader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+	unsigned int Assets::RenderLoader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
 		// read and compile vertex shader
 		std::ifstream vtx_file{ vtx_path };
 		if (!vtx_file.is_open()) {
@@ -312,8 +314,8 @@ namespace NIKESAURUS {
 		return shader_handle;
 	}
 
-	Render::Model Render::Loader::compileModel(const std::string& path_to_mesh) {
-		Render::Model model;
+	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
+		Assets::Model model;
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
 		if (!mesh_file.is_open()) {
@@ -326,7 +328,6 @@ namespace NIKESAURUS {
 		GLshort index;
 
 		// pos
-		std::vector<Vector2f> vertices;
 		std::vector<Vector2f> tex_coords;
 
 		// indices (indexed rendering with element buffer object)
@@ -347,7 +348,7 @@ namespace NIKESAURUS {
 			case 'v': {// vertex
 				float ndc_x, ndc_y;
 				line_sstm >> ndc_x >> ndc_y;
-				vertices.emplace_back(ndc_x, ndc_y);
+				model.vertices.emplace_back(ndc_x, ndc_y);
 				break;
 			}
 			case 't': {// triangle indices
@@ -382,10 +383,10 @@ namespace NIKESAURUS {
 		mesh_file.close();
 
 		if (tex_coords.size() == 0) {
-			createBaseBuffers(vertices, indices, model);
+			createBaseBuffers(model.vertices, indices, model);
 		}
 		else {
-			createTextureBuffers(vertices, indices, tex_coords, model);
+			createTextureBuffers(model.vertices, indices, tex_coords, model);
 		}
 		model.draw_count = static_cast<GLuint>(indices.size());
 
@@ -394,7 +395,7 @@ namespace NIKESAURUS {
 		return model;
 	}
 
-	unsigned int Render::Loader::compileTexture(const std::string& path_to_texture, int* out_width, int* out_height) {
+	Assets::Texture Assets::RenderLoader::compileTexture(const std::string& path_to_texture) {
 		// find file type
 		std::string junk, filetype;
 		std::stringstream ss{ path_to_texture };
@@ -403,9 +404,6 @@ namespace NIKESAURUS {
 
 		int tex_width{};
 		int tex_height{};
-		// For lim to retrieve texture height and width
-		if (out_width) *out_width = tex_width;
-		if (out_height) *out_height = tex_height;
 		int tex_size{};
 		bool is_tex_or_png_ext = false;
 		const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
@@ -422,7 +420,7 @@ namespace NIKESAURUS {
 		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
 
 		// Return texture
-		return tex_id;
+		return Assets::Texture(tex_id, {tex_width, tex_height});
 	}
 }
 

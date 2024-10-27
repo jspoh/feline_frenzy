@@ -36,7 +36,7 @@ namespace NIKESAURUS {
 
 		//Clear textures
 		for (auto& texture : textures_list) {
-			glDeleteTextures(1, &texture.second);
+			glDeleteTextures(1, &texture.second->gl_data);
 		}
 
 		//Clear audios
@@ -44,8 +44,8 @@ namespace NIKESAURUS {
 	}
 
 	void Assets::Service::configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
-		font_loader = std::make_unique<Font::Loader>();
-		render_loader = std::make_unique<Render::Loader>();
+		font_loader = std::make_unique<Assets::FontLoader>();
+		render_loader = std::make_unique<Assets::RenderLoader>();
 		audio_system = audio_sys;
 	}
 
@@ -59,7 +59,7 @@ namespace NIKESAURUS {
 		}
 
 		NIKEE_CORE_INFO("Loading font to '" + font_id + "'");
-		fonts_list.emplace(std::piecewise_construct, std::forward_as_tuple(font_id), std::forward_as_tuple(std::make_shared<Render::Font>(std::static_pointer_cast<Font::NIKEFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes))));
+		fonts_list.emplace(std::piecewise_construct, std::forward_as_tuple(font_id), std::forward_as_tuple(std::make_shared<Assets::Font>(std::static_pointer_cast<Assets::NIKEFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes))));
 	}
 
 	void Assets::Service::unloadFont(std::string const& font_id) {
@@ -79,7 +79,7 @@ namespace NIKESAURUS {
 		fonts_list.erase(it);
 	}
 
-	std::shared_ptr<Render::Font> const& Assets::Service::getFont(std::string const& font_id) const {
+	std::shared_ptr<Assets::Font> const& Assets::Service::getFont(std::string const& font_id) const {
 		//Find shader
 		auto it = fonts_list.find(font_id);
 
@@ -140,7 +140,7 @@ namespace NIKESAURUS {
 		}
 
 		NIKEE_CORE_INFO("Loading model to '" + model_id + "'");
-		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Render::Model>(render_loader->compileModel(file_path))));
+		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Assets::Model>(render_loader->compileModel(file_path))));
 	}
 
 	void Assets::Service::unloadModel(std::string const& model_id) {
@@ -160,7 +160,7 @@ namespace NIKESAURUS {
 		models_list.erase(it);
 	}
 
-	std::shared_ptr<Render::Model> Assets::Service::getModel(std::string const& model_id) {
+	std::shared_ptr<Assets::Model> Assets::Service::getModel(std::string const& model_id) {
 		//Find model
 		auto it = models_list.find(model_id);
 
@@ -180,7 +180,7 @@ namespace NIKESAURUS {
 		}
 
 		NIKEE_CORE_INFO("Loading texture to '" + texture_id + "'");
-		textures_list.emplace(std::piecewise_construct, std::forward_as_tuple(texture_id), std::forward_as_tuple(render_loader->compileTexture(file_path)));
+		textures_list.emplace(std::piecewise_construct, std::forward_as_tuple(texture_id), std::forward_as_tuple(std::make_shared<Assets::Texture>(render_loader->compileTexture(file_path))));
 	}
 
 	void Assets::Service::unloadTexture(std::string const& texture_id) {
@@ -194,11 +194,11 @@ namespace NIKESAURUS {
 		}
 
 		//Unload texture
-		glDeleteTextures(1, &it->second);
+		glDeleteTextures(1, &it->second->gl_data);
 		textures_list.erase(it);
 	}
 
-	unsigned int Assets::Service::getTexture(std::string const& texture_id) {
+	std::shared_ptr<Assets::Texture> Assets::Service::getTexture(std::string const& texture_id) {
 		if (textures_list.find(texture_id) == textures_list.end())
 		{
 			throw std::runtime_error("TEXTURE DOES NOT EXISTS");
