@@ -80,7 +80,7 @@ namespace NIKESAURUS {
 		//Register render manager
 		getService<Coordinator::Manager>()->registerSystem<Render::Manager>();
 		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
-		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
+		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
 		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Texture>());
 		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Text>());
 	}

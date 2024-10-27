@@ -33,24 +33,24 @@ namespace NIKESAURUS {
 			*********************************************************************/
 
 			//Free type lib
-			std::unique_ptr<Font::Loader> font_loader;
+			std::unique_ptr<Assets::FontLoader> font_loader;
 
 			//Maps to fonts
-			std::unordered_map<std::string, std::shared_ptr<Render::Font>> fonts_list;
+			std::unordered_map<std::string, std::shared_ptr<Assets::Font>> fonts_list;
 
 			/*****************************************************************//**
 			* Render Private Members
 			*********************************************************************/
-			std::unique_ptr<Render::Loader> render_loader;
+			std::unique_ptr<Assets::RenderLoader> render_loader;
 
 			//Map to shaders for render
 			std::unordered_map<std::string, unsigned int> shaders_list;
 
 			//Map to models for render
-			std::unordered_map<std::string, std::shared_ptr<Render::Model>> models_list;
+			std::unordered_map<std::string, std::shared_ptr<Assets::Model>> models_list;
 
 			// Map to textures for render
-			std::unordered_map<std::string, unsigned int> textures_list;
+			std::unordered_map<std::string, std::shared_ptr<Assets::Texture>> textures_list;
 
 			/*****************************************************************//**
 			* Audio Private Members
@@ -82,7 +82,7 @@ namespace NIKESAURUS {
 			void unloadFont(std::string const& fond_id);
 
 			//Get font
-			std::shared_ptr<Render::Font> const& getFont(std::string const& font_id) const;
+			std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
 
 			/*****************************************************************//**
 			* Render ( Texture, Model, Shaders )
@@ -104,7 +104,7 @@ namespace NIKESAURUS {
 			void unloadModel(std::string const& model_id);
 
 			//Get model
-			std::shared_ptr<Render::Model> getModel(std::string const& model_id);
+			std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
 
 			//Load texture
 			void loadTexture(std::string const& texture_id, std::string const& file_path);
@@ -113,7 +113,7 @@ namespace NIKESAURUS {
 			void unloadTexture(std::string const& texture_id);
 
 			//Get texture
-			unsigned int getTexture(std::string const& texture_id);
+			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
 
 			/*****************************************************************//**
 			* Audio

@@ -12,10 +12,23 @@
 #ifndef LOADER_HPP
 #define LOADER_HPP
 
-#include "Components/cRender.h"
-
 namespace NIKESAURUS {
-	namespace Font {
+	namespace Assets {
+
+		//Font Type Data Structure
+		struct Font {
+			struct Character {
+				unsigned int texture;	// Texture ID for the character
+				Vector2f size;			// Size of the character
+				Vector2f bearing;		// Offset from the baseline to the top-left of the character
+				unsigned int advance;   // Horizontal offset to advance to the next character
+
+				Character() : texture{ 0 }, size(), bearing(), advance{ 0 } {}
+				Character(unsigned int texture, Vector2f const& size, Vector2f const& bearing, unsigned int advance) : texture{ texture }, size{ size }, bearing{ bearing }, advance{ advance } {}
+			};
+
+			std::unordered_map<unsigned char, Character> char_map;
+		};
 
 		//Abstract font lib interface
 		class IFontLib {
@@ -34,14 +47,14 @@ namespace NIKESAURUS {
 			FT_Library ft_lib;
 
 			//Generate texture from glyphs for rendering
-			Render::Font generateGlyphsTex(std::string const& file_path, FT_Face& font_face);
+			Font generateGlyphsTex(std::string const& file_path, FT_Face& font_face);
 
 		public:
 			//Default constructor
 			NIKEFontLib();
 
 			//Load free type font
-			Render::Font generateFont(std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+			Font generateFont(std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
 			//Default destructor
 			~NIKEFontLib();
@@ -49,20 +62,42 @@ namespace NIKESAURUS {
 
 		#endif //!EXPOSE TO ENGINE ONLY
 
-		//Font Service
-		class Loader {
+		//Font Loader
+		class FontLoader {
 		private:
 			std::shared_ptr<IFontLib> font_lib;
 		public:
-			Loader();
+			FontLoader();
 
 			//Get font lib
 			std::shared_ptr<IFontLib> getFontLib() const;
 		};
-	}
 
-	namespace Render {
-		class Loader {
+		//Model data structure
+		struct Model {
+			unsigned int vaoid;
+			unsigned int vboid;
+			unsigned int eboid;
+
+			unsigned int primitive_type;
+			unsigned int draw_count;
+
+			std::vector<Vector2f> vertices;
+
+			Model() : vaoid{ 0 }, vboid{ 0 }, eboid{ 0 }, primitive_type{ 0 }, draw_count{ 0 } {}
+		};
+
+		//Texture data structure
+		struct Texture {
+			unsigned int gl_data;
+			Vector2i size;
+
+			Texture() : gl_data{0}, size() {}
+			Texture(unsigned int gl_data, Vector2i&& size) : gl_data{ gl_data }, size{ size }{}
+		};
+
+		//Shader/Model/Texture Loader
+		class RenderLoader {
 		private:
 			/**
 			 * creates a vertex array object for base opengl shaders.
@@ -71,7 +106,7 @@ namespace NIKESAURUS {
 			 * \param indices
 			 * \param model		vao will be stored here
 			 */
-			void createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Render::Model& model);
+			void createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Model& model);
 
 			/**
 			 * creates a vertex array object for base opengl shaders.
@@ -80,7 +115,7 @@ namespace NIKESAURUS {
 			 * \param indices
 			 * \param model		vao will be stored here
 			 */
-			void createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Render::Model& model);
+			void createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Model& model);
 
 			/**
 			 * all .tex files should be 256x256 in RGBA8 format.
@@ -97,7 +132,8 @@ namespace NIKESAURUS {
 
 
 		public:
-			Loader() = default;
+			RenderLoader() = default;
+			~RenderLoader() = default;
 
 			/**
 			 * compiles shader and adds to shader_programs.
@@ -134,7 +170,7 @@ namespace NIKESAURUS {
 			 * \param path_to_mesh
 			 * \return success
 			 */
-			Render::Model compileModel(const std::string& path_to_mesh);
+			Model compileModel(const std::string& path_to_mesh);
 
 			/**
 			 * registers textures.
@@ -145,7 +181,7 @@ namespace NIKESAURUS {
 			 * \param texture_ref
 			 * \param path_to_texture
 			 */
-			unsigned int compileTexture(const std::string& path_to_texture, int* out_width = nullptr, int* out_height = nullptr);
+			Texture compileTexture(const std::string& path_to_texture);
 		};
 	}
 }

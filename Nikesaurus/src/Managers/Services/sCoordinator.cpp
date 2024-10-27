@@ -87,9 +87,6 @@ namespace NIKESAURUS {
 
 	//Define Render Types
 	ECS_DEFINE_TYPES(Render::Cam)
-	ECS_DEFINE_TYPES(Render::Font)
-	ECS_DEFINE_TYPES(Render::Model)
-	ECS_DEFINE_TYPES(Render::Model)
 	ECS_DEFINE_TYPES(Render::Shape)
 	ECS_DEFINE_TYPES(Render::Text)
 	ECS_DEFINE_TYPES(Render::Texture)
