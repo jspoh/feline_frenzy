@@ -22,9 +22,6 @@ namespace NIKESAURUS {
 			//System signature
 			Component::Signature system_signature;
 
-			//Component Types
-			std::set<Component::Type> component_types;
-
 			//List of entities to update
 			std::set<Entity::Type> entities;
 
@@ -118,7 +115,7 @@ namespace NIKESAURUS {
 
 			//Index for adding system is only if
 			template<typename T>
-			std::shared_ptr<T> registerSystem(int index = -1) {
+			std::shared_ptr<T> registerSystem(bool components_linked = true, int index = -1) {
 
 				//Check if system has already been added
 				if (systems_map.find(typeid(T).name()) != systems_map.end()) {
@@ -130,6 +127,9 @@ namespace NIKESAURUS {
 
 				//Init system
 				system->init();
+
+				//Set system components linked
+				system->setComponentsLinked(components_linked);
 
 				//Insert system at back
 				if (index >= 0) {
@@ -181,6 +181,11 @@ namespace NIKESAURUS {
 
 				//System type name
 				std::string sys_name{ typeid(T).name() };
+
+				//Check if system is present
+				if (systems_map.find(sys_name) == systems_map.end()) {
+					throw std::runtime_error("System not registered. Adding component type failed");
+				}
 
 				//Set signature of system
 				systems_map.at(sys_name)->addComponentType(component);

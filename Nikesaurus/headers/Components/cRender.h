@@ -43,25 +43,23 @@ namespace NIKESAURUS {
 		};
 
 		struct Shape {
-			std::string model_ref;
-			Matrix_33 x_form;
+			std::string model_ref; 
 			Color color;
 
-			Shape() : model_ref{ "" }, x_form(), color() {}
+			Shape() : model_ref{ "" }, color() {}
 			Shape(std::string const& model_ref, Color const& color) : model_ref{ model_ref }, color{ color } {};
 		};
 
 		struct Texture {
 			std::string texture_ref;
-			Matrix_33 x_form;
 			Color color;
 			Vector2f texture_size;	// Spritesheet size ( before mapping )
 			Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
 			Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 
-			Texture() : texture_ref{ "" }, x_form(), color(), texture_size(), frame_size(), frame_index() {}
+			Texture() : texture_ref{ "" }, color(), texture_size(), frame_size(), frame_index() {}
 			Texture(std::string const& texture_ref, Color const& color, Vector2f const& texture_size, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
-				:texture_ref{ texture_ref }, x_form(), color{ color }, texture_size{ texture_size }, frame_size{ frame_size }, frame_index{ frame_index }{}
+				:texture_ref{ texture_ref }, color{ color }, texture_size{ texture_size }, frame_size{ frame_size }, frame_index{ frame_index }{}
 		};
 	}
 }

@@ -78,9 +78,9 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Render::Texture>());
 
 		//Register render manager
-		getService<Coordinator::Manager>()->registerSystem<Render::Manager>();
+		getService<Coordinator::Manager>()->registerSystem<Render::Manager>(false);
 		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
-		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
+		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
 		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Texture>());
 		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Text>());
 	}
@@ -100,8 +100,6 @@ namespace NIKESAURUS {
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Coordinator::Service>());
-
-
 
 		//Create console
 		#ifndef NDEBUG

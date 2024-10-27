@@ -33,16 +33,11 @@ namespace NIKESAURUS {
 	}
 
 	void System::ISystem::addComponentType(Component::Type component) {
-		//Insert component types
-		component_types.insert(component);
-
 		//Set signature
 		system_signature.set(component, true);
 	}
 
 	void System::ISystem::removeComponentType(Component::Type component) {
-		//Insert component types
-		component_types.erase(component);
 
 		//Set signature
 		system_signature.set(component, false);
@@ -51,7 +46,7 @@ namespace NIKESAURUS {
 	bool System::ISystem::checkComponentType(Component::Type component) const {
 
 		//Return if component is present
-		return component_types.find(component) != component_types.end();
+		return system_signature.test(component);
 	}
 
 	Component::Signature System::ISystem::getSignature() const {

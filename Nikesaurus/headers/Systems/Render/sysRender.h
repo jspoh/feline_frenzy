@@ -44,10 +44,10 @@ namespace NIKESAURUS {
 			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
 
 			//Render Shape
-			void renderObject(Render::Shape const& e_shape);
+			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
 
 			//Render Texture
-			void renderObject(Render::Texture const& e_texture);
+			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
 			//Render text
 			void renderText(Render::Text const& e_text);
