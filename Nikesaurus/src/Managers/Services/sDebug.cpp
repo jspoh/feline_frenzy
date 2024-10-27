@@ -46,8 +46,8 @@ namespace NIKESAURUS {
 			}
 
 			// Calculate total time for all systems
-			double total_system_time = 0.0;
-			systemPercentages.clear();
+			total_system_time = 0.0;
+			system_percentages.clear();
 
 			// Calculate the time spent in each active system
 			for (size_t i = 0; i < sys.size(); ++i)
@@ -56,7 +56,7 @@ namespace NIKESAURUS {
 				{
 					// Calculate the percentage of the total time for each active system
 					double percentage = (sys_time[i] / gl_time) * 100.0;
-					systemPercentages.push_back({ sys[i]->getSysName(), percentage });
+					system_percentages.push_back({ sys[i]->getSysName(), percentage });
 
 					// Accumulate total system time
 					total_system_time += percentage;

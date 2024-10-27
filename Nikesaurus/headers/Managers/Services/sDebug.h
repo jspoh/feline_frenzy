@@ -26,8 +26,8 @@ namespace NIKESAURUS {
 			Service() = default;
 			~Service() = default;
 
-			std::vector<std::pair<std::string, double>> systemPercentages;
-			double totalSystemTime;
+			std::vector<std::pair<std::string, double>> system_percentages;
+			double total_system_time = 0.0;
 
 
 			void logCrash();

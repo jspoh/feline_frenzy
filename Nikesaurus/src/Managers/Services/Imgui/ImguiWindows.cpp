@@ -55,37 +55,72 @@ namespace NIKESAURUS {
 		ImGui::End();
 	}
 
-	void imguiPerformanceWindow() {
+	void imguiDebuggingWindow() {
+		
 		// Begin ImGui window
-		ImGui::Begin("Performance Viewer");
+		ImGui::Begin("Debugging Tools");
 
-		// Retrieve frame rate (Frames Per Second)
-		float fps = ImGui::GetIO().Framerate;
-		ImGui::Text("FPS: %.2f", fps);
+		if (ImGui::BeginTabBar("TabBar")) {
+			// Performance Viewer Tab
+			if (ImGui::BeginTabItem("Performance Viewer")) {
 
-		// Memory usage
-		auto sys_percentages = NIKEEngine.getService<Debug::Service>()->systemPercentages;
+				// Display FPS 
+				float fps = ImGui::GetIO().Framerate;
+				ImGui::Text("FPS: %.2f", fps);
 
-		if (sys_percentages.empty()) {
-			ImGui::Text("No active systems to report on.");
-		}
-		else {
-			ImGui::Text("System Performance (Percentage of total game loop time):");
+				// Display a FPS in a graph
+				static float fpsValues[100] = { 0 };
+				static int fpsIndex = 0;
+				fpsValues[fpsIndex] = fps;
+				fpsIndex = (fpsIndex + 1) % IM_ARRAYSIZE(fpsValues);
+				ImGui::PlotLines("FPS", fpsValues, IM_ARRAYSIZE(fpsValues), 0, NULL, 0.0f, 120.0f, ImVec2(0, 80));
 
-			for (const auto& [name, percentage] : sys_percentages) {
-				ImGui::Text("%s : %.2f%%", name.c_str(), percentage);
+				ImGui::Spacing();
+				// Display System Usage (Data all being handled in sDebug)
+				auto& sys_percentages = NIKEEngine.getService<Debug::Service>()->system_percentages;
+
+				if (sys_percentages.empty()) {
+					ImGui::Text("No active systems to report on.");
+				}
+				else {
+					ImGui::Text("System Performance (Percentage of total game loop time):");
+
+					for (const auto& [name, percentage] : sys_percentages) {
+						ImGui::Text("%s : %.2f%%", name.c_str(), percentage);
+					}
+
+					ImGui::Text("Total Active System Time: %.2f%%", NIKEEngine.getService<Debug::Service>()->total_system_time);
+				}
+
+				ImGui::EndTabItem();
 			}
 
-			ImGui::Text("Total Active System Time: %.2f%%", NIKEEngine.getService<Debug::Service>()->totalSystemTime);
+			// Crash Logger Tab
+			if (ImGui::BeginTabItem("Crash Logger")) {
+				// Open crash log file
+				std::ifstream crashLogFile("logs/crash-log.txt");
+
+				if (crashLogFile.is_open()) {
+					std::string line;
+					std::string logs;
+
+					while (std::getline(crashLogFile, line)) {
+						logs += line + "\n";
+					}
+					crashLogFile.close();
+
+					ImGui::BeginChild("CrashLogScrollArea", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+					ImGui::TextUnformatted(logs.c_str());
+					ImGui::EndChild();
+				}
+				else {
+					ImGui::Text("Crash log file could not be found!");
+				}
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
 		}
-
-		// Display a plot of frame times for a quick visual reference
-		static float frameTimes[100] = { 0 };
-		static int frameIndex = 0;
-		frameTimes[frameIndex] = 1000.0f / fps;
-		frameIndex = (frameIndex + 1) % 100;
-		ImGui::PlotLines("Frame Times", frameTimes, IM_ARRAYSIZE(frameTimes), 0, NULL, 0.0f, 50.0f, ImVec2(0, 80));
-
 
 		ImGui::End();
 	}

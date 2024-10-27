@@ -73,7 +73,7 @@ namespace NIKESAURUS {
 
 		// Window UI functions goes here
 		imguiEntityWindow();
-		imguiPerformanceWindow();
+		imguiDebuggingWindow();
 		imguiFileSystemWindow();
 		imguiEntityComponentManagementWindow();
 		imguiRenderEntityWindow();

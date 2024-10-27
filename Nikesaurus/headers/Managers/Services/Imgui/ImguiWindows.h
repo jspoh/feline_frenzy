@@ -21,7 +21,7 @@ namespace NIKESAURUS {
 	// This function will design the UI for the file system window
 	void imguiFileSystemWindow();
 	// This function will design the UI for the performance view window
-	void imguiPerformanceWindow();
+	void imguiDebuggingWindow();
 	// This function will design the UI to show all the components available
 	void imguiEntityWindow();
 	// This function will design the UI to show all the components available
