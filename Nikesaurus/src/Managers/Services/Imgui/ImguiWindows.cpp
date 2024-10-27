@@ -97,21 +97,11 @@ namespace NIKESAURUS {
 		// Check if an entity is selected
 		if (!selected_entity.empty()) {
 			ImGui::Text("Selected Entity: %s", selected_entity.c_str());
+			
 
 			Entity::Type entity = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity);
 
-			//// For easier typing
-			//auto component_manager = NIKEEngine.getService<Component::Manager>();
-
-			//// Retrieve all registered component types
-			//for (const auto& elem : NIKEEngine.getService<Component::Manager>()->getComponentTypes()) {
-			//	// Check if the component type exists for the selected entity
-			//	if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<std::any>(entity)) {
-			//		// Retrieve and display the component using ImGui
-			//		auto& component = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<std::any>(entity);
-			//		ImGui::Text("Component: %s", elem.first.c_str());
-			//	}
-			//}
+			ImGui::Text("Number of Components in entity: %d", NIKEEngine.getService<Coordinator::Service>()->getEntityComponentCount(entity));
 
 			// Option to add a new component
 			if (ImGui::Button("Add Component")) {
@@ -119,6 +109,9 @@ namespace NIKESAURUS {
 				open_component_popup = true;
 				ImGui::OpenPopup("Add Component");
 			}
+
+			// Pop up to add components available
+			open_component_popup = showAddComponentPopup(entity, open_component_popup);
 
 			ImGui::SameLine();
 
@@ -128,7 +121,38 @@ namespace NIKESAURUS {
 				// NIKEEngine.getService<Coordinator::Service>()->cloneEntity();
 			}
 
-			open_component_popup = showAddComponentPopup(entity, open_component_popup);
+			//// For easier typing
+			auto coordinator_manager = NIKEEngine.getService<Coordinator::Manager>();
+
+			// Retrieve all registered component types
+			for (const auto& elem : coordinator_manager->getAllComponentTypes()) {
+				bool has_component = false;
+				// Check if the component type exists for the selected entity
+				// Update the list here when more components are added
+				if (elem.first == "Transform::Transform" && coordinator_manager->checkEntityComponent<Transform::Transform>(entity)) {
+					has_component = true;
+				}
+				if (has_component) {
+					if (ImGui::CollapsingHeader(elem.first.c_str(), ImGuiTreeNodeFlags_None)) {
+
+						if (elem.first == "Transform::Transform") {
+							auto& transform_comp = coordinator_manager->getEntityComponent<Transform::Transform>(entity);
+
+							ImGui::Text("Transform Component:");
+							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
+							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
+							ImGui::SliderAngle("Rotation", &transform_comp.rotation);
+						}
+						else if (elem.first == "Render::Texture") {
+							auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
+
+							//ImGui::Text("Texture Component:");
+							//ImGui::InputText("File Path", texture.filePath, IM_ARRAYSIZE(texture.filePath));
+							//ImGui::DragFloat("Opacity", &texture.opacity, 0.01f, 0.0f, 1.0f);
+						}
+					}
+				}
+			}
 			
 			
 		}

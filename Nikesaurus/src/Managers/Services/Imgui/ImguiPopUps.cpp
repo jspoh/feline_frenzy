@@ -69,7 +69,10 @@ namespace NIKESAURUS
             // Add Transform component
             if (ImGui::Button("Transform")) {
                 if (!manager->checkEntityComponent<Transform::Transform>(entity)) {
-                    manager->addEntityComponent(entity, Transform::Transform());
+                    // Add default ctored comp
+                    NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(entity, 
+                       NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Transform::Transform"));
+                    // manager->addEntityComponent(entity, Transform::Transform());
                     ImGui::CloseCurrentPopup();
                 }
                 else {
@@ -83,7 +86,9 @@ namespace NIKESAURUS
             // Add Texture component
             if (ImGui::Button("Texture")) {
                 if (!manager->checkEntityComponent<Render::Texture>(entity)) {
-                    manager->addEntityComponent(entity, Render::Texture());
+                    // Add default ctored comp
+                    NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(entity,
+                        NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Transform::Transform"));
                     ImGui::CloseCurrentPopup();
                 }
                 else {
