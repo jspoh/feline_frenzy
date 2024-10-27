@@ -9,7 +9,7 @@
 
 #include "Core/stdafx.h"
 
-#include "Utility/sLogger.h"
+#include "Utility/uLogger.h"
 
 namespace NIKESAURUS {
 
@@ -21,12 +21,12 @@ namespace NIKESAURUS {
 	{
 		spdlog::set_pattern("%^[%X] %n: %v%$");
 
-		// Core Logger
+		// Core Logger (Logging related to engine)
 		s_CoreLogger = spdlog::stderr_color_mt("NIKEEngine");
 		s_CoreLogger->set_level(spdlog::level::trace);
 		
-		// Client Logger
-		s_ClientLogger = spdlog::stderr_color_mt("Client");
+		// Client Logger (Logging related to game)
+		s_ClientLogger = spdlog::stderr_color_mt("Feline Frenzy");
 		s_ClientLogger->set_level(spdlog::level::trace);
 
 		// Create a file sink (append crash log into file)

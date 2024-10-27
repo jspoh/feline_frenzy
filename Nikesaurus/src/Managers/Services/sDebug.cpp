@@ -37,35 +37,31 @@ namespace NIKESAURUS {
 			log_file.close();
 		}
 
-		void Service::systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times, std::vector<std::shared_ptr<System::ISystem>> systems)
+
+		void Service::updateSystemPercentage(double gl_time, std::vector<double> const& sys_time, std::vector<std::shared_ptr<System::ISystem>> sys)
 		{
-			if (system_times.empty()) {
+			if (sys_time.empty()) {
 				NIKEE_CORE_INFO("No active systems to report on.");
 				return;
 			}
 
 			// Calculate total time for all systems
 			double total_system_time = 0.0;
-
-			// Print header for system performance percentages
-			cout << "System Performance (% of total game loop time):" << endl;
+			systemPercentages.clear();
 
 			// Calculate the time spent in each active system
-			for (size_t i = 0; i < systems.size(); ++i)
+			for (size_t i = 0; i < sys.size(); ++i)
 			{
-				if (systems[i]->getActiveState())
+				if (sys[i]->getActiveState())
 				{
 					// Calculate the percentage of the total time for each active system
-					double percentage = (system_times[i] / game_loop_time) * 100.0;
-					cout << systems[i]->getSysName() << ": " << percentage << "%" << endl;
+					double percentage = (sys_time[i] / gl_time) * 100.0;
+					systemPercentages.push_back({ sys[i]->getSysName(), percentage });
 
 					// Accumulate total system time
 					total_system_time += percentage;
 				}
 			}
-
-			// Print total system percentage
-			cout << "Total Active System Time: " << total_system_time << "%" << endl;
 
 		}
 	}

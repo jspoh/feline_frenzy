@@ -113,7 +113,7 @@ using namespace NIKESAURUS::Math;
 * Utility
 *********************************************************************/
 #include "Utility/uSystems.h"
-#include "Utility/sLogger.h"
+#include "Utility/uLogger.h"
 
 /*****************************************************************//**
 * Math Defines

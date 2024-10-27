@@ -11,17 +11,22 @@ namespace NIKESAURUS {
 
 		static void Init();
 
+		// Logging
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 		
 		inline static std::shared_ptr<spdlog::logger>& GetCrashFileLogger() { return s_CrashFileLogger; }
 
+		// Debugging
+
 	private:
 
+		// Logging 
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
 		static std::shared_ptr<spdlog::logger> s_CrashFileLogger;
 
+		// Debugging
 	};
 
 	//Re-enable DLL Export warning
@@ -42,7 +47,7 @@ namespace NIKESAURUS {
 #define NIKEE_WARN(...)			NIKESAURUS::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define NIKEE_ERROR(...)		NIKESAURUS::Log::GetClientLogger()->error(__VA_ARGS__)
 
-// CRASH LOGGER
+// CRASH LOGGER (USED FOR EXCEPTION ERRORS)
 #define LOG_CRASH(message) \
     do { \
         NIKESAURUS::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \

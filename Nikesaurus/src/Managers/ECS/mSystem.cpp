@@ -153,10 +153,10 @@ namespace NIKESAURUS {
 
 		// Every 4 seconds, call function
 		// 4000 miliseconds = 4 seconds
-		if (time_since_last_call >= 4000)
+		if (time_since_last_call >= 1000)
 		{
 			// Call to calculate and display system runtime percentage
-			NIKEEngine.getService<Debug::Service>()->systemRuntimePercentage(total_game_loop_time, system_times, systems);
+			NIKEEngine.getService<Debug::Service>()->updateSystemPercentage(total_game_loop_time, system_times, systems);
 
 			// Update the last debug call time to the current time
 			last_call_time = current_time;

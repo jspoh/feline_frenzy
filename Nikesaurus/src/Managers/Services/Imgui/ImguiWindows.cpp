@@ -55,6 +55,41 @@ namespace NIKESAURUS {
 		ImGui::End();
 	}
 
+	void imguiPerformanceWindow() {
+		// Begin ImGui window
+		ImGui::Begin("Performance Viewer");
+
+		// Retrieve frame rate (Frames Per Second)
+		float fps = ImGui::GetIO().Framerate;
+		ImGui::Text("FPS: %.2f", fps);
+
+		// Memory usage
+		auto sys_percentages = NIKEEngine.getService<Debug::Service>()->systemPercentages;
+
+		if (sys_percentages.empty()) {
+			ImGui::Text("No active systems to report on.");
+		}
+		else {
+			ImGui::Text("System Performance (Percentage of total game loop time):");
+
+			for (const auto& [name, percentage] : sys_percentages) {
+				ImGui::Text("%s : %.2f%%", name.c_str(), percentage);
+			}
+
+			ImGui::Text("Total Active System Time: %.2f%%", NIKEEngine.getService<Debug::Service>()->totalSystemTime);
+		}
+
+		// Display a plot of frame times for a quick visual reference
+		static float frameTimes[100] = { 0 };
+		static int frameIndex = 0;
+		frameTimes[frameIndex] = 1000.0f / fps;
+		frameIndex = (frameIndex + 1) % 100;
+		ImGui::PlotLines("Frame Times", frameTimes, IM_ARRAYSIZE(frameTimes), 0, NULL, 0.0f, 50.0f, ImVec2(0, 80));
+
+
+		ImGui::End();
+	}
+
 	void imguiEntityWindow()
 	{	
 		static bool open_popup = false;
@@ -167,7 +202,7 @@ namespace NIKESAURUS {
 	void imguiRenderEntityWindow()
 	{
 		ImGui::Begin("Levels Management");
-
+		ImGui::ShowDemoWindow();
 		ImGui::End();
 	}
 }

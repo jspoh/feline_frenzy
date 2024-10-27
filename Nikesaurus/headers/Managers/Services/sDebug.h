@@ -25,9 +25,15 @@ namespace NIKESAURUS {
 		public:
 			Service() = default;
 			~Service() = default;
+
+			std::vector<std::pair<std::string, double>> systemPercentages;
+			double totalSystemTime;
+
+
 			void logCrash();
 			// Check for system runtime 
-			void systemRuntimePercentage(double game_loop_time, std::vector<double> const& system_times, std::vector<std::shared_ptr<System::ISystem>> systems);
+			void updateSystemPercentage(double gl_time, std::vector<double> const& sys_time, std::vector<std::shared_ptr<System::ISystem>> sys);
+
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
