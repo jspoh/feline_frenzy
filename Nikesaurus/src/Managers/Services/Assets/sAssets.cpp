@@ -49,9 +49,9 @@ namespace NIKESAURUS {
 		audio_system = audio_sys;
 	}
 
-	///*****************************************************************//**
-	//* Font
-	//*********************************************************************/
+	/*****************************************************************//**
+	* Font
+	*********************************************************************/
 	void Assets::Service::loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes) {
 		if (fonts_list.find(font_id) != fonts_list.end())
 		{
