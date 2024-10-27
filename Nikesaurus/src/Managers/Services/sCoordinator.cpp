@@ -27,6 +27,10 @@ namespace NIKESAURUS {
 		NIKEEngine.getService<Coordinator::Manager>()->destroyEntity(entity);
 	}
 
+	int Coordinator::Service::getEntityComponentCount(Entity::Type entity) const {
+		return NIKEEngine.getService<Coordinator::Manager>()->getEntityComponentCount(entity);
+	}
+
 	void Coordinator::Service::destroyAllEntities() {
 		NIKEEngine.getService<Coordinator::Manager>()->destroyAllEntities();
 	}
@@ -43,6 +47,10 @@ namespace NIKESAURUS {
 		NIKEEngine.getService<Coordinator::Manager>()->addEntityComponent(entity, std::move(component));
 	}
 
+	void Coordinator::Service::addDefEntityComponent(Entity::Type entity, Component::Type type) {
+		NIKEEngine.getService<Coordinator::Manager>()->addDefEntityComponent(entity, type);
+	}
+
 	template<typename T>
 	void Coordinator::Service::removeEntityComponent(Entity::Type entity) {
 		NIKEEngine.getService<Coordinator::Manager>()->removeEntityComponent<T>(entity);
@@ -53,13 +61,23 @@ namespace NIKESAURUS {
 		return NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<T>(entity);
 	}
 
+	template<typename T>
+	Component::Type Coordinator::Service::getComponentType() {
+		return  NIKEEngine.getService<Coordinator::Manager>()->getComponentType<T>();
+	}
+
+	std::unordered_map<std::string, Component::Type> Coordinator::Service::getAllComponentTypes() const {
+		return NIKEEngine.getService<Coordinator::Manager>()->getAllComponentTypes();
+	}
+
 	/*****************************************************************//**
 	* Explicit Template Instantiations For Template Functions
 	*********************************************************************/
 	#define ECS_DEFINE_TYPES(type)    \
 	template NIKESAURUS_API void Coordinator::Service::addEntityComponent<type>(Entity::Type entity, type&& component); \
 	template NIKESAURUS_API void Coordinator::Service::removeEntityComponent<type>(Entity::Type entity); \
-	template NIKESAURUS_API type& Coordinator::Service::getEntityComponent<type>(Entity::Type entity);
+	template NIKESAURUS_API type& Coordinator::Service::getEntityComponent<type>(Entity::Type entity); \
+	template NIKESAURUS_API Component::Type Coordinator::Service::getComponentType<type>();
 
 	//Define Audio Types
 	ECS_DEFINE_TYPES(Audio::SFX)

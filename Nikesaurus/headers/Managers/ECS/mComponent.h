@@ -24,6 +24,9 @@ namespace NIKESAURUS {
 			//Clone entity
 			virtual void cloneEntity(Entity::Type clone, Entity::Type copy) = 0;
 
+			//Create default entity component
+			virtual void createDefEntityComponent(Entity::Type entity) = 0;
+
 			//Remove destroyed entity
 			virtual void entityDestroyed(Entity::Type entity) = 0;
 		};
@@ -72,11 +75,6 @@ namespace NIKESAURUS {
 				return component_array.at(entity);
 			}
 
-			//Check if entity component is present
-			bool checkComponent(Entity::Type entity) const {
-				return component_array.find(entity) != component_array.end();
-			}
-
 			//Get all entities with component type T
 			std::vector<Entity::Type> getAllEntities() {
 				std::vector<Entity::Type> temp_vec;
@@ -95,6 +93,13 @@ namespace NIKESAURUS {
 
 					//Emplace component and entity
 					component_array.emplace(std::piecewise_construct, std::forward_as_tuple(clone), std::forward_as_tuple(std::move(temp_copy)));
+				}
+			}
+
+			//Create default entity component
+			void createDefEntityComponent(Entity::Type entity) override {
+				if (component_array.find(entity) == component_array.end()) {
+					component_array.emplace(std::piecewise_construct, std::forward_as_tuple(entity), std::forward_as_tuple());
 				}
 			}
 
@@ -122,9 +127,14 @@ namespace NIKESAURUS {
 			//Private type casting for easy retrieval
 			template<typename T>
 			std::shared_ptr<Array<T>> getComponentArray() {
-				std::string type_name{ typeid(T).name() };
+				std::string type_name{ convertTypeString(typeid(T).name()) };
 
 				return std::static_pointer_cast<Array<T>>(component_arrays.at(type_name));
+			}
+
+			//Convert Component Type String
+			std::string convertTypeString(std::string&& str_type) {
+				return str_type.substr(str_type.find_first_not_of(':', str_type.find_first_of(':')), str_type.size() - str_type.find_first_not_of(':', str_type.find_first_of(':')));
 			}
 
 			//Component id
@@ -140,7 +150,7 @@ namespace NIKESAURUS {
 			void registerComponent() {
 
 				//Component type name
-				std::string type_name{ typeid(T).name() };
+				std::string type_name{ convertTypeString(typeid(T).name()) };
 
 				//Check if component has been registered before
 				if (component_types.find(type_name) != component_types.end()) {
@@ -157,7 +167,7 @@ namespace NIKESAURUS {
 			template<typename T>
 			void removeComponent() {
 				//Component type name
-				std::string type_name{ typeid(T).name() };
+				std::string type_name{ convertTypeString(typeid(T).name()) };
 
 				//Check if component has been registered before
 				if (component_types.find(type_name) == component_types.end()) {
@@ -174,18 +184,19 @@ namespace NIKESAURUS {
 			//Add component associated with entity type
 			template<typename T>
 			void addEntityComponent(Entity::Type entity, T&& component) {
-				//Component type name
-				std::string type_name{ typeid(T).name() };
 
 				//Add component
 				getComponentArray<T>()->addComponent(entity, std::move(component));
 			}
 
+			//Add default entity component for entity
+			void addDefEntityComponent(Entity::Type entity, Component::Type type);
+
 			//Remove component associated with entity type
 			template<typename T>
 			void removeEntityComponent(Entity::Type entity) {
 				//Component type name
-				std::string type_name{ typeid(T).name() };
+				std::string type_name{ convertTypeString(typeid(T).name()) };
 
 				//Remove component
 				getComponentArray<T>()->removeComponent(entity);
@@ -197,17 +208,11 @@ namespace NIKESAURUS {
 				return getComponentArray<T>()->getComponent(entity);
 			}
 
-			//Check if entity component is present
-			template<typename T>
-			bool checkEntityComponent(Entity::Type entity) {
-				return getComponentArray<T>()->checkComponent(entity);
-			}
-
 			//Get Component Type
 			template<typename T>
 			Component::Type getComponentType() {
 				//Component type name
-				std::string type_name{ typeid(T).name() };
+				std::string type_name{ convertTypeString(typeid(T).name()) };
 
 				//Check if component has been registered
 				if (component_types.find(type_name) == component_types.end()) {
@@ -229,6 +234,9 @@ namespace NIKESAURUS {
 
 			//Remove entity from all components
 			void entityDestroyed(Entity::Type entity);
+
+			//Get all component types
+			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
 		};
 	}
 }

@@ -32,15 +32,6 @@ namespace NIKESAURUS {
 		return id;
 	}
 
-	Entity::Type Entity::Manager::cloneEntity(Entity::Type original_entity) {
-
-		static_cast<void> (original_entity);
-		if (entities.find(original_entity) == entities.end()) {
-			throw std::runtime_error("Entity not found.");
-		}
-		return 0;
-	}
-
 	void Entity::Manager::destroyEntity(Entity::Type entity) {
 		//Check if entity has alr been created
 		if (entities.find(entity) == entities.end()) {
@@ -72,7 +63,16 @@ namespace NIKESAURUS {
 		return entities.at(entity);
 	}
 
-	int Entity::Manager::getEntityCount() const {
+	int Entity::Manager::getEntityComponentCount(Entity::Type entity) const {
+		//Check if entity has alr been created
+		if (entities.find(entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
+
+		return static_cast<int>(entities.at(entity).count());
+	}
+
+	int Entity::Manager::getEntitiesCount() const {
 		return static_cast<int>(entities.size());
 	}
 

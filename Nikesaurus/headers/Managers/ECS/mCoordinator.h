@@ -41,6 +41,9 @@ namespace NIKESAURUS {
 			//Destroy Entity
 			void destroyEntity(Entity::Type entity);
 
+			//Get entity component count
+			int getEntityComponentCount(Entity::Type entity) const;
+
 			//Destroy Entity
 			void destroyAllEntities();
 
@@ -87,6 +90,8 @@ namespace NIKESAURUS {
 				system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), true);
 			}
 
+			void addDefEntityComponent(Entity::Type entity, Component::Type type);
+
 			template<typename T>
 			void removeEntityComponent(Entity::Type entity) {
 				//Remove component
@@ -108,13 +113,15 @@ namespace NIKESAURUS {
 
 			template<typename T>
 			bool checkEntityComponent(Entity::Type entity) {
-				return component_manager->checkEntityComponent<T>(entity);
+				return entity_manager->getSignature(entity).test(component_manager->getComponentType<T>());
 			}
 
 			template<typename T>
 			Component::Type getComponentType() {
 				return component_manager->getComponentType<T>();
 			}
+
+			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
 
 			/*****************************************************************//**
 			* System Methods
