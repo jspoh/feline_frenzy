@@ -17,21 +17,38 @@
 
 namespace NIKESAURUS {
 
-	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe) {
+	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
 		Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
-		if (!render_wireframe) {
-			float angleDisp = obj.rotation;
-			Matrix_33RotDeg(rot_mat, angleDisp);
-		}
-		else {
-			Matrix_33RotDeg(rot_mat, 0);
-		}
+		Matrix_33RotDeg(rot_mat, obj.rotation);
 
 		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+
+		// OpenGL requires matrix in col maj so transpose
+		Matrix_33Transpose(x_form, result);
+	}
+
+	void Render::Manager::transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe) {
+		//Transform matrix here
+		Matrix_33 result, scale_mat, rot_mat, trans_mat, pre_trans_mat, post_trans_mat;
+
+		if (!render_wireframe) {
+			Matrix_33RotDeg(rot_mat, obj.rotation);
+			Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+			Matrix_33Translate(pre_trans_mat, -((obj.scale.x / 2.0f)), -((obj.scale.y / 2.0f)));
+			Matrix_33Translate(post_trans_mat, ((obj.scale.x / 2.0f)), ((obj.scale.y / 2.0f)));
+			Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
+			result = world_to_ndc_mat * trans_mat * pre_trans_mat * rot_mat * post_trans_mat * scale_mat;
+		}
+		else {
+			Matrix_33RotDeg(rot_mat, 0);
+			Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+			Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
+			result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+		}
 
 		// OpenGL requires matrix in col maj so transpose
 		Matrix_33Transpose(x_form, result);
@@ -208,6 +225,10 @@ namespace NIKESAURUS {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
+
+		//Run time error if entity has no transform
+		if (!NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entity))
+			throw std::runtime_error("Trying to render object with no transform. Render failed.");
 		
 		//Matrix used for rendering
 		Matrix_33 matrix;
@@ -220,7 +241,7 @@ namespace NIKESAURUS {
 			auto& e_shape = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Shape>(entity);
 
 			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform(), false);
+			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
 
 			//Render Shape
 			renderObject(matrix, e_shape);
@@ -230,32 +251,39 @@ namespace NIKESAURUS {
 
 			//Copy transform for texture mapping
 			Transform::Transform copy = e_transform;
-			copy.scale = e_texture.texture_size.normalized() * copy.scale.length();
+			Vector2f tex_size{ (float)NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)->size.x, (float)NIKEEngine.getService<Assets::Service>()->getTexture(e_texture.texture_ref)->size.y };
+			copy.scale = tex_size.normalized()* copy.scale.length();
 
 			// Transform matrix here
-			transformMatrix(copy, matrix, camera_system->getWorldToNDCXform(), false);
+			transformMatrix(copy, matrix, camera_system->getWorldToNDCXform());
 
 			// Render Texture
 			renderObject(matrix, e_texture);
 		}
 
 		if (debugMode) {
-			//Calculate wireframe matrix
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform(), true);
-
 			// Render debugging wireframe
 			Render::Color wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+
+			//Calculate wireframe matrix
+			transformMatrixDebug(e_transform, matrix, camera_system->getWorldToNDCXform(), true);
 			renderWireFrame(matrix, wire_frame_color);
+
+			//Calculate direction matrix
+			if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Velocity>(entity)) {
+				auto const& e_velo = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(entity);
+
+				if (e_velo.velocity.x != 0.0f || e_velo.velocity.y != 0.0f) {
+					Transform::Transform dir_transform = e_transform;
+					dir_transform.scale.x = 1.0f;
+					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>((180.0f / M_PI));
+					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
+					transformMatrixDebug(dir_transform, matrix, camera_system->getWorldToNDCXform(), false);
+					renderWireFrame(matrix, wire_frame_color);
+				}
+			}
 		}
 	}
-
-	//void Render::Manager::trackCamEntity(std::string const& cam_identifier) {
-	//	camera_system->trackCamEntity(cam_identifier);
-	//}
-
-	//std::unique_ptr<Camera::System>& Render::Manager::getCamEntity() {
-	//	return camera_system;
-	//}
 
 	void Render::Manager::init() {
 
@@ -266,7 +294,7 @@ namespace NIKESAURUS {
 		camera_system = std::make_unique<Camera::System>();
 
 		//Init Camera ( Camera height defaulted at window height )
-		camera_system->init(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().y);
+		camera_system->init();
 
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);
@@ -279,46 +307,25 @@ namespace NIKESAURUS {
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		////Update set of cameras
-		//std::set<Entity::Type> cam_entities;
-		//for (auto& entity : entities) {
-		//	//Update camera position
-		//	if (!NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(entity))
-		//		continue;
+		for (auto& layer : NIKEEngine.getService<Scenes::Service>()->getCurrScene()->getLayers()) {
+			for (auto& entity : entities) {
+				if (!layer->checkEntity(entity))
+					continue;
 
-		//	//Update camera and push to list
-		//	auto& e_transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
-		//	auto& e_camera = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Cam>(entity);
-		//	e_camera.position = e_transform.position;
-		//	cam_entities.insert(entity);
-		//}
-
-		////Update camera with set of cam entitiess
-		//camera_system->updateCameraEntities(std::move(cam_entities));
-
-		////Update camera system
-		//camera_system->update();
-
-		//Update all and render except camera entities
-		for (auto& entity : entities) {
-			////Check for text objects
-			//if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Text>(entity)) {
-			//	renderText(NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Text>(entity));
-			//	continue;
-			//}
-
-			////Skip camera
-			//if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(entity)) continue;
-
-			//Transform and render object
-			transformAndRenderEntity(entity, true);
+				//Transform and render object
+				transformAndRenderEntity(entity, true);
+			}
 		}
 
-		//// Render camera above all components
+		////Update all and render except camera entities
 		//for (auto& entity : entities) {
-		//	if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(entity)) {
-		//		transformAndRenderEntity(entity, true);
-		//	}
+		//	////Check for text objects
+		//	//if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Text>(entity)) {
+		//	//	renderText(NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Text>(entity));
+		//	//	continue;
+		//	//}
+		//	//Transform and render object
+		//	transformAndRenderEntity(entity, true);
 		//}
 	}
 }

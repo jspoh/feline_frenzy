@@ -11,60 +11,48 @@
 #ifndef CAMERA_SYSTEM_HPP
 #define CAMERA_SYSTEM_HPP
 
-#include "Core/stdafx.h"
+#include "Managers/Services/sEvents.h"
+#include "Managers/Services/sWindows.h"
 #include "Components/cRender.h"
 
 namespace NIKESAURUS {
 	namespace Camera {
 
-		class System {
+		class System 
+			:	public Events::IEventListener<Windows::WindowResized>,
+			public Events::IEventListener<Render::ChangeCamEvent>
+		{
 		public:
 			System();
 
 			//Init camera
-			void init(float camera_height);
-
-			//Update camera
-			void update();
+			void init();
 
 			//Get matrix
-			const Matrix_33& getWorldToNDCXform() const;
+			Matrix_33 getWorldToNDCXform() const;
 
 			// Get Pos to World coordinates
 			const Vector3f getPosToWorld(const Vector2f& pos) const;
-			//Get cam pos
-			const Vector2f& getCamPos() const;
-
-			//Update camera entities
-			void updateCameraEntities(std::set<Entity::Type>&& entities);
-
-			//Track camera entity
-			void trackCamEntity(std::string const& cam_identifier);
-
 		private:
-			//Camera entity
-			std::set<Entity::Type> cam_entities;
-
-			//Current tracked cam
-			std::string cam_id;
 
 			//Targets
 			Vector2f target;
 			Vector2f up;
 
+			//Active cam id
+			Entity::Type cam_id;
+
+			//Default Camera
+			Render::Cam def_cam;
+
 			//Camera aspect ratio
 			float aspect_ratio;
 
-			//Camera height
-			float cam_height;
+			//On window resized event
+			void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
 
-			//Camera position
-			Vector2f cam_pos;
-
-			// Matrix transformation
-			Matrix_33 view_xform;
-			Matrix_33 cam_to_ndc_xform;
-			Matrix_33 world_to_ndc_xform;
+			//On change camera event
+			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
 		};
 	}
 }

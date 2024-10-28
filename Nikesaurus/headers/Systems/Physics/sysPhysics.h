@@ -12,7 +12,7 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
-#include "Systems/Physics/sysCollision.h"
+//#include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 
 namespace NIKESAURUS {
@@ -25,7 +25,7 @@ namespace NIKESAURUS {
 			void operator=(Manager const& copy) = delete;
 
 		public:
-			Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
+			//Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
 
 			//Default Constructor
 			Manager() = default;
@@ -33,18 +33,10 @@ namespace NIKESAURUS {
 			//Default Destructor
 			~Manager() override = default;
 
-			//Singleton Of Manager Class
-			static std::shared_ptr<Manager> getInstance() {
-				static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
-				return instance;
-			}
-
 			//Init
 			void init() override;
 
-			// Runtime scaling and rotation
-			void runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp);
-
+			//System name
 			std::string getSysName() override
 			{
 				return "Physics System";
@@ -52,9 +44,6 @@ namespace NIKESAURUS {
 
 			//Update
 			void update() override;
-
-			//Move Object
-			//void move(Transform::Transform& transform);
 		};
 	}
 }

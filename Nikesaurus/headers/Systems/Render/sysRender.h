@@ -41,7 +41,10 @@ namespace NIKESAURUS {
 			std::unique_ptr<Camera::System> camera_system;
 
 			//Transform matrix
-			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
+			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
+
+			//Transform matrix debug
+			void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
 
 			//Render Shape
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
@@ -64,19 +67,10 @@ namespace NIKESAURUS {
 			//Destructor
 			~Manager() = default;
 
-			//// Debug mode for bounding box
-			//bool debug_mode = false;
-
 			std::string getSysName()
 			{
 				return "Render System";
 			}
-
-			////Track camera entity
-			//void trackCamEntity(std::string const& cam_identifier);
-
-			////Get camera entity
-			//std::unique_ptr<Camera::System>& getCamEntity();
 
 			/**
 			* update all object's xform

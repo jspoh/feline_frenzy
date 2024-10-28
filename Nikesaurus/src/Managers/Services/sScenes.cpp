@@ -12,6 +12,83 @@
 #include "Core/Engine.h"
 
 namespace NIKESAURUS {
+	/*****************************************************************//**
+	* Layer
+	*********************************************************************/
+	void Scenes::Layer::addEntity(Entity::Type entity) {
+		entities.insert(entity);
+	}
+
+	void Scenes::Layer::removeEntity(Entity::Type entity) {
+		entities.erase(entity);
+	}
+
+	bool Scenes::Layer::checkEntity(Entity::Type entity) const {
+		return entities.find(entity) != entities.end();
+	}
+
+	void Scenes::Layer::setLayerState(bool state) {
+		b_state = state;
+	}
+
+	bool Scenes::Layer::getLayerState() const {
+		return b_state;
+	}
+
+	/*****************************************************************//**
+	* Scene Interface
+	*********************************************************************/
+	std::shared_ptr<Scenes::Layer> Scenes::IScene::registerLayer(std::string const& layer_id, int index) {
+		//Check if layer has been added
+		auto it = layers_map.find(layer_id);
+		if (it != layers_map.end()) {
+			throw std::runtime_error("Layer already registered.");
+		}
+
+		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
+
+		//Insert layers at back
+		if (index >= 0) {
+			layers.emplace(layers.begin() + index, layer);
+		}
+		else {
+			layers.push_back(layer);
+			index = static_cast<int>(layers.size()) - 1;
+		}
+
+		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer_id), std::forward_as_tuple(std::make_pair(index, layer)));
+
+		return layer;
+	}
+
+	std::shared_ptr<Scenes::Layer> Scenes::IScene::getLayer(std::string const& layer_id) {
+		//Check if layer has been added
+		auto it = layers_map.find(layer_id);
+		if (it == layers_map.end()) {
+			throw std::runtime_error("Layer has not been registered.");
+		}
+
+		return it->second.second;
+	}
+
+	void Scenes::IScene::removeLayer(std::string const& layer_id) {
+		//Check if layer has been added
+		auto it = layers_map.find(layer_id);
+		if (it == layers_map.end()) {
+			throw std::runtime_error("Layer has not been registered.");
+		}
+
+		layers.erase(layers.begin() + it->second.first);
+		layers_map.erase(it);
+	}
+
+	std::vector<std::shared_ptr<Scenes::Layer>> const& Scenes::IScene::getLayers() const {
+		return layers;
+	}
+
+	/*****************************************************************//**
+	* Scene maanger
+	*********************************************************************/
 	void Scenes::Service::initScene(std::string scene_id) {
 		curr_scene = scenes.at(scene_id);
 		prev_scene = curr_scene;
@@ -76,6 +153,10 @@ namespace NIKESAURUS {
 			curr_scene->load();
 			curr_scene->init();
 		}
+	}
+
+	std::shared_ptr<Scenes::IScene> Scenes::Service::getCurrScene() {
+		return curr_scene;
 	}
 
 	std::string Scenes::Service::getCurrSceneID() const {

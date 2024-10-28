@@ -28,14 +28,11 @@ namespace NIKESAURUS {
 				: position{ position }, scale{ scale }, rotation{ rotation } {}
 		};
 
-		//struct Runtime_Transform {
-		//	bool runtime_scale_up = false;
-		//	bool runtime_rotate = false;
-		//	bool runtime_scale_down = false;
-		//};
-
 		struct Velocity {
 			Vector2f velocity;
+
+			Velocity() : velocity() {}
+			Velocity(Vector2f const& velocity) : velocity{ velocity } {}
 		};
 	}
 }

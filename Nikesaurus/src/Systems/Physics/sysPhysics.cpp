@@ -22,147 +22,140 @@ namespace NIKESAURUS {
 
     }
 
-    void Physics::Manager::runtimeScaleOrRotate(Transform::Runtime_Transform& runtime_comp, Transform::Transform& transform_comp)
-    {
-
-        if (runtime_comp.runtime_scale_up)
-        {
-            transform_comp.scale.x *= 1.05f;
-            transform_comp.scale.y *= 1.05f;
-        }
-
-        if (runtime_comp.runtime_scale_down)
-        {
-            transform_comp.scale.x /= 1.05f;
-            transform_comp.scale.y /= 1.05f;
-        }
-
-        if (runtime_comp.runtime_rotate)
-        {
-            transform_comp.rotation += 10.f;
-        }
-
-    }
-
     void Physics::Manager::update() {
-        float dt = NIKEEngine.getService<Windows::Manager>()->getDeltaTime();
+        float dt = NIKEEngine.getService<Windows::Service>()->getDeltaTime();
 
-        // Loop through all entities to reset collision flags
-        for (Entity::Type entity : entities) {
-            if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entity)) {
-                Collision::Collider& collider = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity);
-                collider.left = collider.right = collider.top = collider.bottom = false; // Must reset in physics loop
+        for (auto& layer : NIKEEngine.getService<Scenes::Service>()->getCurrScene()->getLayers()) {
+            for (auto& entity : entities) {
+                if (!layer->checkEntity(entity))
+                    continue;
 
-                //cout << "E bounding box min: " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_min.x << ", " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_min.y << endl;
-                //cout << "E bounding box max: " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_max.x << ", " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_max.y << endl;
-            }
-        }
-        // Loop through all entities to perform collision checks
-        for (Entity::Type entityA : entities) {
-            if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entityA) &&
-                NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Velocity>(entityA) &&
-                NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entityA)) {
+                if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Velocity>(entity)) {
+                    auto& e_transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
+                    auto& e_velo = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(entity);
 
-                // Loop through all other entities for collision detection
-                for (Entity::Type entityB : entities) {
-                    if (entityA == entityB) {
-                        continue; // Skip self-collision
-                    }
-
-                    if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entityB) &&
-                        NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entityB)) {
-
-                        float firstTimeOfCollision = 0.0f;
-
-                        // Perform AABB collision detection between entityA and entityB
-                        Physics::Manager::getInstance()->collision_manager.detectAABBRectRect(entityA, entityB, firstTimeOfCollision);
-                    }
+                    e_transform.position.x += e_velo.velocity.x * dt;
+                    e_transform.position.y += e_velo.velocity.y * dt;
                 }
             }
         }
 
-        // Loop through all entities to perform physics and movement updates
-        for (const auto& entity : entities) {
-            // Check if entity contains Transform component and Velocity component
-            if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entity) &&
-                NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Velocity>(entity)) {
+        //// Loop through all entities to reset collision flags
+        //for (Entity::Type entity : entities) {
+        //    if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entity)) {
+        //        Collision::Collider& collider = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity);
+        //        collider.left = collider.right = collider.top = collider.bottom = false; // Must reset in physics loop
 
-                // Reference to transform component
-                Transform::Transform& transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
+        //        //cout << "E bounding box min: " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_min.x << ", " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_min.y << endl;
+        //        //cout << "E bounding box max: " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_max.x << ", " << NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity).rect_max.y << endl;
+        //    }
+        //}
+        //// Loop through all entities to perform collision checks
+        //for (Entity::Type entityA : entities) {
+        //    if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entityA) &&
+        //        NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Velocity>(entityA) &&
+        //        NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entityA)) {
 
-                // Reference to velocity component
-                Transform::Velocity& velocity = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(entity);
+        //        // Loop through all other entities for collision detection
+        //        for (Entity::Type entityB : entities) {
+        //            if (entityA == entityB) {
+        //                continue; // Skip self-collision
+        //            }
 
-                const float speed = 100.0f;
+        //            if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entityB) &&
+        //                NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entityB)) {
 
-                // For entities without move but still have movement
-                if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entity)) {
-                    Collision::Collider& collider = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity);
+        //                float firstTimeOfCollision = 0.0f;
 
-                    // For entities that bounce
-                    if (collider.bounceFlag == true) {
-                        // Adjust velocity based collision flags
-                        if (collider.top && (velocity.velocity.y > 0.0f)) {
-                            velocity.velocity.y *= -1;
-                        }
+        //                // Perform AABB collision detection between entityA and entityB
+        //                Physics::Manager::getInstance()->collision_manager.detectAABBRectRect(entityA, entityB, firstTimeOfCollision);
+        //            }
+        //        }
+        //    }
+        //}
 
-                        if (collider.bottom && (velocity.velocity.y < 0.0f)) {
-                            velocity.velocity.y *= -1;
-                        }
+        //// Loop through all entities to perform physics and movement updates
+        //for (const auto& entity : entities) {
+        //    // Check if entity contains Transform component and Velocity component
+        //    if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entity) &&
+        //        NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Velocity>(entity)) {
 
-                        if (collider.right && (velocity.velocity.x > 0.0f)) {
-                            velocity.velocity.x *= -1;
-                        }
+        //        // Reference to transform component
+        //        Transform::Transform& transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
 
-                        if (collider.left && (velocity.velocity.x < 0.0f)) {
-                            velocity.velocity.x *= -1;
-                        }
-                    }
-                    else {
-                        // Adjust velocity based collision flags
-                        if (collider.top && (velocity.velocity.y > 0.0f)) {
-                            velocity.velocity.y = 0;
-                        }
+        //        // Reference to velocity component
+        //        Transform::Velocity& velocity = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(entity);
 
-                        if (collider.bottom && (velocity.velocity.y < 0.0f)) {
-                            velocity.velocity.y = 0;
-                        }
+        //        const float speed = 100.0f;
 
-                        if (collider.right && (velocity.velocity.x > 0.0f)) {
-                            velocity.velocity.x = 0;
-                        }
+        //        // For entities without move but still have movement
+        //        if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entity)) {
+        //            Collision::Collider& collider = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity);
 
-                        if (collider.left && (velocity.velocity.x < 0.0f)) {
-                            velocity.velocity.x = 0;
-                        }
-                    }
-                }
+        //            // For entities that bounce
+        //            if (collider.bounceFlag == true) {
+        //                // Adjust velocity based collision flags
+        //                if (collider.top && (velocity.velocity.y > 0.0f)) {
+        //                    velocity.velocity.y *= -1;
+        //                }
 
-                // Normalize Movement
-                if (velocity.velocity.lengthSq() > 0.0f) {
-                    velocity.velocity = velocity.velocity.normalize();
-                }
+        //                if (collider.bottom && (velocity.velocity.y < 0.0f)) {
+        //                    velocity.velocity.y *= -1;
+        //                }
 
-                // Apply velocity to transform component if no collision in that direction
-                transform.position += velocity.velocity * speed * dt;
+        //                if (collider.right && (velocity.velocity.x > 0.0f)) {
+        //                    velocity.velocity.x *= -1;
+        //                }
 
-                // Update collider bounding box
-                if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entity)) {
-                    Collision::Collider& collider = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity);
-                    collider.rect_min = transform.position - (transform.scale * 0.5f);
-                    collider.rect_max = transform.position + (transform.scale * 0.5f);
-                }
-            }
-            if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entity) &&
-                NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Runtime_Transform>(entity)) {
+        //                if (collider.left && (velocity.velocity.x < 0.0f)) {
+        //                    velocity.velocity.x *= -1;
+        //                }
+        //            }
+        //            else {
+        //                // Adjust velocity based collision flags
+        //                if (collider.top && (velocity.velocity.y > 0.0f)) {
+        //                    velocity.velocity.y = 0;
+        //                }
 
-                // Reference to transform component
-                Transform::Transform& c_transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
+        //                if (collider.bottom && (velocity.velocity.y < 0.0f)) {
+        //                    velocity.velocity.y = 0;
+        //                }
 
-                // Reference to runtime component
-                Transform::Runtime_Transform& c_runtime = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Runtime_Transform>(entity);
-                runtimeScaleOrRotate(c_runtime, c_transform);
-            }
-        }
+        //                if (collider.right && (velocity.velocity.x > 0.0f)) {
+        //                    velocity.velocity.x = 0;
+        //                }
+
+        //                if (collider.left && (velocity.velocity.x < 0.0f)) {
+        //                    velocity.velocity.x = 0;
+        //                }
+        //            }
+        //        }
+
+        //        // Normalize Movement
+        //        if (velocity.velocity.lengthSq() > 0.0f) {
+        //            velocity.velocity = velocity.velocity.normalize();
+        //        }
+
+        //        // Apply velocity to transform component if no collision in that direction
+        //        transform.position += velocity.velocity * speed * dt;
+
+        //        // Update collider bounding box
+        //        if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(entity)) {
+        //            Collision::Collider& collider = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(entity);
+        //            collider.rect_min = transform.position - (transform.scale * 0.5f);
+        //            collider.rect_max = transform.position + (transform.scale * 0.5f);
+        //        }
+        //    }
+        //    if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(entity) &&
+        //        NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Runtime_Transform>(entity)) {
+
+        //        // Reference to transform component
+        //        Transform::Transform& c_transform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(entity);
+
+        //        // Reference to runtime component
+        //        Transform::Runtime_Transform& c_runtime = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Runtime_Transform>(entity);
+        //        runtimeScaleOrRotate(c_runtime, c_transform);
+        //    }
+        //}
     }
 }

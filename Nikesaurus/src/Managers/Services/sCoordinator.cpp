@@ -83,6 +83,7 @@ namespace NIKESAURUS {
 	ECS_DEFINE_TYPES(Audio::SFX)
 
 	//Define Transform Types
+	ECS_DEFINE_TYPES(Transform::Velocity)
 	ECS_DEFINE_TYPES(Transform::Transform)
 
 	//Define Render Types

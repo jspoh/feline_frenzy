@@ -99,7 +99,7 @@ namespace NIKESAURUS {
 			std::vector<std::shared_ptr<System::ISystem>> systems;
 
 			//Map to systems for individual access
-			std::unordered_map<std::string, std::shared_ptr<System::ISystem>> systems_map;
+			std::unordered_map<std::string, std::pair<int, std::shared_ptr<System::ISystem>>> systems_map;
 
 			//Private type casting for easy retrieval
 			template<typename T>
@@ -117,8 +117,11 @@ namespace NIKESAURUS {
 			template<typename T>
 			std::shared_ptr<T> registerSystem(bool components_linked = true, int index = -1) {
 
+				//Get iterator
+				auto it = systems_map.find(typeid(T).name());
+
 				//Check if system has already been added
-				if (systems_map.find(typeid(T).name()) != systems_map.end()) {
+				if (it != systems_map.end()) {
 					throw std::runtime_error("System already registered.");
 				}
 
@@ -137,10 +140,11 @@ namespace NIKESAURUS {
 				}
 				else {
 					systems.push_back(system);
+					index = static_cast<int>(systems.size()) - 1;
 				}
 
 				//Emplace shared pointer to system in map
-				systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(typeid(T).name()), std::forward_as_tuple(system));
+				systems_map.emplace(std::piecewise_construct, std::forward_as_tuple(typeid(T).name()), std::forward_as_tuple(std::move(std::make_pair(index, system))));
 
 				//Return system created
 				return system;
@@ -149,60 +153,60 @@ namespace NIKESAURUS {
 			//Index for adding system is only if
 			template<typename T>
 			void removeSystem() {
-				std::shared_ptr<System::ISystem> sys = systems_map.at(typeid(T).name());
-				int i = 0;
-				for (; i < systems.size(); i++) {
-					if (systems.at(i) == sys)
-						break;
+				//Get iterator
+				auto it = systems_map.find(typeid(T).name());
+
+				//Check if system has already been added
+				if (it == systems_map.end()) {
+					throw std::runtime_error("System not registered. Removal failed.");
 				}
 
-				systems.erase(systems.begin() + i);
-				systems_map.erase(typeid(T).name());
+				systems.erase(systems.begin() + it->second.first);
+				systems_map.erase(it);
 			}
 
 			//Set system state
 			template<typename T>
 			void setSystemState(bool state) {
-				//System type name
-				std::string sys_name{ typeid(T).name() };
+				//Get iterator
+				auto it = systems_map.find(typeid(T).name());
 
-				//Check if system is present
-				if (systems_map.find(sys_name) == systems_map.end()) {
+				//Check if system has already been added
+				if (it == systems_map.end()) {
 					throw std::runtime_error("System not registered. Setting of state failed");
 				}
 
-				//Remove system
-				systems_map.at(sys_name)->setActiveState(state);
+				//Set system state
+				it->second.second->setActiveState(state);
 			}
 
 			//Set signature of system
 			template<typename T>
 			void addComponentType(Component::Type component) {
+				//Get iterator
+				auto it = systems_map.find(typeid(T).name());
 
-				//System type name
-				std::string sys_name{ typeid(T).name() };
-
-				//Check if system is present
-				if (systems_map.find(sys_name) == systems_map.end()) {
+				//Check if system has already been added
+				if (it == systems_map.end()) {
 					throw std::runtime_error("System not registered. Adding component type failed");
 				}
 
 				//Set signature of system
-				systems_map.at(sys_name)->addComponentType(component);
+				it->second.second->addComponentType(component);
 			}
 
 			//Get System index
 			template<typename T>
 			int getSystemIndex() {
-				std::shared_ptr<System::ISystem> sys = systems_map.at(typeid(T).name());
-				int i = 0;
-				for (; i < systems.size(); i++) {
-					if (systems.at(i) == sys)
-						return i;
+				//Get iterator
+				auto it = systems_map.find(typeid(T).name());
+
+				//Check if system has already been added
+				if (it == systems_map.end()) {
+					throw std::runtime_error("System not registered. Checking of index failed");
 				}
 
-				throw std::runtime_error("System not registered yet!");
-				return -1;
+				return it->first;
 			}
 
 			//Update entities list based on signature

@@ -14,6 +14,14 @@
 #include "Managers/Services/sInput.h"
 
 namespace NIKESAURUS {
+	void Events::IEvent::setEventProcessed(bool processed) {
+		b_event_processed = processed;
+	}
+
+	bool Events::IEvent::getEventProcessed() const {
+		return b_event_processed;
+	}
+
 	void Events::Service::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {
 		NIKEEngine.getService<Events::Service>()->dispatchEvent(std::make_shared<Windows::WindowResized>(width, height));
 	}

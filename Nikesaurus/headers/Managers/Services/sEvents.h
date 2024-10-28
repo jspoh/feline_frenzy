@@ -20,9 +20,19 @@ namespace NIKESAURUS {
 
 		//Event interface
 		class NIKESAURUS_API IEvent {
+		private:
+			bool b_event_processed;
 		public:
+			//Default constructor
+			IEvent() : b_event_processed{ false } {}
 			//Default virtual destructor
 			virtual ~IEvent() = default;
+
+			//Set event processed
+			void setEventProcessed(bool processed);
+
+			//Get event processed
+			bool getEventProcessed() const;
 		};
 
 		//Base listener class
@@ -97,6 +107,9 @@ namespace NIKESAURUS {
 
 				//Dispatch to listener
 				for (auto& listener : listeners) {
+					if (new_event->getEventProcessed())
+						break;
+
 					listener->execute(new_event);
 				}
 			}

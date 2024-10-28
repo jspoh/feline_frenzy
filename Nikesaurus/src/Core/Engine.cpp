@@ -13,7 +13,7 @@
 //Registered Systems
 #include "Systems/sysAudio.h"
 //#include "../headers/Systems/sysInput.h"
-//#include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
 //#include "../headers/Systems/Animation/sysAnimation.h"
 #include "../headers/Systems/Render/sysRender.h"
 //#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
@@ -28,9 +28,8 @@ namespace NIKESAURUS {
 		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();
 
 		////Register physics components
-		//ecs_coordinator->registerComponent<Transform::Velocity>();
+		getService<Coordinator::Manager>()->registerComponent<Transform::Velocity>();
 		getService<Coordinator::Manager>()->registerComponent<Transform::Transform>();
-		//ecs_coordinator->registerComponent<Transform::Runtime_Transform>();
 		//ecs_coordinator->registerComponent<Move::Movement>();
 		//ecs_coordinator->registerComponent<Collision::Collider>();
 
@@ -50,24 +49,14 @@ namespace NIKESAURUS {
 	}
 
 	void Core::Engine::registerDefSystems() {
-		////Register audio system
+		//Register audio system
 		getService<Coordinator::Manager>()->registerSystem<Audio::Manager>();
 		getService<Coordinator::Manager>()->addSystemComponentType<Audio::Manager>(getService<Coordinator::Manager>()->getComponentType<Audio::SFX>());
 
-		////Register input manager
-		//ecs_coordinator->registerSystem<Input::Manager>(Input::Manager::getInstance());
-		//ecs_coordinator->accessSystem<Input::Manager>()->setComponentsLinked(false);
-		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Key>());
-		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Input::Mouse>());
-		//ecs_coordinator->addSystemComponentType<Input::Manager>(getComponentType<Transform::Runtime_Transform>());
-
-		////Register physics manager
-		//ecs_coordinator->registerSystem<Physics::Manager>(Physics::Manager::getInstance());
-		//ecs_coordinator->accessSystem<Physics::Manager>()->setComponentsLinked(false);
-		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Transform::Velocity>());
-		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Transform::Runtime_Transform>());
-		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Transform::Transform>());
-		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType<Move::Movement>());
+		//Register physics manager
+		getService<Coordinator::Manager>()->registerSystem<Physics::Manager>(false);
+		getService<Coordinator::Manager>()->addSystemComponentType<Physics::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Velocity>());
+		getService<Coordinator::Manager>()->addSystemComponentType<Physics::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
 		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType <Collision::Collider>());
 
 		////Register animation manager
@@ -185,17 +174,28 @@ namespace NIKESAURUS {
 				getService<IMGUI::Service>()->update();
 			}
 
+			getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 0.0f;
+			getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = 0.0f;
+			
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
+				getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 200.0f;
+			}
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
+				getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = -200.0f;
+			}
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
+				getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = -200.0f;
+			}
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
+				getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = 200.0f;
+			}
+
 			//Update scenes manager
 			getService<Scenes::Service>()->update();
 
 			//Escape Key Testing //!MOVE OUT SOON
 			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 				getService<Windows::Service>()->getWindow()->terminate();
-			}
-
-			//Audio Testing //!MOVE OUT SOON
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ENTER)) {
-				getService<Audio::Service>()->playAudio("SFX", "", "MASTER", 1.0f, 1.0f, false);
 			}
 
 			//Control FPS

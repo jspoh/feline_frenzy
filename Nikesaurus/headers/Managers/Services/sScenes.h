@@ -18,6 +18,69 @@ namespace NIKESAURUS {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		//Layer class
+		class NIKESAURUS_API Layer {
+		private:
+			//Entities in layer
+			std::set<Entity::Type> entities;
+
+			//Layer state
+			bool b_state;
+		public:
+			Layer() : b_state{ true }{}
+			~Layer() = default;
+
+			//Add entity to layer
+			void addEntity(Entity::Type entity);
+
+			//Remove entity from layer
+			void removeEntity(Entity::Type entity);
+
+			//Check if entity is present in layer
+			bool checkEntity(Entity::Type entity) const;
+
+			//Set layer state
+			void setLayerState(bool state);
+
+			//Get layer state
+			bool getLayerState() const;
+		};
+
+		//Scene interface
+		class NIKESAURUS_API IScene {
+		private:
+			//File path to scene
+			std::string file_path;
+
+			//Layers within scene
+			std::unordered_map<std::string, std::pair<int, std::shared_ptr<Layer>>> layers_map;
+			std::vector<std::shared_ptr<Layer>> layers;
+		public:
+			//Default constructor
+			IScene() = default;
+
+			//Phases
+			virtual void load() = 0;
+			virtual void init() = 0;
+			virtual void exit() = 0;
+			virtual void unload() = 0;
+
+			//Create layer
+			std::shared_ptr<Layer> registerLayer(std::string const& layer_id, int index = -1);
+
+			//Get layer
+			std::shared_ptr<Layer> getLayer(std::string const& layer_id);
+
+			//Remove layer
+			void removeLayer(std::string const& layer_id);
+
+			//Get all layers
+			std::vector<std::shared_ptr<Layer>> const& getLayers() const;
+
+			//Default virtual destructor
+			virtual ~IScene() = default;
+		};
+
 		//Scene manager actions
 		enum class NIKESAURUS_API Actions {
 			CHANGE = 0,
@@ -34,22 +97,6 @@ namespace NIKESAURUS {
 			//Constructor
 			SceneEvent(Actions scene_action, std::string next_scene_id)
 				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {}
-		};
-
-		//Scene interface
-		class NIKESAURUS_API IScene {
-		public:
-			//Default constructor
-			IScene() = default;
-
-			//Phases
-			virtual void load() = 0;
-			virtual void init() = 0;
-			virtual void exit() = 0;
-			virtual void unload() = 0;
-
-			//Default virtual destructor
-			virtual ~IScene() = default;
 		};
 
 		//Scenes manager
@@ -88,12 +135,6 @@ namespace NIKESAURUS {
 			//Default Constructor
 			Service() = default;
 
-			//Singleton Of Service Class
-			static std::shared_ptr<Service> getInstance() {
-				static std::shared_ptr<Service> instance{ std::make_shared<Service>() };
-				return instance;
-			}
-
 			//Register scenes
 			template<typename T>
 			void registerScene(std::string const& scene_id) {
@@ -111,6 +152,9 @@ namespace NIKESAURUS {
 			}
 
 			//Get Current Scene
+			std::shared_ptr<IScene> getCurrScene();
+
+			//Get Current Scene ID
 			std::string getCurrSceneID() const;
 
 			//Queue scene event

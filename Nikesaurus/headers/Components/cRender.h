@@ -12,19 +12,29 @@
 #define C_RENDER_HPP
 
 #include "Core/stdafx.h"
+#include "Managers/Services/sEvents.h"
 
 namespace NIKESAURUS {
 	namespace Render {
 
 		struct Cam {
-			std::string id;
 			Vector2f position;	// Position of camera
 			float height;	// represents how much of the world is visible vertically (zoom level).
 
-			Cam() : id{ "" }, position(), height{ 0.0f } {}
+			Cam() : position(), height{ 0.0f } {}
+			Cam(float height) : position(), height{height} {}
+			Cam(Vector2f const& position, float height) : position{ position }, height{ height } {}
 		};
 
-		//Color Define
+		//Change camera event
+		struct NIKESAURUS_API ChangeCamEvent : public Events::IEvent {
+			Entity::Type entity_id;
+
+			//If a entity id does not have a camera attached, default camera is deployed
+			ChangeCamEvent(Entity::Type entity_id)
+				: entity_id{ entity_id } {}
+		};
+
 		struct Color{
 			float r, g, b, a;
 			
@@ -53,13 +63,12 @@ namespace NIKESAURUS {
 		struct Texture {
 			std::string texture_ref;
 			Color color;
-			Vector2f texture_size;	// Spritesheet size ( before mapping )
 			Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
 			Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 
-			Texture() : texture_ref{ "" }, color(), texture_size(), frame_size(), frame_index() {}
-			Texture(std::string const& texture_ref, Color const& color, Vector2f const& texture_size, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
-				:texture_ref{ texture_ref }, color{ color }, texture_size{ texture_size }, frame_size{ frame_size }, frame_index{ frame_index }{}
+			Texture() : texture_ref{ "" }, color(), frame_size(), frame_index() {}
+			Texture(std::string const& texture_ref, Color const& color, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
+				:texture_ref{ texture_ref }, color{ color }, frame_size{ frame_size }, frame_index{ frame_index }{}
 		};
 	}
 }
