@@ -41,7 +41,7 @@ namespace NIKESAURUS {
 					if (ImGui::Selectable((filename + "/").c_str(), false)) {
 						// Update to the new path when clicking a directory
 						SET_ASSETS_PATH(path);
-						GET_ASSETS_PATH() = path; 
+						GET_ASSETS_PATH() = path;
 					}
 				}
 				// If file with a valid extension, display it
@@ -49,7 +49,7 @@ namespace NIKESAURUS {
 					// If click on the asset, able to load it
 					if (ImGui::Selectable(filename.c_str())) {
 						// Trigger the popup when selected
-						show_load_popup = true; 
+						show_load_popup = true;
 					}
 				}
 			}
@@ -62,7 +62,7 @@ namespace NIKESAURUS {
 	}
 
 	void imguiDebuggingWindow() {
-		
+
 		// Begin ImGui window
 		ImGui::Begin("Debugging Tools");
 
@@ -132,7 +132,7 @@ namespace NIKESAURUS {
 	}
 
 	void imguiEntityWindow()
-	{	
+	{
 		static bool open_popup = false;
 
 		// Begin the ImGui window
@@ -159,7 +159,7 @@ namespace NIKESAURUS {
 				NIKEEngine.getService<IMGUI::Service>()->getSelectedEntityName() = elem.first;
 			}
 		}
-		
+
 		ImGui::End();
 	}
 
@@ -173,78 +173,60 @@ namespace NIKESAURUS {
 		// Check if an entity is selected
 		if (!selected_entity.empty()) {
 			ImGui::Text("Selected Entity: %s", selected_entity.c_str());
-			
 
 			Entity::Type entity = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity);
-
 			ImGui::Text("Number of Components in entity: %d", NIKEEngine.getService<Coordinator::Service>()->getEntityComponentCount(entity));
 
 			// Option to add a new component
 			if (ImGui::Button("Add Component")) {
-				// Logic to add a component to the entity
 				open_component_popup = true;
 				ImGui::OpenPopup("Add Component");
 			}
 
-			// Pop up to add components available
+			// Show add component popup
 			open_component_popup = showAddComponentPopup(entity, open_component_popup);
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("Clone Entity")) {
-				// Clone entity logic
-				// TODO: Create pop up to choose which entity to clone
-				// NIKEEngine.getService<Coordinator::Service>()->cloneEntity();
+				// TODO: Create popup to choose which entity to clone
 			}
 
-			//// For easier typing
 			auto coordinator_manager = NIKEEngine.getService<Coordinator::Manager>();
 
-			// Retrieve all registered component types
+			// Retrieve and display all registered component types
 			for (const auto& elem : coordinator_manager->getAllComponentTypes()) {
-				bool has_component = false;
-				// Check if the component type exists for the selected entity
-				// Update the list here when more components are added
-				if (elem.first == "Transform::Transform" && coordinator_manager->checkEntityComponent<Transform::Transform>(entity)) {
-					has_component = true;
-				}
-				if (elem.first == "Render::Texture" && coordinator_manager->checkEntityComponent<Render::Texture>(entity)) {
-					has_component = true;
-				}
-				if (has_component) {
-					if (ImGui::CollapsingHeader(elem.first.c_str(), ImGuiTreeNodeFlags_None)) {
+				const std::string& component_name = elem.first;
+				Component::Type component_type = elem.second;
 
-						if (elem.first == "Transform::Transform") {
+				// Check if the component exists in the entity
+				if (coordinator_manager->checkEntityComponent(entity, component_type)) {
+					// Create a collapsible header for the component
+					if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_None)) {
+						if (component_name == "Transform::Transform") {
 							auto& transform_comp = coordinator_manager->getEntityComponent<Transform::Transform>(entity);
-
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
 							ImGui::SliderAngle("Rotation", &transform_comp.rotation);
 						}
-						else if (elem.first == "Render::Texture") {
-							//auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
-							char texture_ref[300]{};
+						else if (component_name == "Render::Texture") {
+							auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
+							static char texture_ref[300] = {};
 							ImGui::Text("Enter a texture ref:");
 							ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref));
-							//std::string texture_ref;
-							//Color color;
-							//Vector2f texture_size;	// Spritesheet size ( before mapping )
-							//Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
-							//Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 						}
+						// Additional component-specific UI elements can go here
 					}
 				}
 			}
-			
-			
 		}
 		else {
 			ImGui::Text("No entity selected.");
 		}
 
-		
 		ImGui::End();
 	}
+
 
 	void imguiRenderEntityWindow()
 	{

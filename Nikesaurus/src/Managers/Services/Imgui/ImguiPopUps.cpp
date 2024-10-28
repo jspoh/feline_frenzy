@@ -64,34 +64,26 @@ namespace NIKESAURUS
             // Get coordinator manager, save typing more stuff
             auto manager = NIKEEngine.getService<Coordinator::Manager>();
 
-            // Add Transform component
-            if (ImGui::Button("Transform")) {
-                if (!manager->checkEntityComponent<Transform::Transform>(entity)) {
-                    // Add default ctored comp
-                    NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(entity, 
-                       NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Transform::Transform"));
-                    // manager->addEntityComponent(entity, Transform::Transform());
-                    ImGui::CloseCurrentPopup();
-                }
-                else {
-                    // Flag to open the component exists popup
-                    show_exist_popup = true;  
-                }
-            }
+            // Iterate over all registered components
+            for (const auto& component : manager->getAllComponentTypes()) {
+                // Component.first is the string name of the component
+                // Component.second is the actual component type
 
-            ImGui::SameLine();
+                // Display each component as a button
+                if (ImGui::Button(component.first.c_str())) {
+                    // Check if the entity already has this component
+                    if (!manager->checkEntityComponent(entity, component.second)) {
+                        // Add the default-constructed component to the entity
+                        NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()
+                            ->addDefEntityComponent(entity, component.second);
 
-            // Add Texture component
-            if (ImGui::Button("Texture")) {
-                if (!manager->checkEntityComponent<Render::Texture>(entity)) {
-                    // Add default ctored comp
-                    NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(entity,
-                        NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Render::Texture"));
-                    ImGui::CloseCurrentPopup();
-                }
-                else {
-                    // Flag to open the component exists popup
-                    show_exist_popup = true;  
+                        // Close the popup after adding the component
+                        ImGui::CloseCurrentPopup();
+                    }
+                    else {
+                        // Set flag to open the "Component Exists" popup
+                        show_exist_popup = true;
+                    }
                 }
             }
 
