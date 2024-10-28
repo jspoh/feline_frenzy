@@ -9,8 +9,6 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/Imgui/sImgui.h"
-#include "Components/cRender.h"
-#include "Components/cTransform.h"
 #include "Core/Engine.h"
 
 namespace NIKESAURUS
@@ -88,7 +86,7 @@ namespace NIKESAURUS
                 if (!manager->checkEntityComponent<Render::Texture>(entity)) {
                     // Add default ctored comp
                     NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(entity,
-                        NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Transform::Transform"));
+                        NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Render::Texture"));
                     ImGui::CloseCurrentPopup();
                 }
                 else {

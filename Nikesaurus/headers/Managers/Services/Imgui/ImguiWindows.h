@@ -28,6 +28,8 @@ namespace NIKESAURUS {
 	void imguiEntityComponentManagementWindow();
 	// This function will design the UI to render the entities
 	void imguiRenderEntityWindow();
+	// This function will design the UI to show the loaded assets
+	void imguiShowLoadedAssetsWindow();
 }
 
 

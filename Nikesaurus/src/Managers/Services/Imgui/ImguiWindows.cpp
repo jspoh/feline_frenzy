@@ -12,6 +12,8 @@ namespace NIKESAURUS {
 			return;
 		}
 
+		static bool show_load_popup = false;
+
 		// Begin the ImGui window with a title
 		ImGui::Begin("Assets Browser");
 
@@ -44,7 +46,11 @@ namespace NIKESAURUS {
 				}
 				// If file with a valid extension, display it
 				else if (hasValidExtension(path)) {
-					ImGui::Text("%s", filename.c_str());
+					// If click on the asset, able to load it
+					if (ImGui::Selectable(filename.c_str())) {
+						// Trigger the popup when selected
+						show_load_popup = true; 
+					}
 				}
 			}
 		}
@@ -202,23 +208,29 @@ namespace NIKESAURUS {
 				if (elem.first == "Transform::Transform" && coordinator_manager->checkEntityComponent<Transform::Transform>(entity)) {
 					has_component = true;
 				}
+				if (elem.first == "Render::Texture" && coordinator_manager->checkEntityComponent<Render::Texture>(entity)) {
+					has_component = true;
+				}
 				if (has_component) {
 					if (ImGui::CollapsingHeader(elem.first.c_str(), ImGuiTreeNodeFlags_None)) {
 
 						if (elem.first == "Transform::Transform") {
 							auto& transform_comp = coordinator_manager->getEntityComponent<Transform::Transform>(entity);
 
-							ImGui::Text("Transform Component:");
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
 							ImGui::SliderAngle("Rotation", &transform_comp.rotation);
 						}
 						else if (elem.first == "Render::Texture") {
-							auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
-
-							//ImGui::Text("Texture Component:");
-							//ImGui::InputText("File Path", texture.filePath, IM_ARRAYSIZE(texture.filePath));
-							//ImGui::DragFloat("Opacity", &texture.opacity, 0.01f, 0.0f, 1.0f);
+							//auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
+							char texture_ref[300]{};
+							ImGui::Text("Enter a texture ref:");
+							ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref));
+							//std::string texture_ref;
+							//Color color;
+							//Vector2f texture_size;	// Spritesheet size ( before mapping )
+							//Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
+							//Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 						}
 					}
 				}
@@ -237,6 +249,18 @@ namespace NIKESAURUS {
 	void imguiRenderEntityWindow()
 	{
 		ImGui::Begin("Levels Management");
+
+		unsigned int tex_id = NIKEEngine.getService<Assets::Service>()->getTexture("test")->gl_data;
+		Vector2i tex_size = NIKEEngine.getService<Assets::Service>()->getTexture("test")->size;
+
+		ImGui::Image((intptr_t)tex_id, ImVec2((float)tex_size.x / 2, (float)tex_size.y / 2));
+
+		ImGui::End();
+	}
+	void imguiShowLoadedAssetsWindow()
+	{
+		ImGui::Begin("Loaded Assets");
+
 		ImGui::End();
 	}
 }

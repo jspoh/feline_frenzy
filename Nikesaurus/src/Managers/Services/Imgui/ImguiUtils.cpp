@@ -28,7 +28,7 @@ namespace NIKESAURUS
     bool hasValidExtension(const std::filesystem::path& filePath) {
         std::string extension = filePath.extension().string();
         return (extension == ".png" || extension == ".jpg" || extension == ".wav" || extension == ".txt"
-            || extension == ".scn" || extension == ".ogg" || extension == ".tex" || extension == ".ttf");
+            || extension == ".scn" || extension == ".ogg" || extension == ".tex" || extension == ".ttf" || extension == ".frag" || extension == ".vert");
     }
 
     

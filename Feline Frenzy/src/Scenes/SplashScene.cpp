@@ -24,7 +24,6 @@ void Splash::Scene::load() {
 
 	//Load Texture
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("PLAYER", "assets/Textures/player.png");
-
 	//Load Font
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
 
@@ -62,8 +61,13 @@ void Splash::Scene::init() {
 
 	NIKESAURUS::Entity::Type shape_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
 	base_Layer->addEntity(shape_1);
-	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({ 0.0f, 0.0f }, { 75.0f, 75.0f }, 0.0f));
-	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Shape>(shape_1, NIKESAURUS::Render::Shape("TRIANGLE", {1.0f, 0.0f, 0.0f, 1.0f}));
+	//NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(shape_1, NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Render::Texture"));
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Texture>(shape_1, NIKESAURUS::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}, {256.0f, 256.0f}));
+	
+	//Method 1
+	 //NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	 //NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 
 	NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
 	base_Layer->addEntity(sfx_1);
