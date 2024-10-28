@@ -116,6 +116,10 @@ namespace NIKESAURUS {
 				return entity_manager->getSignature(entity).test(component_manager->getComponentType<T>());
 			}
 
+			bool checkEntityComponent(Entity::Type entity, Component::Type component_type) {
+				return entity_manager->getSignature(entity).test(component_type);
+			}
+
 			template<typename T>
 			Component::Type getComponentType() {
 				return component_manager->getComponentType<T>();
