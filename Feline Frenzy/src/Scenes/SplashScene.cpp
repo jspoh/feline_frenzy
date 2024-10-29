@@ -24,6 +24,7 @@ void Splash::Scene::load() {
 
 	//Load Texture
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("PLAYER", "assets/Textures/player.png");
+	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadTexture("TREE", "assets/Textures/Tree_Orange.png");
 	//Load Font
 	NIKEEngine.getService<NIKESAURUS::Assets::Service>()->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
 
@@ -51,6 +52,7 @@ void Splash::Scene::init() {
 
 	//Create player
 	NIKESAURUS::Entity::Type player_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	NIKEEngine.getService<NIKESAURUS::IMGUI::Service>()->addEntityRef("PLAYER", player_1);
 	second_layer->addEntity(player_1);
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(player_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Velocity>(player_1, NIKESAURUS::Transform::Velocity());
@@ -60,10 +62,11 @@ void Splash::Scene::init() {
 	NIKEEngine.getService<NIKESAURUS::Events::Service>()->dispatchEvent(std::make_shared<NIKESAURUS::Render::ChangeCamEvent>(player_1));
 
 	NIKESAURUS::Entity::Type shape_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();
+	NIKEEngine.getService<NIKESAURUS::IMGUI::Service>()->addEntityRef("shape_1", shape_1);
 	base_Layer->addEntity(shape_1);
 	//NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addDefEntityComponent(shape_1, NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->getAllComponentTypes().at("Render::Texture"));
 	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
-	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Texture>(shape_1, NIKESAURUS::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
+	NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->addEntityComponent<NIKESAURUS::Render::Texture>(shape_1, NIKESAURUS::Render::Texture("TREE", {0.0f, 0.0f, 0.0f, 1.0f}));
 	
 	//Method 1
 	 //NIKESAURUS::Entity::Type sfx_1 = NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->createEntity();

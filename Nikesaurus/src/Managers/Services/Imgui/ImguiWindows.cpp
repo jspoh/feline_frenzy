@@ -207,7 +207,7 @@ namespace NIKESAURUS {
 							auto& transform_comp = coordinator_manager->getEntityComponent<Transform::Transform>(entity);
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
-							ImGui::SliderAngle("Rotation", &transform_comp.rotation);
+							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg" );
 						}
 						else if (component_name == "Render::Texture") {
 							auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
