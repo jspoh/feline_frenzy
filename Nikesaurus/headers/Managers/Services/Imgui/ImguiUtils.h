@@ -11,7 +11,7 @@
 #ifndef IMGUI_UTILS
 #define IMGUI_UTILS
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	// This function will be used to update imgui's input if needed
 	void imguiInputUpdate();

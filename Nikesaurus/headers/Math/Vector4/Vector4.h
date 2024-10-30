@@ -11,7 +11,7 @@
 #pragma warning(push)
 #pragma warning(disable: 26495) // Disable the specific warning for this block
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Math {
 		template<typename T>
 		class Vector4 {

@@ -15,7 +15,7 @@
 /*****************************************************************//**
 * ISystem
 *********************************************************************/
-namespace NIKESAURUS {
+namespace NIKE {
 	void System::ISystem::setComponentsLinked(bool state) {
 		b_components_linked = state;
 	}

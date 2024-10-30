@@ -15,7 +15,7 @@
 
 #include "Core/stdafx.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Transform {
 
 		struct Transform {

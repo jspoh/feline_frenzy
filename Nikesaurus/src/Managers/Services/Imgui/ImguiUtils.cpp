@@ -2,7 +2,7 @@
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
 
-namespace NIKESAURUS
+namespace NIKE
 {
     void imguiInputUpdate()
     {

@@ -15,13 +15,13 @@
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Managers/Services/Imgui/ImguiPopUps.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	// All Caps to differentiate from imgui includes
 	namespace IMGUI {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class NIKESAURUS_API Service
+		class NIKE_API Service
 		{
 		public:
 			Service() = default;

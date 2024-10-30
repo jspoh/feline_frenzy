@@ -31,10 +31,10 @@ int WINAPI WinMain(
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
 	NIKE_SCENES_SERVICE->registerScene<Menu::Scene>("MENU");
 
-	//NIKE_EVENTS_SERVICE.getService<NIKESAURUS::Coordinator::Service>()->
+	//NIKE_EVENTS_SERVICE.getService<NIKE::Coordinator::Service>()->
 
 	//Change Scene To Main Menu
-	//NIKE_SCENES_SERVICE->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
+	//NIKE_SCENES_SERVICE->queueSceneEvent(NIKE::Scenes::SceneEvent(NIKE::Scenes::Actions::CHANGE, "MENU"));
 
 	//Run Engine
 	NIKE_ENGINE.run();

@@ -15,7 +15,7 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here

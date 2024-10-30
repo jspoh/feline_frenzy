@@ -13,7 +13,7 @@
 #define SPLASH_SCENE_HPP
 
 namespace Splash {
-	class Scene : public NIKESAURUS::Scenes::IScene {
+	class Scene : public NIKE::Scenes::IScene {
 	private:
 
 	public:

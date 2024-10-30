@@ -15,7 +15,7 @@
 //#include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Physics {
 
 		class Manager : public System::ISystem {

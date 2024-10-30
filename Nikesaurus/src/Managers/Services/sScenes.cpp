@@ -11,7 +11,7 @@
 #include "Managers/Services/sScenes.h"
 #include "Core/Engine.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*****************************************************************//**
 	* Layer
 	*********************************************************************/

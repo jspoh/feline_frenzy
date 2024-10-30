@@ -13,7 +13,7 @@
 #include "Managers/Services/sWindows.h"
 #include "Managers/Services/sInput.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	void Events::IEvent::setEventProcessed(bool processed) {
 		b_event_processed = processed;
 	}

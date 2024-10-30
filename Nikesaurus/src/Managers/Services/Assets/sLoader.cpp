@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*****************************************************************//**
 	* NIKE FONT LIB
 	*********************************************************************/

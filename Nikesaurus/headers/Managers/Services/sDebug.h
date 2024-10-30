@@ -14,13 +14,13 @@
 
 #include "Managers/ECS/mSystem.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Debug {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class NIKESAURUS_API Service
+		class NIKE_API Service
 		{
 		public:
 			Service() = default;

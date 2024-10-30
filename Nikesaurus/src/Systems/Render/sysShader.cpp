@@ -12,7 +12,7 @@
 #include "Systems/Render/sysShader.h"
 #include "Core/Engine.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	void Shader::Manager::useShader(const std::string& shader_ref) {
 		glUseProgram(NIKE_ASSETS_SERVICE->getShader(shader_ref));

@@ -12,7 +12,7 @@
 #ifndef M_COMPONENT_HPP
 #define M_COMPONENT_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Component {
 
 		//Component Array interface

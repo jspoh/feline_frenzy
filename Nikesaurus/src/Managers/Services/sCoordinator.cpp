@@ -11,7 +11,7 @@
 #include "Core/Engine.h"
 #include "Managers/Services/sCoordinator.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*****************************************************************//**
 	* Entity Methods
 	*********************************************************************/
@@ -74,10 +74,10 @@ namespace NIKESAURUS {
 	* Explicit Template Instantiations For Template Functions
 	*********************************************************************/
 	#define ECS_DEFINE_TYPES(type)    \
-	template NIKESAURUS_API void Coordinator::Service::addEntityComponent<type>(Entity::Type entity, type&& component); \
-	template NIKESAURUS_API void Coordinator::Service::removeEntityComponent<type>(Entity::Type entity); \
-	template NIKESAURUS_API type& Coordinator::Service::getEntityComponent<type>(Entity::Type entity); \
-	template NIKESAURUS_API Component::Type Coordinator::Service::getComponentType<type>();
+	template NIKE_API void Coordinator::Service::addEntityComponent<type>(Entity::Type entity, type&& component); \
+	template NIKE_API void Coordinator::Service::removeEntityComponent<type>(Entity::Type entity); \
+	template NIKE_API type& Coordinator::Service::getEntityComponent<type>(Entity::Type entity); \
+	template NIKE_API Component::Type Coordinator::Service::getComponentType<type>();
 
 	//Define Audio Types
 	ECS_DEFINE_TYPES(Audio::SFX)

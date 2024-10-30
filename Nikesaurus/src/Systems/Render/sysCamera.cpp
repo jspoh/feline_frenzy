@@ -10,7 +10,7 @@
 #include "Systems/Render/sysCamera.h"
 #include "Core/Engine.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	Camera::System::System() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, aspect_ratio{ 0.0f } { }
 
 	void Camera::System::onEvent(std::shared_ptr<Windows::WindowResized> event) {

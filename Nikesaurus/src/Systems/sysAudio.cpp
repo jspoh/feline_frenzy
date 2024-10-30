@@ -12,7 +12,7 @@
 #include "Systems/sysAudio.h"
 #include "Components/cAudio.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	void Audio::Manager::init() {
 
 	}

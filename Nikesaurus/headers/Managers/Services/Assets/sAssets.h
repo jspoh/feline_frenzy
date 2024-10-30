@@ -16,13 +16,13 @@
 #include "Managers/Services/sAudio.h"
 #include "Components/cRender.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Assets
 	{
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class NIKESAURUS_API Service {
+		class NIKE_API Service {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;

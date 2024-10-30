@@ -13,7 +13,7 @@
 //Definition of nullstream for debugging
 NullStream nullstream;
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Debug
 	{
 		void Service::logCrash()

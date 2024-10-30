@@ -17,7 +17,7 @@
 #include "Components/cTransform.h"
 
 
-namespace NIKESAURUS {
+namespace NIKE {
     void Physics::Manager::init() {
 
     }

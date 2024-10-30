@@ -3,7 +3,7 @@
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Core/Engine.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	void imguiFileSystemWindow() {
 		// Check if the path exists

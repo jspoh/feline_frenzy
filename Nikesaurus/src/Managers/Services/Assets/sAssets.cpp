@@ -12,7 +12,7 @@
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/sAudio.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	Assets::Service::~Service() {
 
 		//Clear fonts

@@ -11,7 +11,7 @@
 #include "Core/Engine.h"
 #include "Managers/Services/sInput.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	void Input::Service::onEvent(std::shared_ptr<KeyEvent> event) {
 

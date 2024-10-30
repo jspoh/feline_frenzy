@@ -18,7 +18,7 @@
 #include "../headers/Systems/Render/sysRender.h"
 //#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	//Defintion of the static services member variable
 	std::unordered_map<std::string, std::shared_ptr<void>> Core::Engine::services;
@@ -96,7 +96,7 @@ namespace NIKESAURUS {
 		#endif
 
 		//Init Logger
-		NIKESAURUS::Log::Init();
+		NIKE::Log::Init();
 
 		//Setup window with config file
 		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));

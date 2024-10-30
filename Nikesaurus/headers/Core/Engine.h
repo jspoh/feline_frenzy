@@ -28,13 +28,13 @@
 #include "Managers/ECS/mCoordinator.h"
 #endif
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Core {
 
 		//Disable DLL Export warning
 		#pragma warning(disable: 4251)
 
-		class NIKESAURUS_API Engine {
+		class NIKE_API Engine {
 		private:
 
 			//Default Constructor For Engine
@@ -117,22 +117,22 @@ namespace NIKESAURUS {
 }
 
 //Core Engine Macros
-#define NIKE_ENGINE NIKESAURUS::Core::Engine::getInstance()
-#define NIKE_PROVIDE_SERVICE(service) NIKESAURUS::Core::Engine::getInstance().provideService<service>(std::make_shared<service>())
-#define NIKE_GET_SERVICE(service) NIKESAURUS::Core::Engine::getInstance().getService<service>()
-#define NIKE_WINDOWS_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Windows::Service>()
-#define NIKE_SCENES_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Scenes::Service>()
-#define NIKE_EVENTS_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Events::Service>()
-#define NIKE_INPUT_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Input::Service>()
-#define NIKE_AUDIO_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Audio::Service>()
-#define NIKE_ASSETS_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Assets::Service>()
-#define NIKE_DEBUG_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Debug::Service>()
-#define NIKE_IMGUI_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::IMGUI::Service>()
-#define NIKE_ECS_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Coordinator::Service>()
+#define NIKE_ENGINE NIKE::Core::Engine::getInstance()
+#define NIKE_PROVIDE_SERVICE(service) NIKE::Core::Engine::getInstance().provideService<service>(std::make_shared<service>())
+#define NIKE_GET_SERVICE(service) NIKE::Core::Engine::getInstance().getService<service>()
+#define NIKE_WINDOWS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Windows::Service>()
+#define NIKE_SCENES_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Scenes::Service>()
+#define NIKE_EVENTS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Events::Service>()
+#define NIKE_INPUT_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Input::Service>()
+#define NIKE_AUDIO_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Audio::Service>()
+#define NIKE_ASSETS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Assets::Service>()
+#define NIKE_DEBUG_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Debug::Service>()
+#define NIKE_IMGUI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::IMGUI::Service>()
+#define NIKE_ECS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Coordinator::Service>()
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL
-#define NIKE_ECS_MANAGER NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Coordinator::Manager>()
+#define NIKE_ECS_MANAGER NIKE::Core::Engine::getInstance().getService<NIKE::Coordinator::Manager>()
 #endif
 
 #endif // !ENGINE_HPP

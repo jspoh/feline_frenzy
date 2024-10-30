@@ -12,14 +12,14 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Scenes {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
 		//Layer class
-		class NIKESAURUS_API Layer {
+		class NIKE_API Layer {
 		private:
 			//Entities in layer
 			std::set<Entity::Type> entities;
@@ -47,7 +47,7 @@ namespace NIKESAURUS {
 		};
 
 		//Scene interface
-		class NIKESAURUS_API IScene {
+		class NIKE_API IScene {
 		private:
 			//File path to scene
 			std::string file_path;
@@ -82,7 +82,7 @@ namespace NIKESAURUS {
 		};
 
 		//Scene manager actions
-		enum class NIKESAURUS_API Actions {
+		enum class NIKE_API Actions {
 			CHANGE = 0,
 			RESTART,
 			PREVIOUS,
@@ -90,7 +90,7 @@ namespace NIKESAURUS {
 		};
 
 		//Change Scene Event
-		struct NIKESAURUS_API SceneEvent {
+		struct NIKE_API SceneEvent {
 			Actions scene_action;
 			std::string next_scene_id;
 
@@ -100,7 +100,7 @@ namespace NIKESAURUS {
 		};
 
 		//Scenes manager
-		class NIKESAURUS_API Service {
+		class NIKE_API Service {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;

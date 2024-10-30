@@ -11,7 +11,7 @@
 #ifndef IMGUI_POP_UPS
 #define IMGUI_POP_UPS
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*!********************************************************************
 	* Pop up UI
 	**********************************************************************/

@@ -34,8 +34,8 @@ void Splash::Scene::load() {
 
 void Splash::Scene::init() {
 
-	std::shared_ptr<NIKESAURUS::Scenes::Layer> base_Layer = registerLayer("BASE");
-	std::shared_ptr<NIKESAURUS::Scenes::Layer> second_layer = registerLayer("SECOND");
+	std::shared_ptr<NIKE::Scenes::Layer> base_Layer = registerLayer("BASE");
+	std::shared_ptr<NIKE::Scenes::Layer> second_layer = registerLayer("SECOND");
 
 	//Creat Channel Group
 	NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
@@ -50,29 +50,29 @@ void Splash::Scene::init() {
 	NIKEE_WARN("This is a warning message");
 
 	//Create player
-	NIKESAURUS::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity();
+	NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity();
 	second_layer->addEntity(player_1);
-	NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Transform::Transform>(player_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Transform::Velocity>(player_1, NIKESAURUS::Transform::Velocity());
-	NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Render::Texture>(player_1, NIKESAURUS::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Render::Cam>(player_1, NIKESAURUS::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Velocity>(player_1, NIKE::Transform::Velocity());
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 
-	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKESAURUS::Render::ChangeCamEvent>(player_1));
+	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
-	NIKESAURUS::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
+	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
 	base_Layer->addEntity(shape_1);
 	//NIKE_ECS_SERVICE->addDefEntityComponent(shape_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Render::Texture"));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Transform::Transform>(shape_1, NIKESAURUS::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Render::Texture>(shape_1, NIKESAURUS::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
 	
 	//Method 1
-	 //NIKESAURUS::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
-	 //NIKE_ECS_SERVICE->addEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1, NIKESAURUS::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
+	 //NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
+	 //NIKE_ECS_SERVICE->addEntityComponent<NIKE::Audio::SFX>(sfx_1, NIKE::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
 
-	NIKESAURUS::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
+	NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
 	base_Layer->addEntity(sfx_1);
 	NIKE_ECS_SERVICE->addDefEntityComponent(sfx_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Audio::SFX"));
-	NIKE_ECS_SERVICE->getEntityComponent<NIKESAURUS::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
+	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 	// Test crash logger
 	//LOG_CRASH("This is a test crash");
 }

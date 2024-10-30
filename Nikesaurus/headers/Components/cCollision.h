@@ -14,13 +14,13 @@
 
 #include "Core/stdafx.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
     namespace Collision {
 
         //Temporary Disable DLL Export Warning
         #pragma warning(disable: 4251)
 
-        struct NIKESAURUS_API Collider {
+        struct NIKE_API Collider {
             bool active = false; // Tracks if collider is in use (collision enabled or not)
             //Vector2 position;  // Position of the object (X, Y) world coordinates
             //Vector2 size;      // Size (width, height)
