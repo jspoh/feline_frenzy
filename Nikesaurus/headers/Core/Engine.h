@@ -130,10 +130,9 @@ namespace NIKESAURUS {
 #define NIKE_IMGUI_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::IMGUI::Service>()
 #define NIKE_ECS_SERVICE NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Coordinator::Service>()
 
-	//ECS manager for internal usage
+//ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL
 #define NIKE_ECS_MANAGER NIKESAURUS::Core::Engine::getInstance().getService<NIKESAURUS::Coordinator::Manager>()
 #endif
-
 
 #endif // !ENGINE_HPP

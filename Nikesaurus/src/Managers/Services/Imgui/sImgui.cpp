@@ -25,7 +25,7 @@ namespace NIKESAURUS {
 		ImGui_ImplOpenGL3_Init("#version 450");
 
 		// For testing
-		NIKE_ENGINE.getService<Assets::Service>()->loadTexture("test", "assets/Textures/Tree_Orange.png");
+		NIKE_ASSETS_SERVICE->loadTexture("test", "assets/Textures/Tree_Orange.png");
 	}
 
 	void IMGUI::Service::cleanUp()

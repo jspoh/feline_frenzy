@@ -32,8 +32,8 @@ namespace NIKESAURUS {
 
 		//Setup events listening
 		std::shared_ptr<Camera::System> cam_sys_wrapped(this);
-		NIKE_ENGINE.getService<Events::Service>()->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
-		NIKE_ENGINE.getService<Events::Service>()->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
+		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
 
 		//Setup default camera
 		def_cam.position = { 0.0f, 0.0f };
@@ -43,11 +43,11 @@ namespace NIKESAURUS {
 	Matrix_33 Camera::System::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
-		if (NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(cam_id)) {
-			if(NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cam_id))
-			NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(cam_id).position;
+		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
+			if(NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(cam_id))
+			NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id).position;
 
-			cam = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Render::Cam>(cam_id);
+			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
 		}
 		else {
 			cam = def_cam;

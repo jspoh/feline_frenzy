@@ -83,7 +83,7 @@ namespace NIKESAURUS {
 
 				ImGui::Spacing();
 				// Display System Usage (Data all being handled in sDebug)
-				auto& sys_percentages = NIKE_ENGINE.getService<Debug::Service>()->system_percentages;
+				auto& sys_percentages = NIKE_DEBUG_SERVICE->system_percentages;
 
 				if (sys_percentages.empty()) {
 					ImGui::Text("No active systems to report on.");
@@ -95,7 +95,7 @@ namespace NIKESAURUS {
 						ImGui::Text("%s : %.2f%%", name.c_str(), percentage);
 					}
 
-					ImGui::Text("Total Active System Time: %.2f%%", NIKE_ENGINE.getService<Debug::Service>()->total_system_time);
+					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->total_system_time);
 				}
 
 				ImGui::EndTabItem();
@@ -148,15 +148,15 @@ namespace NIKESAURUS {
 		open_popup = showCreateEntityPopUp(open_popup);
 
 		// Show number of entities in the level
-		ImGui::Text("Number of entities in level: %d", NIKE_ENGINE.getService<Coordinator::Service>()->getEntitiesCount());
+		ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
 
 		// Show entities ref name that are created
-		for (auto const& elem : NIKE_ENGINE.getService<IMGUI::Service>()->getEntityRef())
+		for (auto const& elem : NIKE_IMGUI_SERVICE->getEntityRef())
 		{
-			if (ImGui::Selectable(elem.first.c_str(), NIKE_ENGINE.getService<IMGUI::Service>()->getSelectedEntityName() == elem.first))
+			if (ImGui::Selectable(elem.first.c_str(), NIKE_IMGUI_SERVICE->getSelectedEntityName() == elem.first))
 			{
 				// Update the selected entity name
-				NIKE_ENGINE.getService<IMGUI::Service>()->getSelectedEntityName() = elem.first;
+				NIKE_IMGUI_SERVICE->getSelectedEntityName() = elem.first;
 			}
 		}
 
@@ -167,15 +167,15 @@ namespace NIKESAURUS {
 	{
 		static bool open_component_popup = false;
 
-		std::string selected_entity = NIKE_ENGINE.getService<IMGUI::Service>()->getSelectedEntityName();
+		std::string selected_entity = NIKE_IMGUI_SERVICE->getSelectedEntityName();
 		ImGui::Begin("Entity Component Management");
 
 		// Check if an entity is selected
 		if (!selected_entity.empty()) {
 			ImGui::Text("Selected Entity: %s", selected_entity.c_str());
 
-			Entity::Type entity = NIKE_ENGINE.getService<IMGUI::Service>()->getEntityByName(selected_entity);
-			ImGui::Text("Number of Components in entity: %d", NIKE_ENGINE.getService<Coordinator::Service>()->getEntityComponentCount(entity));
+			Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity);
+			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entity));
 
 			// Option to add a new component
 			if (ImGui::Button("Add Component")) {
@@ -192,7 +192,7 @@ namespace NIKESAURUS {
 				// TODO: Create popup to choose which entity to clone
 			}
 
-			auto coordinator_manager = NIKE_ENGINE.getService<Coordinator::Manager>();
+			auto coordinator_manager = NIKE_ECS_MANAGER;
 
 			// Retrieve and display all registered component types
 			for (const auto& elem : coordinator_manager->getAllComponentTypes()) {
@@ -232,8 +232,8 @@ namespace NIKESAURUS {
 	{
 		ImGui::Begin("Levels Management");
 
-		unsigned int tex_id = NIKE_ENGINE.getService<Assets::Service>()->getTexture("test")->gl_data;
-		Vector2i tex_size = NIKE_ENGINE.getService<Assets::Service>()->getTexture("test")->size;
+		unsigned int tex_id = NIKE_ASSETS_SERVICE->getTexture("test")->gl_data;
+		Vector2i tex_size = NIKE_ASSETS_SERVICE->getTexture("test")->size;
 
 		ImGui::Image((intptr_t)tex_id, ImVec2((float)tex_size.x / 2, (float)tex_size.y / 2));
 
