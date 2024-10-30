@@ -21,11 +21,11 @@ namespace NIKESAURUS {
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 		ImGui::StyleColorsDark();
-		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKEEngine.getService<Windows::Service>()->getWindow())->getWindowPtr(), true);
+		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 
 		// For testing
-		NIKEEngine.getService<Assets::Service>()->loadTexture("test", "assets/Textures/Tree_Orange.png");
+		NIKE_ENGINE.getService<Assets::Service>()->loadTexture("test", "assets/Textures/Tree_Orange.png");
 	}
 
 	void IMGUI::Service::cleanUp()

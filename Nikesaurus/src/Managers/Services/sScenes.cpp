@@ -189,7 +189,7 @@ namespace NIKESAURUS {
 				restartScene();
 				break;
 			case Scenes::Actions::CLOSE:
-				NIKEEngine.getService<Windows::Service>()->getWindow()->terminate();
+				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 				break;
 			default:
 				break;

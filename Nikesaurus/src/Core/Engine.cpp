@@ -108,14 +108,14 @@ namespace NIKESAURUS {
 		getService<Windows::Service>()->getWindow()->setupEventCallbacks();
 
 		//Setup input modes
-		NIKEEngine.getService<Windows::Service>()->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
+		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
 		//Add Event Listeners
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKEEngine.getService<Windows::Service>()->getWindow());
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKEEngine.getService<Input::Service>());
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKEEngine.getService<Input::Service>());
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKEEngine.getService<Input::Service>());
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKEEngine.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_ENGINE.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_ENGINE.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_ENGINE.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_ENGINE.getService<Input::Service>());
 
 		//Setup Audio
 		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
@@ -153,7 +153,7 @@ namespace NIKESAURUS {
 			getService<Windows::Service>()->getWindow()->pollEvents();
 
 			//Clear buffer ( Temp )
-			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
+			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
 			//Update all systems
 			getService<Coordinator::Manager>()->updateSystems();
@@ -202,7 +202,7 @@ namespace NIKESAURUS {
 			getService<Windows::Service>()->controlFPS();
 
 			//Swap Buffers
-			NIKEEngine.getService<Windows::Service>()->getWindow()->swapBuffers();
+			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 		}
 
 		//Clean up window resources

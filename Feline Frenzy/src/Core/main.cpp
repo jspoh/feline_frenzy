@@ -25,19 +25,19 @@ int WINAPI WinMain(
 	#endif
 
 	//Init Engine
-	NIKEEngine.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
+	NIKE_ENGINE.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
 
 	//Register Scenes
-	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Splash::Scene>("SPLASH");
-	NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->registerScene<Menu::Scene>("MENU");
+	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
+	NIKE_SCENES_SERVICE->registerScene<Menu::Scene>("MENU");
 
-	//NIKEEngine.getService<NIKESAURUS::Coordinator::Service>()->
+	//NIKE_ENGINE.getService<NIKESAURUS::Coordinator::Service>()->
 
 	//Change Scene To Main Menu
-	//NIKEEngine.getService<NIKESAURUS::Scenes::Service>()->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
+	//NIKE_SCENES_SERVICE->queueSceneEvent(NIKESAURUS::Scenes::SceneEvent(NIKESAURUS::Scenes::Actions::CHANGE, "MENU"));
 
 	//Run Engine
-	NIKEEngine.run();
+	NIKE_ENGINE.run();
 
 	return 0;
 }

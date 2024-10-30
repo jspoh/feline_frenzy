@@ -64,8 +64,8 @@ namespace NIKESAURUS {
 		};
 
 		// Defines to reduce the long line
-		#define GET_ASSETS_PATH() NIKEEngine.getService<IMGUI::Service>()->getAssetsPath()
-		#define SET_ASSETS_PATH(path) NIKEEngine.getService<IMGUI::Service>()->setFilePath(path)
+		#define GET_ASSETS_PATH() NIKE_ENGINE.getService<IMGUI::Service>()->getAssetsPath()
+		#define SET_ASSETS_PATH(path) NIKE_ENGINE.getService<IMGUI::Service>()->setFilePath(path)
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)

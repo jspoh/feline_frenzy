@@ -16,27 +16,27 @@ namespace NIKESAURUS {
 	* Entity Methods
 	*********************************************************************/
 	Entity::Type Coordinator::Service::createEntity() {
-		return NIKEEngine.getService<Coordinator::Manager>()->createEntity();
+		return NIKE_ENGINE.getService<Coordinator::Manager>()->createEntity();
 	}
 
 	Entity::Type Coordinator::Service::cloneEntity(Entity::Type copy) {
-		return NIKEEngine.getService<Coordinator::Manager>()->cloneEntity(copy);
+		return NIKE_ENGINE.getService<Coordinator::Manager>()->cloneEntity(copy);
 	}
 
 	void Coordinator::Service::destroyEntity(Entity::Type entity) {
-		NIKEEngine.getService<Coordinator::Manager>()->destroyEntity(entity);
+		NIKE_ENGINE.getService<Coordinator::Manager>()->destroyEntity(entity);
 	}
 
 	int Coordinator::Service::getEntityComponentCount(Entity::Type entity) const {
-		return NIKEEngine.getService<Coordinator::Manager>()->getEntityComponentCount(entity);
+		return NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponentCount(entity);
 	}
 
 	void Coordinator::Service::destroyAllEntities() {
-		NIKEEngine.getService<Coordinator::Manager>()->destroyAllEntities();
+		NIKE_ENGINE.getService<Coordinator::Manager>()->destroyAllEntities();
 	}
 
 	int Coordinator::Service::getEntitiesCount() {
-		return NIKEEngine.getService<Coordinator::Manager>()->getEntitiesCount();
+		return NIKE_ENGINE.getService<Coordinator::Manager>()->getEntitiesCount();
 	}
 
 	/*****************************************************************//**
@@ -44,30 +44,30 @@ namespace NIKESAURUS {
 	*********************************************************************/
 	template<typename T>
 	void Coordinator::Service::addEntityComponent(Entity::Type entity, T&& component) {
-		NIKEEngine.getService<Coordinator::Manager>()->addEntityComponent(entity, std::move(component));
+		NIKE_ENGINE.getService<Coordinator::Manager>()->addEntityComponent(entity, std::move(component));
 	}
 
 	void Coordinator::Service::addDefEntityComponent(Entity::Type entity, Component::Type type) {
-		NIKEEngine.getService<Coordinator::Manager>()->addDefEntityComponent(entity, type);
+		NIKE_ENGINE.getService<Coordinator::Manager>()->addDefEntityComponent(entity, type);
 	}
 
 	template<typename T>
 	void Coordinator::Service::removeEntityComponent(Entity::Type entity) {
-		NIKEEngine.getService<Coordinator::Manager>()->removeEntityComponent<T>(entity);
+		NIKE_ENGINE.getService<Coordinator::Manager>()->removeEntityComponent<T>(entity);
 	}
 
 	template<typename T>
 	T& Coordinator::Service::getEntityComponent(Entity::Type entity) {
-		return NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<T>(entity);
+		return NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<T>(entity);
 	}
 
 	template<typename T>
 	Component::Type Coordinator::Service::getComponentType() {
-		return  NIKEEngine.getService<Coordinator::Manager>()->getComponentType<T>();
+		return  NIKE_ENGINE.getService<Coordinator::Manager>()->getComponentType<T>();
 	}
 
 	std::unordered_map<std::string, Component::Type> Coordinator::Service::getAllComponentTypes() const {
-		return NIKEEngine.getService<Coordinator::Manager>()->getAllComponentTypes();
+		return NIKE_ENGINE.getService<Coordinator::Manager>()->getAllComponentTypes();
 	}
 
 	/*****************************************************************//**
