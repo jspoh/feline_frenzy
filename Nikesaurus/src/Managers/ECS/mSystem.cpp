@@ -151,7 +151,7 @@ namespace NIKESAURUS {
 		if (time_since_last_call >= 1000)
 		{
 			// Call to calculate and display system runtime percentage
-			NIKEEngine.getService<Debug::Service>()->updateSystemPercentage(total_game_loop_time, system_times, systems);
+			NIKE_DEBUG_SERVICE->updateSystemPercentage(total_game_loop_time, system_times, systems);
 
 			// Update the last debug call time to the current time
 			last_call_time = current_time;

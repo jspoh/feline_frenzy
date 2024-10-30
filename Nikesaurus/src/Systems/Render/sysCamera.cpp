@@ -24,7 +24,7 @@ namespace NIKESAURUS {
 
 	void Camera::System::init() {
 		// !TODO set height as a constant from the config
-		aspect_ratio = static_cast<float>(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().x) / static_cast<float>(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().y);
+		aspect_ratio = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x) / static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 		float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
 
 		up = Vector2(-sin(angleDisp), cos(angleDisp));
@@ -32,22 +32,22 @@ namespace NIKESAURUS {
 
 		//Setup events listening
 		std::shared_ptr<Camera::System> cam_sys_wrapped(this);
-		NIKEEngine.getService<Events::Service>()->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
-		NIKEEngine.getService<Events::Service>()->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
+		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
 
 		//Setup default camera
 		def_cam.position = { 0.0f, 0.0f };
-		def_cam.height = static_cast<float>(NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().y);
+		def_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 	}
 
 	Matrix_33 Camera::System::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
-		if (NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Render::Cam>(cam_id)) {
-			if(NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cam_id))
-			NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Cam>(cam_id).position = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(cam_id).position;
+		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
+			if(NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(cam_id))
+			NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id).position;
 
-			cam = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Render::Cam>(cam_id);
+			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
 		}
 		else {
 			cam = def_cam;
@@ -70,8 +70,8 @@ namespace NIKESAURUS {
 
 	const Vector3f Camera::System::getPosToWorld(const Vector2f& pos) const
 	{
-		float ndcX = (2.0f * pos.x) / NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().x - 1.0f;
-		float ndcY = 1.0f - (2.0f * pos.y) / NIKEEngine.getService<Windows::Service>()->getWindow()->getWindowSize().y;
+		float ndcX = (2.0f * pos.x) / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x - 1.0f;
+		float ndcY = 1.0f - (2.0f * pos.y) / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
 
 		Matrix_33 view_xform{
 			1, 0,  -def_cam.position.x,

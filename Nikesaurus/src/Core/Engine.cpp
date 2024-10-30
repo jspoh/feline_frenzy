@@ -25,11 +25,11 @@ namespace NIKESAURUS {
 
 	void Core::Engine::registerDefComponents() {
 		//Register Audio Components
-		getService<Coordinator::Manager>()->registerComponent<Audio::SFX>();
+		NIKE_ECS_MANAGER->registerComponent<Audio::SFX>();
 
 		////Register physics components
-		getService<Coordinator::Manager>()->registerComponent<Transform::Velocity>();
-		getService<Coordinator::Manager>()->registerComponent<Transform::Transform>();
+		NIKE_ECS_MANAGER->registerComponent<Transform::Velocity>();
+		NIKE_ECS_MANAGER->registerComponent<Transform::Transform>();
 		//ecs_coordinator->registerComponent<Move::Movement>();
 		//ecs_coordinator->registerComponent<Collision::Collider>();
 
@@ -38,11 +38,11 @@ namespace NIKESAURUS {
 		//ecs_coordinator->registerComponent<Animation::cSprite>();
 
 		////Register render components
-		getService<Coordinator::Manager>()->registerComponent<Render::Shape>();
-		getService<Coordinator::Manager>()->registerComponent<Render::Texture>();
-		getService<Coordinator::Manager>()->registerComponent<Render::Color>();
-		getService<Coordinator::Manager>()->registerComponent<Render::Cam>();
-		getService<Coordinator::Manager>()->registerComponent<Render::Text>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Color>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Cam>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
 
 		////Register audio components
 		//ecs_coordinator->registerComponent<Audio::cAudio>();
@@ -50,13 +50,13 @@ namespace NIKESAURUS {
 
 	void Core::Engine::registerDefSystems() {
 		//Register audio system
-		getService<Coordinator::Manager>()->registerSystem<Audio::Manager>();
-		getService<Coordinator::Manager>()->addSystemComponentType<Audio::Manager>(getService<Coordinator::Manager>()->getComponentType<Audio::SFX>());
+		NIKE_ECS_MANAGER->registerSystem<Audio::Manager>();
+		NIKE_ECS_MANAGER->addSystemComponentType<Audio::Manager>(NIKE_ECS_MANAGER->getComponentType<Audio::SFX>());
 
 		//Register physics manager
-		getService<Coordinator::Manager>()->registerSystem<Physics::Manager>(false);
-		getService<Coordinator::Manager>()->addSystemComponentType<Physics::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Velocity>());
-		getService<Coordinator::Manager>()->addSystemComponentType<Physics::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Velocity>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType <Collision::Collider>());
 
 		////Register animation manager
@@ -67,11 +67,11 @@ namespace NIKESAURUS {
 		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Render::Texture>());
 
 		//Register render manager
-		getService<Coordinator::Manager>()->registerSystem<Render::Manager>(false);
-		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Transform::Transform>());
-		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Shape>());
-		getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Texture>());
-		//getService<Coordinator::Manager>()->addSystemComponentType<Render::Manager>(getService<Coordinator::Manager>()->getComponentType<Render::Text>());
+		NIKE_ECS_MANAGER->registerSystem<Render::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Shape>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
+		//NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Text>());
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
@@ -92,30 +92,30 @@ namespace NIKESAURUS {
 
 		//Create console
 		#ifndef NDEBUG
-		getService<Windows::Service>()->createConsole(custom_welcome);
+		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
 		#endif
 
 		//Init Logger
 		NIKESAURUS::Log::Init();
 
 		//Setup window with config file
-		getService<Windows::Service>()->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
+		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
 
 		//Set Target FPS
-		getService<Windows::Service>()->setTargetFPS(fps);
+		NIKE_WINDOWS_SERVICE->setTargetFPS(fps);
 
 		//Set up event callbacks
-		getService<Windows::Service>()->getWindow()->setupEventCallbacks();
+		NIKE_WINDOWS_SERVICE->getWindow()->setupEventCallbacks();
 
 		//Setup input modes
-		NIKEEngine.getService<Windows::Service>()->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
+		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
 		//Add Event Listeners
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKEEngine.getService<Windows::Service>()->getWindow());
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKEEngine.getService<Input::Service>());
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKEEngine.getService<Input::Service>());
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKEEngine.getService<Input::Service>());
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKEEngine.getService<Input::Service>());
+		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
 
 		//Setup Audio
 		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
@@ -124,7 +124,7 @@ namespace NIKESAURUS {
 		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
 
 		//Init imgui
-		getService<IMGUI::Service>()->init();
+		NIKE_IMGUI_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();
@@ -135,31 +135,31 @@ namespace NIKESAURUS {
 
 	void Core::Engine::run() {
 
-		while (getService<Windows::Service>()->getWindow()->windowState()) {
+		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
 			//Calculate Delta Time
-			getService<Windows::Service>()->calculateDeltaTime();
+			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
 			//Set Window Title
-			getService<Windows::Service>()->getWindow()->setWindowTitle(getService<Windows::Service>()->getWindow()->getWindowTitle() +
-				" | " + getService<Scenes::Service>()->getCurrSceneID() +
-				" | " + std::to_string(getService<Windows::Service>()->getCurrentFPS()) + " fps" +
-				" | " + std::to_string(getService<Coordinator::Manager>()->getEntitiesCount()) + " entities");
+			NIKE_WINDOWS_SERVICE->getWindow()->setWindowTitle(NIKE_WINDOWS_SERVICE->getWindow()->getWindowTitle() +
+				" | " + NIKE_SCENES_SERVICE->getCurrSceneID() +
+				" | " + std::to_string(NIKE_WINDOWS_SERVICE->getCurrentFPS()) + " fps" +
+				" | " + std::to_string(NIKE_ECS_MANAGER->getEntitiesCount()) + " entities");
 
 			//Update all audio pending actions
 			getService<Audio::Service>()->getAudioSystem()->update();
 
 			//Poll system events
-			getService<Windows::Service>()->getWindow()->pollEvents();
+			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
 			//Clear buffer ( Temp )
-			NIKEEngine.getService<Windows::Service>()->getWindow()->clearBuffer();
+			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
 			//Update all systems
-			getService<Coordinator::Manager>()->updateSystems();
+			NIKE_ECS_MANAGER->updateSystems();
 
 			// Call update imgui
-			// getService<IMGUI::Service>()->update();
+			// NIKE_IMGUI_SERVICE->update();
 
 
 			static bool imgui_overlay_enable = true;
@@ -171,7 +171,7 @@ namespace NIKESAURUS {
 
 			// Toggle imgui windows to show or not
 			if (imgui_overlay_enable) {
-				getService<IMGUI::Service>()->update();
+				NIKE_IMGUI_SERVICE->update();
 			}
 
 			getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 0.0f;
@@ -191,21 +191,21 @@ namespace NIKESAURUS {
 			}
 
 			//Update scenes manager
-			getService<Scenes::Service>()->update();
+			NIKE_SCENES_SERVICE->update();
 
 			//Escape Key Testing //!MOVE OUT SOON
 			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-				getService<Windows::Service>()->getWindow()->terminate();
+				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 			}
 
 			//Control FPS
-			getService<Windows::Service>()->controlFPS();
+			NIKE_WINDOWS_SERVICE->controlFPS();
 
 			//Swap Buffers
-			NIKEEngine.getService<Windows::Service>()->getWindow()->swapBuffers();
+			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 		}
 
 		//Clean up window resources
-		getService<Windows::Service>()->getWindow()->cleanUp();
+		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();
 	}
 }

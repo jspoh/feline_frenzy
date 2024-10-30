@@ -23,22 +23,22 @@ namespace NIKESAURUS {
 	}
 
 	void Events::Service::fbsize_cb([[maybe_unused]] GLFWwindow* window, [[maybe_unused]] int width, [[maybe_unused]] int height) {
-		NIKEEngine.getService<Events::Service>()->dispatchEvent(std::make_shared<Windows::WindowResized>(width, height));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Windows::WindowResized>(width, height));
 	}
 
 	void Events::Service::key_cb([[maybe_unused]] GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods) {
-		NIKEEngine.getService<Events::Service>()->dispatchEvent(std::make_shared<Input::KeyEvent>(key, action));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::KeyEvent>(key, action));
 	}
 
 	void Events::Service::mousebutton_cb([[maybe_unused]] GLFWwindow* window, int button, int action, [[maybe_unused]] int mods) {
-		NIKEEngine.getService<Events::Service>()->dispatchEvent(std::make_shared<Input::MouseBtnEvent>(button, action));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseBtnEvent>(button, action));
 	}
 
 	void Events::Service::mousepos_cb([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
-		NIKEEngine.getService<Events::Service>()->dispatchEvent(std::make_shared<Input::MouseMovedEvent>(Vector2f(static_cast<float>(xpos), static_cast<float>(ypos))));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseMovedEvent>(Vector2f(static_cast<float>(xpos), static_cast<float>(ypos))));
 	}
 
 	void Events::Service::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {
-		NIKEEngine.getService<Events::Service>()->dispatchEvent(std::make_shared<Input::MouseScrollEvent>(Vector2f(static_cast<float>(xoffset), static_cast<float>(yoffset))));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseScrollEvent>(Vector2f(static_cast<float>(xoffset), static_cast<float>(yoffset))));
 	}
 }
