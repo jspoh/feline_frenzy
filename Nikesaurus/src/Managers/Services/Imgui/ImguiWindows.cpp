@@ -250,7 +250,12 @@ namespace NIKE {
 	void imguiShowGameViewport()
 	{
 		ImGui::Begin("Game Viewport");
-		ImGui::Image((intptr_t)NIKE::Render::Manager::textureColorbuffer, ImVec2(1280, 720));
+		ImTextureID textureID = (ImTextureID)NIKE_ECS_MANAGER->getSystemInstance<Render::Manager>()->getTextureColorBuffer();
+		// Define UV coordinates to flip the texture vertically
+		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
+		ImVec2 uv1(1.0f, 0.0f); // Top-right
+
+		ImGui::Image(textureID, ImVec2(1024, 576), uv0, uv1);
 		ImGui::End();
 	}
 }

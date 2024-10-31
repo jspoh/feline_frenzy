@@ -16,8 +16,6 @@
 #include "Math/Mtx33.h"
 
 namespace NIKE {
-	GLuint Render::Manager::framebuffer = 0;
-	GLuint Render::Manager::textureColorbuffer = 0;
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
@@ -287,6 +285,31 @@ namespace NIKE {
 		}
 	}
 
+	void Render::Manager::renderViewport() {
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		//Iterater through layers
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			//SKip inactive layer
+			if (!layer->getLayerState())
+				continue;
+
+			for (auto& entity : entities) {
+
+				//Skip entities that are not present within layer
+				if (!layer->checkEntity(entity))
+					continue;
+
+				//Transform and render object
+				transformAndRenderEntity(entity, false);
+			}
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+
+	}
+
 	void Render::Manager::init() {
 
 		glGenFramebuffers(1, &framebuffer);
@@ -324,28 +347,7 @@ namespace NIKE {
 	void Render::Manager::update() {
 
 		//Before drawing clear screen
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		//Iterater through layers
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
-			//SKip inactive layer
-			if (!layer->getLayerState())
-				continue;
-
-			for (auto& entity : entities) {
-
-				//Skip entities that are not present within layer
-				if (!layer->checkEntity(entity))
-					continue;
-
-				//Transform and render object
-				transformAndRenderEntity(entity, true);
-			}
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
-
+		renderViewport();
 
 		glClear(GL_COLOR_BUFFER_BIT);
 

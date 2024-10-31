@@ -40,6 +40,8 @@ namespace NIKE {
 			//Camera System
 			std::unique_ptr<Camera::System> camera_system;
 
+			GLuint framebuffer, textureColorbuffer;
+
 			//Transform matrix
 			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
 
@@ -55,6 +57,9 @@ namespace NIKE {
 			//Render text
 			void renderText(Render::Text const& e_text);
 
+			//Render viewport
+			void renderViewport();
+
 			//Render debugging wireframe
 			void renderWireFrame(Matrix_33 const& x_form, Render::Color const& e_color);
 
@@ -67,11 +72,13 @@ namespace NIKE {
 			//Destructor
 			~Manager() = default;
 
-			static GLuint framebuffer, textureColorbuffer;
-
 			std::string getSysName()
 			{
 				return "Render System";
+			}
+
+			GLuint getTextureColorBuffer() const {
+				return textureColorbuffer;
 			}
 
 			/**

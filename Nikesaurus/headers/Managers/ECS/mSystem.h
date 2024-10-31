@@ -195,6 +195,19 @@ namespace NIKE {
 				it->second.second->addComponentType(component);
 			}
 
+			template<typename T>
+			std::shared_ptr<T> getSystemInstance() {
+				auto it = systems_map.find(typeid(T).name());
+
+				// Check if the system is registered
+				if (it == systems_map.end()) {
+					throw std::runtime_error("System not registered. Retrieval failed.");
+				}
+
+				// Return the system instance cast to the appropriate type
+				return std::static_pointer_cast<T>(it->second.second);
+			}
+
 			//Get System index
 			template<typename T>
 			int getSystemIndex() {
