@@ -19,7 +19,7 @@
 * - THERE WILL BE AUIDIO GROUP AND AUDIO
 /****************************************/
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Audio {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
@@ -374,7 +374,7 @@ namespace NIKESAURUS {
 		*********************************************************************/
 
 		//Audio Service
-		class NIKESAURUS_API Service {
+		class NIKE_API Service {
 		private:
 			// Delete Copy Constructor & Copy Assignment
 			Service(Service const& rhs) = delete;

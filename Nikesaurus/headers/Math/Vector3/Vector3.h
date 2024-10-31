@@ -9,7 +9,7 @@
 
 #pragma once
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Math {
 		template<typename T>
 		class Vector3 {

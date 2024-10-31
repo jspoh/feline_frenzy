@@ -10,7 +10,7 @@
 #include "Core/stdafx.h"
 #include "Utility/uSystems.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	Utility::Clock::Clock()
 		: start{ std::chrono::high_resolution_clock::now() }, duration{ 0.0f }
 	{

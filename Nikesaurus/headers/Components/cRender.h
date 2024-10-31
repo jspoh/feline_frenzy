@@ -14,7 +14,7 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/sEvents.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Render {
 
 		struct Cam {
@@ -27,7 +27,7 @@ namespace NIKESAURUS {
 		};
 
 		//Change camera event
-		struct NIKESAURUS_API ChangeCamEvent : public Events::IEvent {
+		struct NIKE_API ChangeCamEvent : public Events::IEvent {
 			Entity::Type entity_id;
 
 			//If a entity id does not have a camera attached, default camera is deployed

@@ -12,7 +12,7 @@
 #include "Managers/Services/sWindows.h"
 #include "Managers/Services/sEvents.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*****************************************************************//**
 	* NIKE Window
 	*********************************************************************/

@@ -12,7 +12,7 @@
 #define MENU_SCENE_HPP
 
 namespace Menu {
-	class Scene : public NIKESAURUS::Scenes::IScene {
+	class Scene : public NIKE::Scenes::IScene {
 	private:
 
 	public:

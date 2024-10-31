@@ -15,14 +15,14 @@
 #include "Core/stdafx.h"
 #include "Managers/mEvents.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Animation {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
 		//Animation Modes
-		enum class NIKESAURUS_API Mode {
+		enum class NIKE_API Mode {
 			PAUSE = 0,
 			RESUME,
 			RESTART,
@@ -30,7 +30,7 @@ namespace NIKESAURUS {
 		};
 
 		//Animation Event
-		struct NIKESAURUS_API AnimationEvent : public Events::IEvent {
+		struct NIKE_API AnimationEvent : public Events::IEvent {
 		public:
 			Mode animation_action;
 			std::string animator_id;
@@ -41,7 +41,7 @@ namespace NIKESAURUS {
 		};
 
 		//Sprite event
-		struct NIKESAURUS_API SpriteEvent {
+		struct NIKE_API SpriteEvent {
 			Vector2 new_start_index;
 			Vector2 new_end_index;
 			std::string animator_id;
@@ -57,7 +57,7 @@ namespace NIKESAURUS {
 				: new_start_index{ new_start }, new_end_index{ new_end }, animator_id{ id }, num_animations{ num_animations }, mouse_type{ mouse_type }, key_type{ key_type }, animation_ongoing{ false } {}
 		};
 
-		struct NIKESAURUS_API cBase {
+		struct NIKE_API cBase {
 			//Animation Tracker ( Infinite number of animations if set to 0 )
 			int animations_to_complete;
 
@@ -91,7 +91,7 @@ namespace NIKESAURUS {
 				b_animation_finished{ false }, b_pingpong{ pingpong_mode }, b_reverse{ false }, animation_speed{ animation_speed }, timer() {}
 		};
 
-		struct NIKESAURUS_API cSprite {
+		struct NIKE_API cSprite {
 
 			//Sprite sheet Size ( cols x rows )
 			Vector2 sheet_size;

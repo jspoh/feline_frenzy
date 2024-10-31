@@ -13,7 +13,7 @@
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/Assets/sAssets.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*****************************************************************//**
 	* NIKE AUDIO
 	*********************************************************************/
@@ -386,13 +386,13 @@ namespace NIKESAURUS {
 	* NIKE AUDIO SERVICE
 	*********************************************************************/
 	//Definition of static groups
-	std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> NIKESAURUS::Audio::Service::channel_groups;
+	std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> NIKE::Audio::Service::channel_groups;
 
-	void NIKESAURUS::Audio::Service::setAudioSystem(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
+	void NIKE::Audio::Service::setAudioSystem(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
 		audio_system = audio_sys;
 	}
 
-	std::shared_ptr<Audio::IAudioSystem> NIKESAURUS::Audio::Service::getAudioSystem() const {
+	std::shared_ptr<Audio::IAudioSystem> NIKE::Audio::Service::getAudioSystem() const {
 		return audio_system;
 	}
 
@@ -481,7 +481,7 @@ namespace NIKESAURUS {
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused) {
 		
 		//Get assets services
-		auto assets_service = NIKEEngine.getService<Assets::Service>();
+		auto assets_service = NIKE_ASSETS_SERVICE;
 
 		//Play sound & get channel that sound is playing under
 		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(assets_service->getAudio(audio_id), getChannelGroup(channel_group_id), start_paused);

@@ -13,7 +13,7 @@
 #ifndef M_SYSTEM_HPP
 #define M_SYSTEM_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace System {
 
 		//System interface

@@ -50,12 +50,12 @@
  /*****************************************************************//**
  * Windows Application
  *********************************************************************/
-#ifdef NIKESAURUS_PLATFORM_WINDOWS
+#ifdef NIKE_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 
  /*****************************************************************//**
- * NIKESAURUS CORE HEADER
+ * NIKE CORE HEADER
  *********************************************************************/
 #include "Core.h"
 
@@ -107,7 +107,7 @@
 #include "Math/Vector4/Vector4.h"
 
 //Using math namespace
-using namespace NIKESAURUS::Math;
+using namespace NIKE::Math;
 
 /*****************************************************************//**
 * Utility

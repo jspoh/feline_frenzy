@@ -12,14 +12,14 @@
 #ifndef M_EVENTS_HPP
 #define M_EVENTS_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Events {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
 		//Event interface
-		class NIKESAURUS_API IEvent {
+		class NIKE_API IEvent {
 		private:
 			bool b_event_processed;
 		public:
@@ -36,7 +36,7 @@ namespace NIKESAURUS {
 		};
 
 		//Base listener class
-		class NIKESAURUS_API BaseEventListener {
+		class NIKE_API BaseEventListener {
 		public:
 			//Default virtual destructor
 			virtual ~BaseEventListener() = default;
@@ -47,7 +47,7 @@ namespace NIKESAURUS {
 
 		//Event listener
 		template<typename T>
-		class NIKESAURUS_API IEventListener : public BaseEventListener {
+		class NIKE_API IEventListener : public BaseEventListener {
 		public:
 			//Default virtual destructor
 			virtual ~IEventListener() = default;
@@ -65,7 +65,7 @@ namespace NIKESAURUS {
 		};
 
 		//Events manager
-		class NIKESAURUS_API Service {
+		class NIKE_API Service {
 		public:
 			//Type def container of event listeners
 			using EventListeners = std::vector<std::shared_ptr<BaseEventListener>>;

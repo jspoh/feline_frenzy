@@ -13,21 +13,21 @@
 
 #include "sEvents.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Input {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
 		//Key States
-		enum class NIKESAURUS_API States {
+		enum class NIKE_API States {
 			PRESS = NIKE_PRESS,
 			RELEASE = NIKE_RELEASE,
 			REPEAT = NIKE_REPEAT
 		};
 
 		//Key Event
-		struct NIKESAURUS_API KeyEvent : public Events::IEvent {
+		struct NIKE_API KeyEvent : public Events::IEvent {
 			int code;
 			States state;
 
@@ -36,7 +36,7 @@ namespace NIKESAURUS {
 		};
 
 		//Mouse Event
-		struct NIKESAURUS_API MouseBtnEvent : public Events::IEvent {
+		struct NIKE_API MouseBtnEvent : public Events::IEvent {
 			int code;
 			States state;
 
@@ -45,7 +45,7 @@ namespace NIKESAURUS {
 		};
 
 		//Mouse Moved Event
-		struct NIKESAURUS_API MouseMovedEvent : public Events::IEvent {
+		struct NIKE_API MouseMovedEvent : public Events::IEvent {
 			Vector2f pos;
 
 			MouseMovedEvent(Vector2f pos)
@@ -53,7 +53,7 @@ namespace NIKESAURUS {
 		};
 
 		//Mouse Scroll Event
-		struct NIKESAURUS_API MouseScrollEvent : public Events::IEvent {
+		struct NIKE_API MouseScrollEvent : public Events::IEvent {
 			Vector2f offset;
 
 			MouseScrollEvent(Vector2f offset)
@@ -61,7 +61,7 @@ namespace NIKESAURUS {
 		};
 
 		//Input manager for input polling
-		class NIKESAURUS_API Service 
+		class NIKE_API Service 
 			:	public Events::IEventListener<KeyEvent>,
 				public Events::IEventListener<MouseBtnEvent>,
 				public Events::IEventListener<MouseMovedEvent>,

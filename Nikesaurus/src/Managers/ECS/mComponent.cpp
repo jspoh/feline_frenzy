@@ -10,7 +10,7 @@
 #include "Core/stdafx.h"
 #include "Managers/ECS/mComponent.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	void Component::Manager::addDefEntityComponent(Entity::Type entity, Component::Type type) {
 		std::string component_string;
 		for (auto const& comp_type : component_types) {

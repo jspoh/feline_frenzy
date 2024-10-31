@@ -10,7 +10,7 @@
 #include "Core/stdafx.h"
 #include "Math/Mtx33.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Math {
 		constexpr float PI_OVER_180 = 0.0174532925199432f;
 

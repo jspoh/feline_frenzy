@@ -12,7 +12,7 @@
 #ifndef LOADER_HPP
 #define LOADER_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Assets {
 
 		//Font Type Data Structure

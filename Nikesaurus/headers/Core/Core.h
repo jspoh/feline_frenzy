@@ -11,11 +11,11 @@
  /*****************************************************************//**
  * DLL Export & Import Defines
  *********************************************************************/
-#ifdef NIKESAURUS_PLATFORM_WINDOWS
+#ifdef NIKE_PLATFORM_WINDOWS
 	#ifdef NIKE_BUILD_DLL
-		#define NIKESAURUS_API __declspec(dllexport)
+		#define NIKE_API __declspec(dllexport)
 	#else
-		#define NIKESAURUS_API __declspec(dllimport)
+		#define NIKE_API __declspec(dllimport)
 	#endif
 #else
 #endif
@@ -296,7 +296,7 @@ typedef unsigned int NIKE_AUDIO_MODE;
 *********************************************************************/
 #include <bitset>
 
-namespace NIKESAURUS {
+namespace NIKE {
     namespace Entity {
         //Entity Type
         using Type = uint16_t;

@@ -11,7 +11,7 @@
 #ifndef M_ENTITY_HPP
 #define M_ENTITY_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Entity {
 
 		//Entity Management

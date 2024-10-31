@@ -15,13 +15,13 @@
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Managers/Services/Imgui/ImguiPopUps.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	// All Caps to differentiate from imgui includes
 	namespace IMGUI {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class NIKESAURUS_API Service
+		class NIKE_API Service
 		{
 		public:
 			Service() = default;
@@ -64,8 +64,8 @@ namespace NIKESAURUS {
 		};
 
 		// Defines to reduce the long line
-		#define GET_ASSETS_PATH() NIKEEngine.getService<IMGUI::Service>()->getAssetsPath()
-		#define SET_ASSETS_PATH(path) NIKEEngine.getService<IMGUI::Service>()->setFilePath(path)
+		#define GET_ASSETS_PATH() NIKE_ENGINE.NIKE_IMGUI_SERVICE->getAssetsPath()
+		#define SET_ASSETS_PATH(path) NIKE_ENGINE.NIKE_IMGUI_SERVICE->setFilePath(path)
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)

@@ -15,7 +15,7 @@
 #include "Managers/Services/sWindows.h"
 #include "Components/cRender.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Camera {
 
 		class System 

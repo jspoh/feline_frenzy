@@ -11,7 +11,7 @@
 
 #include "Utility/uLogger.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
 	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
@@ -22,7 +22,7 @@ namespace NIKESAURUS {
 		spdlog::set_pattern("%^[%X] %n: %v%$");
 
 		// Core Logger (Logging related to engine)
-		s_CoreLogger = spdlog::stderr_color_mt("NIKEEngine");
+		s_CoreLogger = spdlog::stderr_color_mt("NIKE_EVENTS_SERVICE");
 		s_CoreLogger->set_level(spdlog::level::trace);
 		
 		// Client Logger (Logging related to game)

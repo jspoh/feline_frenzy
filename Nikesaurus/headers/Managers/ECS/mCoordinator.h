@@ -15,7 +15,7 @@
 #include "Managers/ECS/mComponent.h"
 #include "Managers/ECS/mSystem.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Coordinator {
 
 		class Manager {

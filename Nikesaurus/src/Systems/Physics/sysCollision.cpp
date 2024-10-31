@@ -129,22 +129,22 @@ namespace NIKESAURUS {
     // Set collider component
     bool Collision::Manager::setColliderComp(Entity::Type& cEntity, bool bounceFlag) {
         // Check that entity has Transform component
-        if (!NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cEntity)) {
+        if (!NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cEntity)) {
             cout << "Entity's Transform not set" << endl;
             return false;
         }
 
         // Reference to Transform component
-        Transform::Transform& eTransform = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(cEntity);
+        Transform::Transform& eTransform = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Transform::Transform>(cEntity);
 
         // Reference to Velocity component
-        //Transform::Velocity& eVelocity = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(cEntity);
+        //Transform::Velocity& eVelocity = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(cEntity);
 
         Vector2 Rect_Min = { eTransform.position.x - (eTransform.scale.x * 0.5f), eTransform.position.y - (eTransform.scale.y * 0.5f) };
         Vector2 Rect_Max = { eTransform.position.x + (eTransform.scale.x * 0.5f), eTransform.position.y + (eTransform.scale.y * 0.5f) };
 
         // cCollider.h
-        NIKEEngine.getService<Coordinator::Manager>()->addEntityComponentObj<Collision::Collider>(cEntity, { true, 0.0f, Rect_Min, Rect_Max, false, false, false, false, bounceFlag, {0.0f, 0.0f}, {0.0f, 0.0f} });
+        NIKE_ENGINE.getService<Coordinator::Manager>()->addEntityComponentObj<Collision::Collider>(cEntity, { true, 0.0f, Rect_Min, Rect_Max, false, false, false, false, bounceFlag, {0.0f, 0.0f}, {0.0f, 0.0f} });
 
         return true;
     }
@@ -195,7 +195,7 @@ namespace NIKESAURUS {
 
         // Initialize time of first and last collision along each axis
         Vector2 tFirst = { 0.0f, 0.0f };
-        Vector2 tLast = { NIKEEngine.getService<Windows::Manager>()->getDeltaTime(), NIKEEngine.getService<Windows::Manager>()->getDeltaTime() }; // Need a way to get time for previous frame
+        Vector2 tLast = { NIKE_ENGINE.getService<Windows::Manager>()->getDeltaTime(), NIKE_ENGINE.getService<Windows::Manager>()->getDeltaTime() }; // Need a way to get time for previous frame
 
         // Step 3: Check dynamic collision on x-axis
         if (velRel.x != 0) {
@@ -232,7 +232,7 @@ namespace NIKESAURUS {
         float tLastOverall = getMin(tLast.x, tLast.y);
 
         // Ensure that the time of first collision occurs before the time of last collision
-        if (tFirstOverall > tLastOverall || tFirstOverall > NIKEEngine.getService<Windows::Manager>()->getDeltaTime()) { // Need a way to get time for previous frame
+        if (tFirstOverall > tLastOverall || tFirstOverall > NIKE_ENGINE.getService<Windows::Manager>()->getDeltaTime()) { // Need a way to get time for previous frame
             return false; // No collision detected
         }
 
@@ -244,19 +244,19 @@ namespace NIKESAURUS {
 
     bool Collision::Manager::detectAABBRectRect(Entity::Type& cEntityA, Entity::Type& cEntityB, float& firstTimeOfCollision) {
         // Check if both entities have the required components
-        if (!NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cEntityA) || !NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(cEntityA) ||
-            !NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cEntityB) || !NIKEEngine.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(cEntityB)) {
+        if (!NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cEntityA) || !NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(cEntityA) ||
+            !NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Transform::Transform>(cEntityB) || !NIKE_ENGINE.getService<Coordinator::Manager>()->checkEntityComponent<Collision::Collider>(cEntityB)) {
             cout << "Entity's Transform or Collider not set" << endl;
             return false;
         }
 
         // References to components
-        Transform::Velocity& eVelocityA = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(cEntityA);
-        Transform::Velocity& eVelocityB = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(cEntityB);
-        Collision::Collider& eColliderA = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(cEntityA);
-        Collision::Collider& eColliderB = NIKEEngine.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(cEntityB);
+        Transform::Velocity& eVelocityA = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(cEntityA);
+        Transform::Velocity& eVelocityB = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Transform::Velocity>(cEntityB);
+        Collision::Collider& eColliderA = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(cEntityA);
+        Collision::Collider& eColliderB = NIKE_ENGINE.getService<Coordinator::Manager>()->getEntityComponent<Collision::Collider>(cEntityB);
 
-        const float deltaTime = NIKEEngine.getService<Windows::Manager>()->getDeltaTime();
+        const float deltaTime = NIKE_ENGINE.getService<Windows::Manager>()->getDeltaTime();
         const float epsilon = 0.0001f;
 
         // Step 1: Static collision detection

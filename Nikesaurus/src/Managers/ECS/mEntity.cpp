@@ -10,7 +10,7 @@
 #include "Core/stdafx.h"
 #include "Managers/ECS/mEntity.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	Entity::Manager::Manager() {
 		//Fill avail_entities with all possibles indexes up to the limit
 		for (Entity::Type i = 0; i < Entity::MAX; i++) {

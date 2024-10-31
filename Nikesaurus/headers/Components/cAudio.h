@@ -14,7 +14,7 @@
 
 #include "Core/stdafx.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Audio {
 
 		//SFX Struct

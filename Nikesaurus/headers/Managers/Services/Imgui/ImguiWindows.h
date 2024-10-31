@@ -13,7 +13,7 @@
 #ifndef IMGUI_WINDOWS
 #define IMGUI_WINDOWS
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	/*!********************************************************************
 	* Window UI

@@ -14,7 +14,7 @@
 #include "Managers/ECS/mSystem.h"
 #include "Components/cAudio.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Audio {
 		class Manager : public System::ISystem {
 		private:

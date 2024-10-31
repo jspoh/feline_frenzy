@@ -1,11 +1,11 @@
 #pragma once
 
-namespace NIKESAURUS {
+namespace NIKE {
 
 	//Temporary Disable DLL Export Warning
 	#pragma warning(disable: 4251)
 
-	class NIKESAURUS_API Log
+	class NIKE_API Log
 	{
 	public:
 
@@ -35,22 +35,22 @@ namespace NIKESAURUS {
 }
 
 // CORE LOGGING MACROS (USED FOR ERROR DEBUGGING IN ENGINE)
-#define NIKEE_CORE_TRACE(...)	NIKESAURUS::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define NIKEE_CORE_INFO(...)	NIKESAURUS::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define NIKEE_CORE_WARN(...)	NIKESAURUS::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define NIKEE_CORE_ERROR(...)	NIKESAURUS::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define NIKEE_CORE_TRACE(...)	NIKE::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define NIKEE_CORE_INFO(...)	NIKE::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define NIKEE_CORE_WARN(...)	NIKE::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define NIKEE_CORE_ERROR(...)	NIKE::Log::GetCoreLogger()->error(__VA_ARGS__)
 
 
 // CLIENT LOGGING MACROS (USED FOR ERROR DEBUGGING IN GAME)
-#define NIKEE_TRACE(...)		NIKESAURUS::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define NIKEE_INFO(...)			NIKESAURUS::Log::GetClientLogger()->info(__VA_ARGS__)
-#define NIKEE_WARN(...)			NIKESAURUS::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define NIKEE_ERROR(...)		NIKESAURUS::Log::GetClientLogger()->error(__VA_ARGS__)
+#define NIKEE_TRACE(...)		NIKE::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define NIKEE_INFO(...)			NIKE::Log::GetClientLogger()->info(__VA_ARGS__)
+#define NIKEE_WARN(...)			NIKE::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define NIKEE_ERROR(...)		NIKE::Log::GetClientLogger()->error(__VA_ARGS__)
 
 // CRASH LOGGER (USED FOR EXCEPTION ERRORS)
 #define LOG_CRASH(message) \
     do { \
-        NIKESAURUS::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \
-		NIKEEngine.getService<NIKESAURUS::Windows::Service>()->getWindow()->cleanUp(); \
+        NIKE::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \
+		NIKE_EVENTS_SERVICE.getService<NIKE::Windows::Service>()->getWindow()->cleanUp(); \
 		assert(false && message); \
     } while (0)

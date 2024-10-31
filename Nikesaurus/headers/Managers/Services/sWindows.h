@@ -15,7 +15,7 @@
 
 #include "sEvents.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Windows {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
@@ -161,7 +161,7 @@ namespace NIKESAURUS {
 		/*****************************************************************//**
 		* Window Service
 		*********************************************************************/
-		class NIKESAURUS_API Service {
+		class NIKE_API Service {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;

@@ -13,7 +13,7 @@
 #ifndef SHADER_MANAGER_HPP
 #define SHADER_MANAGER_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Shader {
 		class Manager {
 		private:

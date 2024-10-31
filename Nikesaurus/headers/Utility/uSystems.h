@@ -12,7 +12,7 @@
 #ifndef SYSTEM_UTILS_HPP
 #define SYSTEM_UTILS_HPP
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Utility {
 
 		//Temporary Disable DLL Export Warning
@@ -21,7 +21,7 @@ namespace NIKESAURUS {
 		/*****************************************************************//**
 		* Clock object
 		*********************************************************************/
-		class NIKESAURUS_API Clock {
+		class NIKE_API Clock {
 		private:
 			//Start Time
 			std::chrono::time_point<std::chrono::high_resolution_clock> start;
@@ -41,7 +41,7 @@ namespace NIKESAURUS {
 		};
 
 		//Generate random float
-		float NIKESAURUS_API randFloat();
+		float NIKE_API randFloat();
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)

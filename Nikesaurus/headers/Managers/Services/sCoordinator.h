@@ -16,9 +16,9 @@
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Coordinator {
-		class NIKESAURUS_API Service {
+		class NIKE_API Service {
 		private:
 		public:
 			//Default constructor

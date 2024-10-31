@@ -23,7 +23,7 @@
 #include "Components/cTransform.h"
 #include "Core/Engine.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Render {
 
 		//Render Manager

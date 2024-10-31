@@ -14,9 +14,9 @@
 
 #include "Core/stdafx.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Move {
-		struct NIKESAURUS_API Movement {
+		struct NIKE_API Movement {
 			bool Up;
 			bool Down;
 			bool Left;
