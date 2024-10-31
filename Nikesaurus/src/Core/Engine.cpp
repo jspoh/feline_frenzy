@@ -69,9 +69,9 @@ namespace NIKE {
 		//Register render manager
 		NIKE_ECS_MANAGER->registerSystem<Render::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Text>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Shape>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
-		//NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Text>());
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
@@ -207,5 +207,6 @@ namespace NIKE {
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();
+
 	}
 }

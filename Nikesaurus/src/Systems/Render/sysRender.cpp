@@ -124,77 +124,62 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderText(Render::Text const& e_text) {
-		//Set polygon mode
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		// use shader
-		shader_system->useShader("texture");
+		//Use text shader
+		shader_system->useShader("text");
 
-		//Texture unit
-		constexpr int texture_unit = 6;
+		//Set shader values
+		shader_system->setUniform("text", "u_textColor", Vector3f(e_text.color.r, e_text.color.g, e_text.color.b));
+		shader_system->setUniform("text", "u_opacity", 1.0f);
 
-		//Get model
-		const auto& model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+		//Calculate project matrix
+		glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x), 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
+		shader_system->setUniform("text", "u_projection", projection);
 
-		// num chars counter
-		int i{};
+		//Set texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindVertexArray(VAO);
 
-		// Iterate through all characters in the string
-		for (char c : e_text.text) {
-			const Assets::Font::Character& ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map.at(c);
-			const unsigned int ch_tex_hdl = ch.texture;
+		//Get text position
+		float x = e_text.position.x;
+		float y = e_text.position.y;
 
-			// set texture
-			glBindTextureUnit(
-				texture_unit, // texture unit (binding index)
-				ch_tex_hdl
-			);
+		//Iterate through all characters
+		for (char c : e_text.text)
+		{
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
 
-			glTextureParameteri(ch_tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(ch_tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			float xpos = x + ch.bearing.x * e_text.scale;
+			float ypos = y - (ch.size.y - ch.bearing.y) * e_text.scale;
 
-			//Matrix33::Matrix_33 xform, scale_mat, rot_mat, trans_mat;
-			//Matrix_33Rot(rot_mat, 0.0f);
-			//Matrix_33Scale(scale_mat, e_text.scale, e_text.scale);
-			//Matrix_33Translate(trans_mat, e_text.position.x, e_text.position.y);
-			//xform = camera_system->getWorldToNDCXform() * trans_mat * rot_mat * scale_mat;
-			//Matrix_33Transpose(xform, xform);
+			float w = ch.size.x * e_text.scale;
+			float h = ch.size.y * e_text.scale;
 
-			// Calculate the position of the character
-			constexpr float offset = 0.01f;
-			const float xpos = e_text.position.x + e_text.scale * i + offset;
-			const float ypos = e_text.position.y;
+			float vertices[6][4] = {
+				{ xpos,     ypos + h,   0.0f, 0.0f },
+				{ xpos,     ypos,       0.0f, 1.0f },
+				{ xpos + w, ypos,       1.0f, 1.0f },
 
-			// !TODO: refine this
-			Matrix_33 xform = Matrix_33::Identity();
-			xform *= e_text.scale;
-			xform.matrix_33[2][0] = xpos;
-			xform.matrix_33[2][1] = ypos;
+				{ xpos,     ypos + h,   0.0f, 0.0f },
+				{ xpos + w, ypos,       1.0f, 1.0f },
+				{ xpos + w, ypos + h,   1.0f, 0.0f }
+			};
 
-			// required to flip around for opengl rendering
-			xform.matrix_33[1][1] *= -1;
-
-			const Vector2f uv_offset{ 0, 0 };
-			const Vector2f frame_size{ 1, 1 };
-
-			//Set uniforms for texture rendering
-			shader_system->setUniform("texture", "u_tex2d", texture_unit);
-			shader_system->setUniform("texture", "u_opacity", 1);
-			shader_system->setUniform("texture", "u_transform", xform);
-			shader_system->setUniform("texture", "uvOffset", uv_offset);
-			shader_system->setUniform("texture", "frameSize", frame_size);
-			shader_system->setUniform("texture", "u_is_font", true);
-
-			//Draw
-			glBindVertexArray(model->vaoid);
-			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-
-			i++;
+			//Render glyph texture over quad
+			glBindTexture(GL_TEXTURE_2D, ch.texture);
+			//Update content of VBO memory
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			//Render quad
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			//Advance cursors for next glyph (note that advance is number of 1/64 pixels)
+			x += (ch.advance >> 6) * e_text.scale; // bitshift by 6 to get value in pixels (2^6 = 64)
 		}
 
-		//Unuse texture
+		//Unbind vertexs
 		glBindVertexArray(0);
-		shader_system->unuseShader();
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void Render::Manager::renderWireFrame(Matrix_33 const& x_form, Render::Color const& e_color) {
@@ -225,10 +210,6 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-
-		//Run time error if entity has no transform
-		if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
-			throw std::runtime_error("Trying to render object with no transform. Render failed.");
 		
 		//Matrix used for rendering
 		Matrix_33 matrix;
@@ -286,42 +267,21 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderViewport() {
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		//Iterater through layers
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
-			//SKip inactive layer
-			if (!layer->getLayerState())
-				continue;
-
-			for (auto& entity : entities) {
-
-				//Skip entities that are not present within layer
-				if (!layer->checkEntity(entity))
-					continue;
-
-				//Transform and render object
-				transformAndRenderEntity(entity, false);
-			}
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
-
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	}
 
 	void Render::Manager::init() {
 
-		glGenFramebuffers(1, &framebuffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glGenFramebuffers(1, &frame_buffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
 		// Create a color attachment texture
-		glGenTextures(1, &textureColorbuffer);
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+		glGenTextures(1, &texture_color_buffer);
+		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
 		// Check if framebuffer is complete
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -341,7 +301,17 @@ namespace NIKE {
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glClearColor(0, 0, 0, 0);
+
+		//Setup VAO & VBO
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 	}
 
 	void Render::Manager::update() {
@@ -356,11 +326,16 @@ namespace NIKE {
 				if (!layer->checkEntity(entity))
 					continue;
 
-				//Transform and render object
-				transformAndRenderEntity(entity, true);
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
+					transformAndRenderEntity(entity, true);
+				}
+				//Else render text
+				else if(NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+					renderText(NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity));
+				}
 			}
 		}
 
-
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 	}
 }

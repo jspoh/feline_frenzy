@@ -126,6 +126,8 @@
     <None Include="assets\Scenes\mainmenu.scn" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
+    <None Include="assets\Shaders\text.frag" />
+    <None Include="assets\Shaders\text.vert" />
     <None Include="assets\Shaders\texture.frag" />
     <None Include="assets\Shaders\texture.vert" />
   </ItemGroup>

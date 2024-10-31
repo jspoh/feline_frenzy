@@ -38,9 +38,13 @@ namespace NIKE {
 			std::unique_ptr<Shader::Manager> shader_system;
 
 			//Camera System
-			std::unique_ptr<Camera::System> camera_system;
+			std::shared_ptr<Camera::System> camera_system;
 
-			GLuint framebuffer, textureColorbuffer;
+			//For rendering viewport
+			unsigned int frame_buffer, texture_color_buffer;
+
+			//Quad rendering variables
+			unsigned int VAO, VBO;
 
 			//Transform matrix
 			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
@@ -77,8 +81,8 @@ namespace NIKE {
 				return "Render System";
 			}
 
-			GLuint getTextureColorBuffer() const {
-				return textureColorbuffer;
+			unsigned int getTextureColorBuffer() const {
+				return texture_color_buffer;
 			}
 
 			/**

@@ -15,6 +15,7 @@ void Splash::Scene::load() {
 	//Load Shaders
 	NIKE_ASSETS_SERVICE->loadShader("base", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
 	NIKE_ASSETS_SERVICE->loadShader("texture", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
+	NIKE_ASSETS_SERVICE->loadShader("text", "assets/Shaders/text.vert", "assets/Shaders/text.frag");
 
 	//Load Models
 	NIKE_ASSETS_SERVICE->loadModel("square", "assets/Models/square.txt");
@@ -67,6 +68,10 @@ void Splash::Scene::init() {
 	//NIKE_ECS_SERVICE->addDefEntityComponent(shape_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Render::Texture"));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {0.0f, 0.0f, 0.0f, 1.0f}));
+
+	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity();
+	second_layer->addEntity(text_1);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_1, NIKE::Render::Text("MONTSERRAT", "THIS IS A SAMPLE TEXT.", {1.0f, 0.0f, 0.0f, 1.0f}, {800.0f, 450.0f}, 1.0f));
 	
 	//Method 1
 	 //NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
@@ -78,6 +83,7 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 	// Test crash logger
 	//LOG_CRASH("This is a test crash");
+
 }
 
 void Splash::Scene::exit() {

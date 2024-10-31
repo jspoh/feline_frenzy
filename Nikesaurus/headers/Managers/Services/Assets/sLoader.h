@@ -18,13 +18,14 @@ namespace NIKE {
 		//Font Type Data Structure
 		struct Font {
 			struct Character {
-				unsigned int texture;	// Texture ID for the character
+				unsigned int texture;
 				Vector2f size;			// Size of the character
 				Vector2f bearing;		// Offset from the baseline to the top-left of the character
 				unsigned int advance;   // Horizontal offset to advance to the next character
 
 				Character() : texture{ 0 }, size(), bearing(), advance{ 0 } {}
-				Character(unsigned int texture, Vector2f const& size, Vector2f const& bearing, unsigned int advance) : texture{ texture }, size{ size }, bearing{ bearing }, advance{ advance } {}
+				Character(unsigned int texture, Vector2f const& size, Vector2f const& bearing, unsigned int advance)
+					: texture{ texture }, size{ size }, bearing{ bearing }, advance{ advance } {}
 			};
 
 			std::unordered_map<unsigned char, Character> char_map;

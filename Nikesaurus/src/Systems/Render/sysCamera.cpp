@@ -31,7 +31,7 @@ namespace NIKE {
 		target = Vector2(cos(angleDisp), sin(angleDisp));
 
 		//Setup events listening
-		std::shared_ptr<Camera::System> cam_sys_wrapped(this);
+		std::shared_ptr<Camera::System> cam_sys_wrapped(this, [](Camera::System*){});
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
 		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
 

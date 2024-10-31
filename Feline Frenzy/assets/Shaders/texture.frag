@@ -10,6 +10,7 @@ layout (location=1) in vec2 f_texcoord;
 layout (location=0) out	vec4 out_color;
 
 uniform sampler2D u_tex2d;
+uniform vec3 u_textColor;
 uniform float u_opacity;
 
 uniform bool u_is_font;
@@ -20,7 +21,6 @@ void main() {
 	if (!u_is_font) {
 		out_color = vec4(tex_color.rgb, tex_color.a * u_opacity);
 	} else {
-		if (tex_color.r < 0.1) discard;
-		out_color = vec4(tex_color.r, tex_color.r, tex_color.r, 1);		// testing for text rendering
+		out_color = vec4(u_textColor.rgb, u_textColor.r * u_opacity);	// testing for text rendering
 	}
 }

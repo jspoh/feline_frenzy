@@ -28,43 +28,47 @@ namespace NIKE {
 
 	Assets::Font Assets::NIKEFontLib::generateGlyphsTex(std::string const& file_path, FT_Face& font_face) {
 
-		//Map of glyph textures
+		//Return font
 		Assets::Font font;
 
+		//Set pixels
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		constexpr unsigned char MAX_ASCII = 128;
+		//Max ascii characters
+		const int max_ascii = 128;
 
-		for (unsigned char c{}; c < MAX_ASCII; c++) {
-			if (FT_Load_Char(font_face, c, FT_LOAD_RENDER)) {
-				cerr << "Failed to load glyph: " << c << "." << endl;
-				continue;
+		//Get texture for each character
+		for (unsigned char c = 0; c < max_ascii; c++)
+		{
+			//Load character glyph
+			if (FT_Load_Char(font_face, c, FT_LOAD_RENDER))
+			{
+				cout << "Error loading glpyh for character: " << c << endl;
 			}
 
-			// !TODO: check if font textures are freed
-
-			//Font texture
+			//Generate texture for character
 			unsigned int texture;
-			glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+			glGenTextures(1, &texture);
 			glBindTexture(GL_TEXTURE_2D, texture);
-			glTexImage2D(GL_TEXTURE_2D,
-				0,		// level
-				GL_RED, // internal format, GL_RED because we only need one channel
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
 				font_face->glyph->bitmap.width,
 				font_face->glyph->bitmap.rows,
-				0,		// border
-				GL_RED, // format
-				GL_UNSIGNED_BYTE, // type
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
 				font_face->glyph->bitmap.buffer
 			);
 
-			// Set texture options
+			//Set texture
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-			//Save character textures
+			//Store character variables
 			font.char_map[c] = {
 				texture,
 				{static_cast<float>(font_face->glyph->bitmap.width), static_cast<float>(font_face->glyph->bitmap.rows)},
