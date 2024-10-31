@@ -52,7 +52,7 @@ void Splash::Scene::init() {
 
 	//Create player
 	NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity();
-	NIKEEngine.getService<NIKESAURUS::IMGUI::Service>()->addEntityRef("PLAYER", player_1);
+	NIKE_IMGUI_SERVICE->addEntityRef("PLAYER", player_1);
 	second_layer->addEntity(player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Velocity>(player_1, NIKE::Transform::Velocity());
@@ -62,11 +62,11 @@ void Splash::Scene::init() {
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
-	NIKEEngine.getService<NIKESAURUS::IMGUI::Service>()->addEntityRef("shape_1", shape_1);
+	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
 	base_Layer->addEntity(shape_1);
 	//NIKE_ECS_SERVICE->addDefEntityComponent(shape_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Render::Texture"));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {0.0f, 0.0f, 0.0f, 1.0f}));
 	
 	//Method 1
 	 //NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();

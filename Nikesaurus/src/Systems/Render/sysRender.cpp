@@ -16,6 +16,8 @@
 #include "Math/Mtx33.h"
 
 namespace NIKE {
+	GLuint Render::Manager::framebuffer = 0;
+	GLuint Render::Manager::textureColorbuffer = 0;
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
@@ -287,6 +289,23 @@ namespace NIKE {
 
 	void Render::Manager::init() {
 
+		glGenFramebuffers(1, &framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+		// Create a color attachment texture
+		glGenTextures(1, &textureColorbuffer);
+		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+		// Check if framebuffer is complete
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();
 
@@ -299,12 +318,13 @@ namespace NIKE {
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glClearColor(0, 0, 0, 0);
 	}
 
 	void Render::Manager::update() {
 
 		//Before drawing clear screen
-		glClearColor(0, 0, 0, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
@@ -317,15 +337,21 @@ namespace NIKE {
 			}
 		}
 
-		////Update all and render except camera entities
-		//for (auto& entity : entities) {
-		//	////Check for text objects
-		//	//if (NIKE_EVENTS_SERVICE.NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
-		//	//	renderText(NIKE_EVENTS_SERVICE.NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity));
-		//	//	continue;
-		//	//}
-		//	//Transform and render object
-		//	transformAndRenderEntity(entity, true);
-		//}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			for (auto& entity : entities) {
+				if (!layer->checkEntity(entity))
+					continue;
+
+				//Transform and render object
+				transformAndRenderEntity(entity, true);
+			}
+		}
+
+
 	}
 }

@@ -2,6 +2,7 @@
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Core/Engine.h"
+#include "../headers/Systems/Render/sysRender.h"
 
 namespace NIKE {
 
@@ -243,6 +244,13 @@ namespace NIKE {
 	{
 		ImGui::Begin("Loaded Assets");
 
+		ImGui::End();
+	}
+
+	void imguiShowGameViewport()
+	{
+		ImGui::Begin("Game Viewport");
+		ImGui::Image((intptr_t)NIKE::Render::Manager::textureColorbuffer, ImVec2(1280, 720));
 		ImGui::End();
 	}
 }

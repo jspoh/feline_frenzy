@@ -67,6 +67,8 @@ namespace NIKE {
 			//Destructor
 			~Manager() = default;
 
+			static GLuint framebuffer, textureColorbuffer;
+
 			std::string getSysName()
 			{
 				return "Render System";
