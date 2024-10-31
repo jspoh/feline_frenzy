@@ -24,6 +24,7 @@ namespace NIKE {
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
+
 		public:
 			//Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
 

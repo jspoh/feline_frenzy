@@ -19,7 +19,14 @@ namespace NIKE {
 
 	void Audio::Manager::update() {
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+
+			//SKip inactive layer
+			if (!layer->getLayerState())
+				continue;
+
 			for (auto& entity : entities) {
+
+				//Skip entities that are not present within layer
 				if (!layer->checkEntity(entity))
 					continue;
 
