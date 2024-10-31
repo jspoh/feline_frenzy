@@ -25,11 +25,23 @@ namespace NIKE {
     void Physics::Manager::update() {
         float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
+        //Iterate through layers
         for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+            //SKip inactive layer
+            if (!layer->getLayerState())
+                continue;
+
             for (auto& entity : entities) {
+
+                //Skip entities that are not present within layer
                 if (!layer->checkEntity(entity))
                     continue;
 
+                //Apply forces/acceleration
+
+                //Update Velocity based on acceleration
+
+                //Update position based on velocity
                 if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Velocity>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     auto& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Transform::Velocity>(entity);
@@ -37,6 +49,10 @@ namespace NIKE {
                     e_transform.position.x += e_velo.velocity.x * dt;
                     e_transform.position.y += e_velo.velocity.y * dt;
                 }
+
+                //Collision detection
+
+                //Collision Resolution
             }
         }
 

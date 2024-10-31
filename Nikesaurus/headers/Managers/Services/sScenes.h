@@ -24,10 +24,13 @@ namespace NIKE {
 			//Entities in layer
 			std::set<Entity::Type> entities;
 
+			//Layer index
+			unsigned int index;
+
 			//Layer state
 			bool b_state;
 		public:
-			Layer() : b_state{ true }{}
+			Layer() : b_state{ true }, index{ 0 }{}
 			~Layer() = default;
 
 			//Add entity to layer
@@ -38,6 +41,12 @@ namespace NIKE {
 
 			//Check if entity is present in layer
 			bool checkEntity(Entity::Type entity) const;
+
+			//Set layer index
+			void setLayerIndex(unsigned int new_index);
+
+			//Get layer index
+			unsigned int getLayerIndex() const;
 
 			//Set layer state
 			void setLayerState(bool state);
@@ -53,7 +62,7 @@ namespace NIKE {
 			std::string file_path;
 
 			//Layers within scene
-			std::unordered_map<std::string, std::pair<int, std::shared_ptr<Layer>>> layers_map;
+			std::unordered_map<std::string, std::shared_ptr<Layer>> layers_map;
 			std::vector<std::shared_ptr<Layer>> layers;
 		public:
 			//Default constructor

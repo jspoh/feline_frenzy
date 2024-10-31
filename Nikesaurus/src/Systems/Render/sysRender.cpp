@@ -307,8 +307,15 @@ namespace NIKE {
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//Iterater through layers
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			//SKip inactive layer
+			if (!layer->getLayerState())
+				continue;
+
 			for (auto& entity : entities) {
+
+				//Skip entities that are not present within layer
 				if (!layer->checkEntity(entity))
 					continue;
 

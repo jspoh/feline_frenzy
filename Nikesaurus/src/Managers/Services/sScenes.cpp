@@ -27,6 +27,14 @@ namespace NIKE {
 		return entities.find(entity) != entities.end();
 	}
 
+	void Scenes::Layer::setLayerIndex(unsigned int new_index) {
+		index = new_index;
+	}
+
+	unsigned int Scenes::Layer::getLayerIndex() const {
+		return index;
+	}
+
 	void Scenes::Layer::setLayerState(bool state) {
 		b_state = state;
 	}
@@ -56,7 +64,8 @@ namespace NIKE {
 			index = static_cast<int>(layers.size()) - 1;
 		}
 
-		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer_id), std::forward_as_tuple(std::make_pair(index, layer)));
+		layer->setLayerIndex(index);
+		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer_id), std::forward_as_tuple(layer));
 
 		return layer;
 	}
@@ -68,7 +77,7 @@ namespace NIKE {
 			throw std::runtime_error("Layer has not been registered.");
 		}
 
-		return it->second.second;
+		return it->second;
 	}
 
 	void Scenes::IScene::removeLayer(std::string const& layer_id) {
@@ -78,7 +87,7 @@ namespace NIKE {
 			throw std::runtime_error("Layer has not been registered.");
 		}
 
-		layers.erase(layers.begin() + it->second.first);
+		layers.erase(layers.begin() + it->second->getLayerIndex());
 		layers_map.erase(it);
 	}
 
