@@ -18,10 +18,15 @@ namespace NIKE {
     namespace Physics {
 
         struct Dynamics {
+            const float max_speed;
+            const float drag;
+            const float mass;
             Vector2f velocity;
+            Vector2f force;
 
-            Dynamics() : velocity() {}
-            Dynamics(Vector2f const& velocity) : velocity{ velocity } {}
+            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ 0.0f }, velocity(), force() {}
+            Dynamics(float max_speed, float drag, float mass)
+                : max_speed{ max_speed }, drag{ drag }, mass{ mass }, velocity(), force() {}
         };
 
         //Temporary Disable DLL Export Warning

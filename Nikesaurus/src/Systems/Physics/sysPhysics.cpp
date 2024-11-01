@@ -37,17 +37,41 @@ namespace NIKE {
                 if (!layer->checkEntity(entity))
                     continue;
 
-                //Apply forces/acceleration
-
-                //Update Velocity based on acceleration
-
-                //Update position based on velocity
                 if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                    auto& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                    auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 
-                    e_transform.position.x += e_velo.velocity.x * dt;
-                    e_transform.position.y += e_velo.velocity.y * dt;
+                    //Apply forces & mass to calculate direction
+                    Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
+
+                    //Update velocity, taking collisions into account if they exist
+                    //if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
+                    //    auto& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+                    //    e_dynamics.velocity += acceleration * collider->collisionTime * dt;
+                    //}
+                    //else {
+                        e_dynamics.velocity += acceleration * dt;
+                    //}
+
+                    //Add drag/friction
+                    e_dynamics.velocity -= e_dynamics.velocity * e_dynamics.drag * dt;
+
+                    //Cap Velocity
+                    if (e_dynamics.velocity.length() > e_dynamics.max_speed) {
+                        e_dynamics.velocity = e_dynamics.velocity.normalize() * e_dynamics.max_speed;
+                    }
+
+                    //Set velocity to zero if net velo < 0.01
+                    if (e_dynamics.velocity.length() < 0.01f) {
+                        e_dynamics.velocity = { 0.0f, 0.0f };
+                    }
+
+                    //Update position based on velocity
+                    e_transform.position.x += e_dynamics.velocity.x * dt;
+                    e_transform.position.y += e_dynamics.velocity.y * dt;
+
+                    //Reset force
+                    e_dynamics.force = { 0.0f, 0.0f };
                 }
 
                 //Collision detection
