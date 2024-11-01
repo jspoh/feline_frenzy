@@ -31,6 +31,9 @@ namespace NIKE {
 			//Get matrix
 			Matrix_33 getWorldToNDCXform() const;
 
+			//Get fixed world
+			Matrix_33 getFixedWorldToNDCXform() const;
+
 			// Get Pos to World coordinates
 			const Vector3f getPosToWorld(const Vector2f& pos) const;
 		private:

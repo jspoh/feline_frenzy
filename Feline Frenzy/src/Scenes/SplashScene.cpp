@@ -66,16 +66,18 @@ void Splash::Scene::init() {
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
 	base_Layer->addEntity(shape_1);
 	//NIKE_ECS_SERVICE->addDefEntityComponent(shape_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Render::Texture"));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 45.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {0.0f, 0.0f, 0.0f, 1.0f}));
 
 	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity();
 	second_layer->addEntity(text_1);
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_1, NIKE::Render::Text("MONTSERRAT", "THIS IS A SAMPLE TEXT.", {1.0f, 0.0f, 0.0f, 1.0f}, {800.0f, 450.0f}, 1.0f));
-	
-	//Method 1
-	 //NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
-	 //NIKE_ECS_SERVICE->addEntityComponent<NIKE::Audio::SFX>(sfx_1, NIKE::Audio::SFX(true, "SFX", "MASTER", 0.5f, 1.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_1, NIKE::Transform::Transform({ 0.0f, -300.0f }, { 0.0f, 0.0f }, 45.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_1, NIKE::Render::Text("MONTSERRAT", "HELLO WORLD.", {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, NIKE::Render::TextOrigin::CENTER));
+
+	NIKE::Entity::Type text_2 = NIKE_ECS_SERVICE->createEntity();
+	second_layer->addEntity(text_2);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_2, NIKE::Transform::Transform({ -750.0f, 400.0f }, { 0.0f, 0.0f }, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_2, NIKE::Render::Text("MONTSERRAT", "PANTAT.", { 1.0f, 0.0f, 0.0f, 1.0f }, 1.0f, NIKE::Render::TextOrigin::LEFT));
 
 	NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
 	base_Layer->addEntity(sfx_1);

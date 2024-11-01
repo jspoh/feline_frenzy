@@ -44,7 +44,7 @@ namespace NIKE {
 			result = world_to_ndc_mat * trans_mat * pre_trans_mat * rot_mat * post_trans_mat * scale_mat;
 		}
 		else {
-			Matrix_33RotDeg(rot_mat, 0);
+			Matrix_33RotDeg(rot_mat, obj.rotation);
 			Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 			Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
 			result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
@@ -123,34 +123,62 @@ namespace NIKE {
 		shader_system->unuseShader();
 	}
 
-	void Render::Manager::renderText(Render::Text const& e_text) {
+	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform) {
 
 		//Use text shader
 		shader_system->useShader("text");
 
 		//Set shader values
 		shader_system->setUniform("text", "u_textColor", Vector3f(e_text.color.r, e_text.color.g, e_text.color.b));
-		shader_system->setUniform("text", "u_opacity", 1.0f);
-
-		//Calculate project matrix
-		glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x), 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
-		shader_system->setUniform("text", "u_projection", projection);
+		shader_system->setUniform("text", "u_opacity", e_text.color.a);
+		shader_system->setUniform("text", "u_transform", x_form);
 
 		//Set texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VAO);
 
-		//Get text position
-		float x = e_text.position.x;
-		float y = e_text.position.y;
+		//Calculate size of text
+		for (char c : e_text.text) {
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
+
+			//Calculate width
+			e_transform.scale.x += (ch.advance >> 6) * e_text.scale;
+
+			//Calculate height
+			e_transform.scale.y = ch.size.y * e_text.scale > e_transform.scale.y ? ch.size.y * e_text.scale : e_transform.scale.y;
+		}
+
+		//Text rendering position based on bot left
+		Vector2f pos;
+
+		//Get text bottom left position for rendering
+		switch (e_text.origin) {
+		case TextOrigin::CENTER:
+			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y / 2.0f };
+			break;
+		case TextOrigin::BOTTOM:
+			pos = { -e_transform.scale.x / 2.0f, 0.0f };
+			break;
+		case TextOrigin::TOP:
+			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y };
+			break;
+		case TextOrigin::LEFT:
+			pos = { 0.0f, -e_transform.scale.y / 2.0f };
+			break;
+		case TextOrigin::RIGHT:
+			pos = { -e_transform.scale.x, -e_transform.scale.y / 2.0f };
+			break;
+		default:
+			break;
+		}
 
 		//Iterate through all characters
 		for (char c : e_text.text)
 		{
 			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
 
-			float xpos = x + ch.bearing.x * e_text.scale;
-			float ypos = y - (ch.size.y - ch.bearing.y) * e_text.scale;
+			float xpos = pos.x + ch.bearing.x * e_text.scale;
+			float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
 
 			float w = ch.size.x * e_text.scale;
 			float h = ch.size.y * e_text.scale;
@@ -174,7 +202,7 @@ namespace NIKE {
 			//Render quad
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			//Advance cursors for next glyph (note that advance is number of 1/64 pixels)
-			x += (ch.advance >> 6) * e_text.scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+			pos.x += (ch.advance >> 6) * e_text.scale; // bitshift by 6 to get value in pixels (2^6 = 64)
 		}
 
 		//Unbind vertexs
@@ -266,6 +294,26 @@ namespace NIKE {
 		}
 	}
 
+	void Render::Manager::transformAndRenderText(Entity::Type entity) {
+
+		//Matrix used for rendering
+		Matrix_33 matrix;
+
+		//Get transform
+		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+
+		auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+
+		//Set transform scale to 1.0f for calculating matrix
+		e_transform.scale = { 1.0f, 1.0f };
+
+		//Transform text matrix
+		transformMatrix(e_transform, matrix, camera_system->getFixedWorldToNDCXform());
+
+		//Render text
+		renderText(matrix, e_text, e_transform);
+	}
+
 	void Render::Manager::renderViewport() {
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	}
@@ -326,12 +374,11 @@ namespace NIKE {
 				if (!layer->checkEntity(entity))
 					continue;
 
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-					transformAndRenderEntity(entity, true);
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+					transformAndRenderText(entity);
 				}
-				//Else render text
-				else if(NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
-					renderText(NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity));
+				else {
+					transformAndRenderEntity(entity, true);
 				}
 			}
 		}

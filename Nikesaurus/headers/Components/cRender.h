@@ -42,16 +42,24 @@ namespace NIKE {
 			Color(float r, float g, float b, float a) : r{ r }, g{ g }, b{ b }, a{ a } {}
 		};
 
+		enum class TextOrigin {
+			CENTER = 0,
+			BOTTOM,
+			TOP,
+			LEFT,
+			RIGHT
+		};
+
 		struct Text {
 			std::string font_ref;
 			std::string text;
 			Color color;
-			Vector2f position;
 			float scale;
+			TextOrigin origin;
 
-			Text() : font_ref{ "" }, text{ "" }, color(), position(), scale{ 1.0f } {}
-			Text(std::string const& font_ref, std::string const& text, Color const& color, Vector2f const& position, float scale)
-				: font_ref{ font_ref }, text{ text }, color{ color }, position{ position }, scale{ scale } {}
+			Text() : font_ref{ "" }, text{ "" }, color(), scale{ 1.0f } {}
+			Text(std::string const& font_ref, std::string const& text, Color const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
+				: font_ref{ font_ref }, text{ text }, color{ color }, scale{ scale }, origin{ origin } {}
 		};
 
 		struct Shape {

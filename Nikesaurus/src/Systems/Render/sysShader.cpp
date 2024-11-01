@@ -54,16 +54,6 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const glm::mat4& value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
-		if (location >= 0) {
-			glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
-		}
-		else {
-			cerr << "Uniform location not found for: " << name << endl;
-		}
-	}
-
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value) {
 		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
 		if (location >= 0) {

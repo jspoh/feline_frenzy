@@ -33,7 +33,6 @@ namespace NIKE {
 			void setUniform(const std::string& shader_ref, const std::string& name, int value);
 			void setUniform(const std::string& shader_ref, const std::string& name, float value);
 			void setUniform(const std::string& shader_ref, const std::string& name, const Matrix_33& value);
-			void setUniform(const std::string& shader_ref, const std::string& name, const glm::mat4& value);
 			void setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value);
 
 			//Sprite sheet

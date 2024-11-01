@@ -68,6 +68,23 @@ namespace NIKE {
 		return cam_to_ndc_xform * view_xform;
 	};
 
+	Matrix_33 Camera::System::getFixedWorldToNDCXform() const
+	{
+		Matrix_33 view_xform{
+			1, 0,  -def_cam.position.x,
+			0, 1,  -def_cam.position.y,
+			0, 0, 1
+		};
+
+		Matrix_33 cam_to_ndc_xform{
+			2.0f / aspect_ratio / def_cam.height, 0, 0,
+			0, 2.0f / def_cam.height, 0,
+			0, 0, 1
+		};
+
+		return cam_to_ndc_xform * view_xform;
+	};
+
 	const Vector3f Camera::System::getPosToWorld(const Vector2f& pos) const
 	{
 		float ndcX = (2.0f * pos.x) / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x - 1.0f;

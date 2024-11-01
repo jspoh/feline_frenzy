@@ -59,16 +59,19 @@ namespace NIKE {
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
 			//Render text
-			void renderText(Render::Text const& e_text);
-
-			//Render viewport
-			void renderViewport();
+			void renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform);
 
 			//Render debugging wireframe
 			void renderWireFrame(Matrix_33 const& x_form, Render::Color const& e_color);
 
-			//Helper function to encapsulate rendering
+			//Render viewport
+			void renderViewport();
+
+			//Helper function to encapsulate rendering entities
 			void transformAndRenderEntity(Entity::Type entity, bool debugMode);
+
+			//Helper function to encapsulate rendering text
+			void transformAndRenderText(Entity::Type entity);
 		public:
 			//Constructor
 			Manager() = default;
