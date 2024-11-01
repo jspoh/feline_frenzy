@@ -1,6 +1,7 @@
+/*****************************************************************//**
  * \file   Engine.cpp
  * \brief  Core engine arhcitecture
- * 
+ *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -8,8 +9,8 @@
 
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
-//
-//Registered Systems
+ //
+ //Registered Systems
 #include "Systems/sysAudio.h"
 //#include "../headers/Systems/sysInput.h"
 #include "../headers/Systems/Physics/sysPhysics.h"
@@ -31,6 +32,8 @@ namespace NIKE {
 
 		////Register physics components
 		NIKE_ECS_MANAGER->registerComponent<Physics::Dynamics>();
+		//ecs_coordinator->registerComponent<Move::Movement>();
+		//ecs_coordinator->registerComponent<Collision::Collider>();
 		NIKE_ECS_MANAGER->registerComponent<Physics::Collider>();
 
 		////Register animation components
@@ -43,6 +46,9 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Color>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Cam>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
+
+		////Register audio components
+		//ecs_coordinator->registerComponent<Audio::cAudio>();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -89,9 +95,9 @@ namespace NIKE {
 		provideService(std::make_shared<Coordinator::Service>());
 
 		//Create console
-		#ifndef NDEBUG
+#ifndef NDEBUG
 		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
-		#endif
+#endif
 
 		//Init Logger
 		NIKE::Log::Init();
@@ -126,7 +132,7 @@ namespace NIKE {
 
 		//Register Def Components
 		registerDefComponents();
-		
+
 		//Register Def Managers
 		registerDefSystems();
 	}
@@ -156,11 +162,13 @@ namespace NIKE {
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
+			// Call update imgui
+			// NIKE_IMGUI_SERVICE->update();
 
 
 			static bool imgui_overlay_enable = true;
 
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_TAB)) {
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_I)) {
 				// Toggle ImGui overlay visibility
 				imgui_overlay_enable = !imgui_overlay_enable;
 			}
@@ -170,26 +178,25 @@ namespace NIKE {
 				NIKE_IMGUI_SERVICE->update();
 			}
 
-			//if (NIKE_IMGUI_SERVICE->checkEntityExist("PLAYER"))
-			//{
-				//getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 0.0f;
-				//getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = 0.0f;
+			getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.y = 0.0f;
+			getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.x = 0.0f;
 
-				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
-				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 200.0f;
-				//}
-				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
-				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = -200.0f;
-				//}
-				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
-				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = -200.0f;
-				//}
-				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
-				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = 200.0f;
-				//}
-			//}
-
-
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.y = 200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 200.0f;
+			}
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.x = -200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -200.0f;
+			}
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.y = -200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -200.0f;
+			}
+			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.x = 200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 200.0f;
+			}
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();

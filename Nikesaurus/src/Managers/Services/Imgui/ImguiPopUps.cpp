@@ -153,6 +153,10 @@ namespace NIKE
     bool removeEntityPopup() {
 
         static char entity_name[32] = ""; 
+
+        // Track if the invalid entity popup should be shown
+        static bool show_invalid_entity_popup = false; 
+
         // Track if the popup is open
         bool is_popup_open = false; 
 
@@ -174,23 +178,52 @@ namespace NIKE
                     is_popup_open = false; 
                 }
                 else {
-                    ImGui::Text("Entity does not exist.");
+                    // Show the invalid entity popup
+                    show_invalid_entity_popup = true;
+                    memset(entity_name, 0, sizeof(entity_name));
+                    ImGui::CloseCurrentPopup();
                 }
+
             }
 
             ImGui::SameLine();
             if (ImGui::Button("Cancel")) {
+                memset(entity_name, 0, sizeof(entity_name));
                 ImGui::CloseCurrentPopup(); 
                 is_popup_open = false; 
             }
 
             ImGui::EndPopup();
         }
+        if (show_invalid_entity_popup) {
+            ImGui::OpenPopup("Invalid Entity");
+            show_invalid_entity_popup = showInvalidEntityPopup();
+        }
         else {
             is_popup_open = true; 
         }
 
+
+
+
         return is_popup_open;
+    }
+
+    bool showInvalidEntityPopup() {
+        // Return false when the popup is closed
+        bool is_open = true; 
+
+        if (ImGui::BeginPopupModal("Invalid Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Entity does not exist.");
+            if (ImGui::Button("OK")) {
+                ImGui::CloseCurrentPopup();
+                // Close the popup
+                is_open = false; 
+            }
+            ImGui::EndPopup();
+        }
+
+        return is_open;
     }
 
 }
