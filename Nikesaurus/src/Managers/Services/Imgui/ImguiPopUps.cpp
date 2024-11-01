@@ -119,4 +119,78 @@ namespace NIKE
         }
         return is_closed;
     }
+
+    bool showLoadAssetPopup(const std::string& asset_name) 
+    {
+        static bool load_asset = false;
+
+        // Open and display the popup modal
+        if (ImGui::BeginPopupModal("Load Asset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Do you want to load this asset?");
+            ImGui::Text("%s", asset_name.c_str());
+            ImGui::Separator();
+
+            if (ImGui::Button("Yes", ImVec2(120, 0))) {
+                // Set the flag to indicate the asset should be loaded
+                load_asset = true;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("No", ImVec2(120, 0))) {
+                // Reset the flag
+                load_asset = false;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+        bool result = load_asset;
+        // Reset for next usage
+        load_asset = false;
+        return result;
+    }
+
+    bool removeEntityPopup() {
+
+        static char entity_name[32] = ""; 
+        // Track if the popup is open
+        bool is_popup_open = false; 
+
+        // Check if the popup should be opened (it will be opened if the button was clicked)
+        if (ImGui::BeginPopupModal("Remove Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter the name of the entity to remove:");
+            ImGui::InputText("##Entity Name", entity_name, IM_ARRAYSIZE(entity_name));
+
+            // Button to confirm removal
+            if (ImGui::Button("Remove")) {
+                if (NIKE_IMGUI_SERVICE->checkEntityExist(entity_name)) {
+                    // Remove the entity
+                    NIKE_ECS_MANAGER->destroyEntity(NIKE_IMGUI_SERVICE->getEntityByName(entity_name));
+                    NIKE_IMGUI_SERVICE->getEntityRef().erase(entity_name);
+                    NIKE_IMGUI_SERVICE->getSelectedEntityName() = {};
+                    // Reset entity_name for the next use
+                    memset(entity_name, 0, sizeof(entity_name));
+                    ImGui::CloseCurrentPopup(); 
+                    is_popup_open = false; 
+                }
+                else {
+                    ImGui::Text("Entity does not exist.");
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup(); 
+                is_popup_open = false; 
+            }
+
+            ImGui::EndPopup();
+        }
+        else {
+            is_popup_open = true; 
+        }
+
+        return is_popup_open;
+    }
+
 }

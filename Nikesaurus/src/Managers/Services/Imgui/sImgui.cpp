@@ -25,7 +25,7 @@ namespace NIKE {
 		ImGui_ImplOpenGL3_Init("#version 450");
 
 		// For testing
-		NIKE_ASSETS_SERVICE->loadTexture("test", "assets/Textures/Tree_Orange.png");
+		// NIKE_ASSETS_SERVICE->loadTexture("test3", "assets/Textures/Tjunction.png");
 	}
 
 	void IMGUI::Service::cleanUp()
@@ -50,7 +50,16 @@ namespace NIKE {
 		entities_ref[name] = entity_type;
 	}
 
-	const std::unordered_map<std::string, Entity::Type>& IMGUI::Service::getEntityRef() const
+	bool IMGUI::Service::checkEntityExist(std::string const& entity_ref)
+	{
+		if (entities_ref.find(entity_ref) != entities_ref.end())
+		{
+			return true;
+		}
+		return false;
+	}
+
+	std::unordered_map<std::string, Entity::Type>& IMGUI::Service::getEntityRef()
 	{
 		return entities_ref;
 	}
@@ -78,9 +87,9 @@ namespace NIKE {
 		imguiEntityWindow();
 		imguiDebuggingWindow();
 		imguiFileSystemWindow();
-		imguiEntityComponentManagementWindow();
 		imguiRenderEntityWindow();
 		imguiShowLoadedAssetsWindow();
+		imguiEntityComponentManagementWindow();
 		imguiShowGameViewport();
 
 

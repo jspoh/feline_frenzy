@@ -207,6 +207,15 @@ namespace NIKE {
 		return textures_list.at(texture_id);
 	}
 
+	bool Assets::Service::checkTextureLoaded(std::string const& texture_id)
+	{
+		if (textures_list.find(texture_id) == textures_list.end())
+		{
+			return false;
+		}
+		return true;
+	}
+
 	/*****************************************************************//**
 	* Audio
 	*********************************************************************/

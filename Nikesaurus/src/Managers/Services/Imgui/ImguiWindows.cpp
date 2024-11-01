@@ -14,6 +14,8 @@ namespace NIKE {
 		}
 
 		static bool show_load_popup = false;
+		static std::string selected_asset;
+
 
 		// Begin the ImGui window with a title
 		ImGui::Begin("Assets Browser");
@@ -35,11 +37,11 @@ namespace NIKE {
 		if (std::filesystem::is_directory(GET_ASSETS_PATH())) {
 			for (const auto& entry : std::filesystem::directory_iterator(GET_ASSETS_PATH())) {
 				const std::filesystem::path& path = entry.path();
-				std::string filename = path.filename().string();
+				std::string file_name = path.filename().string();
 
 				// If directory, make clickable
 				if (std::filesystem::is_directory(path)) {
-					if (ImGui::Selectable((filename + "/").c_str(), false)) {
+					if (ImGui::Selectable((file_name + "/").c_str(), false)) {
 						// Update to the new path when clicking a directory
 						SET_ASSETS_PATH(path);
 						GET_ASSETS_PATH() = path;
@@ -48,9 +50,13 @@ namespace NIKE {
 				// If file with a valid extension, display it
 				else if (hasValidExtension(path)) {
 					// If click on the asset, able to load it
-					if (ImGui::Selectable(filename.c_str())) {
+					if (ImGui::Selectable(file_name.c_str())) {
 						// Trigger the popup when selected
+						selected_asset = file_name;
 						show_load_popup = true;
+					}
+					if (show_load_popup) {
+						ImGui::OpenPopup("Load Asset");
 					}
 				}
 			}
@@ -148,13 +154,30 @@ namespace NIKE {
 		// Display the Create Entity Popup if open
 		open_popup = showCreateEntityPopUp(open_popup);
 
+		ImGui::SameLine();
+
+		// Button to remove an entity, which triggers the popup
+		if (ImGui::Button("Remove Entity")) {
+			open_popup = true;
+			ImGui::OpenPopup("Remove Entity");
+		}
+
+		// Get the selected entity name and retrieve the corresponding entity
+		std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
+		//if (!selected_entity_name.empty()) {
+			// Display the Remove Entity Popup if open, passing in the selected entity
+			//Entity::Type to_remove = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity_name);
+			open_popup = removeEntityPopup();
+		//}
+
 		// Show number of entities in the level
 		ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
 
 		// Show entities ref name that are created
 		for (auto const& elem : NIKE_IMGUI_SERVICE->getEntityRef())
 		{
-			if (ImGui::Selectable(elem.first.c_str(), NIKE_IMGUI_SERVICE->getSelectedEntityName() == elem.first))
+			if (ImGui::Selectable(elem.first.c_str(), NIKE_IMGUI_SERVICE->getSelectedEntityName() == elem.first)
+				&& NIKE_IMGUI_SERVICE->checkEntityExist(elem.first))
 			{
 				// Update the selected entity name
 				NIKE_IMGUI_SERVICE->getSelectedEntityName() = elem.first;
@@ -176,9 +199,10 @@ namespace NIKE {
 			ImGui::Text("Selected Entity: %s", selected_entity.c_str());
 
 			Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity);
+
 			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entity));
 
-			// Option to add a new component
+			// Add a new component
 			if (ImGui::Button("Add Component")) {
 				open_component_popup = true;
 				ImGui::OpenPopup("Add Component");
@@ -193,28 +217,33 @@ namespace NIKE {
 				// TODO: Create popup to choose which entity to clone
 			}
 
-			auto coordinator_manager = NIKE_ECS_MANAGER;
-
 			// Retrieve and display all registered component types
-			for (const auto& elem : coordinator_manager->getAllComponentTypes()) {
+			for (const auto& elem : NIKE_ECS_MANAGER->getAllComponentTypes()) {
 				const std::string& component_name = elem.first;
 				Component::Type component_type = elem.second;
 
 				// Check if the component exists in the entity
-				if (coordinator_manager->checkEntityComponent(entity, component_type)) {
+				if (NIKE_ECS_MANAGER->checkEntityComponent(entity, component_type) && NIKE_IMGUI_SERVICE->checkEntityExist(selected_entity)) {
 					// Create a collapsible header for the component
 					if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_None)) {
 						if (component_name == "Transform::Transform") {
-							auto& transform_comp = coordinator_manager->getEntityComponent<Transform::Transform>(entity);
+							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
-							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg" );
+							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg");
 						}
 						else if (component_name == "Render::Texture") {
-							auto& texture_comp = coordinator_manager->getEntityComponent<Render::Texture>(entity);
-							static char texture_ref[300] = {};
+							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							static char texture_ref[300];
+							strncpy_s(texture_ref, texture_comp.texture_ref.c_str(), sizeof(texture_ref));
+							// Ensure null-termination
+							texture_ref[sizeof(texture_ref) - 1] = '\0';
+
 							ImGui::Text("Enter a texture ref:");
-							ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref));
+							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {
+								// Only update the texture reference if the user made a change
+								texture_comp.texture_ref = texture_ref;
+							}
 						}
 						// Additional component-specific UI elements can go here
 					}
@@ -232,11 +261,6 @@ namespace NIKE {
 	void imguiRenderEntityWindow()
 	{
 		ImGui::Begin("Levels Management");
-
-		unsigned int tex_id = NIKE_ASSETS_SERVICE->getTexture("test")->gl_data;
-		Vector2i tex_size = NIKE_ASSETS_SERVICE->getTexture("test")->size;
-
-		ImGui::Image((intptr_t)tex_id, ImVec2((float)tex_size.x / 2, (float)tex_size.y / 2));
 
 		ImGui::End();
 	}

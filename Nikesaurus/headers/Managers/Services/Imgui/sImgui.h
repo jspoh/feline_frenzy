@@ -42,10 +42,12 @@ namespace NIKE {
 			void setFilePath(const std::filesystem::path& path);
 
 			// Settor to add an entity reference
-			void addEntityRef(const std::string& name, Entity::Type entityType);
+			void addEntityRef(const std::string& name, Entity::Type entity_type);
+
+			bool checkEntityExist(const std::string& entity_ref);
 
 			// Gettors
-			const std::unordered_map<std::string, Entity::Type>& getEntityRef() const;
+			std::unordered_map<std::string, Entity::Type>& getEntityRef();
 			std::string& getSelectedEntityName();
 			Entity::Type getEntityByName(std::string const& input);
 

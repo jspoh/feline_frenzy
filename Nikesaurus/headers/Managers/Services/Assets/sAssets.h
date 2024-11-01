@@ -115,6 +115,9 @@ namespace NIKE {
 			//Get texture
 			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
 
+			//Check if texture loaded
+			bool checkTextureLoaded(std::string const& texture_id);
+
 			/*****************************************************************//**
 			* Audio
 			*********************************************************************/

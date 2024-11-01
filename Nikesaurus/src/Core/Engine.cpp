@@ -1,4 +1,3 @@
-/*****************************************************************//**
  * \file   Engine.cpp
  * \brief  Core engine arhcitecture
  * 
@@ -157,13 +156,11 @@ namespace NIKE {
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
-			// Call update imgui
-			// NIKE_IMGUI_SERVICE->update();
 
 
 			static bool imgui_overlay_enable = true;
 
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_I)) {
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_TAB)) {
 				// Toggle ImGui overlay visibility
 				imgui_overlay_enable = !imgui_overlay_enable;
 			}
@@ -172,19 +169,27 @@ namespace NIKE {
 			if (imgui_overlay_enable) {
 				NIKE_IMGUI_SERVICE->update();
 			}
-			
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 200.0f;
-			}
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -200.0f;
-			}
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -200.0f;
-			}
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 200.0f;
-			}
+
+			//if (NIKE_IMGUI_SERVICE->checkEntityExist("PLAYER"))
+			//{
+				//getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 0.0f;
+				//getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = 0.0f;
+
+				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
+				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = 200.0f;
+				//}
+				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
+				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = -200.0f;
+				//}
+				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
+				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.y = -200.0f;
+				//}
+				//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
+				//	getService<Coordinator::Service>()->getEntityComponent<Transform::Velocity>(0).velocity.x = 200.0f;
+				//}
+			//}
+
+
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
