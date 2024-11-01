@@ -12,6 +12,7 @@
 #include "Core/Engine.h"
 #include "Systems/Render/sysRender.h"
 #include "Components/cTransform.h"
+#include "Components/cPhysics.h"
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
@@ -279,8 +280,8 @@ namespace NIKE {
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Velocity>(entity)) {
-				auto const& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Transform::Velocity>(entity);
+			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
+				auto const& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 
 				if (e_velo.velocity.x != 0.0f || e_velo.velocity.y != 0.0f) {
 					Transform::Transform dir_transform = e_transform;

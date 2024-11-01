@@ -27,13 +27,6 @@ namespace NIKE {
 			Transform(Vector2f const& position, Vector2f const& scale, float rotation)
 				: position{ position }, scale{ scale }, rotation{ rotation } {}
 		};
-
-		struct Velocity {
-			Vector2f velocity;
-
-			Velocity() : velocity() {}
-			Velocity(Vector2f const& velocity) : velocity{ velocity } {}
-		};
 	}
 }
 

@@ -15,7 +15,14 @@
 #include "Core/stdafx.h"
 
 namespace NIKE {
-    namespace Collision {
+    namespace Physics {
+
+        struct Dynamics {
+            Vector2f velocity;
+
+            Dynamics() : velocity() {}
+            Dynamics(Vector2f const& velocity) : velocity{ velocity } {}
+        };
 
         //Temporary Disable DLL Export Warning
         #pragma warning(disable: 4251)
@@ -28,8 +35,8 @@ namespace NIKE {
             //Vector2 velocity; // Current velocity
 
             // For bounding box
-            Vector2 rect_min;
-            Vector2 rect_max;
+            Vector2f rect_min;
+            Vector2f rect_max;
 
             // Which sides of bounding box are colliding/"blocked"
             bool left = false;
@@ -40,8 +47,8 @@ namespace NIKE {
             bool bounceFlag = false;
 
             // For bounding sphere...unused for now
-            Vector2 cir_min;
-            Vector2 cir_max;
+            Vector2f cir_min;
+            Vector2f cir_max;
         };
 
         //Re-enable DLL Export warning

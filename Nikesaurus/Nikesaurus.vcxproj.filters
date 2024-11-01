@@ -55,10 +55,9 @@
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
-    <ClInclude Include="headers\Components\cMove.h" />
     <ClInclude Include="headers\Managers\Services\sEvents.h" />
     <ClInclude Include="headers\Managers\Services\sWindows.h" />
-    <ClInclude Include="headers\Components\cCollision.h" />
+    <ClInclude Include="headers\Components\cPhysics.h" />
     <ClInclude Include="headers\Managers\Services\sDebug.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Utility\uSystems.h" />

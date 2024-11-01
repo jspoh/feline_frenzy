@@ -13,7 +13,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Systems/Physics/sysPhysics.h"
-#include "Components/cMove.h"
+#include "Components/cPhysics.h"
 #include "Components/cTransform.h"
 
 
@@ -42,9 +42,9 @@ namespace NIKE {
                 //Update Velocity based on acceleration
 
                 //Update position based on velocity
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Velocity>(entity)) {
+                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                    auto& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Transform::Velocity>(entity);
+                    auto& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 
                     e_transform.position.x += e_velo.velocity.x * dt;
                     e_transform.position.y += e_velo.velocity.y * dt;

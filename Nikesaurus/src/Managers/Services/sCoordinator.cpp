@@ -83,8 +83,11 @@ namespace NIKE {
 	ECS_DEFINE_TYPES(Audio::SFX)
 
 	//Define Transform Types
-	ECS_DEFINE_TYPES(Transform::Velocity)
 	ECS_DEFINE_TYPES(Transform::Transform)
+
+	//Define Physics Types
+	ECS_DEFINE_TYPES(Physics::Dynamics)
+	ECS_DEFINE_TYPES(Physics::Collider)
 
 	//Define Render Types
 	ECS_DEFINE_TYPES(Render::Cam)

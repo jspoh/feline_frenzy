@@ -81,7 +81,7 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_rectpack.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
-    <ClInclude Include="headers\Components\cCollision.h" />
+    <ClInclude Include="headers\Components\cPhysics.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
@@ -103,7 +103,6 @@
     <ClInclude Include="headers\Managers\Services\sEvents.h" />
     <ClInclude Include="headers\Managers\Services\sWindows.h" />
     <ClInclude Include="headers\Components\cAudio.h" />
-    <ClInclude Include="headers\Components\cMove.h" />
     <ClInclude Include="headers\Components\cCamera.h" />
     <ClInclude Include="headers\Components\cRender.h" />
     <ClInclude Include="headers\Components\cTransform.h" />
