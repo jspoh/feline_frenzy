@@ -43,6 +43,17 @@ namespace NIKE {
 		//Generate random float
 		float NIKE_API randFloat();
 
+		// Utility functions
+		template <typename T>
+		T getMax(const T a, const T b) {
+			return (((a) > (b)) ? (a) : (b));
+		}
+
+		template <typename T>
+		T getMin(const T a, const T b) {
+			return (((a) < (b)) ? (a) : (b));
+		}
+
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)
 	}

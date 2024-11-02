@@ -12,7 +12,7 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
-//#include "Systems/Physics/sysCollision.h"
+#include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 
 namespace NIKE {
@@ -24,15 +24,15 @@ namespace NIKE {
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
+			//Collision sub system
+			std::unique_ptr<Collision::System> collision_system;
 
 		public:
-			//Collision::Manager collision_manager; // Current one instance of collision manager // Added by MKK
-
 			//Default Constructor
 			Manager() = default;
 
 			//Default Destructor
-			~Manager() override = default;
+			~Manager() = default;
 
 			//Init
 			void init() override;

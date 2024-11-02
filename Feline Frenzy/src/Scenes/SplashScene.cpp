@@ -56,7 +56,8 @@ void Splash::Scene::init() {
 	NIKE_IMGUI_SERVICE->addEntityRef("PLAYER", player_1);
 	second_layer->addEntity(player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(50.0f, 1.0f, 2.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::SLIDE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 
@@ -64,9 +65,10 @@ void Splash::Scene::init() {
 
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
-	base_Layer->addEntity(shape_1);
-	//NIKE_ECS_SERVICE->addDefEntityComponent(shape_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Render::Texture"));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 45.0f));
+	second_layer->addEntity(shape_1);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(shape_1, NIKE::Physics::Dynamics(0.0f, 0.0f, 1.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(shape_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {0.0f, 0.0f, 0.0f, 1.0f}));
 
 	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity();

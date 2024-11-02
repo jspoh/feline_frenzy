@@ -43,6 +43,10 @@ namespace NIKE {
 		avail_entities.push(entity);
 	}
 
+	bool Entity::Manager::checkEntity(Entity::Type entity) const {
+		return entities.find(entity) != entities.end();
+	}
+
 	void Entity::Manager::setSignature(Entity::Type entity, Component::Signature signature) {
 		//Check if entity has alr been created
 		if (entities.find(entity) == entities.end()) {

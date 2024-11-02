@@ -41,6 +41,9 @@ namespace NIKE {
 			//Destroy Entity
 			void destroyEntity(Entity::Type entity);
 
+			//Check entity
+			bool checkEntity(Entity::Type entity) const;
+
 			//Get entity component count
 			int getEntityComponentCount(Entity::Type entity) const;
 

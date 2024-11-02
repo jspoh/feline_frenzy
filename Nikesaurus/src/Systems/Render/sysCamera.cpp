@@ -43,7 +43,7 @@ namespace NIKE {
 	Matrix_33 Camera::System::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
+		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
 			if(NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(cam_id))
 			NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id).position;
 

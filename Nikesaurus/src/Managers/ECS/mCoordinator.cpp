@@ -32,6 +32,10 @@ namespace NIKE {
 		system_manager->entityDestroyed(entity); 
 	}
 
+	bool Coordinator::Manager::checkEntity(Entity::Type entity) const {
+		return entity_manager->checkEntity(entity);
+	}
+
 	int Coordinator::Manager::getEntityComponentCount(Entity::Type entity) const{
 		return entity_manager->getEntityComponentCount(entity);
 	}

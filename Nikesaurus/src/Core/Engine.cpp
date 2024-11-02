@@ -32,8 +32,6 @@ namespace NIKE {
 
 		////Register physics components
 		NIKE_ECS_MANAGER->registerComponent<Physics::Dynamics>();
-		//ecs_coordinator->registerComponent<Move::Movement>();
-		//ecs_coordinator->registerComponent<Collision::Collider>();
 		NIKE_ECS_MANAGER->registerComponent<Physics::Collider>();
 
 		////Register animation components
@@ -61,7 +59,6 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
-		//ecs_coordinator->addSystemComponentType<Physics::Manager>(getComponentType <Collision::Collider>());
 
 		////Register animation manager
 		//ecs_coordinator->registerSystem<Animation::Manager>(Animation::Manager::getInstance());
@@ -178,24 +175,17 @@ namespace NIKE {
 				NIKE_IMGUI_SERVICE->update();
 			}
 
-			getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.y = 0.0f;
-			getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.x = 0.0f;
-
 			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.y = 200.0f;
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 500.0f;
 			}
 			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.x = -200.0f;
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -500.0f;
 			}
 			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.y = -200.0f;
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -500.0f;
 			}
 			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).velocity.x = 200.0f;
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 200.0f;
+				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 500.0f;
 			}
 
 			//Update scenes manager

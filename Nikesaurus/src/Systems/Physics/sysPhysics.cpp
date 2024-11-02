@@ -19,7 +19,7 @@
 
 namespace NIKE {
     void Physics::Manager::init() {
-
+        collision_system = std::make_unique<Collision::System>();
     }
 
     void Physics::Manager::update() {
@@ -31,12 +31,14 @@ namespace NIKE {
             if (!layer->getLayerState())
                 continue;
 
+            //Iterate through all entities
             for (auto& entity : entities) {
 
                 //Skip entities that are not present within layer
                 if (!layer->checkEntity(entity))
                     continue;
 
+                //Update entities with dynamics
                 if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
@@ -44,14 +46,8 @@ namespace NIKE {
                     //Apply forces & mass to calculate direction
                     Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
 
-                    //Update velocity, taking collisions into account if they exist
-                    //if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
-                    //    auto& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-                    //    e_dynamics.velocity += acceleration * collider->collisionTime * dt;
-                    //}
-                    //else {
-                        e_dynamics.velocity += acceleration * dt;
-                    //}
+                    //Update velocity based on acceleration
+                    e_dynamics.velocity += acceleration * dt;
 
                     //Add drag/friction
                     e_dynamics.velocity -= e_dynamics.velocity * e_dynamics.drag * dt;
@@ -75,8 +71,43 @@ namespace NIKE {
                 }
 
                 //Collision detection
+                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
 
-                //Collision Resolution
+                    //Get entity collider
+                    auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+                    auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                    auto& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+
+                    //Check for collision with other entities
+                    for (auto& colliding_entity : entities) {
+
+                        //Skip entities that are not present within layer & skip same entities
+                        if (!layer->checkEntity(colliding_entity) || entity == colliding_entity || !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
+                            continue;
+
+                        //Get colliding entity's data
+                        auto& other_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
+                        auto& other_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
+                        auto& other_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
+
+                        //Check for collision
+                        Collision::CollisionInfo info;
+                        if (collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
+
+                            //Set the flag of colliders
+                            e_collider.b_collided = true;
+                            other_collider.b_collided = true;
+
+                            //Collision resolution
+                            collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
+                        }
+                        else {
+                            //Set the flag of colliders
+                            e_collider.b_collided = false;
+                            other_collider.b_collided = false;
+                        }
+                    }
+                }
             }
         }
 

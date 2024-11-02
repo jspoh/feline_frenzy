@@ -29,32 +29,47 @@ namespace NIKE {
                 : max_speed{ max_speed }, drag{ drag }, mass{ mass }, velocity(), force() {}
         };
 
+        enum class Resolution {
+            NONE = 0,
+            SLIDE,
+            BOUNCE
+        };
+
+        struct Collider {
+            bool b_collided;
+            Resolution resolution;
+            float elasticity; //For bounce collision resolution
+            
+            Collider() : b_collided{ false }, resolution{ Resolution::NONE }, elasticity{ 0.0f } {}
+            Collider(Resolution resolution, float elasticity = 0.0f) : b_collided{ false }, resolution{ resolution }, elasticity{ elasticity } {}
+        };
+
         //Temporary Disable DLL Export Warning
         #pragma warning(disable: 4251)
 
-        struct NIKE_API Collider {
-            bool active = false; // Tracks if collider is in use (collision enabled or not)
-            //Vector2 position;  // Position of the object (X, Y) world coordinates
-            //Vector2 size;      // Size (width, height)
-            float radius = 0.0f; // Optional for circle colliders
-            //Vector2 velocity; // Current velocity
+        //struct NIKE_API Collider {
+        //    bool active = false; // Tracks if collider is in use (collision enabled or not)
+        //    //Vector2 position;  // Position of the object (X, Y) world coordinates
+        //    //Vector2 size;      // Size (width, height)
+        //    float radius = 0.0f; // Optional for circle colliders
+        //    //Vector2 velocity; // Current velocity
 
-            // For bounding box
-            Vector2f rect_min;
-            Vector2f rect_max;
+        //    // For bounding box
+        //    Vector2f rect_min;
+        //    Vector2f rect_max;
 
-            // Which sides of bounding box are colliding/"blocked"
-            bool left = false;
-            bool right = false;
-            bool top = false;
-            bool bottom = false;
+        //    // Which sides of bounding box are colliding/"blocked"
+        //    bool left = false;
+        //    bool right = false;
+        //    bool top = false;
+        //    bool bottom = false;
 
-            bool bounceFlag = false;
+        //    bool bounceFlag = false;
 
-            // For bounding sphere...unused for now
-            Vector2f cir_min;
-            Vector2f cir_max;
-        };
+        //    // For bounding sphere...unused for now
+        //    Vector2f cir_min;
+        //    Vector2f cir_max;
+        //};
 
         //Re-enable DLL Export warning
         #pragma warning(default: 4251)

@@ -39,6 +39,9 @@ namespace NIKE {
 			//Destroy Entity
 			void destroyEntity(Entity::Type entity);
 
+			//Check entity is present
+			bool checkEntity(Entity::Type entity) const;
+
 			//Set signature
 			void setSignature(Entity::Type entity, Component::Signature signature);
 

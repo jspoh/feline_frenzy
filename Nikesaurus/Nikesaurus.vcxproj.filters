@@ -36,6 +36,7 @@
     <ClCompile Include="src\Managers\Services\Imgui\ImguiPopUps.cpp" />
     <ClCompile Include="src\Systems\Render\sysRender.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
+    <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiPopUps.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
+    <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
