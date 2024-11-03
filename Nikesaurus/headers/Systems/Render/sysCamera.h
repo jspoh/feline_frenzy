@@ -18,9 +18,10 @@
 namespace NIKE {
 	namespace Camera {
 
-		class System 
-			:	public Events::IEventListener<Windows::WindowResized>,
-			public Events::IEventListener<Render::ChangeCamEvent>
+		class System
+			: public Events::IEventListener<Windows::WindowResized>,
+			public Events::IEventListener<Render::ChangeCamEvent>,
+			public Events::IEventListener<Render::UpdateCamEvent>
 		{
 		public:
 			System();
@@ -56,6 +57,9 @@ namespace NIKE {
 
 			//On change camera event
 			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
+
+			//On update camera event
+			void onEvent(std::shared_ptr<Render::UpdateCamEvent> event) override;
 		};
 	}
 }

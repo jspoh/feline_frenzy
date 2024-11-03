@@ -91,6 +91,7 @@ namespace NIKE {
 		imguiShowLoadedAssetsWindow();
 		imguiEntityComponentManagementWindow();
 		imguiShowGameViewport();
+		imguiCameraControl();
 
 		//ImGui::ShowDemoWindow();
 		// THIS 2 CALL THE OPENGL DRAWING

@@ -36,7 +36,11 @@ namespace NIKE {
 	// This function will design the UI to show the loaded assets
 	void imguiShowLoadedAssetsWindow();
 
+	// This function renders the game into the viewport of the imgui window
 	void imguiShowGameViewport();
+
+	// This functions allows for the control of the camera
+	void imguiCameraControl();
 }
 
 

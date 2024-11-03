@@ -16,6 +16,21 @@
 
 namespace NIKE {
 	namespace Render {
+		enum class CamPosition {
+			UP = 0,
+			DOWN,
+			LEFT,
+			RIGHT,
+			RESET_POS,
+			NONE
+		};
+
+		enum class CamZoom {
+			ZOOM_IN = 0,
+			ZOOM_OUT,
+			RESET_ZOOM,
+			NONE
+		};
 
 		struct Cam {
 			Vector2f position;	// Position of camera
@@ -35,12 +50,25 @@ namespace NIKE {
 				: entity_id{ entity_id } {}
 		};
 
+		//Update camera event
+		struct NIKE_API UpdateCamEvent : public Events::IEvent {
+			std::optional<CamPosition> edit_position; // Optional position change
+			std::optional<CamZoom> edit_zoom;      // Optional zoom level change
+
+			UpdateCamEvent(
+				std::optional<CamPosition> pos = std::nullopt,
+				std::optional<CamZoom> zoom = std::nullopt)
+				: edit_position{ pos }, edit_zoom { zoom } {}
+		};
+
 		struct Color{
 			float r, g, b, a;
 			
 			Color() : r{ 0.0f }, g{ 0.0f }, b{ 0.0f }, a{ 0.0f } {}
 			Color(float r, float g, float b, float a) : r{ r }, g{ g }, b{ b }, a{ a } {}
 		};
+
+
 
 		enum class TextOrigin {
 			CENTER = 0,
