@@ -315,26 +315,40 @@ namespace NIKE {
 			// Move camera position up
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
 		}
+		if (ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+		}
+
 
 		ImGui::SameLine();
 		if (ImGui::Button("Down")) {
 			// Move camera position down
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
 		}
+		if (ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+		}
+
 
 		ImGui::SameLine();
 		if (ImGui::Button("Left")) {
 			// Move camera position left
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
 		}
+		if (ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+		}
+
 
 		ImGui::SameLine();
 		if (ImGui::Button("Right")) {
 			// Move camera position right
-
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
-
 		}
+		if (ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+		}
+
 		if (ImGui::Button("Reset Position")) {
 			// Move camera position right
 
@@ -346,13 +360,19 @@ namespace NIKE {
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In")) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
-
 		}
+		if (ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
+		}
+
 		ImGui::SameLine();
 		if (ImGui::Button("Zoom Out")) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
-
 		}
+		if (ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
+		}
+
 		if (ImGui::Button("Reset Cam")) {
 			// Move camera position right
 

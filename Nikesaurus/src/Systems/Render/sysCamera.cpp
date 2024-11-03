@@ -23,17 +23,18 @@ namespace NIKE {
 	}
 
 	void Camera::System::onEvent(std::shared_ptr<Render::UpdateCamEvent> event) {
+		// !TODO remove hard coded values for the adjustments
 		if (event->edit_position == NIKE::Render::CamPosition::UP) {
-			def_cam.position.y += 10.f;
+			def_cam.position.y += 2.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::DOWN) {
-			def_cam.position.y -= 10.f;
+			def_cam.position.y -= 2.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::LEFT) {
-			def_cam.position.x -= 10.f;
+			def_cam.position.x -= 2.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::RIGHT) {
-			def_cam.position.x += 10.f;
+			def_cam.position.x += 2.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::RESET_POS){
 			def_cam.position.x = 0.f;
@@ -42,10 +43,10 @@ namespace NIKE {
 
 
 		if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_IN) {
-			def_cam.height -= 20.f;
+			def_cam.height -= 10.f;
 		}
 		else if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_OUT) {
-			def_cam.height += 20.f;
+			def_cam.height += 10.f;
 		}
 		else if (event->edit_zoom == NIKE::Render::CamZoom::RESET_ZOOM) {
 			def_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);

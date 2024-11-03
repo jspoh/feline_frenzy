@@ -135,16 +135,6 @@ namespace NIKE {
 				return std::static_pointer_cast<Array<T>>(component_arrays.at(type_name));
 			}
 
-			//Private type casting for easy retrieval
-			std::shared_ptr<IArray> getComponentArrayByType(Component::Type type) {
-				for (const auto& pair : component_types) {
-					if (pair.second == type) {
-						return component_arrays.at(pair.first);
-					}
-				}
-				return nullptr;
-			}
-
 			//Convert Component Type String
 			std::string convertTypeString(std::string&& str_type) {
 				return str_type.substr(str_type.find_first_not_of(':', str_type.find_first_of(':')), str_type.size() - str_type.find_first_not_of(':', str_type.find_first_of(':')));
@@ -215,13 +205,7 @@ namespace NIKE {
 				getComponentArray<T>()->removeComponent(entity);
 			}
 
-			void removeEntityComponent(Entity::Type entity, Component::Type type) {
-				// Get the component array corresponding to the Component::Type
-				auto component_array = getComponentArrayByType(type);
-				if (component_array) {
-					component_array->removeComponent(entity);  
-				}
-			}
+			void removeEntityComponent(Entity::Type entity, Component::Type type);
 
 			//Retrieve component associated with entity type
 			template<typename T>
