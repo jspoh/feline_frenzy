@@ -71,6 +71,8 @@ namespace NIKE {
             float overlapX = Utility::getMin(aabb_a.rect_max.x - aabb_b.rect_min.x, aabb_b.rect_max.x - aabb_a.rect_min.x);
             float overlapY = Utility::getMin(aabb_a.rect_max.y - aabb_b.rect_min.y, aabb_b.rect_max.y - aabb_a.rect_min.y);
 
+
+
             // Determine MTV direction and smallest overlap
             Vector2f mtv_dir;
             if (overlapX < overlapY) {
