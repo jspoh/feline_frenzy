@@ -13,6 +13,7 @@
 #define C_COLLISION_HPP
 
 #include "Core/stdafx.h"
+#include "Managers/Services/sEvents.h"
 
 namespace NIKE {
     namespace Physics {
@@ -38,10 +39,17 @@ namespace NIKE {
         struct Collider {
             bool b_collided;
             Resolution resolution;
-            float elasticity; //For bounce collision resolution
             
-            Collider() : b_collided{ false }, resolution{ Resolution::NONE }, elasticity{ 0.0f } {}
-            Collider(Resolution resolution, float elasticity = 0.0f) : b_collided{ false }, resolution{ resolution }, elasticity{ elasticity } {}
+            Collider() : b_collided{ false }, resolution{ Resolution::NONE }{}
+            Collider(Resolution resolution) : b_collided{ false }, resolution{ resolution } {}
+        };
+
+        //Change physics world variables
+        struct ChangePhysicsEvent : public Events::IEvent {
+            float restitution;
+
+            ChangePhysicsEvent(float restitution)
+                : restitution{ restitution } {}
         };
 
         //Temporary Disable DLL Export Warning

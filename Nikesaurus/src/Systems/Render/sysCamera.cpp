@@ -20,6 +20,7 @@ namespace NIKE {
 
 	void Camera::System::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
 		cam_id = event->entity_id;
+		event->setEventProcessed(true);
 	}
 
 	void Camera::System::onEvent(std::shared_ptr<Render::UpdateCamEvent> event) {
@@ -40,7 +41,6 @@ namespace NIKE {
 			def_cam.position.y = 0.f;
 		}
 
-
 		if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_IN) {
 			def_cam.height -= 20.f;
 		}
@@ -56,6 +56,8 @@ namespace NIKE {
 			active_cam.position = def_cam.position;
 			active_cam.height = def_cam.height;
 		}
+
+		event->setEventProcessed(true);
 	}
 
 	void Camera::System::init() {

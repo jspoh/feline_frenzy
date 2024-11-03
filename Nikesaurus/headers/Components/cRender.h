@@ -42,7 +42,7 @@ namespace NIKE {
 		};
 
 		//Change camera event
-		struct NIKE_API ChangeCamEvent : public Events::IEvent {
+		struct ChangeCamEvent : public Events::IEvent {
 			Entity::Type entity_id;
 
 			//If a entity id does not have a camera attached, default camera is deployed
@@ -51,7 +51,7 @@ namespace NIKE {
 		};
 
 		//Update camera event
-		struct NIKE_API UpdateCamEvent : public Events::IEvent {
+		struct UpdateCamEvent : public Events::IEvent {
 			std::optional<CamPosition> edit_position; // Optional position change
 			std::optional<CamZoom> edit_zoom;      // Optional zoom level change
 
@@ -67,8 +67,6 @@ namespace NIKE {
 			Color() : r{ 0.0f }, g{ 0.0f }, b{ 0.0f }, a{ 0.0f } {}
 			Color(float r, float g, float b, float a) : r{ r }, g{ g }, b{ b }, a{ a } {}
 		};
-
-
 
 		enum class TextOrigin {
 			CENTER = 0,
