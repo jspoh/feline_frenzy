@@ -231,11 +231,16 @@ namespace NIKE {
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
 							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg");
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
 						}
 						else if (component_name == "Render::Texture") {
 							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 							static char texture_ref[300];
-							strncpy_s(texture_ref, texture_comp.texture_ref.c_str(), sizeof(texture_ref));
+							// strncpy_s(texture_comp.texture_ref, texture_ref, sizeof(texture_ref));
 							// Ensure null-termination
 							texture_ref[sizeof(texture_ref) - 1] = '\0';
 
@@ -243,6 +248,20 @@ namespace NIKE {
 							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {
 								// Only update the texture reference if the user made a change
 								texture_comp.texture_ref = texture_ref;
+							}
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else
+						{
+							// Other components that do not need specfic UI goes here
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
 						// Additional component-specific UI elements can go here

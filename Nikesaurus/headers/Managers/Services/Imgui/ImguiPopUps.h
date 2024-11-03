@@ -22,6 +22,9 @@ namespace NIKE {
 	// This function will create a pop up for user to choose which component to add 
 	bool showAddComponentPopup(Entity::Type& entity, bool pop_up);
 
+	// This function will create a pop up for user to choose which component to remove
+	bool removeComponentPopup(Entity::Type& entity, bool pop_up);
+
 	// This function will create a pop up to tell user that the component has already been added to that entity
 	bool showComponentExistsPopup();
 	

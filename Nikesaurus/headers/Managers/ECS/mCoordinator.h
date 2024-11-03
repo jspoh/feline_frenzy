@@ -109,6 +109,19 @@ namespace NIKE {
 				system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), false);
 			}
 
+			void removeEntityComponent(Entity::Type entity, Component::Type type) {
+				// Remove component based on Component::Type directly
+				component_manager->removeEntityComponent(entity,type);
+
+				// Set bit signature of component to false
+				Component::Signature sign = entity_manager->getSignature(entity);
+				sign.set(type, false);  
+				entity_manager->setSignature(entity, sign);
+
+				// Update entities list
+				system_manager->updateEntitiesList(entity, sign, type, false);
+			}
+
 			template<typename T>
 			T& getEntityComponent(Entity::Type entity) {
 				return component_manager->getEntityComponent<T>(entity);
