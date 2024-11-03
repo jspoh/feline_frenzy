@@ -259,13 +259,15 @@ namespace NIKE {
 		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
 			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
-			//Copy transform for texture mapping
-			Transform::Transform copy = e_transform;
-			Vector2f tex_size{ (float)NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x, (float)NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y };
-			copy.scale = tex_size.normalized()* copy.scale.length();
+			//Allow stretching of texture
+			if (!e_texture.b_stretch) {
+				//Copy transform for texture mapping ( Locks the transformation of a texture )
+				Vector2f tex_size{ (float)NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x, (float)NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y };
+				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+			}
 
 			// Transform matrix here
-			transformMatrix(copy, matrix, camera_system->getWorldToNDCXform());
+			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
 
 			// Render Texture
 			renderObject(matrix, e_texture);
