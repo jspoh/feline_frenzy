@@ -57,7 +57,7 @@ namespace NIKE {
 			float scale;
 			TextOrigin origin;
 
-			Text() : font_ref{ "" }, text{ "" }, color(), scale{ 1.0f } {}
+			Text() : font_ref{ "" }, text{ "" }, color(), scale{ 1.0f }, origin{ TextOrigin::CENTER } {}
 			Text(std::string const& font_ref, std::string const& text, Color const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
 				: font_ref{ font_ref }, text{ text }, color{ color }, scale{ scale }, origin{ origin } {}
 		};
@@ -75,10 +75,11 @@ namespace NIKE {
 			Color color;
 			Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
 			Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
+			bool b_stretch;
 
-			Texture() : texture_ref{ "" }, color(), frame_size(), frame_index() {}
-			Texture(std::string const& texture_ref, Color const& color, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
-				:texture_ref{ texture_ref }, color{ color }, frame_size{ frame_size }, frame_index{ frame_index }{}
+			Texture() : texture_ref{ "" }, color(), frame_size(), frame_index(), b_stretch{ false } {}
+			Texture(std::string const& texture_ref, Color const& color, bool b_stretch = false, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
+				:texture_ref{ texture_ref }, color{ color }, frame_size{ frame_size }, frame_index{ frame_index }, b_stretch{ b_stretch } {}
 		};
 	}
 }

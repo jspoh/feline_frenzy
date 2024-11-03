@@ -175,6 +175,7 @@ namespace NIKE {
 				NIKE_IMGUI_SERVICE->update();
 			}
 
+			getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force = { 0.0f, 0.0f };
 			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
 				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 500.0f;
 			}
