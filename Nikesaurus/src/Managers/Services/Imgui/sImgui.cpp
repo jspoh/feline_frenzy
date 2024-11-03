@@ -92,7 +92,7 @@ namespace NIKE {
 		imguiEntityComponentManagementWindow();
 		imguiShowGameViewport();
 
-
+		//ImGui::ShowDemoWindow();
 		// THIS 2 CALL THE OPENGL DRAWING
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

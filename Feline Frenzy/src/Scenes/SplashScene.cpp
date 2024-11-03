@@ -53,7 +53,7 @@ void Splash::Scene::init() {
 
 	//Create player
 	NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity();
-	NIKE_IMGUI_SERVICE->addEntityRef("PLAYER", player_1);
+	NIKE_IMGUI_SERVICE->addEntityRef("player_1", player_1);
 	second_layer->addEntity(player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
@@ -72,11 +72,13 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {0.0f, 0.0f, 0.0f, 1.0f}));
 
 	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity();
+	NIKE_IMGUI_SERVICE->addEntityRef("text_1", text_1);
 	second_layer->addEntity(text_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_1, NIKE::Transform::Transform({ 0.0f, -300.0f }, { 0.0f, 0.0f }, 45.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_1, NIKE::Render::Text("MONTSERRAT", "HELLO WORLD.", {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, NIKE::Render::TextOrigin::CENTER));
 
 	NIKE::Entity::Type text_2 = NIKE_ECS_SERVICE->createEntity();
+	NIKE_IMGUI_SERVICE->addEntityRef("text_2", text_2);
 	second_layer->addEntity(text_2);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_2, NIKE::Transform::Transform({ -750.0f, 400.0f }, { 0.0f, 0.0f }, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_2, NIKE::Render::Text("MONTSERRAT", "PANTAT.", { 1.0f, 0.0f, 0.0f, 1.0f }, 1.0f, NIKE::Render::TextOrigin::LEFT));

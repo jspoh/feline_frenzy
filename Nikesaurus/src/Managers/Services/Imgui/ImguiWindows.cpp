@@ -91,17 +91,19 @@ namespace NIKE {
 				ImGui::Spacing();
 				// Display System Usage (Data all being handled in sDebug)
 				auto& sys_percentages = NIKE_DEBUG_SERVICE->system_percentages;
-
+				ImGui::Separator();
 				if (sys_percentages.empty()) {
 					ImGui::Text("No active systems to report on.");
 				}
 				else {
 					ImGui::Text("System Performance (Percentage of total game loop time):");
-
+					ImGui::Spacing();
 					for (const auto& [name, percentage] : sys_percentages) {
+						double barPercent = percentage / 100.0;
 						ImGui::Text("%s : %.2f%%", name.c_str(), percentage);
+						ImGui::ProgressBar(barPercent, ImVec2(-1, 0));
 					}
-
+					ImGui::Spacing();
 					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->total_system_time);
 				}
 
