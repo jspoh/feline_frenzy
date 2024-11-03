@@ -65,9 +65,6 @@ namespace NIKE {
                     //Update position based on velocity
                     e_transform.position.x += e_dynamics.velocity.x * dt;
                     e_transform.position.y += e_dynamics.velocity.y * dt;
-
-                    //Reset force
-                    e_dynamics.force = { 0.0f, 0.0f };
                 }
 
                 //Collision detection
