@@ -13,41 +13,55 @@
 
 namespace NIKE {
 
-    void Collision::System::bounceResolution(Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info) {
+    void Collision::System::bounceResolution(
+        Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
+        Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
+        CollisionInfo const& info) {
+
         //Calculate relative velocity
         Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
         float normal_vel = vel_rel.dot(info.collision_normal);
 
-        //If the entities are already moving apart, no need to resolve further
+        //Check if entities are already moving apart
         if (normal_vel > 0) return;
 
-        // Define restitution for bounce effect (0 = inelastic, 1 = perfectly elastic)
-        float restitution = 1.0f; // Adjust as needed
+        //Calculate impulse magnitude based on collision response
+        float impulse_magnitude = -(1 + restitution) * normal_vel;
 
-        // Calculate impulse magnitude based on collision response
-        float impulseMagnitude = -(1.0f + restitution) * normal_vel;
-
-        // Calculate the reflection vector for angular bounce
-        Vector2f impulse = impulseMagnitude * info.collision_normal;
+        //Calculate the reflection vector for angular bounce
+        Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
-            // Apply full impulse to dynamics_b to reflect its velocity along the collision normal
+            //Transform back outside of collision
+            transform_a.position += info.mtv;
+
+            //Apply impluse to velocity
             dynamics_b.velocity -= impulse;
         }
         else if (collider_b.resolution == Physics::Resolution::NONE) {
-            // Apply full impulse to dynamics_a to reflect its velocity along the collision normal
+            //Transform back outside of collision
+            transform_a.position += info.mtv;
+
+            //Apply impluse to velocity
             dynamics_a.velocity += impulse;
         }
         else {
-            // Both are dynamic; split impulse based on mass
-            float totalMass = dynamics_a.mass + dynamics_b.mass;
-            Vector2f impulseA = impulse * (dynamics_b.mass / totalMass);
-            Vector2f impulseB = impulse * (dynamics_a.mass / totalMass);
+            //Transform back outside of collision
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
 
-            // Apply the impulses to both velocities in opposite directions along the collision normal
-            dynamics_a.velocity += impulseA;
-            dynamics_b.velocity -= impulseB;
+            //Apply impulse to velocity based on mass
+            dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
+            dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
         }
+    }
+
+    void Collision::System::setRestitution(float val) {
+        restitution = val;
+    }
+
+    float Collision::System::getRestitution() const {
+        return restitution;
     }
 
     bool Collision::System::detectAABBRectRect(
@@ -70,8 +84,6 @@ namespace NIKE {
             // Calculate overlaps on each axis
             float overlapX = Utility::getMin(aabb_a.rect_max.x - aabb_b.rect_min.x, aabb_b.rect_max.x - aabb_a.rect_min.x);
             float overlapY = Utility::getMin(aabb_a.rect_max.y - aabb_b.rect_min.y, aabb_b.rect_max.y - aabb_a.rect_min.y);
-
-
 
             // Determine MTV direction and smallest overlap
             Vector2f mtv_dir;
@@ -161,14 +173,16 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
+        //Bounce Resolution
+        if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
+            bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+        }
+
         switch (collider_a.resolution) {
         case Physics::Resolution::NONE:
             break;
         case Physics::Resolution::SLIDE:
             transform_a.position += info.mtv;
-            break;
-        case Physics::Resolution::BOUNCE:
-            bounceResolution(dynamics_a, collider_a, dynamics_b, collider_b, info);
             break;
         default:
             break;
@@ -180,11 +194,9 @@ namespace NIKE {
         case Physics::Resolution::SLIDE:
             transform_b.position += info.mtv;
             break;
-        case Physics::Resolution::BOUNCE:
-            bounceResolution(dynamics_a, collider_a, dynamics_b, collider_b, info);
-            break;
         default:
             break;
         }
     }
+
 }

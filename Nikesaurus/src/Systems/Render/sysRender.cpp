@@ -277,6 +277,15 @@ namespace NIKE {
 			// Render debugging wireframe
 			Render::Color wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
 
+			//Check for collider component
+			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
+				auto const& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+
+				if (e_collider.b_collided) {
+					wire_frame_color = { 0.0f, 1.0f, 0.0f, 1.0f };
+				}
+			}
+
 			//Calculate wireframe matrix
 			transformMatrixDebug(e_transform, matrix, camera_system->getWorldToNDCXform(), true);
 			renderWireFrame(matrix, wire_frame_color);

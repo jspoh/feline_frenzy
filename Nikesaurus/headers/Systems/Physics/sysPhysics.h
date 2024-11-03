@@ -14,11 +14,12 @@
 
 #include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
+#include "Components/cPhysics.h"
 
 namespace NIKE {
 	namespace Physics {
 
-		class Manager : public System::ISystem {
+		class Manager : public System::ISystem, public Events::IEventListener<Physics::ChangePhysicsEvent> {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
@@ -45,6 +46,9 @@ namespace NIKE {
 
 			//Update
 			void update() override;
+
+			//On change physics event
+			void onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) override;
 		};
 	}
 }

@@ -36,14 +36,26 @@ namespace NIKE {
                     : rect_min{ rect_min }, rect_max{ rect_max }{}
             };
 
-            void bounceResolution(Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
+            //Collision world restitution for bounce effect (0 = inelastic, 1 = perfectly elastic)
+            float restitution;
+
+            //Bounce collision resolution
+            void bounceResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
 
         public:
-            System() = default;
+            System() : restitution{ 1.0f } {}
             ~System() = default;
 
+            //Set collision world restitution
+            void setRestitution(float val);
+
+            //Get collision world restitution
+            float getRestitution() const;
+
+            //AABB Collision detection
             bool detectAABBRectRect(Transform::Transform const& transform_a, Physics::Dynamics const& dynamics_a, Transform::Transform const& transform_b, Physics::Dynamics const& dynamics_b, CollisionInfo& info);
 
+            //Collision resolution
             void collisionResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
         };
     }
