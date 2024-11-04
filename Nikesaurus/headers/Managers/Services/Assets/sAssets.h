@@ -84,6 +84,9 @@ namespace NIKE {
 			//Get font
 			std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
 
+			// Checker
+			bool checkFontExist(std::string const& font_id);
+
 			/*****************************************************************//**
 			* Render ( Texture, Model, Shaders )
 			*********************************************************************/
@@ -105,6 +108,9 @@ namespace NIKE {
 
 			//Get model
 			std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
+
+			// Check model
+			bool checkModelExist(std::string const& model_id);
 
 			//Load texture
 			void loadTexture(std::string const& texture_id, std::string const& file_path);

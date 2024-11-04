@@ -86,8 +86,15 @@ namespace NIKE
                 }
             }
 
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                show_exist_popup = false;
+            }
+
             ImGui::EndPopup();
         }
+
+
 
         // Handle the "Component Exists" popup separately
         if (show_exist_popup) {

@@ -249,6 +249,9 @@ namespace NIKE {
 
 							ImGui::Text("Enter a texture ref:");
 							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {}
+							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
+							ImGui::DragInt2("Frame Count", &texture_comp.frame_count.x, 1);
+							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
 								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_ref))
@@ -266,6 +269,14 @@ namespace NIKE {
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
+							// A button to play SFX
+							if (!texture_comp.texture_ref.empty())
+							{
+								ImGui::Text("Stretch: %s", texture_comp.b_stretch ? "true" : "false");
+								if (ImGui::Button("Stretch")) {
+									texture_comp.b_stretch = !texture_comp.b_stretch;
+								}
+							}
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
@@ -287,6 +298,133 @@ namespace NIKE {
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
+						else if (component_name == "Render::Cam") {
+							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity);
+
+							// Default value for cam height will be the window height if there is no adjustments
+							if (cam_comp.height <= 0.0f) { 
+								cam_comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+							}
+
+							ImGui::DragFloat2("Position", &cam_comp.position.x, 0.1f);
+							ImGui::DragFloat("Height", &cam_comp.height, 0.1f);
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else if (component_name == "Render::Shape") {
+							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+							static char input_model_ref[300];
+							// Ensure null-termination
+							input_model_ref[sizeof(input_model_ref) - 1] = '\0';
+							ImGui::Text("Enter the shape model to use:");
+							if (ImGui::InputText("##shapeRef", input_model_ref, IM_ARRAYSIZE(input_model_ref))) {
+								// Optionally handle input change here if needed
+							}
+							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.1f);
+							// Save buttons to confirm changes
+							if (ImGui::Button("Save Font Ref")) {
+								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))
+								{
+									// Update channel ID in component
+									shape_comp.model_ref = input_model_ref;
+									ImGui::OpenPopup("VALID INPUT");
+									show_save_popup = true;
+								}
+								else
+								{
+									ImGui::OpenPopup("INVALID INPUT");
+									show_error_popup = true;
+								}
+							}
+
+
+							// Show pop ups
+							show_error_popup = ShowErrorPopup();
+							show_save_popup = ShowSaveConfirmationPopup();
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+
+						}
+						else if (component_name == "Render::Text") {
+							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+
+							static char input_font_ref[300];
+							static char input_text[300];
+							// Ensure null-termination
+							input_font_ref[sizeof(input_font_ref) - 1] = '\0';
+							input_text[sizeof(input_text) - 1] = '\0';
+
+							ImGui::Text("Enter the font to use:");
+							if (ImGui::InputText("##fontRef", input_font_ref, IM_ARRAYSIZE(input_font_ref))) {
+								// Optionally handle input change here if needed
+							}
+
+							ImGui::Text("Enter text to display:");
+							if (ImGui::InputText("##text", input_text, IM_ARRAYSIZE(input_text))) {
+								// Stuff
+							}
+
+							ImGui::DragFloat4("Color in RBGA", &text_comp.color.r, 0.1f);
+							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.1f);
+
+							// Variable to hold the selected resolution
+							static NIKE::Render::TextOrigin selected_origin = NIKE::Render::TextOrigin::CENTER;
+
+							// Display a dropdown to select resolution
+							// For now this hard code it 
+							const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
+							int current_origin = static_cast<int>(selected_origin);
+
+							// Display the selected resolution
+							ImGui::Text("Current Resolution: %s", origin_names[current_origin]);
+
+							// Combo box for selecting text origin
+							if (ImGui::Combo("##Origin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
+								selected_origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
+								text_comp.origin = selected_origin;
+							}
+
+
+							// Save buttons to confirm changes
+							if (ImGui::Button("Save Font Ref")) {
+								if (NIKE_ASSETS_SERVICE->checkFontExist(input_font_ref))
+								{
+									// Update channel ID in component
+									text_comp.font_ref = input_font_ref;
+									ImGui::OpenPopup("VALID INPUT");
+									show_save_popup = true;
+								}
+								else
+								{
+									ImGui::OpenPopup("INVALID INPUT");
+									show_error_popup = true;
+								}
+							}
+
+							if (ImGui::Button("Save Text to show")) {
+								text_comp.text = input_text;
+								ImGui::OpenPopup("VALID INPUT");
+								show_save_popup = true;
+							}
+
+							// Show pop ups
+							show_error_popup = ShowErrorPopup();
+							show_save_popup = ShowSaveConfirmationPopup();
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
 						else if (component_name == "Physics::Collider") {
 							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
 
@@ -298,14 +436,15 @@ namespace NIKE {
 							const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
 							int current_resolution = static_cast<int>(selected_resolution);
 
+							// Display the selected resolution
+							ImGui::Text("Current Resolution: %s", resolution_names[current_resolution]);
+
 							// Combo box for selecting resolution
 							if (ImGui::Combo("##Resolution", &current_resolution, resolution_names, IM_ARRAYSIZE(resolution_names))) {
 								selected_resolution = static_cast<NIKE::Physics::Resolution>(current_resolution);
 								dynamics_comp.resolution = selected_resolution;
 							}
 
-							// Optional: display the selected resolution
-							ImGui::Text("Current Resolution: %s", resolution_names[current_resolution]);
 
 
 							// Remove Component 

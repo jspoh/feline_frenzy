@@ -92,6 +92,15 @@ namespace NIKE {
 		return it->second;
 	}
 
+	bool Assets::Service::checkFontExist(std::string const& font_id)
+	{
+		if (fonts_list.find(font_id) == fonts_list.end())
+		{
+			return false;
+		}
+		return true;
+	}
+
 	/*****************************************************************//**
 	* Rendering
 	*********************************************************************/
@@ -171,6 +180,15 @@ namespace NIKE {
 		}
 
 		return it->second;
+	}
+
+	bool Assets::Service::checkModelExist(std::string const& model_id)
+	{
+		if (models_list.find(model_id) == models_list.end())
+		{
+			return false;
+		}
+		return true;
 	}
 
 	void Assets::Service::loadTexture(std::string const& texture_id, std::string const& file_path) {
