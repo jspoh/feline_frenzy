@@ -10,7 +10,7 @@
 #include "Core/pch.h"
 #include "Scenes/SplashScene.h"
 
-void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& layer, std::vector<std::vector<int>>& grid) {
+void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
 	// Open Scene file
 	std::ifstream ifs{ file, std::ios::in };
 
@@ -43,50 +43,96 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 
 	//cout << "Grid loaded successfully. Data:" << endl;
 
+	// Calculate offset to center the grid
 	float tile_size = 100.0f;
+	float offset_x = (width * tile_size) / 2.0f - center.x;  // Centering the x-axis
+	float offset_y = (height * tile_size) / 2.0f - center.y; // Centering the y-axis
+
 	// Create entities from grid info
 	for (int row = 0; row < height; ++row) {
 		for (int col = 0; col < width; ++col) {
 			int tileID = grid[row][col];
 
-			cout << grid[row][col] << " ";
+			//cout << grid[row][col] << " ";
 
 			
 			// Create tile here
+			bool flip{ false };
+			bool collide{ false };
 			std::string texture_name{"grass"};
 			switch (tileID) {
 			case 1:
 				texture_name = "wallBottomCorner";
+				flip = false;
+				collide = true;
 				break;
 			case 2:
 				texture_name = "wallBottomMiddle";
+				flip = false;
+				collide = true;
 				break;
 			case 3:
 				texture_name = "wallLeft";
+				flip = false;
+				collide = true;
 				break;
 			case 4:
 				texture_name = "grass";
+				flip = false;
+				collide = false;
 				break;
 			case 5:
 				texture_name = "wallTopCorner";
+				flip = false;
+				collide = true;
 				break;
 			case 6:
 				texture_name = "wallTopMiddle";
+				flip = false;
+				collide = true;
+				break;
+			case 7:
+				texture_name = "wallBottomCorner";
+				flip = true;
+				collide = true;
+				break;
+			case 8:
+				texture_name = "wallLeft";
+				flip = true;
+				collide = true;
+				break;
+			case 9:
+				texture_name = "wallTopCorner";
+				flip = true;
+				collide = true;
 				break;
 			default:
 				texture_name = "grass";
+				flip = false;
+				collide = false;
 				break;
-			// Case 7-8 are mirrored
 			}
 
 			// Create Entity
 			NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity();
 			NIKE_IMGUI_SERVICE->addEntityRef("tile_" + std::to_string(row) + "_" + std::to_string(col), tile_entity);
 			layer->addEntity(tile_entity);
-			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size, row * tile_size }, { 100.0f, 100.0f }, 0.0f));
-			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }));
+			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size - offset_x, row * tile_size - offset_y}, { 100.0f, 100.0f }, 0.0f));
+			
+			if (collide) {
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
+			}
+			if (flip) {
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { true, false }));
+			}
+			else {
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { false, false }));
+			}
+			
+
 		}
-		cout << endl;
+		//cout << endl;
 	}
 	//cout << "Loaded background grid from file successfully." << endl;
 }
@@ -126,7 +172,7 @@ void Splash::Scene::load() {
 
 void Splash::Scene::init() {
 	//std::shared_ptr<NIKE::Scenes::Layer> background_layer = registerLayer("BACKGROUND");
-	std::shared_ptr<NIKE::Scenes::Layer> base_Layer = registerLayer("BASE");
+	std::shared_ptr<NIKE::Scenes::Layer> base_layer = registerLayer("BASE");
 	std::shared_ptr<NIKE::Scenes::Layer> second_layer = registerLayer("SECOND");
 
 	//Creat Channel Group
@@ -150,7 +196,7 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 200.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::BOUNCE));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {1.0f, 0.0f, 0.0f, 1.0f}, true, 0.5f, false, {9, 5}, {0, 0}, {false, true}));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {1.0f, 0.0f, 0.0f, 1.0f}, true, 0.5f, false, {9, 5}, {0, 0}, {false, false}));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Base>(player_1, NIKE::Animation::Base(0, 0.2f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Sprite>(player_1, NIKE::Animation::Sprite({9,5}, {0, 1}, {8, 1}));
@@ -159,7 +205,7 @@ void Splash::Scene::init() {
 
 	// MapGrid Test
 	std::vector<std::vector<int>> grid;
-	loadBackgroundFromFile("assets/Map/smallmap.txt", base_Layer, grid);
+	loadBackgroundFromFile("assets/Map/smallmap.txt", base_layer, grid, { 0.0f, 200.0f });
 
 	// MapGrid
 	//NIKE::Entity::Type background_1 = NIKE_ECS_SERVICE->createEntity();
@@ -191,7 +237,7 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_2, NIKE::Render::Text("MONTSERRAT", "PANTAT.", { 1.0f, 0.0f, 0.0f, 1.0f }, 1.0f, NIKE::Render::TextOrigin::LEFT));
 
 	NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity();
-	base_Layer->addEntity(sfx_1);
+	base_layer->addEntity(sfx_1);
 	NIKE_ECS_SERVICE->addDefEntityComponent(sfx_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Audio::SFX"));
 	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 	// Test crash logger
