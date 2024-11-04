@@ -93,3 +93,17 @@ inline Vector2<T> Vector2<T>::normalize() {
 	y /= len;
 	return *this;
 }
+
+template<typename T>
+nlohmann::json Vector2<T>::toJson() const {
+	return	{
+			{"x", x},
+			{"y", y}
+			};
+}
+
+template<typename T>
+void Vector2<T>::fromJson(nlohmann::json const& data) {
+	x = data.at("x").get<T>();
+	y = data.at("y").get<T>();
+}

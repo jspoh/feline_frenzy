@@ -27,6 +27,8 @@ namespace NIKE {
 			Transform(Vector2f const& position, Vector2f const& scale, float rotation)
 				: position{ position }, scale{ scale }, rotation{ rotation } {}
 		};
+
+		void registerComponents();
 	}
 }
 

@@ -264,6 +264,7 @@ namespace NIKE {
 							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
 							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
+							ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.1f);
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
 								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_ref))
@@ -281,12 +282,23 @@ namespace NIKE {
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
-							// A button to play SFX
 							if (!texture_comp.texture_ref.empty())
 							{
 								ImGui::Text("Stretch: %s", texture_comp.b_stretch ? "true" : "false");
 								if (ImGui::Button("Stretch")) {
 									texture_comp.b_stretch = !texture_comp.b_stretch;
+								}
+								ImGui::Text("Blend: %s", texture_comp.b_blend ? "true" : "false");
+								if (ImGui::Button("Blend")) {
+									texture_comp.b_blend = !texture_comp.b_blend;
+								}
+								ImGui::Text("Flip Horizontally: %s", texture_comp.b_flip.x ? "true" : "false");
+								if (ImGui::Button("Flip X")) {
+									texture_comp.b_flip.x = !texture_comp.b_flip.x;
+								}
+								ImGui::Text("Flip Vertically: %s", texture_comp.b_flip.y ? "true" : "false");
+								if (ImGui::Button("Flip Y")) {
+									texture_comp.b_flip.y = !texture_comp.b_flip.y;
 								}
 							}
 							// Remove Component 
@@ -331,9 +343,9 @@ namespace NIKE {
 							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 
 							ImGui::DragInt("Number of Animations (If set to 0, infinite number of animations)", &animate_base_comp.animations_to_complete, 1);
-							ImGui::DragInt("Completed Animations", &animate_base_comp.completed_animations, 1);
 							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .1f);
-							ImGui::DragFloat("Animation timer", &animate_base_comp.timer, .1f);
+							ImGui::Text("Animation timer: %f", &animate_base_comp.timer);
+							ImGui::Text("Completed Animations: %d", animate_base_comp.completed_animations);
 
 							// Variable to hold the selected resolution
 							static NIKE::Animation::Mode selected_mode = NIKE::Animation::Mode::PLAYING;
@@ -352,10 +364,10 @@ namespace NIKE {
 								animate_base_comp.animation_mode = selected_mode;
 							}
 
-							ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
-							if (ImGui::Button("Toggle Ping Pong")) {
-								animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
-							}
+							//ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
+							//if (ImGui::Button("Toggle Ping Pong")) {
+							//	animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
+							//}
 
 							ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
 							if (ImGui::Button("Toggle Reverse")) {
@@ -374,7 +386,9 @@ namespace NIKE {
 							ImGui::DragInt2("Sheet Size", &animate_sprite_comp.sheet_size.x, 1);
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
-							ImGui::DragInt2("Current Index", &animate_sprite_comp.curr_index.x, 1);
+							ImGui::Text("Current Index:");
+							ImGui::BulletText("X = %d", animate_sprite_comp.curr_index.x);
+							ImGui::BulletText("Y = %d", animate_sprite_comp.curr_index.y);
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -516,6 +530,9 @@ namespace NIKE {
 							// For now this hard code it 
 							const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
 							int current_resolution = static_cast<int>(selected_resolution);
+
+							//Update resolution
+							current_resolution = static_cast<int>(dynamics_comp.resolution);
 
 							// Display the selected resolution
 							ImGui::Text("Current Resolution: %s", resolution_names[current_resolution]);
