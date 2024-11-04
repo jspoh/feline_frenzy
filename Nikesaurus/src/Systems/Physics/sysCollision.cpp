@@ -1,5 +1,5 @@
 /*****************************************************************//**
-* \file   mCollision.cpp
+* \file   sysCollision.cpp
 * \brief  Implements the collision manager.
 *
 * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
@@ -18,39 +18,39 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        //Calculate relative velocity
+        // Calculate relative velocity
         Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
         float normal_vel = vel_rel.dot(info.collision_normal);
 
-        //Check if entities are already moving apart
+        // Check if entities are already moving apart
         if (normal_vel > 0) return;
 
-        //Calculate impulse magnitude based on collision response
+        // Calculate impulse magnitude based on collision response
         float impulse_magnitude = -(1 + restitution) * normal_vel;
 
-        //Calculate the reflection vector for angular bounce
+        // Calculate the reflection vector for angular bounce
         Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
-            //Transform back outside of collision
+            // Transform back outside of collision
             transform_b.position += info.mtv;
 
-            //Apply impluse to velocity
+            // Apply impluse to velocity
             dynamics_b.velocity -= impulse;
         }
         else if (collider_b.resolution == Physics::Resolution::NONE) {
-            //Transform back outside of collision
+            // Transform back outside of collision
             transform_a.position += info.mtv;
 
-            //Apply impluse to velocity
+            // Apply impluse to velocity
             dynamics_a.velocity += impulse;
         }
         else {
-            //Transform back outside of collision
+            // Transform back outside of collision
             transform_a.position += info.mtv.operator*(0.5f);
             transform_b.position -= info.mtv.operator*(0.5f);
 
-            //Apply impulse to velocity based on mass
+            // Apply impulse to velocity based on mass
             dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
             dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
         }
@@ -73,7 +73,7 @@ namespace NIKE {
         AABB aabb_a({ transform_a.position.x - (transform_a.scale.x * 0.5f), transform_a.position.y - (transform_a.scale.y * 0.5f) }, { transform_a.position.x + (transform_a.scale.x * 0.5f), transform_a.position.y + (transform_a.scale.y * 0.5f) });
         AABB aabb_b({ transform_b.position.x - (transform_b.scale.x * 0.5f), transform_b.position.y - (transform_b.scale.y * 0.5f) }, { transform_b.position.x + (transform_b.scale.x * 0.5f), transform_b.position.y + (transform_b.scale.y * 0.5f) });
 
-        //Get delta time & set epsilon
+        // Get delta time & set epsilon
         const float deltaTime = NIKE_ENGINE.getService<Windows::Service>()->getDeltaTime();
         const float epsilon = 0.0001f;
 
@@ -173,7 +173,7 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        //Bounce Resolution
+        // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
         }

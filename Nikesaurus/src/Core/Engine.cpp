@@ -79,14 +79,15 @@ namespace NIKE {
 		provideService(std::make_shared<Input::Service>());
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
+		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Coordinator::Service>());
 
 		//Create console
-#ifndef NDEBUG
+		#ifndef NDEBUG
 		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
-#endif
+		#endif
 
 		//Init Logger
 		NIKE::Log::Init();
