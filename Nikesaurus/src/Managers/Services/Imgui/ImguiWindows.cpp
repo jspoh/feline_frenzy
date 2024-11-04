@@ -244,21 +244,14 @@ namespace NIKE {
 						else if (component_name == "Render::Texture") {
 							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 							static char texture_ref[300];
-							static bool initialized = false;
-
-							if (!initialized) {
-								// Ensure null-termination
-								texture_ref[sizeof(texture_ref) - 1] = '\0';
-								strcpy_s(texture_ref, texture_comp.texture_ref.c_str());
-								initialized = true;
-							}
+							// Ensure null-termination
+							texture_ref[sizeof(texture_ref) - 1] = '\0';
 
 							ImGui::Text("Enter a texture ref:");
 							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {}
 							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
 							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
-
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
 								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_ref))
@@ -270,7 +263,6 @@ namespace NIKE {
 								}
 								else {
 									ImGui::OpenPopup("INVALID INPUT");
-									strcpy_s(texture_ref, texture_comp.texture_ref.c_str());
 									show_error_popup = true;
 								}
 							}
