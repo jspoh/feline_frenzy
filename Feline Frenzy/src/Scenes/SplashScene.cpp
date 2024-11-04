@@ -10,6 +10,88 @@
 #include "Core/pch.h"
 #include "Scenes/SplashScene.h"
 
+void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& layer, std::vector<std::vector<int>>& grid) {
+	// Open Scene file
+	std::ifstream ifs{ file, std::ios::in };
+
+	if (!ifs) {
+		cerr << "Failed to open mesh file: " << file << endl;
+		return;
+	}
+
+	// Read grid width and height
+	int width, height;
+	ifs >> width >> height;
+
+	if (!ifs) {
+		cerr << "Failed to read grid dimensions from file: " << file << endl;
+		return;
+	}
+
+	// Create a grid to store tile information
+	grid.resize(height, std::vector<int>(width));
+
+	// Save each tile ID into the grid
+	for (int row = 0; row < height; ++row) {
+		for (int col = 0; col < width; ++col) {
+			if (!(ifs >> grid[row][col])) {
+				cerr << "Failed to read tile data at row " << row << ", column " << col << endl;
+				return;
+			}
+		}
+	}
+
+	//cout << "Grid loaded successfully. Data:" << endl;
+
+	float tile_size = 100.0f;
+	// Create entities from grid info
+	for (int row = 0; row < height; ++row) {
+		for (int col = 0; col < width; ++col) {
+			int tileID = grid[row][col];
+
+			cout << grid[row][col] << " ";
+
+			
+			// Create tile here
+			std::string texture_name{"grass"};
+			switch (tileID) {
+			case 1:
+				texture_name = "wallBottomCorner";
+				break;
+			case 2:
+				texture_name = "wallBottomMiddle";
+				break;
+			case 3:
+				texture_name = "wallLeft";
+				break;
+			case 4:
+				texture_name = "grass";
+				break;
+			case 5:
+				texture_name = "wallTopCorner";
+				break;
+			case 6:
+				texture_name = "wallTopMiddle";
+				break;
+			default:
+				texture_name = "grass";
+				break;
+			// Case 7-8 are mirrored
+			}
+
+			// Create Entity
+			NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity();
+			NIKE_IMGUI_SERVICE->addEntityRef("tile_" + std::to_string(row) + "_" + std::to_string(col), tile_entity);
+			layer->addEntity(tile_entity);
+			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size, row * tile_size }, { 100.0f, 100.0f }, 0.0f));
+			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }));
+		}
+		cout << endl;
+	}
+	//cout << "Loaded background grid from file successfully." << endl;
+}
+
+
 void Splash::Scene::load() {
 
 	//Load Shaders
@@ -27,7 +109,12 @@ void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->loadTexture("PLAYER", "assets/Textures/player.png");
 	NIKE_ASSETS_SERVICE->loadTexture("TREE", "assets/Textures/Tree_Orange.png");
 	NIKE_ASSETS_SERVICE->loadTexture("ZOMBIE", "assets/Textures/ZombieSheet.png");
-	NIKE_ASSETS_SERVICE->loadTexture("WALL1", "assets/Textures/M1.png");
+	NIKE_ASSETS_SERVICE->loadTexture("wallTopCorner", "assets/Textures/TopCorner.png");
+	NIKE_ASSETS_SERVICE->loadTexture("wallTopMiddle", "assets/Textures/M1.png");
+	NIKE_ASSETS_SERVICE->loadTexture("wallLeft", "assets/Textures/Left.png");
+	NIKE_ASSETS_SERVICE->loadTexture("grass", "assets/Textures/Grass.png");
+	NIKE_ASSETS_SERVICE->loadTexture("wallBottomCorner", "assets/Textures/BtmCorner.png");
+	NIKE_ASSETS_SERVICE->loadTexture("wallBottomMiddle", "assets/Textures/BtmMiddle.png");
 
 	//Load Font
 	NIKE_ASSETS_SERVICE->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
@@ -70,12 +157,16 @@ void Splash::Scene::init() {
 
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
+	// MapGrid Test
+	std::vector<std::vector<int>> grid;
+	loadBackgroundFromFile("assets/Map/smallmap.txt", base_Layer, grid);
+
 	// MapGrid
-	NIKE::Entity::Type background_1 = NIKE_ECS_SERVICE->createEntity();
-	NIKE_IMGUI_SERVICE->addEntityRef("background_1", background_1);
-	base_Layer->addEntity(background_1);
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(background_1, NIKE::Transform::Transform({ 0.0f, 200.0f }, { 100.0f, 100.0f }, 0.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(background_1, NIKE::Render::Texture("WALL1", { 1.0f, 1.0f, 1.0f, 1.0f }));
+	//NIKE::Entity::Type background_1 = NIKE_ECS_SERVICE->createEntity();
+	//NIKE_IMGUI_SERVICE->addEntityRef("background_1", background_1);
+	//base_Layer->addEntity(background_1);
+	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(background_1, NIKE::Transform::Transform({ 0.0f, 0.0f }, { 100.0f, 100.0f }, 0.0f));	// {0.0f, 0.0f} places the tile at coordinates 0.0 x and 0.0 y
+	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(background_1, NIKE::Render::Texture("wallTopMiddle", { 1.0f, 1.0f, 1.0f, 1.0f }));
 
 
 	// TREE
