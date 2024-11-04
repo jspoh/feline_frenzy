@@ -194,6 +194,7 @@ namespace NIKE {
 		static bool open_component_popup = false;
 		static bool show_error_popup = false;
 		static bool show_save_popup = false;
+		static bool open_clone_popup = false;
 
 		std::string selected_entity = NIKE_IMGUI_SERVICE->getSelectedEntityName();
 		ImGui::Begin("Entity Component Management");
@@ -219,7 +220,11 @@ namespace NIKE {
 
 			if (ImGui::Button("Clone Entity")) {
 				// TODO: Create popup to choose which entity to clone
+				open_clone_popup = true;
+				ImGui::OpenPopup("Clone Entity");
 			}
+
+			open_clone_popup = cloneEntityPopup();
 
 			// Retrieve and display all registered component types
 			for (const auto& elem : NIKE_ECS_MANAGER->getAllComponentTypes()) {
@@ -334,6 +339,9 @@ namespace NIKE {
 							static NIKE::Animation::Mode selected_mode = NIKE::Animation::Mode::PLAYING;
 							const char* mode_names[] = { "PLAYING", "PAUSE", "RESTART", "END" };
 							int current_mode = static_cast<int>(selected_mode);
+
+							//Current active mode
+							current_mode = static_cast<int>(animate_base_comp.animation_mode);
 
 							// Display the selected resolution
 							ImGui::Text("Current Resolution: %s", mode_names[current_mode]);
