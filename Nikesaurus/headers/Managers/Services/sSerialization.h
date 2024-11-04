@@ -17,6 +17,15 @@ namespace NIKE {
 	namespace Serialization {
 
 		//Component Registry
+		class CompRegister {
+		private:
+			std::unordered_map<std::string, std::function<json(const void*)>> serializers;
+			std::unordered_map<std::string, std::function<void(void*, const json&)>> deserializers;
+		public:
+
+			//template<typename T>
+			//void registerComponent(std::function<>())
+		};
 
 
 		//Serialization Service
