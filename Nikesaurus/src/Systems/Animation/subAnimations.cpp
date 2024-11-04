@@ -10,7 +10,7 @@
 #include "Core/stdafx.h"
 #include "Systems/Animation/subAnimations.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	/*****************************************************************//**
 	* Base Animation
 	*********************************************************************/

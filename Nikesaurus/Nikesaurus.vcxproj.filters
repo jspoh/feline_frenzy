@@ -37,6 +37,8 @@
     <ClCompile Include="src\Systems\Render\sysRender.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
+    <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
+    <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -90,6 +92,8 @@
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
+    <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
+    <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

@@ -99,18 +99,18 @@ namespace NIKE {
 		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Caculate UV Offset
-		Vector2 uv_offset{ e_texture.frame_index.x * e_texture.frame_size.x, e_texture.frame_index.y * e_texture.frame_size.y };
+		Vector2f frame_size{ (1.0f / e_texture.frame_count.x) , (1.0f / e_texture.frame_count.y) };
+		Vector2f uv_offset{ e_texture.frame_index.x * frame_size.x, e_texture.frame_index.y * frame_size.y };
 
 		//Translate UV offset to bottom left
-		uv_offset.y = std::abs(1 - uv_offset.y - e_texture.frame_size.y);
+		uv_offset.y = std::abs(1 - uv_offset.y - frame_size.y);
 
 		//Set uniforms for texture rendering
 		shader_system->setUniform("texture", "u_tex2d", texture_unit);
 		shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
 		shader_system->setUniform("texture", "u_transform", x_form);
 		shader_system->setUniform("texture", "uvOffset", uv_offset);
-		shader_system->setUniform("texture", "frameSize", e_texture.frame_size);
-		shader_system->setUniform("texture", "u_is_font", false);
+		shader_system->setUniform("texture", "frameSize", frame_size);
 
 		//Get model
 		auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
@@ -262,7 +262,7 @@ namespace NIKE {
 			//Allow stretching of texture
 			if (!e_texture.b_stretch) {
 				//Copy transform for texture mapping ( Locks the transformation of a texture )
-				Vector2f tex_size{ (float)NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x, (float)NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y };
+				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x) / e_texture.frame_count.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y) / e_texture.frame_count.y };
 				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 			}
 

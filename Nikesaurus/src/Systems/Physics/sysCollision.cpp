@@ -33,7 +33,7 @@ namespace NIKE {
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
             //Transform back outside of collision
-            transform_a.position += info.mtv;
+            transform_b.position += info.mtv;
 
             //Apply impluse to velocity
             dynamics_b.velocity -= impulse;
