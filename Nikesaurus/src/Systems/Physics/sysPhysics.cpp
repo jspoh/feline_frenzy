@@ -42,7 +42,8 @@ namespace NIKE {
                     continue;
 
                 //Update entities with dynamics
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
+                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity) && 
+                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 
@@ -71,7 +72,10 @@ namespace NIKE {
                 }
 
                 //Collision detection
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
+                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&
+                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity) &&
+                    NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)
+                    ) {
 
                     //Get entity collider
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);

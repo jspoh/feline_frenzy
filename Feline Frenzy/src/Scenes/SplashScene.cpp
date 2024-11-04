@@ -104,6 +104,13 @@ void Splash::Scene::init() {
 	// Test crash logger
 	//LOG_CRASH("This is a test crash");
 
+	//Prefabs testing
+	NIKE::Entity::Type test_1 = NIKE_ECS_SERVICE->createEntity();
+	base_Layer->addEntity(test_1);
+	NIKE_SERIALIZE_SERVICE->loadEntityFromFile(test_1, "assets/Scenes/test.scn");
+	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Animation::Base>(test_1).animations_to_complete = 10;
+	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Animation::Sprite>(test_1).start_index = {0, 4};
+	NIKE_SERIALIZE_SERVICE->saveEntityToFile(test_1, "assets/Scenes/test.scn");
 }
 
 void Splash::Scene::exit() {

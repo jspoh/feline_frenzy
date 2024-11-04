@@ -23,8 +23,8 @@ namespace NIKE {
 		//Component Serializer
 		class CompSerializer {
 		private:
-			std::unordered_map<unsigned int, std::function<nlohmann::json(const void*)>> serializers;
-			std::unordered_map<unsigned int, std::function<void(void*, nlohmann::json const&)>> deserializers;
+			std::unordered_map<std::string, std::function<nlohmann::json(const void*)>> serializers;
+			std::unordered_map<std::string, std::function<void(void*, nlohmann::json const&)>> deserializers;
 
 		public:
 
@@ -33,20 +33,20 @@ namespace NIKE {
 			void registerComponent(std::function<nlohmann::json(T const&)> serialize, std::function<void(T&, nlohmann::json const&)> deserialize) {
 				//Emplace serializer functions
 				serializers.emplace(std::piecewise_construct,
-					std::forward_as_tuple(0),
+					std::forward_as_tuple(Utility::convertTypeString(typeid(T).name())),
 					std::forward_as_tuple([serialize](const void* comp) -> nlohmann::json { return serialize(*static_cast<const T*>(comp)); }));
 
 				//Emplace deserializers functions
 				deserializers.emplace(std::piecewise_construct,
-					std::forward_as_tuple(0),
+					std::forward_as_tuple(Utility::convertTypeString(typeid(T).name())),
 					std::forward_as_tuple([deserialize](void* comp, nlohmann::json const& data) { deserialize(*static_cast<T*>(comp), data); }));
 			}
 
 			//Serialize component
-			nlohmann::json serializeComponent(unsigned int comp_type, const void* comp) const;
+			nlohmann::json serializeComponent(std::string const& comp_name, const void* comp) const;
 
 			//Deserialize component
-			void deserializeComponent(unsigned int comp_type, void* comp, nlohmann::json const& data) const;
+			void deserializeComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const;
 		};
 
 		//Serialization Service

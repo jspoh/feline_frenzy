@@ -43,6 +43,9 @@ namespace NIKE {
 		//Generate random float
 		float NIKE_API randFloat();
 
+		//Convert type to string without nike::
+		std::string convertTypeString(std::string&& str_type);
+
 		// Utility functions
 		template <typename T>
 		T getMax(const T a, const T b) {

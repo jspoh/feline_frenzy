@@ -70,6 +70,27 @@ namespace NIKE {
 		system_manager->updateEntitiesList(entity, sign, type, true);
 	}
 
+	void Coordinator::Manager::removeEntityComponent(Entity::Type entity, Component::Type type) {
+		// Remove component based on Component::Type directly
+		component_manager->removeEntityComponent(entity, type);
+
+		// Set bit signature of component to false
+		Component::Signature sign = entity_manager->getSignature(entity);
+		sign.set(type, false);
+		entity_manager->setSignature(entity, sign);
+
+		// Update entities list
+		system_manager->updateEntitiesList(entity, sign, type, false);
+	}
+
+	void* Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
+		return component_manager->getEntityComponent(entity, type);
+	}
+
+	std::unordered_map<std::string, void*> Coordinator::Manager::getAllComponents(Entity::Type entity) const {
+		return component_manager->getAllComponents(entity);
+	}
+
 	std::unordered_map<std::string, Component::Type> Coordinator::Manager::getAllComponentTypes() const {
 		return component_manager->getAllComponentTypes();
 	}

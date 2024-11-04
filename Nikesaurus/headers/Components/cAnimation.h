@@ -78,6 +78,8 @@ namespace NIKE {
 		};
 
 		void registerComponents();
+
+		nlohmann::json serializeComponents(Entity::Type entity);
 	}
 }
 
