@@ -20,6 +20,9 @@
 namespace NIKE {
     void Physics::Manager::init() {
         collision_system = std::make_unique<Collision::System>();
+
+        std::shared_ptr<Physics::Manager> physics_sys_wrapped(this, [](Physics::Manager*) {});
+        NIKE_EVENTS_SERVICE->addEventListeners<Physics::ChangePhysicsEvent>(physics_sys_wrapped);
     }
 
     void Physics::Manager::update() {

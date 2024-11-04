@@ -16,16 +16,13 @@
 #include "Managers/Services/sEvents.h"
 #include "Systems/Animation/subAnimations.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Animation {
-
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
 
 		/*****************************************************************//**
 		* Animation manager
 		*********************************************************************/
-		class NIKESAURUS_API Manager : public System::ISystem, public Events::IEventListener<Animation::AnimationEvent> {
+		class Manager : public System::ISystem, public Events::IEventListener<Animation::AnimationEvent> {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
@@ -37,12 +34,6 @@ namespace NIKESAURUS {
 		public:
 			//Default Constructor
 			Manager() = default;
-
-			//Singleton Of Manager Class
-			static std::shared_ptr<Manager> getInstance() {
-				static std::shared_ptr<Manager> instance{ std::make_shared<Manager>() };
-				return instance;
-			}
 
 			//Destructor
 			~Manager() = default;
@@ -60,11 +51,8 @@ namespace NIKESAURUS {
 			void update() override;
 
 			//Execute event
-			void executeEvent(std::shared_ptr<Animation::AnimationEvent> event) override;
+			void onEvent(std::shared_ptr<Animation::AnimationEvent> event) override;
 		};
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

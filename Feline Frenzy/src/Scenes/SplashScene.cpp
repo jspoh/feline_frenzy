@@ -26,6 +26,8 @@ void Splash::Scene::load() {
 	//Load Texture
 	NIKE_ASSETS_SERVICE->loadTexture("PLAYER", "assets/Textures/player.png");
 	NIKE_ASSETS_SERVICE->loadTexture("TREE", "assets/Textures/Tree_Orange.png");
+	NIKE_ASSETS_SERVICE->loadTexture("ZOMBIE", "assets/Textures/ZombieSheet.png");
+
 	//Load Font
 	NIKE_ASSETS_SERVICE->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
 
@@ -51,6 +53,8 @@ void Splash::Scene::init() {
 	// Test Logger
 	NIKEE_WARN("This is a warning message");
 
+	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Physics::ChangePhysicsEvent>(1.0f));
+
 	//Create player
 	NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("player_1", player_1);
@@ -58,7 +62,7 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 200.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::BOUNCE));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("PLAYER", {0.0f, 0.0f, 0.0f, 1.0f}));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {0.0f, 0.0f, 0.0f, 1.0f}, false, {9, 5}, {0, 0}));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));

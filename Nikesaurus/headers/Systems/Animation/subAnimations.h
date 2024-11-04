@@ -15,16 +15,13 @@
 #include "Components/cAnimation.h"
 #include "Components/cRender.h"
 
-namespace NIKESAURUS {
+namespace NIKE {
 	namespace Animation {
-
-		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
 
 		/*****************************************************************//**
 		* Base Animation
 		*********************************************************************/
-		class NIKESAURUS_API Base {
+		class Base {
 		protected:
 			//Stop Animation
 			virtual void stopAnimation(Animation::cBase& base_components);
@@ -52,7 +49,7 @@ namespace NIKESAURUS {
 		/*****************************************************************//**
 		* Spritesheet Animation
 		*********************************************************************/
-		class NIKESAURUS_API SpriteSheet : public Animation::Base {
+		class SpriteSheet : public Animation::Base {
 		private:
 
 			//Calculate number of frames
@@ -74,9 +71,6 @@ namespace NIKESAURUS {
 			//Get event
 			void executeEvent(Animation::Mode event_mode, Animation::cBase& base_components);
 		};
-
-		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
 	}
 }
 

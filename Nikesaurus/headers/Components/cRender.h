@@ -99,13 +99,13 @@ namespace NIKE {
 		struct Texture {
 			std::string texture_ref;
 			Color color;
-			Vector2f frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
+			Vector2i frame_count;	// x: 1 / frames in col,  y: 1 / frames in row
 			Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
 			bool b_stretch;
 
-			Texture() : texture_ref{ "" }, color(), frame_size(), frame_index(), b_stretch{ false } {}
-			Texture(std::string const& texture_ref, Color const& color, bool b_stretch = false, Vector2f const& frame_size = {1.0f, 1.0f}, Vector2i const& frame_index = {0, 0})
-				:texture_ref{ texture_ref }, color{ color }, frame_size{ frame_size }, frame_index{ frame_index }, b_stretch{ b_stretch } {}
+			Texture() : texture_ref{ "" }, color(), frame_count(), frame_index(), b_stretch{ false } {}
+			Texture(std::string const& texture_ref, Color const& color, bool b_stretch = false, Vector2i const& frame_count = {1, 1}, Vector2i const& frame_index = {0, 0})
+				:texture_ref{ texture_ref }, color{ color }, frame_count{ frame_count }, frame_index{ frame_index }, b_stretch{ b_stretch } {}
 		};
 	}
 }
