@@ -697,7 +697,7 @@ namespace NIKE {
 		if (!NIKE_IMGUI_SERVICE->populateLists) {
 			cameraEntities.clear();
 
-			cameraEntities.emplace_back("Free Cam", -1);
+			cameraEntities.emplace_back(std::string("Free Cam"), static_cast<Entity::Type>(-1));
 			// Populate the cameraEntities list only once
 			for (const auto& elem : NIKE_IMGUI_SERVICE->getEntityRef()) {
 				if (NIKE_IMGUI_SERVICE->checkEntityExist(elem.first)) {
@@ -726,7 +726,7 @@ namespace NIKE {
 				};
 
 			// Use the lambda with ImGui::Combo
-			if (ImGui::Combo("##CameraSelector", &selectedCameraIndex, cameraNameGetter, &cameraEntities, cameraEntities.size())) {
+			if (ImGui::Combo("##CameraSelector", &selectedCameraIndex, cameraNameGetter, &cameraEntities, static_cast<int>(cameraEntities.size()))) {
 				// Dispatch an event when the camera selection changes
 				Entity::Type entity = cameraEntities[selectedCameraIndex].second;
 				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(entity));

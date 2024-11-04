@@ -193,7 +193,7 @@ namespace NIKE {
         }
 
         // Apply scaling and rotation
-        float angleRad = transform.rotation * (M_PI / 180.0f);  // Ensure degrees to radians
+        float angleRad = static_cast<float>(transform.rotation * (M_PI / 180.0f));  // Ensure degrees to radians
         float cosAngle = cos(angleRad);
         float sinAngle = sin(angleRad);
         Vector2f position = transform.position;

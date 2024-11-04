@@ -29,7 +29,7 @@ namespace NIKE {
 		return nlohmann::json();
 	}
 
-	void Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& data) {
+	void Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& ddata) {
 
 	}
 
