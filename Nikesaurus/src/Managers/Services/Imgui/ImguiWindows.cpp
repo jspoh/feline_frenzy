@@ -250,7 +250,7 @@ namespace NIKE {
 							ImGui::Text("Enter a texture ref:");
 							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {}
 							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
-							ImGui::DragInt2("Frame Count", &texture_comp.frame_count.x, 1);
+							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
@@ -289,8 +289,8 @@ namespace NIKE {
 							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
 							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
 							ImGui::DragFloat("Max Speed", &dynamics_comp.max_speed, 0.1f);
-							ImGui::DragFloat("Drag", &dynamics_comp.max_speed, 0.1f);
-							ImGui::DragFloat("Mass", &dynamics_comp.max_speed, 0.1f);
+							ImGui::DragFloat("Drag", &dynamics_comp.drag, 0.1f);
+							ImGui::DragFloat("Mass", &dynamics_comp.mass, 0.1f);
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))

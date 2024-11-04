@@ -94,4 +94,8 @@ namespace NIKE {
 	ECS_DEFINE_TYPES(Render::Shape)
 	ECS_DEFINE_TYPES(Render::Text)
 	ECS_DEFINE_TYPES(Render::Texture)
+
+	//Define animation types
+	ECS_DEFINE_TYPES(Animation::Base)
+	ECS_DEFINE_TYPES(Animation::Sprite)
 }

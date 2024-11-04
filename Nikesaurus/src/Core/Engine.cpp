@@ -12,11 +12,9 @@
  //
  //Registered Systems
 #include "Systems/sysAudio.h"
-//#include "../headers/Systems/sysInput.h"
 #include "../headers/Systems/Physics/sysPhysics.h"
-//#include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/Animation/sysAnimation.h"
 #include "../headers/Systems/Render/sysRender.h"
-//#include "../headers/Systems/GameLogic/sysObjectSpawner.h"
 
 namespace NIKE {
 
@@ -35,18 +33,14 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Physics::Collider>();
 
 		////Register animation components
-		//ecs_coordinator->registerComponent<Animation::cBase>();
-		//ecs_coordinator->registerComponent<Animation::cSprite>();
+		NIKE_ECS_MANAGER->registerComponent<Animation::Base>();
+		NIKE_ECS_MANAGER->registerComponent<Animation::Sprite>();
 
 		////Register render components
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Color>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Cam>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
-
-		////Register audio components
-		//ecs_coordinator->registerComponent<Audio::cAudio>();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -61,11 +55,9 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 
 		////Register animation manager
-		//ecs_coordinator->registerSystem<Animation::Manager>(Animation::Manager::getInstance());
-		//accessEvents()->addEventListeners<Animation::AnimationEvent>(accessSystem<Animation::Manager>());
-		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Animation::cBase>());
-		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Animation::cSprite>());
-		//ecs_coordinator->addSystemComponentType<Animation::Manager>(getComponentType<Render::Texture>());
+		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Animation::Manager>(NIKE_ECS_MANAGER->getComponentType<Animation::Base>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Animation::Manager>(NIKE_ECS_MANAGER->getComponentType<Animation::Sprite>());
 
 		//Register render manager
 		NIKE_ECS_MANAGER->registerSystem<Render::Manager>(false);

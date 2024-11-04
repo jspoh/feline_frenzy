@@ -3443,7 +3443,7 @@ namespace ImGui
     IMGUI_API void          EndErrorTooltip();
 
     // Debug Tools
-    IMGUI_API void          DebugAllocHook(ImGuiDebugAllocInfo* info, int frame_count, void* ptr, size_t size); // size >= 0 : alloc, size = -1 : free
+    IMGUI_API void          DebugAllocHook(ImGuiDebugAllocInfo* info, int frame_size, void* ptr, size_t size); // size >= 0 : alloc, size = -1 : free
     IMGUI_API void          DebugDrawCursorPos(ImU32 col = IM_COL32(255, 0, 0, 255));
     IMGUI_API void          DebugDrawLineExtents(ImU32 col = IM_COL32(255, 0, 0, 255));
     IMGUI_API void          DebugDrawItemRect(ImU32 col = IM_COL32(255, 0, 0, 255));

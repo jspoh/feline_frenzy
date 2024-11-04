@@ -14,31 +14,32 @@
 
 namespace NIKE {
 	void Animation::Manager::init() {
-		sprite_animator = std::make_unique<Animation::SpriteSheet>();
-
-		std::shared_ptr<Animation::Manager> animation_sys_wrapped(this, [](Animation::Manager*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<Animation::AnimationEvent>(animation_sys_wrapped);
+		sprite_animator = std::make_unique<Animation::SpriteAnimator>();
 	}
 
 	void Animation::Manager::update() {
-		for (auto& entity : entities) {
-			//Update camera position
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Animation::cSprite>(entity)) {
-				sprite_animator->animateSprite(NIKE_ECS_MANAGER->getEntityComponent<Animation::cBase>(entity), NIKE_ECS_MANAGER->getEntityComponent<Animation::cSprite>(entity), NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity));
-			}
-		}
-	}
+		//Iterate through layers
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			//SKip inactive layer
+			if (!layer->getLayerState())
+				continue;
 
-	//Execute event
-	void Animation::Manager::onEvent(std::shared_ptr<Animation::AnimationEvent> new_event) {
+			//Iterate through all entities
+			for (auto& entity : entities) {
 
-		//Execute event on animator
-		for (auto& entity : entities) {
-			if (NIKE_ECS_MANAGER->getEntityComponent<Animation::cBase>(entity).animator_id == new_event->animator_id) {
-				if (new_event->animation_action == Animation::Mode::RESTART) {
-					NIKE_ECS_MANAGER->getEntityComponent<Animation::cSprite>(entity).curr_index = NIKE_ECS_MANAGER->getEntityComponent<Animation::cSprite>(entity).start_index;
+				//Skip entities that are not present within layer, or doesnt have the base animators
+				if (!layer->checkEntity(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Animation::Base>(entity))
+					continue;
+
+				//Update entities with spritesheet
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Animation::Sprite>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
+					auto& e_baseanimator = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+					auto& e_spriteanimator = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+					auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+
+					//Animate spritesheet
+					sprite_animator->animateSprite(e_baseanimator, e_spriteanimator, e_texture);
 				}
-				sprite_animator->executeEvent(new_event->animation_action, NIKE_ECS_MANAGER->getEntityComponent<Animation::cBase>(entity));
 			}
 		}
 	}

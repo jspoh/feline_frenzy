@@ -21,55 +21,42 @@ namespace NIKE {
 		/*****************************************************************//**
 		* Base Animation
 		*********************************************************************/
-		class Base {
-		protected:
-			//Stop Animation
-			virtual void stopAnimation(Animation::cBase& base_components);
-
-			//Resume Animation
-			virtual void resumeAnimation(Animation::cBase& base_components);
-
-			//Restart Animation ( Can Only Be Called If Animation Paused Abruptly )
-			virtual void restartAnimation(Animation::cBase& base_components);
-
-			//Set Animation Finished
-			void finishAnimation(Animation::cBase& base_components);
-
+		class BaseAnimator {
 		protected:
 			//Default Constructor
-			Base() = default;
+			BaseAnimator() = default;
 
 			//Check If Animation Ends
-			void animationEndChecker(Animation::cBase& base_components);
+			void animationEndChecker(Animation::Base& base_components);
+
+			//Base animator update
+			void update(Animation::Base& base_components);
 
 			//Virtual destructor
-			virtual ~Base() = default;
+			virtual ~BaseAnimator() = default;
 		};
 
 		/*****************************************************************//**
 		* Spritesheet Animation
 		*********************************************************************/
-		class SpriteSheet : public Animation::Base {
+		class SpriteAnimator : public Animation::BaseAnimator {
 		private:
 
 			//Calculate number of frames
-			int frameCount(Animation::cSprite const& sprite_component);
+			int frameCount(Animation::Sprite const& sprite_component);
 
 			//Sheet Iterator Function
-			void iterateForward(Animation::cSprite& sprite_component);
-			void iterateBackWard(Animation::cSprite& sprite_component);
+			void iterateForward(Animation::Sprite& sprite_component);
+			void iterateBackWard(Animation::Sprite& sprite_component);
 		public:
 			//Default constructor
-			SpriteSheet() = default;
+			SpriteAnimator() = default;
 
 			//animate spritesheet
-			void animateSprite(Animation::cBase& base_component, Animation::cSprite& sprite_component, Render::Texture& sprite_texture);
+			void animateSprite(Animation::Base& base_component, Animation::Sprite& sprite_component, Render::Texture& sprite_texture);
 
 			//Default destructor
-			~SpriteSheet() override = default;
-
-			//Get event
-			void executeEvent(Animation::Mode event_mode, Animation::cBase& base_components);
+			~SpriteAnimator() override = default;
 		};
 	}
 }

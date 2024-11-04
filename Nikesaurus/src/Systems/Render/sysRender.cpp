@@ -99,18 +99,23 @@ namespace NIKE {
 		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Caculate UV Offset
-		Vector2f frame_size{ (1.0f / e_texture.frame_count.x) , (1.0f / e_texture.frame_count.y) };
-		Vector2f uv_offset{ e_texture.frame_index.x * frame_size.x, e_texture.frame_index.y * frame_size.y };
+		Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+		Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
 
 		//Translate UV offset to bottom left
-		uv_offset.y = std::abs(1 - uv_offset.y - frame_size.y);
+		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
 
 		//Set uniforms for texture rendering
 		shader_system->setUniform("texture", "u_tex2d", texture_unit);
 		shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
 		shader_system->setUniform("texture", "u_transform", x_form);
 		shader_system->setUniform("texture", "uvOffset", uv_offset);
-		shader_system->setUniform("texture", "frameSize", frame_size);
+		shader_system->setUniform("texture", "frameSize", framesize);
+
+		//Blending options for texture
+		shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
+		shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
+		shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
 		//Get model
 		auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
@@ -211,7 +216,7 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Manager::renderWireFrame(Matrix_33 const& x_form, Render::Color const& e_color) {
+	void Render::Manager::renderWireFrame(Matrix_33 const& x_form, Vector4f const& e_color) {
 		//Set Polygon Mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -262,7 +267,7 @@ namespace NIKE {
 			//Allow stretching of texture
 			if (!e_texture.b_stretch) {
 				//Copy transform for texture mapping ( Locks the transformation of a texture )
-				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x) / e_texture.frame_count.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y) / e_texture.frame_count.y };
+				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y) / e_texture.frame_size.y };
 				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 			}
 
@@ -275,7 +280,7 @@ namespace NIKE {
 
 		if (debugMode) {
 			// Render debugging wireframe
-			Render::Color wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+			Vector4f wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
 
 			//Check for collider component
 			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {

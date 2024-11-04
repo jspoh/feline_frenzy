@@ -9,53 +9,49 @@
 
 #include "Core/stdafx.h"
 #include "Systems/Animation/subAnimations.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	/*****************************************************************//**
 	* Base Animation
 	*********************************************************************/
-	void Animation::Base::animationEndChecker(Animation::cBase& base_components) {
+	void Animation::BaseAnimator::animationEndChecker(Animation::Base& base_components) {
 		//Incr Completed Animations ( If animations to complete == 0, animation will keep running ) 
 		if (++base_components.completed_animations >= base_components.animations_to_complete && base_components.animations_to_complete) {
-			base_components.b_animation_stop = true;
-			base_components.b_animation_finished = true;
+			cout << "HERE" << endl;
+			base_components.animation_mode = Mode::END;
 			base_components.animations_to_complete = base_components.completed_animations;
 		}
 	}
 
-	void Animation::Base::stopAnimation(Animation::cBase& base_components) {
-		base_components.b_animation_stop = true;
-	}
-
-	void Animation::Base::resumeAnimation(Animation::cBase& base_components) {
-		if (!base_components.b_animation_finished) {
-			base_components.b_animation_stop = false;
+	void Animation::BaseAnimator::update(Animation::Base& base_components) {
+		switch (base_components.animation_mode) {
+		case Mode::PLAYING:
+			break;
+		case Mode::PAUSE:
+			break;
+		case Mode::RESTART:
+			base_components.completed_animations = 0;
+			base_components.b_reverse = false;
+			base_components.animation_mode = Mode::PLAYING;
+			break;
+		case Mode::END:
+			break;
+		default:
+			break;
 		}
-	}
-
-	void Animation::Base::restartAnimation(Animation::cBase& base_components) {
-		base_components.b_animation_stop = false;
-		base_components.b_animation_finished = false;
-		base_components.completed_animations = 0;
-
-		base_components.b_reverse = false;
-	}
-
-	void Animation::Base::finishAnimation(Animation::cBase& base_components) {
-		base_components.b_animation_finished = true;
-		base_components.b_animation_stop = true;
 	}
 
 	/*****************************************************************//**
 	* Spritesheet Animation
 	*********************************************************************/
 
-	int Animation::SpriteSheet::frameCount(Animation::cSprite const& sprite_component) {
-		int start_row = (int)sprite_component.start_index.y;
-		int start_col = (int)sprite_component.start_index.x;
-		int end_row = (int)sprite_component.end_index.y;
-		int end_col = (int)sprite_component.end_index.x;
-		int sheet_width = (int)sprite_component.sheet_size.x;  // Number of columns in the sprite sheet
+	int Animation::SpriteAnimator::frameCount(Animation::Sprite const& sprite_component) {
+		int start_row = sprite_component.start_index.y;
+		int start_col = sprite_component.start_index.x;
+		int end_row = sprite_component.end_index.y;
+		int end_col = sprite_component.end_index.x;
+		int sheet_width = sprite_component.sheet_size.x;  // Number of columns in the sprite sheet
 
 		// Calculate number of rows between start and end indices
 		int row_diff = end_row - start_row;
@@ -71,7 +67,7 @@ namespace NIKE {
 		return num_sprites;
 	}
 
-	void Animation::SpriteSheet::iterateForward(Animation::cSprite& sprite_component) {
+	void Animation::SpriteAnimator::iterateForward(Animation::Sprite& sprite_component) {
 		//Iterate Sprites Forward
 		if (sprite_component.curr_index.x < sprite_component.sheet_size.x - 1) {
 			//Increment X
@@ -91,7 +87,7 @@ namespace NIKE {
 		}
 	}
 
-	void Animation::SpriteSheet::iterateBackWard(Animation::cSprite& sprite_component) {
+	void Animation::SpriteAnimator::iterateBackWard(Animation::Sprite& sprite_component) {
 		//Iterate Sprites Backward
 		if (sprite_component.curr_index.x > 0) {
 			//Increment X
@@ -111,15 +107,22 @@ namespace NIKE {
 		}
 	}
 
-	void Animation::SpriteSheet::animateSprite(Animation::cBase& base_component, Animation::cSprite& sprite_component, Render::Texture& sprite_texture) {
-		//Calculate Time Before Next Animation
-		float timePerAnimation{ base_component.animation_speed / frameCount(sprite_component) };
+	void Animation::SpriteAnimator::animateSprite(Animation::Base& base_component, Animation::Sprite& sprite_component, Render::Texture& sprite_texture) {
+		
+		//Set texture frame index
+		sprite_texture.frame_index = sprite_component.curr_index;
+		
+		////Calculate Time Before Next Animation
+		//float timePerAnimation{ base_component.animation_duration / frameCount(sprite_component) };
+
+		//Increment timer with delta time
+		base_component.timer += NIKE_WINDOWS_SERVICE->getDeltaTime();
 
 		//Wait For Next Iteration
-		if (base_component.timer.getElapsedTime() >= timePerAnimation && !base_component.b_animation_stop) {
+		if (base_component.timer >= base_component.frame_duration && (base_component.animation_mode == Mode::PLAYING)) {
 
 			//Reset Timer
-			base_component.timer.restartClock();
+			base_component.timer = 0.0f;
 
 			//If End Has Been Reached
 			if (sprite_component.curr_index == sprite_component.end_index) {
@@ -134,6 +137,7 @@ namespace NIKE {
 				}
 				else {
 					sprite_component.curr_index = sprite_component.start_index;
+					return;
 				}
 			}
 
@@ -156,29 +160,9 @@ namespace NIKE {
 		}
 
 		//Move sprite index back to starting index
-		if (base_component.b_animation_finished) {
+		if (base_component.animation_mode == Mode::END) {
 			sprite_component.curr_index = sprite_component.start_index;
-		}
-
-		sprite_texture.frame_index = sprite_component.curr_index;
-	}
-
-	void Animation::SpriteSheet::executeEvent(Animation::Mode event_mode, Animation::cBase& base_components) {
-		switch (event_mode) {
-		case Animation::Mode::PAUSE:
-			stopAnimation(base_components);
-			break;
-		case Animation::Mode::RESUME:
-			resumeAnimation(base_components);
-			break;
-		case Animation::Mode::RESTART:
-			restartAnimation(base_components);
-			break;
-		case Animation::Mode::END:
-			finishAnimation(base_components);
-			break;
-		default:
-			break;
+			return;
 		}
 	}
 }
