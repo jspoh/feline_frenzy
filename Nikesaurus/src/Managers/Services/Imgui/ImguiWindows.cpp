@@ -194,6 +194,7 @@ namespace NIKE {
 		static bool open_component_popup = false;
 		static bool show_error_popup = false;
 		static bool show_save_popup = false;
+		static bool open_clone_popup = false;
 
 		std::string selected_entity = NIKE_IMGUI_SERVICE->getSelectedEntityName();
 		ImGui::Begin("Entity Component Management");
@@ -219,7 +220,11 @@ namespace NIKE {
 
 			if (ImGui::Button("Clone Entity")) {
 				// TODO: Create popup to choose which entity to clone
+				open_clone_popup = true;
+				ImGui::OpenPopup("Clone Entity");
 			}
+
+			open_clone_popup = cloneEntityPopup();
 
 			// Retrieve and display all registered component types
 			for (const auto& elem : NIKE_ECS_MANAGER->getAllComponentTypes()) {
