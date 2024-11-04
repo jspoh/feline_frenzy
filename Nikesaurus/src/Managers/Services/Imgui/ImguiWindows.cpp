@@ -101,7 +101,7 @@ namespace NIKE {
 					for (const auto& [name, percentage] : sys_percentages) {
 						double barPercent = percentage / 100.0;
 						ImGui::Text("%s : %.2f%%", name.c_str(), percentage);
-						ImGui::ProgressBar(barPercent, ImVec2(-1, 0));
+						ImGui::ProgressBar(static_cast<float>(barPercent), ImVec2(-1, 0));
 					}
 					ImGui::Spacing();
 					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->total_system_time);
@@ -169,7 +169,7 @@ namespace NIKE {
 		//if (!selected_entity_name.empty()) {
 			// Display the Remove Entity Popup if open, passing in the selected entity
 			//Entity::Type to_remove = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity_name);
-			open_popup = removeEntityPopup();
+		open_popup = removeEntityPopup();
 		//}
 
 		// Show number of entities in the level
@@ -191,7 +191,7 @@ namespace NIKE {
 
 	void imguiEntityComponentManagementWindow()
 	{
-		static bool open_component_popup = false; 
+		static bool open_component_popup = false;
 		static bool show_error_popup = false;
 		static bool show_save_popup = false;
 
@@ -266,6 +266,48 @@ namespace NIKE {
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else if (component_name == "Physics::Dynamics") {
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+
+							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
+							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
+							ImGui::DragFloat("Max Speed", &dynamics_comp.max_speed, 0.1f);
+							ImGui::DragFloat("Drag", &dynamics_comp.max_speed, 0.1f);
+							ImGui::DragFloat("Mass", &dynamics_comp.max_speed, 0.1f);
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else if (component_name == "Physics::Collider") {
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+
+							// Variable to hold the selected resolution
+							static NIKE::Physics::Resolution selected_resolution = NIKE::Physics::Resolution::NONE;
+
+							// Display a dropdown to select resolution
+							// For now this hard code it 
+							const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
+							int current_resolution = static_cast<int>(selected_resolution);
+
+							// Combo box for selecting resolution
+							if (ImGui::Combo("##Resolution", &current_resolution, resolution_names, IM_ARRAYSIZE(resolution_names))) {
+								selected_resolution = static_cast<NIKE::Physics::Resolution>(current_resolution);
+								dynamics_comp.resolution = selected_resolution;
+							}
+
+							// Optional: display the selected resolution
+							ImGui::Text("Current Resolution: %s", resolution_names[current_resolution]);
+
+
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{

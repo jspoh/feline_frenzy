@@ -19,9 +19,9 @@ namespace NIKE {
     namespace Physics {
 
         struct Dynamics {
-            const float max_speed;
-            const float drag;
-            const float mass;
+            float max_speed;
+            float drag;
+            float mass;
             Vector2f velocity;
             Vector2f force;
 
