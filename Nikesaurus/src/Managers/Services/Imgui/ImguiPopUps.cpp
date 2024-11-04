@@ -211,9 +211,6 @@ namespace NIKE
             is_popup_open = true; 
         }
 
-
-
-
         return is_popup_open;
     }
 
@@ -261,5 +258,57 @@ namespace NIKE
         }
         return is_open;
     }
+
+    bool cloneEntityPopup() {
+        static char new_entity_name[64] = "";
+
+        // Set a default name for the clone if not already set
+        if (strlen(new_entity_name) == 0) {
+            snprintf(new_entity_name, sizeof(new_entity_name), "%s_clone", NIKE_IMGUI_SERVICE->getSelectedEntityName().c_str());
+        }
+
+        bool is_popup_open = false;
+
+        // Check if the popup should be opened
+        if (ImGui::BeginPopupModal("Clone Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter a new name for the cloned entity:");
+            ImGui::InputText("##New Entity Name", new_entity_name, IM_ARRAYSIZE(new_entity_name));
+
+            if (ImGui::Button("Clone")) {
+                // Check if an entity with the new name already exists
+                if (!NIKE_IMGUI_SERVICE->checkEntityExist(new_entity_name)) {
+                    // Clone the selected entity with the new name
+                    Entity::Type to_clone = NIKE_IMGUI_SERVICE->getEntityByName(NIKE_IMGUI_SERVICE->getSelectedEntityName());
+                    Entity::Type cloned_entity = NIKE_ECS_MANAGER->cloneEntity(to_clone);
+
+                    NIKE_IMGUI_SERVICE->getEntityRef()[new_entity_name] = cloned_entity;
+
+                    // Reset the name buffer for the next use
+                    memset(new_entity_name, 0, sizeof(new_entity_name));
+
+                    ImGui::CloseCurrentPopup();
+                    is_popup_open = false;
+                }
+                else {
+                    ImGui::Text("An entity with this name already exists.");
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false;
+            }
+
+            ImGui::EndPopup();
+        }
+        else {
+            is_popup_open = true;
+        }
+
+        return is_popup_open;
+    }
+
 
 }
