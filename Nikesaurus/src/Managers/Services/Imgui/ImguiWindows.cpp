@@ -244,8 +244,15 @@ namespace NIKE {
 						else if (component_name == "Render::Texture") {
 							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 							static char texture_ref[300];
-							// Ensure null-termination
-							texture_ref[sizeof(texture_ref) - 1] = '\0';
+							static bool texture_initialized = false;
+
+							//For initial initialization
+							if (!texture_initialized) {
+								// Ensure null-termination
+								texture_ref[sizeof(texture_ref) - 1] = '\0';
+								strcpy_s(texture_ref, texture_comp.texture_ref.c_str());
+								texture_initialized = true;
+							}
 
 							ImGui::Text("Enter a texture ref:");
 							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {}
@@ -315,11 +322,70 @@ namespace NIKE {
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
+						else if (component_name == "Animation::Base") {
+							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+
+							ImGui::DragInt("Number of Animations (If set to 0, infinite number of animations)", &animate_base_comp.animations_to_complete, 1);
+							ImGui::DragInt("Completed Animations", &animate_base_comp.completed_animations, 1);
+							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .1f);
+							ImGui::DragFloat("Animation timer", &animate_base_comp.timer, .1f);
+
+							// Variable to hold the selected resolution
+							static NIKE::Animation::Mode selected_mode = NIKE::Animation::Mode::PLAYING;
+							const char* mode_names[] = { "PLAYING", "PAUSE", "RESTART", "END" };
+							int current_mode = static_cast<int>(selected_mode);
+
+							// Display the selected resolution
+							ImGui::Text("Current Resolution: %s", mode_names[current_mode]);
+
+							// Combo box for selecting text origin
+							if (ImGui::Combo("##Origin", &current_mode, mode_names, IM_ARRAYSIZE(mode_names))) {
+								selected_mode = static_cast<NIKE::Animation::Mode>(current_mode);
+								animate_base_comp.animation_mode = selected_mode;
+							}
+
+							ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
+							if (ImGui::Button("Toggle Ping Pong")) {
+								animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
+							}
+
+							ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
+							if (ImGui::Button("Toggle Reverse")) {
+								animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							}
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else if (component_name == "Animation::Sprite") {
+							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+
+							ImGui::DragInt2("Sheet Size", &animate_sprite_comp.sheet_size.x, 1);
+							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
+							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
+							ImGui::DragInt2("Current Index", &animate_sprite_comp.curr_index.x, 1);
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
 						else if (component_name == "Render::Shape") {
 							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
 							static char input_model_ref[300];
-							// Ensure null-termination
-							input_model_ref[sizeof(input_model_ref) - 1] = '\0';
+							static bool shape_initialized = false;
+
+							if (!shape_initialized) {
+								// Ensure null-termination
+								input_model_ref[sizeof(input_model_ref) - 1] = '\0';
+								strcpy_s(input_model_ref, shape_comp.model_ref.c_str());
+								shape_initialized = true;
+							}
+
 							ImGui::Text("Enter the shape model to use:");
 							if (ImGui::InputText("##shapeRef", input_model_ref, IM_ARRAYSIZE(input_model_ref))) {
 								// Optionally handle input change here if needed
@@ -357,10 +423,17 @@ namespace NIKE {
 							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
 							static char input_font_ref[300];
-							static char input_text[300];
-							// Ensure null-termination
-							input_font_ref[sizeof(input_font_ref) - 1] = '\0';
-							input_text[sizeof(input_text) - 1] = '\0';
+							static char input_text[300];							
+							static bool text_initialized = false;
+
+							if (!text_initialized) {
+								// Ensure null-termination
+								input_font_ref[sizeof(input_font_ref) - 1] = '\0';
+								input_text[sizeof(input_text) - 1] = '\0';
+								strcpy_s(input_font_ref, text_comp.font_ref.c_str());
+								strcpy_s(input_text, text_comp.text.c_str());
+								text_initialized = true;
+							}
 
 							ImGui::Text("Enter the font to use:");
 							if (ImGui::InputText("##fontRef", input_font_ref, IM_ARRAYSIZE(input_font_ref))) {
@@ -457,9 +530,16 @@ namespace NIKE {
 							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 							static char input_audio_id[300];
 							static char input_channel_group_id[300];
-							// Ensure null-termination
-							input_audio_id[sizeof(input_audio_id) - 1] = '\0';
-							input_channel_group_id[sizeof(input_channel_group_id) - 1] = '\0';
+							static bool audio_initialized = false;
+
+							if (!audio_initialized) {
+								// Ensure null-termination
+								input_audio_id[sizeof(input_audio_id) - 1] = '\0';
+								input_channel_group_id[sizeof(input_channel_group_id) - 1] = '\0';
+								strcpy_s(input_audio_id, sfx_comp.audio_id.c_str());
+								strcpy_s(input_channel_group_id, sfx_comp.channel_group_id.c_str());
+								audio_initialized = true;
+							}
 
 							ImGui::Text("Enter Audio ID:");
 							if (ImGui::InputText("##audioID", input_audio_id, IM_ARRAYSIZE(input_audio_id))) {
@@ -535,7 +615,7 @@ namespace NIKE {
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
-						// Additional component-specific UI elements can go here
+						// Additional component-specific UI elements goes here
 					}
 				}
 			}
