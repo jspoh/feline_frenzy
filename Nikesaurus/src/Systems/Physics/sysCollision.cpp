@@ -168,6 +168,117 @@ namespace NIKE {
         return true; // Collision detected
     }
 
+    // SAT helper functions
+
+    // Helper to retrieve and apply transformations to vertices based on model_ref
+    std::vector<Vector2f> Collision::System::getRotatedVertices(const Transform::Transform& transform, const std::string& model_ref) {
+        std::vector<Vector2f> vertices;
+
+        // Define vertices for each model type
+        if (model_ref == "triangle") {
+            vertices = {
+                Vector2f(-0.5f, -0.5f),
+                Vector2f(0.5f, -0.5f),
+                Vector2f(0.0f, 0.5f)
+            };
+        }
+        else if (model_ref == "square" || model_ref == "square-texture") {
+            vertices = {
+                Vector2f(0.5f, -0.5f),
+                Vector2f(0.5f, 0.5f),
+                Vector2f(-0.5f, 0.5f),
+                Vector2f(-0.5f, -0.5f)
+            };
+        }
+
+        // Transformation matrices for scaling, rotation, and translation
+        float cosAngle = cos(transform.rotation);
+        float sinAngle = sin(transform.rotation);
+        Vector2f position = transform.position;
+        Vector2f scale = transform.scale;
+
+        // Apply transformations
+        for (Vector2f& vertex : vertices) {
+            vertex.x *= scale.x;
+            vertex.y *= scale.y;
+            float x = vertex.x;
+            float y = vertex.y;
+            vertex.x = position.x + (x * cosAngle - y * sinAngle);
+            vertex.y = position.y + (x * sinAngle + y * cosAngle);
+        }
+        return vertices;
+    }
+
+    std::vector<Vector2f> Collision::System::getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB) {
+        std::vector<Vector2f> axes;
+
+        auto addAxesFromEdges = [&](const std::vector<Vector2f>& vertices) {
+            for (size_t i = 0; i < vertices.size(); ++i) {
+                Vector2f edge = vertices[(i + 1) % vertices.size()] - vertices[i];
+                Vector2f axis(-edge.y, edge.x);
+                axis = axis.normalize();
+                axes.push_back(axis);
+            }
+            };
+
+        addAxesFromEdges(verticesA);
+        addAxesFromEdges(verticesB);
+        return axes;
+    }
+
+    void Collision::System::projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max) {
+        min = max = axis.dot(vertices[0]);
+        for (const Vector2f& vertex : vertices) {
+            float projection = axis.dot(vertex);
+            if (projection < min) min = projection;
+            if (projection > max) max = projection;
+        }
+    }
+
+
+    // Main detect SAT function
+    bool Collision::System::detectSATCollision(const Transform::Transform& transformA, const Transform::Transform& transformB,
+        const std::string& model_refA, const std::string& model_refB, CollisionInfo& info) {
+        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_refA);
+        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_refB);
+        std::vector<Vector2f> axes = getSeparatingAxes(verticesA, verticesB);
+
+        Vector2f smallestAxis;
+        bool collisionDetected = true;
+        bool firstOverlapCalculated = false;
+        float minOverlap = 0.0f;
+
+        for (const Vector2f& axis : axes) {
+            float minA, maxA, minB, maxB;
+            projectVerticesOnAxis(verticesA, axis, minA, maxA);
+            projectVerticesOnAxis(verticesB, axis, minB, maxB);
+
+            // Check if projections do not overlap
+            if (maxA < minB || maxB < minA) {
+                collisionDetected = false;
+                break;
+            }
+
+            // Calculate overlap
+            float overlap = Utility::getMin(maxA, maxB) - Utility::getMax(minA, minB);
+
+            // Set minOverlap on the first calculation or update if a smaller overlap is found
+            if (!firstOverlapCalculated || overlap < minOverlap) {
+                minOverlap = overlap;
+                smallestAxis = axis;
+                firstOverlapCalculated = true;
+            }
+        }
+
+        if (collisionDetected) {
+            info.mtv = smallestAxis * minOverlap;
+            info.collision_normal = smallestAxis;
+        }
+        return collisionDetected;
+    }
+
+
+
     void Collision::System::collisionResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
