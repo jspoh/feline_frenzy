@@ -335,6 +335,9 @@ namespace NIKE {
 							const char* mode_names[] = { "PLAYING", "PAUSE", "RESTART", "END" };
 							int current_mode = static_cast<int>(selected_mode);
 
+							//Current active mode
+							current_mode = static_cast<int>(animate_base_comp.animation_mode);
+
 							// Display the selected resolution
 							ImGui::Text("Current Resolution: %s", mode_names[current_mode]);
 
