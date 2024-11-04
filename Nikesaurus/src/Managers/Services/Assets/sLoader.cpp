@@ -1,10 +1,10 @@
-/*****************************************************************//**
+ï»¿/*****************************************************************//**
  * \file   sysFont.cpp
  * \brief	Font render manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -199,7 +199,7 @@ namespace NIKE {
 			// get tex_size of texture file
 			tex_size = static_cast<int>(texture_file.tellg());
 
-			cout << "HERE: " <<  tex_size << '\n';
+			cout << "HERE: " << tex_size << '\n';
 
 			// return to beginning of file
 			texture_file.seekg(0, std::ios::beg);
@@ -352,7 +352,9 @@ namespace NIKE {
 			case 'v': {// vertex
 				float ndc_x, ndc_y;
 				line_sstm >> ndc_x >> ndc_y;
-				model.vertices.emplace_back(ndc_x, ndc_y);
+				Vertex v;
+				v.pos = { ndc_x, ndc_y };
+				model.vertices.emplace_back(v);
 				break;
 			}
 			case 't': {// triangle indices
@@ -386,11 +388,17 @@ namespace NIKE {
 		}
 		mesh_file.close();
 
+		std::vector<Vector2f> pos_vertices;
+		pos_vertices.reserve(model.vertices.size());
+		for (const Vertex& v : model.vertices) {
+			pos_vertices.emplace_back(v.pos);
+		}
+
 		if (tex_coords.size() == 0) {
-			createBaseBuffers(model.vertices, indices, model);
+			createBaseBuffers(pos_vertices, indices, model);
 		}
 		else {
-			createTextureBuffers(model.vertices, indices, tex_coords, model);
+			createTextureBuffers(pos_vertices, indices, tex_coords, model);
 		}
 		model.draw_count = static_cast<GLuint>(indices.size());
 
@@ -424,7 +432,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
 
 		// Return texture
-		return Assets::Texture(tex_id, {tex_width, tex_height});
+		return Assets::Texture(tex_id, { tex_width, tex_height });
 	}
 }
 

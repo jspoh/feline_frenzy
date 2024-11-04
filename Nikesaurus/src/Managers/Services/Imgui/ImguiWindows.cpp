@@ -326,7 +326,7 @@ namespace NIKE {
 							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity);
 
 							// Default value for cam height will be the window height if there is no adjustments
-							if (cam_comp.height <= 0.0f) { 
+							if (cam_comp.height <= 0.0f) {
 								cam_comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 							}
 
@@ -412,7 +412,7 @@ namespace NIKE {
 							if (ImGui::InputText("##shapeRef", input_model_ref, IM_ARRAYSIZE(input_model_ref))) {
 								// Optionally handle input change here if needed
 							}
-							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.1f);
+							ImGui::DragFloat4("Color in RBGA", &shape_comp.override_color.r, 0.1f);
 							// Save buttons to confirm changes
 							if (ImGui::Button("Save Font Ref")) {
 								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))
@@ -445,7 +445,7 @@ namespace NIKE {
 							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
 							static char input_font_ref[300];
-							static char input_text[300];							
+							static char input_text[300];
 							static bool text_initialized = false;
 
 							if (!text_initialized) {
@@ -475,7 +475,7 @@ namespace NIKE {
 
 							// Display a dropdown to select resolution
 							// For now this hard code it 
-							const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
+							const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT" };
 							int current_origin = static_cast<int>(selected_origin);
 
 							// Display the selected resolution

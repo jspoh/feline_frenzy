@@ -37,7 +37,7 @@ namespace NIKE {
 			float height;	// represents how much of the world is visible vertically (zoom level).
 
 			Cam() : position(), height{ 0.0f } {}
-			Cam(float height) : position(), height{height} {}
+			Cam(float height) : position(), height{ height } {}
 			Cam(Vector2f const& position, float height) : position{ position }, height{ height } {}
 		};
 
@@ -58,7 +58,7 @@ namespace NIKE {
 			UpdateCamEvent(
 				std::optional<CamPosition> pos = std::nullopt,
 				std::optional<CamZoom> zoom = std::nullopt)
-				: edit_position{ pos }, edit_zoom { zoom } {}
+				: edit_position{ pos }, edit_zoom{ zoom } {}
 		};
 
 		enum class TextOrigin {
@@ -81,13 +81,18 @@ namespace NIKE {
 				: font_ref{ font_ref }, text{ text }, color{ color }, scale{ scale }, origin{ origin } {}
 		};
 
+		// set use_override_color to true if setting an override_color
 		struct Shape {
-			std::string model_ref; 
-			Vector4f color;
+			std::string model_ref;
 			Vector2f pos;
 
-			Shape() : model_ref{ "" }, color(), pos() {}
-			Shape(std::string const& model_ref, Vector4f const& color, Vector2f const& pos) : model_ref{ model_ref }, color{ color }, pos{ pos } {};
+			Vector4f override_color;
+			bool use_override_color;
+
+			Shape() : model_ref{ "" }, pos(), override_color{}, use_override_color{ false } {}
+			Shape(std::string const& model_ref, Vector2f const& pos) : model_ref{ model_ref }, pos{ pos }, override_color(), use_override_color{ false } {};
+			Shape(const std::string& model_ref, const Vector4f& override_color, const Vector2f& pos)
+				: model_ref{ model_ref }, pos{ pos }, override_color{ override_color }, use_override_color{ true } {}
 		};
 
 		struct Texture {
@@ -100,8 +105,8 @@ namespace NIKE {
 			bool b_stretch;
 			Vector2b b_flip;
 
-			Texture() : texture_ref{ "" }, color(), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(), frame_index(), b_flip{false, false} {}
-			Texture(std::string const& texture_ref, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
+			Texture() : texture_ref{ "" }, color(), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(), frame_index(), b_flip{ false, false } {}
+			Texture(std::string const& texture_ref, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = { false, false })
 				:texture_ref{ texture_ref }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
 

@@ -5,7 +5,7 @@
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (50%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \date   September 2024
- * 
+ *
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
@@ -54,6 +54,11 @@ namespace NIKE {
 
 			//Render Shape
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
+
+
+
+			// batch render shape
+			void batchRenderObject();
 
 			//Render Texture
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);

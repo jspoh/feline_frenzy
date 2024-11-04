@@ -16,6 +16,9 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
+ // used for BATCHED_RENDERING. comment out to disable
+ //#define BATCHED_RENDERING 1
+
 namespace NIKE {
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
@@ -58,17 +61,20 @@ namespace NIKE {
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
 		//Set polygon mode
 		glPolygonMode(GL_FRONT, GL_FILL);
+		glEnable(GL_BLEND);
 
+#ifndef BATCHED_RENDERING
 		// use shader
 		shader_system->useShader("base");
+		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_ref);
 
 		//Shader set uniform
-		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
-		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
+		shader_system->setUniform("base", "f_color", Vector3f(e_shape.override_color.r, e_shape.override_color.g, e_shape.override_color.b));
+		shader_system->setUniform("base", "f_opacity", e_shape.override_color.a);
+		shader_system->setUniform("base", "override_color", e_shape.use_override_color);
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_ref);
 
 		//Draw
 		glBindVertexArray(model->vaoid);
@@ -77,6 +83,20 @@ namespace NIKE {
 		//Unuse texture
 		glBindVertexArray(0);
 		shader_system->unuseShader();
+#else
+		// prepare for batched rendering
+
+
+#endif
+	}
+
+	void Render::Manager::batchRenderObject() {
+		// use glDrawElementsInstanced or glDrawArraysInstanced. whatever is easier
+
+#ifndef BATCHED_RENDERING
+		return;
+#endif
+
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
@@ -248,7 +268,7 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-		
+
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
