@@ -84,9 +84,10 @@ namespace NIKE {
 		struct Shape {
 			std::string model_ref; 
 			Vector4f color;
+			Vector2f pos;
 
-			Shape() : model_ref{ "" }, color() {}
-			Shape(std::string const& model_ref, Vector4f const& color) : model_ref{ model_ref }, color{ color } {};
+			Shape() : model_ref{ "" }, color(), pos() {}
+			Shape(std::string const& model_ref, Vector4f const& color, Vector2f const& pos) : model_ref{ model_ref }, color{ color }, pos{ pos } {};
 		};
 
 		struct Texture {
