@@ -18,19 +18,19 @@ namespace NIKE {
 	void Animation::BaseAnimator::animationEndChecker(Animation::Base& base_components) {
 		//Incr Completed Animations ( If animations to complete == 0, animation will keep running ) 
 		if (++base_components.completed_animations >= base_components.animations_to_complete && base_components.animations_to_complete) {
-			cout << "HERE" << endl;
 			base_components.animation_mode = Mode::END;
 			base_components.animations_to_complete = base_components.completed_animations;
 		}
 	}
 
-	void Animation::BaseAnimator::update(Animation::Base& base_components) {
+	void Animation::BaseAnimator::baseUpdate(Animation::Base& base_components) {
 		switch (base_components.animation_mode) {
 		case Mode::PLAYING:
 			break;
 		case Mode::PAUSE:
 			break;
 		case Mode::RESTART:
+			base_components.timer = 0.0f;
 			base_components.completed_animations = 0;
 			base_components.b_reverse = false;
 			base_components.animation_mode = Mode::PLAYING;
@@ -108,7 +108,15 @@ namespace NIKE {
 	}
 
 	void Animation::SpriteAnimator::animateSprite(Animation::Base& base_component, Animation::Sprite& sprite_component, Render::Texture& sprite_texture) {
-		
+
+		//Move sprite index back to starting index
+		if (base_component.animation_mode == Mode::END || base_component.animation_mode == Mode::RESTART) {
+			sprite_component.curr_index = sprite_component.start_index;
+		}
+
+		//Update base animator
+		baseUpdate(base_component);
+
 		//Set texture frame index
 		sprite_texture.frame_index = sprite_component.curr_index;
 		
@@ -157,12 +165,6 @@ namespace NIKE {
 				//Set Reverse Iterator To False
 				base_component.b_reverse = false;
 			}
-		}
-
-		//Move sprite index back to starting index
-		if (base_component.animation_mode == Mode::END) {
-			sprite_component.curr_index = sprite_component.start_index;
-			return;
 		}
 	}
 }

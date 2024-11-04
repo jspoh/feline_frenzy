@@ -39,6 +39,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Components\cAnimation.cpp" />
+    <ClCompile Include="src\Components\cAudio.cpp" />
+    <ClCompile Include="src\Components\cPhysics.cpp" />
+    <ClCompile Include="src\Components\cRender.cpp" />
+    <ClCompile Include="src\Components\cTransform.cpp" />
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
@@ -53,6 +58,7 @@
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
+    <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
@@ -96,6 +102,7 @@
     <ClInclude Include="headers\Managers\Services\sCoordinator.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
+    <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />

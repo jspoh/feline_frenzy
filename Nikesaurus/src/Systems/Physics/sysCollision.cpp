@@ -1,5 +1,5 @@
 /*****************************************************************//**
-* \file   mCollision.cpp
+* \file   sysCollision.cpp
 * \brief  Implements the collision manager.
 *
 * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
@@ -18,39 +18,39 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        //Calculate relative velocity
+        // Calculate relative velocity
         Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
         float normal_vel = vel_rel.dot(info.collision_normal);
 
-        //Check if entities are already moving apart
+        // Check if entities are already moving apart
         if (normal_vel > 0) return;
 
-        //Calculate impulse magnitude based on collision response
+        // Calculate impulse magnitude based on collision response
         float impulse_magnitude = -(1 + restitution) * normal_vel;
 
-        //Calculate the reflection vector for angular bounce
+        // Calculate the reflection vector for angular bounce
         Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
-            //Transform back outside of collision
+            // Transform back outside of collision
             transform_b.position += info.mtv;
 
-            //Apply impluse to velocity
+            // Apply impluse to velocity
             dynamics_b.velocity -= impulse;
         }
         else if (collider_b.resolution == Physics::Resolution::NONE) {
-            //Transform back outside of collision
+            // Transform back outside of collision
             transform_a.position += info.mtv;
 
-            //Apply impluse to velocity
+            // Apply impluse to velocity
             dynamics_a.velocity += impulse;
         }
         else {
-            //Transform back outside of collision
+            // Transform back outside of collision
             transform_a.position += info.mtv.operator*(0.5f);
             transform_b.position -= info.mtv.operator*(0.5f);
 
-            //Apply impulse to velocity based on mass
+            // Apply impulse to velocity based on mass
             dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
             dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
         }
@@ -73,7 +73,7 @@ namespace NIKE {
         AABB aabb_a({ transform_a.position.x - (transform_a.scale.x * 0.5f), transform_a.position.y - (transform_a.scale.y * 0.5f) }, { transform_a.position.x + (transform_a.scale.x * 0.5f), transform_a.position.y + (transform_a.scale.y * 0.5f) });
         AABB aabb_b({ transform_b.position.x - (transform_b.scale.x * 0.5f), transform_b.position.y - (transform_b.scale.y * 0.5f) }, { transform_b.position.x + (transform_b.scale.x * 0.5f), transform_b.position.y + (transform_b.scale.y * 0.5f) });
 
-        //Get delta time & set epsilon
+        // Get delta time & set epsilon
         const float deltaTime = NIKE_ENGINE.getService<Windows::Service>()->getDeltaTime();
         const float epsilon = 0.0001f;
 
@@ -168,16 +168,155 @@ namespace NIKE {
         return true; // Collision detected
     }
 
+    // SAT helper functions
+
+    // Helper to retrieve and apply transformations to vertices based on model_ref
+    std::vector<Vector2f> Collision::System::getRotatedVertices(
+        const Transform::Transform& transform, const std::string& model_ref)
+    {
+        std::vector<Vector2f> vertices;
+
+        if (model_ref == "triangle") {
+            vertices = {
+                Vector2f(-0.5f, -0.5f),
+                Vector2f(0.5f, -0.5f),
+                Vector2f(0.0f, 0.5f)
+            };
+        }
+        else if (model_ref == "square" || model_ref == "square-texture") {
+            vertices = {
+                Vector2f(0.5f, -0.5f),
+                Vector2f(0.5f, 0.5f),
+                Vector2f(-0.5f, 0.5f),
+                Vector2f(-0.5f, -0.5f)
+            };
+        }
+
+        // Apply scaling and rotation
+        float angleRad = transform.rotation * (M_PI / 180.0f);  // Ensure degrees to radians
+        float cosAngle = cos(angleRad);
+        float sinAngle = sin(angleRad);
+        Vector2f position = transform.position;
+        Vector2f scale = transform.scale;
+
+        for (Vector2f& vertex : vertices) {
+            vertex.x *= scale.x;
+            vertex.y *= scale.y;
+
+            float rotatedX = vertex.x * cosAngle - vertex.y * sinAngle;
+            float rotatedY = vertex.x * sinAngle + vertex.y * cosAngle;
+
+            vertex.x = position.x + rotatedX;
+            vertex.y = position.y + rotatedY;
+        }
+        return vertices;
+    }
+
+
+    std::vector<Vector2f> Collision::System::getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB)
+    {
+        std::vector<Vector2f> axes;
+
+        auto addAxesFromEdges = [&](const std::vector<Vector2f>& vertices) {
+            for (size_t i = 0; i < vertices.size(); ++i) {
+                // Get the edge vector between consecutive vertices
+                Vector2f edge = vertices[(i + 1) % vertices.size()] - vertices[i];
+                Vector2f axis(-edge.y, edge.x);  // Perpendicular to the edge
+
+                axis = axis.normalize();
+                axes.push_back(axis);
+            }
+            };
+
+        addAxesFromEdges(verticesA);
+        addAxesFromEdges(verticesB);
+
+        return axes;
+    }
+
+
+    void Collision::System::projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max)
+    {
+        // Project vertices and find the min and max projections on the given axis
+        min = max = axis.dot(vertices[0]);
+
+        for (const Vector2f& vertex : vertices) {
+            float projection = axis.dot(vertex);
+            if (projection < min) min = projection;
+            if (projection > max) max = projection;
+        }
+
+        // Adjust the overlap to give priority to edge alignments rather than vertices alone
+        if (abs(min - max) < 0.01f) {
+            min -= 0.01f;  // Slightly offset min to favor edge over vertex-only overlaps
+        }
+    }
+
+    // Main detect SAT function
+    bool Collision::System::detectSATCollision(
+        const Transform::Transform& transformA, const Transform::Transform& transformB,
+        const std::string& model_refA, const std::string& model_refB, CollisionInfo& info)
+    {
+        // Step 1: Get vertices and separating axes
+        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_refA);
+        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_refB);
+        std::vector<Vector2f> axes = getSeparatingAxes(verticesA, verticesB);
+
+        Vector2f smallestAxis;
+        bool collisionDetected = true;
+        float minOverlap = FLT_MAX;
+
+        // Step 2: Project shapes onto each axis to find overlap
+        for (const Vector2f& axis : axes) {
+            float minA, maxA, minB, maxB;
+            projectVerticesOnAxis(verticesA, axis, minA, maxA);
+            projectVerticesOnAxis(verticesB, axis, minB, maxB);
+
+            // Check for separation
+            if (maxA < minB || maxB < minA) {
+                collisionDetected = false;
+                break;
+            }
+
+            // Calculate overlap distance
+            float overlap = Utility::getMin(maxA, maxB) - Utility::getMax(minA, minB);
+
+            // Track the smallest overlap
+            if (overlap < minOverlap) {
+                minOverlap = overlap;
+                smallestAxis = axis;
+            }
+        }
+
+        // Step 3: If collision is detected, assign the MTV and collision normal
+        if (collisionDetected) {
+            // Calculate consistent MTV direction based on relative position
+            Vector2f relativePosition = transformA.position - transformB.position;
+            float biasFactor = 0.001f;
+
+            if (relativePosition.dot(smallestAxis) < 0) {
+                // Vector2f currently no "flip" operator...
+                smallestAxis = { -smallestAxis.x, -smallestAxis.y };  // Flip axis to ensure consistent direction away from the stationary object
+            }
+
+            // Adjust MTV and normal
+            info.mtv = (smallestAxis * minOverlap) + (smallestAxis * biasFactor);
+            info.collision_normal = smallestAxis.normalize();
+        }
+        return collisionDetected;
+    }
+
     void Collision::System::collisionResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        //Bounce Resolution
+        // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
         }
 
+        // Resolution::NONE currently makes movement object "bounce"
         switch (collider_a.resolution) {
         case Physics::Resolution::NONE:
             break;
@@ -187,7 +326,7 @@ namespace NIKE {
         default:
             break;
         }
-
+        
         switch (collider_b.resolution) {
         case Physics::Resolution::NONE:
             break;
@@ -198,5 +337,69 @@ namespace NIKE {
             break;
         }
     }
+
+    /* Temporary storage for mouse click detection functions
+        // Detect if the mouse is inside a rectangular area
+        bool Collision::Manager::detectMClickRect(const Vector2& center, float width, float height) {
+        // Get the mouse position from Input::Manager
+        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
+        float mouseX = mouse.button_pos.x;
+        float mouseY = mouse.button_pos.y;
+
+        // Calculate the boundaries of the rectangle
+        float left = center.x - (width * 0.5f);
+        float right = center.x + (width * 0.5f);
+        float top = center.y - (height * 0.5f);
+        float bottom = center.y + (height * 0.5f);
+
+        // Check if the mouse is inside the rectangle
+        if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
+
+            // Check if the mouse is exactly at the center
+            if (mouseX == center.x && mouseY == center.y) {
+                cout << "Mouse is exactly at the center of the rectangle." << endl;
+            }
+            else {
+                // Print where the mouse is relative to the center of the rectangle
+                if (mouseX < center.x)
+                    cout << "Mouse is on the left side of the center." << endl;
+                else
+                    cout << "Mouse is on the right side of the center." << endl;
+
+                if (mouseY < center.y)
+                    cout << "Mouse is above the center." << endl;
+                else
+                    cout << "Mouse is below the center." << endl;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    // Detect if the mouse is inside a circular area
+    bool Collision::Manager::detectMClickCircle(const Vector2& center, float radius) {
+
+        // Get the mouse position from Input::Manager
+        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
+        float mouseX = mouse.button_pos.x;
+        float mouseY = mouse.button_pos.y;
+
+        // Calculate the distance from the mouse to the center of the circle
+        float distX = mouseX - center.x;
+        float distY = mouseY - center.y;
+        float distance = std::sqrt(distX * distX + distY * distY);
+
+        // Check if the mouse is inside the circle
+        if (distance <= radius) {
+            cout << "Mouse is inside the circle." << endl;
+            return true;
+        }
+
+        return false;
+    }
+    */
 
 }

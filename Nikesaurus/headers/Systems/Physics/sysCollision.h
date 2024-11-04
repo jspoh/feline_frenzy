@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   mCollision.h
+ * \file   sysCollision.h
  * \brief  Collision manager header for the physics system.
  *
  * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
@@ -15,47 +15,56 @@
 namespace NIKE {
     namespace Collision {
 
-        //Collision info for collision resolution
+        // Collision info for collision resolution
         struct CollisionInfo {
-            Vector2f mtv;
-            Vector2f collision_normal;
-            float t_first;
+            Vector2f mtv; // Minimum translation vector for resolving collision
+            Vector2f collision_normal; // Collision normal vector to determine direction of collision (?)
+            float t_first; // Time of first collision
 
             CollisionInfo() : mtv(), collision_normal(), t_first{ 0.0f } {}
         };
 
-        //Collision System
+        // Collision System
         class System {
         private:
-            //Internal AABB
+            // Internal AABB
             struct AABB {
                 Vector2f rect_min;
                 Vector2f rect_max;
 
                 AABB(Vector2f const& rect_min, Vector2f const& rect_max)
-                    : rect_min{ rect_min }, rect_max{ rect_max }{}
+                    : rect_min{ rect_min }, rect_max{ rect_max } {}
             };
 
-            //Collision world restitution for bounce effect (0 = inelastic, 1 = perfectly elastic)
+            // Collision world restitution for bounce effect (0 = inelastic, 1 = perfectly elastic)
             float restitution;
 
-            //Bounce collision resolution
+            // Bounce collision resolution
             void bounceResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
+
+            // SAT helper functions
+            std::vector<Vector2f> getRotatedVertices(const Transform::Transform& transform, const std::string& model_ref);
+            std::vector<Vector2f> getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB);
+            void projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max);
+
 
         public:
             System() : restitution{ 1.0f } {}
             ~System() = default;
 
-            //Set collision world restitution
+            // Set collision world restitution
             void setRestitution(float val);
 
-            //Get collision world restitution
+            // Get collision world restitution
             float getRestitution() const;
 
-            //AABB Collision detection
+            // AABB Collision detection
             bool detectAABBRectRect(Transform::Transform const& transform_a, Physics::Dynamics const& dynamics_a, Transform::Transform const& transform_b, Physics::Dynamics const& dynamics_b, CollisionInfo& info);
 
-            //Collision resolution
+            // SAT Collision detection
+            bool detectSATCollision(Transform::Transform const& transformA, Transform::Transform const& transformB, const std::string& model_refA, const std::string& model_refB, CollisionInfo& info);
+
+            // Collision resolution
             void collisionResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
         };
     }

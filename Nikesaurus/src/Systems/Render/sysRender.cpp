@@ -117,6 +117,10 @@ namespace NIKE {
 		shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
 		shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
+		//Flip texture options
+		shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+		shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+
 		//Get model
 		auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
 

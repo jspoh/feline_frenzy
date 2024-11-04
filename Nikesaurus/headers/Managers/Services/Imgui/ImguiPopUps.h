@@ -40,6 +40,8 @@ namespace NIKE {
 	bool ShowErrorPopup();
 	// Function to display a save confirmation popup
 	bool ShowSaveConfirmationPopup();
+	// Function to clone entity
+	bool cloneEntityPopup();
 
 }
 

@@ -30,7 +30,7 @@ namespace NIKE {
 			void animationEndChecker(Animation::Base& base_components);
 
 			//Base animator update
-			void update(Animation::Base& base_components);
+			void baseUpdate(Animation::Base& base_components);
 
 			//Virtual destructor
 			virtual ~BaseAnimator() = default;

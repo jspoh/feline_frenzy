@@ -40,6 +40,12 @@ namespace NIKE {
 			type dot(const Vector2& rhs) const;
 			type lengthSq() const;
 			type length() const;
+			
+			//Serialize to json
+			nlohmann::json toJson() const;
+
+			//Deserialize from json
+			void fromJson(nlohmann::json const& data);
 		};
 
 		#include "Vector2.inl"

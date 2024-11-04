@@ -32,9 +32,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Physics::Dynamics>();
 		NIKE_ECS_MANAGER->registerComponent<Physics::Collider>();
 
-		////Register animation components
-		NIKE_ECS_MANAGER->registerComponent<Animation::Base>();
-		NIKE_ECS_MANAGER->registerComponent<Animation::Sprite>();
+		Animation::registerComponents();
 
 		////Register render components
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
@@ -79,14 +77,15 @@ namespace NIKE {
 		provideService(std::make_shared<Input::Service>());
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
+		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Coordinator::Service>());
 
 		//Create console
-#ifndef NDEBUG
+		#ifndef NDEBUG
 		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
-#endif
+		#endif
 
 		//Init Logger
 		NIKE::Log::Init();
