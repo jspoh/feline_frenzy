@@ -171,10 +171,11 @@ namespace NIKE {
     // SAT helper functions
 
     // Helper to retrieve and apply transformations to vertices based on model_ref
-    std::vector<Vector2f> Collision::System::getRotatedVertices(const Transform::Transform& transform, const std::string& model_ref) {
+    std::vector<Vector2f> Collision::System::getRotatedVertices(
+        const Transform::Transform& transform, const std::string& model_ref)
+    {
         std::vector<Vector2f> vertices;
 
-        // Define vertices for each model type
         if (model_ref == "triangle") {
             vertices = {
                 Vector2f(-0.5f, -0.5f),
@@ -191,31 +192,37 @@ namespace NIKE {
             };
         }
 
-        // Transformation matrices for scaling, rotation, and translation
-        float cosAngle = cos(transform.rotation);
-        float sinAngle = sin(transform.rotation);
+        // Apply scaling and rotation
+        float angleRad = transform.rotation * (M_PI / 180.0f);  // Ensure degrees to radians
+        float cosAngle = cos(angleRad);
+        float sinAngle = sin(angleRad);
         Vector2f position = transform.position;
         Vector2f scale = transform.scale;
 
-        // Apply transformations
         for (Vector2f& vertex : vertices) {
             vertex.x *= scale.x;
             vertex.y *= scale.y;
-            float x = vertex.x;
-            float y = vertex.y;
-            vertex.x = position.x + (x * cosAngle - y * sinAngle);
-            vertex.y = position.y + (x * sinAngle + y * cosAngle);
+
+            float rotatedX = vertex.x * cosAngle - vertex.y * sinAngle;
+            float rotatedY = vertex.x * sinAngle + vertex.y * cosAngle;
+
+            vertex.x = position.x + rotatedX;
+            vertex.y = position.y + rotatedY;
         }
         return vertices;
     }
 
-    std::vector<Vector2f> Collision::System::getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB) {
+
+    std::vector<Vector2f> Collision::System::getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB)
+    {
         std::vector<Vector2f> axes;
 
         auto addAxesFromEdges = [&](const std::vector<Vector2f>& vertices) {
             for (size_t i = 0; i < vertices.size(); ++i) {
+                // Get the edge vector between consecutive vertices
                 Vector2f edge = vertices[(i + 1) % vertices.size()] - vertices[i];
-                Vector2f axis(-edge.y, edge.x);
+                Vector2f axis(-edge.y, edge.x);  // Perpendicular to the edge
+
                 axis = axis.normalize();
                 axes.push_back(axis);
             }
@@ -223,62 +230,85 @@ namespace NIKE {
 
         addAxesFromEdges(verticesA);
         addAxesFromEdges(verticesB);
+
         return axes;
     }
 
-    void Collision::System::projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max) {
+
+    void Collision::System::projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max)
+    {
+        // Project vertices and find the min and max projections on the given axis
         min = max = axis.dot(vertices[0]);
+
         for (const Vector2f& vertex : vertices) {
             float projection = axis.dot(vertex);
             if (projection < min) min = projection;
             if (projection > max) max = projection;
         }
+
+        // Adjust the overlap to give priority to edge alignments rather than vertices alone
+        if (abs(min - max) < 0.01f) {
+            min -= 0.01f;  // Slightly offset min to favor edge over vertex-only overlaps
+        }
     }
 
 
+
     // Main detect SAT function
-    bool Collision::System::detectSATCollision(const Transform::Transform& transformA, const Transform::Transform& transformB,
-        const std::string& model_refA, const std::string& model_refB, CollisionInfo& info) {
+    bool Collision::System::detectSATCollision(
+        const Transform::Transform& transformA, const Transform::Transform& transformB,
+        const std::string& model_refA, const std::string& model_refB, CollisionInfo& info)
+    {
+        // Step 1: Get vertices and separating axes
         std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_refA);
         std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_refB);
         std::vector<Vector2f> axes = getSeparatingAxes(verticesA, verticesB);
 
         Vector2f smallestAxis;
         bool collisionDetected = true;
-        bool firstOverlapCalculated = false;
-        float minOverlap = 0.0f;
+        float minOverlap = FLT_MAX;
 
+        // Step 2: Project shapes onto each axis to find overlap
         for (const Vector2f& axis : axes) {
             float minA, maxA, minB, maxB;
             projectVerticesOnAxis(verticesA, axis, minA, maxA);
             projectVerticesOnAxis(verticesB, axis, minB, maxB);
 
-            // Check if projections do not overlap
+            // Check for separation
             if (maxA < minB || maxB < minA) {
                 collisionDetected = false;
                 break;
             }
 
-            // Calculate overlap
+            // Calculate overlap distance
             float overlap = Utility::getMin(maxA, maxB) - Utility::getMax(minA, minB);
 
-            // Set minOverlap on the first calculation or update if a smaller overlap is found
-            if (!firstOverlapCalculated || overlap < minOverlap) {
+            // Track the smallest overlap
+            if (overlap < minOverlap) {
                 minOverlap = overlap;
                 smallestAxis = axis;
-                firstOverlapCalculated = true;
             }
         }
 
+        // Step 3: If collision is detected, assign the MTV and collision normal
         if (collisionDetected) {
-            info.mtv = smallestAxis * minOverlap;
-            info.collision_normal = smallestAxis;
+            // Calculate consistent MTV direction based on relative position
+            Vector2f relativePosition = transformA.position - transformB.position;
+            float biasFactor = 0.001f;
+
+            if (relativePosition.dot(smallestAxis) < 0) {
+                // Vector2f currently no "flip" operator...
+                smallestAxis = { -smallestAxis.x, -smallestAxis.y };  // Flip axis to ensure consistent direction away from the stationary object
+            }
+
+            // Adjust MTV and normal
+            info.mtv = (smallestAxis * minOverlap) + (smallestAxis * biasFactor);
+            info.collision_normal = smallestAxis.normalize();
         }
         return collisionDetected;
     }
 
-
-
+    /*
     void Collision::System::collisionResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
@@ -309,5 +339,40 @@ namespace NIKE {
             break;
         }
     }
+    */
+
+    void Collision::System::collisionResolution(
+        Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
+        Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
+        CollisionInfo const& info)
+    {
+        Vector2f mtvFiltered = info.mtv;
+        Vector2f collisionNormal = info.collision_normal;
+
+        // Check the relative positions to ensure MTV is applied away from the stationary object
+        if (collider_a.resolution == Physics::Resolution::SLIDE || collider_b.resolution == Physics::Resolution::SLIDE) {
+            // Apply MTV to move objects directly away from each other
+            Vector2f relativePosition = transform_a.position - transform_b.position;
+
+            if (relativePosition.dot(collisionNormal) > 0) {
+                // Vector2f currently no "flip" operator...
+                mtvFiltered = { -mtvFiltered.x, -mtvFiltered.y };  // Adjust MTV direction if necessary
+            }
+
+            if (collider_a.resolution == Physics::Resolution::SLIDE) {
+                transform_a.position += mtvFiltered;
+            }
+            if (collider_b.resolution == Physics::Resolution::SLIDE) {
+                transform_b.position -= mtvFiltered;
+            }
+        }
+
+        // Apply bounce if required by the collider resolution
+        if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
+            bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+        }
+    }
+
+
 
 }

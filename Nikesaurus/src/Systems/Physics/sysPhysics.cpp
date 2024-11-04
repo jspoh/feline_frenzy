@@ -91,9 +91,26 @@ namespace NIKE {
                         auto& other_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
 
                         //Check for collision
-                        Collision::CollisionInfo info;
-                        if (collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
+                       
+                        // Temporary code to get model_ref for SAT collision, current SAT uses model_ref to determine vertices.
+                        std::string e_model_ref;
+                        std::string other_model_ref;
+                        if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+                            e_model_ref = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).model_ref;
+                        }
+                        else {
+                            e_model_ref = "square"; // Default to square for SAT
+                        }
+                        if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(colliding_entity)) {
+                            other_model_ref = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity).model_ref;
+                        }
+                        else {
+                            other_model_ref = "square"; // Default to square for SAT
+                        }
 
+                        Collision::CollisionInfo info;
+                        //if (collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
+                        if (collision_system->detectSATCollision(e_transform, other_transform, e_model_ref, other_model_ref, info)) {
                             //Set the flag of colliders
                             e_collider.b_collided = true;
                             other_collider.b_collided = true;
