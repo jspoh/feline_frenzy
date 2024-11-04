@@ -55,10 +55,6 @@ namespace NIKE {
 
 			//Register default assets
 			void registerDefSystems();
-
-			//Register default assets
-			void registerDefAssets();
-
 		public:
 
 			/**
@@ -78,7 +74,7 @@ namespace NIKE {
 			void run();
 
 			/*****************************************************************//**
-			* Access Window Functions
+			* Services
 			*********************************************************************/
 			template<typename T>
 			static void provideService(std::shared_ptr<T> service) {
@@ -126,6 +122,7 @@ namespace NIKE {
 #define NIKE_INPUT_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Input::Service>()
 #define NIKE_AUDIO_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Audio::Service>()
 #define NIKE_ASSETS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Assets::Service>()
+#define NIKE_SERIALIZE_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Serialization::Service>()
 #define NIKE_DEBUG_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Debug::Service>()
 #define NIKE_IMGUI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::IMGUI::Service>()
 #define NIKE_ECS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Coordinator::Service>()

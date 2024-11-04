@@ -12,9 +12,6 @@
 #ifndef C_ANIMATION_HPP
 #define C_ANIMATION_HPP
 
-#include "Core/stdafx.h"
-#include "Managers/Services/sEvents.h"
-
 namespace NIKE {
 	namespace Animation {
 
@@ -24,32 +21,6 @@ namespace NIKE {
 			PAUSE,
 			RESTART,
 			END
-		};
-
-		//Animation Event
-		struct AnimationEvent : public Events::IEvent {
-		public:
-			Mode animation_action;
-			std::string animator_id;
-
-			//Constructor
-			AnimationEvent(Mode action, std::string const& id)
-				: animation_action{ action }, animator_id{ id } {}
-		};
-
-		//Sprite event
-		struct SpriteEvent {
-			Vector2i new_start_index;
-			Vector2i new_end_index;
-			std::string animator_id;
-			int num_animations;
-
-			//Boolean control
-			bool animation_ongoing;
-
-			//Constructor
-			SpriteEvent(Vector2i const& new_start, Vector2i const& new_end, std::string const& id, int num_animations)
-				: new_start_index{ new_start }, new_end_index{ new_end }, animator_id{ id }, num_animations{ num_animations }, animation_ongoing{ false } {}
 		};
 
 		struct Base {
@@ -105,6 +76,8 @@ namespace NIKE {
 			Sprite(Vector2i const& sheet_size, Vector2i const& start_index, Vector2i const& end_index)
 				: sheet_size{ sheet_size }, start_index{ start_index }, end_index{ end_index }, curr_index{ start_index } {}
 		};
+
+		void registerComponents();
 	}
 }
 

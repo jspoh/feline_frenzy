@@ -282,7 +282,6 @@ namespace NIKE {
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
-							// A button to play SFX
 							if (!texture_comp.texture_ref.empty())
 							{
 								ImGui::Text("Stretch: %s", texture_comp.b_stretch ? "true" : "false");
@@ -292,6 +291,14 @@ namespace NIKE {
 								ImGui::Text("Blend: %s", texture_comp.b_blend ? "true" : "false");
 								if (ImGui::Button("Blend")) {
 									texture_comp.b_blend = !texture_comp.b_blend;
+								}
+								ImGui::Text("Flip Horizontally: %s", texture_comp.b_flip.x ? "true" : "false");
+								if (ImGui::Button("Flip X")) {
+									texture_comp.b_flip.x = !texture_comp.b_flip.x;
+								}
+								ImGui::Text("Flip Vertically: %s", texture_comp.b_flip.y ? "true" : "false");
+								if (ImGui::Button("Flip Y")) {
+									texture_comp.b_flip.y = !texture_comp.b_flip.y;
 								}
 							}
 							// Remove Component 
@@ -524,6 +531,9 @@ namespace NIKE {
 							// For now this hard code it 
 							const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
 							int current_resolution = static_cast<int>(selected_resolution);
+
+							//Update resolution
+							current_resolution = static_cast<int>(dynamics_comp.resolution);
 
 							// Display the selected resolution
 							ImGui::Text("Current Resolution: %s", resolution_names[current_resolution]);

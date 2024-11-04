@@ -252,8 +252,6 @@ namespace NIKE {
         }
     }
 
-
-
     // Main detect SAT function
     bool Collision::System::detectSATCollision(
         const Transform::Transform& transformA, const Transform::Transform& transformB,
@@ -308,7 +306,6 @@ namespace NIKE {
         return collisionDetected;
     }
 
-    /*
     void Collision::System::collisionResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
@@ -319,6 +316,7 @@ namespace NIKE {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
         }
 
+        // Resolution::NONE currently makes movement object "bounce"
         switch (collider_a.resolution) {
         case Physics::Resolution::NONE:
             break;
@@ -328,7 +326,7 @@ namespace NIKE {
         default:
             break;
         }
-
+        
         switch (collider_b.resolution) {
         case Physics::Resolution::NONE:
             break;
@@ -339,40 +337,69 @@ namespace NIKE {
             break;
         }
     }
-    */
 
-    void Collision::System::collisionResolution(
-        Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
-        Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
-        CollisionInfo const& info)
-    {
-        Vector2f mtvFiltered = info.mtv;
-        Vector2f collisionNormal = info.collision_normal;
+    /* Temporary storage for mouse click detection functions
+        // Detect if the mouse is inside a rectangular area
+        bool Collision::Manager::detectMClickRect(const Vector2& center, float width, float height) {
+        // Get the mouse position from Input::Manager
+        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
+        float mouseX = mouse.button_pos.x;
+        float mouseY = mouse.button_pos.y;
 
-        // Check the relative positions to ensure MTV is applied away from the stationary object
-        if (collider_a.resolution == Physics::Resolution::SLIDE || collider_b.resolution == Physics::Resolution::SLIDE) {
-            // Apply MTV to move objects directly away from each other
-            Vector2f relativePosition = transform_a.position - transform_b.position;
+        // Calculate the boundaries of the rectangle
+        float left = center.x - (width * 0.5f);
+        float right = center.x + (width * 0.5f);
+        float top = center.y - (height * 0.5f);
+        float bottom = center.y + (height * 0.5f);
 
-            if (relativePosition.dot(collisionNormal) > 0) {
-                // Vector2f currently no "flip" operator...
-                mtvFiltered = { -mtvFiltered.x, -mtvFiltered.y };  // Adjust MTV direction if necessary
+        // Check if the mouse is inside the rectangle
+        if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
+
+            // Check if the mouse is exactly at the center
+            if (mouseX == center.x && mouseY == center.y) {
+                cout << "Mouse is exactly at the center of the rectangle." << endl;
+            }
+            else {
+                // Print where the mouse is relative to the center of the rectangle
+                if (mouseX < center.x)
+                    cout << "Mouse is on the left side of the center." << endl;
+                else
+                    cout << "Mouse is on the right side of the center." << endl;
+
+                if (mouseY < center.y)
+                    cout << "Mouse is above the center." << endl;
+                else
+                    cout << "Mouse is below the center." << endl;
             }
 
-            if (collider_a.resolution == Physics::Resolution::SLIDE) {
-                transform_a.position += mtvFiltered;
-            }
-            if (collider_b.resolution == Physics::Resolution::SLIDE) {
-                transform_b.position -= mtvFiltered;
-            }
+            return true;
         }
 
-        // Apply bounce if required by the collider resolution
-        if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
-            bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
-        }
+        return false;
     }
 
 
+    // Detect if the mouse is inside a circular area
+    bool Collision::Manager::detectMClickCircle(const Vector2& center, float radius) {
+
+        // Get the mouse position from Input::Manager
+        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
+        float mouseX = mouse.button_pos.x;
+        float mouseY = mouse.button_pos.y;
+
+        // Calculate the distance from the mouse to the center of the circle
+        float distX = mouseX - center.x;
+        float distY = mouseY - center.y;
+        float distance = std::sqrt(distX * distX + distY * distY);
+
+        // Check if the mouse is inside the circle
+        if (distance <= radius) {
+            cout << "Mouse is inside the circle." << endl;
+            return true;
+        }
+
+        return false;
+    }
+    */
 
 }
