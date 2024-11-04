@@ -314,7 +314,8 @@ namespace NIKE {
 								cam_comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 							}
 
-							ImGui::DragFloat2("Position", &cam_comp.position.x, 0.1f);
+							// Don't add position
+							//ImGui::DragFloat2("Position", &cam_comp.position.x, 0.1f);
 							ImGui::DragFloat("Height", &cam_comp.height, 0.1f);
 
 							// Remove Component 
@@ -531,6 +532,7 @@ namespace NIKE {
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
+								NIKE_IMGUI_SERVICE->populateLists = false;
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
@@ -540,6 +542,7 @@ namespace NIKE {
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
+								NIKE_IMGUI_SERVICE->populateLists = false;
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
@@ -590,6 +593,49 @@ namespace NIKE {
 	void imguiCameraControl()
 	{
 		ImGui::Begin("Camera Control");
+
+		static int selectedCameraIndex = 0; // Index of the currently selected camera
+		static std::vector<std::pair<std::string, Entity::Type>> cameraEntities; // Store camera names and their entities
+
+		if (!NIKE_IMGUI_SERVICE->populateLists) {
+			cameraEntities.clear();
+			// Populate the cameraEntities list only once
+			for (const auto& elem : NIKE_IMGUI_SERVICE->getEntityRef()) {
+				if (NIKE_IMGUI_SERVICE->checkEntityExist(elem.first)) {
+					Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(elem.first);
+
+					// Check if the entity has a camera component
+					if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(entity)) {
+						cameraEntities.emplace_back(elem.first, entity);
+					}
+				}
+			}
+			NIKE_IMGUI_SERVICE->populateLists = true; // Mark as initialized to avoid re-populating
+		}
+
+		// Create a combo box for camera selection
+		if (!cameraEntities.empty()) {
+			ImGui::Text("Select Camera:");
+
+			// Lambda to retrieve items from cameraEntities for ImGui::Combo
+			auto cameraNameGetter = [](void* data, int idx, const char** out_text) {
+				const auto& names = *static_cast<std::vector<std::pair<std::string, Entity::Type>>*>(data);
+				if (idx < 0 || idx >= names.size()) return false;
+				*out_text = names[idx].first.c_str();
+				return true;
+				};
+
+			// Use the lambda with ImGui::Combo
+			if (ImGui::Combo("##CameraSelector", &selectedCameraIndex, cameraNameGetter, &cameraEntities, cameraEntities.size())) {
+				// Dispatch an event when the camera selection changes
+				Entity::Type entity = cameraEntities[selectedCameraIndex].second;
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(entity));
+				
+			}
+		}
+		else {
+			ImGui::Text("No cameras available.");
+		}
 
 		// Position Controls
 		ImGui::Text("Position:");

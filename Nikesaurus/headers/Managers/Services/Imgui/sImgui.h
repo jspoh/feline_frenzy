@@ -46,6 +46,9 @@ namespace NIKE {
 
 			bool checkEntityExist(const std::string& entity_ref);
 
+			// Populate dropdown list whenever component is added
+			bool populateLists;
+
 			// Gettors
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
 			std::string& getSelectedEntityName();

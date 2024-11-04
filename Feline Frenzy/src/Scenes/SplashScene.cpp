@@ -66,17 +66,25 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Base>(player_1, NIKE::Animation::Base(0, 0.2f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Sprite>(player_1, NIKE::Animation::Sprite({9,5}, {0, 1}, {8, 1}));
-
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
 	second_layer->addEntity(shape_1);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(shape_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(shape_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {1.0f, 1.0f, 1.0f, 1.0f}));
 
+	NIKE::Entity::Type shape_2 = NIKE_ECS_SERVICE->createEntity();
+	NIKE_IMGUI_SERVICE->addEntityRef("shape_2", shape_2);
+	base_Layer->addEntity(shape_2);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_2, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_2, NIKE::Transform::Transform({ 200.0f, 100.0f }, { 100.0f, 100.0f }, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_2, NIKE::Render::Texture("TREE", { 1.0f, 1.0f, 1.0f, 1.0f }));
+
+	
 	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("text_1", text_1);
 	second_layer->addEntity(text_1);
