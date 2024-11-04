@@ -246,6 +246,7 @@ namespace NIKE {
 							static char texture_ref[300];
 							static bool texture_initialized = false;
 
+							//For initial initialization
 							if (!texture_initialized) {
 								// Ensure null-termination
 								texture_ref[sizeof(texture_ref) - 1] = '\0';
@@ -258,7 +259,6 @@ namespace NIKE {
 							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
 							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
-
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
 								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_ref))
@@ -270,7 +270,6 @@ namespace NIKE {
 								}
 								else {
 									ImGui::OpenPopup("INVALID INPUT");
-									strcpy_s(texture_ref, texture_comp.texture_ref.c_str());
 									show_error_popup = true;
 								}
 							}
