@@ -27,6 +27,7 @@ void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->loadTexture("PLAYER", "assets/Textures/player.png");
 	NIKE_ASSETS_SERVICE->loadTexture("TREE", "assets/Textures/Tree_Orange.png");
 	NIKE_ASSETS_SERVICE->loadTexture("ZOMBIE", "assets/Textures/ZombieSheet.png");
+	NIKE_ASSETS_SERVICE->loadTexture("WALL1", "assets/Textures/M1.png");
 
 	//Load Font
 	NIKE_ASSETS_SERVICE->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
@@ -37,7 +38,7 @@ void Splash::Scene::load() {
 }
 
 void Splash::Scene::init() {
-
+	//std::shared_ptr<NIKE::Scenes::Layer> background_layer = registerLayer("BACKGROUND");
 	std::shared_ptr<NIKE::Scenes::Layer> base_Layer = registerLayer("BASE");
 	std::shared_ptr<NIKE::Scenes::Layer> second_layer = registerLayer("SECOND");
 
@@ -69,6 +70,15 @@ void Splash::Scene::init() {
 
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
+	// MapGrid
+	NIKE::Entity::Type background_1 = NIKE_ECS_SERVICE->createEntity();
+	NIKE_IMGUI_SERVICE->addEntityRef("background_1", background_1);
+	base_Layer->addEntity(background_1);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(background_1, NIKE::Transform::Transform({ 0.0f, 200.0f }, { 100.0f, 100.0f }, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(background_1, NIKE::Render::Texture("WALL1", { 1.0f, 1.0f, 1.0f, 1.0f }));
+
+
+	// TREE
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
 	second_layer->addEntity(shape_1);
@@ -95,6 +105,7 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 	// Test crash logger
 	//LOG_CRASH("This is a test crash");
+
 
 }
 
