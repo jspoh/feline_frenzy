@@ -40,6 +40,11 @@
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
+    <ClCompile Include="src\Components\cAnimation.cpp" />
+    <ClCompile Include="src\Components\cAudio.cpp" />
+    <ClCompile Include="src\Components\cPhysics.cpp" />
+    <ClCompile Include="src\Components\cRender.cpp" />
+    <ClCompile Include="src\Components\cTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />

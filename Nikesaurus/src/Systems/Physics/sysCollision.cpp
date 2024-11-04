@@ -252,8 +252,6 @@ namespace NIKE {
         }
     }
 
-
-
     // Main detect SAT function
     bool Collision::System::detectSATCollision(
         const Transform::Transform& transformA, const Transform::Transform& transformB,

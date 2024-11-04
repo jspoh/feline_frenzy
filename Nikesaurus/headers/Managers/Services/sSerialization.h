@@ -8,7 +8,8 @@
  *********************************************************************/
 #pragma once
 
-using json = nlohmann::json;
+#include "Core/Engine.h"
+#include "Managers/ECS/mCoordinator.h"
 
 #ifndef M_SERIALIZATION_HPP
 #define M_SERIALIZATION_HPP
@@ -16,25 +17,68 @@ using json = nlohmann::json;
 namespace NIKE {
 	namespace Serialization {
 
-		//Component Registry
-		class CompRegister {
+		//Temporary Disable DLL Export Warning
+		#pragma warning(disable: 4251)
+
+		//Component Serializer
+		class CompSerializer {
 		private:
-			std::unordered_map<std::string, std::function<json(const void*)>> serializers;
-			std::unordered_map<std::string, std::function<void(void*, const json&)>> deserializers;
+			std::unordered_map<unsigned int, std::function<nlohmann::json(const void*)>> serializers;
+			std::unordered_map<unsigned int, std::function<void(void*, nlohmann::json const&)>> deserializers;
+
 		public:
 
-			//template<typename T>
-			//void registerComponent(std::function<>())
-		};
+			//Register component for serialization
+			template<typename T>
+			void registerComponent(std::function<nlohmann::json(T const&)> serialize, std::function<void(T&, nlohmann::json const&)> deserialize) {
+				//Emplace serializer functions
+				serializers.emplace(std::piecewise_construct,
+					std::forward_as_tuple(0),
+					std::forward_as_tuple([serialize](const void* comp) -> nlohmann::json { return serialize(*static_cast<const T*>(comp)); }));
 
+				//Emplace deserializers functions
+				deserializers.emplace(std::piecewise_construct,
+					std::forward_as_tuple(0),
+					std::forward_as_tuple([deserialize](void* comp, nlohmann::json const& data) { deserialize(*static_cast<T*>(comp), data); }));
+			}
+
+			//Serialize component
+			nlohmann::json serializeComponent(unsigned int comp_type, const void* comp) const;
+
+			//Deserialize component
+			void deserializeComponent(unsigned int comp_type, void* comp, nlohmann::json const& data) const;
+		};
 
 		//Serialization Service
 		class NIKE_API Service {
 		private:
+			//Component Serialization Registry
+			std::unique_ptr<CompSerializer> comp_registry;
 
+			//Serialize Entity
+			nlohmann::json serializeEntity(Entity::Type entity);
+
+			//Deserialize Entity
+			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
 		public:
+			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
+			~Service() = default;
 
+			//Register component for serialization
+			template<typename T>
+			void registerComponent(std::function<nlohmann::json(T const&)> serialize, std::function<void(T&, nlohmann::json const&)> deserialize) {
+				comp_registry->registerComponent<T>(serialize, deserialize);
+			}
+
+			//Serialize Entity into file path
+			void saveEntityToFile(Entity::Type entity, std::string const& file_path);
+
+			//Serialize Entity into file path
+			void loadEntityFromFile(Entity::Type entity, std::string const& file_path);
 		};
+
+		//Re-enable DLL Export warning
+		#pragma warning(default: 4251)
 	}
 }
 

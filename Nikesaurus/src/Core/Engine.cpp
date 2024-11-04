@@ -32,9 +32,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Physics::Dynamics>();
 		NIKE_ECS_MANAGER->registerComponent<Physics::Collider>();
 
-		////Register animation components
-		NIKE_ECS_MANAGER->registerComponent<Animation::Base>();
-		NIKE_ECS_MANAGER->registerComponent<Animation::Sprite>();
+		Animation::registerComponents();
 
 		////Register render components
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();

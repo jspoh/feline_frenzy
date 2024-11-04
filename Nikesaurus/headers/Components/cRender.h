@@ -97,11 +97,14 @@ namespace NIKE {
 			bool b_blend;
 			float intensity;
 			bool b_stretch;
+			Vector2b b_flip;
 
-			Texture() : texture_ref{ "" }, color(), frame_size(), frame_index(), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false } {}
-			Texture(std::string const& texture_ref, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 })
-				:texture_ref{ texture_ref }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index } {}
+			Texture() : texture_ref{ "" }, color(), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(), frame_index(), b_flip{false, false} {}
+			Texture(std::string const& texture_ref, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
+				:texture_ref{ texture_ref }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
+
+		void registerComponents();
 	}
 }
 
