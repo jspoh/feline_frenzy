@@ -165,7 +165,7 @@ namespace NIKE {
 
 			static bool imgui_overlay_enable = true;
 
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_I)) {
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_TAB)) {
 				// Toggle ImGui overlay visibility
 				imgui_overlay_enable = !imgui_overlay_enable;
 			}

@@ -48,7 +48,7 @@ namespace NIKE {
 					}
 				}
 				// If file with a valid extension, display it
-				else if (hasValidExtension(path)) {
+				else if (hasValidTextureExtension(path)) {
 					// If click on the asset, able to load it
 					if (ImGui::Selectable(file_name.c_str())) {
 						// Trigger the popup when selected
@@ -191,7 +191,9 @@ namespace NIKE {
 
 	void imguiEntityComponentManagementWindow()
 	{
-		static bool open_component_popup = false;
+		static bool open_component_popup = false; 
+		static bool show_error_popup = false;
+		static bool show_save_popup = false;
 
 		std::string selected_entity = NIKE_IMGUI_SERVICE->getSelectedEntityName();
 		ImGui::Begin("Entity Component Management");
@@ -242,15 +244,101 @@ namespace NIKE {
 						else if (component_name == "Render::Texture") {
 							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 							static char texture_ref[300];
-							// strncpy_s(texture_comp.texture_ref, texture_ref, sizeof(texture_ref));
 							// Ensure null-termination
 							texture_ref[sizeof(texture_ref) - 1] = '\0';
 
 							ImGui::Text("Enter a texture ref:");
-							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {
-								// Only update the texture reference if the user made a change
-								texture_comp.texture_ref = texture_ref;
+							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {}
+							// Save button to confirm changes 
+							if (ImGui::Button("Save Texture ID")) {
+								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_ref))
+								{
+									// Update audio ID in component
+									texture_comp.texture_ref = texture_ref;
+									ImGui::OpenPopup("VALID INPUT");
+									show_save_popup = true;
+								}
+								else {
+									ImGui::OpenPopup("INVALID INPUT");
+									show_error_popup = true;
+								}
 							}
+							// Show pop ups
+							show_error_popup = ShowErrorPopup();
+							show_save_popup = ShowSaveConfirmationPopup();
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else if (component_name == "Audio::SFX") {
+							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+							static char input_audio_id[300];
+							static char input_channel_group_id[300];
+							// Ensure null-termination
+							input_audio_id[sizeof(input_audio_id) - 1] = '\0';
+							input_channel_group_id[sizeof(input_channel_group_id) - 1] = '\0';
+
+							ImGui::Text("Enter Audio ID:");
+							if (ImGui::InputText("##audioID", input_audio_id, IM_ARRAYSIZE(input_audio_id))) {
+								// Optionally handle input change here if needed
+							}
+
+							ImGui::Text("Enter Channel ID:");
+							if (ImGui::InputText("##channelID", input_channel_group_id, IM_ARRAYSIZE(input_channel_group_id))) {
+								// Optionally handle input change here if needed
+							}
+
+							// Set volume
+							ImGui::SliderFloat("Volume", &sfx_comp.volume, 0.f, 1.f, "%.2f");
+							// Set pitch
+							ImGui::SliderFloat("Pitch", &sfx_comp.pitch, 0.f, 1.f, "%.2f");
+
+							// A button to play SFX
+							if (!sfx_comp.audio_id.empty() && !sfx_comp.channel_group_id.empty())
+							{
+								ImGui::Text("Play Sound");
+								if (ImGui::Button("Play")) {
+									sfx_comp.play_sfx = !sfx_comp.play_sfx;
+								}
+							}
+
+
+							// Save button to confirm changes to audio component
+							if (ImGui::Button("Save Channel Group ID")) {
+								if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(input_channel_group_id))
+								{
+									// Update channel ID in component
+									sfx_comp.channel_group_id = input_channel_group_id;
+									ImGui::OpenPopup("VALID INPUT");
+									show_save_popup = true;
+								}
+								else
+								{
+									ImGui::OpenPopup("INVALID INPUT");
+									show_error_popup = true;
+								}
+							}
+							if (ImGui::Button("Save Audio ID")) {
+								if (NIKE_ASSETS_SERVICE->checkAudioExist(input_audio_id))
+								{
+									// Update audio ID in component
+									sfx_comp.audio_id = input_audio_id;
+									ImGui::OpenPopup("VALID INPUT");
+									show_save_popup = true;
+								}
+								else
+								{
+									ImGui::OpenPopup("INVALID INPUT");
+									show_error_popup = true;
+								}
+							}
+
+							// Show pop ups
+							show_error_popup = ShowErrorPopup();
+							show_save_popup = ShowSaveConfirmationPopup();
+
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
@@ -288,6 +376,12 @@ namespace NIKE {
 	void imguiShowLoadedAssetsWindow()
 	{
 		ImGui::Begin("Loaded Assets");
+
+		// Display all loaded textures
+		for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
+		{
+			ImGui::Text("%s", texture.first.c_str());
+		}
 
 		ImGui::End();
 	}

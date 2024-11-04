@@ -16,7 +16,16 @@ namespace NIKE {
 	// This function will be used to update imgui's input if needed
 	void imguiInputUpdate();
 	// This function is used to check if the file has a valid extension (e.g .txt, .png)
-	bool hasValidExtension(const std::filesystem::path& filePath);
+	bool hasValidTextureExtension(const std::filesystem::path& filePath);
+	// This function is used to check if the file has a valid extension (e.g .wav, .ogg)
+	bool hasValidAudioExtension(const std::filesystem::path& filePath);
+	// This function is used to check if the file has a valid extension (e.g .txt, .scn)
+	bool hasValidScnTxtExtension(const std::filesystem::path& filePath);
+	// This function is used to check if the file has a valid extension (e.g .ttf)
+	bool hasValidFontExtension(const std::filesystem::path& filePath);
+	// This function is used to check if the file has a valid extension (e.g .vert)
+	bool hasValidVertExtension(const std::filesystem::path& filePath);
+
 }
 
 #endif

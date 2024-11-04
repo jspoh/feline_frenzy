@@ -420,6 +420,10 @@ namespace NIKE {
 			//Get channel
 			std::shared_ptr<Audio::IChannel> getChannel(std::string const& channel_id);
 
+			// Checkers
+			bool checkChannelGroupExist(std::string const& channel_id);
+			bool checkChannelExist(std::string const& channel_id);
+
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
 			//Channel ID will override each other if the same id is specified more than once

@@ -24,12 +24,36 @@ namespace NIKE
             static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
     }
 
-    // Check if the file has one of the valid extensions (png, jpg, wav)
-    bool hasValidExtension(const std::filesystem::path& filePath) {
+    bool hasValidTextureExtension(const std::filesystem::path& filePath) {
         std::string extension = filePath.extension().string();
-        return (extension == ".png" || extension == ".jpg" || extension == ".wav" || extension == ".txt"
-            || extension == ".scn" || extension == ".ogg" || extension == ".tex" || extension == ".ttf" || extension == ".frag" || extension == ".vert");
+        return (extension == ".png" || extension == ".jpg" || extension == ".tex");
     }
+
+    bool hasValidAudioExtension(const std::filesystem::path& filePath)
+    {
+        std::string extension = filePath.extension().string();
+        return (extension == ".wav" || extension == ".ogg" );
+    }
+
+    bool hasValidScnTxtExtension(const std::filesystem::path& filePath)
+    {
+        std::string extension = filePath.extension().string();
+        return (extension == ".txt" || extension == ".scn");
+    }
+
+    bool hasValidFontExtension(const std::filesystem::path& filePath)
+    {
+        std::string extension = filePath.extension().string();
+        return (extension == ".ttf");
+    }
+
+    bool hasValidVertExtension(const std::filesystem::path& filePath)
+    {
+        std::string extension = filePath.extension().string();
+        return (extension == ".frag" || extension == ".vert");
+    }
+
+
 
     
 }

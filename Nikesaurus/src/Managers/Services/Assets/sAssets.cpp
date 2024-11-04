@@ -216,6 +216,11 @@ namespace NIKE {
 		return true;
 	}
 
+	const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& Assets::Service::getLoadedTextures()
+	{
+		return textures_list;
+	}
+
 	/*****************************************************************//**
 	* Audio
 	*********************************************************************/
@@ -275,5 +280,13 @@ namespace NIKE {
 		}
 
 		return it->second;
+	}
+	bool Assets::Service::checkAudioExist(std::string const& audio_tag)
+	{
+		if (audio_list.find(audio_tag) == audio_list.end())
+		{
+			return false;
+		}
+		return true;
 	}
 }

@@ -118,6 +118,9 @@ namespace NIKE {
 			//Check if texture loaded
 			bool checkTextureLoaded(std::string const& texture_id);
 
+			//Check if texture loaded
+			const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
+
 			/*****************************************************************//**
 			* Audio
 			*********************************************************************/
@@ -132,6 +135,9 @@ namespace NIKE {
 
 			//Get audio
 			std::shared_ptr<Audio::IAudio> getAudio(std::string const& audio_tag);
+
+			// Check for audio
+			bool checkAudioExist(std::string const& audio_tag);
 		};
 
 		//Re-enable DLL Export warning

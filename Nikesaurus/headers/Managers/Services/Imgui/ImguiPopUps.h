@@ -23,7 +23,7 @@ namespace NIKE {
 	bool showAddComponentPopup(Entity::Type& entity, bool pop_up);
 
 	// This function will create a pop up for user to choose which component to remove
-	bool removeComponentPopup(Entity::Type& entity, bool pop_up);
+	// bool removeComponentPopup(Entity::Type& entity, bool pop_up);
 
 	// This function will create a pop up to tell user that the component has already been added to that entity
 	bool showComponentExistsPopup();
@@ -36,6 +36,10 @@ namespace NIKE {
 
 	// This function will create a pop up if there is an invalid string input to remove entity
 	bool showInvalidEntityPopup();
+	// Function to display an error popup if input is invalid
+	bool ShowErrorPopup();
+	// Function to display a save confirmation popup
+	bool ShowSaveConfirmationPopup();
 
 }
 

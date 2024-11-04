@@ -478,6 +478,24 @@ namespace NIKE {
 		return it->second;
 	}
 
+	bool Audio::Service::checkChannelGroupExist(std::string const& channel_id)
+	{
+		if (channel_groups.find(channel_id) == channel_groups.end())
+		{
+			return false;
+		}
+		return true;
+	}
+
+	bool Audio::Service::checkChannelExist(std::string const& channel_id)
+	{
+		if (channels.find(channel_id) == channels.end())
+		{
+			return false;
+		}
+		return true;
+	}
+
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused) {
 		
 		//Get assets services

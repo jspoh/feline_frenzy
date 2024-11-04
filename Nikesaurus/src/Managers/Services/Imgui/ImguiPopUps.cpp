@@ -226,4 +226,32 @@ namespace NIKE
         return is_open;
     }
 
+    // Function to display an error popup if input is invalid
+    bool ShowErrorPopup() {
+        bool is_open = true;
+        if (ImGui::BeginPopupModal("INVALID INPUT", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("%s", "Invalid input, please re-type your input");
+            if (ImGui::Button("OK")) {
+                ImGui::CloseCurrentPopup();
+                is_open = false;
+            }
+            ImGui::EndPopup();
+        }
+        return is_open;
+    }
+
+    // Function to display a save confirmation popup
+    bool ShowSaveConfirmationPopup() {
+        bool is_open = true;
+        if (ImGui::BeginPopupModal("VALID INPUT", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("%s", "Input has been saved");
+            if (ImGui::Button("OK")) {
+                ImGui::CloseCurrentPopup();
+                is_open = false;
+            }
+            ImGui::EndPopup();
+        }
+        return is_open;
+    }
+
 }
