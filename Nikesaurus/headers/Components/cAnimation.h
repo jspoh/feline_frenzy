@@ -20,8 +20,8 @@ namespace NIKE {
 
 		//Animation Modes
 		enum class Mode {
-			PAUSE = 0,
-			RESUME,
+			PLAYING = 0,
+			PAUSE,
 			RESTART,
 			END
 		};
@@ -52,18 +52,15 @@ namespace NIKE {
 				: new_start_index{ new_start }, new_end_index{ new_end }, animator_id{ id }, num_animations{ num_animations }, animation_ongoing{ false } {}
 		};
 
-		struct cBase {
+		struct Base {
+			//Animation Mode
+			Mode animation_mode;
+
 			//Animation Tracker ( Infinite number of animations if set to 0 )
 			int animations_to_complete;
 
 			//Completed animations
 			int completed_animations;
-
-			//Animation state
-			bool b_animation_stop;
-
-			//Animation state
-			bool b_animation_finished;
 
 			//PingPong animation
 			bool b_pingpong;
@@ -71,26 +68,23 @@ namespace NIKE {
 			//Reverse animation
 			bool b_reverse;
 
-			//Animation Speed
-			float animation_speed;
+			//Animation frame duration
+			float frame_duration;
 
-			//Timer
-			Utility::Clock timer;
-
-			//Animator identifier
-			std::string animator_id;
+			//Animation timer
+			float timer;
 
 			//Constructor
-			cBase() : animator_id{""}, animations_to_complete{0}, completed_animations{0}, b_animation_stop{false},
-				b_animation_finished{ false }, b_pingpong{ false }, b_reverse{ false }, animation_speed{ 0.0f }, timer() {}
+			Base() : animation_mode{ Mode::PLAYING }, animations_to_complete{ 0 }, completed_animations{ 0 },
+				 b_pingpong{ false }, b_reverse{ false }, frame_duration{ 0.0f }, timer() {}
 
 			//Arguement constructor
-			cBase(std::string const& animator_id, int animations_to_complete, float animation_speed, bool pingpong_mode = false)
-				: animator_id{ animator_id }, animations_to_complete{ animations_to_complete }, completed_animations{ 0 }, b_animation_stop{ false },
-				b_animation_finished{ false }, b_pingpong{ pingpong_mode }, b_reverse{ false }, animation_speed{ animation_speed }, timer() {}
+			Base(int animations_to_complete, float frame_duration, bool pingpong_mode = false)
+				: animation_mode{ Mode::PLAYING }, animations_to_complete{ animations_to_complete }, completed_animations{ 0 },
+				b_pingpong{ pingpong_mode }, b_reverse{ false }, frame_duration{ frame_duration }, timer() {}
 		};
 
-		struct cSprite {
+		struct Sprite {
 
 			//Sprite sheet Size ( cols x rows )
 			Vector2i sheet_size;
@@ -105,10 +99,10 @@ namespace NIKE {
 			Vector2i curr_index;
 
 			//Constructor
-			cSprite() : sheet_size(), start_index(), end_index(), curr_index() {}
+			Sprite() : sheet_size(), start_index(), end_index(), curr_index() {}
 
 			//Arguement constructor
-			cSprite(Vector2i const& sheet_size, Vector2i const& start_index, Vector2i const& end_index)
+			Sprite(Vector2i const& sheet_size, Vector2i const& start_index, Vector2i const& end_index)
 				: sheet_size{ sheet_size }, start_index{ start_index }, end_index{ end_index }, curr_index{ start_index } {}
 		};
 	}

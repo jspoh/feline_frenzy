@@ -61,13 +61,6 @@ namespace NIKE {
 				: edit_position{ pos }, edit_zoom { zoom } {}
 		};
 
-		struct Color{
-			float r, g, b, a;
-			
-			Color() : r{ 0.0f }, g{ 0.0f }, b{ 0.0f }, a{ 0.0f } {}
-			Color(float r, float g, float b, float a) : r{ r }, g{ g }, b{ b }, a{ a } {}
-		};
-
 		enum class TextOrigin {
 			CENTER = 0,
 			BOTTOM,
@@ -79,33 +72,35 @@ namespace NIKE {
 		struct Text {
 			std::string font_ref;
 			std::string text;
-			Color color;
+			Vector4f color;
 			float scale;
 			TextOrigin origin;
 
 			Text() : font_ref{ "" }, text{ "" }, color(), scale{ 1.0f }, origin{ TextOrigin::CENTER } {}
-			Text(std::string const& font_ref, std::string const& text, Color const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
+			Text(std::string const& font_ref, std::string const& text, Vector4f const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
 				: font_ref{ font_ref }, text{ text }, color{ color }, scale{ scale }, origin{ origin } {}
 		};
 
 		struct Shape {
 			std::string model_ref; 
-			Color color;
+			Vector4f color;
 
 			Shape() : model_ref{ "" }, color() {}
-			Shape(std::string const& model_ref, Color const& color) : model_ref{ model_ref }, color{ color } {};
+			Shape(std::string const& model_ref, Vector4f const& color) : model_ref{ model_ref }, color{ color } {};
 		};
 
 		struct Texture {
 			std::string texture_ref;
-			Color color;
-			Vector2i frame_count;	// x: 1 / frames in col,  y: 1 / frames in row
+			Vector4f color;
+			Vector2i frame_size;	// x: 1 / frames in col,  y: 1 / frames in row
 			Vector2i frame_index;	// frame 1: (0,0), frame 2: (1,0) ( topleft to bot right )
+			bool b_blend;
+			float intensity;
 			bool b_stretch;
 
-			Texture() : texture_ref{ "" }, color(), frame_count(), frame_index(), b_stretch{ false } {}
-			Texture(std::string const& texture_ref, Color const& color, bool b_stretch = false, Vector2i const& frame_count = {1, 1}, Vector2i const& frame_index = {0, 0})
-				:texture_ref{ texture_ref }, color{ color }, frame_count{ frame_count }, frame_index{ frame_index }, b_stretch{ b_stretch } {}
+			Texture() : texture_ref{ "" }, color(), frame_size(), frame_index(), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false } {}
+			Texture(std::string const& texture_ref, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 })
+				:texture_ref{ texture_ref }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index } {}
 		};
 	}
 }

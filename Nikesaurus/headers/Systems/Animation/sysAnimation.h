@@ -22,14 +22,14 @@ namespace NIKE {
 		/*****************************************************************//**
 		* Animation manager
 		*********************************************************************/
-		class Manager : public System::ISystem, public Events::IEventListener<Animation::AnimationEvent> {
+		class Manager : public System::ISystem {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
 			//Sprite animator
-			std::unique_ptr<Animation::SpriteSheet> sprite_animator;
+			std::unique_ptr<Animation::SpriteAnimator> sprite_animator;
 
 		public:
 			//Default Constructor
@@ -49,9 +49,6 @@ namespace NIKE {
 
 			//Override update func
 			void update() override;
-
-			//Execute event
-			void onEvent(std::shared_ptr<Animation::AnimationEvent> event) override;
 		};
 	}
 }

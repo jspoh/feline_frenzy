@@ -37,8 +37,8 @@ namespace NIKE {
             //Iterate through all entities
             for (auto& entity : entities) {
 
-                //Skip entities that are not present within layer
-                if (!layer->checkEntity(entity))
+                //Skip entities that are not present within layer & entities without transform component
+                if (!layer->checkEntity(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
                     continue;
 
                 //Update entities with dynamics

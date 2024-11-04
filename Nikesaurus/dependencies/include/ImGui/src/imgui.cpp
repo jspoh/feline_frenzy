@@ -4692,28 +4692,28 @@ void ImGui::MemFree(void* ptr)
 }
 
 // We record the number of allocation in recent frames, as a way to audit/sanitize our guiding principles of "no allocations on idle/repeating frames"
-void ImGui::DebugAllocHook(ImGuiDebugAllocInfo* info, int frame_count, void* ptr, size_t size)
+void ImGui::DebugAllocHook(ImGuiDebugAllocInfo* info, int frame_size, void* ptr, size_t size)
 {
     ImGuiDebugAllocEntry* entry = &info->LastEntriesBuf[info->LastEntriesIdx];
     IM_UNUSED(ptr);
-    if (entry->FrameCount != frame_count)
+    if (entry->FrameCount != frame_size)
     {
         info->LastEntriesIdx = (info->LastEntriesIdx + 1) % IM_ARRAYSIZE(info->LastEntriesBuf);
         entry = &info->LastEntriesBuf[info->LastEntriesIdx];
-        entry->FrameCount = frame_count;
+        entry->FrameCount = frame_size;
         entry->AllocCount = entry->FreeCount = 0;
     }
     if (size != (size_t)-1)
     {
         entry->AllocCount++;
         info->TotalAllocCount++;
-        //printf("[%05d] MemAlloc(%d) -> 0x%p\n", frame_count, size, ptr);
+        //printf("[%05d] MemAlloc(%d) -> 0x%p\n", frame_size, size, ptr);
     }
     else
     {
         entry->FreeCount++;
         info->TotalFreeCount++;
-        //printf("[%05d] MemFree(0x%p)\n", frame_count, ptr);
+        //printf("[%05d] MemFree(0x%p)\n", frame_size, ptr);
     }
 }
 

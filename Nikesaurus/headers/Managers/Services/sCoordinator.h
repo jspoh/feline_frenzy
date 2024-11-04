@@ -16,6 +16,7 @@
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
+#include "Components/cAnimation.h"
 
 namespace NIKE {
 	namespace Coordinator {
