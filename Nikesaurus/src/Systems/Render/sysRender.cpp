@@ -333,6 +333,24 @@ namespace NIKE {
 
 	void Render::Manager::renderViewport() {
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			for (auto& entity : entities) {
+				if (!layer->checkEntity(entity))
+					continue;
+
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+					transformAndRenderText(entity);
+				}
+				else {
+					transformAndRenderEntity(entity, true);
+				}
+			}
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+
 	}
 
 	void Render::Manager::init() {
@@ -380,26 +398,6 @@ namespace NIKE {
 	}
 
 	void Render::Manager::update() {
-
-		//Before drawing clear screen
 		renderViewport();
-
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
-			for (auto& entity : entities) {
-				if (!layer->checkEntity(entity))
-					continue;
-
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
-					transformAndRenderText(entity);
-				}
-				else {
-					transformAndRenderEntity(entity, true);
-				}
-			}
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 	}
 }

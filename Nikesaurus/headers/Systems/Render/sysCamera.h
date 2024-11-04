@@ -29,6 +29,9 @@ namespace NIKE {
 			//Init camera
 			void init();
 
+			// Return active Cam id
+			Entity::Type getCamId() const;
+
 			//Get matrix
 			Matrix_33 getWorldToNDCXform() const;
 

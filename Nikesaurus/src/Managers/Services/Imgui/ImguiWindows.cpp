@@ -681,11 +681,13 @@ namespace NIKE {
 	{
 		ImGui::Begin("Camera Control");
 
-		static int selectedCameraIndex = 0; // Index of the currently selected camera
+		static int selectedCameraIndex = 1; // Index of the currently selected camera ( REMEMBER TO CHANGE BACK TO 0)
 		static std::vector<std::pair<std::string, Entity::Type>> cameraEntities; // Store camera names and their entities
 
 		if (!NIKE_IMGUI_SERVICE->populateLists) {
 			cameraEntities.clear();
+
+			cameraEntities.emplace_back("Free Cam", -1);
 			// Populate the cameraEntities list only once
 			for (const auto& elem : NIKE_IMGUI_SERVICE->getEntityRef()) {
 				if (NIKE_IMGUI_SERVICE->checkEntityExist(elem.first)) {
@@ -700,6 +702,7 @@ namespace NIKE {
 			NIKE_IMGUI_SERVICE->populateLists = true; // Mark as initialized to avoid re-populating
 		}
 
+		// !TODO update currently selected cam id during init to reflect in drop down
 		// Create a combo box for camera selection
 		if (!cameraEntities.empty()) {
 			ImGui::Text("Select Camera:");
@@ -723,55 +726,60 @@ namespace NIKE {
 		else {
 			ImGui::Text("No cameras available.");
 		}
+		ImGui::Spacing();
 
-		// Position Controls
-		ImGui::Text("Position:");
-		// Create a grid of buttons for up, down, left, and right
-		if (ImGui::Button("Up")) {
-			// Move camera position up
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+		// If camera selected is free cam
+		if (selectedCameraIndex == 0) {
+			// Position Controls
+			ImGui::Text("Position:");
+
+			if (ImGui::Button("Up")) {
+				// Move camera position up
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+			}
+			if (ImGui::IsItemActive()) {
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+			}
+
+
+			ImGui::SameLine();
+			if (ImGui::Button("Down")) {
+				// Move camera position down
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+			}
+			if (ImGui::IsItemActive()) {
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+			}
+
+
+			ImGui::SameLine();
+			if (ImGui::Button("Left")) {
+				// Move camera position left
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+			}
+			if (ImGui::IsItemActive()) {
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+			}
+
+
+			ImGui::SameLine();
+			if (ImGui::Button("Right")) {
+				// Move camera position right
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+			}
+			if (ImGui::IsItemActive()) {
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+			}
+
+			if (ImGui::Button("Reset Position")) {
+				// Move camera position right
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RESET_POS));
+
+			}
+
+			ImGui::Spacing();
 		}
-		if (ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
-		}
-
-
-		ImGui::SameLine();
-		if (ImGui::Button("Down")) {
-			// Move camera position down
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
-		}
-		if (ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
-		}
-
-
-		ImGui::SameLine();
-		if (ImGui::Button("Left")) {
-			// Move camera position left
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
-		}
-		if (ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
-		}
-
-
-		ImGui::SameLine();
-		if (ImGui::Button("Right")) {
-			// Move camera position right
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
-		}
-		if (ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
-		}
-
-		if (ImGui::Button("Reset Position")) {
-			// Move camera position right
-
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RESET_POS));
-
-		}
-
+		
 		// Zoom Controls
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In")) {
@@ -790,7 +798,6 @@ namespace NIKE {
 		}
 
 		if (ImGui::Button("Reset Cam")) {
-			// Move camera position right
 
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::RESET_ZOOM));
 
