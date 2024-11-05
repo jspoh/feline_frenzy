@@ -53,7 +53,7 @@ namespace NIKE {
 						{ "Sheet_Size", comp.sheet_size.toJson() },
 						{ "Start_Index", comp.start_index.toJson() },
 						{ "End_Index", comp.end_index.toJson() },
-						{ "Curr_Index", comp.curr_index.toJson() },
+						{ "Curr_Index", comp.curr_index.toJson() }
 						};
 			},
 

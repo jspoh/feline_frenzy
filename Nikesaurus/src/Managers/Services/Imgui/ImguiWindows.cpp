@@ -248,29 +248,29 @@ namespace NIKE {
 						}
 						else if (component_name == "Render::Texture") {
 							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-							static char texture_ref[300];
+							static char texture_id[300];
 							static bool texture_initialized = false;
 
 							//For initial initialization
 							if (!texture_initialized) {
 								// Ensure null-termination
-								texture_ref[sizeof(texture_ref) - 1] = '\0';
-								strcpy_s(texture_ref, texture_comp.texture_ref.c_str());
+								texture_id[sizeof(texture_id) - 1] = '\0';
+								strcpy_s(texture_id, texture_comp.texture_id.c_str());
 								texture_initialized = true;
 							}
 
 							ImGui::Text("Enter a texture ref:");
-							if (ImGui::InputText("##textureRef", texture_ref, IM_ARRAYSIZE(texture_ref))) {}
+							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id))) {}
 							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
 							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
 							ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.1f);
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
-								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_ref))
+								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_id))
 								{
 									// Update audio ID in component
-									texture_comp.texture_ref = texture_ref;
+									texture_comp.texture_id = texture_id;
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
@@ -282,7 +282,7 @@ namespace NIKE {
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
-							if (!texture_comp.texture_ref.empty())
+							if (!texture_comp.texture_id.empty())
 							{
 								ImGui::Text("Stretch: %s", texture_comp.b_stretch ? "true" : "false");
 								if (ImGui::Button("Stretch")) {
@@ -405,7 +405,7 @@ namespace NIKE {
 							if (!shape_initialized) {
 								// Ensure null-termination
 								input_model_ref[sizeof(input_model_ref) - 1] = '\0';
-								strcpy_s(input_model_ref, shape_comp.model_ref.c_str());
+								strcpy_s(input_model_ref, shape_comp.model_id.c_str());
 								shape_initialized = true;
 							}
 
@@ -419,7 +419,7 @@ namespace NIKE {
 								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))
 								{
 									// Update channel ID in component
-									shape_comp.model_ref = input_model_ref;
+									shape_comp.model_id = input_model_ref;
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
@@ -445,21 +445,21 @@ namespace NIKE {
 						else if (component_name == "Render::Text") {
 							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
-							static char input_font_ref[300];
+							static char input_font_id[300];
 							static char input_text[300];							
 							static bool text_initialized = false;
 
 							if (!text_initialized) {
 								// Ensure null-termination
-								input_font_ref[sizeof(input_font_ref) - 1] = '\0';
+								input_font_id[sizeof(input_font_id) - 1] = '\0';
 								input_text[sizeof(input_text) - 1] = '\0';
-								strcpy_s(input_font_ref, text_comp.font_ref.c_str());
+								strcpy_s(input_font_id, text_comp.font_id.c_str());
 								strcpy_s(input_text, text_comp.text.c_str());
 								text_initialized = true;
 							}
 
 							ImGui::Text("Enter the font to use:");
-							if (ImGui::InputText("##fontRef", input_font_ref, IM_ARRAYSIZE(input_font_ref))) {
+							if (ImGui::InputText("##fontRef", input_font_id, IM_ARRAYSIZE(input_font_id))) {
 								// Optionally handle input change here if needed
 							}
 
@@ -491,10 +491,10 @@ namespace NIKE {
 
 							// Save buttons to confirm changes
 							if (ImGui::Button("Save Font Ref")) {
-								if (NIKE_ASSETS_SERVICE->checkFontExist(input_font_ref))
+								if (NIKE_ASSETS_SERVICE->checkFontExist(input_font_id))
 								{
 									// Update channel ID in component
-									text_comp.font_ref = input_font_ref;
+									text_comp.font_id = input_font_id;
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
@@ -587,7 +587,7 @@ namespace NIKE {
 							{
 								ImGui::Text("Play Sound");
 								if (ImGui::Button("Play")) {
-									sfx_comp.play_sfx = !sfx_comp.play_sfx;
+									sfx_comp.b_play_sfx = !sfx_comp.b_play_sfx;
 								}
 							}
 

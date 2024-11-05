@@ -1,7 +1,7 @@
 {
     "Components": {
         "Animation::Base": {
-            "Animation_Count": 10,
+            "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
             "Completed_Animations": 0,
@@ -24,7 +24,66 @@
             },
             "Start_Index": {
                 "x": 0,
-                "y": 4
+                "y": 1
+            }
+        },
+        "Physics::Collider": {
+            "B_Collided": false,
+            "Resolution": 1
+        },
+        "Physics::Dynamics": {
+            "Drag": 1.0,
+            "Force": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Mass": 2.0,
+            "Max_Speed": 200.0,
+            "Velocity": {
+                "x": 0.0,
+                "y": 0.0
+            }
+        },
+        "Render::Cam": {
+            "Height": 900.0,
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": true,
+            "B_Flip": {
+                "x": false,
+                "y": true
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 9,
+                "y": 5
+            },
+            "Intensity": 0.5,
+            "Texture_ID": "ZOMBIE"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 200.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 100.0,
+                "y": 100.0
             }
         }
     }

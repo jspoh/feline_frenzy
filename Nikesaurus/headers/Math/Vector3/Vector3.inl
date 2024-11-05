@@ -93,3 +93,19 @@ inline Vector3<T> Vector3<T>::normalize() {
 	z /= len;
 	return *this;
 }
+
+template<typename T>
+nlohmann::json Vector3<T>::toJson() const {
+	return	{
+			{"x", x},
+			{"y", y},
+			{"z", z},
+	};
+}
+
+template<typename T>
+void Vector3<T>::fromJson(nlohmann::json const& data) {
+	x = data.at("x").get<T>();
+	y = data.at("y").get<T>();
+	z = data.at("z").get<T>();
+}

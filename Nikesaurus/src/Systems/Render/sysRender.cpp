@@ -68,7 +68,7 @@ namespace NIKE {
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_ref);
+		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
 
 		//Draw
 		glBindVertexArray(model->vaoid);
@@ -92,11 +92,11 @@ namespace NIKE {
 		// set texture
 		glBindTextureUnit(
 			texture_unit, // texture unit (binding index)
-			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data
+			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
 		);
 
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Caculate UV Offset
 		Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
@@ -149,7 +149,7 @@ namespace NIKE {
 
 		//Calculate size of text
 		for (char c : e_text.text) {
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
 
 			//Calculate width
 			e_transform.scale.x += (ch.advance >> 6) * e_text.scale;
@@ -185,7 +185,7 @@ namespace NIKE {
 		//Iterate through all characters
 		for (char c : e_text.text)
 		{
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
 
 			float xpos = pos.x + ch.bearing.x * e_text.scale;
 			float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
@@ -271,7 +271,7 @@ namespace NIKE {
 			//Allow stretching of texture
 			if (!e_texture.b_stretch) {
 				//Copy transform for texture mapping ( Locks the transformation of a texture )
-				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y) / e_texture.frame_size.y };
+				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
 				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 			}
 

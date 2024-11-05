@@ -170,20 +170,20 @@ namespace NIKE {
 
     // SAT helper functions
 
-    // Helper to retrieve and apply transformations to vertices based on model_ref
+    // Helper to retrieve and apply transformations to vertices based on model_id
     std::vector<Vector2f> Collision::System::getRotatedVertices(
-        const Transform::Transform& transform, const std::string& model_ref)
+        const Transform::Transform& transform, const std::string& model_id)
     {
         std::vector<Vector2f> vertices;
 
-        if (model_ref == "triangle") {
+        if (model_id == "triangle") {
             vertices = {
                 Vector2f(-0.5f, -0.5f),
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.0f, 0.5f)
             };
         }
-        else if (model_ref == "square" || model_ref == "square-texture") {
+        else if (model_id == "square" || model_id == "square-texture") {
             vertices = {
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.5f, 0.5f),
@@ -256,11 +256,11 @@ namespace NIKE {
     // Main detect SAT function
     bool Collision::System::detectSATCollision(
         const Transform::Transform& transformA, const Transform::Transform& transformB,
-        const std::string& model_refA, const std::string& model_refB, CollisionInfo& info)
+        const std::string& model_idA, const std::string& model_idB, CollisionInfo& info)
     {
         // Step 1: Get vertices and separating axes
-        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_refA);
-        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_refB);
+        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_idA);
+        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_idB);
         std::vector<Vector2f> axes = getSeparatingAxes(verticesA, verticesB);
 
         Vector2f smallestAxis;
@@ -315,6 +315,14 @@ namespace NIKE {
         // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+            return;
+        }
+
+        // Slide To Slide Resolution
+        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
+            transform_a.position += info.mtv * 0.5f;
+            transform_b.position -= info.mtv * 0.5f;
+            return;
         }
 
         // Resolution::NONE currently makes movement object "bounce"
@@ -332,7 +340,7 @@ namespace NIKE {
         case Physics::Resolution::NONE:
             break;
         case Physics::Resolution::SLIDE:
-            transform_b.position += info.mtv;
+            transform_b.position -= info.mtv;
             break;
         default:
             break;

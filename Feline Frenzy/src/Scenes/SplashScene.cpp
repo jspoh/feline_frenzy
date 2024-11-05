@@ -61,12 +61,15 @@ void Splash::Scene::init() {
 	second_layer->addEntity(player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 200.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::BOUNCE));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::SLIDE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {1.0f, 0.0f, 0.0f, 1.0f}, true, 0.5f, false, {9, 5}, {0, 0}, {false, true}));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Base>(player_1, NIKE::Animation::Base(0, 0.2f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Sprite>(player_1, NIKE::Animation::Sprite({9,5}, {0, 1}, {8, 1}));
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
+
+	//Save player to prefab
+	NIKE_SERIALIZE_SERVICE->saveEntityToFile(player_1, "assets/Scenes/test.scn");
 
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
@@ -101,16 +104,13 @@ void Splash::Scene::init() {
 	base_Layer->addEntity(sfx_1);
 	NIKE_ECS_SERVICE->addDefEntityComponent(sfx_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Audio::SFX"));
 	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
-	// Test crash logger
-	//LOG_CRASH("This is a test crash");
 
 	//Prefabs testing
 	NIKE::Entity::Type test_1 = NIKE_ECS_SERVICE->createEntity();
-	base_Layer->addEntity(test_1);
+	second_layer->addEntity(test_1);
+
 	NIKE_SERIALIZE_SERVICE->loadEntityFromFile(test_1, "assets/Scenes/test.scn");
-	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Animation::Base>(test_1).animations_to_complete = 10;
-	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Animation::Sprite>(test_1).start_index = {0, 4};
-	NIKE_SERIALIZE_SERVICE->saveEntityToFile(test_1, "assets/Scenes/test.scn");
+	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Physics::Dynamics>(test_1).force.x = 100.0f;
 }
 
 void Splash::Scene::exit() {

@@ -93,3 +93,21 @@ inline Vector4<T> Vector4<T>::normalize() {
 	w /= len;
 	return *this;
 }
+
+template<typename T>
+nlohmann::json Vector4<T>::toJson() const {
+	return	{
+			{"x", x},
+			{"y", y},
+			{"z", z},
+			{"w", w}
+	};
+}
+
+template<typename T>
+void Vector4<T>::fromJson(nlohmann::json const& data) {
+	x = data.at("x").get<T>();
+	y = data.at("y").get<T>();
+	z = data.at("z").get<T>();
+	w = data.at("w").get<T>();
+}

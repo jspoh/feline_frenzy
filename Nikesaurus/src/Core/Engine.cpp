@@ -23,22 +23,19 @@ namespace NIKE {
 
 	void Core::Engine::registerDefComponents() {
 		//Register Audio Components
-		NIKE_ECS_MANAGER->registerComponent<Audio::SFX>();
+		Audio::registerComponents();
 
 		//Register transform component
-		NIKE_ECS_MANAGER->registerComponent<Transform::Transform>();
+		Transform::registerComponents();
 
-		////Register physics components
-		NIKE_ECS_MANAGER->registerComponent<Physics::Dynamics>();
-		NIKE_ECS_MANAGER->registerComponent<Physics::Collider>();
-
+		//Register physics components
+		Physics::registerComponents();
+		
+		//Register animation components
 		Animation::registerComponents();
 
-		////Register render components
-		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Cam>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
+		//Register render components
+		Render::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
