@@ -26,6 +26,11 @@
 namespace NIKE {
 	namespace Render {
 
+		struct RenderInstance {
+			Matrix_33 xform;
+			Vector4f color;
+		};
+
 		//Render Manager
 		class Manager : public System::ISystem {
 		private:
@@ -55,7 +60,8 @@ namespace NIKE {
 			//Render Shape
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
 
-
+			constexpr static unsigned int MAX_INSTANCES = 1000;
+			std::vector<RenderInstance> render_instances;
 
 			// batch render shape
 			void batchRenderObject();
@@ -79,7 +85,7 @@ namespace NIKE {
 			void transformAndRenderText(Entity::Type entity);
 		public:
 			//Constructor
-			Manager() = default;
+			Manager();
 
 			//Destructor
 			~Manager() = default;

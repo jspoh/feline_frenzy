@@ -16,6 +16,7 @@ void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->loadShader("base", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
 	NIKE_ASSETS_SERVICE->loadShader("texture", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
 	NIKE_ASSETS_SERVICE->loadShader("text", "assets/Shaders/text.vert", "assets/Shaders/text.frag");
+	NIKE_ASSETS_SERVICE->loadShader("batched_base", "assets/Shaders/batched_base.vert", "assets/Shaders/batched_base.frag");
 
 	//Load Models
 	NIKE_ASSETS_SERVICE->loadModel("square", "assets/Models/square.txt");

@@ -17,9 +17,13 @@
 #include "Math/Mtx33.h"
 
  // used for BATCHED_RENDERING. comment out to disable
- //#define BATCHED_RENDERING 1
+ #define BATCHED_RENDERING
 
 namespace NIKE {
+
+	Render::Manager::Manager() {
+		render_instances.reserve(MAX_INSTANCES);
+	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
@@ -85,8 +89,15 @@ namespace NIKE {
 		shader_system->unuseShader();
 #else
 		// prepare for batched rendering
+		RenderInstance instance;
+		instance.xform = x_form;
+		instance.color = e_shape.override_color;
 
+		render_instances.push_back(instance);
 
+		if (render_instances.size() >= MAX_INSTANCES) {
+			batchRenderObject();
+		}
 #endif
 	}
 
@@ -97,6 +108,62 @@ namespace NIKE {
 		return;
 #endif
 
+		if (render_instances.empty()) {
+			return;
+		}
+
+		shader_system->useShader("batched_base");
+
+		std::vector<Matrix_33> xforms;
+		xforms.reserve(render_instances.size());
+
+		std::vector<Vector4f> colors;
+		colors.reserve(render_instances.size());
+
+		std::vector<bool> override_colors;
+		override_colors.reserve(render_instances.size());
+
+		for (const RenderInstance& instance : render_instances) {
+			xforms.push_back(instance.xform);
+			colors.push_back(instance.color);
+		}
+
+		// !TODO: what if different models?
+		auto model = NIKE_ASSETS_SERVICE->getModel("square");
+		glBindVertexArray(model->vaoid);
+
+		// 3 buffers: transformations, colors
+		unsigned int instance_vbos[2];
+		glCreateBuffers(2, instance_vbos);
+
+		// buffer for transformations
+		glBindBuffer(GL_ARRAY_BUFFER, instance_vbos[0]);
+		glBufferData(GL_ARRAY_BUFFER, xforms.size() * sizeof(Matrix_33), xforms.data(), GL_DYNAMIC_DRAW);
+
+		// no idea what this is
+		constexpr int A_MODEL_TO_NDC_LOC = 4;
+		glEnableVertexAttribArray(A_MODEL_TO_NDC_LOC);
+		glVertexAttribPointer(A_MODEL_TO_NDC_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Matrix_33), (void*)0);
+		glVertexAttribDivisor(A_MODEL_TO_NDC_LOC, 1);		// do i really need this?
+
+		// buffer for colors
+		glBindBuffer(GL_ARRAY_BUFFER, instance_vbos[1]);
+		glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Vector4f), colors.data(), GL_DYNAMIC_DRAW);
+
+		constexpr int A_COLOR_LOC = 1;
+		glEnableVertexAttribArray(A_COLOR_LOC);
+		glVertexAttribPointer(A_COLOR_LOC, 4, GL_FLOAT, GL_FALSE, sizeof(Vector4f), (void*)0);
+		glVertexAttribDivisor(A_COLOR_LOC, 1);
+
+		glDrawElementsInstanced(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr, render_instances.size());
+
+		// cleanup
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDeleteBuffers(2, instance_vbos);
+		glBindVertexArray(0);
+		shader_system->unuseShader();
+
+		render_instances.clear();
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
@@ -423,6 +490,8 @@ namespace NIKE {
 				}
 			}
 		}
+
+		batchRenderObject();	// final call to batchRenderObject in case render_instances buffer isnt full but also not empty
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 	}
