@@ -31,6 +31,17 @@ namespace NIKE {
 			//Default Destructor
 			~Service() = default;
 
+			enum class AssetType {
+				Texture = 0,
+				Sfx,
+				Music,
+				Font,
+				Shaders,
+				Models,
+				Unknown
+			};
+
+
 			//Init
 			void init();
 
@@ -46,6 +57,9 @@ namespace NIKE {
 
 			bool checkEntityExist(const std::string& entity_ref);
 
+			// For reloading of specific asset type
+			void reloadAssets(const std::string& asset_type);
+
 			// Populate dropdown list whenever component is added
 			bool populateLists = false;
 
@@ -60,7 +74,7 @@ namespace NIKE {
 			void operator=(Service const& copy) = delete;
 
 			// Assets file path
-			std::filesystem::path assets_path = "C:\\Users\\User\\feline_frenzy\\Feline Frenzy\\assets";
+			std::filesystem::path assets_path = "assets/";
 			// Container to store the entities created with string ref
 			std::unordered_map<std::string, Entity::Type> entities_ref;
 			// Variable to hold the selected entity name

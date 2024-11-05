@@ -24,7 +24,7 @@ namespace NIKE {
 		ImGui::Text("Current Path: %s", GET_ASSETS_PATH().string().c_str());
 
 		// Navigate back to the root directory
-		std::filesystem::path const root_assets_path = "C:\\Users\\User\\feline_frenzy\\Feline Frenzy\\assets";
+		std::filesystem::path const root_assets_path = "assets/";
 		if (GET_ASSETS_PATH() != root_assets_path) {
 			if (ImGui::Button("Back")) {
 				// Go up one directory level
@@ -47,16 +47,17 @@ namespace NIKE {
 						GET_ASSETS_PATH() = path;
 					}
 				}
-				// If file with a valid extension, display it
-				else if (hasValidTextureExtension(path)) {
-					// If click on the asset, able to load it
+				// Handle different asset types and drag-and-drop
+				else if (hasValidTextureExtension(path) || hasValidAudioExtension(path) || hasValidFontExtension(path)) {
 					if (ImGui::Selectable(file_name.c_str())) {
-						// Trigger the popup when selected
 						selected_asset = file_name;
 						show_load_popup = true;
 					}
-					if (show_load_popup) {
-						ImGui::OpenPopup("Load Asset");
+
+					if (ImGui::BeginDragDropSource()) {
+						ImGui::SetDragDropPayload("ASSET_PATH", path.c_str(), path.string().size() + 1);
+						ImGui::Text("Dragging %s", file_name.c_str());
+						ImGui::EndDragDropSource();
 					}
 				}
 			}
@@ -697,18 +698,40 @@ namespace NIKE {
 
 		ImGui::End();
 	}
+
 	void imguiShowLoadedAssetsWindow()
 	{
-		ImGui::Begin("Loaded Assets");
+		ImGui::Begin("Asset List");
 
-		// Display all loaded textures
-		for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
+		// Tabs for different asset types
+		if (ImGui::BeginTabBar("AssetTypes"))
 		{
-			ImGui::Text("%s", texture.first.c_str());
+			if (ImGui::BeginTabItem("Textures"))
+			{
+				displayAssetList("Textures");
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Models"))
+			{
+				displayAssetList("Models");
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Shaders"))
+			{
+				displayAssetList("Shaders");
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Audio"))
+			{
+				displayAssetList("Audio");
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
 		}
 
 		ImGui::End();
 	}
+
 
 	void imguiShowGameViewport()
 	{

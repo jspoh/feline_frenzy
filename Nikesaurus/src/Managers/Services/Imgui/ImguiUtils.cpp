@@ -32,7 +32,7 @@ namespace NIKE
     bool hasValidAudioExtension(const std::filesystem::path& filePath)
     {
         std::string extension = filePath.extension().string();
-        return (extension == ".wav" || extension == ".ogg" );
+        return (extension == ".wav");
     }
 
     bool hasValidScnTxtExtension(const std::filesystem::path& filePath)
@@ -52,6 +52,64 @@ namespace NIKE
         std::string extension = filePath.extension().string();
         return (extension == ".frag" || extension == ".vert");
     }
+
+    void displayAssetList(const std::string& asset_type)
+    {
+
+        // Refresh button to reload assets if needed
+        if (ImGui::Button(("Refresh " + asset_type).c_str()))
+        {
+            NIKE_ASSETS_SERVICE->reloadAssets(asset_type);
+        }
+        ImGui::Separator();
+
+        ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
+
+        // Check asset type and retrieve appropriate list of loaded assets
+        if (asset_type == "Textures")
+        {
+            // Retrieve loaded textures
+            for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
+            {
+                // Display the texture thumbnail
+                ImGui::Image((intptr_t)texture.second->gl_data, ImVec2(64, 64));  
+
+                // Display the texture name
+                ImGui::SameLine();
+                ImGui::Text("%s", texture.first.c_str());
+
+                // Hover effect with the texture path as tooltip
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Texture path: %s", texture.first.c_str());
+                }
+            }
+        }
+        else if (asset_type == "Audio")
+        {
+            for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedAudios())
+            {
+                ImGui::Text("%s", audio.first.c_str()); 
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Audio path: %s", audio.first.c_str());
+                }
+            }
+        }
+        else if (asset_type == "Fonts")
+        {
+            for (const auto& font : NIKE_ASSETS_SERVICE->getLoadedFonts())
+            {
+                ImGui::Text("%s", font.first.c_str()); 
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Font path: %s", font.first.c_str());
+                }
+            }
+        }
+        // Add more asset types here if needed (e.g., models, shaders)
+
+        ImGui::EndChild();
+    }
+
+
 
 
 

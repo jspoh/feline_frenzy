@@ -79,6 +79,16 @@ namespace NIKE {
 		fonts_list.erase(it);
 	}
 
+	void Assets::Service::unloadAllFonts()
+	{
+		for (auto const& font : fonts_list)
+		{
+			unloadFont(font.first);
+		}
+
+		fonts_list.clear();
+	}
+
 	std::shared_ptr<Assets::Font> const& Assets::Service::getFont(std::string const& font_id) const {
 		//Find shader
 		auto it = fonts_list.find(font_id);
@@ -90,6 +100,11 @@ namespace NIKE {
 		}
 
 		return it->second;
+	}
+
+	const std::unordered_map<std::string, std::shared_ptr<Assets::Font>>& Assets::Service::getLoadedFonts() const
+	{
+		return fonts_list;
 	}
 
 	bool Assets::Service::checkFontExist(std::string const& font_id)
@@ -129,6 +144,16 @@ namespace NIKE {
 		shaders_list.erase(it);
 	}
 
+	void Assets::Service::unloadAllShaders()
+	{
+		for (const auto& shader : shaders_list)
+		{
+			unloadShader(shader.first);
+		}
+
+		shaders_list.clear();
+	}
+
 	unsigned int Assets::Service::getShader(std::string const& shader_id) {
 		//Find shader
 		auto it = shaders_list.find(shader_id);
@@ -140,6 +165,11 @@ namespace NIKE {
 		}
 
 		return it->second;
+	}
+
+	const std::unordered_map<std::string, unsigned int>& Assets::Service::getLoadedShaders()
+	{
+		return shaders_list;
 	}
 
 	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path) {
@@ -169,6 +199,16 @@ namespace NIKE {
 		models_list.erase(it);
 	}
 
+	void Assets::Service::unloadAllModels()
+	{
+		for (auto const& model : models_list)
+		{
+			unloadModel(model.first);
+		}
+
+		models_list.clear();
+	}
+
 	std::shared_ptr<Assets::Model> Assets::Service::getModel(std::string const& model_id) {
 		//Find model
 		auto it = models_list.find(model_id);
@@ -180,6 +220,11 @@ namespace NIKE {
 		}
 
 		return it->second;
+	}
+
+	const std::unordered_map<std::string, std::shared_ptr<Assets::Model>>& Assets::Service::getLoadedModels()
+	{
+		return models_list;
 	}
 
 	bool Assets::Service::checkModelExist(std::string const& model_id)
@@ -214,6 +259,16 @@ namespace NIKE {
 		//Unload texture
 		glDeleteTextures(1, &it->second->gl_data);
 		textures_list.erase(it);
+	}
+
+	void Assets::Service::unloadAllTextures()
+	{
+		for (const auto& texture : textures_list)
+		{
+			unloadTexture(texture.first);
+		}
+
+		textures_list.clear();
 	}
 
 	std::shared_ptr<Assets::Texture> Assets::Service::getTexture(std::string const& texture_id) {
@@ -286,6 +341,16 @@ namespace NIKE {
 		audio_list.erase(it);
 	}
 
+	void Assets::Service::unloadAllAudios()
+	{
+		for (const auto& audio : audio_list)
+		{
+			unloadAudio(audio.first);
+		}
+
+		audio_list.clear();
+	}
+
 	std::shared_ptr<Audio::IAudio> Assets::Service::getAudio(std::string const& audio_tag)
 	{
 		//Find audio
@@ -299,6 +364,12 @@ namespace NIKE {
 
 		return it->second;
 	}
+
+	const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& Assets::Service::getLoadedAudios()
+	{
+		return audio_list;
+	}
+
 	bool Assets::Service::checkAudioExist(std::string const& audio_tag)
 	{
 		if (audio_list.find(audio_tag) == audio_list.end())
@@ -306,5 +377,78 @@ namespace NIKE {
 			return false;
 		}
 		return true;
+	}
+
+	std::string const& Assets::Service::getTexturePath() 
+	{ 
+		return texture_path; 
+	}
+
+	std::string const& Assets::Service::getAudioPath() 
+	{
+		return audio_path; 
+	}
+
+	std::string const& Assets::Service::getFontPath() 
+	{
+		return font_path;
+	}
+
+	std::string const& Assets::Service::getModelsPath() 
+	{ 
+		return models_path; 
+	}
+
+	std::string const& Assets::Service::getScenesPath() 
+	{
+		return scenes_path;
+	}
+
+	std::string const& Assets::Service::getShadersPath() 
+	{
+		return shaders_path; 
+	}
+
+	void Assets::Service::reloadAssets(const std::string& asset_type)
+	{
+		if (asset_type == "Textures") {
+			// Clear textures if needed, or just check for existing ones
+			for (const auto& texture_paths : std::filesystem::directory_iterator(getTexturePath())) {
+				if (hasValidTextureExtension(texture_paths)) {
+					std::string filename = texture_paths.path().filename().string();
+
+					// Check if the texture already exists before loading
+					if (textures_list.find(filename) == textures_list.end()) {
+						loadTexture(filename, texture_paths.path().string());
+					}
+				}
+			}
+		}
+		else if (asset_type == "Audio") {
+			for (const auto& audio_paths : std::filesystem::directory_iterator(getAudioPath())) {
+				if (hasValidAudioExtension(audio_paths)) {
+					std::string filename = audio_paths.path().filename().string();
+
+					// Check if the audio already exists before loading
+					if (audio_list.find(filename) == audio_list.end()) {
+						loadMusic(filename, audio_paths.path().string());
+					}
+				}
+			}
+		}
+		else if (asset_type == "Fonts") {
+			for (const auto& font_paths : std::filesystem::directory_iterator(getFontPath())) {
+				if (hasValidFontExtension(font_paths)) {
+					std::string filename = font_paths.path().filename().string();
+
+					// Check if the font already exists before loading
+					if (fonts_list.find(filename) == fonts_list.end()) {
+						loadFont(filename, font_paths.path().string());
+					}
+				}
+			}
+		}
+
+		// Others goes here
 	}
 }

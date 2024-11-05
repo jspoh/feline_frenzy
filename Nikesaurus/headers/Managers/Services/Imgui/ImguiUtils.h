@@ -25,6 +25,8 @@ namespace NIKE {
 	bool hasValidFontExtension(const std::filesystem::path& filePath);
 	// This function is used to check if the file has a valid extension (e.g .vert)
 	bool hasValidVertExtension(const std::filesystem::path& filePath);
+	// This function will be used to display assets of the given type
+	void displayAssetList(const std::string& assetType);
 
 }
 
