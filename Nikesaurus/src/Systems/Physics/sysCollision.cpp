@@ -120,8 +120,14 @@ namespace NIKE {
                 tLast.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / velRel.x;
             }
         }
-        else if (aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x) {
-            return false; // No collision on the x-axis if there's no relative movement and no static collision
+        else {
+            if (aabb_a.rect_max.x < aabb_b.rect_min.x && aabb_a.rect_min.x > aabb_b.rect_max.x) {
+                tFirst.x = 0.0f;
+                tLast.x = deltaTime; // Full time frame
+            }
+            else {
+                return false; // No collision on the x-axis if there's no relative movement and no static collision
+            }
         }
 
         // Step 4: Check dynamic collision on y-axis
@@ -135,8 +141,14 @@ namespace NIKE {
                 tLast.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / velRel.y;
             }
         }
-        else if (aabb_a.rect_max.y < aabb_b.rect_min.y || aabb_a.rect_min.y > aabb_b.rect_max.y) {
-            return false; // No collision on the y-axis if there's no relative movement and no static collision
+        else {
+            if (aabb_a.rect_max.y < aabb_b.rect_min.y && aabb_a.rect_min.y > aabb_b.rect_max.y) {
+                tFirst.y = 0.0f;
+                tLast.y = deltaTime; // Full time frame
+            }
+            else {
+                return false;// No collision on the y-axis if there's no relative movement and no static collision
+            }
         }
 
         // Step 5: Check if collisions occur within the time frame
@@ -320,8 +332,8 @@ namespace NIKE {
 
         // Slide To Slide Resolution
         if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
-            transform_a.position += info.mtv * 0.5f;
-            transform_b.position -= info.mtv * 0.5f;
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
             return;
         }
 

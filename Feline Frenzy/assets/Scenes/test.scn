@@ -29,7 +29,7 @@
         },
         "Physics::Collider": {
             "B_Collided": false,
-            "Resolution": 1
+            "Resolution": 2
         },
         "Physics::Dynamics": {
             "Drag": 1.0,

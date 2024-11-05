@@ -62,7 +62,7 @@ namespace NIKE {
                     }
 
                     //Set velocity to zero if net velo < 0.01
-                    if (e_dynamics.velocity.length() < 0.01f) {
+                    if (e_dynamics.velocity.length() < 0.0001f) {
                         e_dynamics.velocity = { 0.0f, 0.0f };
                     }
 

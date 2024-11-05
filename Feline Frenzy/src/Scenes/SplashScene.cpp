@@ -61,7 +61,7 @@ void Splash::Scene::init() {
 	second_layer->addEntity(player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 200.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::SLIDE));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::BOUNCE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {1.0f, 0.0f, 0.0f, 1.0f}, true, 0.5f, false, {9, 5}, {0, 0}, {false, true}));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Base>(player_1, NIKE::Animation::Base(0, 0.2f));
@@ -110,7 +110,7 @@ void Splash::Scene::init() {
 	second_layer->addEntity(test_1);
 
 	NIKE_SERIALIZE_SERVICE->loadEntityFromFile(test_1, "assets/Scenes/test.scn");
-	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Physics::Dynamics>(test_1).force.x = 100.0f;
+	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Physics::Dynamics>(test_1).force = { 100.0f, 0.0f };
 }
 
 void Splash::Scene::exit() {
