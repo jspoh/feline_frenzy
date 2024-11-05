@@ -6,6 +6,22 @@
 
 namespace NIKE {
 
+	void imguiDockingSpace() {
+		// Main DockSpace
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+		ImGui::SetNextWindowSize(ImVec2(static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x),
+			static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y)));
+		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+		// Create a full-screen docking space
+		ImGui::Begin("Level Editor", nullptr, window_flags);
+		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::End();
+	}
+
 	void imguiFileSystemWindow() {
 		// Check if the path exists
 		if (!std::filesystem::exists(GET_ASSETS_PATH())) {
@@ -688,14 +704,6 @@ namespace NIKE {
 		else {
 			ImGui::Text("No entity selected.");
 		}
-
-		ImGui::End();
-	}
-
-
-	void imguiRenderEntityWindow()
-	{
-		ImGui::Begin("Levels Management");
 
 		ImGui::End();
 	}

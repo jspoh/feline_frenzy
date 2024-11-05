@@ -18,6 +18,8 @@ namespace NIKE {
 	/*!********************************************************************
 	* Window UI
 	**********************************************************************/
+	// Docking space for imgui
+	void imguiDockingSpace();
 	// This function will design the UI for the file system window
 	void imguiFileSystemWindow();
 
@@ -29,9 +31,6 @@ namespace NIKE {
 
 	// This function will design the UI to show all the components available
 	void imguiEntityComponentManagementWindow();
-
-	// This function will design the UI to render the entities
-	void imguiRenderEntityWindow();
 
 	// This function will design the UI to show the loaded assets
 	void imguiShowLoadedAssetsWindow();
