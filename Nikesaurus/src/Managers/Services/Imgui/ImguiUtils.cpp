@@ -38,7 +38,7 @@ namespace NIKE
     bool hasValidScnTxtExtension(const std::filesystem::path& filePath)
     {
         std::string extension = filePath.extension().string();
-        return (extension == ".txt" || extension == ".scn");
+        return (extension == ".scn");
     }
 
     bool hasValidFontExtension(const std::filesystem::path& filePath)
@@ -61,6 +61,8 @@ namespace NIKE
 
     void displayAssetList(const std::string& asset_type)
     {
+        // Variable to store the selected texture
+        static std::string selected_texture;
 
         // Refresh button to reload assets if needed
         if (ImGui::Button(("Refresh " + asset_type).c_str()) && asset_type != "Shaders")
@@ -83,8 +85,14 @@ namespace NIKE
                 // Top-right
                 ImVec2 uv1(1.0f, 0.0f); 
 
+                // Create a unique ID for the ImageButton using the texture name
+                std::string unique_id = "##" + texture.first;
+
                 // Display the texture thumbnail
-                ImGui::Image((intptr_t)texture.second->gl_data, ImVec2(64, 64), uv0, uv1);  
+                if (ImGui::ImageButton(unique_id.c_str(), (intptr_t)texture.second->gl_data, ImVec2(64, 64), uv0, uv1)) {
+                    // Set selected texture
+                    selected_texture = texture.first; 
+                }
 
                 // Display the texture name
                 ImGui::SameLine();
@@ -95,6 +103,28 @@ namespace NIKE
                     ImGui::SetTooltip("Texture path: %s", texture.first.c_str());
                 }
             }
+        }
+        if (!selected_texture.empty()) {
+            ImGui::Begin("Selected Texture");
+            ImGui::Text("Texture: %s", selected_texture.c_str());
+
+            // Retrieve the texture data to display it
+            auto textureData = NIKE_ASSETS_SERVICE->getLoadedTextures().find(selected_texture);
+            if (textureData != NIKE_ASSETS_SERVICE->getLoadedTextures().end()) {
+                // Adjust size as needed
+                // Bottom-left
+                ImVec2 uv0(0.0f, 1.0f);
+                // Top-right
+                ImVec2 uv1(1.0f, 0.0f);
+                ImGui::Image((intptr_t)textureData->second->gl_data, ImVec2(256, 256), uv0, uv1); 
+            }
+
+            if (ImGui::Button("Close")) {
+                // Clear selection when closing
+                selected_texture.clear(); 
+            }
+
+            ImGui::End();
         }
         else if (asset_type == "Audio")
         {
