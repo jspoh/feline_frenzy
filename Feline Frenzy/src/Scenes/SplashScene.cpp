@@ -10,8 +10,8 @@
 #include "Core/pch.h"
 #include "Scenes/SplashScene.h"
 
-
-void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
+/*
+void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
 	// Open Scene file
 	std::ifstream ifs{ file, std::ios::in };
 
@@ -111,30 +111,34 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 				break;
 			}
 
+			
 			// Create Entity
-			NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity();
+
+			// Set layer to background if not collidable
+			unsigned int layer{(collide)? player_layer->getLayerID() : background_layer->getLayerID()};
+
+			NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity(layer);
 			NIKE_IMGUI_SERVICE->addEntityRef("tile_" + std::to_string(row) + "_" + std::to_string(col), tile_entity);
-			layer->addEntity(tile_entity);
 			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size - offset_x, (height - 1 - row) * tile_size - offset_y }, { 100.0f, 100.0f }, 0.0f));
 			
 			
-			//if (collide) {
-			//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
-			//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
-			//}
+			if (collide) {
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
+			}
 
-			//if (flip) {
-			//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { true, false }));
-			//}
-			//else {
-			//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { false, false }));
-			//}
+			if (flip) {
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { true, false }));
+			}
+			else {
+				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { false, false }));
+			}
 		}
 		//cout << endl;
 	}
 	//cout << "Loaded background grid from file successfully." << endl;
 }
-
+*/
 
 
 void Splash::Scene::load() {
@@ -170,8 +174,8 @@ void Splash::Scene::load() {
 }
 
 void Splash::Scene::init() {
-
-	std::shared_ptr<NIKE::Scenes::Layer> base_Layer = createLayer();
+	std::shared_ptr<NIKE::Scenes::Layer> background_layer = createLayer();
+	std::shared_ptr<NIKE::Scenes::Layer> base_layer = createLayer();
 	std::shared_ptr<NIKE::Scenes::Layer> second_layer = createLayer();
 
 	//base_Layer->setLayerMask(second_layer->getLayerID(), true);
@@ -191,7 +195,7 @@ void Splash::Scene::init() {
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Physics::ChangePhysicsEvent>(1.0f));
 
 	//Create player
-	NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
+	NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity(base_layer->getLayerID());
 	NIKE_IMGUI_SERVICE->addEntityRef("player_1", player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 200.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
@@ -204,7 +208,7 @@ void Splash::Scene::init() {
 
 	// MapGrid Test
 	std::vector<std::vector<int>> grid;
-	loadBackgroundFromFile("assets/Map/mediummap.txt", base_layer, grid, { 0.0f, 200.0f });
+	NIKE_SERIALIZE_SERVICE->loadMapFromFile("assets/Map/mediummap.txt", background_layer, base_layer, grid, { 0.0f, 200.0f });
 	
 	////Save player to prefab
 	//NIKE_SERIALIZE_SERVICE->saveEntityToFile(player_1, "assets/Scenes/test.scn");
@@ -217,24 +221,24 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(shape_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {1.0f, 1.0f, 1.0f, 1.0f}));
 
-	NIKE::Entity::Type shape_2 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
+	NIKE::Entity::Type shape_2 = NIKE_ECS_SERVICE->createEntity(base_layer->getLayerID());
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_2", shape_2);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_2, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_2, NIKE::Transform::Transform({ 200.0f, 100.0f }, { 100.0f, 100.0f }, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_2, NIKE::Render::Texture("TREE", { 1.0f, 1.0f, 1.0f, 1.0f }));
 
 	
-	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
+	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity(base_layer->getLayerID());
 	NIKE_IMGUI_SERVICE->addEntityRef("text_1", text_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_1, NIKE::Transform::Transform({ 0.0f, -300.0f }, { 0.0f, 0.0f }, 45.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_1, NIKE::Render::Text("MONTSERRAT", "HELLO WORLD.", {1.0f, 0.0f, 0.0f, 1.0f}, 1.0f, NIKE::Render::TextOrigin::CENTER));
 
-	NIKE::Entity::Type text_2 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
+	NIKE::Entity::Type text_2 = NIKE_ECS_SERVICE->createEntity(base_layer->getLayerID());
 	NIKE_IMGUI_SERVICE->addEntityRef("text_2", text_2);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_2, NIKE::Transform::Transform({ -750.0f, 400.0f }, { 0.0f, 0.0f }, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_2, NIKE::Render::Text("MONTSERRAT", "PANTAT.", { 1.0f, 0.0f, 0.0f, 1.0f }, 1.0f, NIKE::Render::TextOrigin::LEFT));
 
-	NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
+	NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity(base_layer->getLayerID());
 	NIKE_ECS_SERVICE->addDefEntityComponent(sfx_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Audio::SFX"));
 	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 
