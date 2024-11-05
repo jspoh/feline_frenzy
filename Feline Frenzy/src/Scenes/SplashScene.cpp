@@ -62,12 +62,12 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 			std::string texture_name{"grass"};
 			switch (tileID) {
 			case 1:
-				texture_name = "wallBottomCorner";
+				texture_name = "wallTopCorner";
 				flip = false;
 				collide = true;
 				break;
 			case 2:
-				texture_name = "wallBottomMiddle";
+				texture_name = "wallTopMiddle";
 				flip = false;
 				collide = true;
 				break;
@@ -82,17 +82,17 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 				collide = false;
 				break;
 			case 5:
-				texture_name = "wallTopCorner";
+				texture_name = "wallBottomCorner";
 				flip = false;
 				collide = true;
 				break;
 			case 6:
-				texture_name = "wallTopMiddle";
+				texture_name = "wallBottomMiddle";
 				flip = false;
 				collide = true;
 				break;
 			case 7:
-				texture_name = "wallBottomCorner";
+				texture_name = "wallTopCorner";
 				flip = true;
 				collide = true;
 				break;
@@ -102,7 +102,7 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 				collide = true;
 				break;
 			case 9:
-				texture_name = "wallTopCorner";
+				texture_name = "wallBottomCorner";
 				flip = true;
 				collide = true;
 				break;
@@ -117,12 +117,13 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 			NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity();
 			NIKE_IMGUI_SERVICE->addEntityRef("tile_" + std::to_string(row) + "_" + std::to_string(col), tile_entity);
 			layer->addEntity(tile_entity);
-			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size - offset_x, row * tile_size - offset_y}, { 100.0f, 100.0f }, 0.0f));
+			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size - offset_x, (height - 1 - row) * tile_size - offset_y }, { 100.0f, 100.0f }, 0.0f));
 			
 			if (collide) {
 				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
 				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
 			}
+
 			if (flip) {
 				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { true, false }));
 			}
@@ -206,14 +207,6 @@ void Splash::Scene::init() {
 	// MapGrid Test
 	std::vector<std::vector<int>> grid;
 	loadBackgroundFromFile("assets/Map/smallmap.txt", base_layer, grid, { 0.0f, 200.0f });
-
-	// MapGrid
-	//NIKE::Entity::Type background_1 = NIKE_ECS_SERVICE->createEntity();
-	//NIKE_IMGUI_SERVICE->addEntityRef("background_1", background_1);
-	//base_Layer->addEntity(background_1);
-	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(background_1, NIKE::Transform::Transform({ 0.0f, 0.0f }, { 100.0f, 100.0f }, 0.0f));	// {0.0f, 0.0f} places the tile at coordinates 0.0 x and 0.0 y
-	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(background_1, NIKE::Render::Texture("wallTopMiddle", { 1.0f, 1.0f, 1.0f, 1.0f }));
-
 
 	// TREE
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
