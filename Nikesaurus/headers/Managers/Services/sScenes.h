@@ -179,6 +179,9 @@ namespace NIKE {
 				//Construct scene obj
 				scenes.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
 
+				//Create first layer for scene
+				scenes.at(scene_id)->createLayer();
+
 				//Default starting state will be the first state registered
 				if (!curr_scene) {
 					initScene(scene_id);

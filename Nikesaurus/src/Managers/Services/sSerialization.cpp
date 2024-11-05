@@ -109,7 +109,7 @@ namespace NIKE {
 		}
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::out);
+		std::fstream file(file_path, std::ios::out | std::ios::trunc);
 
 		//Store data
 		file << data.dump(4);
@@ -128,11 +128,20 @@ namespace NIKE {
 		//Read data from file
 		file >> data;
 
+		//Return if there is no data
+		if (data.empty())
+			return;
+
 		//Iterate through all the data;
 		for (auto& item : data) {
 			if (item.contains("Layer")) {
-				auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
-				layer->deserialize(item.at("Layer"));
+				if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(item.at("Layer").at("ID").get<int>())) {
+					auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+					layer->deserialize(item.at("Layer"));
+				}
+				else {
+					NIKE_SCENES_SERVICE->getCurrScene()->getLayer(item.at("Layer").at("ID").get<int>())->deserialize(item.at("Layer"));
+				}
 			}
 
 			if (item.contains("Entity")) {

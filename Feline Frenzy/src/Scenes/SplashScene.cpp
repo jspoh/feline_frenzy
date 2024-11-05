@@ -11,51 +11,35 @@
 #include "Scenes/SplashScene.h"
 
 void Splash::Scene::load() {
-
-	//Load Shaders
-	NIKE_ASSETS_SERVICE->loadShader("base", "assets/Shaders/base.vert", "assets/Shaders/base.frag");
-	NIKE_ASSETS_SERVICE->loadShader("texture", "assets/Shaders/texture.vert", "assets/Shaders/texture.frag");
-	NIKE_ASSETS_SERVICE->loadShader("text", "assets/Shaders/text.vert", "assets/Shaders/text.frag");
-
-	//Load Models
-	NIKE_ASSETS_SERVICE->loadModel("square", "assets/Models/square.txt");
-	NIKE_ASSETS_SERVICE->loadModel("triangle", "assets/Models/triangle.txt");
-	NIKE_ASSETS_SERVICE->loadModel("circle", "assets/Models/circle.txt");
-	NIKE_ASSETS_SERVICE->loadModel("square-texture", "assets/Models/square-texture.txt");
-
-	//Load Texture
-	NIKE_ASSETS_SERVICE->loadTexture("PLAYER", "assets/Textures/player.png");
-	NIKE_ASSETS_SERVICE->loadTexture("TREE", "assets/Textures/Tree_Orange.png");
-	NIKE_ASSETS_SERVICE->loadTexture("ZOMBIE", "assets/Textures/ZombieSheet.png");
-
-	//Load Font
-	NIKE_ASSETS_SERVICE->loadFont("MONTSERRAT", "assets/Fonts/Montserrat-Bold.ttf");
-
-	//Load music
-	NIKE_ASSETS_SERVICE->loadMusic("MUSIC", "assets/Audios/test_music.wav");
-	NIKE_ASSETS_SERVICE->loadSound("SFX", "assets/Audios/test_sound.wav");
+	NIKE_ASSETS_SERVICE->reloadAssets("Textures");
+	NIKE_ASSETS_SERVICE->reloadAssets("Shaders");
+	NIKE_ASSETS_SERVICE->reloadAssets("Audio");
+	NIKE_ASSETS_SERVICE->reloadAssets("Models");
+	NIKE_ASSETS_SERVICE->reloadAssets("Fonts");
 }
 
 void Splash::Scene::init() {
+
+	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/test.scn");
 
 	//std::shared_ptr<NIKE::Scenes::Layer> base_Layer = createLayer();
 	//std::shared_ptr<NIKE::Scenes::Layer> second_layer = createLayer();
 
 	////base_Layer->setLayerMask(second_layer->getLayerID(), true);
 
-	//Creat Channel Group
-	NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
+	////Creat Channel Group
+	//NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
 
-	//Play Music
-	NIKE_AUDIO_SERVICE->playAudio("MUSIC", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
+	////Play Music
+	//NIKE_AUDIO_SERVICE->playAudio("MUSIC", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
 
-	//Set Music Volume
-	NIKE_AUDIO_SERVICE->getChannelGroup("MASTER")->setVolume(0.5f);
+	////Set Music Volume
+	//NIKE_AUDIO_SERVICE->getChannelGroup("MASTER")->setVolume(0.5f);
 
-	// Test Logger
-	NIKEE_WARN("This is a warning message");
+	//// Test Logger
+	//NIKEE_WARN("This is a warning message");
 
-	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Physics::ChangePhysicsEvent>(1.0f));
+	//NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Physics::ChangePhysicsEvent>(1.0f));
 
 	////Create player
 	//NIKE::Entity::Type player_1 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
@@ -83,7 +67,6 @@ void Splash::Scene::init() {
 	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_2, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_2, NIKE::Transform::Transform({ 200.0f, 100.0f }, { 100.0f, 100.0f }, 0.0f));
 	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_2, NIKE::Render::Texture("TREE", { 1.0f, 1.0f, 1.0f, 1.0f }));
-
 	//
 	//NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
 	//NIKE_IMGUI_SERVICE->addEntityRef("text_1", text_1);
@@ -92,18 +75,18 @@ void Splash::Scene::init() {
 
 	//NIKE::Entity::Type text_2 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
 	//NIKE_IMGUI_SERVICE->addEntityRef("text_2", text_2);
-	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(text_2, NIKE::Transform::Transform({ -750.0f, 400.0f }, { 0.0f, 0.0f }, 0.0f));
+	//NIKE_ECS_SERVICE->addEntityComponent(text_2, NIKE::Transform::Transform({ -750.0f, 400.0f }, { 0.0f, 0.0f }, 0.0f));
 	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Text>(text_2, NIKE::Render::Text("MONTSERRAT", "PANTAT.", { 1.0f, 0.0f, 0.0f, 1.0f }, 1.0f, NIKE::Render::TextOrigin::LEFT));
 
 	//NIKE::Entity::Type sfx_1 = NIKE_ECS_SERVICE->createEntity(base_Layer->getLayerID());
 	//NIKE_ECS_SERVICE->addDefEntityComponent(sfx_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Audio::SFX"));
 	//NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
 
-	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/test.scn");
+	//NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/test.scn");
 }
 
 void Splash::Scene::exit() {
-
+	NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/test.scn");
 }
 
 void Splash::Scene::unload() {

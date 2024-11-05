@@ -65,7 +65,6 @@ namespace NIKE {
 			/*****************************************************************//**
 			* File Paths for specific asset types
 			*********************************************************************/
-
 			std::string texture_path = "assets/Textures";
 			std::string audio_path = "assets/Audios";
 			std::string font_path = "assets/Fonts";
@@ -90,6 +89,9 @@ namespace NIKE {
 			//Register font
 			void loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
+			//Reload font
+			void reloadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+
 			//Unload font
 			void unloadFont(std::string const& fond_id);
 
@@ -112,6 +114,9 @@ namespace NIKE {
 			//Load shader
 			void loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
 
+			//Reload shader
+			void reloadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+
 			//Unload shader
 			void unloadShader(std::string const& shader_id);
 
@@ -126,6 +131,9 @@ namespace NIKE {
 
 			//Load model
 			void loadModel(std::string const& model_id, std::string const& file_path);
+
+			//Reload model
+			void reloadModel(std::string const& model_id, std::string const& file_path);
 
 			//Unload model
 			void unloadModel(std::string const& model_id);
@@ -145,6 +153,9 @@ namespace NIKE {
 			//Load texture
 			void loadTexture(std::string const& texture_id, std::string const& file_path);
 
+			//Reload texture
+			void reloadTexture(std::string const& texture_id, std::string const& file_path);
+
 			// Unload texture
 			void unloadTexture(std::string const& texture_id);
 
@@ -154,8 +165,8 @@ namespace NIKE {
 			//Get texture
 			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
 
-			//Check if texture loaded
-			bool checkTextureLoaded(std::string const& texture_id);
+			//Check if texture exist
+			bool checkTextureExist(std::string const& texture_id);
 
 			//Check if texture loaded
 			const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
@@ -166,8 +177,14 @@ namespace NIKE {
 			// Load sound audio
 			void loadSound(std::string const& audio_id, std::string const& file_path);
 
+			// Reload sound
+			void reloadSound(std::string const& audio_id, std::string const& file_path);
+
 			//Load music audio
 			void loadMusic(std::string const& audio_id, std::string const& file_path);
+
+			// Reload music
+			void reloadMusic(std::string const& audio_id, std::string const& file_path);
 
 			//Unload Audio
 			void unloadAudio(std::string const& audio_id);

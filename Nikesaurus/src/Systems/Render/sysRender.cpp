@@ -259,27 +259,33 @@ namespace NIKE {
 		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
 
-			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
 
-			//Render Shape
-			renderObject(matrix, e_shape);
+				//Render Shape
+				renderObject(matrix, e_shape);
+			}
 		}
 		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
 			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
-			//Allow stretching of texture
-			if (!e_texture.b_stretch) {
-				//Copy transform for texture mapping ( Locks the transformation of a texture )
-				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
-				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+			//Check if texture is loaded
+			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
+				//Allow stretching of texture
+				if (!e_texture.b_stretch) {
+					//Copy transform for texture mapping ( Locks the transformation of a texture )
+					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
+					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+				}
+
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
+
+				// Render Texture
+				renderObject(matrix, e_texture);
 			}
-
-			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
-
-			// Render Texture
-			renderObject(matrix, e_texture);
 		}
 
 		if (debugMode) {
@@ -348,11 +354,16 @@ namespace NIKE {
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 
+				//Skip entity if no transform is present
+				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+					continue;
+				
+				if(NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+					transformAndRenderEntity(entity, true);
+				}
+
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
 					transformAndRenderText(entity);
-				}
-				else {
-					transformAndRenderEntity(entity, true);
 				}
 			}
 		}

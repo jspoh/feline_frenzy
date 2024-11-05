@@ -73,7 +73,7 @@ namespace NIKE {
 	* System Manager
 	*********************************************************************/
 
-	void System::Manager::updateEntitiesList(Entity::Type entity, Component::Signature e_signature, Component::Type component, bool b_component_added) {
+	void System::Manager::updateEntitiesList(Entity::Type entity, Component::Signature e_signature) {
 		for (auto& system : systems) {
 			//Check if systems components are set to linked
 			if (system->getComponentsLinked()) {
@@ -86,13 +86,11 @@ namespace NIKE {
 				}
 			}
 			else {
-				//Check component added
-				if (system->checkComponentType(component) && b_component_added) {
+				//Check if there are still components matching
+				if ((system->getSignature() & e_signature).any()) {
 					system->addEntity(entity);
 				}
-
-				//Check component removed
-				if (system->checkComponentType(component) && !b_component_added) {
+				else {
 					system->removeEntity(entity);
 				}
 			}

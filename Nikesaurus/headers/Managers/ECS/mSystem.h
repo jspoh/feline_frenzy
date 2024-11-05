@@ -223,7 +223,7 @@ namespace NIKE {
 			}
 
 			//Update entities list based on signature
-			void updateEntitiesList(Entity::Type entity, Component::Signature e_signature, Component::Type component, bool b_component_added);
+			void updateEntitiesList(Entity::Type entity, Component::Signature e_signature);
 
 			//Clone entity for all systems
 			void cloneEntity(Entity::Type clone, Entity::Type copy);

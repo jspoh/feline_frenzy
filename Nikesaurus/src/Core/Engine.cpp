@@ -163,19 +163,19 @@ namespace NIKE {
 				NIKE_IMGUI_SERVICE->update();
 			}
 
-			getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force = { 0.0f, 0.0f };
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 500.0f;
-			}
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -500.0f;
-			}
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -500.0f;
-			}
-			if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
-				getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 500.0f;
-			}
+			//getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force = { 0.0f, 0.0f };
+			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
+			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 500.0f;
+			//}
+			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
+			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -500.0f;
+			//}
+			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
+			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -500.0f;
+			//}
+			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
+			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 500.0f;
+			//}
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();

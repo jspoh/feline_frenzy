@@ -79,7 +79,7 @@ namespace NIKE {
 		entity_manager->setSignature(entity, sign);
 
 		//Update entities list
-		system_manager->updateEntitiesList(entity, sign, type, true);
+		system_manager->updateEntitiesList(entity, sign);
 	}
 
 	void Coordinator::Manager::removeEntityComponent(Entity::Type entity, Component::Type type) {
@@ -92,7 +92,7 @@ namespace NIKE {
 		entity_manager->setSignature(entity, sign);
 
 		// Update entities list
-		system_manager->updateEntitiesList(entity, sign, type, false);
+		system_manager->updateEntitiesList(entity, sign);
 	}
 
 	void* Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {

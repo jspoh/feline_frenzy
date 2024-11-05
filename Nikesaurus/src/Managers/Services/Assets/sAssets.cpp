@@ -62,6 +62,10 @@ namespace NIKE {
 		fonts_list.emplace(std::piecewise_construct, std::forward_as_tuple(font_id), std::forward_as_tuple(std::make_shared<Assets::Font>(std::static_pointer_cast<Assets::NIKEFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes))));
 	}
 
+	void  Assets::Service::reloadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes) {
+		fonts_list.at(font_id)->char_map = std::static_pointer_cast<Assets::NIKEFontLib>(font_loader->getFontLib())->generateFont(file_path, pixel_sizes).char_map;
+	}
+
 	void Assets::Service::unloadFont(std::string const& font_id) {
 		//Find shader
 		auto it = fonts_list.find(font_id);
@@ -122,11 +126,15 @@ namespace NIKE {
 	void Assets::Service::loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
 		if (shaders_list.find(shader_id) != shaders_list.end())
 		{
-			throw std::runtime_error("MODELS ALREADY EXISTS");
+			throw std::runtime_error("SHADER ALREADY EXISTS");
 		}
 
 		NIKEE_CORE_INFO("Loading shader to '" + shader_id + "'");
 		shaders_list.emplace(std::piecewise_construct, std::forward_as_tuple(shader_id), std::forward_as_tuple(render_loader->compileShader(shader_id, vtx_path, frag_path)));
+	}
+
+	void Assets::Service::reloadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
+		shaders_list.at(shader_id) = render_loader->compileShader(shader_id, vtx_path, frag_path);
 	}
 
 	void Assets::Service::unloadShader(std::string const& shader_id) {
@@ -180,6 +188,10 @@ namespace NIKE {
 
 		NIKEE_CORE_INFO("Loading model to '" + model_id + "'");
 		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Assets::Model>(render_loader->compileModel(file_path))));
+	}
+
+	void Assets::Service::reloadModel(std::string const& model_id, std::string const& file_path) {
+		*models_list.at(model_id) = render_loader->compileModel(file_path);
 	}
 
 	void Assets::Service::unloadModel(std::string const& model_id) {
@@ -246,6 +258,10 @@ namespace NIKE {
 		textures_list.emplace(std::piecewise_construct, std::forward_as_tuple(texture_id), std::forward_as_tuple(std::make_shared<Assets::Texture>(render_loader->compileTexture(file_path))));
 	}
 
+	void Assets::Service::reloadTexture(std::string const& texture_id, std::string const& file_path) {
+		*textures_list.at(texture_id) = render_loader->compileTexture(file_path);
+	}
+
 	void Assets::Service::unloadTexture(std::string const& texture_id) {
 		//Find texture
 		auto it = textures_list.find(texture_id);
@@ -280,7 +296,7 @@ namespace NIKE {
 		return textures_list.at(texture_id);
 	}
 
-	bool Assets::Service::checkTextureLoaded(std::string const& texture_id)
+	bool Assets::Service::checkTextureExist(std::string const& texture_id)
 	{
 		if (textures_list.find(texture_id) == textures_list.end())
 		{
@@ -310,6 +326,10 @@ namespace NIKE {
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createSound(file_path))));
 	}
 
+	void Assets::Service::reloadSound(std::string const& audio_id, std::string const& file_path) {
+		*audio_list.at(audio_id) = *audio_system->createSound(file_path);
+	}
+
 	void Assets::Service::loadMusic(std::string const& audio_id, std::string const& file_path)
 	{
 		// Check if the audio already exists in the map
@@ -321,6 +341,10 @@ namespace NIKE {
 		NIKEE_CORE_INFO("Loading music to '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createStream(file_path))));
+	}
+
+	void Assets::Service::reloadMusic(std::string const& audio_id, std::string const& file_path) {
+		*audio_list.at(audio_id) = *audio_system->createStream(file_path);
 	}
 
 	void Assets::Service::unloadAudio(std::string const& audio_id) {
@@ -417,9 +441,16 @@ namespace NIKE {
 				if (hasValidTextureExtension(texture_paths)) {
 					std::string file_name = texture_paths.path().filename().string();
 
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
 					// Check if the texture already exists before loading
-					if (textures_list.find(file_name) == textures_list.end()) {
-						loadTexture(file_name, texture_paths.path().string());
+					if (!checkTextureExist(file_name.substr(start, size))) {
+						loadTexture(file_name.substr(start, size), texture_paths.path().string());
+					}
+					else {
+						reloadTexture(file_name.substr(start, size), texture_paths.path().string());
 					}
 				}
 			}
@@ -431,9 +462,16 @@ namespace NIKE {
 				if (hasValidAudioExtension(audio_paths)) {
 					std::string file_name = audio_paths.path().filename().string();
 
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
 					// Check if the audio already exists before loading
-					if (audio_list.find(file_name) == audio_list.end()) {
-						loadMusic(file_name, audio_paths.path().string());
+					if (!checkAudioExist(file_name.substr(start, size))) {
+						loadMusic(file_name.substr(start, size), audio_paths.path().string());
+					}
+					else {
+						reloadMusic(file_name.substr(start, size), audio_paths.path().string());
 					}
 				}
 			}
@@ -445,9 +483,16 @@ namespace NIKE {
 				if (hasValidFontExtension(font_paths)) {
 					std::string file_name = font_paths.path().filename().string();
 
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
 					// Check if the font already exists before loading
-					if (fonts_list.find(file_name) == fonts_list.end()) {
-						loadFont(file_name, font_paths.path().string());
+					if (!checkFontExist(file_name.substr(start, size))) {
+						loadFont(file_name.substr(start, size), font_paths.path().string());
+					}
+					else {
+						reloadFont(file_name.substr(start, size), font_paths.path().string());
 					}
 				}
 			}
@@ -459,27 +504,44 @@ namespace NIKE {
 				if (hasValidModelExtension(model_paths)) {
 					std::string file_name = model_paths.path().filename().string();
 
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
 					// Check if the font already exists before loading
-					if (models_list.find(file_name) == models_list.end()) {
-						loadModel(file_name, model_paths.path().string());
+					if (!checkModelExist(file_name.substr(start, size))) {
+						loadModel(file_name.substr(start, size), model_paths.path().string());
+					}
+					else {
+						reloadModel(file_name.substr(start, size), model_paths.path().string());
 					}
 				}
 			}
 		}
-		//else if (asset_type == "Shaders") {
+		else if (asset_type == "Shaders") {
 
-		//	// Load new fonts
-		//	for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
-		//		if (hasValidVertExtension(shader_paths)) {
-		//			std::string file_name = shader_paths.path().filename().string();
+			// Load new fonts
+			for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
+				if (hasValidVertExtension(shader_paths)) {
+					std::string file_name = shader_paths.path().filename().string();
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
 
-		//			// Check if the font already exists before loading
-		//			if (shaders_list.find(file_name) == shaders_list.end()) {
-		//				loadShader(file_name, shader_paths.path().string());
-		//			}
-		//		}
-		//	}
-		//}
+					std::string path = shader_paths.path().string();
+					std::string vtx = path.substr(0, path.find_first_of('.')) + ".vert";
+					std::string frag = path.substr(0, path.find_first_of('.')) + ".frag";
+
+					// Check if the font already exists before loading
+					if (shaders_list.find(file_name.substr(start, size)) == shaders_list.end()) {
+						loadShader(file_name.substr(start, size), vtx, frag);
+					}
+					else {
+						reloadShader(file_name.substr(start, size), vtx, frag);
+					}
+				}
+			}
+		}
 
 		// Others goes here
 	}

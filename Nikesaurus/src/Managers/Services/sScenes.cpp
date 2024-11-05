@@ -210,6 +210,11 @@ namespace NIKE {
 	}
 
 	void Scenes::Service::update() {
+		if (!NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+			curr_scene->exit();
+			curr_scene->unload();
+		}
+
 		if (event_queue) {
 			switch (event_queue->scene_action) {
 			case Scenes::Actions::CHANGE:

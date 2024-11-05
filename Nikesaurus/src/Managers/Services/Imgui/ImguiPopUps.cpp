@@ -26,7 +26,7 @@ namespace NIKE
             ImGui::Text("Enter layer id for the new entity:");
             ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
-            layer_id = std::clamp(layer_id, 0, static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1));
+            layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
 
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
                 if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {

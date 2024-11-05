@@ -319,7 +319,7 @@ namespace NIKE {
 							ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.1f);
 							// Save button to confirm changes 
 							if (ImGui::Button("Save Texture ID")) {
-								if (NIKE_ASSETS_SERVICE->checkTextureLoaded(texture_id))
+								if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id))
 								{
 									// Update audio ID in component
 									texture_comp.texture_id = texture_id;
@@ -744,7 +744,7 @@ namespace NIKE {
 
 	void imguiShowGameViewport()
 	{
-		ImGui::Begin("Game Viewport");
+		ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoResize);
 		ImTextureID textureID = (ImTextureID)NIKE_ECS_MANAGER->getSystemInstance<Render::Manager>()->getTextureColorBuffer();
 		// Define UV coordinates to flip the texture vertically
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
