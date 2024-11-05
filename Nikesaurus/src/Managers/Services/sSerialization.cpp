@@ -53,32 +53,6 @@ namespace NIKE {
 		}
 	}
 
-	nlohmann::json Serialization::Service::serializeLayer(Scenes::Layer const& layer) {
-		//Json Data
-		nlohmann::json data;
-
-		////Layer data
-		//nlohmann::json l_data;
-		//l_data["name"] = layer.getLayerName();
-		//l_data["id"] = layer.getLayerIndex();
-		//data.push_back(l_data);
-
-		////Iterate through all entities
-		//for (auto const& entity : layer.getAllEntities()) {
-		//	nlohmann::json e_data;
-		//	e_data["Entity"] = serializeEntity(entity);
-		//	e_data["Entity"]["id"] = entity;
-
-		//	data.push_back(e_data);
-		//}
-
-		return data;
-	}
-
-	void Serialization::Service::deserializeEntity(Scenes::Layer& layer, nlohmann::json const& data) {
-
-	}
-
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
 		//Json Data
 		nlohmann::json data = serializeEntity(entity);
@@ -118,11 +92,20 @@ namespace NIKE {
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
 
 		//Iterate through all layers in current scene
-		for (auto& layer : layers) {
+		for (auto const& layer : layers) {
 			nlohmann::json l_data;
-			l_data["Layer"] = serializeLayer(*layer);
+			l_data["Layer"] = layer->serialize();
 
 			data.push_back(l_data);
+		}
+
+		//Iterate through all entities
+		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			nlohmann::json e_data;
+			e_data["Entity"] = serializeEntity(entity);
+			e_data["Entity"]["ID"] = entity;
+			e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
+			data.push_back(e_data);
 		}
 
 		//Open file stream
@@ -136,7 +119,31 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadSceneFromFile(std::string const& file_path) {
+		//Json Data
+		nlohmann::json data;
 
+		//Open file stream
+		std::fstream file(file_path, std::ios::in);
+
+		//Read data from file
+		file >> data;
+
+		//Iterate through all the data;
+		for (auto& item : data) {
+			if (item.contains("Layer")) {
+				auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+				layer->deserialize(item.at("Layer"));
+			}
+
+			if (item.contains("Entity")) {
+				Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+				deserializeEntity(entity, item.at("Entity"));
+				NIKE_ECS_MANAGER->setEntityLayerID(entity, item.at("Entity").at("Layer ID").get<unsigned int>());
+			}
+		}
+
+		//Close file
+		file.close();
 	}
 }
 

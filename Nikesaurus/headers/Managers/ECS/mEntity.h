@@ -34,7 +34,7 @@ namespace NIKE {
 			Manager();
 
 			//Create Entity
-			Entity::Type createEntity(unsigned int layer_id);
+			Entity::Type createEntity(unsigned int layer_id = 0);
 
 			//Destroy Entity
 			void destroyEntity(Entity::Type entity);

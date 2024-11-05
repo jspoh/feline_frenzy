@@ -12,6 +12,8 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
+#include "sSerialization.h"
+
 namespace NIKE {
 	namespace Scenes {
 
@@ -23,12 +25,14 @@ namespace NIKE {
 
 		//Layer class
 		class NIKE_API Layer {
+		public:
+			using LayerMask = std::bitset<64>;
 		private:
 			//Friend of layer class
 			friend class IScene;
 
 			//Layer mask
-			std::bitset<64> mask;
+			LayerMask mask;
 
 			//Layer index
 			unsigned int index;
@@ -58,7 +62,13 @@ namespace NIKE {
 			void setLayerMask(unsigned int mask_id, bool state);
 
 			//Get layer mask
-			std::bitset<64> getLayerMask() const;
+			LayerMask getLayerMask() const;
+
+			//Serialize layer
+			nlohmann::json serialize() const;
+
+			//Deserialize layer
+			void deserialize(nlohmann::json const& data);
 		};
 
 		//Scene interface

@@ -325,7 +325,7 @@ namespace NIKE
 
         bool is_popup_open = false;
         
-        static int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(entity);
+        static int layer_id = 0;
 
         // Check if the popup should be opened
         if (ImGui::BeginPopupModal("Set Layer ID", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {

@@ -60,12 +60,6 @@ namespace NIKE {
 
 			//Deserialize Entity
 			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
-
-			//Serialize layer
-			nlohmann::json serializeLayer(Scenes::Layer const& layer);
-
-			//Deserialize layer
-			void deserializeEntity(Scenes::Layer& layer, nlohmann::json const& data);
 		public:
 			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
 			~Service() = default;

@@ -39,6 +39,22 @@ namespace NIKE {
 		return mask;
 	}
 
+	nlohmann::json Scenes::Layer::serialize() const {
+		return	{
+				{"ID", id},
+				{"Index", index},
+				{"Mask", mask.to_ulong()},
+				{"B_State", b_state}
+				};
+	}
+
+	void Scenes::Layer::deserialize(nlohmann::json const& data) {
+		id = data.at("ID").get<unsigned int>();
+		index = data.at("Index").get<unsigned int>();
+		mask = LayerMask(data.at("Mask").get<unsigned long>());
+		b_state = data.at("B_State").get<bool>();
+	}
+
 	/*****************************************************************//**
 	* Scene Interface
 	*********************************************************************/
@@ -80,6 +96,14 @@ namespace NIKE {
 		}
 
 		layers.erase(layers.begin() + it->second->getLayerIndex());
+
+		//Update layers index & mask
+		unsigned int index = 0;
+		for (auto& layer : layers) {
+			layer->index = index++;
+			layer->mask.set(it->second->id, false);
+		}
+
 		layers_map.erase(it);
 	}
 

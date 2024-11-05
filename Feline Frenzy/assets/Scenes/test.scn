@@ -1,8 +1,306 @@
 [
     {
-        "Layer": null
+        "Layer": {
+            "B_State": true,
+            "ID": 0,
+            "Index": 0,
+            "Mask": 1
+        }
     },
     {
-        "Layer": null
+        "Layer": {
+            "B_State": true,
+            "ID": 1,
+            "Index": 1,
+            "Mask": 2
+        }
+    },
+    {
+        "Entity": {
+            "Components": {
+                "Animation::Base": {
+                    "Animation_Count": 0,
+                    "B_PingPong": false,
+                    "B_Reverse": false,
+                    "Completed_Animations": 0,
+                    "Frame_Duration": 0.20000000298023224,
+                    "Mode": 0,
+                    "Timer": 0.0
+                },
+                "Animation::Sprite": {
+                    "Curr_Index": {
+                        "x": 0,
+                        "y": 1
+                    },
+                    "End_Index": {
+                        "x": 8,
+                        "y": 1
+                    },
+                    "Sheet_Size": {
+                        "x": 9,
+                        "y": 5
+                    },
+                    "Start_Index": {
+                        "x": 0,
+                        "y": 1
+                    }
+                },
+                "Physics::Collider": {
+                    "B_Collided": false,
+                    "Resolution": 2
+                },
+                "Physics::Dynamics": {
+                    "Drag": 1.0,
+                    "Force": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "Mass": 2.0,
+                    "Max_Speed": 200.0,
+                    "Velocity": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "Render::Cam": {
+                    "Height": 900.0,
+                    "Position": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "Render::Texture": {
+                    "B_Blend": true,
+                    "B_Flip": {
+                        "x": false,
+                        "y": true
+                    },
+                    "B_Stretch": false,
+                    "Color": {
+                        "w": 1.0,
+                        "x": 1.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "Frame_Index": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "Frame_Size": {
+                        "x": 9,
+                        "y": 5
+                    },
+                    "Intensity": 0.5,
+                    "Texture_ID": "ZOMBIE"
+                },
+                "Transform::Transform": {
+                    "Position": {
+                        "x": 0.0,
+                        "y": 200.0
+                    },
+                    "Rotation": 0.0,
+                    "Scale": {
+                        "x": 100.0,
+                        "y": 100.0
+                    }
+                }
+            },
+            "ID": 0,
+            "Layer ID": 0
+        }
+    },
+    {
+        "Entity": {
+            "Components": {
+                "Physics::Collider": {
+                    "B_Collided": false,
+                    "Resolution": 0
+                },
+                "Physics::Dynamics": {
+                    "Drag": 1.0,
+                    "Force": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "Mass": 0.10000000149011612,
+                    "Max_Speed": 200.0,
+                    "Velocity": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "Render::Cam": {
+                    "Height": 900.0,
+                    "Position": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "Render::Texture": {
+                    "B_Blend": false,
+                    "B_Flip": {
+                        "x": false,
+                        "y": false
+                    },
+                    "B_Stretch": false,
+                    "Color": {
+                        "w": 1.0,
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "Frame_Index": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "Frame_Size": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "Intensity": 0.5,
+                    "Texture_ID": "TREE"
+                },
+                "Transform::Transform": {
+                    "Position": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "Rotation": 0.0,
+                    "Scale": {
+                        "x": 100.0,
+                        "y": 100.0
+                    }
+                }
+            },
+            "ID": 1,
+            "Layer ID": 1
+        }
+    },
+    {
+        "Entity": {
+            "Components": {
+                "Render::Cam": {
+                    "Height": 900.0,
+                    "Position": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                },
+                "Render::Texture": {
+                    "B_Blend": false,
+                    "B_Flip": {
+                        "x": false,
+                        "y": false
+                    },
+                    "B_Stretch": false,
+                    "Color": {
+                        "w": 1.0,
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "Frame_Index": {
+                        "x": 0,
+                        "y": 0
+                    },
+                    "Frame_Size": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "Intensity": 0.5,
+                    "Texture_ID": "TREE"
+                },
+                "Transform::Transform": {
+                    "Position": {
+                        "x": 200.0,
+                        "y": 100.0
+                    },
+                    "Rotation": 0.0,
+                    "Scale": {
+                        "x": 100.0,
+                        "y": 100.0
+                    }
+                }
+            },
+            "ID": 2,
+            "Layer ID": 0
+        }
+    },
+    {
+        "Entity": {
+            "Components": {
+                "Render::Text": {
+                    "Color": {
+                        "w": 1.0,
+                        "x": 1.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "Font_ID": "MONTSERRAT",
+                    "Origin": 0,
+                    "Scale": 1.0,
+                    "Text": "HELLO WORLD."
+                },
+                "Transform::Transform": {
+                    "Position": {
+                        "x": 0.0,
+                        "y": -300.0
+                    },
+                    "Rotation": 45.0,
+                    "Scale": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                }
+            },
+            "ID": 3,
+            "Layer ID": 0
+        }
+    },
+    {
+        "Entity": {
+            "Components": {
+                "Render::Text": {
+                    "Color": {
+                        "w": 1.0,
+                        "x": 1.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "Font_ID": "MONTSERRAT",
+                    "Origin": 3,
+                    "Scale": 1.0,
+                    "Text": "PANTAT."
+                },
+                "Transform::Transform": {
+                    "Position": {
+                        "x": -750.0,
+                        "y": 400.0
+                    },
+                    "Rotation": 0.0,
+                    "Scale": {
+                        "x": 0.0,
+                        "y": 0.0
+                    }
+                }
+            },
+            "ID": 4,
+            "Layer ID": 0
+        }
+    },
+    {
+        "Entity": {
+            "Components": {
+                "Audio::SFX": {
+                    "Audio_ID": "SFX",
+                    "B_Play_SFX": true,
+                    "Channel_Group_ID": "MASTER",
+                    "Pitch": 1.0,
+                    "Volume": 0.5
+                }
+            },
+            "ID": 5,
+            "Layer ID": 0
+        }
     }
 ]
