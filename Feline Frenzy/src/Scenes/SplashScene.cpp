@@ -19,8 +19,8 @@ void Splash::Scene::load() {
 
 	//Load Models
 	NIKE_ASSETS_SERVICE->loadModel("square", "assets/Models/square.txt");
-	NIKE_ASSETS_SERVICE->loadModel("TRIANGLE", "assets/Models/triangle.txt");
-	NIKE_ASSETS_SERVICE->loadModel("CIRCLE", "assets/Models/circle.txt");
+	NIKE_ASSETS_SERVICE->loadModel("triangle", "assets/Models/triangle.txt");
+	NIKE_ASSETS_SERVICE->loadModel("circle", "assets/Models/circle.txt");
 	NIKE_ASSETS_SERVICE->loadModel("square-texture", "assets/Models/square-texture.txt");
 
 	//Load Texture

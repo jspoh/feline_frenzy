@@ -374,6 +374,7 @@ namespace NIKE {
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+								NIKE_IMGUI_SERVICE->populateLists = false;
 							}
 						}
 						else if (component_name == "Animation::Base") {
