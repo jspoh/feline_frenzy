@@ -15,8 +15,8 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entity Methods
 	*********************************************************************/
-	Entity::Type Coordinator::Service::createEntity() {
-		return NIKE_ECS_MANAGER->createEntity();
+	Entity::Type Coordinator::Service::createEntity(unsigned int layer_id) {
+		return NIKE_ECS_MANAGER->createEntity(layer_id);
 	}
 
 	Entity::Type Coordinator::Service::cloneEntity(Entity::Type copy) {

@@ -22,8 +22,8 @@ namespace NIKE {
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
-			//Map of create entities and their component signatures
-			std::unordered_map<Entity::Type, Component::Signature> entities;
+			//Map of create entities and their component signatures & layer id
+			std::unordered_map<Entity::Type, std::pair<Component::Signature, unsigned int>> entities;
 
 			//Entity indexes waiting to be used
 			std::queue<Entity::Type> avail_entities;
@@ -34,7 +34,7 @@ namespace NIKE {
 			Manager();
 
 			//Create Entity
-			Entity::Type createEntity();
+			Entity::Type createEntity(unsigned int layer_id);
 
 			//Destroy Entity
 			void destroyEntity(Entity::Type entity);
@@ -48,14 +48,20 @@ namespace NIKE {
 			//Get signature
 			Component::Signature const& getSignature(Entity::Type entity) const;
 
+			//Set layer id
+			void setLayerID(Entity::Type entity, unsigned int layer_id);
+
+			//Get layer id
+			unsigned int getLayerID(Entity::Type entity) const;
+
 			//Get entity component count
 			int getEntityComponentCount(Entity::Type entity) const;
 
 			//Get number of active entities
 			int getEntitiesCount() const;
 
-			//Get all entity
-			std::vector<Entity::Type> getAllEntities() const;
+			//Get all active entity
+			std::set<Entity::Type> getAllEntities() const;
 		};
 	}
 }

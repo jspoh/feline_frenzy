@@ -53,11 +53,37 @@ namespace NIKE {
 		}
 	}
 
+	nlohmann::json Serialization::Service::serializeLayer(Scenes::Layer const& layer) {
+		//Json Data
+		nlohmann::json data;
+
+		////Layer data
+		//nlohmann::json l_data;
+		//l_data["name"] = layer.getLayerName();
+		//l_data["id"] = layer.getLayerIndex();
+		//data.push_back(l_data);
+
+		////Iterate through all entities
+		//for (auto const& entity : layer.getAllEntities()) {
+		//	nlohmann::json e_data;
+		//	e_data["Entity"] = serializeEntity(entity);
+		//	e_data["Entity"]["id"] = entity;
+
+		//	data.push_back(e_data);
+		//}
+
+		return data;
+	}
+
+	void Serialization::Service::deserializeEntity(Scenes::Layer& layer, nlohmann::json const& data) {
+
+	}
+
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
 		//Json Data
 		nlohmann::json data = serializeEntity(entity);
 
-		//Save entity into file
+		//Open file stream
 		std::fstream file(file_path, std::ios::out);
 
 		//Store data
@@ -71,7 +97,7 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
-		//Load entity from file
+		//Open file stream
 		std::fstream file(file_path, std::ios::in);
 
 		//Read data from file
@@ -82,6 +108,35 @@ namespace NIKE {
 
 		//Close file
 		file.close();
+	}
+
+	void Serialization::Service::saveSceneToFile(std::string const& file_path) {
+		//Json Data
+		nlohmann::json data;
+
+		//Layers in scene
+		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+
+		//Iterate through all layers in current scene
+		for (auto& layer : layers) {
+			nlohmann::json l_data;
+			l_data["Layer"] = serializeLayer(*layer);
+
+			data.push_back(l_data);
+		}
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::out);
+
+		//Store data
+		file << data.dump(4);
+
+		//Close file
+		file.close();
+	}
+
+	void Serialization::Service::loadSceneFromFile(std::string const& file_path) {
+
 	}
 }
 

@@ -73,9 +73,8 @@ namespace NIKE {
         AABB aabb_a({ transform_a.position.x - (transform_a.scale.x * 0.5f), transform_a.position.y - (transform_a.scale.y * 0.5f) }, { transform_a.position.x + (transform_a.scale.x * 0.5f), transform_a.position.y + (transform_a.scale.y * 0.5f) });
         AABB aabb_b({ transform_b.position.x - (transform_b.scale.x * 0.5f), transform_b.position.y - (transform_b.scale.y * 0.5f) }, { transform_b.position.x + (transform_b.scale.x * 0.5f), transform_b.position.y + (transform_b.scale.y * 0.5f) });
 
-        // Get delta time & set epsilon
+        // Get delta time
         const float deltaTime = NIKE_ENGINE.getService<Windows::Service>()->getDeltaTime();
-        const float epsilon = 0.0001f;
 
         // Step 1: Static collision detection
         if (!(aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x ||
@@ -110,7 +109,7 @@ namespace NIKE {
         Vector2 tLast = { deltaTime, deltaTime };
 
         // Step 3: Check dynamic collision on x-axis
-        if (abs(velRel.x) > epsilon) {
+        if (abs(velRel.x) > EPSILON) {
             if (velRel.x > 0) {
                 tFirst.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / velRel.x;
                 tLast.x = (aabb_a.rect_max.x - aabb_b.rect_min.x) / velRel.x;
@@ -131,7 +130,7 @@ namespace NIKE {
         }
 
         // Step 4: Check dynamic collision on y-axis
-        if (abs(velRel.y) > epsilon) {
+        if (abs(velRel.y) > EPSILON) {
             if (velRel.y > 0) {
                 tFirst.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / velRel.y;
                 tLast.y = (aabb_a.rect_min.y - aabb_b.rect_max.y) / velRel.y;

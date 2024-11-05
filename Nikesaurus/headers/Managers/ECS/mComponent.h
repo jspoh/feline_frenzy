@@ -152,12 +152,12 @@ namespace NIKE {
 			}
 
 			//Component id
-			Component::Type component_id{ 0 };
+			Component::Type component_id;
 
 		public:
 
 			//Default Constructor
-			Manager() = default;
+			Manager() : component_id{ 0 }{}
 
 			//Register component with manager
 			template<typename T>

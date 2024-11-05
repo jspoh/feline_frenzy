@@ -15,24 +15,12 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Layer
 	*********************************************************************/
-	void Scenes::Layer::addEntity(Entity::Type entity) {
-		entities.insert(entity);
-	}
-
-	void Scenes::Layer::removeEntity(Entity::Type entity) {
-		entities.erase(entity);
-	}
-
-	bool Scenes::Layer::checkEntity(Entity::Type entity) const {
-		return entities.find(entity) != entities.end();
-	}
-
-	void Scenes::Layer::setLayerIndex(unsigned int new_index) {
-		index = new_index;
-	}
-
 	unsigned int Scenes::Layer::getLayerIndex() const {
 		return index;
+	}
+
+	unsigned int Scenes::Layer::getLayerID() const {
+		return id;
 	}
 
 	void Scenes::Layer::setLayerState(bool state) {
@@ -43,16 +31,18 @@ namespace NIKE {
 		return b_state;
 	}
 
+	void Scenes::Layer::setLayerMask(unsigned int mask_id, bool state) {
+		mask.set(mask_id, state);
+	}
+
+	std::bitset<64> Scenes::Layer::getLayerMask() const {
+		return mask;
+	}
+
 	/*****************************************************************//**
 	* Scene Interface
 	*********************************************************************/
-	std::shared_ptr<Scenes::Layer> Scenes::IScene::registerLayer(std::string const& layer_id, int index) {
-		//Check if layer has been added
-		auto it = layers_map.find(layer_id);
-		if (it != layers_map.end()) {
-			throw std::runtime_error("Layer already registered.");
-		}
-
+	std::shared_ptr<Scenes::Layer> Scenes::IScene::createLayer(int index) {
 		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
 
 		//Insert layers at back
@@ -64,15 +54,16 @@ namespace NIKE {
 			index = static_cast<int>(layers.size()) - 1;
 		}
 
-		layer->setLayerIndex(index);
-		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer_id), std::forward_as_tuple(layer));
+		layer->id = layer_count++;
+		layer->index = index;
+		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer->id), std::forward_as_tuple(layer));
 
 		return layer;
 	}
 
-	std::shared_ptr<Scenes::Layer> Scenes::IScene::getLayer(std::string const& layer_id) {
+	std::shared_ptr<Scenes::Layer> Scenes::IScene::getLayer(unsigned int mask_id) {
 		//Check if layer has been added
-		auto it = layers_map.find(layer_id);
+		auto it = layers_map.find(mask_id);
 		if (it == layers_map.end()) {
 			throw std::runtime_error("Layer has not been registered.");
 		}
@@ -80,15 +71,23 @@ namespace NIKE {
 		return it->second;
 	}
 
-	void Scenes::IScene::removeLayer(std::string const& layer_id) {
+	void Scenes::IScene::removeLayer(unsigned int mask_id) {
 		//Check if layer has been added
-		auto it = layers_map.find(layer_id);
+		auto it = layers_map.find(mask_id);
 		if (it == layers_map.end()) {
 			throw std::runtime_error("Layer has not been registered.");
 		}
 
 		layers.erase(layers.begin() + it->second->getLayerIndex());
 		layers_map.erase(it);
+	}
+
+	bool Scenes::IScene::checkLayer(unsigned int mask_id) {
+		return layers_map.find(mask_id) != layers_map.end();
+	}
+
+	unsigned int Scenes::IScene::getLayerCount() const {
+		return layer_count;
 	}
 
 	std::vector<std::shared_ptr<Scenes::Layer>> const& Scenes::IScene::getLayers() const {

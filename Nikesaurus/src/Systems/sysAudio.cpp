@@ -27,7 +27,7 @@ namespace NIKE {
 			for (auto& entity : entities) {
 
 				//Skip entities that are not present within layer
-				if (!layer->checkEntity(entity))
+				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 
 				//Manage entities with SFX audio

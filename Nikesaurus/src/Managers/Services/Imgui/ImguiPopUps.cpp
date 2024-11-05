@@ -16,28 +16,37 @@ namespace NIKE
 	bool showCreateEntityPopUp(bool pop_up)
 	{
 		static char entity_name[32];
-		static int entity_counter_for_print = 1;
 		// Popup for entity naming
 		if (ImGui::BeginPopupModal("Create Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			ImGui::Text("Enter a name for the new entity:");
 			ImGui::InputText("##EntityNameInput", entity_name, IM_ARRAYSIZE(entity_name));
 
-			if (ImGui::Button("OK") || NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
-				// Create entity function call
-				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity();
-				// If empty string, assign default string
-				if (entity_name[0] == '\0')
-				{
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity_counter_for_print++);
-				}
-				// Save entity_name string
-				NIKE_IMGUI_SERVICE->addEntityRef(entity_name, new_id);
+            //Get layer id
+            static int layer_id = 0;
+            ImGui::Text("Enter layer id for the new entity:");
+            ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
-				// Reset entity_name for the next use
-				memset(entity_name, 0, sizeof(entity_name));
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+                if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+                    // Create entity function call ( Defaulted to the base layer for now )
+                    Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+                    // If empty string, assign default string
+                    if (entity_name[0] == '\0')
+                    {
+                        snprintf(entity_name, sizeof(entity_name), "entity_%04d", new_id);
+                    }
+                    // Save entity_name string
+                    NIKE_IMGUI_SERVICE->addEntityRef(entity_name, new_id);
 
-				pop_up = false;
-				ImGui::CloseCurrentPopup();
+                    // Reset entity_name for the next use
+                    memset(entity_name, 0, sizeof(entity_name));
+
+                    pop_up = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                else {
+                    layer_id = 0;
+                }
 			}
 
 			ImGui::SameLine();
@@ -291,6 +300,45 @@ namespace NIKE
                 }
                 else {
                     ImGui::Text("An entity with this name already exists.");
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false;
+            }
+
+            ImGui::EndPopup();
+        }
+        else {
+            is_popup_open = true;
+        }
+
+        return is_popup_open;
+    }
+
+    bool changeLayerPopup(Entity::Type entity) {
+
+        bool is_popup_open = false;
+        
+        static int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(entity);
+
+        // Check if the popup should be opened
+        if (ImGui::BeginPopupModal("Set Layer ID", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter a new layer id for the entity:");
+            ImGui::InputInt("##New Layer ID", &layer_id);
+
+            if (ImGui::Button("Set") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+                //Check if layer id input is within range
+                if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+                    NIKE_ECS_MANAGER->setEntityLayerID(entity, layer_id);
+                    ImGui::CloseCurrentPopup();
+                    is_popup_open = false;
+                }
+                else {
+                    layer_id = 0;
                 }
             }
 

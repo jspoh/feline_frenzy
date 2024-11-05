@@ -119,6 +119,7 @@ using namespace NIKE::Math;
 * Math Defines
 *********************************************************************/
 #include <corecrt_math_defines.h>
+const float EPSILON = 0.0001f;
 
 /*****************************************************************//**
 * Nullstream for release
