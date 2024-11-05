@@ -61,6 +61,18 @@ namespace NIKE {
 
 			//Map of audios
 			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> audio_list;
+
+			/*****************************************************************//**
+			* File Paths for specific asset types
+			*********************************************************************/
+
+			std::string texture_path = "assets/Textures";
+			std::string audio_path = "assets/Audios";
+			std::string font_path = "assets/Fonts";
+			std::string models_path = "assets/Models";
+			std::string scenes_path = "assets/Scenes";
+			std::string shaders_path = "assets/Shaders";
+
 		public:
 
 			//Default constructor
@@ -81,8 +93,14 @@ namespace NIKE {
 			//Unload font
 			void unloadFont(std::string const& fond_id);
 
+			//Unload all fonts
+			void unloadAllFonts();
+
 			//Get font
 			std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
+
+			//Get loaded fonts
+			const std::unordered_map<std::string, std::shared_ptr<Assets::Font>>& getLoadedFonts() const;
 
 			// Checker
 			bool checkFontExist(std::string const& font_id);
@@ -97,8 +115,14 @@ namespace NIKE {
 			//Unload shader
 			void unloadShader(std::string const& shader_id);
 
+			//Unload all shaders
+			void unloadAllShaders();
+
 			//Get shader
 			unsigned int getShader(std::string const& shader_id);
+
+			//Get shaders
+			const std::unordered_map<std::string, unsigned int>& getLoadedShaders();
 
 			//Load model
 			void loadModel(std::string const& model_id, std::string const& file_path);
@@ -106,8 +130,14 @@ namespace NIKE {
 			//Unload model
 			void unloadModel(std::string const& model_id);
 
+			//Unload all models
+			void unloadAllModels();
+
 			//Get model
 			std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
+
+			//Get models
+			const std::unordered_map<std::string, std::shared_ptr<Assets::Model>>& getLoadedModels();
 
 			// Check model
 			bool checkModelExist(std::string const& model_id);
@@ -115,8 +145,11 @@ namespace NIKE {
 			//Load texture
 			void loadTexture(std::string const& texture_id, std::string const& file_path);
 
-			//Unload texture
+			// Unload texture
 			void unloadTexture(std::string const& texture_id);
+
+			// Unload all textures
+			void unloadAllTextures();
 
 			//Get texture
 			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
@@ -139,11 +172,31 @@ namespace NIKE {
 			//Unload Audio
 			void unloadAudio(std::string const& audio_id);
 
+			//Unload all audios
+			void unloadAllAudios();
+
 			//Get audio
 			std::shared_ptr<Audio::IAudio> getAudio(std::string const& audio_tag);
 
-			// Check for audio
+			//Get audios
+			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedAudios();
+
 			bool checkAudioExist(std::string const& audio_tag);
+
+			/*****************************************************************//**
+			* File path gettors
+			*********************************************************************/
+			std::string const& getTexturePath(); 
+			std::string const& getAudioPath(); 
+			std::string const& getFontPath(); 
+			std::string const& getModelsPath(); 
+			std::string const& getScenesPath(); 
+			std::string const& getShadersPath(); 
+
+			/*****************************************************************//**
+			* Reload of specific asset types
+			*********************************************************************/
+			void reloadAssets(const std::string& asset_type);
 		};
 
 		//Re-enable DLL Export warning

@@ -138,35 +138,73 @@ namespace NIKE
         return is_closed;
     }
 
-    bool showLoadAssetPopup(const std::string& asset_name) 
-    {
-        static bool load_asset = false;
+    //bool showLoadAssetPopup(const std::string& asset_path, AssetType asset_type) {
+    //    // Track if popup is still open
+    //    static bool popup_open = true; 
+    //    bool load_confirmed = false;
+    //    static char ref_input[200] = "";
 
-        // Open and display the popup modal
-        if (ImGui::BeginPopupModal("Load Asset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Do you want to load this asset?");
-            ImGui::Text("%s", asset_name.c_str());
-            ImGui::Separator();
+    //    if (popup_open) {
+    //        ImGui::OpenPopup("Load Asset");
+    //    }
 
-            if (ImGui::Button("Yes", ImVec2(120, 0))) {
-                // Set the flag to indicate the asset should be loaded
-                load_asset = true;
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("No", ImVec2(120, 0))) {
-                // Reset the flag
-                load_asset = false;
-                ImGui::CloseCurrentPopup();
-            }
+    //    if (ImGui::BeginPopupModal("Load Asset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+    //        ImGui::Text("Load asset: %s?", asset_path.c_str());
 
-            ImGui::EndPopup();
-        }
-        bool result = load_asset;
-        // Reset for next usage
-        load_asset = false;
-        return result;
-    }
+    //        // Input field for reference name
+    //        ImGui::InputText("Reference Name", ref_input, IM_ARRAYSIZE(ref_input));
+
+    //        if (ImGui::Button("Load")) {
+    //            // Confirm load
+    //            load_confirmed = true;  
+    //            // Close popup on load
+    //            popup_open = false;     
+
+    //            // Call the appropriate loader based on the asset type
+    //            switch (asset_type) {
+    //            case AssetType::Texture:
+    //                NIKE_ASSETS_SERVICE->loadTexture(ref_input, asset_path);
+    //                break;
+    //            case AssetType::Music:
+    //                NIKE_ASSETS_SERVICE->loadMusic(ref_input, asset_path);
+    //                break;
+    //            case AssetType::Sfx:
+    //                NIKE_ASSETS_SERVICE->loadSound(ref_input, asset_path);
+    //                break;
+    //            case AssetType::Font:
+    //                NIKE_ASSETS_SERVICE->loadFont(ref_input, asset_path);
+    //                break;
+    //            //case AssetType::Shaders:
+    //            //    NIKE_ASSETS_SERVICE->loadShader(ref_input, asset_path);
+    //            //    break;
+    //            //case AssetType::Models:
+    //            //    NIKE_ASSETS_SERVICE->loadModel(ref_input, asset_path);
+    //            //    break;
+    //            default:
+    //                ImGui::Text("Unknown asset type.");
+    //                break;
+    //            }
+
+    //            ImGui::CloseCurrentPopup();
+    //        }
+
+    //        ImGui::SameLine();
+
+    //        if (ImGui::Button("Cancel")) {
+    //            popup_open = false;  // Close popup without loading
+    //            ImGui::CloseCurrentPopup();
+    //        }
+
+    //        ImGui::EndPopup();
+    //    }
+
+    //    // Reset popup open state for next usage if it was closed
+    //    if (!popup_open) {
+    //        popup_open = true;
+    //    }
+
+    //    return load_confirmed;
+    //}
 
     bool removeEntityPopup() {
 
@@ -274,9 +312,9 @@ namespace NIKE
         static char new_entity_name[64] = "";
 
         // Set a default name for the clone if not already set
-        if (strlen(new_entity_name) == 0) {
+        //if (strlen(new_entity_name) == 0) {
             snprintf(new_entity_name, sizeof(new_entity_name), "%s_clone", NIKE_IMGUI_SERVICE->getSelectedEntityName().c_str());
-        }
+        // }
 
         bool is_popup_open = false;
 
@@ -292,7 +330,7 @@ namespace NIKE
                     Entity::Type to_clone = NIKE_IMGUI_SERVICE->getEntityByName(NIKE_IMGUI_SERVICE->getSelectedEntityName());
                     Entity::Type cloned_entity = NIKE_ECS_MANAGER->cloneEntity(to_clone);
 
-                    NIKE_IMGUI_SERVICE->getEntityRef()[new_entity_name] = cloned_entity;
+                    NIKE_IMGUI_SERVICE->getEntityRef().emplace(new_entity_name, cloned_entity);
 
                     // Reset the name buffer for the next use
                     memset(new_entity_name, 0, sizeof(new_entity_name));

@@ -41,6 +41,7 @@ namespace NIKE {
 
 	// This functions allows for the control of the camera
 	void imguiCameraControl();
+
 }
 
 
