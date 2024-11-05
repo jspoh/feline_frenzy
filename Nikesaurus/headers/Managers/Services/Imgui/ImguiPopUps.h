@@ -42,7 +42,8 @@ namespace NIKE {
 	bool ShowSaveConfirmationPopup();
 	// Function to clone entity
 	bool cloneEntityPopup();
-
+	// Function to change layer
+	bool changeLayerPopup(Entity::Type entity);
 }
 
 #endif

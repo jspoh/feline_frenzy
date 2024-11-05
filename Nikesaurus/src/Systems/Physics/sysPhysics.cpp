@@ -38,7 +38,7 @@ namespace NIKE {
             for (auto& entity : entities) {
 
                 //Skip entities that are not present within layer & entities without transform component
-                if (!layer->checkEntity(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+                if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
                     continue;
 
                 //Update entities with dynamics
@@ -46,6 +46,9 @@ namespace NIKE {
                     NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+
+                    //Ensure that mass is not negative
+                    e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
 
                     //Apply forces & mass to calculate direction
                     Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
@@ -62,7 +65,7 @@ namespace NIKE {
                     }
 
                     //Set velocity to zero if net velo < 0.01
-                    if (e_dynamics.velocity.length() < 0.01f) {
+                    if (e_dynamics.velocity.length() < 0.0001f) {
                         e_dynamics.velocity = { 0.0f, 0.0f };
                     }
 
@@ -85,8 +88,10 @@ namespace NIKE {
                     //Check for collision with other entities
                     for (auto& colliding_entity : entities) {
 
-                        //Skip entities that are not present within layer & skip same entities
-                        if (!layer->checkEntity(colliding_entity) || entity == colliding_entity || !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
+                        //Skip entities colliding entites that are not in the layer mask
+                        if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
+                            entity == colliding_entity ||
+                            !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
                             continue;
 
                         //Get colliding entity's data

@@ -175,6 +175,28 @@ namespace NIKE {
 		// Show number of entities in the level
 		ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
 
+		//Update entities list
+		if (NIKE_ECS_MANAGER->getEntitiesCount() != NIKE_IMGUI_SERVICE->getEntityRef().size()) {
+			for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+				bool b_found = false;
+				for (auto const& elem : NIKE_IMGUI_SERVICE->getEntityRef()) {
+					if (elem.second == entity) {
+						b_found = true;
+						break;
+					}
+				}
+
+				if (b_found) continue;
+
+				static char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity);
+
+				//Add entity ref
+				NIKE_IMGUI_SERVICE->addEntityRef(entity_name, entity);
+			}
+		}
+
 		// Show entities ref name that are created
 		for (auto const& elem : NIKE_IMGUI_SERVICE->getEntityRef())
 		{
@@ -195,6 +217,7 @@ namespace NIKE {
 		static bool show_error_popup = false;
 		static bool show_save_popup = false;
 		static bool open_clone_popup = false;
+		static bool open_layer_popup = false;
 
 		std::string selected_entity = NIKE_IMGUI_SERVICE->getSelectedEntityName();
 		ImGui::Begin("Entity Component Management");
@@ -206,6 +229,8 @@ namespace NIKE {
 			Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity);
 
 			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entity));
+
+			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entity));
 
 			// Add a new component
 			if (ImGui::Button("Add Component")) {
@@ -225,6 +250,16 @@ namespace NIKE {
 			}
 
 			open_clone_popup = cloneEntityPopup();
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Set Layer ID")) {
+				// TODO: Create popup to choose which entity to clone
+				open_layer_popup = true;
+				ImGui::OpenPopup("Set Layer ID");
+			}
+
+			open_layer_popup = changeLayerPopup(entity);
 
 			// Retrieve and display all registered component types
 			for (const auto& elem : NIKE_ECS_MANAGER->getAllComponentTypes()) {

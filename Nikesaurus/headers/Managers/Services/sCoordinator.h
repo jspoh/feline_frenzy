@@ -30,7 +30,7 @@ namespace NIKE {
 			* Entity Methods
 			*********************************************************************/
 			//Create Entity
-			Entity::Type createEntity();
+			Entity::Type createEntity(unsigned int layer_id);
 
 			//Clone entity ( ID of clone returned )
 			Entity::Type cloneEntity(Entity::Type copy);

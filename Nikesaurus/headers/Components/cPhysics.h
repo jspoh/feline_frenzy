@@ -25,7 +25,7 @@ namespace NIKE {
             Vector2f velocity;
             Vector2f force;
 
-            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ 0.0f }, velocity(), force() {}
+            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ 0.0001f }, velocity(), force() {}
             Dynamics(float max_speed, float drag, float mass)
                 : max_speed{ max_speed }, drag{ drag }, mass{ mass }, velocity(), force() {}
         };

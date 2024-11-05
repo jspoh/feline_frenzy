@@ -340,8 +340,12 @@ namespace NIKE {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			//SKip inactive layer
+			if (!layer->getLayerState())
+				continue;
+
 			for (auto& entity : entities) {
-				if (!layer->checkEntity(entity))
+				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {

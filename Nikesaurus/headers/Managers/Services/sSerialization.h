@@ -60,6 +60,12 @@ namespace NIKE {
 
 			//Deserialize Entity
 			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
+
+			//Serialize layer
+			nlohmann::json serializeLayer(Scenes::Layer const& layer);
+
+			//Deserialize layer
+			void deserializeEntity(Scenes::Layer& layer, nlohmann::json const& data);
 		public:
 			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
 			~Service() = default;
@@ -73,8 +79,14 @@ namespace NIKE {
 			//Serialize Entity into file path
 			void saveEntityToFile(Entity::Type entity, std::string const& file_path);
 
-			//Serialize Entity into file path
+			//Load entity from file path
 			void loadEntityFromFile(Entity::Type entity, std::string const& file_path);
+
+			//Serialize Scene into file path
+			void saveSceneToFile(std::string const& file_path);
+
+			//Load scene from file path
+			void loadSceneFromFile(std::string const& file_path);
 		};
 
 		//Re-enable DLL Export warning
