@@ -26,6 +26,8 @@ namespace NIKE
             ImGui::Text("Enter layer id for the new entity:");
             ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
+            layer_id = std::clamp(layer_id, 0, static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1));
+
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
                 if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
                     // Create entity function call ( Defaulted to the base layer for now )
@@ -329,6 +331,8 @@ namespace NIKE
         if (ImGui::BeginPopupModal("Set Layer ID", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Text("Enter a new layer id for the entity:");
             ImGui::InputInt("##New Layer ID", &layer_id);
+
+            layer_id = std::clamp(layer_id, 0, static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1));
 
             if (ImGui::Button("Set") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
                 //Check if layer id input is within range

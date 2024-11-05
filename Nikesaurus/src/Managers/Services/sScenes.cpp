@@ -56,6 +56,7 @@ namespace NIKE {
 
 		layer->id = layer_count++;
 		layer->index = index;
+		layer->mask.set(layer->id, true);
 		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer->id), std::forward_as_tuple(layer));
 
 		return layer;

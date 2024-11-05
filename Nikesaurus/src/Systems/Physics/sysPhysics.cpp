@@ -89,7 +89,9 @@ namespace NIKE {
                     for (auto& colliding_entity : entities) {
 
                         //Skip entities colliding entites that are not in the layer mask
-                        if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) || entity == colliding_entity || !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
+                        if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
+                            entity == colliding_entity ||
+                            !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
                             continue;
 
                         //Get colliding entity's data

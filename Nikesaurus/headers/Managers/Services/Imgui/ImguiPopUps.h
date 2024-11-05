@@ -44,7 +44,6 @@ namespace NIKE {
 	bool cloneEntityPopup();
 	// Function to change layer
 	bool changeLayerPopup(Entity::Type entity);
-
 }
 
 #endif
