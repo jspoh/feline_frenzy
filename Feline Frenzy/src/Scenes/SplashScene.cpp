@@ -119,6 +119,7 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 			layer->addEntity(tile_entity);
 			NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity, NIKE::Transform::Transform({ col * tile_size - offset_x, (height - 1 - row) * tile_size - offset_y }, { 100.0f, 100.0f }, 0.0f));
 			
+			/*
 			if (collide) {
 				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
 				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
@@ -130,6 +131,7 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 			else {
 				NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name, { 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { false, false }));
 			}
+			*/
 			
 
 		}
@@ -205,7 +207,7 @@ void Splash::Scene::init() {
 
 	// MapGrid Test
 	std::vector<std::vector<int>> grid;
-	loadBackgroundFromFile("assets/Map/smallmap.txt", base_layer, grid, { 0.0f, 200.0f });
+	loadBackgroundFromFile("assets/Map/mediummap.txt", base_layer, grid, { 0.0f, 200.0f });
 
 	// TREE
 	//Save player to prefab
@@ -222,7 +224,7 @@ void Splash::Scene::init() {
 
 	NIKE::Entity::Type shape_2 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_2", shape_2);
-	base_Layer->addEntity(shape_2);
+	base_layer->addEntity(shape_2);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_2, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_2, NIKE::Transform::Transform({ 200.0f, 100.0f }, { 100.0f, 100.0f }, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_2, NIKE::Render::Texture("TREE", { 1.0f, 1.0f, 1.0f, 1.0f }));
