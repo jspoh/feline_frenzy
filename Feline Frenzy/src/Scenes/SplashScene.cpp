@@ -59,7 +59,7 @@ void loadBackgroundFromFile(const std::string& file, std::shared_ptr<NIKE::Scene
 			// Create tile here
 			bool flip{ false };
 			bool collide{ false };
-			std::string texture_name{"grass"};
+			std::string texture_name{};
 			switch (tileID) {
 			case 1:
 				texture_name = "wallTopCorner";
