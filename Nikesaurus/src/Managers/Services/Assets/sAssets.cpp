@@ -4,7 +4,7 @@
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -412,43 +412,76 @@ namespace NIKE {
 	void Assets::Service::reloadAssets(const std::string& asset_type)
 	{
 		if (asset_type == "Textures") {
-			// Clear textures if needed, or just check for existing ones
+			// Load new textures
 			for (const auto& texture_paths : std::filesystem::directory_iterator(getTexturePath())) {
 				if (hasValidTextureExtension(texture_paths)) {
-					std::string filename = texture_paths.path().filename().string();
+					std::string file_name = texture_paths.path().filename().string();
 
 					// Check if the texture already exists before loading
-					if (textures_list.find(filename) == textures_list.end()) {
-						loadTexture(filename, texture_paths.path().string());
+					if (textures_list.find(file_name) == textures_list.end()) {
+						loadTexture(file_name, texture_paths.path().string());
 					}
 				}
 			}
 		}
 		else if (asset_type == "Audio") {
+
+			// Load new audio
 			for (const auto& audio_paths : std::filesystem::directory_iterator(getAudioPath())) {
 				if (hasValidAudioExtension(audio_paths)) {
-					std::string filename = audio_paths.path().filename().string();
+					std::string file_name = audio_paths.path().filename().string();
 
 					// Check if the audio already exists before loading
-					if (audio_list.find(filename) == audio_list.end()) {
-						loadMusic(filename, audio_paths.path().string());
+					if (audio_list.find(file_name) == audio_list.end()) {
+						loadMusic(file_name, audio_paths.path().string());
 					}
 				}
 			}
 		}
 		else if (asset_type == "Fonts") {
+
+			// Load new fonts
 			for (const auto& font_paths : std::filesystem::directory_iterator(getFontPath())) {
 				if (hasValidFontExtension(font_paths)) {
-					std::string filename = font_paths.path().filename().string();
+					std::string file_name = font_paths.path().filename().string();
 
 					// Check if the font already exists before loading
-					if (fonts_list.find(filename) == fonts_list.end()) {
-						loadFont(filename, font_paths.path().string());
+					if (fonts_list.find(file_name) == fonts_list.end()) {
+						loadFont(file_name, font_paths.path().string());
 					}
 				}
 			}
 		}
+		else if (asset_type == "Models") {
+
+			// Load new fonts
+			for (const auto& model_paths : std::filesystem::directory_iterator(getModelsPath())) {
+				if (hasValidModelExtension(model_paths)) {
+					std::string file_name = model_paths.path().filename().string();
+
+					// Check if the font already exists before loading
+					if (models_list.find(file_name) == models_list.end()) {
+						loadModel(file_name, model_paths.path().string());
+					}
+				}
+			}
+		}
+		//else if (asset_type == "Shaders") {
+
+		//	// Load new fonts
+		//	for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
+		//		if (hasValidVertExtension(shader_paths)) {
+		//			std::string file_name = shader_paths.path().filename().string();
+
+		//			// Check if the font already exists before loading
+		//			if (shaders_list.find(file_name) == shaders_list.end()) {
+		//				loadShader(file_name, shader_paths.path().string());
+		//			}
+		//		}
+		//	}
+		//}
 
 		// Others goes here
 	}
+
 }
