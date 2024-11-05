@@ -75,7 +75,7 @@ namespace NIKE
                     if (!manager->checkEntityComponent(entity, component.second)) {
                         // Add the default-constructed component to the entity
                         manager->addDefEntityComponent(entity, component.second);
-
+                        NIKE_IMGUI_SERVICE->populateLists = false;
                         // Close the popup after adding the component
                         ImGui::CloseCurrentPopup();
                     }
@@ -181,6 +181,7 @@ namespace NIKE
                     NIKE_IMGUI_SERVICE->getSelectedEntityName() = {};
                     // Reset entity_name for the next use
                     memset(entity_name, 0, sizeof(entity_name));
+                    NIKE_IMGUI_SERVICE->populateLists = false;
                     ImGui::CloseCurrentPopup(); 
                     is_popup_open = false; 
                 }

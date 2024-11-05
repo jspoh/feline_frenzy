@@ -28,4 +28,8 @@ namespace NIKE {
 	float Utility::randFloat() {
 		return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 	}
+
+	std::string Utility::convertTypeString(std::string&& str_type) {
+		return str_type.substr(str_type.find_first_not_of(':', str_type.find_first_of(':')), str_type.size() - str_type.find_first_not_of(':', str_type.find_first_of(':')));
+	}
 }

@@ -24,6 +24,7 @@ namespace NIKE {
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 
+		populateLists = false;
 		// For testing
 		// NIKE_ASSETS_SERVICE->loadTexture("test3", "assets/Textures/Tjunction.png");
 	}

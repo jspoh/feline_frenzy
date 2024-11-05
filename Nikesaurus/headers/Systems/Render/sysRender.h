@@ -74,7 +74,7 @@ namespace NIKE {
 			void transformAndRenderText(Entity::Type entity);
 		public:
 			//Constructor
-			Manager() = default;
+			Manager() :frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {}
 
 			//Destructor
 			~Manager() = default;

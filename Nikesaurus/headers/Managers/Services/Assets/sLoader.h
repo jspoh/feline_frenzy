@@ -179,7 +179,7 @@ namespace NIKE {
 			 * files ending in `.tex` are assumed to already be clean RGBA8 format
 			 * other files are parsed with stb_image.h
 			 *
-			 * \param texture_ref
+			 * \param texture_id
 			 * \param path_to_texture
 			 */
 			Texture compileTexture(const std::string& path_to_texture);

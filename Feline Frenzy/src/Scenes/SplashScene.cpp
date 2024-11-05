@@ -196,12 +196,11 @@ void Splash::Scene::init() {
 	second_layer->addEntity(player_1);
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(player_1, NIKE::Transform::Transform({0.0f, 200.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(player_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 2.0f));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::BOUNCE));
-	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {1.0f, 0.0f, 0.0f, 1.0f}, true, 0.5f, false, {9, 5}, {0, 0}, {false, false}));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(player_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::SLIDE));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(player_1, NIKE::Render::Texture("ZOMBIE", {1.0f, 0.0f, 0.0f, 1.0f}, true, 0.5f, false, {9, 5}, {0, 0}, {false, true}));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(player_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Base>(player_1, NIKE::Animation::Base(0, 0.2f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Sprite>(player_1, NIKE::Animation::Sprite({9,5}, {0, 1}, {8, 1}));
-
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
 	// MapGrid Test
@@ -209,14 +208,26 @@ void Splash::Scene::init() {
 	loadBackgroundFromFile("assets/Map/smallmap.txt", base_layer, grid, { 0.0f, 200.0f });
 
 	// TREE
+	//Save player to prefab
+	NIKE_SERIALIZE_SERVICE->saveEntityToFile(player_1, "assets/Scenes/test.scn");
+
 	NIKE::Entity::Type shape_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("shape_1", shape_1);
 	second_layer->addEntity(shape_1);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_1, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_1, NIKE::Transform::Transform({0.0f, 0.0f}, {100.0f, 100.0f}, 0.0f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(shape_1, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(shape_1, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_1, NIKE::Render::Texture("TREE", {1.0f, 1.0f, 1.0f, 1.0f}));
 
+	NIKE::Entity::Type shape_2 = NIKE_ECS_SERVICE->createEntity();
+	NIKE_IMGUI_SERVICE->addEntityRef("shape_2", shape_2);
+	base_Layer->addEntity(shape_2);
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Cam>(shape_2, NIKE::Render::Cam(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(shape_2, NIKE::Transform::Transform({ 200.0f, 100.0f }, { 100.0f, 100.0f }, 0.0f));
+	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(shape_2, NIKE::Render::Texture("TREE", { 1.0f, 1.0f, 1.0f, 1.0f }));
+
+	
 	NIKE::Entity::Type text_1 = NIKE_ECS_SERVICE->createEntity();
 	NIKE_IMGUI_SERVICE->addEntityRef("text_1", text_1);
 	second_layer->addEntity(text_1);
@@ -233,10 +244,13 @@ void Splash::Scene::init() {
 	base_layer->addEntity(sfx_1);
 	NIKE_ECS_SERVICE->addDefEntityComponent(sfx_1, NIKE_ECS_SERVICE->getAllComponentTypes().at("Audio::SFX"));
 	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Audio::SFX>(sfx_1) = { true, "SFX", "MASTER", 0.5f, 1.0f };
-	// Test crash logger
-	//LOG_CRASH("This is a test crash");
 
+	//Prefabs testing
+	NIKE::Entity::Type test_1 = NIKE_ECS_SERVICE->createEntity();
+	second_layer->addEntity(test_1);
 
+	NIKE_SERIALIZE_SERVICE->loadEntityFromFile(test_1, "assets/Scenes/test.scn");
+	NIKE_ECS_SERVICE->getEntityComponent<NIKE::Physics::Dynamics>(test_1).force.x = 100.0f;
 }
 
 void Splash::Scene::exit() {

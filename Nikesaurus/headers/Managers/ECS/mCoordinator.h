@@ -109,23 +109,14 @@ namespace NIKE {
 				system_manager->updateEntitiesList(entity, sign, component_manager->getComponentType<T>(), false);
 			}
 
-			void removeEntityComponent(Entity::Type entity, Component::Type type) {
-				// Remove component based on Component::Type directly
-				component_manager->removeEntityComponent(entity,type);
-
-				// Set bit signature of component to false
-				Component::Signature sign = entity_manager->getSignature(entity);
-				sign.set(type, false);  
-				entity_manager->setSignature(entity, sign);
-
-				// Update entities list
-				system_manager->updateEntitiesList(entity, sign, type, false);
-			}
+			void removeEntityComponent(Entity::Type entity, Component::Type type);
 
 			template<typename T>
 			T& getEntityComponent(Entity::Type entity) {
 				return component_manager->getEntityComponent<T>(entity);
 			}
+
+			void* getEntityComponent(Entity::Type entity, Component::Type type);
 
 			template<typename T>
 			bool checkEntityComponent(Entity::Type entity) {
@@ -140,6 +131,12 @@ namespace NIKE {
 			Component::Type getComponentType() {
 				return component_manager->getComponentType<T>();
 			}
+
+			Component::Type getComponentType(std::string const& type) {
+				return component_manager->getComponentType(type);
+			}
+
+			std::unordered_map<std::string, void *> getAllComponents(Entity::Type entity) const;
 
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
 

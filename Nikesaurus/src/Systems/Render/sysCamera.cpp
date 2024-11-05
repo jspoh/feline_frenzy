@@ -25,38 +25,41 @@ namespace NIKE {
 
 	void Camera::System::onEvent(std::shared_ptr<Render::UpdateCamEvent> event) {
 		// !TODO remove hard coded values for the adjustments
+		// Zoom Controls with Clamp
+		const float min_zoom = 0.0f;
+		const float max_zoom = 2000.0f;  
+
+		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(cam_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) 
+			? NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id) : def_cam;
+
+		// !TODO remove hard coded values for the adjustments
 		if (event->edit_position == NIKE::Render::CamPosition::UP) {
-			def_cam.position.y += 2.f;
+			active_cam.position.y += 5.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::DOWN) {
-			def_cam.position.y -= 2.f;
+			active_cam.position.y -= 5.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::LEFT) {
-			def_cam.position.x -= 2.f;
+			active_cam.position.x -= 5.f;
 		}
 		else if (event->edit_position == NIKE::Render::CamPosition::RIGHT) {
-			def_cam.position.x += 2.f;
+			active_cam.position.x += 5.f;
 		}
-		else if (event->edit_position == NIKE::Render::CamPosition::RESET_POS){
-			def_cam.position.x = 0.f;
-			def_cam.position.y = 0.f;
+		else if (event->edit_position == NIKE::Render::CamPosition::RESET_POS) {
+			active_cam.position = Vector2f(0.f, 0.f);
 		}
 
 		if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_IN) {
-			def_cam.height -= 10.f;
+			active_cam.height -= 10.f;
 		}
 		else if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_OUT) {
-			def_cam.height += 10.f;
+			active_cam.height += 10.f;
 		}
 		else if (event->edit_zoom == NIKE::Render::CamZoom::RESET_ZOOM) {
-			def_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+			active_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 		}
-
-		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
-			auto& active_cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
-			active_cam.position = def_cam.position;
-			active_cam.height = def_cam.height;
-		}
+		// Clamp the zoom height
+		active_cam.height = std::clamp(active_cam.height, min_zoom, max_zoom);
 
 		event->setEventProcessed(true);
 	}
@@ -80,12 +83,16 @@ namespace NIKE {
 		def_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 	}
 
+	Entity::Type Camera::System::getCamId() const {
+		return cam_id;
+	}
+
 	Matrix_33 Camera::System::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
 		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
 			if(NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(cam_id))
-			NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id).position + def_cam.position;
+			NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id).position;
 
 			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
 		}
