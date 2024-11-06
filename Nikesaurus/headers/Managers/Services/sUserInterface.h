@@ -55,9 +55,6 @@ namespace NIKE {
 
 		private:
 
-			//Unordered map of UI Entities
-			std::unordered_map<std::string, std::pair<Entity::Type, bool>> ui_entities;
-
 			//On key btn event
 			void onEvent(std::shared_ptr<Input::KeyEvent> event) override;
 
@@ -75,6 +72,12 @@ namespace NIKE {
 
 			//Button hover check
 			bool buttonHovered(Entity::Type entity);
+
+			//Button hovering container
+			std::unordered_map<std::string, std::pair<Transform::Transform, bool>> hover_container;
+
+			//Unordered map of UI Entities
+			std::unordered_map<std::string, std::pair<Entity::Type, bool>> ui_entities;
 
 			//Data structure of state
 			struct EventStates {
