@@ -39,6 +39,10 @@ namespace NIKE {
 
 	void Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& data) {
 
+		//If there are no components
+		if (!data.contains("Components"))
+			return;
+
 		//Iterate through all components stored within data
 		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
 			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
@@ -103,7 +107,6 @@ namespace NIKE {
 		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
 			nlohmann::json e_data;
 			e_data["Entity"] = serializeEntity(entity);
-			e_data["Entity"]["ID"] = entity;
 			e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 			data.push_back(e_data);
 		}

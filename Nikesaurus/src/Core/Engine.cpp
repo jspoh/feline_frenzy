@@ -77,6 +77,7 @@ namespace NIKE {
 		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
+		provideService(std::make_shared<UI::Service>());
 		provideService(std::make_shared<Coordinator::Service>());
 
 		//Create console
@@ -101,6 +102,13 @@ namespace NIKE {
 
 		//Add Event Listeners
 		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+
+		//Add event listener for UI
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
+
+		//Add event listener for Input
 		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
@@ -144,13 +152,6 @@ namespace NIKE {
 			//Clear buffer ( Temp )
 			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-			//Update all systems
-			NIKE_ECS_MANAGER->updateSystems();
-
-			// Call update imgui
-			// NIKE_IMGUI_SERVICE->update();
-
-
 			static bool imgui_overlay_enable = true;
 
 			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_TAB)) {
@@ -163,27 +164,23 @@ namespace NIKE {
 				NIKE_IMGUI_SERVICE->update();
 			}
 
-			//getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force = { 0.0f, 0.0f };
-			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_W)) {
-			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = 500.0f;
-			//}
-			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_A)) {
-			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = -500.0f;
-			//}
-			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_S)) {
-			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.y = -500.0f;
-			//}
-			//if (getService<Input::Service>()->isKeyPressed(NIKE_KEY_D)) {
-			//	getService<Coordinator::Service>()->getEntityComponent<Physics::Dynamics>(0).force.x = 500.0f;
-			//}
-
-			//Update scenes manager
-			NIKE_SCENES_SERVICE->update();
-
 			//Escape Key Testing //!MOVE OUT SOON
 			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 			}
+
+			//update UI First
+			NIKE_UI_SERVICE->update();
+
+			//Update scenes manager
+			NIKE_SCENES_SERVICE->update();
+
+			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
+			//	cout << "TRUE" << endl;
+			//}
+
+			//Update all systems
+			NIKE_ECS_MANAGER->updateSystems();
 
 			//Control FPS
 			NIKE_WINDOWS_SERVICE->controlFPS();

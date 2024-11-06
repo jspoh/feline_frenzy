@@ -1,3 +1,10 @@
 [
-    
+    {
+        "Layer": {
+            "B_State": true,
+            "ID": 0,
+            "Index": 0,
+            "Mask": 1
+        }
+    }
 ]

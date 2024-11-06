@@ -523,6 +523,8 @@ namespace NIKE {
 
 							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.1f);
 							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.1f);
+							ImGui::Text((std::string("Text Size X: ") + std::to_string(text_comp.size.x)).c_str());
+							ImGui::Text((std::string("Text Size Y: ") + std::to_string(text_comp.size.y)).c_str());
 
 							// Variable to hold the selected resolution
 							static NIKE::Render::TextOrigin selected_origin = NIKE::Render::TextOrigin::CENTER;
@@ -532,8 +534,8 @@ namespace NIKE {
 							const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
 							int current_origin = static_cast<int>(selected_origin);
 
-							// Display the selected resolution
-							ImGui::Text("Current Resolution: %s", origin_names[current_origin]);
+							// Display the selected text origin
+							ImGui::Text("Current Text Origin: %s", origin_names[current_origin]);
 
 							// Combo box for selecting text origin
 							if (ImGui::Combo("##Origin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {

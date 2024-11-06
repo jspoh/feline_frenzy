@@ -59,7 +59,7 @@ namespace NIKE {
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
 			//Render text
-			void renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform);
+			void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
 			//Render debugging wireframe
 			void renderWireFrame(Matrix_33 const& x_form, Vector4f const& e_color);

@@ -59,6 +59,7 @@
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
+    <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
@@ -103,6 +104,7 @@
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
+    <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />

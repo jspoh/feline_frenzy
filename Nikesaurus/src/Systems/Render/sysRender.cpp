@@ -133,7 +133,7 @@ namespace NIKE {
 		shader_system->unuseShader();
 	}
 
-	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform) {
+	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 
 		//Use text shader
 		shader_system->useShader("text");
@@ -147,16 +147,22 @@ namespace NIKE {
 		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VAO);
 
+		//Temp text size
+		Vector2f text_size;
+
 		//Calculate size of text
 		for (char c : e_text.text) {
 			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
 
 			//Calculate width
-			e_transform.scale.x += (ch.advance >> 6) * e_text.scale;
+			text_size.x += (ch.advance >> 6) * e_text.scale;
 
 			//Calculate height
-			e_transform.scale.y = ch.size.y * e_text.scale > e_transform.scale.y ? ch.size.y * e_text.scale : e_transform.scale.y;
+			text_size.y = ch.size.y * e_text.scale > text_size.y ? ch.size.y * e_text.scale : text_size.y;
 		}
+
+		//Assign size to e_text
+		e_text.size = text_size;
 
 		//Text rendering position based on bot left
 		Vector2f pos;
@@ -164,19 +170,19 @@ namespace NIKE {
 		//Get text bottom left position for rendering
 		switch (e_text.origin) {
 		case TextOrigin::CENTER:
-			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y / 2.0f };
+			pos = { -e_text.size.x / 2.0f, -e_text.size.y / 2.0f };
 			break;
 		case TextOrigin::BOTTOM:
-			pos = { -e_transform.scale.x / 2.0f, 0.0f };
+			pos = { -e_text.size.x / 2.0f, 0.0f };
 			break;
 		case TextOrigin::TOP:
-			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y };
+			pos = { -e_text.size.x / 2.0f, -e_text.size.y };
 			break;
 		case TextOrigin::LEFT:
-			pos = { 0.0f, -e_transform.scale.y / 2.0f };
+			pos = { 0.0f, -e_text.size.y / 2.0f };
 			break;
 		case TextOrigin::RIGHT:
-			pos = { -e_transform.scale.x, -e_transform.scale.y / 2.0f };
+			pos = { -e_text.size.x, -e_text.size.y / 2.0f };
 			break;
 		default:
 			break;
@@ -331,19 +337,20 @@ namespace NIKE {
 
 		auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
-		//Set transform scale to 1.0f for calculating matrix
-		e_transform.scale = { 1.0f, 1.0f };
+		//Make copy of transform, scale to 1.0f for calculating matrix
+		Transform::Transform copy = e_transform;
+		copy.scale = { 1.0f, 1.0f };
 
 		//Transform text matrix
-		transformMatrix(e_transform, matrix, camera_system->getFixedWorldToNDCXform());
+		transformMatrix(copy, matrix, camera_system->getFixedWorldToNDCXform());
 
 		//Render text
-		renderText(matrix, e_text, e_transform);
+		renderText(matrix, e_text);
 	}
 
 	void Render::Manager::renderViewport() {
-		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-		glClear(GL_COLOR_BUFFER_BIT);
+		//glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+		//glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
 			//SKip inactive layer
@@ -374,8 +381,8 @@ namespace NIKE {
 
 	void Render::Manager::init() {
 
-		glGenFramebuffers(1, &frame_buffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+		//glGenFramebuffers(1, &frame_buffer);
+		//glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
 		// Create a color attachment texture
 		glGenTextures(1, &texture_color_buffer);

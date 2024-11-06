@@ -46,6 +46,7 @@ namespace NIKE {
 						{ "Text", comp.text },
 						{ "Color", comp.color.toJson() },
 						{ "Scale", comp.scale },
+						{ "Size", comp.size.toJson() },
 						{ "Origin", static_cast<int>(comp.origin) }
 						};
 			},
@@ -56,6 +57,7 @@ namespace NIKE {
 				comp.text = data.at("Text").get<std::string>();
 				comp.color.fromJson(data.at("Color"));
 				comp.scale = data.at("Scale").get<float>();
+				comp.size.fromJson(data.at("Size"));
 				comp.origin = static_cast<TextOrigin>(data.at("Origin").get<int>());
 			}
 		);
