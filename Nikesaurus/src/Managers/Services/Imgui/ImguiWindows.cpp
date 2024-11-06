@@ -304,7 +304,7 @@ namespace NIKE {
 							static bool texture_initialized = false;
 
 							//For initial initialization
-							if (!texture_initialized) {
+							if (!texture_initialized || texture_id != texture_comp.texture_id.c_str()) {
 								// Ensure null-termination
 								texture_id[sizeof(texture_id) - 1] = '\0';
 								strcpy_s(texture_id, texture_comp.texture_id.c_str());
@@ -312,7 +312,10 @@ namespace NIKE {
 							}
 
 							ImGui::Text("Enter a texture ref:");
-							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id))) {}
+							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id))) 
+							{
+								texture_comp.texture_id = texture_id;
+							}
 							// Begin drag-and-drop target for texture reference
 							if (ImGui::BeginDragDropTarget())
 							{
@@ -321,7 +324,8 @@ namespace NIKE {
 									// Retrieve the texture ID from the payload and set it as the texture_id
 									const char* dropped_texture = static_cast<const char*>(payload->Data);
 									strncpy_s(texture_id, dropped_texture, sizeof(texture_id) - 1);
-									texture_id[sizeof(texture_id) - 1] = '\0'; // Ensure null-termination
+									texture_id[sizeof(texture_id) - 1] = '\0'; 
+									texture_comp.texture_id = texture_id;
 								}
 								ImGui::EndDragDropTarget();
 							}
