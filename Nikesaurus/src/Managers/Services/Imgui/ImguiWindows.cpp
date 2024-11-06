@@ -69,12 +69,6 @@ namespace NIKE {
 						selected_asset = file_name;
 						show_load_popup = true;
 					}
-
-					if (ImGui::BeginDragDropSource()) {
-						ImGui::SetDragDropPayload("ASSET_PATH", path.c_str(), path.string().size() + 1);
-						ImGui::Text("Dragging %s", file_name.c_str());
-						ImGui::EndDragDropSource();
-					}
 				}
 			}
 		}
@@ -769,6 +763,113 @@ namespace NIKE {
 			}
 
 			ImGui::EndTabBar(); 
+		}
+
+		ImGui::End();
+	}
+
+	void imguiLayerManagementWindow()
+	{
+		ImGui::Begin("Layer Management", nullptr, ImGuiWindowFlags_NoResize);
+
+		// Static variables for managing the selected layer and bit manipulations
+		static unsigned int edit_mask_id = 0;
+		static bool bit_state = false;
+		static unsigned int bit_position = 0;
+		static int selected_layer_index = -1;
+
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
+		const auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+
+		// Display layer count
+		ImGui::Text("Total Layers: %u", layer_count);
+
+		// Layer selection dropdown
+		if (!layers.empty()) {
+			std::vector<std::string> layer_names;
+			for (int i = 0; i < layers.size(); ++i) {
+				layer_names.push_back("Layer " + std::to_string(i));
+			}
+
+			// Show dropdown to select a layer
+			if (ImGui::BeginCombo("Select Layer", (selected_layer_index >= 0 ? layer_names[selected_layer_index].c_str() : "None"))) {
+				for (int i = 0; i < layers.size(); ++i) {
+					const bool is_selected = (selected_layer_index == i);
+					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
+						selected_layer_index = i;
+						// Copy current layer's mask ID to edit
+						edit_mask_id = static_cast<unsigned int>(layers[selected_layer_index]->getLayerMask().to_ulong());
+					}
+					if (is_selected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+		}
+		else {
+			ImGui::Text("No layers available.");
+		}
+
+		ImGui::Separator();
+
+		// Button to create a new layer with the next available index
+		if (ImGui::Button("Create Layer")) {
+			NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
+			selected_layer_index = layer_count; 
+		}
+
+		// Show selected layer for editing
+		if (selected_layer_index != -1 && selected_layer_index < layers.size()) {
+			ImGui::Text("Edit Selected Layer");
+
+			// Input for the bit position and its desired state
+			ImGui::InputScalar("Bit Position", ImGuiDataType_U32, &bit_position);
+			ImGui::Checkbox("Set Bit State", &bit_state);
+
+			// Button to apply the change to the selected layer's mask
+			if (ImGui::Button("Update Layer Mask")) {
+				if (bit_position < 64) {
+					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
+				}
+				else {
+					ImGui::OpenPopup("Invalid Bit Position");
+				}
+			}
+
+			// Button to remove the selected layer
+			ImGui::SameLine();
+			if (ImGui::Button("Remove Layer")) {
+				if (layer_count > 1)
+				{
+					unsigned int layer_id = layers[selected_layer_index]->getLayerID();
+					NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(layer_id);
+
+					// Update the selected index and refetch the layers
+					selected_layer_index = -1;
+				}
+				else {
+					ImGui::OpenPopup("Unable to remove layer");
+				}
+
+			}
+
+			// Popup for invalid bit position error
+			if (ImGui::BeginPopup("Invalid Bit Position")) {
+				ImGui::Text("Error: Bit position must be between 0 and 63.");
+				if (ImGui::Button("Close")) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (ImGui::BeginPopup("Unable to remove layer")) {
+				ImGui::Text("Unable to remove layer");
+				if (ImGui::Button("Close")) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+		}
+		else {
+			ImGui::Text("Select a layer to edit or remove.");
 		}
 
 		ImGui::End();

@@ -109,7 +109,7 @@ namespace NIKE {
 			unsigned int getLayerCount() const;
 
 			//Get all layers
-			std::vector<std::shared_ptr<Layer>> const& getLayers() const;
+			std::vector<std::shared_ptr<Layer>>& getLayers();
 
 			//Default virtual destructor
 			virtual ~IScene() = default;

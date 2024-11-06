@@ -105,6 +105,9 @@ namespace NIKE {
 		}
 
 		layers_map.erase(it);
+
+		// Decrement the count of layers after removing
+		--layer_count;
 	}
 
 	bool Scenes::IScene::checkLayer(unsigned int layer_id) {
@@ -115,7 +118,7 @@ namespace NIKE {
 		return layer_count;
 	}
 
-	std::vector<std::shared_ptr<Scenes::Layer>> const& Scenes::IScene::getLayers() const {
+	std::vector<std::shared_ptr<Scenes::Layer>>& Scenes::IScene::getLayers() {
 		return layers;
 	}
 

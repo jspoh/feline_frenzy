@@ -35,6 +35,9 @@ namespace NIKE {
 	// This function will design the UI to show the loaded assets
 	void imguiShowLoadedAssetsWindow();
 
+	// This function will design the UI to show the loaded assets
+	void imguiLayerManagementWindow();
+
 	// This function renders the game into the viewport of the imgui window
 	void imguiShowGameViewport(bool& dispatch);
 

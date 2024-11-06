@@ -18,7 +18,8 @@ namespace NIKE {
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
+		// Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 		ImGui::StyleColorsDark();
@@ -106,11 +107,12 @@ namespace NIKE {
 			// Window UI functions goes here
 			imguiEntityWindow();
 			imguiDebuggingWindow();
-			imguiFileSystemWindow();
+			// imguiFileSystemWindow();
 			imguiShowLoadedAssetsWindow();
 			imguiEntityComponentManagementWindow();
 			imguiShowGameViewport(b_dispatch_viewport);
 			imguiCameraControl();
+			imguiLayerManagementWindow();
 
 			// THIS 2 CALL THE OPENGL DRAWING
 			ImGui::Render();
