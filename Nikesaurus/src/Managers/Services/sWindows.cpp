@@ -89,6 +89,15 @@ namespace NIKE {
 
 		//Engine Init Successful
 		NIKEE_CORE_INFO("GL init success");
+
+		// enable debug logging
+#ifndef NDEBUG
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+			cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
+			}, nullptr);
+#endif
 	}
 	
 	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {

@@ -122,7 +122,7 @@ namespace NIKE {
 		static constexpr int NUM_VERTICES_IN_MODEL = 4;
 		vertices.reserve(render_instances.size() * NUM_VERTICES_IN_MODEL);
 		for (size_t i{}; i < render_instances.size(); i++) {
-			vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.begin());
+			vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.end());
 		}
 
 		// populate vbo
@@ -139,7 +139,7 @@ namespace NIKE {
 		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
 		for (size_t i{ 1 }; i <= render_instances.size(); i++) {
 			for (size_t j{}; j < model.indices.size(); j++) {
-				indices.push_back(model.indices[j] + (i * 4));
+				indices.push_back(model.indices[j] + (i * NUM_VERTICES_IN_MODEL));
 			}
 		}
 
