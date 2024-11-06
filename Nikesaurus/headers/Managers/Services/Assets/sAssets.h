@@ -65,12 +65,18 @@ namespace NIKE {
 			/*****************************************************************//**
 			* File Paths for specific asset types
 			*********************************************************************/
-			std::string texture_path = "assets/Textures";
-			std::string audio_path = "assets/Audios";
-			std::string font_path = "assets/Fonts";
-			std::string models_path = "assets/Models";
-			std::string scenes_path = "assets/Scenes";
-			std::string shaders_path = "assets/Shaders";
+			std::string texture_path = "assets/Textures/";
+			std::string audio_path = "assets/Audios/";
+			std::string font_path = "assets/Fonts/";
+			std::string models_path = "assets/Models/";
+			std::string scenes_path = "assets/Scenes/";
+			std::string shaders_path = "assets/Shaders/";
+
+			/*****************************************************************//**
+			* Scn (Levels) private members
+			*********************************************************************/
+
+			std::unordered_map<std::string, std::filesystem::path> levels_list;
 
 		public:
 
@@ -199,6 +205,15 @@ namespace NIKE {
 			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedAudios();
 
 			bool checkAudioExist(std::string const& audio_tag);
+
+			/*****************************************************************//**
+			* File path gettors
+			*********************************************************************/
+			void loadScn(const std::filesystem::directory_entry& entry);
+			void loadScnFiles();
+			bool checkScnFileExist(const std::string& entry);
+			void reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path);
+			std::unordered_map<std::string, std::filesystem::path>& getLevelsList();
 
 			/*****************************************************************//**
 			* File path gettors

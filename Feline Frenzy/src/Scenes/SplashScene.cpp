@@ -20,7 +20,7 @@ void Splash::Scene::load() {
 
 void Splash::Scene::init() {
 
-	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/test.scn");
+	//NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/test.scn");
 
 	//std::shared_ptr<NIKE::Scenes::Layer> base_Layer = createLayer();
 	//std::shared_ptr<NIKE::Scenes::Layer> second_layer = createLayer();
@@ -86,7 +86,7 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
-	NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/test.scn");
+	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/test.scn");
 }
 
 void Splash::Scene::unload() {

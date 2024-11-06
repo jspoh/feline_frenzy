@@ -61,6 +61,11 @@ namespace NIKE {
 		return false;
 	}
 
+	void IMGUI::Service::resetVariables()
+	{
+		entities_ref.clear();
+	}
+
 	std::unordered_map<std::string, Entity::Type>& IMGUI::Service::getEntityRef()
 	{
 		return entities_ref;

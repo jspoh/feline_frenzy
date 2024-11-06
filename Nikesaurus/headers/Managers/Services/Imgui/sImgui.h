@@ -31,17 +31,6 @@ namespace NIKE {
 			//Default Destructor
 			~Service() = default;
 
-			enum class AssetType {
-				Texture = 0,
-				Sfx,
-				Music,
-				Font,
-				Shaders,
-				Models,
-				Unknown
-			};
-
-
 			//Init
 			void init();
 
@@ -62,6 +51,9 @@ namespace NIKE {
 
 			// Populate dropdown list whenever component is added
 			bool populateLists = false;
+
+			// Reset variables
+			void resetVariables();
 
 			// Gettors
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
