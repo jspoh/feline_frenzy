@@ -114,6 +114,11 @@ namespace NIKE {
 			imguiCameraControl();
 			imguiLayerManagementWindow();
 
+			for (auto& asset : NIKE_ASSETS_SERVICE->getLevelsList())
+			{
+				cout << asset.first << endl;
+			}
+
 			// THIS 2 CALL THE OPENGL DRAWING
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

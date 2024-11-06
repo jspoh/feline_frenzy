@@ -94,7 +94,7 @@ namespace NIKE
                 std::filesystem::directory_entry scene_file_path(file_path);
                 NIKE_SERIALIZE_SERVICE->saveSceneToFile(file_path);
                 NIKE_ASSETS_SERVICE->loadScn(scene_file_path);
-                // Reset entity_name for the next use
+                // Reset for the next use
                 memset(file_input, 0, sizeof(file_input));
                 ImGui::CloseCurrentPopup();
             }

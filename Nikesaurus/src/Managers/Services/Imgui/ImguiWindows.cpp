@@ -225,6 +225,7 @@ namespace NIKE {
 	void imguiEntityComponentManagementWindow()
 	{
 		static bool open_component_popup = false;
+		static bool open_save_entity_popup = false;
 		static bool show_error_popup = false;
 		static bool show_save_popup = false;
 		static bool open_clone_popup = false;
@@ -261,6 +262,15 @@ namespace NIKE {
 			}
 
 			open_clone_popup = cloneEntityPopup();
+
+			// Add a new component
+			if (ImGui::Button("Save Entity")) {
+				open_save_entity_popup = true;
+				ImGui::OpenPopup("Save Entity");
+			}
+
+			// Show save entity popup
+			open_save_entity_popup = saveEntityPopup(entity);
 
 			ImGui::SameLine();
 
@@ -727,6 +737,13 @@ namespace NIKE {
 		// Tabs for different asset types
 		if (ImGui::BeginTabBar("Asset Types"))
 		{
+			// Levels tab for .scn files
+			if (ImGui::BeginTabItem("Levels"))
+			{
+				displayAssetList("Levels");
+				ImGui::EndTabItem();
+			}
+
 			// Textures tab
 			if (ImGui::BeginTabItem("Textures"))
 			{
@@ -752,13 +769,6 @@ namespace NIKE {
 			if (ImGui::BeginTabItem("Audio"))
 			{
 				displayAssetList("Audio");
-				ImGui::EndTabItem();
-			}
-
-			// Levels tab for .scn files
-			if (ImGui::BeginTabItem("Levels"))
-			{
-				displayAssetList("Levels");
 				ImGui::EndTabItem();
 			}
 

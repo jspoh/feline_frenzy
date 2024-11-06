@@ -27,9 +27,6 @@ namespace NIKE {
 
 	// This function will create a pop up to tell user that the component has already been added to that entity
 	bool showComponentExistsPopup();
-	
-	// This function will create a pop up to ask the user if the user wants the asset to be loaded
-	bool showLoadAssetPopup(const std::string& asset_name);
 
 	// This function will create a pop up to ask the user if the user wants either the entity or component to removed
 	bool removeEntityPopup();
@@ -44,6 +41,9 @@ namespace NIKE {
 	bool cloneEntityPopup();
 	// Function to change layer
 	bool changeLayerPopup(Entity::Type entity);
+
+	// Function to save entity into scn file
+	bool saveEntityPopup(Entity::Type entity);
 }
 
 #endif

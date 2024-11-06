@@ -212,7 +212,6 @@ namespace NIKE
         return is_open;
     }
 
-    // Function to display an error popup if input is invalid
     bool ShowErrorPopup() {
         bool is_open = true;
         if (ImGui::BeginPopupModal("INVALID INPUT", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -327,6 +326,57 @@ namespace NIKE
         }
         else {
             is_popup_open = true;
+        }
+
+        return is_popup_open;
+    }
+
+    bool saveEntityPopup(Entity::Type entity)
+    {
+        bool is_popup_open = false;
+        static bool is_input_correct = true;
+        static char input[300] = "";
+
+        // Popup window for saving the entity
+        if (ImGui::BeginPopupModal("Save Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter file path to save the entity:");
+
+            // Input field for file path
+            ImGui::InputText("File Path##", input, IM_ARRAYSIZE(input));
+
+            std::string scn_file = std::string(input) + ".scn";
+
+            std::string scn_file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scn_file;
+
+            cout << scn_file << endl;
+
+            // Button to save the entity
+            if (ImGui::Button("Save")) {
+                if (NIKE_ASSETS_SERVICE->checkScnFileExist(scn_file) && input[0] != '\0') {
+                    // Serialize the entity to the file path
+                    NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, scn_file_path);
+                    ImGui::CloseCurrentPopup();
+                    is_popup_open = false; 
+                }
+                else {
+                    is_input_correct = false;
+                    ImGui::OpenPopup("INVALID INPUT");
+                }
+            }
+
+            
+            is_input_correct = ShowErrorPopup();
+            
+
+            ImGui::SameLine();
+
+            // Button to cancel/save later
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false; 
+            }
+
+            ImGui::EndPopup();
         }
 
         return is_popup_open;

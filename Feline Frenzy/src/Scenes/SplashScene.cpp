@@ -96,7 +96,7 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
-	NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/test.scn");
+	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/test.scn");
 }
 
 void Splash::Scene::unload() {
