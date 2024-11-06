@@ -14,12 +14,22 @@
 #include "Managers/Services/Imgui/ImguiUtils.h"
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Managers/Services/Imgui/ImguiPopUps.h"
+#include "Managers/Services/sEvents.h"
 
 namespace NIKE {
 	// All Caps to differentiate from imgui includes
 	namespace IMGUI {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
+
+		//View port event
+		struct ViewPortEvent : public Events::IEvent {
+			Vector2f window_pos;
+			Vector2f window_size;
+
+			ViewPortEvent() : window_pos() {}
+			ViewPortEvent(Vector2f const& window_pos, Vector2f const& window_size) : window_pos{ window_pos }, window_size{ window_size } {}
+		};
 
 		class NIKE_API Service
 		{
@@ -60,6 +70,9 @@ namespace NIKE {
 			std::string& getSelectedEntityName();
 			Entity::Type getEntityByName(std::string const& input);
 
+			//Gettor for seeing if imgui is active
+			bool getImguiActive() const;
+
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
@@ -72,6 +85,9 @@ namespace NIKE {
 			// Variable to hold the selected entity name
 			std::string selected_entity_name;
 
+			//Boolean for toggling imgui
+			bool b_show_imgui = false;
+			bool b_dispatch_viewport = false;
 		};
 
 		// Defines to reduce the long line

@@ -123,6 +123,9 @@ namespace NIKE {
 		//Init imgui
 		NIKE_IMGUI_SERVICE->init();
 
+		//Init UI
+		NIKE_UI_SERVICE->init();
+
 		//Register Def Components
 		registerDefComponents();
 
@@ -152,18 +155,6 @@ namespace NIKE {
 			//Clear buffer ( Temp )
 			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-			static bool imgui_overlay_enable = true;
-
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_TAB)) {
-				// Toggle ImGui overlay visibility
-				imgui_overlay_enable = !imgui_overlay_enable;
-			}
-
-			// Toggle imgui windows to show or not
-			if (imgui_overlay_enable) {
-				NIKE_IMGUI_SERVICE->update();
-			}
-
 			//Escape Key Testing //!MOVE OUT SOON
 			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
@@ -175,13 +166,20 @@ namespace NIKE {
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
 
-			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-			//	cout << "TRUE" << endl;
-			//}
+			if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
+				cout << "TRUE" << endl;
+			}
+
+			if (NIKE_UI_SERVICE->isButtonClicked("Test1", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
+				cout << "TRUE" << endl;
+			}
 
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
+			//ImGui Render & Update
+			NIKE_IMGUI_SERVICE->update();
+		
 			//Control FPS
 			NIKE_WINDOWS_SERVICE->controlFPS();
 

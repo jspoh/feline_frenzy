@@ -97,13 +97,13 @@ namespace NIKE {
 			std::shared_ptr<Layer> createLayer(int index = -1);
 
 			//Get layer
-			std::shared_ptr<Layer> getLayer(unsigned int mask_id);
+			std::shared_ptr<Layer> getLayer(unsigned int layer_id);
 
 			//Remove layer
-			void removeLayer(unsigned int mask_id);
+			void removeLayer(unsigned int layer_id);
 
 			//Check layer
-			bool checkLayer(unsigned int mask_id);
+			bool checkLayer(unsigned int layer_id);
 
 			//Get layer count
 			unsigned int getLayerCount() const;

@@ -89,6 +89,11 @@ namespace NIKE {
 		mouse_pos = event->pos;
 	}
 
+	void UI::Service::onEvent(std::shared_ptr<IMGUI::ViewPortEvent> event) {
+		window_pos = event->window_pos;
+		window_size = event->window_size;
+	}
+
 	bool UI::Service::buttonHovered(Entity::Type entity) {
 		//Get bounding box
 		auto const& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -101,12 +106,14 @@ namespace NIKE {
 			auto const& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
 			vert = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
 			for (auto& point : vert) {
-				point.x += (e_transform.position.x);
-				point.y += (e_transform.position.y);
-				point.x *= e_transform.scale.x;
-				point.y *= e_transform.scale.y;
-				point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-				point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
+				point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+				point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+				point.x += e_transform.position.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+				point.y -= e_transform.position.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+
+				//Translate model to mouse window coords
+				point.x += (window_size.x / 2.0f) + window_pos.x;
+				point.y += (window_size.y / 2.0f) + window_pos.y;
 			}
 		}
 		else {
@@ -206,6 +213,13 @@ namespace NIKE {
 
 	std::unordered_map<std::string, std::pair<Entity::Type, bool>> UI::Service::getAllButtons() const {
 		return ui_entities;
+	}
+
+	void UI::Service::init() {
+		window_pos = { 0.0f ,0.0f };
+		window_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x ,(float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+		std::shared_ptr<UI::Service> ui_service_wrapped(this, [](UI::Service*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<IMGUI::ViewPortEvent>(ui_service_wrapped);
 	}
 
 	void UI::Service::update() {

@@ -349,8 +349,12 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderViewport() {
-		//glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-		//glClear(GL_COLOR_BUFFER_BIT);
+
+		//Render to frame buffer if imgui is active
+		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
 			//SKip inactive layer
@@ -375,14 +379,15 @@ namespace NIKE {
 			}
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
-
+		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		}
 	}
 
 	void Render::Manager::init() {
 
-		//glGenFramebuffers(1, &frame_buffer);
-		//glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+		glGenFramebuffers(1, &frame_buffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
 		// Create a color attachment texture
 		glGenTextures(1, &texture_color_buffer);

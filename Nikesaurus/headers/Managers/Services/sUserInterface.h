@@ -38,7 +38,8 @@ namespace NIKE {
 		class NIKE_API Service 
 			:	public Events::IEventListener<Input::KeyEvent>,
 				public Events::IEventListener<Input::MouseMovedEvent>,
-				public Events::IEventListener<Input::MouseBtnEvent> {
+				public Events::IEventListener<Input::MouseBtnEvent>,
+				public Events::IEventListener<IMGUI::ViewPortEvent> {
 
 		//Friend class
 		friend class NIKE::Serialization::Service;
@@ -57,6 +58,9 @@ namespace NIKE {
 			//On mouse move event
 			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
 
+			//On new imgui viewport event
+			void onEvent(std::shared_ptr<IMGUI::ViewPortEvent> event) override;
+
 			//Button hover check
 			bool buttonHovered(Entity::Type entity);
 
@@ -72,6 +76,12 @@ namespace NIKE {
 
 			//Mouse Position
 			Vector2f mouse_pos;
+
+			//Window Pos
+			Vector2f window_pos;
+
+			//Window Size
+			Vector2f window_size;
 		public:
 			//Default constructor
 			Service() = default;
@@ -90,6 +100,9 @@ namespace NIKE {
 
 			//Check if entity is a button
 			std::unordered_map<std::string, std::pair<Entity::Type, bool>> getAllButtons() const;
+
+			//UI init function
+			void init();
 
 			//UI Update function
 			void update();

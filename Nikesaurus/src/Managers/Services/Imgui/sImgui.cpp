@@ -81,29 +81,50 @@ namespace NIKE {
 		return entities_ref[input];
 	}
 
+	bool IMGUI::Service::getImguiActive() const {
+		return b_show_imgui;
+	}
+
 	void IMGUI::Service::update()
 	{
-		// Main IMGUI loop
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		//Toggle imgui on off
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
+			b_show_imgui = !b_show_imgui;
+			b_dispatch_viewport = true;
+		}
 
-		imguiInputUpdate();
+		if (b_show_imgui) {
+			// Main IMGUI loop
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
 
-		imguiDockingSpace();
+			imguiInputUpdate();
 
-		// Window UI functions goes here
-		imguiEntityWindow();
-		imguiDebuggingWindow();
-		imguiFileSystemWindow();
-		imguiShowLoadedAssetsWindow();
-		imguiEntityComponentManagementWindow();
-		imguiShowGameViewport();
-		imguiCameraControl();
+			imguiDockingSpace();
 
-		// THIS 2 CALL THE OPENGL DRAWING
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			// Window UI functions goes here
+			imguiEntityWindow();
+			imguiDebuggingWindow();
+			imguiFileSystemWindow();
+			imguiShowLoadedAssetsWindow();
+			imguiEntityComponentManagementWindow();
+			imguiShowGameViewport(b_dispatch_viewport);
+			imguiCameraControl();
+
+			// THIS 2 CALL THE OPENGL DRAWING
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+
+		//Dispatch normal viewport
+		if (b_dispatch_viewport) {
+			//Dispatch viewport changes
+			Vector2f win_pos = { 0.0f, 0.0f };
+			Vector2f win_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<IMGUI::ViewPortEvent>(win_pos, win_size));
+			b_dispatch_viewport = false;
+		}
 	}
 
 }

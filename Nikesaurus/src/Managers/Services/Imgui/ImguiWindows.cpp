@@ -774,16 +774,27 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-
-
-
-	void imguiShowGameViewport()
+	void imguiShowGameViewport(bool& dispatch)
 	{
 		ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoResize);
 		ImTextureID textureID = (ImTextureID)NIKE_ECS_MANAGER->getSystemInstance<Render::Manager>()->getTextureColorBuffer();
 		// Define UV coordinates to flip the texture vertically
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
 		ImVec2 uv1(1.0f, 0.0f); // Top-right
+
+		//Dispatch window viewport events
+		static Vector2f win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
+
+		//Dispatch view port changes
+		if (win_pos != Vector2f(ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2) ||
+			dispatch) {
+			//Dispatch viewport changes
+			win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
+
+			Vector2f win_size = { 1024.0f, 576.0f };
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<IMGUI::ViewPortEvent>(win_pos, win_size));
+			dispatch = false;
+		}
 
 		ImGui::Image(textureID, ImVec2(1024, 576), uv0, uv1);
 		ImGui::End();
