@@ -142,12 +142,13 @@ namespace NIKE {
 		glVertexArrayAttribBinding(model.vaoid, 0, 0);
 
 		// Create EBO
+		model.indices = indices;
 		glCreateBuffers(1, &model.eboid);
 		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
 
-	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model) {
+	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices) {
 		// allocate space for vbo
 		glCreateBuffers(1, &model.vboid);
 
@@ -464,7 +465,7 @@ namespace NIKE {
 
 		if (tex_coords.size() == 0) {
 			if (for_batched_rendering) {
-				createBatchedBaseBuffers(model);
+				createBatchedBaseBuffers(model, pos_vertices, indices);
 			}
 			else {
 				createBaseBuffers(pos_vertices, indices, model);

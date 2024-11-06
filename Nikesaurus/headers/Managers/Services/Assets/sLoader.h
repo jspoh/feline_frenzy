@@ -95,6 +95,7 @@ namespace NIKE {
 			unsigned int vboid;
 			unsigned int eboid;
 
+			std::vector<unsigned int> indices;
 			unsigned int primitive_type;
 			unsigned int draw_count;
 
@@ -129,7 +130,7 @@ namespace NIKE {
 			 * 
 			 * \param model
 			 */
-			void createBatchedBaseBuffers(Model& model);
+			void createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices);
 
 			/**
 			 * creates a vertex array object for base opengl shaders.

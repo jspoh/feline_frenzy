@@ -17,7 +17,7 @@
 #include "Math/Mtx33.h"
 
  // used for BATCHED_RENDERING. comment out to disable
- #define BATCHED_RENDERING
+#define BATCHED_RENDERING
 
 namespace NIKE {
 
@@ -107,6 +107,7 @@ namespace NIKE {
 #ifndef BATCHED_RENDERING
 		return;
 #endif
+		// !TODO: only implemented for quads..
 
 		if (render_instances.empty()) {
 			return;
@@ -114,47 +115,41 @@ namespace NIKE {
 
 		shader_system->useShader("batched_base");
 
-		std::vector<Matrix_33> xforms;
-		xforms.reserve(render_instances.size());
+		auto& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
 
-		std::vector<Vector4f> colors;
-		colors.reserve(render_instances.size());
-
-		for (const RenderInstance& instance : render_instances) {
-			xforms.push_back(instance.xform);
-			colors.push_back(instance.color);
+		// create buffer of vertices
+		std::vector<Assets::Vertex> vertices;
+		static constexpr int NUM_VERTICES_IN_MODEL = 4;
+		vertices.reserve(render_instances.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances.size(); i++) {
+			vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.begin());
 		}
 
-		// !TODO: what if different models?
-		auto model = NIKE_ASSETS_SERVICE->getModel("square");
-		glBindVertexArray(model->vaoid);
+		// populate vbo
+		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
 
-		// 3 buffers: transformations, colors
-		unsigned int instance_vbos[2];
-		glCreateBuffers(2, instance_vbos);
+		// bind vbo to vao
+		static constexpr int BINDING_INDEX = 10;
+		glVertexArrayVertexBuffer(model.vaoid, 10, model.vboid, 0, sizeof(Assets::Vertex));
 
-		// buffer for transformations
-		glNamedBufferStorage(GL_ARRAY_BUFFER, xforms.size() * sizeof(Matrix_33), xforms.data(), GL_DYNAMIC_STORAGE_BIT);
+		// create buffer of indices for indexed rendering
+		std::vector<unsigned int> indices;
+		static constexpr int NUM_INDICES_FOR_QUAD = 6;
+		indices.reserve(render_instances.size() * NUM_INDICES_FOR_QUAD);
+		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
+		for (size_t i{ 1 }; i <= render_instances.size(); i++) {
+			for (size_t j{}; j < model.indices.size(); j++) {
+				indices.push_back(model.indices[j] + (i * 4));
+			}
+		}
 
-		constexpr int A_MODEL_TO_NDC_LOC = 4;
-		glEnableVertexAttribArray(A_MODEL_TO_NDC_LOC);
-		glVertexAttribPointer(A_MODEL_TO_NDC_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Matrix_33), (void*)0);
-		glVertexAttribDivisor(A_MODEL_TO_NDC_LOC, 1);		// do i really need this?
+		// populate ebo
+		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
 
-		// buffer for colors
-		glBindBuffer(GL_ARRAY_BUFFER, instance_vbos[1]);
-		glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Vector4f), colors.data(), GL_DYNAMIC_DRAW);
-
-		constexpr int A_COLOR_LOC = 1;
-		glEnableVertexAttribArray(A_COLOR_LOC);
-		glVertexAttribPointer(A_COLOR_LOC, 4, GL_FLOAT, GL_FALSE, sizeof(Vector4f), (void*)0);
-		glVertexAttribDivisor(A_COLOR_LOC, 1);
-
-		glDrawElementsInstanced(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr, render_instances.size());
+		// vbo and ebo are already bound to vao
+		glDrawElements(model.primitive_type, indices.size(), GL_UNSIGNED_INT, nullptr);
 
 		// cleanup
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDeleteBuffers(2, instance_vbos);
 		glBindVertexArray(0);
 		shader_system->unuseShader();
 
