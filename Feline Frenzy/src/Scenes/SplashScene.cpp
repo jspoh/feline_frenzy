@@ -75,7 +75,7 @@ void Splash::Scene::init() {
 	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Animation::Sprite>(player_1, NIKE::Animation::Sprite({9,5}, {0, 1}, {8, 1}));
 	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(player_1));
 
-	// MapGrid Test
+	// Draw Map Test
 	std::vector<std::vector<int>> grid;
 	NIKE_MAP_SERVICE->loadMapFromFile("assets/Map/mediummap.txt", background_layer, base_layer, grid, { 0.0f, 200.0f });
 	

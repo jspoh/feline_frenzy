@@ -10,10 +10,27 @@
 #include "Managers/Services/sMap.h"
 
 namespace NIKE {
-	void Map::Service::initializeGrid(float w, float h) {
-		this->width = w;
-		this->height = h;
+	void Map::Service::initializeGrid(float map_width, float map_height, const std::vector<std::vector<int>>& tileData) {
+		// Set map width and height for the grid
+		width = map_width;
+		height = map_height;
+
+		// Resize and reset the blockedCells grid
 		blockedCells.resize(width * height, false);
+
+		// Loop through tileData to set blocked cells based on tileID
+		for (int y = 0; y < map_height; ++y) {
+			for (int x = 0; x < map_width; ++x) {
+				int tileID = tileData[y][x];
+
+				// Define blocked cells based on specific tile IDs
+				if (tileID == 1 || tileID == 2 || tileID == 3 || // e.g., wall tiles
+					tileID == 5 || tileID == 6 || tileID == 7 ||
+					tileID == 8 || tileID == 9) {
+					setCellBlocked(x, y, true);  // Mark cell as blocked
+				}
+			}
+		}
 	}
 
 	bool Map::Service::isCellBlocked(float x, float y) const {
@@ -31,75 +48,88 @@ namespace NIKE {
 	}
 
     std::vector<NIKE::Math::Vector2f> Map::Service::findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal) {
-        struct Node {
-            NIKE::Math::Vector2f position;
-            float gCost;
-            float hCost;
-            float fCost() const { return gCost + hCost; }
-        };
+		// Node structure representing each position in the grid for pathfinding
+		struct Node {
+			NIKE::Math::Vector2f position;
+			float gCost;  // Distance from the start node
+			float hCost;  // Heuristic distance to the goal node
+			float fCost() const { return gCost + hCost; }
+		};
 
-        struct CompareNode {
-            bool operator()(const Node& a, const Node& b) {
-                return a.fCost() > b.fCost();
-            }
-        };
+		// Custom comparator for priority queue to prioritize nodes with lower fCost
+		struct CompareNode {
+			bool operator()(const Node& a, const Node& b) {
+				return a.fCost() > b.fCost();
+			}
+		};
 
-        // Use Manhattan distance (or modify for other heuristics)
-        auto calculateHeuristic = [](NIKE::Math::Vector2f a, NIKE::Math::Vector2f b) {
-            return std::abs(a.x - b.x) + std::abs(a.y - b.y);
-            };
+		// Heuristic function (Manhattan distance)
+		auto calculateHeuristic = [](NIKE::Math::Vector2f a, NIKE::Math::Vector2f b) {
+			return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+			};
 
-        std::priority_queue<Node, std::vector<Node>, CompareNode> openList;
-        std::unordered_map<int, NIKE::Math::Vector2f> cameFrom;
-        std::unordered_map<int, float> gScore;
+		// Priority queue to store nodes to explore, prioritized by lowest fCost
+		std::priority_queue<Node, std::vector<Node>, CompareNode> openList;
+		// Maps for reconstructing the path and tracking the cost from the start
+		std::unordered_map<int, NIKE::Math::Vector2f> cameFrom;
+		std::unordered_map<int, float> gScore;
 
-        // Convert Vector2f to Vector2i for grid-based operations
-        auto hashPosition = [this](NIKE::Math::Vector2f pos) {
-            // Cast the Vector2f to Vector2i (rounding or truncating if needed)
-            int x = static_cast<int>(pos.x);
-            int y = static_cast<int>(pos.y);
-            return y * static_cast<int>(width) + x;  // Assuming grid is width * height
-            };
+		// Helper function to convert a position to a unique hash for grid indexing
+		auto hashPosition = [this](NIKE::Math::Vector2f pos) {
+			int x = static_cast<int>(pos.x);
+			int y = static_cast<int>(pos.y);
+			return y * static_cast<int>(width) + x;
+			};
 
-        openList.push(Node{ start, 0.0f, calculateHeuristic(start, goal) });
-        gScore[hashPosition(start)] = 0.0f;
+		// Initialize start node and insert it into the open list
+		openList.push(Node{ start, 0.0f, calculateHeuristic(start, goal) });
+		gScore[hashPosition(start)] = 0.0f;
 
-        // Directional movement in terms of Vector2i
-        std::vector<NIKE::Math::Vector2f> directions = { {0.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f}, {-1.0f, 0.0f} };
+		// Possible movement directions (up, down, left, right)
+		std::vector<NIKE::Math::Vector2f> directions = { {0.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f}, {-1.0f, 0.0f} };
 
-        while (!openList.empty()) {
-            Node current = openList.top();
-            openList.pop();
+		// A* search loop
+		while (!openList.empty()) {
+			Node current = openList.top();
+			openList.pop();
 
-            if (current.position == goal) {
-                std::vector<NIKE::Math::Vector2f> path;
-                for (NIKE::Math::Vector2f pos = goal; pos != start; pos = cameFrom[hashPosition(pos)]) {
-                    path.push_back(pos);
-                }
-                path.push_back(start);
-                std::reverse(path.begin(), path.end());
-                return path;
-            }
+			// If the goal is reached, reconstruct the path
+			if (current.position == goal) {
+				std::vector<NIKE::Math::Vector2f> path;
+				for (NIKE::Math::Vector2f pos = goal; pos != start; pos = cameFrom[hashPosition(pos)]) {
+					path.push_back(pos);
+				}
+				path.push_back(start);
+				std::reverse(path.begin(), path.end());
+				return path;  // Return the found path
+			}
 
-            // Update directions based on current position
-            for (const auto& dir : directions) {
-                NIKE::Math::Vector2f neighborPos = current.position + dir; // Assuming Vector2f addition
-                if (neighborPos.x < 0 || neighborPos.x >= width || neighborPos.y < 0 || neighborPos.y >= height || isCellBlocked(neighborPos.x, neighborPos.y)) {
-                    continue;
-                }
+			// Explore each direction
+			for (const auto& dir : directions) {
+				NIKE::Math::Vector2f neighborPos = current.position + dir;
 
-                float tentativeGScore = gScore[hashPosition(current.position)] + 1.0f;
+				// Check boundaries and if cell is blocked
+				if (neighborPos.x < 0 || neighborPos.x >= width ||
+					neighborPos.y < 0 || neighborPos.y >= height ||
+					isCellBlocked(neighborPos.x, neighborPos.y)) {
+					continue;
+				}
 
-                if (gScore.find(hashPosition(neighborPos)) == gScore.end() || tentativeGScore < gScore[hashPosition(neighborPos)]) {
-                    cameFrom[hashPosition(neighborPos)] = current.position;
-                    gScore[hashPosition(neighborPos)] = tentativeGScore;
-                    float hCost = calculateHeuristic(neighborPos, goal);
-                    openList.push(Node{ neighborPos, tentativeGScore, hCost });
-                }
-            }
-        }
+				// Calculate tentative gScore
+				float tentativeGScore = gScore[hashPosition(current.position)] + 1.0f;
 
-        return {};  // No path found
+				int neighborHash = hashPosition(neighborPos);
+				if (gScore.find(neighborHash) == gScore.end() || tentativeGScore < gScore[neighborHash]) {
+					cameFrom[neighborHash] = current.position;
+					gScore[neighborHash] = tentativeGScore;
+					float hCost = calculateHeuristic(neighborPos, goal);
+					openList.push(Node{ neighborPos, tentativeGScore, hCost });
+				}
+			}
+		}
+
+		// Return empty if no path is found
+		return {};
     }
 
 	void Map::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
@@ -127,6 +157,9 @@ namespace NIKE {
 				}
 			}
 		}
+
+		// Initialize the grid for pathfinding using the loaded map data
+		initializeGrid(width, height, grid);
 
 		// Calculate offset to center the grid
 		float tile_size = 100.0f;

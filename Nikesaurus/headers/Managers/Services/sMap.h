@@ -25,7 +25,7 @@ namespace NIKE {
 			~Service() = default;
 
 			// Initializa Grid
-			void initializeGrid(float width, float height);
+			void initializeGrid(float map_width, float map_height, const std::vector<std::vector<int>>& tileData);
 
 			// Check if cell is blocked
 			bool isCellBlocked(float x, float y) const;
