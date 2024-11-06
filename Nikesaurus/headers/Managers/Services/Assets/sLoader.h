@@ -125,6 +125,13 @@ namespace NIKE {
 			void createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Model& model);
 
 			/**
+			 * create vao for batched_base shaders.
+			 * 
+			 * \param model
+			 */
+			void createBatchedBaseBuffers(Model& model);
+
+			/**
 			 * creates a vertex array object for base opengl shaders.
 			 *
 			 * \param vertices
@@ -186,7 +193,7 @@ namespace NIKE {
 			 * \param path_to_mesh
 			 * \return success
 			 */
-			Model compileModel(const std::string& path_to_mesh);
+			Model compileModel(const std::string& path_to_mesh, bool for_batched_rendering=false);
 
 			/**
 			 * registers textures.

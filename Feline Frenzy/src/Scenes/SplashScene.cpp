@@ -23,6 +23,7 @@ void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->loadModel("TRIANGLE", "assets/Models/triangle.txt");
 	NIKE_ASSETS_SERVICE->loadModel("CIRCLE", "assets/Models/circle.txt");
 	NIKE_ASSETS_SERVICE->loadModel("square-texture", "assets/Models/square-texture.txt");
+	NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
 
 	//Load Texture
 	NIKE_ASSETS_SERVICE->loadTexture("PLAYER", "assets/Textures/player.png");

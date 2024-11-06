@@ -60,7 +60,6 @@ namespace NIKE {
 			//Render Shape
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
 
-			constexpr static unsigned int MAX_INSTANCES = 1000;
 			std::vector<RenderInstance> render_instances;
 
 			// batch render shape
@@ -84,6 +83,8 @@ namespace NIKE {
 			//Helper function to encapsulate rendering text
 			void transformAndRenderText(Entity::Type entity);
 		public:
+			constexpr static unsigned int MAX_INSTANCES = 1000;
+
 			//Constructor
 			Manager();
 

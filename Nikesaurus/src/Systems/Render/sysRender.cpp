@@ -120,9 +120,6 @@ namespace NIKE {
 		std::vector<Vector4f> colors;
 		colors.reserve(render_instances.size());
 
-		std::vector<bool> override_colors;
-		override_colors.reserve(render_instances.size());
-
 		for (const RenderInstance& instance : render_instances) {
 			xforms.push_back(instance.xform);
 			colors.push_back(instance.color);
@@ -137,10 +134,8 @@ namespace NIKE {
 		glCreateBuffers(2, instance_vbos);
 
 		// buffer for transformations
-		glBindBuffer(GL_ARRAY_BUFFER, instance_vbos[0]);
-		glBufferData(GL_ARRAY_BUFFER, xforms.size() * sizeof(Matrix_33), xforms.data(), GL_DYNAMIC_DRAW);
+		glNamedBufferStorage(GL_ARRAY_BUFFER, xforms.size() * sizeof(Matrix_33), xforms.data(), GL_DYNAMIC_STORAGE_BIT);
 
-		// no idea what this is
 		constexpr int A_MODEL_TO_NDC_LOC = 4;
 		glEnableVertexAttribArray(A_MODEL_TO_NDC_LOC);
 		glVertexAttribPointer(A_MODEL_TO_NDC_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Matrix_33), (void*)0);

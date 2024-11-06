@@ -9,6 +9,7 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
+#include "Systems/Render/sysRender.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
@@ -144,6 +145,73 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+	}
+
+	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model) {
+		// allocate space for vbo
+		glCreateBuffers(1, &model.vboid);
+
+		// only handles drwaing quads
+		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
+		static constexpr int VERTEX_SIZE = sizeof(Vertex);
+		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
+		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		glCreateVertexArrays(1, &model.vaoid);
+
+		// batched_base.vert location=0
+		static constexpr int POSITION_ATTRIB_INDEX = 0;
+		static constexpr int POSITION_ATTRIB_SIZE = 2;		// num elements (x,y)
+		static constexpr int POSITION_DATA_TYPE = GL_FLOAT;
+		glEnableVertexArrayAttrib(model.vaoid, POSITION_ATTRIB_INDEX);		// vertex attrib index 0
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			POSITION_ATTRIB_INDEX,
+			POSITION_ATTRIB_SIZE,
+			POSITION_DATA_TYPE,
+			false,		//normalized
+			0			// offset
+		);
+
+		// batched_base.vert location=1
+		static constexpr int COLOR_ATTRIB_INDEX = 1;
+		static constexpr int COLOR_ATTRIB_SIZE = 4;		// num elements (r,g,b,a)
+		static constexpr int COLOR_DATA_TYPE = GL_FLOAT;
+		static constexpr int COLOR_DATA_OFFSET = offsetof(Vertex, col);
+		glEnableVertexArrayAttrib(model.vaoid, COLOR_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			COLOR_ATTRIB_INDEX,
+			COLOR_ATTRIB_SIZE,
+			COLOR_DATA_TYPE,
+			false,		//normalized
+			COLOR_DATA_OFFSET		// offset
+		);
+
+		// batched_base.vert location=4
+		static constexpr int XFORM_ATTRIB_INDEX = 4;
+		static constexpr int XFORM_ATTRIB_SIZE = 9;		// num elements (3x3 mtx)
+		static constexpr int XFORM_DATA_TYPE = GL_FLOAT;
+		static constexpr int XFORM_DATA_OFFSET = offsetof(Vertex, transform);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX);		// vertex attrib index 4
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET		// offset
+		);
+
+		// create ebo
+		glCreateBuffers(1, &model.eboid);
+
+		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
+		static constexpr int INDEX_SIZE = sizeof(unsigned int);
+		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
+		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// vbo and ebo data population will be done in update
 	}
 
 	void Assets::RenderLoader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Assets::Model& model) {
@@ -318,7 +386,7 @@ namespace NIKE {
 		return shader_handle;
 	}
 
-	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
+	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh, bool for_batched_rendering) {
 		Assets::Model model;
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
@@ -395,7 +463,12 @@ namespace NIKE {
 		}
 
 		if (tex_coords.size() == 0) {
-			createBaseBuffers(pos_vertices, indices, model);
+			if (for_batched_rendering) {
+				createBatchedBaseBuffers(model);
+			}
+			else {
+				createBaseBuffers(pos_vertices, indices, model);
+			}
 		}
 		else {
 			createTextureBuffers(pos_vertices, indices, tex_coords, model);

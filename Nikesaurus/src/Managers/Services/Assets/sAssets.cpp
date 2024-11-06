@@ -142,14 +142,14 @@ namespace NIKE {
 		return it->second;
 	}
 
-	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path) {
+	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering) {
 		if (models_list.find(model_id) != models_list.end())
 		{
 			throw std::runtime_error("MODELS ALREADY EXISTS");
 		}
 
 		NIKEE_CORE_INFO("Loading model to '" + model_id + "'");
-		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Assets::Model>(render_loader->compileModel(file_path))));
+		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Assets::Model>(render_loader->compileModel(file_path, for_batched_rendering))));
 	}
 
 	void Assets::Service::unloadModel(std::string const& model_id) {

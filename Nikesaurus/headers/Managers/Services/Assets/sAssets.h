@@ -101,7 +101,7 @@ namespace NIKE {
 			unsigned int getShader(std::string const& shader_id);
 
 			//Load model
-			void loadModel(std::string const& model_id, std::string const& file_path);
+			void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering=false);
 
 			//Unload model
 			void unloadModel(std::string const& model_id);
