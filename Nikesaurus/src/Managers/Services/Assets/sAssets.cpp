@@ -403,6 +403,52 @@ namespace NIKE {
 		return true;
 	}
 
+	void Assets::Service::loadScn(const std::filesystem::directory_entry& entry)
+	{
+		if (entry.is_regular_file() && hasValidScnTxtExtension(entry.path())) {
+			std::string file_name = entry.path().filename().string();
+
+			// Only add the file if it doesn't already exist in the levels list
+			if (levels_list.find(file_name) == levels_list.end()) {
+				levels_list[file_name] = entry.path();
+			}
+		}
+	}
+
+	void Assets::Service::loadScnFiles()
+	{
+		// Ensure the levels list is fresh each time
+		levels_list.clear();
+
+		// Iterate through the directory and load valid scene files
+		for (const auto& entry : std::filesystem::directory_iterator(getScenesPath())) {
+			loadScn(entry);
+		}
+	}
+
+	bool Assets::Service::checkScnFileExist(const std::string& entry)
+	{
+		// Check if the file path is already in the levels_list
+		return levels_list.find(entry) != levels_list.end();
+	}
+
+	void Assets::Service::reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path)
+	{
+		auto it = levels_list.find(scn_key);
+		if (it != levels_list.end()) {
+			// If the scene exists, update it with the new file path
+			it->second = scn_file_path;
+			std::filesystem::directory_entry entry(scn_file_path);
+			loadScn(entry);
+		}
+	}
+	
+
+	std::unordered_map<std::string, std::filesystem::path>& Assets::Service::getLevelsList()
+	{
+		return levels_list;
+	}
+
 	std::string const& Assets::Service::getTexturePath() 
 	{ 
 		return texture_path; 
@@ -514,6 +560,27 @@ namespace NIKE {
 					}
 					else {
 						reloadModel(file_name.substr(start, size), model_paths.path().string());
+					}
+				}
+			}
+		}
+		else if (asset_type == "Levels") {
+
+			// Load new fonts
+			for (const auto& scn_paths : std::filesystem::directory_iterator(getScenesPath())) {
+				if (hasValidScnTxtExtension(scn_paths)) {
+					std::string file_name = scn_paths.path().filename().string();
+
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
+					// Check if the font already exists before loading
+					if (!checkScnFileExist(file_name.substr(start, size))) {
+						loadScn(scn_paths);
+					}
+					else {
+						reloadScn(file_name.substr(start, size), scn_paths.path());
 					}
 				}
 			}

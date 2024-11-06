@@ -61,13 +61,50 @@ namespace NIKE
 
     void displayAssetList(const std::string& asset_type)
     {
-        // Variable to store the selected texture
+        // Variable to store the selected texture and file path
         static std::string selected_texture;
+        static std::string selected_file_path;
 
         // Refresh button to reload assets if needed
         if (ImGui::Button(("Refresh " + asset_type).c_str()) && asset_type != "Shaders")
         {
             NIKE_ASSETS_SERVICE->reloadAssets(asset_type);
+        }
+        // Always show "Save Scene" button
+        if (ImGui::Button("Save Scene"))
+        {
+            ImGui::OpenPopup("Save Scene As");
+        }
+
+        // Show the "Save Scene As" popup if the button was clicked
+        if (ImGui::BeginPopupModal("Save Scene As"))
+        {
+            static char file_input[128] = "";
+            ImGui::InputText("Filename", file_input, IM_ARRAYSIZE(file_input));
+
+            if (ImGui::Button("Save"))
+            {
+                std::string scene_name = file_input;
+                if (scene_name.empty())
+                {
+                    scene_name = "default";
+                }
+
+                std::string file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scene_name + ".scn";
+                std::filesystem::directory_entry scene_file_path(file_path);
+                NIKE_SERIALIZE_SERVICE->saveSceneToFile(file_path);
+                NIKE_ASSETS_SERVICE->loadScn(scene_file_path);
+                // Reset entity_name for the next use
+                memset(file_input, 0, sizeof(file_input));
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
+            {
+                memset(file_input, 0, sizeof(file_input));
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
         }
         ImGui::Separator();
 
@@ -76,74 +113,32 @@ namespace NIKE
         // Check asset type and retrieve appropriate list of loaded assets
         if (asset_type == "Textures")
         {
-            // Retrieve loaded textures
             for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
             {
-                // Define UV coordinates to flip the texture vertically
-                // Bottom-left
-                ImVec2 uv0(0.0f, 1.0f); 
-                // Top-right
-                ImVec2 uv1(1.0f, 0.0f); 
+                ImVec2 uv0(0.0f, 1.0f);
+                ImVec2 uv1(1.0f, 0.0f);
 
-                // Create a unique ID for the ImageButton using the texture name
                 std::string unique_id = "##" + texture.first;
-
-                // Display the texture thumbnail
                 if (ImGui::ImageButton(unique_id.c_str(), (intptr_t)texture.second->gl_data, ImVec2(64, 64), uv0, uv1)) {
-                    // Set selected texture
-                    selected_texture = texture.first; 
+                    selected_texture = texture.first;
                 }
 
-                // Display the texture name
                 ImGui::SameLine();
                 ImGui::Text("%s", texture.first.c_str());
-
-                // Hover effect with the texture path as tooltip
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Texture path: %s", texture.first.c_str());
-                }
             }
-        }
-        if (!selected_texture.empty()) {
-            ImGui::Begin("Selected Texture");
-            ImGui::Text("Texture: %s", selected_texture.c_str());
-
-            // Retrieve the texture data to display it
-            auto textureData = NIKE_ASSETS_SERVICE->getLoadedTextures().find(selected_texture);
-            if (textureData != NIKE_ASSETS_SERVICE->getLoadedTextures().end()) {
-                // Adjust size as needed
-                // Bottom-left
-                ImVec2 uv0(0.0f, 1.0f);
-                // Top-right
-                ImVec2 uv1(1.0f, 0.0f);
-                ImGui::Image((intptr_t)textureData->second->gl_data, ImVec2(256, 256), uv0, uv1); 
-            }
-
-            if (ImGui::Button("Close")) {
-                // Clear selection when closing
-                selected_texture.clear(); 
-            }
-
-            ImGui::End();
         }
         else if (asset_type == "Audio")
         {
             for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedAudios())
             {
-                ImGui::Text("%s", audio.first.c_str()); 
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Audio path: %s", audio.first.c_str());
-                }
+                ImGui::Text("%s", audio.first.c_str());
             }
         }
         else if (asset_type == "Fonts")
         {
             for (const auto& font : NIKE_ASSETS_SERVICE->getLoadedFonts())
             {
-                ImGui::Text("%s", font.first.c_str()); 
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Font path: %s", font.first.c_str());
-                }
+                ImGui::Text("%s", font.first.c_str());
             }
         }
         else if (asset_type == "Models")
@@ -151,9 +146,6 @@ namespace NIKE
             for (const auto& model : NIKE_ASSETS_SERVICE->getLoadedModels())
             {
                 ImGui::Text("%s", model.first.c_str());
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Model path: %s", model.first.c_str());
-                }
             }
         }
         else if (asset_type == "Shaders")
@@ -161,20 +153,42 @@ namespace NIKE
             for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedShaders())
             {
                 ImGui::Text("%s", shader.first.c_str());
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Shader path: %s", shader.first.c_str());
+            }
+        }
+        else if (asset_type == "Levels")
+        {
+            // Load levels list if empty
+            if (NIKE_ASSETS_SERVICE->getLevelsList().empty()) {
+                NIKE_ASSETS_SERVICE->loadScnFiles();
+            }
+
+            // Display loaded .scn files with selectable items
+            for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList())
+            {
+                if (ImGui::Selectable(level.first.c_str())) {
+                    selected_file_path = level.first;
+                    NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
+                    // Ensure the file exists before attempting to load it
+                    std::string scene_file_path = level.second.string();
+                    if (std::filesystem::exists(scene_file_path))
+                    {
+                        cout << "Loading scene from: " << scene_file_path << endl;
+
+                        // Clear previous scene entities before loading the new one
+                        NIKE_ECS_SERVICE->destroyAllEntities();
+                        NIKE_IMGUI_SERVICE->getEntityRef().clear();
+
+                        // Load the scene from the selected file path
+                        NIKE_SERIALIZE_SERVICE->loadSceneFromFile(scene_file_path);
+                    }
                 }
             }
         }
-        // Add more asset types here if needed (e.g., models, shaders)
 
         ImGui::EndChild();
     }
 
 
 
-
-
-    
 }
 

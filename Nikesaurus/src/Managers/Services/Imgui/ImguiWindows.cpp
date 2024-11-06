@@ -313,7 +313,7 @@ namespace NIKE {
 
 							ImGui::Text("Enter a texture ref:");
 							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id))) {}
-							ImGui::DragFloat4("Color in RBGA", &texture_comp.color.r, 0.1f);
+							ImGui::DragFloat4("Texture Color (RBGA)", &texture_comp.color.r, 0.1f);
 							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
 							ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.1f);
@@ -521,7 +521,7 @@ namespace NIKE {
 								// Stuff
 							}
 
-							ImGui::DragFloat4("Color in RBGA", &text_comp.color.r, 0.1f);
+							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.1f);
 							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.1f);
 
 							// Variable to hold the selected resolution
@@ -713,33 +713,50 @@ namespace NIKE {
 		ImGui::Begin("Asset List");
 
 		// Tabs for different asset types
-		if (ImGui::BeginTabBar("AssetTypes"))
+		if (ImGui::BeginTabBar("Asset Types"))
 		{
+			// Textures tab
 			if (ImGui::BeginTabItem("Textures"))
 			{
 				displayAssetList("Textures");
 				ImGui::EndTabItem();
 			}
+
+			// Models tab
 			if (ImGui::BeginTabItem("Models"))
 			{
 				displayAssetList("Models");
 				ImGui::EndTabItem();
 			}
+
+			// Shaders tab
 			if (ImGui::BeginTabItem("Shaders"))
 			{
 				displayAssetList("Shaders");
 				ImGui::EndTabItem();
 			}
+
+			// Audio tab
 			if (ImGui::BeginTabItem("Audio"))
 			{
 				displayAssetList("Audio");
 				ImGui::EndTabItem();
 			}
-			ImGui::EndTabBar();
+
+			// Levels tab for .scn files
+			if (ImGui::BeginTabItem("Levels"))
+			{
+				displayAssetList("Levels");
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar(); 
 		}
 
 		ImGui::End();
 	}
+
+
 
 
 	void imguiShowGameViewport()
