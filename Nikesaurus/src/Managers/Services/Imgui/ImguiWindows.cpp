@@ -15,11 +15,25 @@ namespace NIKE {
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
+
+
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
+		bool is_playing = NIKE_IMGUI_SERVICE->getGamePaused();
+		// Menu Bar for Play/Pause controls
+		if (ImGui::BeginMenuBar()) {
+			ImGui::Spacing();
+			ImGui::Text("Play / Pause Controls : ");
+			if (ImGui::Button(is_playing ? "Pause" : "Play")) {
+				NIKE_IMGUI_SERVICE->setGamePaused(!is_playing);
+			}
+			ImGui::Spacing();
+			ImGui::EndMenuBar();
+		}
 		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 		ImGui::End();
+
 	}
 
 	void imguiFileSystemWindow() {
