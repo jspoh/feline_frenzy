@@ -68,9 +68,9 @@ namespace NIKE {
 			void deserializeEntity(Scenes::Layer& layer, nlohmann::json const& data);
 
 			//Create Tile
-			void createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
-				std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-				std::shared_ptr<NIKE::Scenes::Layer>& player_layer);
+			//void createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer);
 		public:
 			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
 			~Service() = default;
@@ -94,11 +94,11 @@ namespace NIKE {
 			void loadSceneFromFile(std::string const& file_path);
 
 			//Load map from file path
-			void loadMapFromFile(const std::string& file,
-				std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-				std::shared_ptr<NIKE::Scenes::Layer>& player_layer,
-				std::vector<std::vector<int>>& grid,
-				const NIKE::Math::Vector2<float>& center);
+			//void loadMapFromFile(const std::string& file,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer,
+			//	std::vector<std::vector<int>>& grid,
+			//	const NIKE::Math::Vector2<float>& center);
 		};
 
 		//Re-enable DLL Export warning

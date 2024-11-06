@@ -78,6 +78,7 @@ namespace NIKE {
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Coordinator::Service>());
+		provideService(std::make_shared<Map::Service>());
 
 		//Create console
 		#ifndef NDEBUG

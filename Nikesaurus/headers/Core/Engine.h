@@ -22,6 +22,7 @@
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/sCoordinator.h"
+#include "Managers/Services/sMap.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL
@@ -126,6 +127,7 @@ namespace NIKE {
 #define NIKE_DEBUG_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Debug::Service>()
 #define NIKE_IMGUI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::IMGUI::Service>()
 #define NIKE_ECS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Coordinator::Service>()
+#define NIKE_MAP_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Map::Service>()
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

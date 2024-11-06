@@ -208,7 +208,7 @@ void Splash::Scene::init() {
 
 	// MapGrid Test
 	std::vector<std::vector<int>> grid;
-	NIKE_SERIALIZE_SERVICE->loadMapFromFile("assets/Map/mediummap.txt", background_layer, base_layer, grid, { 0.0f, 200.0f });
+	NIKE_MAP_SERVICE->loadMapFromFile("assets/Map/mediummap.txt", background_layer, base_layer, grid, { 0.0f, 200.0f });
 	
 	////Save player to prefab
 	//NIKE_SERIALIZE_SERVICE->saveEntityToFile(player_1, "assets/Scenes/test.scn");
