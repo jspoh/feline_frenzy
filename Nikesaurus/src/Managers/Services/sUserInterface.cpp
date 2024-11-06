@@ -220,6 +220,15 @@ namespace NIKE {
 		return ui_entities;
 	}
 
+	bool UI::Service::checkEntity(Entity::Type entity) const {
+		for (auto const& ui_entity : ui_entities) {
+			if (ui_entity.second.first == entity)
+				return true;
+		}
+
+		return false;
+	}
+
 	void UI::Service::init() {
 		window_pos = { 0.0f ,0.0f };
 		window_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x ,(float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };

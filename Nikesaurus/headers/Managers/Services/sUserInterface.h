@@ -113,8 +113,11 @@ namespace NIKE {
 			//Check Button Clicked
 			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state);
 
-			//Check if entity is a button
+			//Get all buttons
 			std::unordered_map<std::string, std::pair<Entity::Type, bool>> getAllButtons() const;
+
+			//Check if entity is UI
+			bool checkEntity(Entity::Type entity) const;
 
 			//UI init function
 			void init();
