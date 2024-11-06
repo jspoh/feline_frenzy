@@ -123,6 +123,15 @@ namespace NIKE
                     selected_texture = texture.first;
                 }
 
+                // Initiate drag-and-drop source for the texture
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+                {
+                    // Set payload as the texture name to pass to the target
+                    ImGui::SetDragDropPayload("Texture", texture.first.c_str(), texture.first.size() + 1);
+                    ImGui::Text("Dragging %s", texture.first.c_str());
+                    ImGui::EndDragDropSource();
+                }
+
                 ImGui::SameLine();
                 ImGui::Text("%s", texture.first.c_str());
             }

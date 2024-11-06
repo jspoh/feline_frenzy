@@ -313,6 +313,18 @@ namespace NIKE {
 
 							ImGui::Text("Enter a texture ref:");
 							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id))) {}
+							// Begin drag-and-drop target for texture reference
+							if (ImGui::BeginDragDropTarget())
+							{
+								if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture"))
+								{
+									// Retrieve the texture ID from the payload and set it as the texture_id
+									const char* dropped_texture = static_cast<const char*>(payload->Data);
+									strncpy_s(texture_id, dropped_texture, sizeof(texture_id) - 1);
+									texture_id[sizeof(texture_id) - 1] = '\0'; // Ensure null-termination
+								}
+								ImGui::EndDragDropTarget();
+							}
 							ImGui::DragFloat4("Texture Color (RBGA)", &texture_comp.color.r, 0.1f);
 							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
 							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
