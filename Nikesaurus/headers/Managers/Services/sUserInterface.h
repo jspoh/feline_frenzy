@@ -34,12 +34,21 @@ namespace NIKE {
 			RELEASED
 		};
 
+		//Change btn ratio event
+		struct ChangeBtnTxtRatio : Events::IEvent {
+			Vector2f ratio;
+
+			ChangeBtnTxtRatio() : ratio(){}
+			ChangeBtnTxtRatio(Vector2f const& ratio) : ratio{ ratio } {}
+		};
+
 		//User Interface Service
 		class NIKE_API Service 
 			:	public Events::IEventListener<Input::KeyEvent>,
 				public Events::IEventListener<Input::MouseMovedEvent>,
 				public Events::IEventListener<Input::MouseBtnEvent>,
-				public Events::IEventListener<IMGUI::ViewPortEvent> {
+				public Events::IEventListener<IMGUI::ViewPortEvent>,
+				public Events::IEventListener<ChangeBtnTxtRatio> {
 
 		//Friend class
 		friend class NIKE::Serialization::Service;
@@ -60,6 +69,9 @@ namespace NIKE {
 
 			//On new imgui viewport event
 			void onEvent(std::shared_ptr<IMGUI::ViewPortEvent> event) override;
+
+			//On Change btn txt ratio
+			void onEvent(std::shared_ptr<ChangeBtnTxtRatio> event) override;
 
 			//Button hover check
 			bool buttonHovered(Entity::Type entity);
@@ -82,6 +94,9 @@ namespace NIKE {
 
 			//Window Size
 			Vector2f window_size;
+
+			//Button Txt Ratio
+			Vector2f btn_ratio;
 		public:
 			//Default constructor
 			Service() = default;

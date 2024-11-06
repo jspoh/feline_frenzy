@@ -542,7 +542,8 @@ namespace NIKE {
 							}
 
 							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.1f);
-							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.1f);
+							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.02f);
+							text_comp.scale = std::clamp(text_comp.scale, EPSILON, 10.0f);
 							ImGui::Text((std::string("Text Size X: ") + std::to_string(text_comp.size.x)).c_str());
 							ImGui::Text((std::string("Text Size Y: ") + std::to_string(text_comp.size.y)).c_str());
 

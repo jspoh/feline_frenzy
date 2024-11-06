@@ -166,13 +166,13 @@ namespace NIKE {
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
 
-			if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-				cout << "TRUE" << endl;
-			}
+			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
+			//	cout << "TRUE" << endl;
+			//}
 
-			if (NIKE_UI_SERVICE->isButtonClicked("Test1", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-				cout << "TRUE" << endl;
-			}
+			//if (NIKE_UI_SERVICE->isButtonClicked("Test1", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
+			//	cout << "TRUE" << endl;
+			//}
 
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();

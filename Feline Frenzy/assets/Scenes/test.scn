@@ -2,7 +2,42 @@
     {
         "Layer": {
             "B_State": true,
-            "Entities": [],
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 0.0,
+                                    "z": 1.0
+                                },
+                                "Font_ID": "Montserrat-Bold",
+                                "Origin": 0,
+                                "Scale": 2.0199999809265137,
+                                "Size": {
+                                    "x": 389.8599853515625,
+                                    "y": 72.72000122070313
+                                },
+                                "Text": "NIGGER"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": -100.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 41.400001525878906,
+                                    "y": 30.0
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                }
+            ],
             "ID": 0,
             "Index": 0,
             "Mask": 1
@@ -33,10 +68,10 @@
                                 },
                                 "Font_ID": "Montserrat-Bold",
                                 "Origin": 0,
-                                "Scale": 1.0,
+                                "Scale": 1.2102941274642944,
                                 "Size": {
-                                    "x": 126.0,
-                                    "y": 34.0
+                                    "x": 152.49705505371094,
+                                    "y": 41.150001525878906
                                 },
                                 "Text": "PLAY"
                             },
@@ -45,59 +80,15 @@
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Rotation": 0.0,
+                                "Rotation": 360.0,
                                 "Scale": {
-                                    "x": 200.0,
-                                    "y": 100.0
+                                    "x": 334.8999938964844,
+                                    "y": 82.30000305175781
                                 }
                             }
                         },
                         "Layer ID": 1,
                         "UI ID": "Test"
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Model_ID": "square"
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Font_ID": "Montserrat-Bold",
-                                "Origin": 0,
-                                "Scale": 1.0,
-                                "Size": {
-                                    "x": 126.0,
-                                    "y": 34.0
-                                },
-                                "Text": "PLAY"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 0.0,
-                                    "y": 400.0
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 200.0,
-                                    "y": 100.0
-                                }
-                            }
-                        },
-                        "Layer ID": 1,
-                        "UI ID": "Test1"
                     }
                 }
             ],

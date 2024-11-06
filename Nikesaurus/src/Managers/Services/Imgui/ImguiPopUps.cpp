@@ -352,16 +352,10 @@ namespace NIKE
 
             // Button to save the entity
             if (ImGui::Button("Save")) {
-                if (NIKE_ASSETS_SERVICE->checkScnFileExist(scn_file) && input[0] != '\0') {
-                    // Serialize the entity to the file path
-                    NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, scn_file_path);
-                    ImGui::CloseCurrentPopup();
-                    is_popup_open = false; 
-                }
-                else {
-                    is_input_correct = false;
-                    ImGui::OpenPopup("INVALID INPUT");
-                }
+                // Serialize the entity to the file path
+                NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, scn_file_path);
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false; 
             }
 
             

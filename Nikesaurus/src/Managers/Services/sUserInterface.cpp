@@ -94,6 +94,11 @@ namespace NIKE {
 		window_size = event->window_size;
 	}
 
+	void UI::Service::onEvent(std::shared_ptr<ChangeBtnTxtRatio> event) {
+		btn_ratio = event->ratio;
+		event->setEventProcessed(true);
+	}
+
 	bool UI::Service::buttonHovered(Entity::Type entity) {
 		//Get bounding box
 		auto const& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -218,11 +223,25 @@ namespace NIKE {
 	void UI::Service::init() {
 		window_pos = { 0.0f ,0.0f };
 		window_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x ,(float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+		btn_ratio = { 0.5f, 0.5f };
 		std::shared_ptr<UI::Service> ui_service_wrapped(this, [](UI::Service*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<IMGUI::ViewPortEvent>(ui_service_wrapped);
 	}
 
 	void UI::Service::update() {
+
+		//Remove inactive entities
+		for (auto it = ui_entities.begin(); it != ui_entities.end();) {
+			if (!NIKE_ECS_MANAGER->checkEntity(it->second.first)) {
+
+				it = ui_entities.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+
+		//Iterate through active entities
 		for (auto& entity : ui_entities) {
 
 			//Always set UI layer entity to the last layer
@@ -234,6 +253,25 @@ namespace NIKE {
 			for (auto& input : input_checks) {
 				input.second.first = false;
 			}
+
+			//Control the text scale
+			auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.first);
+			auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.first);
+
+			//Clamp Rectangle Size
+			e_transform.scale.x = std::clamp(e_transform.scale.x, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x));
+			e_transform.scale.y = std::clamp(e_transform.scale.y, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
+
+			//Text size to transform ratio
+			Vector2f ratio{ e_text.size.x / e_transform.scale.x, e_text.size.y / e_transform.scale.y };
+			float maxScale{ Utility::getMin(e_transform.scale.x / e_text.size.x, e_transform.scale.y / e_text.size.y) };
+			float txtscale{ ratio.x - btn_ratio.x > ratio.y - btn_ratio.y
+				? std::clamp((e_transform.scale.x * btn_ratio.x) / e_text.size.x, 0.0f, maxScale)
+				: std::clamp((e_transform.scale.y * btn_ratio.y) / e_text.size.y, 0.0f, maxScale) };
+			e_text.scale *= txtscale;
+
+			//Clamp scale
+			e_text.scale = std::clamp(e_text.scale, EPSILON, 10.0f);
 
 			//Check if button is hovered
 			if (buttonHovered(entity.second.first)) {
