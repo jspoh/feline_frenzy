@@ -126,6 +126,28 @@ namespace NIKE
                 ImGui::SameLine();
                 ImGui::Text("%s", texture.first.c_str());
             }
+            if (!selected_texture.empty()) {
+                ImGui::Begin("Selected Texture");
+                ImGui::Text("Texture: %s", selected_texture.c_str());
+
+                // Retrieve the texture data to display it
+                auto textureData = NIKE_ASSETS_SERVICE->getLoadedTextures().find(selected_texture);
+                if (textureData != NIKE_ASSETS_SERVICE->getLoadedTextures().end()) {
+                    // Adjust size as needed
+                    // Bottom-left
+                    ImVec2 uv0(0.0f, 1.0f);
+                    // Top-right
+                    ImVec2 uv1(1.0f, 0.0f);
+                    ImGui::Image((intptr_t)textureData->second->gl_data, ImVec2(256, 256), uv0, uv1);
+                }
+
+                if (ImGui::Button("Close")) {
+                    // Clear selection when closing
+                    selected_texture.clear();
+                }
+
+                ImGui::End();
+            }
         }
         else if (asset_type == "Audio")
         {
