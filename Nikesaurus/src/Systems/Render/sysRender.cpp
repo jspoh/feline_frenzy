@@ -258,6 +258,8 @@ namespace NIKE {
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
+		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() :camera_system->getWorldToNDCXform();
+
 		//Get transform
 		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
@@ -268,7 +270,7 @@ namespace NIKE {
 			//Check if model exists
 			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
 				// Transform matrix here
-				transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
+				transformMatrix(e_transform, matrix, cam_ndcx);
 
 				//Render Shape
 				renderObject(matrix, e_shape);
@@ -287,7 +289,7 @@ namespace NIKE {
 				}
 
 				// Transform matrix here
-				transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
+				transformMatrix(e_transform, matrix, cam_ndcx);
 
 				// Render Texture
 				renderObject(matrix, e_texture);
@@ -308,7 +310,7 @@ namespace NIKE {
 			}
 
 			//Calculate wireframe matrix
-			transformMatrixDebug(e_transform, matrix, camera_system->getWorldToNDCXform(), true);
+			transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
@@ -320,7 +322,7 @@ namespace NIKE {
 					dir_transform.scale.x = 1.0f;
 					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>((180.0f / M_PI));
 					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-					transformMatrixDebug(dir_transform, matrix, camera_system->getWorldToNDCXform(), false);
+					transformMatrixDebug(dir_transform, matrix, cam_ndcx, false);
 					renderWireFrame(matrix, wire_frame_color);
 				}
 			}

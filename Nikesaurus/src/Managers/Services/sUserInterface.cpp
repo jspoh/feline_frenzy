@@ -122,7 +122,17 @@ namespace NIKE {
 			}
 		}
 		else {
+			vert = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
+			for (auto& point : vert) {
+				point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+				point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+				point.x += e_transform.position.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+				point.y -= e_transform.position.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 
+				//Translate model to mouse window coords
+				point.x += (window_size.x / 2.0f) + window_pos.x;
+				point.y += (window_size.y / 2.0f) + window_pos.y;
+			}
 		}
 
 		//Calculate vertices intersection with mouse
@@ -161,6 +171,10 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(shape));
 
+		//Add transform into hover container
+		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+		hover_container[btn_id].second = false;
+
 		return ui_entities.at(btn_id).first;
 	}
 
@@ -178,6 +192,10 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(trans));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(texture));
+
+		//Add transform into hover container
+		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+		hover_container[btn_id].second = false;
 		
 		return ui_entities.at(btn_id).first;
 	}
@@ -218,6 +236,15 @@ namespace NIKE {
 
 	std::unordered_map<std::string, std::pair<Entity::Type, bool>> UI::Service::getAllButtons() const {
 		return ui_entities;
+	}
+
+	bool UI::Service::checkEntity(Entity::Type entity) const {
+		for (auto const& ui_entity : ui_entities) {
+			if (ui_entity.second.first == entity)
+				return true;
+		}
+
+		return false;
 	}
 
 	void UI::Service::init() {
@@ -276,9 +303,22 @@ namespace NIKE {
 			//Check if button is hovered
 			if (buttonHovered(entity.second.first)) {
 				entity.second.second = true;
+
+				//Save data before hover
+				if (!hover_container[entity.first].second) {
+					hover_container[entity.first].first.scale = e_transform.scale;
+					hover_container[entity.first].second = true;
+				}
+
+				//Hover
+				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
 			}
 			else {
 				entity.second.second = false;
+				if (hover_container[entity.first].second) {
+					e_transform.scale = hover_container[entity.first].first.scale;
+					hover_container[entity.first].second = false;
+				}
 			}
 		}
 	}
