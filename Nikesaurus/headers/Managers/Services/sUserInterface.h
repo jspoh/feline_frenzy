@@ -12,6 +12,14 @@
 #include "Components/cRender.h"
 #include "sInput.h"
 #include "sEvents.h"
+#include "sSerialization.h"
+
+//Forward declaration of friend class
+namespace NIKE {
+	namespace Serialization {
+		class Service;
+	}
+}
 
 namespace NIKE {
 	namespace UI {
@@ -19,6 +27,7 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		//UI Input States
 		enum class InputStates {
 			PRESSED = 0,
 			TRIGGERED,
@@ -30,6 +39,10 @@ namespace NIKE {
 			:	public Events::IEventListener<Input::KeyEvent>,
 				public Events::IEventListener<Input::MouseMovedEvent>,
 				public Events::IEventListener<Input::MouseBtnEvent> {
+
+		//Friend class
+		friend class NIKE::Serialization::Service;
+
 		private:
 
 			//Unordered map of UI Entities
@@ -75,14 +88,11 @@ namespace NIKE {
 			//Check Button Clicked
 			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state);
 
+			//Check if entity is a button
+			std::unordered_map<std::string, std::pair<Entity::Type, bool>> getAllButtons() const;
+
 			//UI Update function
 			void update();
-
-			//Serialize
-			nlohmann::json serialize() const;
-
-			//Deserialize
-			void deserialize(nlohmann::json const& data);
 		};
 
 		//Re-enable DLL Export warning

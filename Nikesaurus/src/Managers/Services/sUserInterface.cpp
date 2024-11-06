@@ -204,6 +204,10 @@ namespace NIKE {
 		return false;
 	}
 
+	std::unordered_map<std::string, std::pair<Entity::Type, bool>> UI::Service::getAllButtons() const {
+		return ui_entities;
+	}
+
 	void UI::Service::update() {
 		for (auto& entity : ui_entities) {
 
@@ -226,21 +230,4 @@ namespace NIKE {
 			}
 		}
 	}
-
-	nlohmann::json UI::Service::serialize() const {
-		return	{
-				//{"ID", id},
-				//{"Index", index},
-				//{"Mask", mask.to_ulong()},
-				//{"B_State", b_state}
-				};
-	}
-
-	void UI::Service::deserialize(nlohmann::json const& data) {
-		//id = data.at("ID").get<unsigned int>();
-		//index = data.at("Index").get<unsigned int>();
-		//mask = LayerMask(data.at("Mask").get<unsigned long>());
-		//b_state = data.at("B_State").get<bool>();
-	}
-
 }

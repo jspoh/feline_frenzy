@@ -95,20 +95,46 @@ namespace NIKE {
 		//Layers in scene
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
 
+		//UI Entities
+		std::unordered_map<Entity::Type, std::string> ui_entities;
+		for (auto const& entity : NIKE_UI_SERVICE->getAllButtons()) {
+			ui_entities.emplace(entity.second.first, entity.first);
+		}
+
 		//Iterate through all layers in current scene
 		for (auto const& layer : layers) {
+
+			//Serialize layer
 			nlohmann::json l_data;
 			l_data["Layer"] = layer->serialize();
 
-			data.push_back(l_data);
-		}
+			//Create json array
+			l_data["Layer"]["Entities"] = nlohmann::json::array();
 
-		//Iterate through all entities
-		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-			nlohmann::json e_data;
-			e_data["Entity"] = serializeEntity(entity);
-			e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
-			data.push_back(e_data);
+			//Iterate through all entities
+			for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+				//Skip entities not present in layer
+				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+					continue;
+
+				//Entity data
+				nlohmann::json e_data;
+
+				//Serialize entity
+				e_data["Entity"] = serializeEntity(entity);
+				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
+
+				//If entity is a UI Entity
+				if (ui_entities.find(entity) != ui_entities.end()) {
+					e_data["Entity"]["UI ID"] = ui_entities.at(entity);
+				}
+
+				//Push entity into layer data
+				l_data["Layer"]["Entities"].push_back(e_data);
+			}
+
+			//Push layer data into main data
+			data.push_back(l_data);
 		}
 
 		//Open file stream
@@ -135,22 +161,30 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
-		//Iterate through all the data;
-		for (auto& item : data) {
-			if (item.contains("Layer")) {
-				if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(item.at("Layer").at("ID").get<int>())) {
-					auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
-					layer->deserialize(item.at("Layer"));
-				}
-				else {
-					NIKE_SCENES_SERVICE->getCurrScene()->getLayer(item.at("Layer").at("ID").get<int>())->deserialize(item.at("Layer"));
-				}
+		//Iterate through all layer data
+		for (const auto& l_data : data) {
+
+			//Deserialize first layer
+			if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
+				auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+				layer->deserialize(l_data.at("Layer"));
+			}
+			else {
+				NIKE_SCENES_SERVICE->getCurrScene()->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
 			}
 
-			if (item.contains("Entity")) {
+			//Iterate through all entities within layer
+			for (const auto& e_data : l_data["Layer"]["Entities"]) {
+
+				//Deserialize all entities
 				Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-				deserializeEntity(entity, item.at("Entity"));
-				NIKE_ECS_MANAGER->setEntityLayerID(entity, item.at("Entity").at("Layer ID").get<unsigned int>());
+				deserializeEntity(entity, e_data.at("Entity"));
+				NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
+
+				//Check if entity is a UI entity
+				if (e_data.at("Entity").contains("UI ID")) {
+					NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), std::make_pair(entity, false));
+				}
 			}
 		}
 
