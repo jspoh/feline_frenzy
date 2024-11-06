@@ -29,7 +29,7 @@ namespace NIKE {
 	bool showComponentExistsPopup();
 
 	// This function will create a pop up to ask the user if the user wants either the entity or component to removed
-	bool removeEntityPopup();
+	bool removeEntityPopup(std::string& entity);
 
 	// This function will create a pop up if there is an invalid string input to remove entity
 	bool showInvalidEntityPopup();

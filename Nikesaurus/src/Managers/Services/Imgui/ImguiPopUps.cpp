@@ -138,9 +138,9 @@ namespace NIKE
         return is_closed;
     }
 
-    bool removeEntityPopup() {
+    bool removeEntityPopup(std::string& entity_name) {
 
-        static char entity_name[32] = ""; 
+
 
         // Track if the invalid entity popup should be shown
         static bool show_invalid_entity_popup = false; 
@@ -150,8 +150,8 @@ namespace NIKE
 
         // Check if the popup should be opened (it will be opened if the button was clicked)
         if (ImGui::BeginPopupModal("Remove Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Enter the name of the entity to remove:");
-            ImGui::InputText("##Entity Name", entity_name, IM_ARRAYSIZE(entity_name));
+            ImGui::Text("Are you sure you want to remove %s?", entity_name.c_str());
+
 
             // Button to confirm removal
             if (ImGui::Button("Remove")) {
@@ -161,7 +161,7 @@ namespace NIKE
                     NIKE_IMGUI_SERVICE->getEntityRef().erase(entity_name);
                     NIKE_IMGUI_SERVICE->getSelectedEntityName() = {};
                     // Reset entity_name for the next use
-                    memset(entity_name, 0, sizeof(entity_name));
+                    entity_name = {};
                     NIKE_IMGUI_SERVICE->populateLists = false;
                     ImGui::CloseCurrentPopup(); 
                     is_popup_open = false; 
@@ -169,7 +169,7 @@ namespace NIKE
                 else {
                     // Show the invalid entity popup
                     show_invalid_entity_popup = true;
-                    memset(entity_name, 0, sizeof(entity_name));
+
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -177,7 +177,7 @@ namespace NIKE
 
             ImGui::SameLine();
             if (ImGui::Button("Cancel")) {
-                memset(entity_name, 0, sizeof(entity_name));
+
                 ImGui::CloseCurrentPopup(); 
                 is_popup_open = false; 
             }
