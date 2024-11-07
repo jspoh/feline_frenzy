@@ -435,5 +435,51 @@ namespace NIKE
         return is_popup_open;
     }
 
+    bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type) {
+        bool deleted = false;
+
+        // Confirmation popup for deleting a file
+        if (ImGui::BeginPopupModal("Confirm Delete", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Are you sure you want to delete this file?");
+            ImGui::Separator();
+
+            if (ImGui::Button("Yes")) {
+                std::string full_file_path;
+
+                // Determine which asset type to delete
+                if (asset_type == "Levels") {
+                    // Retrieve the scene file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(file_path).string();
+                }
+                else if (asset_type == "Prefabs") {
+                    // Retrieve the prefab file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(file_path).string();
+                }
+
+                // Attempt to delete the selected file
+                if (NIKE_ASSETS_SERVICE->deleteFile(full_file_path)) {
+                    // Refresh the respective list after deletion
+                    if (asset_type == "Levels") {
+                        NIKE_ASSETS_SERVICE->loadScnFiles();
+                    }
+                    else if (asset_type == "Prefabs") {
+                        NIKE_ASSETS_SERVICE->loadPrefabFiles();
+                    }
+                    deleted = true;
+                }
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("No")) {
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+
+        return deleted;
+    }
 
 }

@@ -72,21 +72,20 @@ namespace NIKE
         static std::string selected_file_path;
 
         // To track if we need to show the popup
-        static bool open_create_entity_popup = false;  
+        static bool open_entity_prefab_popup = false;
+        static bool delete_file_popup = false;
         // Stores the selected prefab name
-        static std::string selected_prefab;             
+        static std::string selected_prefab;
 
         // Refresh button to reload assets if needed
-        if (ImGui::Button(("Refresh " + asset_type).c_str()) && asset_type != "Shaders")
+        if (ImGui::Button(("Refresh " + asset_type).c_str()))
         {
             NIKE_ASSETS_SERVICE->reloadAssets(asset_type);
         }
 
         ImGui::Separator();
-
         ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
 
-        // Check asset type and retrieve appropriate list of loaded assets
         if (asset_type == "Textures")
         {
             for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
@@ -99,10 +98,9 @@ namespace NIKE
                     selected_texture = texture.first;
                 }
 
-                // Initiate drag-and-drop source for the texture
+                // Drag-and-drop source for the texture
                 if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                 {
-                    // Set payload as the texture name to pass to the target
                     ImGui::SetDragDropPayload("Texture", texture.first.c_str(), texture.first.size() + 1);
                     ImGui::Text("Dragging %s", texture.first.c_str());
                     ImGui::EndDragDropSource();
@@ -115,22 +113,16 @@ namespace NIKE
                 ImGui::Begin("Selected Texture");
                 ImGui::Text("Texture: %s", selected_texture.c_str());
 
-                // Retrieve the texture data to display it
                 auto textureData = NIKE_ASSETS_SERVICE->getLoadedTextures().find(selected_texture);
                 if (textureData != NIKE_ASSETS_SERVICE->getLoadedTextures().end()) {
-                    // Adjust size as needed
-                    // Bottom-left
                     ImVec2 uv0(0.0f, 1.0f);
-                    // Top-right
                     ImVec2 uv1(1.0f, 0.0f);
                     ImGui::Image((intptr_t)textureData->second->gl_data, ImVec2(256, 256), uv0, uv1);
                 }
 
                 if (ImGui::Button("Close")) {
-                    // Clear selection when closing
                     selected_texture.clear();
                 }
-
                 ImGui::End();
             }
         }
@@ -155,31 +147,36 @@ namespace NIKE
                 ImGui::Text("%s", model.first.c_str());
             }
         }
-		else if (asset_type == "Prefabs")
-		{
-			for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
-			{
-				const std::string& prefab_name = prefab.first;
-
-				if (ImGui::Selectable(prefab_name.c_str())) {
-					selected_prefab = prefab_name;
-					open_create_entity_popup = true;
-					ImGui::OpenPopup("Create Entity with Prefab");
-				}
-			}
-
-            // Open pop up to create entity with prefab
-            open_create_entity_popup = showCreateEntityPrefabPopUp(selected_prefab);
-        }
-        else if (asset_type == "Shaders")
+        else if (asset_type == "Prefabs")
         {
-            for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedShaders())
+            if (ImGui::Button("Clear all Prefabs files"))
             {
-                ImGui::Text("%s", shader.first.c_str());
+                if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getPrefabsPath()))
+                {
+                    NIKE_ASSETS_SERVICE->loadPrefabFiles();
+                }
             }
+
+            for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
+            {
+                const std::string& prefab_name = prefab.first;
+
+                if (ImGui::Selectable(prefab_name.c_str())) {
+                    selected_prefab = prefab_name;
+                    open_entity_prefab_popup = true;
+                    ImGui::OpenPopup("Create Entity with Prefab");
+                }
+                else if (ImGui::Button(("Remove " + prefab.first).c_str())) {
+                    selected_file_path = prefab.first;
+                    delete_file_popup = true;
+                    ImGui::OpenPopup("Confirm Delete");
+                }
+            }
+
+            open_entity_prefab_popup = showCreateEntityPrefabPopUp(selected_prefab);
+            delete_file_popup = showDeleteFilePopup(selected_file_path, "Prefabs");
         }
         else if (asset_type == "Levels") {
-            // Load levels list if empty
             if (NIKE_ASSETS_SERVICE->getLevelsList().empty()) {
                 NIKE_ASSETS_SERVICE->loadScnFiles();
             }
@@ -194,60 +191,40 @@ namespace NIKE
                 }
             }
 
-            // Display loaded .scn files with selectable items
             for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
                 if (ImGui::Selectable(level.first.c_str())) {
                     selected_file_path = level.first;
                     NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
 
-                    // Ensure the file exists before attempting to load it
                     std::string scene_file_path = level.second.string();
                     if (std::filesystem::exists(scene_file_path)) {
-                        // Clear previous scene entities before loading the new one
                         NIKE_ECS_MANAGER->destroyAllEntities();
                         NIKE_IMGUI_SERVICE->getEntityRef().clear();
-
-                        // Load the scene from the selected file path
                         NIKE_SERIALIZE_SERVICE->loadSceneFromFile(scene_file_path);
                         NIKE_IMGUI_SERVICE->populateLists = false;
                     }
                 }
 
-                // Display "Remove File" button next to each selectable item
                 if (ImGui::Button(("Remove " + level.first).c_str())) {
-                    // Open a confirmation popup when "Remove File" button is clicked
                     selected_file_path = level.first;
+                    delete_file_popup = true;
                     ImGui::OpenPopup("Confirm Delete");
                 }
             }
-
-            // Confirmation popup for deleting a file
-            if (ImGui::BeginPopupModal("Confirm Delete", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                ImGui::Text("Are you sure you want to delete this file?");
-                ImGui::Separator();
-
-                if (ImGui::Button("Yes")) {
-                    // Attempt to delete the selected file
-                    std::string scene_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(selected_file_path).string();
-                    if (NIKE_ASSETS_SERVICE->deleteFile(scene_file_path)) {
-                        // Refresh levels list after deletion
-                        NIKE_ASSETS_SERVICE->loadScnFiles();
-                    }
-                    ImGui::CloseCurrentPopup();
-                }
-
-                ImGui::SameLine();
-
-                if (ImGui::Button("No")) {
-                    ImGui::CloseCurrentPopup();
-                }
-
-                ImGui::EndPopup();
+            delete_file_popup = showDeleteFilePopup(selected_file_path, "Levels");
+        }
+        else if (asset_type == "Shaders")
+        {
+            for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedShaders())
+            {
+                ImGui::Text("%s", shader.first.c_str());
             }
         }
 
         ImGui::EndChild();
     }
+
+
 
 
 

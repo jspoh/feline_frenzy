@@ -47,6 +47,9 @@ namespace NIKE {
 
 	// Function to save entity into scn file
 	bool savePrefabPopup(Entity::Type entity);
+
+	// Function to confirm to delete file
+	bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type);
 }
 
 #endif
