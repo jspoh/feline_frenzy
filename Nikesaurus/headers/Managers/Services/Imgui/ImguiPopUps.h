@@ -43,7 +43,7 @@ namespace NIKE {
 	bool changeLayerPopup(Entity::Type entity);
 
 	// Function to save entity into scn file
-	bool saveEntityPopup(Entity::Type entity);
+	bool savePrefabPopup(Entity::Type entity);
 }
 
 #endif

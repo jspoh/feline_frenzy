@@ -21,7 +21,7 @@ namespace NIKE {
 	// Docking space for imgui
 	void imguiDockingSpace();
 	// This function will design the UI for the file system window
-	void imguiFileSystemWindow();
+	// void imguiFileSystemWindow();
 
 	// This function will design the UI for the performance view window
 	void imguiDebuggingWindow();
@@ -34,6 +34,9 @@ namespace NIKE {
 
 	// This function will design the UI to show the loaded assets
 	void imguiShowLoadedAssetsWindow();
+
+	// This function will design the UI to show the loaded assets
+	void imguiShowLoadedLevelsWindow();
 
 	// This function will design the UI to show the loaded assets
 	void imguiLayerManagementWindow();

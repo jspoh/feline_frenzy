@@ -449,6 +449,50 @@ namespace NIKE {
 		return levels_list;
 	}
 
+	void Assets::Service::loadPrefab(const std::filesystem::directory_entry& entry)
+	{
+		if (entry.is_regular_file() && hasValidScnTxtExtension(entry.path())) {
+			std::string file_name = entry.path().filename().string();
+
+			// Only add the file if it doesn't already exist in the prefabs list
+			if (prefabs_list.find(file_name) == prefabs_list.end()) {
+				prefabs_list[file_name] = entry.path();
+			}
+		}
+	}
+
+	void Assets::Service::loadPrefabFiles()
+	{
+		// Ensure the levels list is fresh each time
+		prefabs_list.clear();
+
+		// Iterate through the directory and load valid scene files
+		for (const auto& entry : std::filesystem::directory_iterator(getPrefabsPath())) {
+			loadPrefab(entry);
+		}
+	}
+
+	bool Assets::Service::checkPrefabFileExist(const std::string& entry)
+	{
+		return prefabs_list.find(entry) != prefabs_list.end();
+	}
+
+	void Assets::Service::reloadPrefab(std::string const& prefab_key, 
+		std::filesystem::path const& prefab_file_path)
+	{
+		auto it = prefabs_list.find(prefab_key);
+		if (it != prefabs_list.end()) {
+			it->second = prefab_file_path;
+			std::filesystem::directory_entry entry(prefab_file_path);
+			loadScn(entry);
+		}
+	}
+
+	std::unordered_map<std::string, std::filesystem::path>& Assets::Service::getLoadedPrefabs()
+	{
+		return prefabs_list;
+	}
+
 	std::string const& Assets::Service::getTexturePath() 
 	{ 
 		return texture_path; 
@@ -477,6 +521,11 @@ namespace NIKE {
 	std::string const& Assets::Service::getShadersPath() 
 	{
 		return shaders_path; 
+	}
+
+	std::string const& Assets::Service::getPrefabsPath()
+	{
+		return prefabs_path;
 	}
 
 	void Assets::Service::reloadAssets(const std::string& asset_type)

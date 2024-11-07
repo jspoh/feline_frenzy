@@ -59,6 +59,12 @@ namespace NIKE
         return (extension == ".txt");
     }
 
+    bool hasValidPrefabExtension(const std::filesystem::path& filePath)
+    {
+        std::string extension = filePath.extension().string();
+        return (extension == ".prefab");
+    }
+
     void displayAssetList(const std::string& asset_type)
     {
         // Variable to store the selected texture and file path
@@ -70,42 +76,7 @@ namespace NIKE
         {
             NIKE_ASSETS_SERVICE->reloadAssets(asset_type);
         }
-        // Always show "Save Scene" button
-        if (ImGui::Button("Save Scene"))
-        {
-            ImGui::OpenPopup("Save Scene As");
-        }
 
-        // Show the "Save Scene As" popup if the button was clicked
-        if (ImGui::BeginPopupModal("Save Scene As"))
-        {
-            static char file_input[128] = "";
-            ImGui::InputText("Filename", file_input, IM_ARRAYSIZE(file_input));
-
-            if (ImGui::Button("Save"))
-            {
-                std::string scene_name = file_input;
-                if (scene_name.empty())
-                {
-                    scene_name = "default";
-                }
-
-                std::string file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scene_name + ".scn";
-                std::filesystem::directory_entry scene_file_path(file_path);
-                NIKE_SERIALIZE_SERVICE->saveSceneToFile(file_path);
-                NIKE_ASSETS_SERVICE->loadScn(scene_file_path);
-                // Reset for the next use
-                memset(file_input, 0, sizeof(file_input));
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel"))
-            {
-                memset(file_input, 0, sizeof(file_input));
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndPopup();
-        }
         ImGui::Separator();
 
         ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
@@ -177,6 +148,13 @@ namespace NIKE
             for (const auto& model : NIKE_ASSETS_SERVICE->getLoadedModels())
             {
                 ImGui::Text("%s", model.first.c_str());
+            }
+        }
+        else if (asset_type == "Prefabs")
+        {
+            for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
+            {
+                ImGui::Text("%s", prefab.first.c_str());
             }
         }
         else if (asset_type == "Shaders")

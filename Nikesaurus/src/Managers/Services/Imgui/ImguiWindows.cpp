@@ -22,62 +22,62 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void imguiFileSystemWindow() {
-		// Check if the path exists
-		if (!std::filesystem::exists(GET_ASSETS_PATH())) {
-			ImGui::Text("Assets folder does not exist.");
-			return;
-		}
+	//void imguiFileSystemWindow() {
+	//	// Check if the path exists
+	//	if (!std::filesystem::exists(GET_ASSETS_PATH())) {
+	//		ImGui::Text("Assets folder does not exist.");
+	//		return;
+	//	}
 
-		static bool show_load_popup = false;
-		static std::string selected_asset;
+	//	static bool show_load_popup = false;
+	//	static std::string selected_asset;
 
 
-		// Begin the ImGui window with a title
-		ImGui::Begin("Assets Browser");
+	//	// Begin the ImGui window with a title
+	//	ImGui::Begin("Assets Browser");
 
-		// Display the current path
-		ImGui::Text("Current Path: %s", GET_ASSETS_PATH().string().c_str());
+	//	// Display the current path
+	//	ImGui::Text("Current Path: %s", GET_ASSETS_PATH().string().c_str());
 
-		// Navigate back to the root directory
-		std::filesystem::path const root_assets_path = "assets/";
-		if (GET_ASSETS_PATH() != root_assets_path) {
-			if (ImGui::Button("Back")) {
-				// Go up one directory level
-				SET_ASSETS_PATH(GET_ASSETS_PATH().parent_path());
-				GET_ASSETS_PATH() = GET_ASSETS_PATH().parent_path();
-			}
-		}
+	//	// Navigate back to the root directory
+	//	std::filesystem::path const root_assets_path = "assets/";
+	//	if (GET_ASSETS_PATH() != root_assets_path) {
+	//		if (ImGui::Button("Back")) {
+	//			// Go up one directory level
+	//			SET_ASSETS_PATH(GET_ASSETS_PATH().parent_path());
+	//			GET_ASSETS_PATH() = GET_ASSETS_PATH().parent_path();
+	//		}
+	//	}
 
-		// List directories and files
-		if (std::filesystem::is_directory(GET_ASSETS_PATH())) {
-			for (const auto& entry : std::filesystem::directory_iterator(GET_ASSETS_PATH())) {
-				const std::filesystem::path& path = entry.path();
-				std::string file_name = path.filename().string();
+	//	// List directories and files
+	//	if (std::filesystem::is_directory(GET_ASSETS_PATH())) {
+	//		for (const auto& entry : std::filesystem::directory_iterator(GET_ASSETS_PATH())) {
+	//			const std::filesystem::path& path = entry.path();
+	//			std::string file_name = path.filename().string();
 
-				// If directory, make clickable
-				if (std::filesystem::is_directory(path)) {
-					if (ImGui::Selectable((file_name + "/").c_str(), false)) {
-						// Update to the new path when clicking a directory
-						SET_ASSETS_PATH(path);
-						GET_ASSETS_PATH() = path;
-					}
-				}
-				// Handle different asset types and drag-and-drop
-				else if (hasValidTextureExtension(path) || hasValidAudioExtension(path) || hasValidFontExtension(path)) {
-					if (ImGui::Selectable(file_name.c_str())) {
-						selected_asset = file_name;
-						show_load_popup = true;
-					}
-				}
-			}
-		}
-		else {
-			ImGui::Text("No valid directory or path.");
-		}
+	//			// If directory, make clickable
+	//			if (std::filesystem::is_directory(path)) {
+	//				if (ImGui::Selectable((file_name + "/").c_str(), false)) {
+	//					// Update to the new path when clicking a directory
+	//					SET_ASSETS_PATH(path);
+	//					GET_ASSETS_PATH() = path;
+	//				}
+	//			}
+	//			// Handle different asset types and drag-and-drop
+	//			else if (hasValidTextureExtension(path) || hasValidAudioExtension(path) || hasValidFontExtension(path)) {
+	//				if (ImGui::Selectable(file_name.c_str())) {
+	//					selected_asset = file_name;
+	//					show_load_popup = true;
+	//				}
+	//			}
+	//		}
+	//	}
+	//	else {
+	//		ImGui::Text("No valid directory or path.");
+	//	}
 
-		ImGui::End();
-	}
+	//	ImGui::End();
+	//}
 
 	void imguiDebuggingWindow() {
 
@@ -264,13 +264,13 @@ namespace NIKE {
 			open_clone_popup = cloneEntityPopup();
 
 			// Add a new component
-			if (ImGui::Button("Save Entity")) {
+			if (ImGui::Button("Save Prefab")) {
 				open_save_entity_popup = true;
-				ImGui::OpenPopup("Save Entity");
+				ImGui::OpenPopup("Save Prefab");
 			}
 
 			// Show save entity popup
-			open_save_entity_popup = saveEntityPopup(entity);
+			open_save_entity_popup = savePrefabPopup(entity);
 
 			ImGui::SameLine();
 
@@ -316,7 +316,7 @@ namespace NIKE {
 							}
 
 							ImGui::Text("Enter a texture ref:");
-							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id))) 
+							if (ImGui::InputText("##textureRef", texture_id, IM_ARRAYSIZE(texture_id)))
 							{
 								texture_comp.texture_id = texture_id;
 							}
@@ -328,7 +328,7 @@ namespace NIKE {
 									// Retrieve the texture ID from the payload and set it as the texture_id
 									const char* dropped_texture = static_cast<const char*>(payload->Data);
 									strncpy_s(texture_id, dropped_texture, sizeof(texture_id) - 1);
-									texture_id[sizeof(texture_id) - 1] = '\0'; 
+									texture_id[sizeof(texture_id) - 1] = '\0';
 									texture_comp.texture_id = texture_id;
 								}
 								ImGui::EndDragDropTarget();
@@ -398,7 +398,7 @@ namespace NIKE {
 							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity);
 
 							// Default value for cam height will be the window height if there is no adjustments
-							if (cam_comp.height <= 0.0f) { 
+							if (cam_comp.height <= 0.0f) {
 								cam_comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 							}
 
@@ -519,7 +519,7 @@ namespace NIKE {
 							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
 							static char input_font_id[300];
-							static char input_text[300];							
+							static char input_text[300];
 							static bool text_initialized = false;
 
 							if (!text_initialized) {
@@ -552,7 +552,7 @@ namespace NIKE {
 
 							// Display a dropdown to select resolution
 							// For now this hard code it 
-							const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
+							const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT" };
 							int current_origin = static_cast<int>(selected_origin);
 
 							// Display the selected text origin
@@ -739,9 +739,9 @@ namespace NIKE {
 		if (ImGui::BeginTabBar("Asset Types"))
 		{
 			// Levels tab for .scn files
-			if (ImGui::BeginTabItem("Levels"))
+			if (ImGui::BeginTabItem("Prefabs"))
 			{
-				displayAssetList("Levels");
+				displayAssetList("Prefabs");
 				ImGui::EndTabItem();
 			}
 
@@ -753,18 +753,25 @@ namespace NIKE {
 			}
 
 			// Models tab
-			if (ImGui::BeginTabItem("Models"))
+			//if (ImGui::BeginTabItem("Models"))
+			//{
+			//	displayAssetList("Models");
+			//	ImGui::EndTabItem();
+			//}
+
+			// Font tab
+			if (ImGui::BeginTabItem("Fonts"))
 			{
-				displayAssetList("Models");
+				displayAssetList("Fonts");
 				ImGui::EndTabItem();
 			}
 
 			// Shaders tab
-			if (ImGui::BeginTabItem("Shaders"))
-			{
-				displayAssetList("Shaders");
-				ImGui::EndTabItem();
-			}
+			//if (ImGui::BeginTabItem("Shaders"))
+			//{
+			//	displayAssetList("Shaders");
+			//	ImGui::EndTabItem();
+			//}
 
 			// Audio tab
 			if (ImGui::BeginTabItem("Audio"))
@@ -773,7 +780,62 @@ namespace NIKE {
 				ImGui::EndTabItem();
 			}
 
-			ImGui::EndTabBar(); 
+			ImGui::EndTabBar();
+		}
+
+		ImGui::End();
+	}
+
+	void imguiShowLoadedLevelsWindow()
+	{
+		ImGui::Begin("Levels");
+
+		// Always show "Save Scene" button
+		if (ImGui::Button("Save Scene"))
+		{
+			ImGui::OpenPopup("Save Scene As");
+		}
+
+		// Tabs for different asset types
+		//if (ImGui::BeginTabBar("Asset Types"))
+		//{
+			// Levels tab for .scn files
+		//	if (ImGui::BeginTabItem("Levels"))
+		//	{
+		displayAssetList("Levels");
+		//		ImGui::EndTabItem();
+		//	}
+		//}
+
+		// Show the "Save Scene As" popup if the button was clicked
+		if (ImGui::BeginPopupModal("Save Scene As"))
+		{
+			static char file_input[128] = "";
+			ImGui::InputText("Filename", file_input, IM_ARRAYSIZE(file_input));
+
+			if (ImGui::Button("Save"))
+			{
+				std::string scene_name = file_input;
+				if (scene_name.empty())
+				{
+					scene_name = "default";
+				}
+
+				std::string file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scene_name + ".scn";
+				std::filesystem::directory_entry scene_file_path(file_path);
+				NIKE_SERIALIZE_SERVICE->saveSceneToFile(file_path);
+				NIKE_ASSETS_SERVICE->loadScn(scene_file_path);
+				// Reset for the next use
+				memset(file_input, 0, sizeof(file_input));
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel"))
+			{
+				memset(file_input, 0, sizeof(file_input));
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
 		}
 
 		ImGui::End();
@@ -825,7 +887,7 @@ namespace NIKE {
 		// Button to create a new layer with the next available index
 		if (ImGui::Button("Create Layer")) {
 			NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
-			selected_layer_index = layer_count; 
+			selected_layer_index = layer_count;
 		}
 
 		// Show selected layer for editing
@@ -955,7 +1017,7 @@ namespace NIKE {
 				// Dispatch an event when the camera selection changes
 				Entity::Type entity = cameraEntities[selectedCameraIndex].second;
 				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(entity));
-				
+
 			}
 		}
 		else {
@@ -1014,7 +1076,7 @@ namespace NIKE {
 
 			ImGui::Spacing();
 		}
-		
+
 		// Zoom Controls
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In")) {
