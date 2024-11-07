@@ -82,12 +82,19 @@ namespace NIKE {
 				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin } {}
 		};
 
+		// set use_override_color to true if setting an override_color
 		struct Shape {
-			std::string model_id; 
-			Vector4f color;
+			std::string model_id;
+			Vector2f pos;
 
-			Shape() : model_id{ "square" }, color(1.f, 1.f, 1.f, 1.f) {}
-			Shape(std::string const& model_id, Vector4f const& color) : model_id{ model_id }, color{ color } {};
+			Vector4f color;
+			bool use_override_color;
+
+			Shape() :model_id{ "square" }, color(1.f, 1.f, 1.f, 1.f), pos{}, use_override_color { false } {}
+			Shape(std::string const& model_id, Vector2f const& pos) : model_id{ model_id }, pos{ pos }, color(), use_override_color{ false } {};
+			Shape(const std::string& model_id, const Vector4f& color, const Vector2f& pos)
+				: model_id{ model_id }, pos{ pos }, color{ color }, use_override_color{ true } {}
+			Shape(std::string const& model_id, Vector4f const& color) : model_id{ model_id }, color{ color }, pos{}, use_override_color{ true } {};
 		};
 
 		struct Texture {

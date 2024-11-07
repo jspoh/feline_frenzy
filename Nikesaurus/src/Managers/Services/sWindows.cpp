@@ -1,12 +1,12 @@
- /*****************************************************************//**
- * \file   mWindows.cpp
- * \brief  Windows manager
- *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
- * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
- * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
- *********************************************************************/
+/*****************************************************************//**
+* \file   mWindows.cpp
+* \brief  Windows manager
+*
+* \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
+* \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
+* \date   September 2024
+* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+*********************************************************************/
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sWindows.h"
@@ -17,12 +17,12 @@ namespace NIKE {
 	* NIKE Window
 	*********************************************************************/
 	Windows::NIKEWindow::NIKEWindow(Vector2i window_size, std::string window_title)
-		: ptr_window{ nullptr }, window_pos(), window_size{window_size}, window_title{window_title}, b_full_screen{false}
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }
 	{
 	}
 
-	Windows::NIKEWindow::NIKEWindow(std::string const& file_path) 
-		: ptr_window{nullptr}, b_full_screen{ false }
+	Windows::NIKEWindow::NIKEWindow(std::string const& file_path)
+		: ptr_window{ nullptr }, b_full_screen{ false }
 	{
 		//Get file stream
 		std::fstream fileStream;
@@ -89,8 +89,19 @@ namespace NIKE {
 
 		//Engine Init Successful
 		NIKEE_CORE_INFO("GL init success");
+
+		// enable debug logging
+#ifndef NDEBUG
+		// !TODO: re-enable this
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
+			//NIKEE_CORE_ERROR("GL Debug Message: {0}\nSource: {1}", message, source);
+			}, nullptr);
+#endif
 	}
-	
+
 	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
 		return ptr_window;
 	}
@@ -106,7 +117,7 @@ namespace NIKE {
 	void Windows::NIKEWindow::setFullScreen(int value) {
 
 		//Attributes
-		GLFWmonitor * monitor;
+		GLFWmonitor* monitor;
 		const GLFWvidmode* mode;
 
 		//Static Window Size For Remembering Size Before FullScreen
@@ -127,8 +138,8 @@ namespace NIKE {
 			//Set Full Screen Mode True
 			b_full_screen = true;
 		}
-		
-		if(value == GLFW_FALSE && b_full_screen) {
+
+		if (value == GLFW_FALSE && b_full_screen) {
 			// Go to windowed mode
 			monitor = nullptr;
 
@@ -148,7 +159,7 @@ namespace NIKE {
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
 	}
 
-	void Windows::NIKEWindow::setInputMode(int mode, int value){
+	void Windows::NIKEWindow::setInputMode(int mode, int value) {
 		glfwSetInputMode(ptr_window, mode, value);
 	}
 
@@ -226,7 +237,7 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Window Service
 	*********************************************************************/
-	Windows::Service::Service(std::shared_ptr<IWindow> window) 
+	Windows::Service::Service(std::shared_ptr<IWindow> window)
 		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
 
 	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {

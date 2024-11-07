@@ -109,20 +109,41 @@ namespace NIKE {
 		//If Shape
 		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 			auto const& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-			vert = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
-			for (auto& point : vert) {
-				point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-				point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
-				point.x += e_transform.position.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-				point.y -= e_transform.position.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 
-				//Translate model to mouse window coords
-				point.x += (window_size.x / 2.0f) + window_pos.x;
-				point.y += (window_size.y / 2.0f) + window_pos.y;
-			}
+			auto getVertices = [e_shape]() {
+				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
+
+				std::vector<Vector2f> vert;
+				for (const Assets::Vertex& v : vertices) {
+					vert.push_back(v.pos);
+				}
+				return vert;
+			};
+
+			vert = getVertices();
+				for (auto& point : vert) {
+					point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+					point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+					point.x += e_transform.position.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+					point.y -= e_transform.position.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+
+					//Translate model to mouse window coords
+					point.x += (window_size.x / 2.0f) + window_pos.x;
+					point.y += (window_size.y / 2.0f) + window_pos.y;
+				}
 		}
 		else {
-			vert = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
+			auto getVertices = []() {
+				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
+
+				std::vector<Vector2f> vert;
+				for (const Assets::Vertex& v : vertices) {
+					vert.push_back(v.pos);
+				}
+				return vert;
+				};
+
+			vert = getVertices();
 			for (auto& point : vert) {
 				point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
 				point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
@@ -157,7 +178,7 @@ namespace NIKE {
 	}
 
 	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape) {
-		
+
 		//Create an extra layer if there is only 1 layer
 		if (NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() <= 1) {
 			NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
@@ -178,7 +199,7 @@ namespace NIKE {
 		return ui_entities.at(btn_id).first;
 	}
 
-	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text && text, Render::Texture && texture) {
+	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture) {
 
 		//Create an extra layer if there is only 1 layer
 		if (NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() <= 1) {
@@ -196,7 +217,7 @@ namespace NIKE {
 		//Add transform into hover container
 		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
 		hover_container[btn_id].second = false;
-		
+
 		return ui_entities.at(btn_id).first;
 	}
 
@@ -230,7 +251,7 @@ namespace NIKE {
 		default:
 			break;
 		}
-		
+
 		return false;
 	}
 
