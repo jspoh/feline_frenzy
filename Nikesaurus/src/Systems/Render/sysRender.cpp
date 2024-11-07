@@ -23,6 +23,12 @@ namespace NIKE {
 
 	Render::Manager::Manager() {
 		render_instances.reserve(MAX_INSTANCES);
+
+#ifdef BATCHED_RENDERING
+		NIKEE_INFO("Using batched rendering");
+#else
+		NIKEE_INFO("Not using batched rendering");
+#endif
 	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
@@ -156,12 +162,13 @@ namespace NIKE {
 		// populate ebo
 		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
 
-		// bind vao
 
 		// vbo and ebo are already bound to vao
 		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
 
+		// init shader
 		shader_system->useShader("batched_base");
+		// bind vao
 		glBindVertexArray(model.vaoid);
 		glDrawElements(model.primitive_type, indices.size(), INDICES_TYPE, nullptr);
 
@@ -175,7 +182,7 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
 		}
-		}
+	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		//Set polygon mode
@@ -506,4 +513,4 @@ namespace NIKE {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 	}
-	}
+}

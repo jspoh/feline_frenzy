@@ -151,6 +151,10 @@ namespace NIKE {
 	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices) {
 		// only handles drwaing quads
 		
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
 
 		// create vao
 		glCreateVertexArrays(1, &model.vaoid);
@@ -192,7 +196,7 @@ namespace NIKE {
 			POSITION_ATTRIB_SIZE,
 			POSITION_DATA_TYPE,
 			false,		//normalized
-			0			// offset
+			offsetof(Vertex, pos)			// offset
 		);
 
 		// batched_base.vert location=1
@@ -250,6 +254,11 @@ namespace NIKE {
 		);
 
 		// vbo and ebo data population will be done in update
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Assets::RenderLoader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Assets::Model& model) {
