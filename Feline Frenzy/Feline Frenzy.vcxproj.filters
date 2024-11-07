@@ -56,5 +56,6 @@
     <None Include="assets\Shaders\text.frag" />
     <None Include="assets\Shaders\batched_base.frag" />
     <None Include="assets\Shaders\batched_base.vert" />
+    <None Include="assets\Shaders\batched_texture.vert" />
   </ItemGroup>
 </Project>

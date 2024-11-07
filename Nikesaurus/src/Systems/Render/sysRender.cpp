@@ -378,20 +378,8 @@ namespace NIKE {
 		//Get transform
 		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
-		//Check If Shape
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-
-			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
-				// Transform matrix here
-				transformMatrix(e_transform, matrix, cam_ndcx);
-
-				//Render Shape
-				renderObject(matrix, e_shape);
-			}
-		}
-		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
+		//Check If Texture
+		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
 			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
 			//Check if texture is loaded
@@ -408,6 +396,18 @@ namespace NIKE {
 
 				// Render Texture
 				renderObject(matrix, e_texture);
+			}
+		}
+		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, cam_ndcx);
+
+				//Render Shape
+				renderObject(matrix, e_shape);
 			}
 		}
 

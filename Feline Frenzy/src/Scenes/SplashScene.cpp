@@ -10,6 +10,8 @@
 #include "Core/pch.h"
 #include "Scenes/SplashScene.h"
 
+#include "Core/Engine.h"
+
 void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->reloadAssets("Textures");
 	NIKE_ASSETS_SERVICE->reloadAssets("Shaders");
@@ -40,6 +42,7 @@ void Splash::Scene::init() {
 
 	//Set Music Volume
 	NIKE_AUDIO_SERVICE->getChannelGroup("MASTER")->setVolume(0.5f);
+
 }
 
 void Splash::Scene::exit() {
