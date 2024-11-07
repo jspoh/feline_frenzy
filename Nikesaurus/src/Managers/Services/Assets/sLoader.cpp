@@ -521,6 +521,7 @@ namespace NIKE {
 			createTextureBuffers(pos_vertices, indices, tex_coords, model);
 		}
 		model.draw_count = static_cast<GLuint>(indices.size());
+		model.indices = indices;
 
 		NIKEE_CORE_INFO("Sucessfully loaded model from " + path_to_mesh);
 

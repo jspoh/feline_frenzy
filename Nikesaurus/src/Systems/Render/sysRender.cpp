@@ -149,7 +149,6 @@ namespace NIKE {
 				v.transform = render_instances[i].xform;
 			}
 			
-
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
 		}
 
