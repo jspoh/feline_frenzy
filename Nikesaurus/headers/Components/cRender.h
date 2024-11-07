@@ -86,13 +86,13 @@ namespace NIKE {
 			std::string model_ref;
 			Vector2f pos;
 
-			Vector4f override_color;
+			Vector4f color;
 			bool use_override_color;
 
-			Shape() : model_ref{ "" }, pos(), override_color{}, use_override_color{ false } {}
-			Shape(std::string const& model_ref, Vector2f const& pos) : model_ref{ model_ref }, pos{ pos }, override_color(), use_override_color{ false } {};
-			Shape(const std::string& model_ref, const Vector4f& override_color, const Vector2f& pos)
-				: model_ref{ model_ref }, pos{ pos }, override_color{ override_color }, use_override_color{ true } {}
+			Shape() : model_ref{ "" }, pos(), color{}, use_override_color{ false } {}
+			Shape(std::string const& model_ref, Vector2f const& pos) : model_ref{ model_ref }, pos{ pos }, color(), use_override_color{ false } {};
+			Shape(const std::string& model_ref, const Vector4f& color, const Vector2f& pos)
+				: model_ref{ model_ref }, pos{ pos }, color{ color }, use_override_color{ true } {}
 		};
 
 		struct Texture {

@@ -85,8 +85,8 @@ namespace NIKE {
 		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_ref);
 
 		//Shader set uniform
-		shader_system->setUniform("base", "f_color", Vector3f(e_shape.override_color.r, e_shape.override_color.g, e_shape.override_color.b));
-		shader_system->setUniform("base", "f_opacity", e_shape.override_color.a);
+		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
+		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
 		shader_system->setUniform("base", "override_color", e_shape.use_override_color);
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
@@ -103,7 +103,7 @@ namespace NIKE {
 		// prepare for batched rendering
 		RenderInstance instance;
 		instance.xform = x_form;
-		instance.color = e_shape.override_color;
+		instance.color = e_shape.color;
 
 		render_instances.push_back(instance);
 
