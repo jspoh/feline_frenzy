@@ -16,8 +16,9 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
-// // used for BATCHED_RENDERING. comment out to disable
-#define BATCHED_RENDERING
+
+// batched rendering
+constexpr bool BATCHED_RENDERING = true;
 
 namespace NIKE {
 
@@ -74,42 +75,43 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-#ifndef BATCHED_RENDERING
-		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
-		glEnable(GL_BLEND);
+		if (BATCHED_RENDERING) {
+			//Set polygon mode
+			glPolygonMode(GL_FRONT, GL_FILL);
+			glEnable(GL_BLEND);
 
-		// use shader
-		shader_system->useShader("base");
+			// use shader
+			shader_system->useShader("base");
 
-		//Shader set uniform
-		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
-		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
-		shader_system->setUniform("base", "override_color", e_shape.use_override_color);
-		shader_system->setUniform("base", "model_to_ndc", x_form);
+			//Shader set uniform
+			shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
+			shader_system->setUniform("base", "f_opacity", e_shape.color.a);
+			shader_system->setUniform("base", "override_color", e_shape.use_override_color);
+			shader_system->setUniform("base", "model_to_ndc", x_form);
 
-		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
+			//Get model
+			auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
 
-		//Draw
-		glBindVertexArray(model->vaoid);
-		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+			//Draw
+			glBindVertexArray(model->vaoid);
+			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 
-		//Unuse texture
-		glBindVertexArray(0);
-		shader_system->unuseShader();
-#else
-		// prepare for batched rendering
-		RenderInstance instance;
-		instance.xform = x_form;
-		instance.color = e_shape.color;
-
-		render_instances.push_back(instance);
-
-		if (render_instances.size() >= MAX_INSTANCES) {
-			batchRenderObject();
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_system->unuseShader();
 		}
-#endif
+		else {
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.color = e_shape.color;
+
+			render_instances.push_back(instance);
+
+			if (render_instances.size() >= MAX_INSTANCES) {
+				batchRenderObject();
+			}
+		}
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
@@ -125,9 +127,9 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-#ifndef BATCHED_RENDERING
-		return;
-#endif
+		if (!BATCHED_RENDERING) {
+			return;
+		}
 		// !TODO: only implemented for quads..
 
 		if (render_instances.empty()) {
