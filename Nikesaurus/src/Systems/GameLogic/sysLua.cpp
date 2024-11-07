@@ -29,9 +29,14 @@ namespace NIKE {
         );
 
         //Register lua bindings for key inputs
-        lua_state->set_function("isKeyPressed", [](int key)->bool {return NIKE_INPUT_SERVICE->isKeyPressed(key); });
-        lua_state->set_function("isKeyTriggered", [](int key)->bool {return NIKE_INPUT_SERVICE->isKeyTriggered(key); });
-        lua_state->set_function("iskeyReleased", [](int key)->bool {return NIKE_INPUT_SERVICE->isKeyReleased(key); });
+        lua_state->set_function("isKeyPressed", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyPressed(key); });
+        lua_state->set_function("isKeyTriggered", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyTriggered(key); });
+        lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
+
+        //Bind Cout for lua
+        lua_state->set_function("cout", [](const std::string& msg) {
+            cout << "[Lua] " << msg << endl;
+            });
     }
 
     Lua::System::System()
@@ -45,8 +50,8 @@ namespace NIKE {
     }
 
     void Lua::System::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
+        system->registerLuaBindings(*lua_state);
         systems.push_back(system);
-        systems.at(systems.size() - 1)->registerLuaBindings(*lua_state);
     }
 
     std::string Lua::System::loadScript(std::string const& file_path) {

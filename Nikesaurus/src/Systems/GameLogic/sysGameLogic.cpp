@@ -48,16 +48,15 @@ namespace NIKE {
 					//Run script
 					if (e_player.script_id == "") {
 						e_player.script_id = lua_system->loadScript(e_player.script);
-						lua_system->executeScript(e_player.script_id, "update")(entity);
+						auto func = lua_system->executeScript(e_player.script_id, "update")(entity);
 						e_player.b_loaded = true;
-						//assets/Scripts/player.lua
 					}
 					else if (e_player.b_loaded) {
-						lua_system->executeScript(e_player.script_id, "update")(entity);
+						auto func = lua_system->executeScript(e_player.script_id, "update")(entity);
 					}
 					else {
 						lua_system->reloadScript(e_player.script_id);
-						lua_system->executeScript(e_player.script_id, "update")(entity);
+						auto func =lua_system->executeScript(e_player.script_id, "update")(entity);
 						e_player.b_loaded = true;
 					}
 				}

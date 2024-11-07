@@ -769,13 +769,13 @@ namespace NIKE {
 							static char script_path[300];
 							static bool scripth_path_init = false;
 
-							////For initial initialization
-							//if (!scripth_path_init || script_path != e_player.script.c_str()) {
-							//	// Ensure null-termination
-							//	script_path[sizeof(script_path) - 1] = '\0';
-							//	strcpy_s(script_path, e_player.script.c_str());
-							//	scripth_path_init = true;
-							//}
+							//For initial initialization
+							if (!scripth_path_init || script_path != e_player.script.c_str()) {
+								// Ensure null-termination
+								script_path[sizeof(script_path) - 1] = '\0';
+								strcpy_s(script_path, e_player.script.c_str());
+								scripth_path_init = true;
+							}
 
 							ImGui::Text("Enter a script:");
 							if (ImGui::InputText("##PlayerScript", script_path, IM_ARRAYSIZE(script_path))){

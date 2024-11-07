@@ -186,6 +186,8 @@ namespace NIKE {
     }
 
     void Physics::Manager::applyForce(Entity::Type entity, Vector2f const& force) {
+        cout << "HERE" << endl;
+
         if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
             return;
 
@@ -195,8 +197,8 @@ namespace NIKE {
     }
 
     void Physics::Manager::registerLuaBindings(sol::state& lua_state) {
-        lua_state["apply_force"] = [this](unsigned int entity, float x_force, float y_force) {
+        lua_state.set_function("applyForce", [this](unsigned int entity, float x_force, float y_force) {
             applyForce(static_cast<Entity::Type>(entity), Vector2f(x_force, y_force));
-            };
+            });
     }
 }

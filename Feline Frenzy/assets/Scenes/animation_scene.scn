@@ -64,12 +64,12 @@
                                 "Completed_Animations": 0,
                                 "Frame_Duration": 0.20000000298023224,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.0674079954624176
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 2,
-                                    "y": 0
+                                    "x": 6,
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 0,
@@ -83,6 +83,9 @@
                                     "x": 0,
                                     "y": 0
                                 }
+                            },
+                            "GameLogic::Player": {
+                                "Script_Path": "assets/Scripts/player.lua"
                             },
                             "Physics::Collider": {
                                 "B_Collided": false,
@@ -122,8 +125,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
-                                    "y": 0
+                                    "x": 6,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
