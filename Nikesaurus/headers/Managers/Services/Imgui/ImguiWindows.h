@@ -2,7 +2,8 @@
  * \file   ImguiUtils.h
  * \brief  imgui system
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (60%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (40%)
  * \Brief This file contains declarations of utility functions to be used
  * \date   September 2024
  * All content ? 2024 DigiPen Institute of Technology Singapore, all rights reserved.

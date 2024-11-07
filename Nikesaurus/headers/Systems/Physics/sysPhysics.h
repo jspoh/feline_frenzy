@@ -49,6 +49,9 @@ namespace NIKE {
 
 			//On change physics event
 			void onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) override;
+
+			//Apply forces
+			void applyForce(Entity::Type entity, Vector2f const& force);
 		};
 	}
 }

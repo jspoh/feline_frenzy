@@ -12,8 +12,6 @@
 #define GAME_LOGIC_HPP
 
 #include "../headers/Managers/ECS/mSystem.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Core/Engine.h"
 
 namespace NIKE {
     namespace GameLogic {
@@ -24,31 +22,28 @@ namespace NIKE {
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
 
-            // Map to associate each entity with its state machine
-            //std::unordered_map<Entity::Type, std::unique_ptr<StateMachineManager>> state_machines;
-
 	    public:
 		    //Default constructor
 		    Manager() = default;
 
-		    //Init Inputs
-		    void init() override;
+			//Default Destructor
+			~Manager() = default;
 
 		    std::string getSysName() override
 		    {
 			    return "Game Logic System";
 		    }
 
+			//Init Inputs
+			void init() override;
+
 		    //Update Inputs
 		    void update() override;
 
-		    //Default Destructor
-		    ~Manager() override = default;
-
-            // Utility functions for logic, should be moved in future
-            // Generates a random unit vector direction
-            Vector2f getRandomDirection();
-            Entity::Type getPlayerEntity();
+            //// Utility functions for logic, should be moved in future
+            //// Generates a random unit vector direction
+            //Vector2f getRandomDirection();
+            //Entity::Type getPlayerEntity();
 	    };
     }
 }

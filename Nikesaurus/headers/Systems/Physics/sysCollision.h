@@ -12,6 +12,9 @@
 #ifndef COLLISION_MANAGER_HPP
 #define COLLISION_MANAGER_HPP
 
+#include "Components/cTransform.h"
+#include "Components/cPhysics.h"
+
 namespace NIKE {
     namespace Collision {
 

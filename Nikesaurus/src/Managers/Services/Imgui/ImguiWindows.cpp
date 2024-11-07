@@ -1,3 +1,14 @@
+/*****************************************************************//**
+ * \file   ImguiUtils.cpp
+ * \brief  imgui system
+ *
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (60%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (40%)
+ * \Brief This file contains declarations of utility functions to be used
+ * \date   September 2024
+ * All content ? 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #include "Core/stdafx.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/Imgui/ImguiWindows.h"
@@ -1020,11 +1031,13 @@ namespace NIKE {
 		}
 	}
 
-	void imguiShowGameViewport(bool& dispatch, unsigned int tex_id){
+	void imguiShowGameViewport(bool& dispatch, unsigned int tex_id) {
 		ImGui::Begin("Game Viewport");
 
-		float aspect_ratio = 16.f / 9.f;
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
+
+		float aspect_ratio = 16.f / 9.f;
+		
 
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
@@ -1035,17 +1048,14 @@ namespace NIKE {
 		}
 
 		ImTextureID textureID = (ImTextureID)tex_id;
-		// Define UV coordinates to flip the texture vertically
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
 		ImVec2 uv1(1.0f, 0.0f); // Top-right
 
-		//Dispatch window viewport events
+		// Dispatch window viewport events
 		static Vector2f win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
 
-		//Dispatch view port changes
 		if (win_pos != Vector2f(ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2) ||
 			dispatch) {
-			//Dispatch viewport changes
 			win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
 
 			Vector2f win_size = { viewport_width, viewport_height };
@@ -1053,9 +1063,56 @@ namespace NIKE {
 			dispatch = false;
 		}
 
+		ImVec2 mouse_pos = ImGui::GetMousePos();
+		ImVec2 scalar = { (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / window_size.x), (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / window_size.y) };
+		mouse_pos.x -= win_pos.x;
+		mouse_pos.y -= win_pos.y;
+		mouse_pos.x -= (viewport_width / 2.0f);
+		mouse_pos.y -= (viewport_height / 2.0f);
+		mouse_pos.y = -mouse_pos.y;
+
+		mouse_pos.x *= scalar.x;
+		mouse_pos.y *= scalar.y;
+
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
+
+		// Begin drag-and-drop target to create a new entity with the dropped texture
+		// Begin drag-and-drop target to create a new entity with the dropped texture
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture")) {
+				// Retrieve the texture ID from the payload
+				const char* dropped_texture = static_cast<const char*>(payload->Data);
+				std::string new_texture_id(dropped_texture);
+
+				// Static counter to generate unique entity reference strings
+				static int texture_counter = 1;
+				std::string entity_ref = "texture_" + std::to_string(texture_counter++); // Generate unique ID
+
+				// Create a new entity
+				Entity::Type new_entity = NIKE_ECS_MANAGER->createEntity();
+
+				// Register the entity with the generated reference
+				NIKE_IMGUI_SERVICE->addEntityRef(entity_ref, new_entity);
+
+				Vector2f def_size{ 100.0f, 100.0f };
+
+				// Convert to own vector
+				Vector2f own_mouse{mouse_pos.x , mouse_pos.y};
+
+				// Add a Transform component to the new entity with the calculated mouse position and random size
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(new_entity, Transform::Transform(own_mouse, def_size, 0.f));
+
+				// Add a Texture component to the new entity with the specified texture ID and default color
+				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(new_entity, Render::Texture(new_texture_id, { 1.0f, 1.0f, 1.0f, 1.0f }));
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+
 		ImGui::End();
 	}
+
+
 
 	void imguiCameraControl()
 	{

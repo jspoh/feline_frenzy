@@ -10,6 +10,15 @@
 #include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
+
+	void GameLogic::Manager::init() {
+
+	}
+
+	void GameLogic::Manager::update() {
+
+	}
+
 	//void GameLogic::Manager::init() {
 
 	//	// Variable to store player entity ID
