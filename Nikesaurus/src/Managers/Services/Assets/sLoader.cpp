@@ -147,7 +147,7 @@ namespace NIKE {
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
 
-	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices) {
+	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model) {
 		// only handles drwaing quads
 
 		GLenum err = glGetError();
@@ -414,7 +414,6 @@ namespace NIKE {
 		glAttachShader(shader_handle, frag_handle);
 		glLinkProgram(shader_handle);
 
-
 		// validate shader program
 		int success = false;
 		glGetProgramiv(shader_handle, GL_LINK_STATUS, &success);
@@ -513,7 +512,7 @@ namespace NIKE {
 
 		if (tex_coords.size() == 0) {
 			if (for_batched_rendering) {
-				createBatchedBaseBuffers(model, pos_vertices, indices);
+				createBatchedBaseBuffers(model);
 			}
 			else {
 				createBaseBuffers(pos_vertices, indices, model);

@@ -128,7 +128,7 @@ namespace NIKE {
 			void createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Model& model);
 
 			
-			void createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices);
+			void createBatchedBaseBuffers(Model& model);
 
 			/**
 			 * creates a vertex array object for base opengl shaders.

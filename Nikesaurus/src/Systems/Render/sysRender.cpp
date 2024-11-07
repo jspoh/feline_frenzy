@@ -16,7 +16,7 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
- // used for BATCHED_RENDERING. comment out to disable
+// // used for BATCHED_RENDERING. comment out to disable
 #define BATCHED_RENDERING
 
 namespace NIKE {
@@ -161,7 +161,7 @@ namespace NIKE {
 		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
 		for (size_t i{}; i < render_instances.size(); i++) {
 			for (size_t j{}; j < model.indices.size(); j++) {
-				indices.push_back(model.indices[j] + (i * NUM_VERTICES_IN_MODEL));
+				indices.push_back(model.indices[j] + static_cast<unsigned int>((i * NUM_VERTICES_IN_MODEL)));
 			}
 		}
 

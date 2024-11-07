@@ -176,7 +176,7 @@ namespace NIKE {
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
-			//Deserialize first layer
+			//Deserialize layer
 			if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
 				auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
 				layer->deserialize(l_data.at("Layer"));

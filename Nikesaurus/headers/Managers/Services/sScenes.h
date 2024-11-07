@@ -34,20 +34,14 @@ namespace NIKE {
 			//Layer mask
 			LayerMask mask;
 
-			//Layer index
-			unsigned int index;
-
 			//Layer mask id
 			unsigned int id;
 
 			//Layer state
 			bool b_state;
 		public:
-			Layer() : b_state{ true }, index{ 0 }, id{ 0 } {}
+			Layer() : b_state{ true }, id{ 0 } {}
 			~Layer() = default;
-
-			//Get layer index
-			unsigned int getLayerIndex() const;
 
 			//Get layer name
 			unsigned int getLayerID() const;
@@ -78,14 +72,10 @@ namespace NIKE {
 			std::string file_path;
 
 			//Layers within scene
-			std::unordered_map<unsigned int, std::shared_ptr<Layer>> layers_map;
 			std::vector<std::shared_ptr<Layer>> layers;
-
-			//Layer count
-			unsigned int layer_count;
 		public:
 			//Default constructor
-			IScene() : layer_count{ 0 }{}
+			IScene() = default;
 
 			//Phases
 			virtual void load() = 0;

@@ -862,28 +862,29 @@ namespace NIKE {
 		// Static variables for managing the selected layer and bit manipulations
 		static unsigned int edit_mask_id = 0;
 		static bool bit_state = false;
+		static unsigned int selected_layer_index = 0;
 		static unsigned int bit_position = 0;
-		static int selected_layer_index = -1;
 
 		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
 		const auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+
+		std::vector<std::string> layer_names;
+		for (int i = 0; i < layers.size(); ++i) {
+			layer_names.push_back("Layer " + std::to_string(NIKE_SCENES_SERVICE->getCurrScene()->getLayer(i)->getLayerID()));
+		}
 
 		// Display layer count
 		ImGui::Text("Total Layers: %u", layer_count);
 
 		// Layer selection dropdown
 		if (!layers.empty()) {
-			std::vector<std::string> layer_names;
-			for (int i = 0; i < layers.size(); ++i) {
-				layer_names.push_back("Layer " + std::to_string(i));
-			}
-
 			// Show dropdown to select a layer
 			if (ImGui::BeginCombo("Select Layer", (selected_layer_index >= 0 ? layer_names[selected_layer_index].c_str() : "None"))) {
-				for (int i = 0; i < layers.size(); ++i) {
+				for (unsigned int i = 0; i < layers.size(); ++i) {
 					const bool is_selected = (selected_layer_index == i);
 					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
 						selected_layer_index = i;
+						bit_position = 0;
 						// Copy current layer's mask ID to edit
 						edit_mask_id = static_cast<unsigned int>(layers[selected_layer_index]->getLayerMask().to_ulong());
 					}
@@ -896,74 +897,110 @@ namespace NIKE {
 			ImGui::Text("No layers available.");
 		}
 
-		ImGui::Separator();
-
-		// Button to create a new layer with the next available index
-		if (ImGui::Button("Create Layer")) {
-			NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
-			selected_layer_index = layer_count;
-		}
-
 		// Show selected layer for editing
 		if (selected_layer_index != -1 && selected_layer_index < layers.size()) {
 			ImGui::Text("Edit Selected Layer");
 
-			// Input for the bit position and its desired state
-			ImGui::InputScalar("Bit Position", ImGuiDataType_U32, &bit_position);
-			ImGui::Checkbox("Set Bit State", &bit_state);
-
-			// Button to apply the change to the selected layer's mask
-			if (ImGui::Button("Update Layer Mask")) {
-				if (bit_position < 64) {
-					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
-				}
-				else {
-					ImGui::OpenPopup("Invalid Bit Position");
-				}
+			// Button to create a new layer with the next available index
+			if (ImGui::Button("Create Layer")) {
+				NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
+				selected_layer_index = layer_count;
 			}
 
-			// Button to remove the selected layer
 			ImGui::SameLine();
+
+			// Button to remove the selected layer
 			if (ImGui::Button("Remove Layer")) {
+
+				//Only able to remove layer
 				if (layer_count > 1)
 				{
 					unsigned int layer_id = layers[selected_layer_index]->getLayerID();
 					NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(layer_id);
 
 					// Update the selected index and refetch the layers
-					selected_layer_index = -1;
+					selected_layer_index = 0;
+					bit_position = 0;
 				}
 				else {
 					ImGui::OpenPopup("Unable to remove layer");
 				}
-
 			}
 
-			// Popup for invalid bit position error
-			if (ImGui::BeginPopup("Invalid Bit Position")) {
-				ImGui::Text("Error: Bit position must be between 0 and 63.");
-				if (ImGui::Button("Close")) {
-					ImGui::CloseCurrentPopup();
+			ImGui::Separator();
+
+			// Show selected layer for editing
+			if (selected_layer_index != -1 && selected_layer_index < layers.size()) {
+				ImGui::Text("Edit Selected Layer");
+
+				//Set bit position
+				if (selected_layer_index == bit_position) {
+					for (unsigned int i = 0; i < layers.size(); ++i) {
+						// Skip the currently selected layer
+						if (i == selected_layer_index)
+							continue;
+
+						bit_position = i;
+						break;
+					}
 				}
-				ImGui::EndPopup();
-			}
-			if (ImGui::BeginPopup("Unable to remove layer")) {
-				ImGui::Text("Unable to remove layer");
-				if (ImGui::Button("Close")) {
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
-		}
-		else {
-			ImGui::Text("Select a layer to edit or remove.");
-		}
 
-		ImGui::End();
+				// Layer selection dropdown
+				if (layers.size() > 1) {
+					if (ImGui::BeginCombo("Select Mask Layer", layer_names.size() > 0 ? layer_names[bit_position].c_str() : "None")) {
+						for (unsigned int i = 0; i < layers.size(); ++i) {
+							// Skip the currently selected layer
+							if (i == static_cast<unsigned int>(selected_layer_index))
+								continue;
+
+							// Check if the current layer in the loop is the selected mask layer
+							const bool mask_selected = (bit_position == i);
+
+							// Display the selectable item
+							if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
+								bit_position = i;  // Update bit_position when a new item is selected
+							}
+
+							// Set focus to the selected item if it matches
+							if (mask_selected) ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+
+					//Set bit state
+					bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
+					ImGui::Checkbox("Set Bit State", &bit_state);
+					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
+				}
+				else {
+					ImGui::Text("No layers available.");
+				}
+
+				// Popup for invalid bit position error
+				if (ImGui::BeginPopup("Unable to create layer")) {
+					ImGui::Text("Error: Max number of 64 layers created");
+					if (ImGui::Button("Close")) {
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+				if (ImGui::BeginPopup("Unable to remove layer")) {
+					ImGui::Text("Unable to remove layer");
+					if (ImGui::Button("Close")) {
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+			}
+			else {
+				ImGui::Text("Select a layer to edit or remove.");
+			}
+
+			ImGui::End();
+		}
 	}
 
-	void imguiShowGameViewport(bool& dispatch)
-	{
+	void imguiShowGameViewport(bool& dispatch){
 		ImGui::Begin("Game Viewport");
 
 		float aspect_ratio = 16.f / 9.f;

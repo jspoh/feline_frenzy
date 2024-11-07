@@ -204,7 +204,7 @@ namespace NIKE
                     std::string scene_file_path = level.second.string();
                     if (std::filesystem::exists(scene_file_path)) {
                         // Clear previous scene entities before loading the new one
-                        NIKE_ECS_SERVICE->destroyAllEntities();
+                        NIKE_ECS_MANAGER->destroyAllEntities();
                         NIKE_IMGUI_SERVICE->getEntityRef().clear();
 
                         // Load the scene from the selected file path

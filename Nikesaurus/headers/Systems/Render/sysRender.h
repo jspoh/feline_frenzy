@@ -60,6 +60,7 @@ namespace NIKE {
 			//Render Shape
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
 
+			//
 			std::vector<RenderInstance> render_instances;
 
 			// batch render shape

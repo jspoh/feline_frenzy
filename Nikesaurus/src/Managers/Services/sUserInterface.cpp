@@ -141,9 +141,8 @@ namespace NIKE {
 					vert.push_back(v.pos);
 				}
 				return vert;
-				};
+			};
 
-			vert = getVertices();
 			for (auto& point : vert) {
 				point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
 				point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
@@ -277,7 +276,6 @@ namespace NIKE {
 	}
 
 	void UI::Service::update() {
-
 		//Remove inactive entities
 		for (auto it = ui_entities.begin(); it != ui_entities.end();) {
 			if (!NIKE_ECS_MANAGER->checkEntity(it->second.first)) {

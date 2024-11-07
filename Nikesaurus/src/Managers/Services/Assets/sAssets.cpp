@@ -658,18 +658,27 @@ namespace NIKE {
 		else if (asset_type == "Shaders") {
 
 			// Load new fonts
+			int temp_count = 0;
 			for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
+				temp_count++;
+				//Skip loading shader twice
+				if (temp_count % 2)
+					continue;
+
 				if (hasValidVertExtension(shader_paths)) {
+					//Get file name
 					std::string file_name = shader_paths.path().filename().string();
+
 					//string variables
 					size_t start = file_name.find_first_not_of('\\');
 					size_t size = file_name.find_first_of('.', start) - start;
 
+					//Get file path
 					std::string path = shader_paths.path().string();
 					std::string vtx = path.substr(0, path.find_first_of('.')) + ".vert";
 					std::string frag = path.substr(0, path.find_first_of('.')) + ".frag";
 
-					// Check if the font already exists before loading
+					//Check if the file already exists before loading
 					if (shaders_list.find(file_name.substr(start, size)) == shaders_list.end()) {
 						loadShader(file_name.substr(start, size), vtx, frag);
 					}
@@ -679,7 +688,6 @@ namespace NIKE {
 				}
 			}
 		}
-
 		// Others goes here
 	}
 
