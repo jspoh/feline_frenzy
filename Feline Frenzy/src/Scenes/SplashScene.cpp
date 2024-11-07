@@ -111,7 +111,7 @@ void Splash::Scene::init() {
 	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(batch_shape_2, NIKE::Transform::Transform({ -100.0f, 200.0f }, { 100.0f, 100.0f }, 0.0f));
 	//NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Shape>(batch_shape_2, { "square", {0, 1, 0, 1}, {0, 0} });
 
-	// 1000 objects at 3fps (without batch rendering on jspoh's computer)
+	// 1000 objects at 3-6fps (without batch rendering on jspoh's computer)
 	constexpr int BATCH_RENDERING_SHAPES_COUNT = 1015;
 	srand(time(NULL));
 

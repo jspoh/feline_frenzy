@@ -130,7 +130,7 @@ namespace NIKE {
 
 		// bind vbo to vao
 		static constexpr int BINDING_INDEX = 10;
-		glVertexArrayVertexBuffer(model.vaoid, 10, model.vboid, 0, sizeof(Assets::Vertex));
+		glVertexArrayVertexBuffer(model.vaoid, BINDING_INDEX, model.vboid, 0, sizeof(Assets::Vertex));
 
 		// create buffer of indices for indexed rendering
 		std::vector<unsigned int> indices;
@@ -147,7 +147,8 @@ namespace NIKE {
 		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
 
 		// vbo and ebo are already bound to vao
-		glDrawElements(model.primitive_type, indices.size(), GL_UNSIGNED_INT, nullptr);
+		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
+		glDrawElements(model.primitive_type, indices.size(), INDICES_TYPE, nullptr);
 
 		// cleanup
 		glBindVertexArray(0);
