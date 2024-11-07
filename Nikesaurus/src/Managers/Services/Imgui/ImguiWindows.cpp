@@ -34,8 +34,7 @@ namespace NIKE {
 				if (!scene_file_path.empty() && std::filesystem::exists(scene_file_path)) {
 					NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
 
-					// Clear previous scene entities before loading the new one
-					NIKE_ECS_SERVICE->destroyAllEntities();
+					NIKE_ECS_MANAGER->destroyAllEntities();
 					NIKE_IMGUI_SERVICE->getEntityRef().clear();
 
 					// Load the scene from the selected file path
