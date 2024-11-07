@@ -142,6 +142,9 @@ namespace NIKE {
 		// populate ebo
 		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
 
+		// bind vao
+		glBindVertexArray(model.vaoid);
+
 		// vbo and ebo are already bound to vao
 		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
 		glDrawElements(model.primitive_type, indices.size(), INDICES_TYPE, nullptr);
