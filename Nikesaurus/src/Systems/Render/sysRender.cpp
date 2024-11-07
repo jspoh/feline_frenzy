@@ -23,7 +23,7 @@ constexpr bool BATCHED_RENDERING = true;
 namespace NIKE {
 
 	Render::Manager::Manager() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {
-		render_instances.reserve(MAX_INSTANCES);
+		render_instances_quad.reserve(MAX_INSTANCES);
 
 		if (BATCHED_RENDERING) {
 			NIKEE_INFO("Using batched rendering");
@@ -76,7 +76,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		if (BATCHED_RENDERING) {
+		if (!BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 			glEnable(GL_BLEND);
@@ -107,9 +107,9 @@ namespace NIKE {
 			instance.xform = x_form;
 			instance.color = e_shape.color;
 
-			render_instances.push_back(instance);
+			render_instances_quad.push_back(instance);
 
-			if (render_instances.size() >= MAX_INSTANCES) {
+			if (render_instances_quad.size() >= MAX_INSTANCES) {
 				batchRenderObject();
 			}
 		}
@@ -133,7 +133,7 @@ namespace NIKE {
 		}
 		// !TODO: only implemented for quads..
 
-		if (render_instances.empty()) {
+		if (render_instances_quad.empty()) {
 			return;
 		}
 
@@ -142,13 +142,13 @@ namespace NIKE {
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
 		static constexpr int NUM_VERTICES_IN_MODEL = 4;
-		vertices.reserve(render_instances.size() * NUM_VERTICES_IN_MODEL);
-		for (size_t i{}; i < render_instances.size(); i++) {
+		vertices.reserve(render_instances_quad.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances_quad.size(); i++) {
 			// create temp model to populate with current instance's data
 			Assets::Model m{ model };
 			for (Assets::Vertex& v : m.vertices) {
-				v.col = render_instances[i].color;
-				v.transform = render_instances[i].xform;
+				v.col = render_instances_quad[i].color;
+				v.transform = render_instances_quad[i].xform;
 			}
 
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
@@ -160,9 +160,9 @@ namespace NIKE {
 		// create buffer of indices for indexed rendering
 		std::vector<unsigned int> indices;
 		static constexpr int NUM_INDICES_FOR_QUAD = 6;
-		indices.reserve(render_instances.size() * NUM_INDICES_FOR_QUAD);
+		indices.reserve(render_instances_quad.size() * NUM_INDICES_FOR_QUAD);
 		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
-		for (size_t i{}; i < render_instances.size(); i++) {
+		for (size_t i{}; i < render_instances_quad.size(); i++) {
 			for (size_t j{}; j < model.indices.size(); j++) {
 				indices.push_back(model.indices[j] + static_cast<unsigned int>((i * NUM_VERTICES_IN_MODEL)));
 			}
@@ -189,7 +189,7 @@ namespace NIKE {
 		glBindVertexArray(0);
 		shader_system->unuseShader();
 
-		render_instances.clear();
+		render_instances_quad.clear();
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
@@ -198,58 +198,65 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
-		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			glPolygonMode(GL_FRONT, GL_FILL);
 
-		// use shader
-		shader_system->useShader("texture");
+			// use shader
+			shader_system->useShader("texture");
 
-		//Texture unit
-		constexpr int texture_unit = 6;
+			//Texture unit
+			constexpr int texture_unit = 6;
 
-		// set texture
-		glBindTextureUnit(
-			texture_unit, // texture unit (binding index)
-			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
-		);
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
+			);
 
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		//Caculate UV Offset
-		Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
-		Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
+			//Caculate UV Offset
+			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
 
-		//Translate UV offset to bottom left
-		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+			//Translate UV offset to bottom left
+			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
 
-		//Set uniforms for texture rendering
-		shader_system->setUniform("texture", "u_tex2d", texture_unit);
-		shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
-		shader_system->setUniform("texture", "u_transform", x_form);
-		shader_system->setUniform("texture", "uvOffset", uv_offset);
-		shader_system->setUniform("texture", "frameSize", framesize);
+			//Set uniforms for texture rendering
+			shader_system->setUniform("texture", "u_tex2d", texture_unit);
+			shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
+			shader_system->setUniform("texture", "u_transform", x_form);
+			shader_system->setUniform("texture", "uvOffset", uv_offset);
+			shader_system->setUniform("texture", "frameSize", framesize);
 
-		//Blending options for texture
-		shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
-		shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
-		shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
+			//Blending options for texture
+			shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
+			shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
+			shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
-		//Flip texture options
-		shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-		shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+			//Flip texture options
+			shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
-		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+			//Get model
+			auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
 
-		//Draw
-		glBindVertexArray(model->vaoid);
-		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+			//Draw
+			glBindVertexArray(model->vaoid);
+			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 
-		//Unuse texture
-		glBindVertexArray(0);
-		shader_system->unuseShader();
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_system->unuseShader();
+		}
+		else {
+
+		}
 	}
+
+	void batchRenderTextures() {}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 

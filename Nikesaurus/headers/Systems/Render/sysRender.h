@@ -61,13 +61,18 @@ namespace NIKE {
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
 
 			//
-			std::vector<RenderInstance> render_instances;
+			std::vector<RenderInstance> render_instances_quad;
 
 			// batch render shape
 			void batchRenderObject();
 
 			//Render Texture
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
+
+			std::vector<RenderInstance> render_instances_texture;
+
+			// batch render texture
+			void batchRenderTextures();
 
 			//Render text
 			void renderText(Matrix_33 const& x_form, Render::Text& e_text);
