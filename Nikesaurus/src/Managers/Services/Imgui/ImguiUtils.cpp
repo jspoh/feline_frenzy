@@ -191,6 +191,8 @@ namespace NIKE
                 }
             }
 
+            ImGui::Separator();
+
             for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
                 if (ImGui::Selectable(level.first.c_str())) {
                     selected_file_path = level.first;
@@ -210,6 +212,8 @@ namespace NIKE
                     delete_file_popup = true;
                     ImGui::OpenPopup("Confirm Delete");
                 }
+
+                ImGui::Separator();
             }
             delete_file_popup = showDeleteFilePopup(selected_file_path, "Levels");
         }

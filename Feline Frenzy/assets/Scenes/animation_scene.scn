@@ -28,17 +28,17 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "background"
+                                "Texture_ID": "Tileset_Guide"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 35.400001525878906,
+                                    "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Rotation": 0.0,
+                                "Rotation": -0.0,
                                 "Scale": {
-                                    "x": 2000.0001220703125,
-                                    "y": 1125.0
+                                    "x": 1622.5948486328125,
+                                    "y": 1622.5948486328125
                                 }
                             }
                         },
@@ -47,7 +47,6 @@
                 }
             ],
             "ID": 0,
-            "Index": 0,
             "Mask": 1
         }
     },
@@ -65,12 +64,12 @@
                                 "Completed_Animations": 0,
                                 "Frame_Duration": 0.20000000298023224,
                                 "Mode": 0,
-                                "Timer": 0.06695960462093353
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 7,
-                                    "y": 3
+                                    "x": 2,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 0,
@@ -102,6 +101,13 @@
                                     "y": 0.0
                                 }
                             },
+                            "Render::Cam": {
+                                "Height": 500.0,
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 200.0
+                                }
+                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -116,25 +122,25 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 7,
-                                    "y": 3
+                                    "x": 1,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 9,
-                                    "y": 5
+                                    "x": 10,
+                                    "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "ZombieSheet"
+                                "Texture_ID": "Player_Walk_Front_Spritesheet"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 51.98540496826172,
-                                    "y": 0.0
+                                    "x": 0.0,
+                                    "y": 200.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 100.8017807006836,
-                                    "y": 134.40237426757813
+                                    "x": 149.99998474121094,
+                                    "y": 149.99998474121094
                                 }
                             }
                         },
@@ -143,7 +149,6 @@
                 }
             ],
             "ID": 1,
-            "Index": 1,
             "Mask": 2
         }
     }

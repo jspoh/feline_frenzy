@@ -16,10 +16,12 @@ uniform int override_color;
 layout (location=0) out vec4 out_color;
 
 void main() {
+	// now batch rendering is being commented out for now
 	if (override_color == 1) {
 		out_color = vec4(f_color, f_opacity);
 	} else {
-		out_color = a_color;
+		// out_color = vec4(a_color, 1);
+		out_color = vec4(f_color, f_opacity);
 	}
 }
 
