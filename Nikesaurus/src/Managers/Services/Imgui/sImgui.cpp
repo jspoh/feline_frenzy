@@ -120,8 +120,16 @@ namespace NIKE {
 		}
 	}
 
+	void IMGUI::Service::setDebugMode(bool flag) {
+		b_debug_mode = flag;
+	}
+
 	bool IMGUI::Service::getGamePaused() const {
 		return b_pause_game;
+	}
+
+	bool IMGUI::Service::getDebugMode() const {
+		return b_debug_mode;
 	}
 
 	void IMGUI::Service::onEvent(std::shared_ptr<Render::ViewportTexture> event) {

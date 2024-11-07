@@ -31,6 +31,8 @@ namespace NIKE {
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
 		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();
+		bool is_debug = NIKE_IMGUI_SERVICE->getDebugMode();
+
 		// Menu Bar for Play/Pause controls
 		if (ImGui::BeginMenuBar()) {
 			ImGui::Spacing();
@@ -58,7 +60,14 @@ namespace NIKE {
 					NIKEE_CORE_ERROR("Error: Scene file path is invalid or file does not exist.");
 				}
 			}
+			ImGui::SameLine();
+			ImGui::Text("Toggle Debug Box : ");
+			if (ImGui::Button(is_debug ? "Hide" : "Show")) {
+				NIKE_IMGUI_SERVICE->setDebugMode(!is_debug);
+			}
 			ImGui::Spacing();
+
+
 			ImGui::EndMenuBar();
 		}
 		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
