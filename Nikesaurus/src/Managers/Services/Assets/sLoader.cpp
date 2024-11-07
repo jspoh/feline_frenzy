@@ -149,16 +149,32 @@ namespace NIKE {
 	}
 
 	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices) {
-		// allocate space for vbo
+		// only handles drwaing quads
+		
+
+		// create vao
+		glCreateVertexArrays(1, &model.vaoid);
+
+		// create vbo
 		glCreateBuffers(1, &model.vboid);
 
-		// only handles drwaing quads
-		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
+		// create ebo
+		glCreateBuffers(1, &model.eboid);
+
+		// bind vbo and ebo to vao
+		constexpr int VBO_BINDING_INDEX = 10;
 		static constexpr int VERTEX_SIZE = sizeof(Vertex);
+		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
+		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
+
+
+		// allocate space for vbo
+		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
 		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
 		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
-		glCreateVertexArrays(1, &model.vaoid);
+		// set vertex array attributes
 
 		// batched_base.vert location=0
 		static constexpr int POSITION_ATTRIB_INDEX = 0;
@@ -190,23 +206,45 @@ namespace NIKE {
 		);
 
 		// batched_base.vert location=4
-		static constexpr int XFORM_ATTRIB_INDEX = 4;
-		static constexpr int XFORM_ATTRIB_SIZE = 9;		// num elements (3x3 mtx)
+		static constexpr int XFORM_ATTRIB_INDEX_0 = 4;
+		static constexpr int XFORM_ATTRIB_SIZE = 3;		// num elements(row of 3x3 mtx)
 		static constexpr int XFORM_DATA_TYPE = GL_FLOAT;
-		static constexpr int XFORM_DATA_OFFSET = offsetof(Vertex, transform);
-		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX);		// vertex attrib index 4
+		static constexpr int XFORM_DATA_OFFSET_0 = offsetof(Vertex, transform);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_0);		// vertex attrib index 4
 		glVertexArrayAttribFormat(
 			model.vaoid,
-			XFORM_ATTRIB_INDEX,
+			XFORM_ATTRIB_INDEX_0,
 			XFORM_ATTRIB_SIZE,
 			XFORM_DATA_TYPE,
 			false,		//normalized
-			XFORM_DATA_OFFSET		// offset
+			XFORM_DATA_OFFSET_0		// offset
 		);
 
-		// create ebo
-		glCreateBuffers(1, &model.eboid);
+		static constexpr int XFORM_ATTRIB_INDEX_1 = 5;
+		static constexpr int XFORM_DATA_OFFSET_1 = XFORM_DATA_OFFSET_0 + sizeof(std::array<float, 3>);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_1);		// vertex attrib index 5
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_1,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_1		// offset
+		);
 
+		static constexpr int XFORM_ATTRIB_INDEX_2 = 6;
+		static constexpr int XFORM_DATA_OFFSET_2 = XFORM_DATA_OFFSET_1 + sizeof(std::array<float, 3>);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_2);		// vertex attrib index 6
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_2,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_2		// offset
+		);
+
+		// allocate space for ebo
 		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
 		static constexpr int INDEX_SIZE = sizeof(unsigned int);
 		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;

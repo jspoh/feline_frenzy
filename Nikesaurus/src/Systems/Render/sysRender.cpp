@@ -128,10 +128,6 @@ namespace NIKE {
 		// populate vbo
 		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
 
-		// bind vbo to vao
-		static constexpr int BINDING_INDEX = 10;
-		glVertexArrayVertexBuffer(model.vaoid, BINDING_INDEX, model.vboid, 0, sizeof(Assets::Vertex));
-
 		// create buffer of indices for indexed rendering
 		std::vector<unsigned int> indices;
 		static constexpr int NUM_INDICES_FOR_QUAD = 6;
