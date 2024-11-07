@@ -30,6 +30,8 @@ namespace NIKE {
 			Matrix_33 xform;
 			Vector4f color;
 			unsigned int tex;
+			Vector2f framesize;
+			Vector2f uv_offset;
 		};
 
 		//Render Manager

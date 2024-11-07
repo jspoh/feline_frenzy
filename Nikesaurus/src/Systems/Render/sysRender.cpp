@@ -252,10 +252,19 @@ namespace NIKE {
 			shader_system->unuseShader();
 		}
 		else {
+			//Caculate UV Offset
+			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
+
+			//Translate UV offset to bottom left
+			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+
 			// prepare for batched rendering
 			RenderInstance instance;
 			instance.xform = x_form;
 			instance.tex = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
+			instance.framesize = framesize;
+			instance.uv_offset = uv_offset;
 
 			render_instances_texture.push_back(instance);
 
@@ -266,7 +275,36 @@ namespace NIKE {
 	}
 
 	void Render::Manager::batchRenderTextures() {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
 
+		if (!BATCHED_RENDERING) {
+			return;
+		}
+
+		if (render_instances_texture.empty()) {
+			return;
+		}
+
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_texture");
+		
+		// create buffer of vertices
+		std::vector<Assets::Vertex> vertices;
+		static constexpr int NUM_VERTICES_IN_MODEL = 4;
+		vertices.reserve(render_instances_texture.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances_texture.size(); i++) {
+			// create temp model to populate with current instance's data
+			Assets::Model m{ model };
+			for (Assets::Vertex& v : m.vertices) {
+				v.tex_hdl = render_instances_texture[i].tex;
+				v.tex_coords = 
+				v.transform = render_instances_texture[i].xform;
+			}
+
+			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
+		}
 	}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {

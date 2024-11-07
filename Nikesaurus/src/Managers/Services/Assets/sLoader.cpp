@@ -390,6 +390,38 @@ namespace NIKE {
 		);
 		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_2, VBO_BINDING_INDEX);
 
+		// batched_texture.vert location=8
+		static constexpr int FRAMESIZE_ATTRIB_INDEX = 8;
+		static constexpr int FRAMESIZE_ATTRIB_SIZE = 2;		// num elements (x, y)
+		static constexpr int FRAMESIZE_DATA_TYPE = GL_FLOAT;
+		static constexpr int FRAMESIZE_DATA_OFFSET = offsetof(Vertex, framesize);
+		glEnableVertexArrayAttrib(model.vaoid, FRAMESIZE_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			FRAMESIZE_ATTRIB_INDEX,
+			FRAMESIZE_ATTRIB_SIZE,
+			FRAMESIZE_DATA_TYPE,
+			false,		//normalized
+			FRAMESIZE_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, FRAMESIZE_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_texture.vert location=8
+		static constexpr int UVOFFSET_ATTRIB_INDEX = 8;
+		static constexpr int UVOFFSET_ATTRIB_SIZE = 2;		// num elements (x, y)
+		static constexpr int UVOFFSET_DATA_TYPE = GL_FLOAT;
+		static constexpr int UVOFFSET_DATA_OFFSET = offsetof(Vertex, uv_offset);
+		glEnableVertexArrayAttrib(model.vaoid, UVOFFSET_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			UVOFFSET_ATTRIB_INDEX,
+			UVOFFSET_ATTRIB_SIZE,
+			UVOFFSET_DATA_TYPE,
+			false,		//normalized
+			UVOFFSET_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, UVOFFSET_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
 		// vbo and ebo data population will be done in update
 
 		err = glGetError();
