@@ -131,7 +131,7 @@ void Splash::Scene::init() {
 		const float RAND_B = (rand() & 100) / 100.f;
 
 		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(batch_shape, NIKE::Transform::Transform({ RAND_X, RAND_Y }, { 100.0f, 100.0f }, 0.0f));
-		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Shape>(batch_shape, { "square", {RAND_R, RAND_G, RAND_B, 1}, {0, 0} });
+		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Shape>(batch_shape, NIKE::Render::Shape{ "square", {RAND_R, RAND_G, RAND_B, 1}, {0, 0} });
 	}
 }
 

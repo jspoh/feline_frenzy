@@ -142,7 +142,15 @@ namespace NIKE {
 		static constexpr int NUM_VERTICES_IN_MODEL = 4;
 		vertices.reserve(render_instances.size() * NUM_VERTICES_IN_MODEL);
 		for (size_t i{}; i < render_instances.size(); i++) {
-			vertices.insert(vertices.end(), model.vertices.begin(), model.vertices.end());
+			// create temp model to populate with current instance's data
+			Assets::Model m{ model };
+			for (Assets::Vertex& v : m.vertices) {
+				v.col = render_instances[i].color;
+				v.transform = render_instances[i].xform;
+			}
+			
+
+			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
 		}
 
 		// populate vbo
@@ -170,7 +178,7 @@ namespace NIKE {
 		shader_system->useShader("batched_base");
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		glDrawElements(model.primitive_type, indices.size(), INDICES_TYPE, nullptr);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
 		// cleanup
 		glBindVertexArray(0);

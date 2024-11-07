@@ -77,7 +77,7 @@ namespace NIKE {
 		// Vertex data structure
 		struct Vertex {
 			Vector2f pos;
-			Vector2f col;
+			Vector4f col;
 			Vector2f tex_coords;
 			unsigned int tex_hdl;
 			unsigned int tex_binding_idx;
@@ -86,9 +86,9 @@ namespace NIKE {
 			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
 			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
 			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector2f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector2f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector2f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int tex_binding_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, tex_binding_idx{tex_binding_idx} {}
+			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int tex_binding_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, tex_binding_idx{tex_binding_idx} {}
 		};
 
 		//Model data structure
