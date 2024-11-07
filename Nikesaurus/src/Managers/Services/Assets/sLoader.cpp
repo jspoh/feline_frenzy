@@ -423,7 +423,7 @@ namespace NIKE {
 			char info_log[512];
 			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
 			cerr << "Failed to link shader program " << shader_ref << ": " << info_log << endl;
-			throw std::exception();
+			//throw std::exception();
 		}
 
 		// cleanup shaders

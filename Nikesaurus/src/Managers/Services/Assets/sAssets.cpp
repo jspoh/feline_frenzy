@@ -683,4 +683,27 @@ namespace NIKE {
 		// Others goes here
 	}
 
+	bool Assets::Service::deleteFile(std::string const& file_path)
+	{
+		return std::filesystem::remove(file_path);
+	}
+
+	bool Assets::Service::deleteAllFiles(std::string const& file_path)
+	{
+		bool all_deleted = true;
+		if (std::filesystem::exists(file_path) && std::filesystem::is_directory(file_path)) {
+			// Iterate through each file in the directory
+			for (const auto& entry : std::filesystem::directory_iterator(file_path)) {
+				// Check if the entry is a file (not a subdirectory)
+				if (std::filesystem::is_regular_file(entry.path())) {
+					// Attempt to delete the file and check success
+					if (!std::filesystem::remove(entry.path())) {
+						all_deleted = false;
+					}
+				}
+			}
+		}
+		return all_deleted;
+	}
+
 }

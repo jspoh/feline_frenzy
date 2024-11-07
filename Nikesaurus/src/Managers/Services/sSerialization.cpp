@@ -78,8 +78,16 @@ namespace NIKE {
 		//Open file stream
 		std::fstream file(file_path, std::ios::in);
 
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
 		//Read data from file
 		file >> data;
+
+		//Return if there is no data
+		if (data.empty())
+			return;
 
 		//Deserialize data
 		deserializeEntity(entity, data);
@@ -153,6 +161,10 @@ namespace NIKE {
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::in);
+
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
 
 		//Read data from file
 		file >> data;

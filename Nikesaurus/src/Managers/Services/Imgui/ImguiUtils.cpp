@@ -178,23 +178,31 @@ namespace NIKE
                 ImGui::Text("%s", shader.first.c_str());
             }
         }
-        else if (asset_type == "Levels")
-        {
+        else if (asset_type == "Levels") {
             // Load levels list if empty
             if (NIKE_ASSETS_SERVICE->getLevelsList().empty()) {
                 NIKE_ASSETS_SERVICE->loadScnFiles();
             }
 
-            // Display loaded .scn files with selectable items
-            for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList())
+            ImGui::SameLine();
+
+            if (ImGui::Button("Clear all Level files"))
             {
+                if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getScenesPath()))
+                {
+                    NIKE_ASSETS_SERVICE->loadScnFiles();
+                }
+            }
+
+            // Display loaded .scn files with selectable items
+            for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
                 if (ImGui::Selectable(level.first.c_str())) {
                     selected_file_path = level.first;
                     NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
+
                     // Ensure the file exists before attempting to load it
                     std::string scene_file_path = level.second.string();
-                    if (std::filesystem::exists(scene_file_path))
-                    {
+                    if (std::filesystem::exists(scene_file_path)) {
                         // Clear previous scene entities before loading the new one
                         NIKE_ECS_SERVICE->destroyAllEntities();
                         NIKE_IMGUI_SERVICE->getEntityRef().clear();
@@ -204,6 +212,37 @@ namespace NIKE
                         NIKE_IMGUI_SERVICE->populateLists = false;
                     }
                 }
+
+                // Display "Remove File" button next to each selectable item
+                if (ImGui::Button(("Remove " + level.first).c_str())) {
+                    // Open a confirmation popup when "Remove File" button is clicked
+                    selected_file_path = level.first;
+                    ImGui::OpenPopup("Confirm Delete");
+                }
+            }
+
+            // Confirmation popup for deleting a file
+            if (ImGui::BeginPopupModal("Confirm Delete", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::Text("Are you sure you want to delete this file?");
+                ImGui::Separator();
+
+                if (ImGui::Button("Yes")) {
+                    // Attempt to delete the selected file
+                    std::string scene_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(selected_file_path).string();
+                    if (NIKE_ASSETS_SERVICE->deleteFile(scene_file_path)) {
+                        // Refresh levels list after deletion
+                        NIKE_ASSETS_SERVICE->loadScnFiles();
+                    }
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("No")) {
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
             }
         }
 
