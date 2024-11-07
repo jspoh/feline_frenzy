@@ -92,10 +92,12 @@ namespace NIKE {
 
 		// enable debug logging
 #ifndef NDEBUG
+		// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
+			//NIKEE_CORE_ERROR("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
 #endif
 	}

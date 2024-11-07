@@ -63,11 +63,17 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+#ifndef BATCHED_RENDERING
 		//Set polygon mode
 		glPolygonMode(GL_FRONT, GL_FILL);
 		glEnable(GL_BLEND);
 
-#ifndef BATCHED_RENDERING
 		// use shader
 		shader_system->useShader("base");
 		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_ref);
@@ -99,10 +105,20 @@ namespace NIKE {
 			batchRenderObject();
 		}
 #endif
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Render::Manager::batchRenderObject() {
 		// !TODO: considering implementing instanced too with glDrawElementsInstanced
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
 
 #ifndef BATCHED_RENDERING
 		return;
@@ -112,8 +128,6 @@ namespace NIKE {
 		if (render_instances.empty()) {
 			return;
 		}
-
-		shader_system->useShader("batched_base");
 
 		auto& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
 
@@ -143,10 +157,12 @@ namespace NIKE {
 		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
 
 		// bind vao
-		glBindVertexArray(model.vaoid);
 
 		// vbo and ebo are already bound to vao
 		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
+
+		shader_system->useShader("batched_base");
+		glBindVertexArray(model.vaoid);
 		glDrawElements(model.primitive_type, indices.size(), INDICES_TYPE, nullptr);
 
 		// cleanup
@@ -154,7 +170,12 @@ namespace NIKE {
 		shader_system->unuseShader();
 
 		render_instances.clear();
-	}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
+		}
+		}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		//Set polygon mode
@@ -485,4 +506,4 @@ namespace NIKE {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 	}
-}
+	}
