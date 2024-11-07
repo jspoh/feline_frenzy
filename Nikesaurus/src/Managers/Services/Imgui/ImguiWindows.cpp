@@ -763,6 +763,33 @@ namespace NIKE {
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
+						else if (component_name == "GameLogic::Player") {
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Player>(entity);
+
+							static char script_path[300];
+							static bool scripth_path_init = false;
+
+							////For initial initialization
+							//if (!scripth_path_init || script_path != e_player.script.c_str()) {
+							//	// Ensure null-termination
+							//	script_path[sizeof(script_path) - 1] = '\0';
+							//	strcpy_s(script_path, e_player.script.c_str());
+							//	scripth_path_init = true;
+							//}
+
+							ImGui::Text("Enter a script:");
+							if (ImGui::InputText("##PlayerScript", script_path, IM_ARRAYSIZE(script_path))){
+
+							}
+
+							if (ImGui::Button("Save Script")) {
+								e_player.script = script_path;
+							}
+
+							ImGui::Separator();
+
+							ImGui::Text(std::string("Script Id: " + e_player.script_id).c_str());
+						}
 						else
 						{
 							// Other components that do not need specfic UI goes here

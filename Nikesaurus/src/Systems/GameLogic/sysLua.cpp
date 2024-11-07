@@ -7,26 +7,62 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
+#include "Core/Engine.h"
 #include "Systems/GameLogic/sysLua.h"
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
 
     void Lua::System::registerBindings() {
+
+        //Reigster all lua system bindings
+        for (auto& system : systems) {
+            system->registerLuaBindings(*lua_state);
+        }
+
+        //Register lua table for key codes
+        lua_state->create_named_table("Key",
+            "W", NIKE_KEY_W,
+            "A", NIKE_KEY_A,
+            "S", NIKE_KEY_S,
+            "D", NIKE_KEY_D
+        );
+
+        //Register lua bindings for key inputs
+        lua_state->set_function("isKeyPressed", [](int key)->bool {return NIKE_INPUT_SERVICE->isKeyPressed(key); });
+        lua_state->set_function("isKeyTriggered", [](int key)->bool {return NIKE_INPUT_SERVICE->isKeyTriggered(key); });
+        lua_state->set_function("iskeyReleased", [](int key)->bool {return NIKE_INPUT_SERVICE->isKeyReleased(key); });
     }
 
     Lua::System::System()
-        : lua_state{ std::make_unique<sol::state>() } {}
+        : lua_state{ std::make_unique<sol::state>() } {
+        registerBindings();
+    }
 
     void Lua::System::init() {
         //Lua state init
         lua_state->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table);
-
-        //Register function bindings
-        registerBindings();
     }
 
-    void Lua::System::loadScript(std::string const& script_id, std::string const& file_path) {
+    void Lua::System::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
+        systems.push_back(system);
+        systems.at(systems.size() - 1)->registerLuaBindings(*lua_state);
+    }
+
+    std::string Lua::System::loadScript(std::string const& file_path) {
+
+        //Create script id
+        size_t lua_pos = file_path.find_first_of(".lua");
+
+        //Throw error if file extension is wrong
+        if (lua_pos == std::string::npos) {
+            throw std::runtime_error("Invalid file extension");
+        }
+
+        //Create script id
+        std::string script_id = file_path.substr(file_path.find_last_of('/') + 1, file_path.find_last_of('.') - file_path.find_last_of('/') - 1);
+
+        //Load script
         sol::load_result script = lua_state->load_file(file_path);
 
         //Load failure
@@ -35,28 +71,68 @@ namespace NIKE {
             NIKEE_CORE_WARN(err.what());
         }
 
-        // Store the script for hot-reloading
-        scripts[script_id].second = std::move(script);
+        //Execute the script to get the table
+        sol::protected_function_result result = script();
+
+        //Execute failure
+        if (!result.valid()) {
+            sol::error err = result;
+            NIKEE_CORE_WARN(err.what());
+        }
+
+        //Get script table
+        sol::table script_table = result;
+
+        //Store the script table for hot-reloading
+        scripts[script_id].second = std::move(script_table);
+        NIKEE_CORE_INFO("Script: " + script_id + " succesfully loaded from: " + scripts.at(script_id).first);
+
+        //Return script id
+        return script_id;
     }
 
-    void Lua::System::reloadScripts() {
+    void Lua::System::reloadScript(std::string const& script_id) {
+        //Check if script is already loaded
+        auto it = scripts.find(script_id);
+        if (it == scripts.end()) {
+            throw std::runtime_error("Script not loaded yet.");
+        }
+
+        //Reload script file
+        sol::load_result new_script = lua_state->load_file(scripts.at(script_id).first);
+
+        //Load failure
+        if (!new_script.valid()) {
+            sol::error err = new_script;
+            NIKEE_CORE_WARN(err.what());
+        }
+
+        //Execute the script to get the table
+        sol::protected_function_result result = new_script();
+
+        //Execute failure
+        if (!result.valid()) {
+            sol::error err = result;
+            NIKEE_CORE_WARN(err.what());
+        }
+
+        //Get script table
+        sol::table script_table = result;
+
+        //Update new script table
+        scripts.at(script_id).second = std::move(script_table);
+        NIKEE_CORE_INFO("Script: " + script_id + " succesfully reloaded from: " + scripts.at(script_id).first);
+    }
+
+    void Lua::System::reloadAllScripts() {
         for (auto& script : scripts) {
-            //Reload script file
-            sol::load_result new_script = lua_state->load_file(script.second.first);
 
-            //Load failure
-            if (!new_script.valid()) {
-                sol::error err = new_script;
-                NIKEE_CORE_WARN(err.what());
-            }
-
-            //Update new script
-            script.second.second = std::move(new_script);
-            NIKEE_CORE_INFO("Script: " + script.first + " succesfully reloaded from: " + script.second.first);
+            //Reload script
+            reloadScript(script.first);
         }
     }
 
-    void Lua::System::executeScript(std::string const& script_id) {
+    sol::protected_function Lua::System::executeScript(std::string const& script_id, std::string const& function) {
 
         //Check if script is already loaded
         auto it = scripts.find(script_id);
@@ -64,13 +140,16 @@ namespace NIKE {
             throw std::runtime_error("Script not loaded yet.");
         }
 
-        //Execute script
-        sol::protected_function_result execute = it->second.second();
+        //Access the script table
+        sol::table script_table = it->second.second;
 
-        //Execute failure
-        if (!execute.valid()) {
-            sol::error err = execute;
-            NIKEE_CORE_WARN(err.what());
+        //Execute script
+        sol::protected_function func = script_table[function];
+        if (!func.valid()) {
+            throw std::runtime_error("Function not found in script.");
         }
+
+        //Return function
+        return func;
     }
 }
