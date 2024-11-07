@@ -38,13 +38,17 @@ namespace NIKE {
             for (auto& entity : entities) {
 
                 //Skip entities that are not present within layer & entities without transform component
-                if (!layer->checkEntity(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+                if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
                     continue;
 
                 //Update entities with dynamics
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
+                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity) && 
+                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+
+                    //Ensure that mass is not negative
+                    e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
 
                     //Apply forces & mass to calculate direction
                     Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
@@ -61,7 +65,7 @@ namespace NIKE {
                     }
 
                     //Set velocity to zero if net velo < 0.01
-                    if (e_dynamics.velocity.length() < 0.01f) {
+                    if (e_dynamics.velocity.length() < 0.0001f) {
                         e_dynamics.velocity = { 0.0f, 0.0f };
                     }
 
@@ -71,7 +75,10 @@ namespace NIKE {
                 }
 
                 //Collision detection
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
+                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&
+                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity) &&
+                    NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)
+                    ) {
 
                     //Get entity collider
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -81,8 +88,10 @@ namespace NIKE {
                     //Check for collision with other entities
                     for (auto& colliding_entity : entities) {
 
-                        //Skip entities that are not present within layer & skip same entities
-                        if (!layer->checkEntity(colliding_entity) || entity == colliding_entity || !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
+                        //Skip entities colliding entites that are not in the layer mask
+                        if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
+                            entity == colliding_entity ||
+                            !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
                             continue;
 
                         //Get colliding entity's data
@@ -90,20 +99,20 @@ namespace NIKE {
                         auto& other_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
                         auto& other_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
                        
-                        // Temporary code to get model_ref for SAT collision, current SAT uses model_ref to determine vertices.
-                        std::string e_model_ref;
-                        std::string other_model_ref;
+                        // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
+                        std::string e_model_id;
+                        std::string other_model_id;
                         if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-                            e_model_ref = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).model_ref;
+                            e_model_id = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).model_id;
                         }
                         else {
-                            e_model_ref = "square"; // Default to square for SAT
+                            e_model_id = "square"; // Default to square for SAT
                         }
                         if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(colliding_entity)) {
-                            other_model_ref = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity).model_ref;
+                            other_model_id = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity).model_id;
                         }
                         else {
-                            other_model_ref = "square"; // Default to square for SAT
+                            other_model_id = "square"; // Default to square for SAT
                         }
 
                         Collision::CollisionInfo info;
@@ -115,7 +124,7 @@ namespace NIKE {
                             //Collision resolution
                             collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
                         }
-                        else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_ref, other_model_ref, info)) {
+                        else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_id, other_model_id, info)) {
                             //Set the flag of colliders
                             e_collider.b_collided = true;
                             other_collider.b_collided = true;

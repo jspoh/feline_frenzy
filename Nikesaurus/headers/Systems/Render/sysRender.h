@@ -69,7 +69,7 @@ namespace NIKE {
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
 			//Render text
-			void renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform);
+			void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
 			//Render debugging wireframe
 			void renderWireFrame(Matrix_33 const& x_form, Vector4f const& e_color);
@@ -87,6 +87,9 @@ namespace NIKE {
 
 			//Constructor
 			Manager();
+
+			// !TODO: merge conflict
+			// Manager() :frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {}
 
 			//Destructor
 			~Manager() = default;

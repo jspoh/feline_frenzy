@@ -21,7 +21,7 @@
 
 namespace NIKE {
 
-	Render::Manager::Manager() {
+	Render::Manager::Manager() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {
 		render_instances.reserve(MAX_INSTANCES);
 
 #ifdef BATCHED_RENDERING
@@ -82,7 +82,7 @@ namespace NIKE {
 
 		// use shader
 		shader_system->useShader("base");
-		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_ref);
+		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
 
 		//Shader set uniform
 		shader_system->setUniform("base", "f_color", Vector3f(e_shape.override_color.r, e_shape.override_color.g, e_shape.override_color.b));
@@ -208,11 +208,11 @@ namespace NIKE {
 		// set texture
 		glBindTextureUnit(
 			texture_unit, // texture unit (binding index)
-			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data
+			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
 		);
 
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		//Caculate UV Offset
 		Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
@@ -249,7 +249,7 @@ namespace NIKE {
 		shader_system->unuseShader();
 	}
 
-	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform) {
+	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 
 		//Use text shader
 		shader_system->useShader("text");
@@ -263,16 +263,22 @@ namespace NIKE {
 		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VAO);
 
+		//Temp text size
+		Vector2f text_size;
+
 		//Calculate size of text
 		for (char c : e_text.text) {
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
 
 			//Calculate width
-			e_transform.scale.x += (ch.advance >> 6) * e_text.scale;
+			text_size.x += (ch.advance >> 6) * e_text.scale;
 
 			//Calculate height
-			e_transform.scale.y = ch.size.y * e_text.scale > e_transform.scale.y ? ch.size.y * e_text.scale : e_transform.scale.y;
+			text_size.y = ch.size.y * e_text.scale > text_size.y ? ch.size.y * e_text.scale : text_size.y;
 		}
+
+		//Assign size to e_text
+		e_text.size = text_size;
 
 		//Text rendering position based on bot left
 		Vector2f pos;
@@ -280,19 +286,19 @@ namespace NIKE {
 		//Get text bottom left position for rendering
 		switch (e_text.origin) {
 		case TextOrigin::CENTER:
-			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y / 2.0f };
+			pos = { -e_text.size.x / 2.0f, -e_text.size.y / 2.0f };
 			break;
 		case TextOrigin::BOTTOM:
-			pos = { -e_transform.scale.x / 2.0f, 0.0f };
+			pos = { -e_text.size.x / 2.0f, 0.0f };
 			break;
 		case TextOrigin::TOP:
-			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y };
+			pos = { -e_text.size.x / 2.0f, -e_text.size.y };
 			break;
 		case TextOrigin::LEFT:
-			pos = { 0.0f, -e_transform.scale.y / 2.0f };
+			pos = { 0.0f, -e_text.size.y / 2.0f };
 			break;
 		case TextOrigin::RIGHT:
-			pos = { -e_transform.scale.x, -e_transform.scale.y / 2.0f };
+			pos = { -e_text.size.x, -e_text.size.y / 2.0f };
 			break;
 		default:
 			break;
@@ -301,7 +307,7 @@ namespace NIKE {
 		//Iterate through all characters
 		for (char c : e_text.text)
 		{
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_ref)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
 
 			float xpos = pos.x + ch.bearing.x * e_text.scale;
 			float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
@@ -368,6 +374,8 @@ namespace NIKE {
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
+		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() :camera_system->getWorldToNDCXform();
+
 		//Get transform
 		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
@@ -375,27 +383,33 @@ namespace NIKE {
 		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
 
-			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, cam_ndcx);
 
-			//Render Shape
-			renderObject(matrix, e_shape);
+				//Render Shape
+				renderObject(matrix, e_shape);
+			}
 		}
 		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
 			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
-			//Allow stretching of texture
-			if (!e_texture.b_stretch) {
-				//Copy transform for texture mapping ( Locks the transformation of a texture )
-				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_ref)->size.y) / e_texture.frame_size.y };
-				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+			//Check if texture is loaded
+			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
+				//Allow stretching of texture
+				if (!e_texture.b_stretch) {
+					//Copy transform for texture mapping ( Locks the transformation of a texture )
+					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
+					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+				}
+
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, cam_ndcx);
+
+				// Render Texture
+				renderObject(matrix, e_texture);
 			}
-
-			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
-
-			// Render Texture
-			renderObject(matrix, e_texture);
 		}
 
 		if (debugMode) {
@@ -412,7 +426,7 @@ namespace NIKE {
 			}
 
 			//Calculate wireframe matrix
-			transformMatrixDebug(e_transform, matrix, camera_system->getWorldToNDCXform(), true);
+			transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
@@ -424,7 +438,7 @@ namespace NIKE {
 					dir_transform.scale.x = 1.0f;
 					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>((180.0f / M_PI));
 					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-					transformMatrixDebug(dir_transform, matrix, camera_system->getWorldToNDCXform(), false);
+					transformMatrixDebug(dir_transform, matrix, cam_ndcx, false);
 					renderWireFrame(matrix, wire_frame_color);
 				}
 			}
@@ -441,18 +455,51 @@ namespace NIKE {
 
 		auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
-		//Set transform scale to 1.0f for calculating matrix
-		e_transform.scale = { 1.0f, 1.0f };
+		//Make copy of transform, scale to 1.0f for calculating matrix
+		Transform::Transform copy = e_transform;
+		copy.scale = { 1.0f, 1.0f };
 
 		//Transform text matrix
-		transformMatrix(e_transform, matrix, camera_system->getFixedWorldToNDCXform());
+		transformMatrix(copy, matrix, camera_system->getFixedWorldToNDCXform());
 
 		//Render text
-		renderText(matrix, e_text, e_transform);
+		renderText(matrix, e_text);
 	}
 
 	void Render::Manager::renderViewport() {
-		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
+		//Render to frame buffer if imgui is active
+		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			//SKip inactive layer
+			if (!layer->getLayerState())
+				continue;
+
+			for (auto& entity : entities) {
+				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+					continue;
+
+				//Skip entity if no transform is present
+				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+					continue;
+				
+				if(NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+					transformAndRenderEntity(entity, true);
+				}
+
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+					transformAndRenderText(entity);
+				}
+			}
+		}
+
+		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		}
 	}
 
 	void Render::Manager::init() {
@@ -500,9 +547,9 @@ namespace NIKE {
 	}
 
 	void Render::Manager::update() {
-
-		//Before drawing clear screen
 		renderViewport();
+
+		// !TODO: merge conflict (this chunk was removed. final call to batchRenderObject is important)
 
 		glClear(GL_COLOR_BUFFER_BIT);
 

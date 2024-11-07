@@ -15,24 +15,12 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Layer
 	*********************************************************************/
-	void Scenes::Layer::addEntity(Entity::Type entity) {
-		entities.insert(entity);
-	}
-
-	void Scenes::Layer::removeEntity(Entity::Type entity) {
-		entities.erase(entity);
-	}
-
-	bool Scenes::Layer::checkEntity(Entity::Type entity) const {
-		return entities.find(entity) != entities.end();
-	}
-
-	void Scenes::Layer::setLayerIndex(unsigned int new_index) {
-		index = new_index;
-	}
-
 	unsigned int Scenes::Layer::getLayerIndex() const {
 		return index;
+	}
+
+	unsigned int Scenes::Layer::getLayerID() const {
+		return id;
 	}
 
 	void Scenes::Layer::setLayerState(bool state) {
@@ -43,16 +31,34 @@ namespace NIKE {
 		return b_state;
 	}
 
+	void Scenes::Layer::setLayerMask(unsigned int mask_id, bool state) {
+		mask.set(mask_id, state);
+	}
+
+	std::bitset<64> Scenes::Layer::getLayerMask() const {
+		return mask;
+	}
+
+	nlohmann::json Scenes::Layer::serialize() const {
+		return	{
+				{"ID", id},
+				{"Index", index},
+				{"Mask", mask.to_ulong()},
+				{"B_State", b_state}
+				};
+	}
+
+	void Scenes::Layer::deserialize(nlohmann::json const& data) {
+		id = data.at("ID").get<unsigned int>();
+		index = data.at("Index").get<unsigned int>();
+		mask = LayerMask(data.at("Mask").get<unsigned long>());
+		b_state = data.at("B_State").get<bool>();
+	}
+
 	/*****************************************************************//**
 	* Scene Interface
 	*********************************************************************/
-	std::shared_ptr<Scenes::Layer> Scenes::IScene::registerLayer(std::string const& layer_id, int index) {
-		//Check if layer has been added
-		auto it = layers_map.find(layer_id);
-		if (it != layers_map.end()) {
-			throw std::runtime_error("Layer already registered.");
-		}
-
+	std::shared_ptr<Scenes::Layer> Scenes::IScene::createLayer(int index) {
 		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
 
 		//Insert layers at back
@@ -64,13 +70,15 @@ namespace NIKE {
 			index = static_cast<int>(layers.size()) - 1;
 		}
 
-		layer->setLayerIndex(index);
-		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer_id), std::forward_as_tuple(layer));
+		layer->id = layer_count++;
+		layer->index = index;
+		layer->mask.set(layer->id, true);
+		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer->id), std::forward_as_tuple(layer));
 
 		return layer;
 	}
 
-	std::shared_ptr<Scenes::Layer> Scenes::IScene::getLayer(std::string const& layer_id) {
+	std::shared_ptr<Scenes::Layer> Scenes::IScene::getLayer(unsigned int layer_id) {
 		//Check if layer has been added
 		auto it = layers_map.find(layer_id);
 		if (it == layers_map.end()) {
@@ -80,7 +88,7 @@ namespace NIKE {
 		return it->second;
 	}
 
-	void Scenes::IScene::removeLayer(std::string const& layer_id) {
+	void Scenes::IScene::removeLayer(unsigned int layer_id) {
 		//Check if layer has been added
 		auto it = layers_map.find(layer_id);
 		if (it == layers_map.end()) {
@@ -88,10 +96,29 @@ namespace NIKE {
 		}
 
 		layers.erase(layers.begin() + it->second->getLayerIndex());
+
+		//Update layers index & mask
+		unsigned int index = 0;
+		for (auto& layer : layers) {
+			layer->index = index++;
+			layer->mask.set(it->second->id, false);
+		}
+
 		layers_map.erase(it);
+
+		// Decrement the count of layers after removing
+		--layer_count;
 	}
 
-	std::vector<std::shared_ptr<Scenes::Layer>> const& Scenes::IScene::getLayers() const {
+	bool Scenes::IScene::checkLayer(unsigned int layer_id) {
+		return layers_map.find(layer_id) != layers_map.end();
+	}
+
+	unsigned int Scenes::IScene::getLayerCount() const {
+		return layer_count;
+	}
+
+	std::vector<std::shared_ptr<Scenes::Layer>>& Scenes::IScene::getLayers() {
 		return layers;
 	}
 
@@ -186,6 +213,11 @@ namespace NIKE {
 	}
 
 	void Scenes::Service::update() {
+		if (!NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+			curr_scene->exit();
+			curr_scene->unload();
+		}
+
 		if (event_queue) {
 			switch (event_queue->scene_action) {
 			case Scenes::Actions::CHANGE:

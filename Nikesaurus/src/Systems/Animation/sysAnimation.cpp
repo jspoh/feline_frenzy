@@ -28,7 +28,7 @@ namespace NIKE {
 			for (auto& entity : entities) {
 
 				//Skip entities that are not present within layer, or doesnt have the base animators
-				if (!layer->checkEntity(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Animation::Base>(entity))
+				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Animation::Base>(entity))
 					continue;
 
 				//Update entities with spritesheet

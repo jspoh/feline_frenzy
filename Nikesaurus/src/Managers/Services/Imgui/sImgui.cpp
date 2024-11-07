@@ -18,12 +18,15 @@ namespace NIKE {
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		// Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 
+		populateLists = false;
 		// For testing
 		// NIKE_ASSETS_SERVICE->loadTexture("test3", "assets/Textures/Tjunction.png");
 	}
@@ -59,6 +62,11 @@ namespace NIKE {
 		return false;
 	}
 
+	void IMGUI::Service::resetVariables()
+	{
+		entities_ref.clear();
+	}
+
 	std::unordered_map<std::string, Entity::Type>& IMGUI::Service::getEntityRef()
 	{
 		return entities_ref;
@@ -74,29 +82,59 @@ namespace NIKE {
 		return entities_ref[input];
 	}
 
+	bool IMGUI::Service::getImguiActive() const {
+		return b_show_imgui;
+	}
+	
+	void IMGUI::Service::setGamePaused(bool pause) {
+		b_pause_game = pause;
+	}
+
+	bool IMGUI::Service::getGamePaused() const {
+		return b_pause_game;
+	}
+
 	void IMGUI::Service::update()
 	{
-		// Main IMGUI loop
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		//Toggle imgui on off
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
+			b_show_imgui = !b_show_imgui;
+			b_dispatch_viewport = true;
+		}
 
-		imguiInputUpdate();
+		if (b_show_imgui) {
+			// Main IMGUI loop
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
 
-		// Window UI functions goes here
-		imguiEntityWindow();
-		imguiDebuggingWindow();
-		imguiFileSystemWindow();
-		imguiRenderEntityWindow();
-		imguiShowLoadedAssetsWindow();
-		imguiEntityComponentManagementWindow();
-		imguiShowGameViewport();
-		imguiCameraControl();
+			imguiInputUpdate();
 
-		//ImGui::ShowDemoWindow();
-		// THIS 2 CALL THE OPENGL DRAWING
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			imguiDockingSpace();
+
+			// Window UI functions goes here
+			imguiEntityWindow();
+			imguiDebuggingWindow();
+			// imguiFileSystemWindow();
+			imguiShowLoadedAssetsWindow();
+			imguiEntityComponentManagementWindow();
+			imguiShowGameViewport(b_dispatch_viewport);
+			imguiCameraControl();
+			imguiLayerManagementWindow();
+
+			// THIS 2 CALL THE OPENGL DRAWING
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+
+		//Dispatch normal viewport
+		if (b_dispatch_viewport) {
+			//Dispatch viewport changes
+			Vector2f win_pos = { 0.0f, 0.0f };
+			Vector2f win_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<IMGUI::ViewPortEvent>(win_pos, win_size));
+			b_dispatch_viewport = false;
+		}
 	}
 
 }

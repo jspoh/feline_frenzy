@@ -73,9 +73,8 @@ namespace NIKE {
         AABB aabb_a({ transform_a.position.x - (transform_a.scale.x * 0.5f), transform_a.position.y - (transform_a.scale.y * 0.5f) }, { transform_a.position.x + (transform_a.scale.x * 0.5f), transform_a.position.y + (transform_a.scale.y * 0.5f) });
         AABB aabb_b({ transform_b.position.x - (transform_b.scale.x * 0.5f), transform_b.position.y - (transform_b.scale.y * 0.5f) }, { transform_b.position.x + (transform_b.scale.x * 0.5f), transform_b.position.y + (transform_b.scale.y * 0.5f) });
 
-        // Get delta time & set epsilon
+        // Get delta time
         const float deltaTime = NIKE_ENGINE.getService<Windows::Service>()->getDeltaTime();
-        const float epsilon = 0.0001f;
 
         // Step 1: Static collision detection
         if (!(aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x ||
@@ -110,7 +109,7 @@ namespace NIKE {
         Vector2 tLast = { deltaTime, deltaTime };
 
         // Step 3: Check dynamic collision on x-axis
-        if (abs(velRel.x) > epsilon) {
+        if (abs(velRel.x) > EPSILON) {
             if (velRel.x > 0) {
                 tFirst.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / velRel.x;
                 tLast.x = (aabb_a.rect_max.x - aabb_b.rect_min.x) / velRel.x;
@@ -120,12 +119,18 @@ namespace NIKE {
                 tLast.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / velRel.x;
             }
         }
-        else if (aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x) {
-            return false; // No collision on the x-axis if there's no relative movement and no static collision
+        else {
+            if (aabb_a.rect_max.x < aabb_b.rect_min.x && aabb_a.rect_min.x > aabb_b.rect_max.x) {
+                tFirst.x = 0.0f;
+                tLast.x = deltaTime; // Full time frame
+            }
+            else {
+                return false; // No collision on the x-axis if there's no relative movement and no static collision
+            }
         }
 
         // Step 4: Check dynamic collision on y-axis
-        if (abs(velRel.y) > epsilon) {
+        if (abs(velRel.y) > EPSILON) {
             if (velRel.y > 0) {
                 tFirst.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / velRel.y;
                 tLast.y = (aabb_a.rect_min.y - aabb_b.rect_max.y) / velRel.y;
@@ -135,8 +140,14 @@ namespace NIKE {
                 tLast.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / velRel.y;
             }
         }
-        else if (aabb_a.rect_max.y < aabb_b.rect_min.y || aabb_a.rect_min.y > aabb_b.rect_max.y) {
-            return false; // No collision on the y-axis if there's no relative movement and no static collision
+        else {
+            if (aabb_a.rect_max.y < aabb_b.rect_min.y && aabb_a.rect_min.y > aabb_b.rect_max.y) {
+                tFirst.y = 0.0f;
+                tLast.y = deltaTime; // Full time frame
+            }
+            else {
+                return false;// No collision on the y-axis if there's no relative movement and no static collision
+            }
         }
 
         // Step 5: Check if collisions occur within the time frame
@@ -170,20 +181,20 @@ namespace NIKE {
 
     // SAT helper functions
 
-    // Helper to retrieve and apply transformations to vertices based on model_ref
+    // Helper to retrieve and apply transformations to vertices based on model_id
     std::vector<Vector2f> Collision::System::getRotatedVertices(
-        const Transform::Transform& transform, const std::string& model_ref)
+        const Transform::Transform& transform, const std::string& model_id)
     {
         std::vector<Vector2f> vertices;
 
-        if (model_ref == "triangle") {
+        if (model_id == "triangle") {
             vertices = {
                 Vector2f(-0.5f, -0.5f),
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.0f, 0.5f)
             };
         }
-        else if (model_ref == "square" || model_ref == "square-texture") {
+        else if (model_id == "square" || model_id == "square-texture") {
             vertices = {
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.5f, 0.5f),
@@ -193,7 +204,8 @@ namespace NIKE {
         }
 
         // Apply scaling and rotation
-        float angleRad = transform.rotation * (M_PI / 180.0f);  // Ensure degrees to radians
+        float angleRad = transform.rotation * ((float)M_PI / 180.0f);  // Ensure degrees to radians
+
         float cosAngle = cos(angleRad);
         float sinAngle = sin(angleRad);
         Vector2f position = transform.position;
@@ -255,11 +267,11 @@ namespace NIKE {
     // Main detect SAT function
     bool Collision::System::detectSATCollision(
         const Transform::Transform& transformA, const Transform::Transform& transformB,
-        const std::string& model_refA, const std::string& model_refB, CollisionInfo& info)
+        const std::string& model_idA, const std::string& model_idB, CollisionInfo& info)
     {
         // Step 1: Get vertices and separating axes
-        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_refA);
-        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_refB);
+        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_idA);
+        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_idB);
         std::vector<Vector2f> axes = getSeparatingAxes(verticesA, verticesB);
 
         Vector2f smallestAxis;
@@ -314,6 +326,14 @@ namespace NIKE {
         // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+            return;
+        }
+
+        // Slide To Slide Resolution
+        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
+            return;
         }
 
         // Resolution::NONE currently makes movement object "bounce"
@@ -331,7 +351,7 @@ namespace NIKE {
         case Physics::Resolution::NONE:
             break;
         case Physics::Resolution::SLIDE:
-            transform_b.position += info.mtv;
+            transform_b.position -= info.mtv;
             break;
         default:
             break;

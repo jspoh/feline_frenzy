@@ -319,8 +319,6 @@ namespace NIKE {
 			// get tex_size of texture file
 			tex_size = static_cast<int>(texture_file.tellg());
 
-			cout << "HERE: " << tex_size << '\n';
-
 			// return to beginning of file
 			texture_file.seekg(0, std::ios::beg);
 

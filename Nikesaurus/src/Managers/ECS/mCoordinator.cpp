@@ -11,12 +11,12 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entity Methods
 	*********************************************************************/
-	Entity::Type Coordinator::Manager::createEntity() {
-		return entity_manager->createEntity();
+	Entity::Type Coordinator::Manager::createEntity(unsigned int layer_id) {
+		return entity_manager->createEntity(layer_id);
 	}
 
 	Entity::Type Coordinator::Manager::cloneEntity(Entity::Type copy) {
-		Entity::Type new_entity = entity_manager->createEntity();
+		Entity::Type new_entity = entity_manager->createEntity(entity_manager->getLayerID(copy));
 		component_manager->cloneEntity(new_entity, copy);
 		entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
 		system_manager->cloneEntity(new_entity, copy);
@@ -50,6 +50,18 @@ namespace NIKE {
 		return entity_manager->getEntitiesCount();
 	}
 
+	std::set<Entity::Type> Coordinator::Manager::getAllEntities() const {
+		return entity_manager->getAllEntities();
+	}
+
+	void Coordinator::Manager::setEntityLayerID(Entity::Type entity, unsigned int layer_id) {
+		entity_manager->setLayerID(entity, layer_id);
+	}
+
+	unsigned int Coordinator::Manager::getEntityLayerID(Entity::Type entity) const {
+		return entity_manager->getLayerID(entity);
+	}
+
 	void Coordinator::Manager::updateSystems() {
 		system_manager->updateSystems();
 	}
@@ -67,7 +79,28 @@ namespace NIKE {
 		entity_manager->setSignature(entity, sign);
 
 		//Update entities list
-		system_manager->updateEntitiesList(entity, sign, type, true);
+		system_manager->updateEntitiesList(entity, sign);
+	}
+
+	void Coordinator::Manager::removeEntityComponent(Entity::Type entity, Component::Type type) {
+		// Remove component based on Component::Type directly
+		component_manager->removeEntityComponent(entity, type);
+
+		// Set bit signature of component to false
+		Component::Signature sign = entity_manager->getSignature(entity);
+		sign.set(type, false);
+		entity_manager->setSignature(entity, sign);
+
+		// Update entities list
+		system_manager->updateEntitiesList(entity, sign);
+	}
+
+	void* Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
+		return component_manager->getEntityComponent(entity, type);
+	}
+
+	std::unordered_map<std::string, void*> Coordinator::Manager::getAllComponents(Entity::Type entity) const {
+		return component_manager->getAllComponents(entity);
 	}
 
 	std::unordered_map<std::string, Component::Type> Coordinator::Manager::getAllComponentTypes() const {

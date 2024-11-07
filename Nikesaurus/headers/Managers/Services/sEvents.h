@@ -102,7 +102,13 @@ namespace NIKE {
 			//Dispatch event
 			template<typename T>
 			void dispatchEvent(std::shared_ptr<T> new_event) {
-				assert(event_listeners.find(typeid(T).name()) != event_listeners.end() && "Event type not found");
+
+				//No Listener for event
+				if(event_listeners.find(typeid(T).name()) == event_listeners.end()) {
+					NIKEE_CORE_WARN("No one is listening for this event: " + std::string(typeid(T).name()));
+					return;
+				}
+
 				auto& listeners = event_listeners.at(typeid(T).name());
 
 				//Dispatch to listener

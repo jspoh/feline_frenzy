@@ -16,28 +16,39 @@ namespace NIKE
 	bool showCreateEntityPopUp(bool pop_up)
 	{
 		static char entity_name[32];
-		static int entity_counter_for_print = 1;
 		// Popup for entity naming
 		if (ImGui::BeginPopupModal("Create Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			ImGui::Text("Enter a name for the new entity:");
 			ImGui::InputText("##EntityNameInput", entity_name, IM_ARRAYSIZE(entity_name));
 
-			if (ImGui::Button("OK") || NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
-				// Create entity function call
-				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity();
-				// If empty string, assign default string
-				if (entity_name[0] == '\0')
-				{
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity_counter_for_print++);
-				}
-				// Save entity_name string
-				NIKE_IMGUI_SERVICE->addEntityRef(entity_name, new_id);
+            //Get layer id
+            static int layer_id = 0;
+            ImGui::Text("Enter layer id for the new entity:");
+            ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
-				// Reset entity_name for the next use
-				memset(entity_name, 0, sizeof(entity_name));
+            layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
 
-				pop_up = false;
-				ImGui::CloseCurrentPopup();
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+                if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+                    // Create entity function call ( Defaulted to the base layer for now )
+                    Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+                    // If empty string, assign default string
+                    if (entity_name[0] == '\0')
+                    {
+                        snprintf(entity_name, sizeof(entity_name), "entity_%04d", new_id);
+                    }
+                    // Save entity_name string
+                    NIKE_IMGUI_SERVICE->addEntityRef(entity_name, new_id);
+
+                    // Reset entity_name for the next use
+                    memset(entity_name, 0, sizeof(entity_name));
+
+                    pop_up = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                else {
+                    layer_id = 0;
+                }
 			}
 
 			ImGui::SameLine();
@@ -75,7 +86,7 @@ namespace NIKE
                     if (!manager->checkEntityComponent(entity, component.second)) {
                         // Add the default-constructed component to the entity
                         manager->addDefEntityComponent(entity, component.second);
-
+                        NIKE_IMGUI_SERVICE->populateLists = false;
                         // Close the popup after adding the component
                         ImGui::CloseCurrentPopup();
                     }
@@ -127,39 +138,9 @@ namespace NIKE
         return is_closed;
     }
 
-    bool showLoadAssetPopup(const std::string& asset_name) 
-    {
-        static bool load_asset = false;
+    bool removeEntityPopup(std::string& entity_name) {
 
-        // Open and display the popup modal
-        if (ImGui::BeginPopupModal("Load Asset", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Do you want to load this asset?");
-            ImGui::Text("%s", asset_name.c_str());
-            ImGui::Separator();
 
-            if (ImGui::Button("Yes", ImVec2(120, 0))) {
-                // Set the flag to indicate the asset should be loaded
-                load_asset = true;
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("No", ImVec2(120, 0))) {
-                // Reset the flag
-                load_asset = false;
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::EndPopup();
-        }
-        bool result = load_asset;
-        // Reset for next usage
-        load_asset = false;
-        return result;
-    }
-
-    bool removeEntityPopup() {
-
-        static char entity_name[32] = ""; 
 
         // Track if the invalid entity popup should be shown
         static bool show_invalid_entity_popup = false; 
@@ -169,8 +150,8 @@ namespace NIKE
 
         // Check if the popup should be opened (it will be opened if the button was clicked)
         if (ImGui::BeginPopupModal("Remove Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Enter the name of the entity to remove:");
-            ImGui::InputText("##Entity Name", entity_name, IM_ARRAYSIZE(entity_name));
+            ImGui::Text("Are you sure you want to remove %s?", entity_name.c_str());
+
 
             // Button to confirm removal
             if (ImGui::Button("Remove")) {
@@ -180,14 +161,15 @@ namespace NIKE
                     NIKE_IMGUI_SERVICE->getEntityRef().erase(entity_name);
                     NIKE_IMGUI_SERVICE->getSelectedEntityName() = {};
                     // Reset entity_name for the next use
-                    memset(entity_name, 0, sizeof(entity_name));
+                    entity_name = {};
+                    NIKE_IMGUI_SERVICE->populateLists = false;
                     ImGui::CloseCurrentPopup(); 
                     is_popup_open = false; 
                 }
                 else {
                     // Show the invalid entity popup
                     show_invalid_entity_popup = true;
-                    memset(entity_name, 0, sizeof(entity_name));
+
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -195,7 +177,7 @@ namespace NIKE
 
             ImGui::SameLine();
             if (ImGui::Button("Cancel")) {
-                memset(entity_name, 0, sizeof(entity_name));
+
                 ImGui::CloseCurrentPopup(); 
                 is_popup_open = false; 
             }
@@ -230,7 +212,6 @@ namespace NIKE
         return is_open;
     }
 
-    // Function to display an error popup if input is invalid
     bool ShowErrorPopup() {
         bool is_open = true;
         if (ImGui::BeginPopupModal("INVALID INPUT", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -262,9 +243,9 @@ namespace NIKE
         static char new_entity_name[64] = "";
 
         // Set a default name for the clone if not already set
-        if (strlen(new_entity_name) == 0) {
+        //if (strlen(new_entity_name) == 0) {
             snprintf(new_entity_name, sizeof(new_entity_name), "%s_clone", NIKE_IMGUI_SERVICE->getSelectedEntityName().c_str());
-        }
+        // }
 
         bool is_popup_open = false;
 
@@ -280,7 +261,7 @@ namespace NIKE
                     Entity::Type to_clone = NIKE_IMGUI_SERVICE->getEntityByName(NIKE_IMGUI_SERVICE->getSelectedEntityName());
                     Entity::Type cloned_entity = NIKE_ECS_MANAGER->cloneEntity(to_clone);
 
-                    NIKE_IMGUI_SERVICE->getEntityRef()[new_entity_name] = cloned_entity;
+                    NIKE_IMGUI_SERVICE->getEntityRef().emplace(new_entity_name, cloned_entity);
 
                     // Reset the name buffer for the next use
                     memset(new_entity_name, 0, sizeof(new_entity_name));
@@ -304,6 +285,92 @@ namespace NIKE
         }
         else {
             is_popup_open = true;
+        }
+
+        return is_popup_open;
+    }
+
+    bool changeLayerPopup(Entity::Type entity) {
+
+        bool is_popup_open = false;
+        
+        static int layer_id = 0;
+
+        // Check if the popup should be opened
+        if (ImGui::BeginPopupModal("Set Layer ID", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter a new layer id for the entity:");
+            ImGui::InputInt("##New Layer ID", &layer_id);
+
+            layer_id = std::clamp(layer_id, 0, static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1));
+
+            if (ImGui::Button("Set") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+                //Check if layer id input is within range
+                if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+                    NIKE_ECS_MANAGER->setEntityLayerID(entity, layer_id);
+                    ImGui::CloseCurrentPopup();
+                    is_popup_open = false;
+                }
+                else {
+                    layer_id = 0;
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false;
+            }
+
+            ImGui::EndPopup();
+        }
+        else {
+            is_popup_open = true;
+        }
+
+        return is_popup_open;
+    }
+
+    bool saveEntityPopup(Entity::Type entity)
+    {
+        bool is_popup_open = false;
+        static bool is_input_correct = true;
+        static char input[300] = "";
+
+        // Popup window for saving the entity
+        if (ImGui::BeginPopupModal("Save Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter file path to save the entity:");
+
+            // Input field for file path
+            ImGui::InputText("File Path##", input, IM_ARRAYSIZE(input));
+
+            std::string scn_file = std::string(input) + ".scn";
+
+            std::string scn_file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scn_file;
+
+            cout << scn_file << endl;
+
+            // Button to save the entity
+            if (ImGui::Button("Save")) {
+                // Serialize the entity to the file path
+                NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, scn_file_path);
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false; 
+            }
+
+            
+            is_input_correct = ShowErrorPopup();
+            
+
+            ImGui::SameLine();
+
+            // Button to cancel/save later
+            if (ImGui::Button("Cancel")) {
+                ImGui::CloseCurrentPopup();
+                is_popup_open = false; 
+            }
+
+            ImGui::EndPopup();
         }
 
         return is_popup_open;

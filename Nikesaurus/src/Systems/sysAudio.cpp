@@ -27,16 +27,16 @@ namespace NIKE {
 			for (auto& entity : entities) {
 
 				//Skip entities that are not present within layer
-				if (!layer->checkEntity(entity))
+				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 
 				//Manage entities with SFX audio
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Audio::SFX>(entity)) {
 					auto& e_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 
-					if (e_sfx.play_sfx) {
+					if (e_sfx.b_play_sfx) {
 						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false);
-						e_sfx.play_sfx = false;
+						e_sfx.b_play_sfx = false;
 					}
 				}
 			}

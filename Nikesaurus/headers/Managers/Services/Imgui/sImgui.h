@@ -14,12 +14,22 @@
 #include "Managers/Services/Imgui/ImguiUtils.h"
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Managers/Services/Imgui/ImguiPopUps.h"
+#include "Managers/Services/sEvents.h"
 
 namespace NIKE {
 	// All Caps to differentiate from imgui includes
 	namespace IMGUI {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
+
+		//View port event
+		struct ViewPortEvent : public Events::IEvent {
+			Vector2f window_pos;
+			Vector2f window_size;
+
+			ViewPortEvent() : window_pos() {}
+			ViewPortEvent(Vector2f const& window_pos, Vector2f const& window_size) : window_pos{ window_pos }, window_size{ window_size } {}
+		};
 
 		class NIKE_API Service
 		{
@@ -46,10 +56,26 @@ namespace NIKE {
 
 			bool checkEntityExist(const std::string& entity_ref);
 
+			// For reloading of specific asset type
+			void reloadAssets(const std::string& asset_type);
+
+			// Populate dropdown list whenever component is added
+			bool populateLists = false;
+
+			// Reset variables
+			void resetVariables();
+
+			// Setters
+			void setGamePaused(bool pause);
+
 			// Gettors
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
 			std::string& getSelectedEntityName();
 			Entity::Type getEntityByName(std::string const& input);
+
+			//Gettor for seeing if imgui is active
+			bool getImguiActive() const;
+			bool getGamePaused() const;
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
@@ -57,12 +83,16 @@ namespace NIKE {
 			void operator=(Service const& copy) = delete;
 
 			// Assets file path
-			std::filesystem::path assets_path = "C:\\Users\\User\\feline_frenzy\\Feline Frenzy\\assets";
+			std::filesystem::path assets_path = "assets/";
 			// Container to store the entities created with string ref
 			std::unordered_map<std::string, Entity::Type> entities_ref;
 			// Variable to hold the selected entity name
 			std::string selected_entity_name;
 
+			//Boolean for toggling imgui
+			bool b_show_imgui = false;
+			bool b_dispatch_viewport = false;
+			bool b_pause_game = false;
 		};
 
 		// Defines to reduce the long line

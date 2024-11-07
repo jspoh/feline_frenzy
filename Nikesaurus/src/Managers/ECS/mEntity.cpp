@@ -8,7 +8,9 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
+#include "Core/Engine.h"
 #include "Managers/ECS/mEntity.h"
+
 
 namespace NIKE {
 	Entity::Manager::Manager() {
@@ -18,7 +20,7 @@ namespace NIKE {
 		}
 	}
 
-	Entity::Type Entity::Manager::createEntity() {
+	Entity::Type Entity::Manager::createEntity(unsigned int layer_id) {
 
 		//Check if entity has reached the max limit
 		if (avail_entities.empty()) {
@@ -29,6 +31,15 @@ namespace NIKE {
 		Entity::Type id{ avail_entities.front() };
 		entities.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple());
 		avail_entities.pop();
+
+		//Add layer id
+		if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(layer_id)) {
+			throw std::runtime_error("Layer does not exist.");
+		}
+
+		//Assign layer id to entity
+		entities.at(id).second = layer_id;
+
 		return id;
 	}
 
@@ -54,7 +65,7 @@ namespace NIKE {
 		}
 
 		//Set Signature
-		entities.at(entity) = signature;
+		entities.at(entity).first = signature;
 	}
 
 	Component::Signature const& Entity::Manager::getSignature(Entity::Type entity) const {
@@ -64,8 +75,29 @@ namespace NIKE {
 		}
 
 		//Get Signature
-		return entities.at(entity);
+		return entities.at(entity).first;
 	}
+
+	void Entity::Manager::setLayerID(Entity::Type entity, unsigned int layer_id) {
+		//Check if entity has alr been created
+		if (entities.find(entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
+
+		//Set Signature
+		entities.at(entity).second = layer_id;
+	}
+
+	unsigned int Entity::Manager::getLayerID(Entity::Type entity) const {
+		//Check if entity has alr been created
+		if (entities.find(entity) == entities.end()) {
+			throw std::runtime_error("Entity not found.");
+		}
+
+		//Get Signature
+		return entities.at(entity).second;
+	}
+
 
 	int Entity::Manager::getEntityComponentCount(Entity::Type entity) const {
 		//Check if entity has alr been created
@@ -73,17 +105,17 @@ namespace NIKE {
 			throw std::runtime_error("Entity not found.");
 		}
 
-		return static_cast<int>(entities.at(entity).count());
+		return static_cast<int>(entities.at(entity).first.count());
 	}
 
 	int Entity::Manager::getEntitiesCount() const {
 		return static_cast<int>(entities.size());
 	}
 
-	std::vector<Entity::Type> Entity::Manager::getAllEntities() const {
-		std::vector<Entity::Type> return_vec;
+	std::set<Entity::Type> Entity::Manager::getAllEntities() const {
+		std::set<Entity::Type> return_vec;
 		for (auto const& entity : entities) {
-			return_vec.push_back(entity.first);
+			return_vec.insert(entity.first);
 		}
 		return return_vec;
 	}

@@ -21,6 +21,12 @@ namespace NIKE {
 		public:
 			virtual ~IArray() = default;
 
+			//Check entity
+			virtual bool checkEntity(Entity::Type entity) = 0;
+
+			//Get entity
+			virtual void* getEntityComponent(Entity::Type entity) = 0;
+
 			//Clone entity
 			virtual void cloneEntity(Entity::Type clone, Entity::Type copy) = 0;
 
@@ -88,6 +94,16 @@ namespace NIKE {
 				return temp_vec;
 			}
 
+			//Check entity
+			bool checkEntity(Entity::Type entity) override {
+				return component_array.find(entity) != component_array.end();
+			}
+
+			//get entity
+			void* getEntityComponent(Entity::Type entity) override {
+				return &component_array.at(entity);
+			}
+
 			//Clone entity
 			void cloneEntity(Entity::Type clone, Entity::Type copy) override {
 				//Clone entity
@@ -130,30 +146,25 @@ namespace NIKE {
 			//Private type casting for easy retrieval
 			template<typename T>
 			std::shared_ptr<Array<T>> getComponentArray() {
-				std::string type_name{ convertTypeString(typeid(T).name()) };
+				std::string type_name{ Utility::convertTypeString(typeid(T).name()) };
 
 				return std::static_pointer_cast<Array<T>>(component_arrays.at(type_name));
 			}
 
-			//Convert Component Type String
-			std::string convertTypeString(std::string&& str_type) {
-				return str_type.substr(str_type.find_first_not_of(':', str_type.find_first_of(':')), str_type.size() - str_type.find_first_not_of(':', str_type.find_first_of(':')));
-			}
-
 			//Component id
-			Component::Type component_id{ 0 };
+			Component::Type component_id;
 
 		public:
 
 			//Default Constructor
-			Manager() = default;
+			Manager() : component_id{ 0 }{}
 
 			//Register component with manager
 			template<typename T>
 			void registerComponent() {
 
 				//Component type name
-				std::string type_name{ convertTypeString(typeid(T).name()) };
+				std::string type_name{ Utility::convertTypeString(typeid(T).name()) };
 
 				//Check if component has been registered before
 				if (component_types.find(type_name) != component_types.end()) {
@@ -170,7 +181,7 @@ namespace NIKE {
 			template<typename T>
 			void removeComponent() {
 				//Component type name
-				std::string type_name{ convertTypeString(typeid(T).name()) };
+				std::string type_name{ Utility::convertTypeString(typeid(T).name()) };
 
 				//Check if component has been registered before
 				if (component_types.find(type_name) == component_types.end()) {
@@ -199,7 +210,7 @@ namespace NIKE {
 			template<typename T>
 			void removeEntityComponent(Entity::Type entity) {
 				//Component type name
-				std::string type_name{ convertTypeString(typeid(T).name()) };
+				std::string type_name{ Utility::convertTypeString(typeid(T).name()) };
 
 				//Remove component
 				getComponentArray<T>()->removeComponent(entity);
@@ -213,11 +224,14 @@ namespace NIKE {
 				return getComponentArray<T>()->getComponent(entity);
 			}
 
+			//Retrieve a void* to component based on component type
+			void* getEntityComponent(Entity::Type entity, Component::Type type);
+
 			//Get Component Type
 			template<typename T>
 			Component::Type getComponentType() {
 				//Component type name
-				std::string type_name{ convertTypeString(typeid(T).name()) };
+				std::string type_name{ Utility::convertTypeString(typeid(T).name()) };
 
 				//Check if component has been registered
 				if (component_types.find(type_name) == component_types.end()) {
@@ -227,6 +241,9 @@ namespace NIKE {
 				//Return component type
 				return component_types.at(type_name);
 			}
+
+			//Get Component Type string overload
+			Component::Type getComponentType(std::string const& type);
 
 			// Get all entities with that component
 			template<typename T>
@@ -239,6 +256,9 @@ namespace NIKE {
 
 			//Remove entity from all components
 			void entityDestroyed(Entity::Type entity);
+
+			//Get all entity components
+			std::unordered_map<std::string, void*> getAllComponents(Entity::Type entity) const;
 
 			//Get all component types
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;

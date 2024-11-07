@@ -43,7 +43,7 @@ namespace NIKE {
             void bounceResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
 
             // SAT helper functions
-            std::vector<Vector2f> getRotatedVertices(const Transform::Transform& transform, const std::string& model_ref);
+            std::vector<Vector2f> getRotatedVertices(const Transform::Transform& transform, const std::string& model_id);
             std::vector<Vector2f> getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB);
             void projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max);
 
@@ -62,7 +62,7 @@ namespace NIKE {
             bool detectAABBRectRect(Transform::Transform const& transform_a, Physics::Dynamics const& dynamics_a, Transform::Transform const& transform_b, Physics::Dynamics const& dynamics_b, CollisionInfo& info);
 
             // SAT Collision detection
-            bool detectSATCollision(Transform::Transform const& transformA, Transform::Transform const& transformB, const std::string& model_refA, const std::string& model_refB, CollisionInfo& info);
+            bool detectSATCollision(Transform::Transform const& transformA, Transform::Transform const& transformB, const std::string& model_idA, const std::string& model_idB, CollisionInfo& info);
 
             // Collision resolution
             void collisionResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
