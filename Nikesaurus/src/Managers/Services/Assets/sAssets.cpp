@@ -180,18 +180,18 @@ namespace NIKE {
 		return shaders_list;
 	}
 
-	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path) {
+	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering) {
 		if (models_list.find(model_id) != models_list.end())
 		{
 			throw std::runtime_error("MODELS ALREADY EXISTS");
 		}
 
 		NIKEE_CORE_INFO("Loading model to '" + model_id + "'");
-		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Assets::Model>(render_loader->compileModel(file_path))));
+		models_list.emplace(std::piecewise_construct, std::forward_as_tuple(model_id), std::forward_as_tuple(std::make_shared<Assets::Model>(render_loader->compileModel(file_path, for_batched_rendering))));
 	}
 
-	void Assets::Service::reloadModel(std::string const& model_id, std::string const& file_path) {
-		*models_list.at(model_id) = render_loader->compileModel(file_path);
+	void Assets::Service::reloadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering) {
+		*models_list.at(model_id) = render_loader->compileModel(file_path, for_batched_rendering);
 	}
 
 	void Assets::Service::unloadModel(std::string const& model_id) {
@@ -449,6 +449,50 @@ namespace NIKE {
 		return levels_list;
 	}
 
+	void Assets::Service::loadPrefab(const std::filesystem::directory_entry& entry)
+	{
+		if (entry.is_regular_file() && hasValidPrefabExtension(entry.path())) {
+			std::string file_name = entry.path().filename().string();
+
+			// Only add the file if it doesn't already exist in the prefabs list
+			if (prefabs_list.find(file_name) == prefabs_list.end()) {
+				prefabs_list[file_name] = entry.path();
+			}
+		}
+	}
+
+	void Assets::Service::loadPrefabFiles()
+	{
+		// Ensure the levels list is fresh each time
+		prefabs_list.clear();
+
+		// Iterate through the directory and load valid scene files
+		for (const auto& entry : std::filesystem::directory_iterator(getPrefabsPath())) {
+			loadPrefab(entry);
+		}
+	}
+
+	bool Assets::Service::checkPrefabFileExist(const std::string& entry)
+	{
+		return prefabs_list.find(entry) != prefabs_list.end();
+	}
+
+	void Assets::Service::reloadPrefab(std::string const& prefab_key, 
+		std::filesystem::path const& prefab_file_path)
+	{
+		auto it = prefabs_list.find(prefab_key);
+		if (it != prefabs_list.end()) {
+			it->second = prefab_file_path;
+			std::filesystem::directory_entry entry(prefab_file_path);
+			loadScn(entry);
+		}
+	}
+
+	std::unordered_map<std::string, std::filesystem::path>& Assets::Service::getLoadedPrefabs()
+	{
+		return prefabs_list;
+	}
+
 	std::string const& Assets::Service::getTexturePath() 
 	{ 
 		return texture_path; 
@@ -477,6 +521,11 @@ namespace NIKE {
 	std::string const& Assets::Service::getShadersPath() 
 	{
 		return shaders_path; 
+	}
+
+	std::string const& Assets::Service::getPrefabsPath()
+	{
+		return prefabs_path;
 	}
 
 	void Assets::Service::reloadAssets(const std::string& asset_type)
@@ -585,21 +634,51 @@ namespace NIKE {
 				}
 			}
 		}
-		else if (asset_type == "Shaders") {
+		else if (asset_type == "Prefabs") {
 
 			// Load new fonts
-			for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
-				if (hasValidVertExtension(shader_paths)) {
-					std::string file_name = shader_paths.path().filename().string();
+			for (const auto& prefab_paths : std::filesystem::directory_iterator(getPrefabsPath())) {
+				if (hasValidPrefabExtension(prefab_paths)) {
+					std::string file_name = prefab_paths.path().filename().string();
+
 					//string variables
 					size_t start = file_name.find_first_not_of('\\');
 					size_t size = file_name.find_first_of('.', start) - start;
 
+					// Check if the font already exists before loading
+					if (!checkPrefabFileExist(file_name.substr(start, size))) {
+						loadPrefab(prefab_paths);
+					}
+					else {
+						reloadPrefab(file_name.substr(start, size), prefab_paths.path());
+					}
+				}
+			}
+			}
+		else if (asset_type == "Shaders") {
+
+			// Load new fonts
+			int temp_count = 0;
+			for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
+				temp_count++;
+				//Skip loading shader twice
+				if (temp_count % 2)
+					continue;
+
+				if (hasValidVertExtension(shader_paths)) {
+					//Get file name
+					std::string file_name = shader_paths.path().filename().string();
+
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
+					//Get file path
 					std::string path = shader_paths.path().string();
 					std::string vtx = path.substr(0, path.find_first_of('.')) + ".vert";
 					std::string frag = path.substr(0, path.find_first_of('.')) + ".frag";
 
-					// Check if the font already exists before loading
+					//Check if the file already exists before loading
 					if (shaders_list.find(file_name.substr(start, size)) == shaders_list.end()) {
 						loadShader(file_name.substr(start, size), vtx, frag);
 					}
@@ -609,8 +688,30 @@ namespace NIKE {
 				}
 			}
 		}
-
 		// Others goes here
+	}
+
+	bool Assets::Service::deleteFile(std::string const& file_path)
+	{
+		return std::filesystem::remove(file_path);
+	}
+
+	bool Assets::Service::deleteAllFiles(std::string const& file_path)
+	{
+		bool all_deleted = true;
+		if (std::filesystem::exists(file_path) && std::filesystem::is_directory(file_path)) {
+			// Iterate through each file in the directory
+			for (const auto& entry : std::filesystem::directory_iterator(file_path)) {
+				// Check if the entry is a file (not a subdirectory)
+				if (std::filesystem::is_regular_file(entry.path())) {
+					// Attempt to delete the file and check success
+					if (!std::filesystem::remove(entry.path())) {
+						all_deleted = false;
+					}
+				}
+			}
+		}
+		return all_deleted;
 	}
 
 }

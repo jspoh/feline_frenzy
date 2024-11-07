@@ -36,6 +36,9 @@ namespace NIKE {
 	// Checks if the file has a valid model extension (e.g .txt)
 	bool hasValidModelExtension(const std::filesystem::path& filePath);
 
+	// Checks if the file has a valid prefab extension (e.g .prefab)
+	bool hasValidPrefabExtension(const std::filesystem::path& filePath);
+
 	// This function will be used to display assets of the given type
 	void displayAssetList(const std::string& assetType);
 

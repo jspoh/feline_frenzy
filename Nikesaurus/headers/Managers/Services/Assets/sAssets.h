@@ -71,12 +71,15 @@ namespace NIKE {
 			std::string models_path = "assets/Models/";
 			std::string scenes_path = "assets/Scenes/";
 			std::string shaders_path = "assets/Shaders/";
+			std::string prefabs_path = "assets/Prefabs/";
 
 			/*****************************************************************//**
 			* Scn (Levels) private members
 			*********************************************************************/
-
 			std::unordered_map<std::string, std::filesystem::path> levels_list;
+
+			// Prefabs paths containers
+			std::unordered_map<std::string, std::filesystem::path> prefabs_list;
 
 		public:
 
@@ -136,10 +139,10 @@ namespace NIKE {
 			const std::unordered_map<std::string, unsigned int>& getLoadedShaders();
 
 			//Load model
-			void loadModel(std::string const& model_id, std::string const& file_path);
+			void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
 
 			//Reload model
-			void reloadModel(std::string const& model_id, std::string const& file_path);
+			void reloadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
 
 			//Unload model
 			void unloadModel(std::string const& model_id);
@@ -207,13 +210,22 @@ namespace NIKE {
 			bool checkAudioExist(std::string const& audio_tag);
 
 			/*****************************************************************//**
-			* File path gettors
+			* Scn File path
 			*********************************************************************/
 			void loadScn(const std::filesystem::directory_entry& entry);
 			void loadScnFiles();
 			bool checkScnFileExist(const std::string& entry);
 			void reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path);
 			std::unordered_map<std::string, std::filesystem::path>& getLevelsList();
+
+			/*****************************************************************//**
+			* Prefab File path
+			*********************************************************************/
+			void loadPrefab(const std::filesystem::directory_entry& entry);
+			void loadPrefabFiles();
+			bool checkPrefabFileExist(const std::string& entry);
+			void reloadPrefab(std::string const&, std::filesystem::path const&);
+			std::unordered_map<std::string, std::filesystem::path>& getLoadedPrefabs();
 
 			/*****************************************************************//**
 			* File path gettors
@@ -224,11 +236,14 @@ namespace NIKE {
 			std::string const& getModelsPath(); 
 			std::string const& getScenesPath(); 
 			std::string const& getShadersPath(); 
+			std::string const& getPrefabsPath();
 
 			/*****************************************************************//**
 			* Reload of specific asset types
 			*********************************************************************/
 			void reloadAssets(const std::string& asset_type);
+			bool deleteFile(std::string const& file_path);
+			bool deleteAllFiles(std::string const& file_path);
 		};
 
 		//Re-enable DLL Export warning

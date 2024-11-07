@@ -78,7 +78,6 @@ namespace NIKE {
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<UI::Service>());
-		provideService(std::make_shared<Coordinator::Service>());
 
 		//Create console
 		#ifndef NDEBUG
@@ -165,6 +164,21 @@ namespace NIKE {
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
+
+			//Render entity to mouse click
+			if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+
+				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+
+				for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
+					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+					Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
+					Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+				}
+			}
 
 			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
 			//	cout << "TRUE" << endl;

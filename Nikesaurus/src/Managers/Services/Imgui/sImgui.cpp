@@ -121,6 +121,7 @@ namespace NIKE {
 			imguiShowGameViewport(b_dispatch_viewport);
 			imguiCameraControl();
 			imguiLayerManagementWindow();
+			imguiShowLoadedLevelsWindow();
 
 			// THIS 2 CALL THE OPENGL DRAWING
 			ImGui::Render();

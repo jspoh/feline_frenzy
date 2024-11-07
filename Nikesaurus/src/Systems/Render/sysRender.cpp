@@ -16,7 +16,22 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
+
+// batched rendering
+constexpr bool BATCHED_RENDERING = true;
+
 namespace NIKE {
+
+	Render::Manager::Manager() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {
+		render_instances_quad.reserve(MAX_INSTANCES);
+
+		if (BATCHED_RENDERING) {
+			NIKEE_INFO("Using batched rendering");
+		}
+		else {
+			NIKEE_INFO("Not using batched rendering");
+		}
+	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
@@ -56,82 +71,192 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
-		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			glPolygonMode(GL_FRONT, GL_FILL);
+			glEnable(GL_BLEND);
+
+			// use shader
+			shader_system->useShader("base");
+
+			//Shader set uniform
+			shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
+			shader_system->setUniform("base", "f_opacity", e_shape.color.a);
+			shader_system->setUniform("base", "override_color", e_shape.use_override_color);
+			shader_system->setUniform("base", "model_to_ndc", x_form);
+
+			//Get model
+			auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
+
+			//Draw
+			glBindVertexArray(model->vaoid);
+			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_system->unuseShader();
+		}
+		else {
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.color = e_shape.color;
+
+			render_instances_quad.push_back(instance);
+
+			if (render_instances_quad.size() >= MAX_INSTANCES) {
+				batchRenderObject();
+			}
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Render::Manager::batchRenderObject() {
+		// !TODO: considering implementing instanced too with glDrawElementsInstanced
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		if (!BATCHED_RENDERING) {
+			return;
+		}
+		// !TODO: only implemented for quads..
+
+		if (render_instances_quad.empty()) {
+			return;
+		}
+
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+
+		// create buffer of vertices
+		std::vector<Assets::Vertex> vertices;
+		static constexpr int NUM_VERTICES_IN_MODEL = 4;
+		vertices.reserve(render_instances_quad.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances_quad.size(); i++) {
+			// create temp model to populate with current instance's data
+			Assets::Model m{ model };
+			for (Assets::Vertex& v : m.vertices) {
+				v.col = render_instances_quad[i].color;
+				v.transform = render_instances_quad[i].xform;
+			}
+
+			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
+		}
+
+		// populate vbo
+		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
+
+		// create buffer of indices for indexed rendering
+		std::vector<unsigned int> indices;
+		static constexpr int NUM_INDICES_FOR_QUAD = 6;
+		indices.reserve(render_instances_quad.size() * NUM_INDICES_FOR_QUAD);
+		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
+		for (size_t i{}; i < render_instances_quad.size(); i++) {
+			for (size_t j{}; j < model.indices.size(); j++) {
+				indices.push_back(model.indices[j] + static_cast<unsigned int>((i * NUM_VERTICES_IN_MODEL)));
+			}
+		}
+
+		// populate ebo
+		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
+
+
+		// vbo and ebo are already bound to vao
+		// but bind again just in case???
+		//glVertexArrayVertexBuffer(model.vaoid, 10, model.vboid, 0, sizeof(Assets::Vertex));
+		//glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
+		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
 
 		// use shader
-		shader_system->useShader("base");
+		shader_system->useShader("batched_base");
+		// bind vao
+		glBindVertexArray(model.vaoid);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
-		//Shader set uniform
-		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
-		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
-		shader_system->setUniform("base", "model_to_ndc", x_form);
-
-		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
-
-		//Draw
-		glBindVertexArray(model->vaoid);
-		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-
-		//Unuse texture
+		// cleanup
 		glBindVertexArray(0);
 		shader_system->unuseShader();
+
+		render_instances_quad.clear();
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
+		}
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
-		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			glPolygonMode(GL_FRONT, GL_FILL);
 
-		// use shader
-		shader_system->useShader("texture");
+			// use shader
+			shader_system->useShader("texture");
 
-		//Texture unit
-		constexpr int texture_unit = 6;
+			//Texture unit
+			constexpr int texture_unit = 6;
 
-		// set texture
-		glBindTextureUnit(
-			texture_unit, // texture unit (binding index)
-			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
-		);
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
+			);
 
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		//Caculate UV Offset
-		Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
-		Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
+			//Caculate UV Offset
+			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
 
-		//Translate UV offset to bottom left
-		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+			//Translate UV offset to bottom left
+			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
 
-		//Set uniforms for texture rendering
-		shader_system->setUniform("texture", "u_tex2d", texture_unit);
-		shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
-		shader_system->setUniform("texture", "u_transform", x_form);
-		shader_system->setUniform("texture", "uvOffset", uv_offset);
-		shader_system->setUniform("texture", "frameSize", framesize);
+			//Set uniforms for texture rendering
+			shader_system->setUniform("texture", "u_tex2d", texture_unit);
+			shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
+			shader_system->setUniform("texture", "u_transform", x_form);
+			shader_system->setUniform("texture", "uvOffset", uv_offset);
+			shader_system->setUniform("texture", "frameSize", framesize);
 
-		//Blending options for texture
-		shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
-		shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
-		shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
+			//Blending options for texture
+			shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
+			shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
+			shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
-		//Flip texture options
-		shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-		shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+			//Flip texture options
+			shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
-		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+			//Get model
+			auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
 
-		//Draw
-		glBindVertexArray(model->vaoid);
-		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+			//Draw
+			glBindVertexArray(model->vaoid);
+			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 
-		//Unuse texture
-		glBindVertexArray(0);
-		shader_system->unuseShader();
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_system->unuseShader();
+		}
+		else {
+
+		}
 	}
+
+	void batchRenderTextures() {}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 
@@ -254,29 +379,17 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-		
+
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
-		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() :camera_system->getWorldToNDCXform();
+		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() : camera_system->getWorldToNDCXform();
 
 		//Get transform
 		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
-		//Check If Shape
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-
-			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
-				// Transform matrix here
-				transformMatrix(e_transform, matrix, cam_ndcx);
-
-				//Render Shape
-				renderObject(matrix, e_shape);
-			}
-		}
-		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
+		//Check If Texture
+		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
 			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
 			//Check if texture is loaded
@@ -293,6 +406,18 @@ namespace NIKE {
 
 				// Render Texture
 				renderObject(matrix, e_texture);
+			}
+		}
+		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, cam_ndcx);
+
+				//Render Shape
+				renderObject(matrix, e_shape);
 			}
 		}
 
@@ -370,11 +495,20 @@ namespace NIKE {
 				//Skip entity if no transform is present
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
 					continue;
-				
-				if(NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 					transformAndRenderEntity(entity, true);
 				}
+			}
+		}
 
+		batchRenderObject();		// at least 1 call to this is required every frame at the very end
+
+		// render text last
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			if (!layer->getLayerState())
+				continue;
+			for (auto& entity : entities) {
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
 					transformAndRenderText(entity);
 				}
@@ -432,5 +566,8 @@ namespace NIKE {
 
 	void Render::Manager::update() {
 		renderViewport();
+
+		// moved to renderViewport to ensure it draws before text
+		//batchRenderObject();		// at least 1 call to this is required every frame at the very end
 	}
 }

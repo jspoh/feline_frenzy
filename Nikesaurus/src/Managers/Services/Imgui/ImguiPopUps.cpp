@@ -13,8 +13,9 @@
 
 namespace NIKE
 {
-	bool showCreateEntityPopUp(bool pop_up)
+	bool showCreateEntityPopUp()
 	{
+        static bool pop_up = false;
 		static char entity_name[32];
 		// Popup for entity naming
 		if (ImGui::BeginPopupModal("Create Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -62,6 +63,66 @@ namespace NIKE
 		}
 		return pop_up;
 	}
+
+    bool showCreateEntityPrefabPopUp(std::string const& file_path)
+    {
+        static bool pop_up = false;
+        static char entity_name[32];
+        // Popup for entity naming
+        if (ImGui::BeginPopupModal("Create Entity with Prefab", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter a name for the new entity:");
+            ImGui::InputText("##EntityNameInput", entity_name, IM_ARRAYSIZE(entity_name));
+
+            //Get layer id
+            static int layer_id = 0;
+            ImGui::Text("Enter layer id for the new entity:");
+            ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
+
+            layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+
+            if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+                if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+                    // Create entity function call ( Defaulted to the base layer for now )
+                    Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+                    // If empty string, assign default string
+                    if (entity_name[0] == '\0')
+                    {
+                        snprintf(entity_name, sizeof(entity_name), "entity_%04d", new_id);
+                    }
+                    // Save entity_name string
+                    NIKE_IMGUI_SERVICE->addEntityRef(entity_name, new_id);
+
+                    // Load entity with prefab
+                    std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
+                    NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
+
+                    if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(new_id))
+                    {
+                        NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id).position = {0.f,0.f};
+                    }
+
+                    // Reset entity_name for the next use
+                    memset(entity_name, 0, sizeof(entity_name));
+
+                    pop_up = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                else {
+                    layer_id = 0;
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel")) {
+                pop_up = false;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+        return pop_up;
+    }
 
 	bool showAddComponentPopup(Entity::Type& entity, bool pop_up)
 	{
@@ -331,33 +392,31 @@ namespace NIKE
         return is_popup_open;
     }
 
-    bool saveEntityPopup(Entity::Type entity)
+    bool savePrefabPopup(Entity::Type entity)
     {
         bool is_popup_open = false;
         static bool is_input_correct = true;
         static char input[300] = "";
 
         // Popup window for saving the entity
-        if (ImGui::BeginPopupModal("Save Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Enter file path to save the entity:");
+        if (ImGui::BeginPopupModal("Save Prefab", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Enter file path to save prefab:");
 
             // Input field for file path
             ImGui::InputText("File Path##", input, IM_ARRAYSIZE(input));
 
-            std::string scn_file = std::string(input) + ".scn";
+            std::string prefab_file = std::string(input) + ".prefab";
 
-            std::string scn_file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scn_file;
-
-            cout << scn_file << endl;
+            std::string prefab_file_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + prefab_file;
 
             // Button to save the entity
             if (ImGui::Button("Save")) {
-                // Serialize the entity to the file path
-                NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, scn_file_path);
+                // Serialize the prefab to the file path
+                NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, prefab_file_path);
                 ImGui::CloseCurrentPopup();
                 is_popup_open = false; 
             }
-
+            
             
             is_input_correct = ShowErrorPopup();
             

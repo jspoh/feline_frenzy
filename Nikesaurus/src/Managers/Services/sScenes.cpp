@@ -15,10 +15,6 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Layer
 	*********************************************************************/
-	unsigned int Scenes::Layer::getLayerIndex() const {
-		return index;
-	}
-
 	unsigned int Scenes::Layer::getLayerID() const {
 		return id;
 	}
@@ -42,7 +38,6 @@ namespace NIKE {
 	nlohmann::json Scenes::Layer::serialize() const {
 		return	{
 				{"ID", id},
-				{"Index", index},
 				{"Mask", mask.to_ulong()},
 				{"B_State", b_state}
 				};
@@ -50,7 +45,6 @@ namespace NIKE {
 
 	void Scenes::Layer::deserialize(nlohmann::json const& data) {
 		id = data.at("ID").get<unsigned int>();
-		index = data.at("Index").get<unsigned int>();
 		mask = LayerMask(data.at("Mask").get<unsigned long>());
 		b_state = data.at("B_State").get<bool>();
 	}
@@ -60,7 +54,6 @@ namespace NIKE {
 	*********************************************************************/
 	std::shared_ptr<Scenes::Layer> Scenes::IScene::createLayer(int index) {
 		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
-
 		//Insert layers at back
 		if (index >= 0) {
 			layers.emplace(layers.begin() + index, layer);
@@ -70,52 +63,58 @@ namespace NIKE {
 			index = static_cast<int>(layers.size()) - 1;
 		}
 
-		layer->id = layer_count++;
-		layer->index = index;
+		layer->id = index;
 		layer->mask.set(layer->id, true);
-		layers_map.emplace(std::piecewise_construct, std::forward_as_tuple(layer->id), std::forward_as_tuple(layer));
 
 		return layer;
 	}
 
 	std::shared_ptr<Scenes::Layer> Scenes::IScene::getLayer(unsigned int layer_id) {
 		//Check if layer has been added
-		auto it = layers_map.find(layer_id);
-		if (it == layers_map.end()) {
+		if (layer_id >= static_cast<unsigned int>(layers.size())) {
 			throw std::runtime_error("Layer has not been registered.");
 		}
 
-		return it->second;
+		return layers.at(layer_id);
 	}
 
 	void Scenes::IScene::removeLayer(unsigned int layer_id) {
 		//Check if layer has been added
-		auto it = layers_map.find(layer_id);
-		if (it == layers_map.end()) {
+		if (layer_id >= static_cast<unsigned int>(layers.size())) {
 			throw std::runtime_error("Layer has not been registered.");
 		}
 
-		layers.erase(layers.begin() + it->second->getLayerIndex());
+		//Set all of removed layer bit to false
+		for (auto& layer : layers) {
+			//Set bit removed id bit to false
+			layer->mask.set(layer_id, false);
+		}
+
+		//Erase layer
+		layers.erase(layers.begin() + layer_id);
 
 		//Update layers index & mask
 		unsigned int index = 0;
 		for (auto& layer : layers) {
-			layer->index = index++;
-			layer->mask.set(it->second->id, false);
+			//Get new index
+			layer->id = index++;
+
+			//Shift all bits down
+			for (unsigned int i = layer_id + 1; i < layers.size(); i++) {
+				layer->mask[i - 1] = layer->mask[i];
+			}
+
+			//Clear the last bit, as it has shifted left by one position
+			layer->mask[layers.size() - 1] = false;
 		}
-
-		layers_map.erase(it);
-
-		// Decrement the count of layers after removing
-		--layer_count;
 	}
 
 	bool Scenes::IScene::checkLayer(unsigned int layer_id) {
-		return layers_map.find(layer_id) != layers_map.end();
+		return layer_id < static_cast<unsigned int>(layers.size());
 	}
 
 	unsigned int Scenes::IScene::getLayerCount() const {
-		return layer_count;
+		return static_cast<unsigned int>(layers.size());
 	}
 
 	std::vector<std::shared_ptr<Scenes::Layer>>& Scenes::IScene::getLayers() {

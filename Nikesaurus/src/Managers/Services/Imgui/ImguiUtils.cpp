@@ -59,53 +59,29 @@ namespace NIKE
         return (extension == ".txt");
     }
 
+    bool hasValidPrefabExtension(const std::filesystem::path& filePath)
+    {
+        std::string extension = filePath.extension().string();
+        return (extension == ".prefab");
+    }
+
     void displayAssetList(const std::string& asset_type)
     {
         // Variable to store the selected texture and file path
         static std::string selected_texture;
         static std::string selected_file_path;
 
+        // To track if we need to show the popup
+        static bool open_create_entity_popup = false;  
+        // Stores the selected prefab name
+        static std::string selected_prefab;             
+
         // Refresh button to reload assets if needed
         if (ImGui::Button(("Refresh " + asset_type).c_str()) && asset_type != "Shaders")
         {
             NIKE_ASSETS_SERVICE->reloadAssets(asset_type);
         }
-        // Always show "Save Scene" button
-        if (ImGui::Button("Save Scene"))
-        {
-            ImGui::OpenPopup("Save Scene As");
-        }
 
-        // Show the "Save Scene As" popup if the button was clicked
-        if (ImGui::BeginPopupModal("Save Scene As"))
-        {
-            static char file_input[128] = "";
-            ImGui::InputText("Filename", file_input, IM_ARRAYSIZE(file_input));
-
-            if (ImGui::Button("Save"))
-            {
-                std::string scene_name = file_input;
-                if (scene_name.empty())
-                {
-                    scene_name = "default";
-                }
-
-                std::string file_path = NIKE_ASSETS_SERVICE->getScenesPath() + scene_name + ".scn";
-                std::filesystem::directory_entry scene_file_path(file_path);
-                NIKE_SERIALIZE_SERVICE->saveSceneToFile(file_path);
-                NIKE_ASSETS_SERVICE->loadScn(scene_file_path);
-                // Reset for the next use
-                memset(file_input, 0, sizeof(file_input));
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel"))
-            {
-                memset(file_input, 0, sizeof(file_input));
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndPopup();
-        }
         ImGui::Separator();
 
         ImGui::BeginChild("Asset List", ImVec2(0, 0), true);
@@ -179,6 +155,22 @@ namespace NIKE
                 ImGui::Text("%s", model.first.c_str());
             }
         }
+		else if (asset_type == "Prefabs")
+		{
+			for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
+			{
+				const std::string& prefab_name = prefab.first;
+
+				if (ImGui::Selectable(prefab_name.c_str())) {
+					selected_prefab = prefab_name;
+					open_create_entity_popup = true;
+					ImGui::OpenPopup("Create Entity with Prefab");
+				}
+			}
+
+            // Open pop up to create entity with prefab
+            open_create_entity_popup = showCreateEntityPrefabPopUp(selected_prefab);
+        }
         else if (asset_type == "Shaders")
         {
             for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedShaders())
@@ -186,25 +178,33 @@ namespace NIKE
                 ImGui::Text("%s", shader.first.c_str());
             }
         }
-        else if (asset_type == "Levels")
-        {
+        else if (asset_type == "Levels") {
             // Load levels list if empty
             if (NIKE_ASSETS_SERVICE->getLevelsList().empty()) {
                 NIKE_ASSETS_SERVICE->loadScnFiles();
             }
 
-            // Display loaded .scn files with selectable items
-            for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList())
+            ImGui::SameLine();
+
+            if (ImGui::Button("Clear all Level files"))
             {
+                if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getScenesPath()))
+                {
+                    NIKE_ASSETS_SERVICE->loadScnFiles();
+                }
+            }
+
+            // Display loaded .scn files with selectable items
+            for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
                 if (ImGui::Selectable(level.first.c_str())) {
                     selected_file_path = level.first;
                     NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
+
                     // Ensure the file exists before attempting to load it
                     std::string scene_file_path = level.second.string();
-                    if (std::filesystem::exists(scene_file_path))
-                    {
+                    if (std::filesystem::exists(scene_file_path)) {
                         // Clear previous scene entities before loading the new one
-                        NIKE_ECS_SERVICE->destroyAllEntities();
+                        NIKE_ECS_MANAGER->destroyAllEntities();
                         NIKE_IMGUI_SERVICE->getEntityRef().clear();
 
                         // Load the scene from the selected file path
@@ -212,6 +212,37 @@ namespace NIKE
                         NIKE_IMGUI_SERVICE->populateLists = false;
                     }
                 }
+
+                // Display "Remove File" button next to each selectable item
+                if (ImGui::Button(("Remove " + level.first).c_str())) {
+                    // Open a confirmation popup when "Remove File" button is clicked
+                    selected_file_path = level.first;
+                    ImGui::OpenPopup("Confirm Delete");
+                }
+            }
+
+            // Confirmation popup for deleting a file
+            if (ImGui::BeginPopupModal("Confirm Delete", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::Text("Are you sure you want to delete this file?");
+                ImGui::Separator();
+
+                if (ImGui::Button("Yes")) {
+                    // Attempt to delete the selected file
+                    std::string scene_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(selected_file_path).string();
+                    if (NIKE_ASSETS_SERVICE->deleteFile(scene_file_path)) {
+                        // Refresh levels list after deletion
+                        NIKE_ASSETS_SERVICE->loadScnFiles();
+                    }
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("No")) {
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
             }
         }
 
