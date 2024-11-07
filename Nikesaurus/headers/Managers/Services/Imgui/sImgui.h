@@ -65,6 +65,9 @@ namespace NIKE {
 			// Reset variables
 			void resetVariables();
 
+			// Setters
+			void setGamePaused(bool pause);
+
 			// Gettors
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
 			std::string& getSelectedEntityName();
@@ -72,6 +75,7 @@ namespace NIKE {
 
 			//Gettor for seeing if imgui is active
 			bool getImguiActive() const;
+			bool getGamePaused() const;
 
 		private:
 			//Delete Copy Constructor & Copy Assignment
@@ -88,6 +92,7 @@ namespace NIKE {
 			//Boolean for toggling imgui
 			bool b_show_imgui = false;
 			bool b_dispatch_viewport = false;
+			bool b_pause_game = false;
 		};
 
 		// Defines to reduce the long line

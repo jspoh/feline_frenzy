@@ -20,6 +20,7 @@ namespace NIKE {
 	**********************************************************************/
 	// Docking space for imgui
 	void imguiDockingSpace();
+
 	// This function will design the UI for the file system window
 	// void imguiFileSystemWindow();
 

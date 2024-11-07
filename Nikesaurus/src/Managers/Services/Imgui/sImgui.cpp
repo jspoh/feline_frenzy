@@ -85,6 +85,14 @@ namespace NIKE {
 	bool IMGUI::Service::getImguiActive() const {
 		return b_show_imgui;
 	}
+	
+	void IMGUI::Service::setGamePaused(bool pause) {
+		b_pause_game = pause;
+	}
+
+	bool IMGUI::Service::getGamePaused() const {
+		return b_pause_game;
+	}
 
 	void IMGUI::Service::update()
 	{

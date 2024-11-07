@@ -187,6 +187,7 @@ namespace NIKE
 
                         // Load the scene from the selected file path
                         NIKE_SERIALIZE_SERVICE->loadSceneFromFile(scene_file_path);
+                        NIKE_IMGUI_SERVICE->populateLists = false;
                     }
                 }
             }

@@ -15,11 +15,25 @@ namespace NIKE {
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
+
+
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
+		bool is_playing = NIKE_IMGUI_SERVICE->getGamePaused();
+		// Menu Bar for Play/Pause controls
+		if (ImGui::BeginMenuBar()) {
+			ImGui::Spacing();
+			ImGui::Text("Play / Pause Controls : ");
+			if (ImGui::Button(is_playing ? "Pause" : "Play")) {
+				NIKE_IMGUI_SERVICE->setGamePaused(!is_playing);
+			}
+			ImGui::Spacing();
+			ImGui::EndMenuBar();
+		}
 		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 		ImGui::End();
+
 	}
 
 	//void imguiFileSystemWindow() {
@@ -180,7 +194,7 @@ namespace NIKE {
 		//if (!selected_entity_name.empty()) {
 			// Display the Remove Entity Popup if open, passing in the selected entity
 			//Entity::Type to_remove = NIKEEngine.getService<IMGUI::Service>()->getEntityByName(selected_entity_name);
-		open_popup = removeEntityPopup();
+		open_popup = removeEntityPopup(selected_entity_name);
 		//}
 
 		// Show number of entities in the level
@@ -950,7 +964,19 @@ namespace NIKE {
 
 	void imguiShowGameViewport(bool& dispatch)
 	{
-		ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoResize);
+		ImGui::Begin("Game Viewport");
+
+		float aspect_ratio = 16.f / 9.f;
+		ImVec2 window_size = ImGui::GetContentRegionAvail();
+
+		float viewport_width = window_size.x;
+		float viewport_height = window_size.x / aspect_ratio;
+
+		if (viewport_height > window_size.y) {
+			viewport_height = window_size.y;
+			viewport_width = window_size.y * aspect_ratio;
+		}
+
 		ImTextureID textureID = (ImTextureID)NIKE_ECS_MANAGER->getSystemInstance<Render::Manager>()->getTextureColorBuffer();
 		// Define UV coordinates to flip the texture vertically
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
@@ -965,12 +991,12 @@ namespace NIKE {
 			//Dispatch viewport changes
 			win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
 
-			Vector2f win_size = { 1024.0f, 576.0f };
+			Vector2f win_size = { viewport_width, viewport_height };
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<IMGUI::ViewPortEvent>(win_pos, win_size));
 			dispatch = false;
 		}
 
-		ImGui::Image(textureID, ImVec2(1024, 576), uv0, uv1);
+		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 		ImGui::End();
 	}
 
@@ -978,7 +1004,7 @@ namespace NIKE {
 	{
 		ImGui::Begin("Camera Control");
 
-		static int selectedCameraIndex = 1; // Index of the currently selected camera ( REMEMBER TO CHANGE BACK TO 0)
+		static int selectedCameraIndex = 0; // Index of the currently selected camera ( REMEMBER TO CHANGE BACK TO 0)
 		static std::vector<std::pair<std::string, Entity::Type>> cameraEntities; // Store camera names and their entities
 
 		if (!NIKE_IMGUI_SERVICE->populateLists) {
