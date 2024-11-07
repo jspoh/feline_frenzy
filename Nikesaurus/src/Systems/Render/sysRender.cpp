@@ -18,7 +18,7 @@
 
 
 // batched rendering
-constexpr bool BATCHED_RENDERING = true;
+constexpr bool BATCHED_RENDERING = false;
 
 namespace NIKE {
 
@@ -71,10 +71,10 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
-		}
+		//GLenum err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		//}
 
 		if (!BATCHED_RENDERING) {
 			//Set polygon mode
@@ -114,19 +114,19 @@ namespace NIKE {
 			}
 		}
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
-		}
+		//err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		//}
 	}
 
 	void Render::Manager::batchRenderObject() {
 		// !TODO: considering implementing instanced too with glDrawElementsInstanced
 
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
-		}
+		//GLenum err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		//}
 
 		if (!BATCHED_RENDERING) {
 			return;
@@ -191,10 +191,10 @@ namespace NIKE {
 
 		render_instances_quad.clear();
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
-		}
+		//err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
+		//}
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {

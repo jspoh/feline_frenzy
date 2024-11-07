@@ -7,6 +7,7 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/pch.h"
+class NullStream nullstream;
 
 //Splash Scene
 #include "Scenes/SplashScene.h"
