@@ -182,6 +182,11 @@ namespace NIKE {
 				system_manager->addComponentType<T>(component);
 			}
 
+			template<typename T>
+			void setSystemState(bool state) {
+				system_manager->setSystemState<T>(state);
+			}
+
 			void updateSystems();
 
 		};

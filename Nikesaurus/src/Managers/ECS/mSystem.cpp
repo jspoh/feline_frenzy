@@ -5,7 +5,7 @@
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (90%)
  * \co-author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (10%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -140,7 +140,10 @@ namespace NIKE {
 				system_times.push_back(system_duration.count());
 
 			}
-			
+			else {
+				//Push system no run time
+				system_times.push_back(0.0);
+			}
 		}
 		// Track total end time for the update call
 		std::chrono::steady_clock::time_point total_end_time = std::chrono::steady_clock::now();
