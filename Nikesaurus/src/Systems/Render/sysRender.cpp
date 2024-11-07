@@ -102,7 +102,7 @@ namespace NIKE {
 	}
 
 	void Render::Manager::batchRenderObject() {
-		// use glDrawElementsInstanced or glDrawArraysInstanced. whatever is easier
+		// !TODO: considering implementing instanced too with glDrawElementsInstanced
 
 #ifndef BATCHED_RENDERING
 		return;
