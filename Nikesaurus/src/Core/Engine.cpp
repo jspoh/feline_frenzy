@@ -15,6 +15,7 @@
 #include "../headers/Systems/Physics/sysPhysics.h"
 #include "../headers/Systems/Animation/sysAnimation.h"
 #include "../headers/Systems/Render/sysRender.h"
+//#include "../headers/Systems/sysPathfinding.h"
 
 namespace NIKE {
 
@@ -36,6 +37,9 @@ namespace NIKE {
 
 		//Register render components
 		Render::registerComponents();
+
+		//Register pathfinding components
+		Pathfinding::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -48,6 +52,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
 
 		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);

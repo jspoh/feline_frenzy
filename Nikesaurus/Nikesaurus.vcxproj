@@ -41,6 +41,7 @@
     </ClCompile>
     <ClCompile Include="src\Components\cAnimation.cpp" />
     <ClCompile Include="src\Components\cAudio.cpp" />
+    <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Components\cPhysics.cpp" />
     <ClCompile Include="src\Components\cRender.cpp" />
     <ClCompile Include="src\Components\cTransform.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_rectpack.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
+    <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Core\Core.h" />

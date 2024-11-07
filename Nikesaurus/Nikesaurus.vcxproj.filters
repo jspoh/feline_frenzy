@@ -46,6 +46,7 @@
     <ClCompile Include="src\Components\cRender.cpp" />
     <ClCompile Include="src\Components\cTransform.cpp" />
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
+    <ClCompile Include="src\Components\cPathfinding.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -103,6 +104,7 @@
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
+    <ClInclude Include="headers\Components\cPathfinding.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
