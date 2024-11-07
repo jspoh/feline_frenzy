@@ -84,15 +84,14 @@ namespace NIKE {
 
 		// set use_override_color to true if setting an override_color
 		struct Shape {
-			std::string model_ref;
+			std::string model_id;
 			Vector2f pos;
-
 			Vector4f color;
 
-			Shape() : model_ref{ "" }, pos(), override_color{}, use_override_color{ false } {}
-			Shape(std::string const& model_ref, Vector2f const& pos) : model_ref{ model_ref }, pos{ pos }, override_color(), use_override_color{ false } {};
-			Shape(const std::string& model_ref, const Vector4f& override_color, const Vector2f& pos)
-				: model_ref{ model_ref }, pos{ pos }, override_color{ override_color }, use_override_color{ true } {}
+			Shape() : model_id{ "" }, pos(), color{} {}
+			Shape(std::string const& model_id, Vector2f const& pos) : model_id{ model_id }, pos{ pos }, color() {};
+			Shape(const std::string& model_id, const Vector4f& color, const Vector2f& pos)
+				: model_id{ model_id }, pos{ pos }, color{ color } {}
 
 			// !TODO: merge conflict
 			// std::string model_id; 

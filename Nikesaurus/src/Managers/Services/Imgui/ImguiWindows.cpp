@@ -500,7 +500,7 @@ namespace NIKE {
 							if (ImGui::InputText("##shapeRef", input_model_ref, IM_ARRAYSIZE(input_model_ref))) {
 								// Optionally handle input change here if needed
 							}
-							ImGui::DragFloat4("Color in RBGA", &shape_comp.override_color.r, 0.1f);
+							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.1f);
 							// Save buttons to confirm changes
 							if (ImGui::Button("Save Font Ref")) {
 								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))

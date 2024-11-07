@@ -103,7 +103,7 @@ namespace NIKE {
 		// prepare for batched rendering
 		RenderInstance instance;
 		instance.xform = x_form;
-		instance.color = e_shape.override_color;
+		instance.color = e_shape.color;
 
 		render_instances.push_back(instance);
 
