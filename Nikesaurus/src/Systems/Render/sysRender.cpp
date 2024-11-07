@@ -135,7 +135,7 @@ namespace NIKE {
 			return;
 		}
 
-		auto& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -171,9 +171,13 @@ namespace NIKE {
 
 
 		// vbo and ebo are already bound to vao
+		// but bind again just in case???
+		//glVertexArrayVertexBuffer(model.vaoid, 10, model.vboid, 0, sizeof(Assets::Vertex));
+		//glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
 		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
 
-		// init shader
+		// use shader
 		shader_system->useShader("batched_base");
 		// bind vao
 		glBindVertexArray(model.vaoid);
