@@ -1053,6 +1053,23 @@ namespace NIKE {
 			dispatch = false;
 		}
 
+		ImVec2 mouse_pos = ImGui::GetMousePos();
+		ImVec2 scalar = { (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / window_size.x), (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / window_size.y) };
+		mouse_pos.x -= win_pos.x;
+		mouse_pos.y -= win_pos.y;
+		mouse_pos.x -= (viewport_width / 2.0f);
+		mouse_pos.y -= (viewport_height / 2.0f);
+		mouse_pos.y = -mouse_pos.y;
+
+		mouse_pos.x *= scalar.x;
+		mouse_pos.y *= scalar.y;
+
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+			Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+			NIKE_ECS_MANAGER->addEntityComponent(entity, Transform::Transform({ mouse_pos.x, mouse_pos.y }, { 100.0f, 100.0f }, 0.0f));
+			NIKE_ECS_MANAGER->addEntityComponent(entity, Render::Shape("square", { 1.0f, 0.0f, 0.0f, 1.0f }));
+		}
+
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 		ImGui::End();
 	}

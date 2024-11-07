@@ -184,4 +184,13 @@ namespace NIKE {
         collision_system->setRestitution(event->restitution);
         event->setEventProcessed(true);
     }
+
+    void Physics::Manager::applyForce(Entity::Type entity, Vector2f const& force) {
+        if(!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
+            return;
+
+        //Get dynamics
+        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+        e_dynamics.force = force;
+    }
 }
