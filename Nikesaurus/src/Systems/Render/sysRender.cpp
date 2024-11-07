@@ -160,7 +160,7 @@ namespace NIKE {
 		static constexpr int NUM_INDICES_FOR_QUAD = 6;
 		indices.reserve(render_instances.size() * NUM_INDICES_FOR_QUAD);
 		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
-		for (size_t i{ 1 }; i <= render_instances.size(); i++) {
+		for (size_t i{}; i < render_instances.size(); i++) {
 			for (size_t j{}; j < model.indices.size(); j++) {
 				indices.push_back(model.indices[j] + (i * NUM_VERTICES_IN_MODEL));
 			}
