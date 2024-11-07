@@ -19,13 +19,33 @@ namespace NIKE {
 
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
-		bool is_playing = NIKE_IMGUI_SERVICE->getGamePaused();
+		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();
 		// Menu Bar for Play/Pause controls
 		if (ImGui::BeginMenuBar()) {
 			ImGui::Spacing();
 			ImGui::Text("Play / Pause Controls : ");
-			if (ImGui::Button(is_playing ? "Pause" : "Play")) {
-				NIKE_IMGUI_SERVICE->setGamePaused(!is_playing);
+			if (ImGui::Button(is_paused ? "Play" : "Pause")) {
+				NIKE_IMGUI_SERVICE->setGamePaused(!is_paused);
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Reset Scene")) {
+				std::string scene_file_path = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+
+				if (!scene_file_path.empty() && std::filesystem::exists(scene_file_path)) {
+					NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
+
+					// Clear previous scene entities before loading the new one
+					NIKE_ECS_SERVICE->destroyAllEntities();
+					NIKE_IMGUI_SERVICE->getEntityRef().clear();
+
+					// Load the scene from the selected file path
+					NIKE_SERIALIZE_SERVICE->loadSceneFromFile(scene_file_path);
+					NIKE_IMGUI_SERVICE->populateLists = false;
+				}
+				else {
+
+					NIKEE_CORE_ERROR("Error: Scene file path is invalid or file does not exist.");
+				}
 			}
 			ImGui::Spacing();
 			ImGui::EndMenuBar();

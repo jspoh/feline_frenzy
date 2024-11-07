@@ -122,19 +122,25 @@ namespace NIKE {
 
 		// Update all systems
 		for (auto const& system : systems) {
+			
 			if (system->getActiveState())
 			{
 				std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
 
-				//Break system update loop if system update returns true
-				system->update();
+				// When game is paused make sure all systems are not running except render (!TODO CHANGE TO Deactive Active state)
+				if (!NIKE_IMGUI_SERVICE->getGamePaused() || system->getSysName() == "Render System") {
+					//Break system update loop if system update returns true
+					system->update();
+				}
 
 				std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
 
 				// Calculate the time taken by the system
 				std::chrono::duration<double, std::milli> system_duration = system_end_time - system_start_time;
 				system_times.push_back(system_duration.count());
+
 			}
+			
 		}
 		// Track total end time for the update call
 		std::chrono::steady_clock::time_point total_end_time = std::chrono::steady_clock::now();

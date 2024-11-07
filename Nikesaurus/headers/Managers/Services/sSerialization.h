@@ -60,6 +60,10 @@ namespace NIKE {
 
 			//Deserialize Entity
 			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
+
+			//current scene path string when (de-serialising)
+			std::string curr_scene_file = "";
+
 		public:
 			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
 			~Service() = default;
@@ -81,6 +85,9 @@ namespace NIKE {
 
 			//Load scene from file path
 			void loadSceneFromFile(std::string const& file_path);
+
+			//Get current scene file path
+			std::string const& getCurrSceneFile() const;
 		};
 
 		//Re-enable DLL Export warning

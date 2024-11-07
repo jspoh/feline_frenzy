@@ -190,6 +190,13 @@ namespace NIKE {
 
 		//Close file
 		file.close();
+
+		// Save file path
+		curr_scene_file = file_path;
+	}
+
+	std::string const& Serialization::Service::getCurrSceneFile() const {
+		return curr_scene_file;
 	}
 }
 

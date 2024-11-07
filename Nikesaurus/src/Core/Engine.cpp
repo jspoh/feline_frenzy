@@ -171,10 +171,7 @@ namespace NIKE {
 			//}
 
 			//Update all systems
-			if (!NIKE_IMGUI_SERVICE->getGamePaused()) {
-				NIKE_ECS_MANAGER->updateSystems();
-			}
-
+			NIKE_ECS_MANAGER->updateSystems();
 
 			//ImGui Render & Update
 			NIKE_IMGUI_SERVICE->update();
