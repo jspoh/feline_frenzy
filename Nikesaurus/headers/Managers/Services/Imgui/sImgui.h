@@ -15,6 +15,7 @@
 #include "Managers/Services/Imgui/ImguiWindows.h"
 #include "Managers/Services/Imgui/ImguiPopUps.h"
 #include "Managers/Services/sEvents.h"
+#include "Components/cRender.h"
 
 namespace NIKE {
 	// All Caps to differentiate from imgui includes
@@ -31,7 +32,7 @@ namespace NIKE {
 			ViewPortEvent(Vector2f const& window_pos, Vector2f const& window_size) : window_pos{ window_pos }, window_size{ window_size } {}
 		};
 
-		class NIKE_API Service
+		class NIKE_API Service : public Events::IEventListener<Render::ViewportTexture>
 		{
 		public:
 			Service() = default;
@@ -77,6 +78,9 @@ namespace NIKE {
 			bool getImguiActive() const;
 			bool getGamePaused() const;
 
+			//Viewport texture event
+			void onEvent(std::shared_ptr<Render::ViewportTexture> event) override;
+
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
@@ -93,6 +97,9 @@ namespace NIKE {
 			bool b_show_imgui = false;
 			bool b_dispatch_viewport = false;
 			bool b_pause_game = false;
+
+			//Viewport tex_id
+			unsigned int tex_id;
 		};
 
 		// Defines to reduce the long line

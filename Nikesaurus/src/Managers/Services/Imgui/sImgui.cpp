@@ -32,6 +32,9 @@ namespace NIKE {
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
 
+		std::shared_ptr<IMGUI::Service> imgui_service_wrapped(this, [](IMGUI::Service*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(imgui_service_wrapped);
+
 		populateLists = false;
 		// For testing
 		// NIKE_ASSETS_SERVICE->loadTexture("test3", "assets/Textures/Tjunction.png");
@@ -104,9 +107,6 @@ namespace NIKE {
 
 			//Set animation system pause
 			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(false);
-
-			//Set animation system pause
-			//NIKE_ECS_MANAGER->setSystemState<Render::Manager>(false);
 		}
 		else {
 			//Set audio system play
@@ -117,14 +117,16 @@ namespace NIKE {
 
 			//Set animation system play
 			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(true);
-
-			//Set render system play
-			NIKE_ECS_MANAGER->setSystemState<Render::Manager>(true);
 		}
 	}
 
 	bool IMGUI::Service::getGamePaused() const {
 		return b_pause_game;
+	}
+
+	void IMGUI::Service::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
+		tex_id = event->tex_id;
+		event->setEventProcessed(true);
 	}
 
 	void IMGUI::Service::update()
@@ -151,7 +153,7 @@ namespace NIKE {
 			// imguiFileSystemWindow();
 			imguiShowLoadedAssetsWindow();
 			imguiEntityComponentManagementWindow();
-			imguiShowGameViewport(b_dispatch_viewport);
+			imguiShowGameViewport(b_dispatch_viewport, tex_id);
 			imguiCameraControl();
 			imguiLayerManagementWindow();
 			imguiShowLoadedLevelsWindow();

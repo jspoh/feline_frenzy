@@ -34,6 +34,7 @@ namespace NIKE {
 				if (!scene_file_path.empty() && std::filesystem::exists(scene_file_path)) {
 					NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
 
+					// Clear previous scene entities before loading the new one
 					NIKE_ECS_MANAGER->destroyAllEntities();
 					NIKE_IMGUI_SERVICE->getEntityRef().clear();
 
@@ -1019,7 +1020,7 @@ namespace NIKE {
 		}
 	}
 
-	void imguiShowGameViewport(bool& dispatch){
+	void imguiShowGameViewport(bool& dispatch, unsigned int tex_id){
 		ImGui::Begin("Game Viewport");
 
 		float aspect_ratio = 16.f / 9.f;
@@ -1033,7 +1034,7 @@ namespace NIKE {
 			viewport_width = window_size.y * aspect_ratio;
 		}
 
-		ImTextureID textureID = (ImTextureID)NIKE_ECS_MANAGER->getSystemInstance<Render::Manager>()->getTextureColorBuffer();
+		ImTextureID textureID = (ImTextureID)tex_id;
 		// Define UV coordinates to flip the texture vertically
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
 		ImVec2 uv1(1.0f, 0.0f); // Top-right

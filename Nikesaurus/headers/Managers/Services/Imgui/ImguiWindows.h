@@ -43,7 +43,7 @@ namespace NIKE {
 	void imguiLayerManagementWindow();
 
 	// This function renders the game into the viewport of the imgui window
-	void imguiShowGameViewport(bool& dispatch);
+	void imguiShowGameViewport(bool& dispatch, unsigned int tex_id);
 
 	// This functions allows for the control of the camera
 	void imguiCameraControl();

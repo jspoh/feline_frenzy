@@ -61,6 +61,13 @@ namespace NIKE {
 				: edit_position{ pos }, edit_zoom { zoom } {}
 		};
 
+		//Viewport texture event
+		struct ViewportTexture : public Events::IEvent {
+			unsigned int tex_id;
+
+			ViewportTexture(unsigned int tex_id) : tex_id{ tex_id } {}
+		};
+
 		enum class TextOrigin {
 			CENTER = 0,
 			BOTTOM,

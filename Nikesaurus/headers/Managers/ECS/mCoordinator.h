@@ -171,12 +171,6 @@ namespace NIKE {
 			}
 
 			template<typename T>
-			std::shared_ptr<T> getSystemInstance()
-			{
-				return system_manager->getSystemInstance<T>();
-			}
-
-			template<typename T>
 			void addSystemComponentType(Component::Type component)
 			{
 				system_manager->addComponentType<T>(component);

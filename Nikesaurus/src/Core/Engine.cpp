@@ -139,12 +139,6 @@ namespace NIKE {
 			//Calculate Delta Time
 			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
-			//Set Window Title
-			NIKE_WINDOWS_SERVICE->getWindow()->setWindowTitle(NIKE_WINDOWS_SERVICE->getWindow()->getWindowTitle() +
-				" | " + NIKE_SCENES_SERVICE->getCurrSceneID() +
-				" | " + std::to_string(NIKE_WINDOWS_SERVICE->getCurrentFPS()) + " fps" +
-				" | " + std::to_string(NIKE_ECS_MANAGER->getEntitiesCount()) + " entities");
-
 			//Update all audio pending actions
 			getService<Audio::Service>()->getAudioSystem()->update();
 

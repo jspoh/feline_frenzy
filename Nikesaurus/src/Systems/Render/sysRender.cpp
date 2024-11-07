@@ -481,6 +481,8 @@ namespace NIKE {
 		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 		}
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
