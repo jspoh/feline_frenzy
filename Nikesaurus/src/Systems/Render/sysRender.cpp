@@ -25,11 +25,12 @@ namespace NIKE {
 	Render::Manager::Manager() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {
 		render_instances.reserve(MAX_INSTANCES);
 
-#ifdef BATCHED_RENDERING
-		NIKEE_INFO("Using batched rendering");
-#else
-		NIKEE_INFO("Not using batched rendering");
-#endif
+		if (BATCHED_RENDERING) {
+			NIKEE_INFO("Using batched rendering");
+		}
+		else {
+			NIKEE_INFO("Not using batched rendering");
+		}
 	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
