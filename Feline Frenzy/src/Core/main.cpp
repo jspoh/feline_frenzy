@@ -31,6 +31,10 @@ int WINAPI WinMain(
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
 	NIKE_SCENES_SERVICE->registerScene<Menu::Scene>("MENU");
 
+	// register built in model for batched quad rendering (!TODO: can be implemented in a different way if required)
+	NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
+
+
 	//NIKE_EVENTS_SERVICE.getService<NIKE::Coordinator::Service>()->
 
 	//Change Scene To Main Menu

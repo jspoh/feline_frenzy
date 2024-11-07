@@ -9,6 +9,7 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
+#include "Systems/Render/sysRender.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
@@ -144,6 +145,124 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+	}
+
+	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices) {
+		// only handles drwaing quads
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		// create vao
+		glCreateVertexArrays(1, &model.vaoid);
+
+		// create vbo
+		glCreateBuffers(1, &model.vboid);
+
+		// create ebo
+		glCreateBuffers(1, &model.eboid);
+
+		// bind vbo and ebo to vao
+		constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int VERTEX_SIZE = sizeof(Vertex);
+		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
+		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
+
+		// allocate space for vbo
+		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
+		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
+		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// allocate space for ebo
+		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
+		static constexpr int INDEX_SIZE = sizeof(unsigned int);
+		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
+		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// set vertex array attributes
+
+		// batched_base.vert location=0
+		static constexpr int POSITION_ATTRIB_INDEX = 0;
+		static constexpr int POSITION_ATTRIB_SIZE = 2;		// num elements (x,y)
+		static constexpr int POSITION_DATA_TYPE = GL_FLOAT;
+		glEnableVertexArrayAttrib(model.vaoid, POSITION_ATTRIB_INDEX);		// vertex attrib index 0
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			POSITION_ATTRIB_INDEX,
+			POSITION_ATTRIB_SIZE,
+			POSITION_DATA_TYPE,
+			false,		//normalized
+			offsetof(Vertex, pos)			// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, POSITION_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_base.vert location=1
+		static constexpr int COLOR_ATTRIB_INDEX = 1;
+		static constexpr int COLOR_ATTRIB_SIZE = 4;		// num elements (r,g,b,a)
+		static constexpr int COLOR_DATA_TYPE = GL_FLOAT;
+		static constexpr int COLOR_DATA_OFFSET = offsetof(Vertex, col);
+		glEnableVertexArrayAttrib(model.vaoid, COLOR_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			COLOR_ATTRIB_INDEX,
+			COLOR_ATTRIB_SIZE,
+			COLOR_DATA_TYPE,
+			false,		//normalized
+			COLOR_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, COLOR_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_base.vert location=4
+		static constexpr int XFORM_ATTRIB_INDEX_0 = 4;
+		static constexpr int XFORM_ATTRIB_SIZE = 3;		// num elements(row of 3x3 mtx)
+		static constexpr int XFORM_DATA_TYPE = GL_FLOAT;
+		static constexpr int XFORM_DATA_OFFSET_0 = offsetof(Vertex, transform);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_0);		// vertex attrib index 4
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_0,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_0		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_0, VBO_BINDING_INDEX);
+
+		static constexpr int XFORM_ATTRIB_INDEX_1 = 5;
+		static constexpr int XFORM_DATA_OFFSET_1 = XFORM_DATA_OFFSET_0 + sizeof(std::array<float, 3>);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_1);		// vertex attrib index 5
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_1,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_1		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_1, VBO_BINDING_INDEX);
+
+		static constexpr int XFORM_ATTRIB_INDEX_2 = 6;
+		static constexpr int XFORM_DATA_OFFSET_2 = XFORM_DATA_OFFSET_1 + sizeof(std::array<float, 3>);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_2);		// vertex attrib index 6
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_2,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_2		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_2, VBO_BINDING_INDEX);
+
+		// vbo and ebo data population will be done in update
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Assets::RenderLoader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Assets::Model& model) {
@@ -316,7 +435,7 @@ namespace NIKE {
 		return shader_handle;
 	}
 
-	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
+	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh, bool for_batched_rendering) {
 		Assets::Model model;
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
@@ -350,7 +469,9 @@ namespace NIKE {
 			case 'v': {// vertex
 				float ndc_x, ndc_y;
 				line_sstm >> ndc_x >> ndc_y;
-				model.vertices.emplace_back(ndc_x, ndc_y);
+				Vertex v;
+				v.pos = { ndc_x, ndc_y };
+				model.vertices.emplace_back(v);
 				break;
 			}
 			case 't': {// triangle indices
@@ -384,13 +505,25 @@ namespace NIKE {
 		}
 		mesh_file.close();
 
+		std::vector<Vector2f> pos_vertices;
+		pos_vertices.reserve(model.vertices.size());
+		for (const Vertex& v : model.vertices) {
+			pos_vertices.emplace_back(v.pos);
+		}
+
 		if (tex_coords.size() == 0) {
-			createBaseBuffers(model.vertices, indices, model);
+			if (for_batched_rendering) {
+				createBatchedBaseBuffers(model, pos_vertices, indices);
+			}
+			else {
+				createBaseBuffers(pos_vertices, indices, model);
+			}
 		}
 		else {
-			createTextureBuffers(model.vertices, indices, tex_coords, model);
+			createTextureBuffers(pos_vertices, indices, tex_coords, model);
 		}
 		model.draw_count = static_cast<GLuint>(indices.size());
+		model.indices = indices;
 
 		NIKEE_CORE_INFO("Sucessfully loaded model from " + path_to_mesh);
 
@@ -422,7 +555,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
 
 		// Return texture
-		return Assets::Texture(tex_id, {tex_width, tex_height});
+		return Assets::Texture(tex_id, { tex_width, tex_height });
 	}
 }
 

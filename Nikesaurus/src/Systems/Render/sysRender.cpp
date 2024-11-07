@@ -16,7 +16,20 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
+ // used for BATCHED_RENDERING. comment out to disable
+#define BATCHED_RENDERING
+
 namespace NIKE {
+
+	Render::Manager::Manager() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {
+		render_instances.reserve(MAX_INSTANCES);
+
+#ifdef BATCHED_RENDERING
+		NIKEE_INFO("Using batched rendering");
+#else
+		NIKEE_INFO("Not using batched rendering");
+#endif
+	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
@@ -56,8 +69,15 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+#ifndef BATCHED_RENDERING
 		//Set polygon mode
 		glPolygonMode(GL_FRONT, GL_FILL);
+		glEnable(GL_BLEND);
 
 		// use shader
 		shader_system->useShader("base");
@@ -65,6 +85,7 @@ namespace NIKE {
 		//Shader set uniform
 		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
 		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
+		shader_system->setUniform("base", "override_color", e_shape.use_override_color);
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
@@ -77,6 +98,100 @@ namespace NIKE {
 		//Unuse texture
 		glBindVertexArray(0);
 		shader_system->unuseShader();
+#else
+		// prepare for batched rendering
+		RenderInstance instance;
+		instance.xform = x_form;
+		instance.color = e_shape.color;
+
+		render_instances.push_back(instance);
+
+		if (render_instances.size() >= MAX_INSTANCES) {
+			batchRenderObject();
+		}
+#endif
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Render::Manager::batchRenderObject() {
+		// !TODO: considering implementing instanced too with glDrawElementsInstanced
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+#ifndef BATCHED_RENDERING
+		return;
+#endif
+		// !TODO: only implemented for quads..
+
+		if (render_instances.empty()) {
+			return;
+		}
+
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+
+		// create buffer of vertices
+		std::vector<Assets::Vertex> vertices;
+		static constexpr int NUM_VERTICES_IN_MODEL = 4;
+		vertices.reserve(render_instances.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances.size(); i++) {
+			// create temp model to populate with current instance's data
+			Assets::Model m{ model };
+			for (Assets::Vertex& v : m.vertices) {
+				v.col = render_instances[i].color;
+				v.transform = render_instances[i].xform;
+			}
+
+			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
+		}
+
+		// populate vbo
+		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
+
+		// create buffer of indices for indexed rendering
+		std::vector<unsigned int> indices;
+		static constexpr int NUM_INDICES_FOR_QUAD = 6;
+		indices.reserve(render_instances.size() * NUM_INDICES_FOR_QUAD);
+		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
+		for (size_t i{}; i < render_instances.size(); i++) {
+			for (size_t j{}; j < model.indices.size(); j++) {
+				indices.push_back(model.indices[j] + (i * NUM_VERTICES_IN_MODEL));
+			}
+		}
+
+		// populate ebo
+		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
+
+
+		// vbo and ebo are already bound to vao
+		// but bind again just in case???
+		//glVertexArrayVertexBuffer(model.vaoid, 10, model.vboid, 0, sizeof(Assets::Vertex));
+		//glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
+		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
+
+		// use shader
+		shader_system->useShader("batched_base");
+		// bind vao
+		glBindVertexArray(model.vaoid);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+
+		// cleanup
+		glBindVertexArray(0);
+		shader_system->unuseShader();
+
+		render_instances.clear();
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
+		}
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
@@ -254,11 +369,11 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-		
+
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
-		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() :camera_system->getWorldToNDCXform();
+		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() : camera_system->getWorldToNDCXform();
 
 		//Get transform
 		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -370,11 +485,20 @@ namespace NIKE {
 				//Skip entity if no transform is present
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
 					continue;
-				
-				if(NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 					transformAndRenderEntity(entity, true);
 				}
+			}
+		}
 
+		batchRenderObject();		// at least 1 call to this is required every frame at the very end
+
+		// render text last
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			if (!layer->getLayerState())
+				continue;
+			for (auto& entity : entities) {
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
 					transformAndRenderText(entity);
 				}
@@ -432,5 +556,8 @@ namespace NIKE {
 
 	void Render::Manager::update() {
 		renderViewport();
+
+		// moved to renderViewport to ensure it draws before text
+		//batchRenderObject();		// at least 1 call to this is required every frame at the very end
 	}
 }

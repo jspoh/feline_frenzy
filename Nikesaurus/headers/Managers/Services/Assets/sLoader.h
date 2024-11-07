@@ -15,6 +15,23 @@
 namespace NIKE {
 	namespace Assets {
 
+		// Vertex data structure
+		struct Vertex {
+			Vector2f pos;
+			Vector4f col;
+			Vector2f tex_coords;
+			unsigned int tex_hdl;
+			unsigned int tex_binding_idx;
+			Matrix_33 transform;		// column major
+
+			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int tex_binding_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, tex_binding_idx{ tex_binding_idx } {}
+		};
+
 		//Font Type Data Structure
 		struct Font {
 			struct Character {
@@ -39,7 +56,7 @@ namespace NIKE {
 			virtual ~IFontLib() = default;
 		};
 
-		#ifdef NIKE_BUILD_DLL //!EXPOSE TO ENGINE ONLY
+#ifdef NIKE_BUILD_DLL //!EXPOSE TO ENGINE ONLY
 
 		//Font Service
 		class NIKEFontLib : public IFontLib {
@@ -61,7 +78,7 @@ namespace NIKE {
 			~NIKEFontLib();
 		};
 
-		#endif //!EXPOSE TO ENGINE ONLY
+#endif //!EXPOSE TO ENGINE ONLY
 
 		//Font Loader
 		class FontLoader {
@@ -80,10 +97,11 @@ namespace NIKE {
 			unsigned int vboid;
 			unsigned int eboid;
 
+			std::vector<unsigned int> indices;
 			unsigned int primitive_type;
 			unsigned int draw_count;
 
-			std::vector<Vector2f> vertices;
+			std::vector<Vertex> vertices;
 
 			Model() : vaoid{ 0 }, vboid{ 0 }, eboid{ 0 }, primitive_type{ 0 }, draw_count{ 0 } {}
 		};
@@ -93,8 +111,8 @@ namespace NIKE {
 			unsigned int gl_data;
 			Vector2i size;
 
-			Texture() : gl_data{0}, size() {}
-			Texture(unsigned int gl_data, Vector2i&& size) : gl_data{ gl_data }, size{ size }{}
+			Texture() : gl_data{ 0 }, size() {}
+			Texture(unsigned int gl_data, Vector2i&& size) : gl_data{ gl_data }, size{ size } {}
 		};
 
 		//Shader/Model/Texture Loader
@@ -108,6 +126,9 @@ namespace NIKE {
 			 * \param model		vao will be stored here
 			 */
 			void createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Model& model);
+
+			
+			void createBatchedBaseBuffers(Model& model, const std::vector<Vector2f>& pos_vertices, const std::vector<unsigned int>& indices);
 
 			/**
 			 * creates a vertex array object for base opengl shaders.
@@ -144,7 +165,7 @@ namespace NIKE {
 			 * \param frag_path		path to fragment shader
 			 */
 			unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
-		
+
 			/**
 			 * creates vertex array object. from mesh data and registers it to meshes.
 			 *
@@ -171,7 +192,7 @@ namespace NIKE {
 			 * \param path_to_mesh
 			 * \return success
 			 */
-			Model compileModel(const std::string& path_to_mesh);
+			Model compileModel(const std::string& path_to_mesh, bool for_batched_rendering = false);
 
 			/**
 			 * registers textures.
