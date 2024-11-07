@@ -198,6 +198,7 @@ namespace NIKE {
 			false,		//normalized
 			offsetof(Vertex, pos)			// offset
 		);
+		glVertexArrayAttribBinding(model.vaoid, POSITION_ATTRIB_INDEX, VBO_BINDING_INDEX);
 
 		// batched_base.vert location=1
 		static constexpr int COLOR_ATTRIB_INDEX = 1;
@@ -213,6 +214,7 @@ namespace NIKE {
 			false,		//normalized
 			COLOR_DATA_OFFSET		// offset
 		);
+		glVertexArrayAttribBinding(model.vaoid, COLOR_ATTRIB_INDEX, VBO_BINDING_INDEX);
 
 		// batched_base.vert location=4
 		static constexpr int XFORM_ATTRIB_INDEX_0 = 4;
@@ -228,6 +230,7 @@ namespace NIKE {
 			false,		//normalized
 			XFORM_DATA_OFFSET_0		// offset
 		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_0, VBO_BINDING_INDEX);
 
 		static constexpr int XFORM_ATTRIB_INDEX_1 = 5;
 		static constexpr int XFORM_DATA_OFFSET_1 = XFORM_DATA_OFFSET_0 + sizeof(std::array<float, 3>);
@@ -240,6 +243,7 @@ namespace NIKE {
 			false,		//normalized
 			XFORM_DATA_OFFSET_1		// offset
 		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_1, VBO_BINDING_INDEX);
 
 		static constexpr int XFORM_ATTRIB_INDEX_2 = 6;
 		static constexpr int XFORM_DATA_OFFSET_2 = XFORM_DATA_OFFSET_1 + sizeof(std::array<float, 3>);
@@ -252,6 +256,7 @@ namespace NIKE {
 			false,		//normalized
 			XFORM_DATA_OFFSET_2		// offset
 		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_2, VBO_BINDING_INDEX);
 
 		// vbo and ebo data population will be done in update
 

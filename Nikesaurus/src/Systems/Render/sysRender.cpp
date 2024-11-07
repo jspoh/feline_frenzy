@@ -17,7 +17,7 @@
 #include "Math/Mtx33.h"
 
  // used for BATCHED_RENDERING. comment out to disable
-#define BATCHED_RENDERING
+//#define BATCHED_RENDERING
 
 namespace NIKE {
 
