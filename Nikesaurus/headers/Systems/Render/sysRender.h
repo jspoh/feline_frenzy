@@ -29,6 +29,7 @@ namespace NIKE {
 		struct RenderInstance {
 			Matrix_33 xform;
 			Vector4f color;
+			unsigned int tex;
 		};
 
 		//Render Manager

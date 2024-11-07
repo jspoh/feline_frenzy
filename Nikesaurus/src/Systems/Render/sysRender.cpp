@@ -252,11 +252,22 @@ namespace NIKE {
 			shader_system->unuseShader();
 		}
 		else {
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.tex = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
 
+			render_instances_texture.push_back(instance);
+
+			if (render_instances_texture.size() >= MAX_INSTANCES) {
+				batchRenderTextures();
+			}
 		}
 	}
 
-	void batchRenderTextures() {}
+	void Render::Manager::batchRenderTextures() {
+
+	}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 

@@ -21,15 +21,15 @@ namespace NIKE {
 			Vector4f col;
 			Vector2f tex_coords;
 			unsigned int tex_hdl;
-			unsigned int tex_binding_idx;
+			unsigned int sampler_idx;	// index to use in sampler2DArray
 			Matrix_33 transform;		// column major
 
-			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int tex_binding_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, tex_binding_idx{ tex_binding_idx } {}
+			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int sampler_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, sampler_idx{ sampler_idx } {}
 		};
 
 		//Font Type Data Structure
@@ -138,6 +138,8 @@ namespace NIKE {
 			 * \param model		vao will be stored here
 			 */
 			void createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Model& model);
+
+			void createBatchedTextureBuffers(Model& model);
 
 			/**
 			 * all .tex files should be 256x256 in RGBA8 format.
