@@ -168,11 +168,16 @@ namespace NIKE {
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 
 
-
 		// allocate space for vbo
 		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
 		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
 		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// allocate space for ebo
+		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
+		static constexpr int INDEX_SIZE = sizeof(unsigned int);
+		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
+		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		// set vertex array attributes
 
@@ -243,12 +248,6 @@ namespace NIKE {
 			false,		//normalized
 			XFORM_DATA_OFFSET_2		// offset
 		);
-
-		// allocate space for ebo
-		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
-		static constexpr int INDEX_SIZE = sizeof(unsigned int);
-		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
-		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		// vbo and ebo data population will be done in update
 	}
