@@ -451,7 +451,7 @@ namespace NIKE {
 
 	void Assets::Service::loadPrefab(const std::filesystem::directory_entry& entry)
 	{
-		if (entry.is_regular_file() && hasValidScnTxtExtension(entry.path())) {
+		if (entry.is_regular_file() && hasValidPrefabExtension(entry.path())) {
 			std::string file_name = entry.path().filename().string();
 
 			// Only add the file if it doesn't already exist in the prefabs list
@@ -634,6 +634,27 @@ namespace NIKE {
 				}
 			}
 		}
+		else if (asset_type == "Prefabs") {
+
+			// Load new fonts
+			for (const auto& prefab_paths : std::filesystem::directory_iterator(getPrefabsPath())) {
+				if (hasValidPrefabExtension(prefab_paths)) {
+					std::string file_name = prefab_paths.path().filename().string();
+
+					//string variables
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
+					// Check if the font already exists before loading
+					if (!checkPrefabFileExist(file_name.substr(start, size))) {
+						loadPrefab(prefab_paths);
+					}
+					else {
+						reloadPrefab(file_name.substr(start, size), prefab_paths.path());
+					}
+				}
+			}
+			}
 		else if (asset_type == "Shaders") {
 
 			// Load new fonts

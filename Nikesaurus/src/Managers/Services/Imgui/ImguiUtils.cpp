@@ -71,6 +71,11 @@ namespace NIKE
         static std::string selected_texture;
         static std::string selected_file_path;
 
+        // To track if we need to show the popup
+        static bool open_create_entity_popup = false;  
+        // Stores the selected prefab name
+        static std::string selected_prefab;             
+
         // Refresh button to reload assets if needed
         if (ImGui::Button(("Refresh " + asset_type).c_str()) && asset_type != "Shaders")
         {
@@ -150,12 +155,21 @@ namespace NIKE
                 ImGui::Text("%s", model.first.c_str());
             }
         }
-        else if (asset_type == "Prefabs")
-        {
-            for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
-            {
-                ImGui::Text("%s", prefab.first.c_str());
-            }
+		else if (asset_type == "Prefabs")
+		{
+			for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
+			{
+				const std::string& prefab_name = prefab.first;
+
+				if (ImGui::Selectable(prefab_name.c_str())) {
+					selected_prefab = prefab_name;
+					open_create_entity_popup = true;
+					ImGui::OpenPopup("Create Entity with Prefab");
+				}
+			}
+
+            // Open pop up to create entity with prefab
+            open_create_entity_popup = showCreateEntityPrefabPopUp(selected_prefab);
         }
         else if (asset_type == "Shaders")
         {

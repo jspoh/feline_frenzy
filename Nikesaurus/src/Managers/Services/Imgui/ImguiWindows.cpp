@@ -179,7 +179,7 @@ namespace NIKE {
 		}
 
 		// Display the Create Entity Popup if open
-		open_popup = showCreateEntityPopUp(open_popup);
+		open_popup = showCreateEntityPopUp();
 
 		ImGui::SameLine();
 

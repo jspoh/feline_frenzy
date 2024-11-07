@@ -17,7 +17,10 @@ namespace NIKE {
 	**********************************************************************/
 
 	// This function will create a pop up for user to input their entity name for easier UI
-	bool showCreateEntityPopUp(bool pop_up);
+	bool showCreateEntityPopUp();
+
+	// This function will create a pop up for user to input their entity name for easier UI
+	bool showCreateEntityPrefabPopUp(std::string const& file_path);
 
 	// This function will create a pop up for user to choose which component to add 
 	bool showAddComponentPopup(Entity::Type& entity, bool pop_up);

@@ -16,6 +16,7 @@ void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->reloadAssets("Audio");
 	NIKE_ASSETS_SERVICE->reloadAssets("Models");
 	NIKE_ASSETS_SERVICE->reloadAssets("Fonts");
+	NIKE_ASSETS_SERVICE->reloadAssets("Prefabs");
 }
 
 void Splash::Scene::init() {
