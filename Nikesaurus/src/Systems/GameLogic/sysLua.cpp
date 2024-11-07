@@ -34,9 +34,14 @@ namespace NIKE {
         lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
 
         //Bind Cout for lua
-        lua_state->set_function("cout", [](const std::string& msg) {
+        lua_state->set_function("cout", sol::overload(
+            [](const std::string& msg) {
             cout << "[Lua] " << msg << endl;
-            });
+            },
+            [](int value) {
+                cout << "[Lua] " << value << endl;
+            }
+            ));
     }
 
     Lua::System::System()
@@ -46,7 +51,7 @@ namespace NIKE {
 
     void Lua::System::init() {
         //Lua state init
-        lua_state->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table);
+        lua_state->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table, sol::lib::io);
     }
 
     void Lua::System::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {

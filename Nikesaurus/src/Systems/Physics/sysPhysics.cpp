@@ -185,20 +185,30 @@ namespace NIKE {
         event->setEventProcessed(true);
     }
 
-    void Physics::Manager::applyForce(Entity::Type entity, Vector2f const& force) {
-        cout << "HERE" << endl;
-
+    void Physics::Manager::applyXForce(Entity::Type entity, float force) {
         if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
             return;
 
         //Get dynamics
         auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        e_dynamics.force = force;
+        e_dynamics.force.x = force;
+    }
+
+    void Physics::Manager::applyYForce(Entity::Type entity, float force) {
+        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
+            return;
+
+        //Get dynamics
+        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+        e_dynamics.force.y = force;
     }
 
     void Physics::Manager::registerLuaBindings(sol::state& lua_state) {
-        lua_state.set_function("applyForce", [this](unsigned int entity, float x_force, float y_force) {
-            applyForce(static_cast<Entity::Type>(entity), Vector2f(x_force, y_force));
+        lua_state.set_function("applyXForce", [this](unsigned int entity, float x_force) {
+            applyXForce(static_cast<Entity::Type>(entity), x_force);
+            });
+        lua_state.set_function("applyYForce", [this](unsigned int entity, float y_force) {
+            applyYForce(static_cast<Entity::Type>(entity), y_force);
             });
     }
 }

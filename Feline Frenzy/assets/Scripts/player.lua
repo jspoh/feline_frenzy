@@ -3,19 +3,24 @@ Player = {}
 
 -- Update function to be called every frame
 function Player:update(entity)
-cout(entity)
-    -- Input handling with your defined key codes
+    --Reset force
+    applyXForce(entity, 0.0)
+    applyYForce(entity, 0.0)
+
     if isKeyPressed(Key.W) then
-        applyForce(entity, 0.0, 100.0)  -- Example upward force
+        applyYForce(entity, 100.0)  -- Upward force
     end
+
     if isKeyPressed(Key.S) then
-        applyForce(entity, 0.0, -100.0) -- Example downward force
+        applyYForce(entity, -100.0) -- Downward force
     end
+
     if isKeyPressed(Key.A) then
-        applyForce(entity, -100.0, 0.0) -- Example leftward force
+        applyXForce(entity, -100.0) -- Left force
     end
+
     if isKeyPressed(Key.D) then
-        applyForce(entity, 100.0, 0.0)  -- Example rightward force
+        applyXForce(entity, 100.0)  -- Right force
     end
 end
 

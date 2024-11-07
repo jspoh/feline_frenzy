@@ -33,7 +33,8 @@ namespace NIKE {
 			std::unique_ptr<Collision::System> collision_system;
 
 			//Apply forces
-			void applyForce(Entity::Type entity, Vector2f const& force);
+			void applyXForce(Entity::Type entity, float force);
+			void applyYForce(Entity::Type entity, float force);
 		public:
 			//Default Constructor
 			Manager() = default;
