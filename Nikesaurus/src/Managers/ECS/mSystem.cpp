@@ -135,6 +135,10 @@ namespace NIKE {
 				std::chrono::duration<double, std::milli> system_duration = system_end_time - system_start_time;
 				system_times.push_back(system_duration.count());
 			}
+			else {
+				//Push system no run time
+				system_times.push_back(0.0);
+			}
 		}
 		// Track total end time for the update call
 		std::chrono::steady_clock::time_point total_end_time = std::chrono::steady_clock::now();

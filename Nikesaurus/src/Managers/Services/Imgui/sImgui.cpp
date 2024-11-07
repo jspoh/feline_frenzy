@@ -11,6 +11,12 @@
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
 
+ //Registered Systems
+#include "Systems/sysAudio.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/Render/sysRender.h"
+
 namespace NIKE {
 
 	void IMGUI::Service::init()
@@ -88,6 +94,33 @@ namespace NIKE {
 	
 	void IMGUI::Service::setGamePaused(bool pause) {
 		b_pause_game = pause;
+
+		if (b_pause_game) {
+			//Set audio system pause
+			NIKE_ECS_MANAGER->setSystemState<Audio::Manager>(false);
+
+			//Set physics system pause
+			NIKE_ECS_MANAGER->setSystemState<Physics::Manager>(false);
+
+			//Set animation system pause
+			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(false);
+
+			//Set animation system pause
+			//NIKE_ECS_MANAGER->setSystemState<Render::Manager>(false);
+		}
+		else {
+			//Set audio system play
+			NIKE_ECS_MANAGER->setSystemState<Audio::Manager>(true);
+
+			//Set physics system play
+			NIKE_ECS_MANAGER->setSystemState<Physics::Manager>(true);
+
+			//Set animation system play
+			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(true);
+
+			//Set render system play
+			NIKE_ECS_MANAGER->setSystemState<Render::Manager>(true);
+		}
 	}
 
 	bool IMGUI::Service::getGamePaused() const {
