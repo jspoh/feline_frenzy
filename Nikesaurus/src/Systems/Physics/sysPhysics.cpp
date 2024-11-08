@@ -76,11 +76,11 @@ namespace NIKE {
                 }
 
                 //Pathfinding
-                if (NIKE_ECS_MANAGER->checkEntityComponent<NIKE::Pathfinding::Path>(entity) &&
-                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-                    auto& e_pathfinding = NIKE_ECS_SERVICE->getEntityComponent<NIKE::Pathfinding::Path>(entity);
+                //if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity) &&
+                //    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
+                //    auto& e_pathfinding = NIKE_ECS_SERVICE->getEntityComponent<Pathfinding::Path>(entity);
 
-                }
+                //}
 
                 //Collision detection
                 if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&

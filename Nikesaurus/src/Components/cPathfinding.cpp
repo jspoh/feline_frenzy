@@ -25,8 +25,8 @@ namespace NIKE {
                 }
                 return {
                     { "Path", path_json },
-                    { "CurrentIndex", comp.currentIndex },
-                    { "PathFound", comp.pathFound }
+                    { "CurrentIndex", comp.current_index },
+                    { "PathFound", comp.path_found }
                 };
             },
 
@@ -38,8 +38,8 @@ namespace NIKE {
                     point.fromJson(point_data); // Assuming fromJson() is defined for Vector2f
                     comp.path.push_back(point);
                 }
-                comp.currentIndex = data.at("CurrentIndex").get<int>();
-                comp.pathFound = data.at("PathFound").get<bool>();
+                comp.current_index = data.at("CurrentIndex").get<int>();
+                comp.path_found = data.at("PathFound").get<bool>();
             }
         );
     }

@@ -15,6 +15,7 @@
 #include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
+#include "Components/cPathfinding.h"
 
 namespace NIKE {
 	namespace Physics {
