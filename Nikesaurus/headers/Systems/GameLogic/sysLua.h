@@ -8,25 +8,32 @@
  *********************************************************************/
 #pragma once
 
+#ifndef SYS_LUA_HPP
+#define SYS_LUA_HPP
+
 namespace NIKE {
 	namespace Lua {
 
 		//Bindable lua interface
-		class LuaBinding {
-
+		class ILuaBind {
+		private:
+		public:
+			virtual void registerLuaBindings(sol::state& lua_state) = 0;
+			virtual ~ILuaBind() = default;
 		};
 		
 		//Lua system
 		class System {
 		private:
-			//Binding of lua to C++ functions
-			void registerBindings();
 
 			//Lua State
 			std::unique_ptr<sol::state> lua_state;
 
 			//Loaded lua scripts
-			std::unordered_map<std::string, std::pair<std::string, sol::load_result>> scripts;
+			std::unordered_map<std::string, std::pair<std::string, sol::table>> scripts;
+
+			//Lua bindable systems
+			std::vector<std::shared_ptr<ILuaBind>> systems;
 		public:
 			System();
 			~System() = default;
@@ -34,14 +41,25 @@ namespace NIKE {
 			//Initialize Lua
 			void init();
 
+			//Binding of lua to C++ functions
+			void registerBindings();
+
+			//Register lua bindable systems
+			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+
 			//Load lua script
-			void loadScript(std::string const& script_id, std::string const& file_path);
+			std::string loadScript(std::string const& file_path);
+
+			//reload lua script
+			void reloadScript(std::string const& script_id);
 
 			//Reload all lua scripts
-			void reloadScripts();
+			void reloadAllScripts();
 
 			//Execute lua scripts
-			void executeScript(std::string const& script_id);
+			sol::protected_function executeScript(std::string const& script_id, std::string const& function);
 		};
 	}
 }
+
+#endif //!SYS_LUA_HPP

@@ -493,15 +493,15 @@ namespace NIKE {
 								animate_base_comp.animation_mode = selected_mode;
 							}
 
-							//ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
-							//if (ImGui::Button("Toggle Ping Pong")) {
-							//	animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
-							//}
-
-							ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
-							if (ImGui::Button("Toggle Reverse")) {
-								animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
+							if (ImGui::Button("Toggle Ping Pong")) {
+								animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
 							}
+
+							//ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
+							//if (ImGui::Button("Toggle Reverse")) {
+							//	animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							//}
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -512,9 +512,11 @@ namespace NIKE {
 						else if (component_name == "Animation::Sprite") {
 							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
 
-							ImGui::DragInt2("Sheet Size", &animate_sprite_comp.sheet_size.x, 1);
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
+							ImGui::Text("Sheet Size:");
+							ImGui::BulletText("X = %d", animate_sprite_comp.sheet_size.x);
+							ImGui::BulletText("Y = %d", animate_sprite_comp.sheet_size.y);
 							ImGui::Text("Current Index:");
 							ImGui::BulletText("X = %d", animate_sprite_comp.curr_index.x);
 							ImGui::BulletText("Y = %d", animate_sprite_comp.curr_index.y);
@@ -763,6 +765,33 @@ namespace NIKE {
 								NIKE_IMGUI_SERVICE->populateLists = false;
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
+						}
+						else if (component_name == "GameLogic::Player") {
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Player>(entity);
+
+							static char script_path[300];
+							static bool scripth_path_init = false;
+
+							//For initial initialization
+							if (!scripth_path_init || script_path != e_player.script.c_str()) {
+								// Ensure null-termination
+								script_path[sizeof(script_path) - 1] = '\0';
+								strcpy_s(script_path, e_player.script.c_str());
+								scripth_path_init = true;
+							}
+
+							ImGui::Text("Enter a script:");
+							if (ImGui::InputText("##PlayerScript", script_path, IM_ARRAYSIZE(script_path))){
+
+							}
+
+							if (ImGui::Button("Save Script")) {
+								e_player.script = script_path;
+							}
+
+							ImGui::Separator();
+
+							ImGui::Text(std::string("Script Id: " + e_player.script_id).c_str());
 						}
 						else
 						{

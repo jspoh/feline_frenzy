@@ -11,10 +11,11 @@
 #include "Core/Engine.h"
  //
  //Registered Systems
+#include "Systems/GameLogic/sysGameLogic.h"
+#include "Systems/Physics/sysPhysics.h"
+#include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
-#include "../headers/Systems/Physics/sysPhysics.h"
-#include "../headers/Systems/Animation/sysAnimation.h"
-#include "../headers/Systems/Render/sysRender.h"
+#include "Systems/Render/sysRender.h"
 
 namespace NIKE {
 
@@ -36,23 +37,32 @@ namespace NIKE {
 
 		//Register render components
 		Render::registerComponents();
+
+		//Register render components
+		GameLogic::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
-		//Register audio system
-		NIKE_ECS_MANAGER->registerSystem<Audio::Manager>();
-		NIKE_ECS_MANAGER->addSystemComponentType<Audio::Manager>(NIKE_ECS_MANAGER->getComponentType<Audio::SFX>());
+
+		//Register game logic manager
+		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Player>());
 
 		//Register physics manager
-		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		game_logic_sys->registerLuaSystem(physics_sys);
 
-		////Register animation manager
+		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Animation::Manager>(NIKE_ECS_MANAGER->getComponentType<Animation::Base>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Animation::Manager>(NIKE_ECS_MANAGER->getComponentType<Animation::Sprite>());
+
+		//Register audio system
+		NIKE_ECS_MANAGER->registerSystem<Audio::Manager>();
+		NIKE_ECS_MANAGER->addSystemComponentType<Audio::Manager>(NIKE_ECS_MANAGER->getComponentType<Audio::SFX>());
 
 		//Register render manager
 		NIKE_ECS_MANAGER->registerSystem<Render::Manager>(false);

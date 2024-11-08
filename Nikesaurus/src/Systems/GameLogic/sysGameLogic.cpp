@@ -8,15 +8,60 @@
 
 #include "Core/stdafx.h"
 #include "Systems/GameLogic/sysGameLogic.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 
 	void GameLogic::Manager::init() {
+		lua_system = std::make_unique<Lua::System>();
+		lua_system->init();
+	}
 
+	void GameLogic::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
+		//Add system to lua
+		lua_system->registerLuaSystem(system);
 	}
 
 	void GameLogic::Manager::update() {
 
+		//Get layers
+		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+
+		//Reverse Iterate through layers
+		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
+
+			//SKip inactive layer
+			if (!(*layer)->getLayerState())
+				continue;
+
+			//Iterate through all entities
+			for (auto& entity : entities) {
+				
+				//Check for player logic comp
+				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::Player>(entity)) {
+					auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Player>(entity);
+
+					//Skip if script has not been set
+					if (e_player.script == "")
+						continue;
+
+					//Run script
+					if (e_player.script_id == "") {
+						e_player.script_id = lua_system->loadScript(e_player.script);
+						auto func = lua_system->executeScript(e_player.script_id, "update")(1, entity);
+						e_player.b_loaded = true;
+					}
+					else if (e_player.b_loaded) {
+						auto func = lua_system->executeScript(e_player.script_id, "update")(1, entity);
+					}
+					else {
+						lua_system->reloadScript(e_player.script_id);
+						auto func =lua_system->executeScript(e_player.script_id, "update")(1, entity);
+						e_player.b_loaded = true;
+					}
+				}
+			}
+		}
 	}
 
 	//void GameLogic::Manager::init() {

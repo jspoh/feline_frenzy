@@ -68,8 +68,8 @@
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 2,
-                                    "y": 0
+                                    "x": 5,
+                                    "y": 2
                                 },
                                 "End_Index": {
                                     "x": 0,
@@ -84,21 +84,24 @@
                                     "y": 0
                                 }
                             },
+                            "GameLogic::Player": {
+                                "Script_Path": "assets/Scripts/player.lua"
+                            },
                             "Physics::Collider": {
                                 "B_Collided": false,
                                 "Resolution": 2
                             },
                             "Physics::Dynamics": {
-                                "Drag": 0.0,
+                                "Drag": 0.800000011920929,
                                 "Force": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Mass": 9.999999747378752e-05,
-                                "Max_Speed": 20.0,
+                                "Mass": 2.0,
+                                "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": -0.22134990990161896,
+                                    "y": -0.49007806181907654
                                 }
                             },
                             "Render::Cam": {
@@ -122,8 +125,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
-                                    "y": 0
+                                    "x": 4,
+                                    "y": 2
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -134,8 +137,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 0.0,
-                                    "y": 200.0
+                                    "x": -21.722660064697266,
+                                    "y": -5.652067184448242
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

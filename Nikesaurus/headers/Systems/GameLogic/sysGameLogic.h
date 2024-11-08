@@ -11,7 +11,8 @@
 #ifndef GAME_LOGIC_HPP
 #define GAME_LOGIC_HPP
 
-#include "../headers/Managers/ECS/mSystem.h"
+#include "Managers/ECS/mSystem.h"
+#include "sysLua.h"
 
 namespace NIKE {
     namespace GameLogic {
@@ -22,6 +23,9 @@ namespace NIKE {
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
 
+			//Internal lua system
+			std::unique_ptr<Lua::System> lua_system;
+
 	    public:
 		    //Default constructor
 		    Manager() = default;
@@ -29,6 +33,7 @@ namespace NIKE {
 			//Default Destructor
 			~Manager() = default;
 
+			//Get system name
 		    std::string getSysName() override
 		    {
 			    return "Game Logic System";
@@ -37,13 +42,11 @@ namespace NIKE {
 			//Init Inputs
 			void init() override;
 
+			//Register systems for lua
+			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+
 		    //Update Inputs
 		    void update() override;
-
-            //// Utility functions for logic, should be moved in future
-            //// Generates a random unit vector direction
-            //Vector2f getRandomDirection();
-            //Entity::Type getPlayerEntity();
 	    };
     }
 }

@@ -46,6 +46,7 @@
     <ClCompile Include="src\Components\cTransform.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysLua.cpp" />
+    <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +106,7 @@
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
+    <ClInclude Include="headers\Components\cGameLogic.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

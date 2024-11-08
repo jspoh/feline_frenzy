@@ -29,6 +29,7 @@
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
 #include "Components/cAnimation.h"
+#include "Components/cGameLogic.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL
