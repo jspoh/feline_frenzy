@@ -108,7 +108,18 @@ namespace NIKE {
 	}
 
 	void Animation::SpriteAnimator::animateSprite(Animation::Base& base_component, Animation::Sprite& sprite_component, Render::Texture& sprite_texture) {
+		//Limit Frame Size
+		sprite_component.sheet_size.x = sprite_texture.frame_size.x;
+		sprite_component.sheet_size.y = sprite_texture.frame_size.y;
 
+		//Limit Start Index
+		sprite_component.start_index.x = std::clamp(sprite_component.start_index.x, 0, sprite_component.sheet_size.x - 1);
+		sprite_component.start_index.y = std::clamp(sprite_component.start_index.y, 0, sprite_component.sheet_size.y - 1);
+
+		//Limit End Index
+		sprite_component.end_index.x = std::clamp(sprite_component.end_index.x, 0, sprite_component.sheet_size.x - 1);
+		sprite_component.end_index.y = std::clamp(sprite_component.end_index.y, 0, sprite_component.sheet_size.y - 1);
+		
 		//Move sprite index back to starting index
 		if (base_component.animation_mode == Mode::END || base_component.animation_mode == Mode::RESTART) {
 			sprite_component.curr_index = sprite_component.start_index;

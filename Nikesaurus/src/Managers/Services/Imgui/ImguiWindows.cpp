@@ -492,15 +492,15 @@ namespace NIKE {
 								animate_base_comp.animation_mode = selected_mode;
 							}
 
-							//ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
-							//if (ImGui::Button("Toggle Ping Pong")) {
-							//	animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
-							//}
-
-							ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
-							if (ImGui::Button("Toggle Reverse")) {
-								animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
+							if (ImGui::Button("Toggle Ping Pong")) {
+								animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
 							}
+
+							//ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
+							//if (ImGui::Button("Toggle Reverse")) {
+							//	animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							//}
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -511,9 +511,11 @@ namespace NIKE {
 						else if (component_name == "Animation::Sprite") {
 							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
 
-							ImGui::DragInt2("Sheet Size", &animate_sprite_comp.sheet_size.x, 1);
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
+							ImGui::Text("Sheet Size:");
+							ImGui::BulletText("X = %d", animate_sprite_comp.sheet_size.x);
+							ImGui::BulletText("Y = %d", animate_sprite_comp.sheet_size.y);
 							ImGui::Text("Current Index:");
 							ImGui::BulletText("X = %d", animate_sprite_comp.curr_index.x);
 							ImGui::BulletText("Y = %d", animate_sprite_comp.curr_index.y);
