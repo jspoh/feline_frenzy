@@ -701,14 +701,13 @@ namespace NIKE {
 							}
 
 							ImGui::Text("Enter Audio ID:");
-							if (ImGui::InputText("##audioID", input_audio_id, IM_ARRAYSIZE(input_audio_id))) {
-								// Optionally handle input change here if needed
-							}
+							ImGui::InputText("##audioID", input_audio_id, IM_ARRAYSIZE(input_audio_id));
+							
 
 							ImGui::Text("Enter Channel ID:");
-							if (ImGui::InputText("##channelID", input_channel_group_id, IM_ARRAYSIZE(input_channel_group_id))) {
-								// Optionally handle input change here if needed
-							}
+							ImGui::InputText("##channelID", input_channel_group_id, IM_ARRAYSIZE(input_channel_group_id));
+
+							
 
 							// Set volume
 							ImGui::SliderFloat("Volume", &sfx_comp.volume, 0.f, 1.f, "%.2f");
@@ -731,12 +730,14 @@ namespace NIKE {
 								{
 									// Update channel ID in component
 									sfx_comp.channel_group_id = input_channel_group_id;
+									memset(input_channel_group_id, 0, sizeof(input_channel_group_id));
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
 								else
 								{
 									ImGui::OpenPopup("INVALID INPUT");
+									memset(input_channel_group_id, 0, sizeof(input_channel_group_id));
 									show_error_popup = true;
 								}
 							}
@@ -745,11 +746,13 @@ namespace NIKE {
 								{
 									// Update audio ID in component
 									sfx_comp.audio_id = input_audio_id;
+									memset(input_audio_id, 0 ,sizeof(input_audio_id));
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
 								else
 								{
+									memset(input_audio_id, 0, sizeof(input_audio_id));
 									ImGui::OpenPopup("INVALID INPUT");
 									show_error_popup = true;
 								}
@@ -1377,23 +1380,49 @@ namespace NIKE {
 		}
 		// Saving input
 		if (ImGui::Button("Save Channel Input")) {
-			//if (NIKE_ASSETS_SERVICE->checkAudioExist(current_channel_input))
-			//{
+			if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(current_channel_input))
+			{
 				ImGui::OpenPopup("VALID INPUT");
 				show_save_popup = true;
-			//}
+			}
+			else
+			{
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+		}
+
+		if (ImGui::Button("Play BGM"))
+		{
+			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
+			{
+				std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
+
+				NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0);
+			}
+			else
+			{
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+
+		}
+
+		if (ImGui::Button("Stop BGM"))
+		{
+			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
+			{
+
+				NIKE_AUDIO_SERVICE->getChannelGroup(current_channel_input)->stop();
+			}
+
 		}
 
 		// Show pop ups
 		show_error_popup = ShowErrorPopup();
 		show_save_popup = ShowSaveConfirmationPopup();
-
-		if (ImGui::Button("Play BGM"))
-		{
-			std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
-
-			NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0);
-		}
 
 		ImGui::End();
 	}
