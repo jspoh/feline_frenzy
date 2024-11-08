@@ -545,7 +545,7 @@ namespace NIKE {
 							}
 							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.001f, 0.f, 1.f);
 							// Save buttons to confirm changes
-							if (ImGui::Button("Save Font Ref")) {
+							if (ImGui::Button("Save Shape Ref")) {
 								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))
 								{
 									// Update channel ID in component
@@ -594,7 +594,7 @@ namespace NIKE {
 							}
 
 							ImGui::Text("Enter text to display:");
-							if (ImGui::InputText("##text", input_text, IM_ARRAYSIZE(input_text))) {
+							if (ImGui::InputText("##textww", input_text, IM_ARRAYSIZE(input_text))) {
 								// Stuff
 							}
 
