@@ -37,19 +37,19 @@ namespace NIKE {
 			std::vector<NIKE::Math::Vector2f> findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal);
 
 			//Load map from file path
-			void loadMapFromFile(const std::string& file,
-				std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-				std::shared_ptr<NIKE::Scenes::Layer>& player_layer,
-				std::vector<std::vector<int>>& grid,
-				const NIKE::Math::Vector2<float>& center);
+			//void loadMapFromFile(const std::string& file,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer,
+			//	std::vector<std::vector<int>>& grid,
+			//	const NIKE::Math::Vector2<float>& center);
 
 		private:
 			float width, height;
 			std::vector<bool> blockedCells;  // Example structure for grid data
 			//Create Tile
-			void createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
-				std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-				std::shared_ptr<NIKE::Scenes::Layer>& player_layer);
+			//void createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
+			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer);
 		};
 
 		//Re-enable DLL Export warning

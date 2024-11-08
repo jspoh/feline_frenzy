@@ -132,6 +132,7 @@ namespace NIKE {
 		return {};
     }
 
+	/*
 	void Map::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
 		// Open Scene file
 		std::ifstream ifs{ file, std::ios::in };
@@ -195,6 +196,7 @@ namespace NIKE {
 		default: texture_name = "grass"; break;
 		}
 
+
 		// Set layer to background if not collidable
 		unsigned int layer = (collide) ? player_layer->getLayerID() : background_layer->getLayerID();
 		NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity(layer);
@@ -212,5 +214,5 @@ namespace NIKE {
 		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name,
 			{ 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { flip, false }));
 	}
-
+	*/
 }
