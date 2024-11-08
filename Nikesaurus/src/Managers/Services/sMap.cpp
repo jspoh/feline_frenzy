@@ -16,7 +16,7 @@ namespace NIKE {
 		height = map_height;
 
 		// Resize and reset the blockedCells grid
-		blockedCells.resize(width * height, false);
+		blockedCells.resize(static_cast<size_t>(width) * static_cast<size_t>(height), false);
 
 		// Loop through tileData to set blocked cells based on tileID
 		for (int y = 0; y < map_height; ++y) {
@@ -24,10 +24,8 @@ namespace NIKE {
 				int tileID = tileData[y][x];
 
 				// Define blocked cells based on specific tile IDs
-				if (tileID == 1 || tileID == 2 || tileID == 3 || // e.g., wall tiles
-					tileID == 5 || tileID == 6 || tileID == 7 ||
-					tileID == 8 || tileID == 9) {
-					setCellBlocked(x, y, true);  // Mark cell as blocked
+				if (tileID != 4) {
+					setCellBlocked(static_cast<float>(x), static_cast<float>(y), true); // Mark cell as blocked
 				}
 			}
 		}
@@ -37,14 +35,14 @@ namespace NIKE {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			throw std::out_of_range("Cell coordinates out of bounds");
 		}
-		return blockedCells[y * width + x];
+		return blockedCells[static_cast<size_t>(y) * static_cast<size_t>(width) + static_cast<size_t>(x)];
 	}
 
 	void Map::Service::setCellBlocked(float x, float y, bool blocked) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			throw std::out_of_range("Cell coordinates out of bounds");
 		}
-		blockedCells[y * width + x] = blocked;
+		blockedCells[static_cast<size_t>(y) * static_cast<size_t>(width) + static_cast<size_t>(x)] = blocked;
 	}
 
     std::vector<NIKE::Math::Vector2f> Map::Service::findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal) {
