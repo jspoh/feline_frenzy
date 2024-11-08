@@ -17,7 +17,7 @@
 #include "Math/Mtx33.h"
 
 
-// batched rendering
+ // batched rendering
 constexpr bool BATCHED_RENDERING = true;
 
 namespace NIKE {
@@ -289,7 +289,7 @@ namespace NIKE {
 		}
 
 		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_texture");
-		
+
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
 		static constexpr int NUM_VERTICES_IN_MODEL = 4;
@@ -328,9 +328,17 @@ namespace NIKE {
 		// create vector of texture handles
 		// cant pass in unsigned int so.. using int
 		std::vector<int> textures;
-		textures.reserve(render_instances_texture.size());
-		for (const Assets::Vertex& v : vertices) {
-			textures.push_back(static_cast<int>(v.tex_hdl));
+		textures.reserve(vertices.size());
+		for (int i{}; i < vertices.size(); i++) {
+			const Assets::Vertex& v = vertices[i];
+
+			const int tex_binding_idx = i;
+
+			// bind textures
+			// using texture ids as texture units too..
+			glBindTextureUnit(tex_binding_idx, v.tex_hdl);
+
+			textures.push_back(tex_binding_idx);
 		}
 		shader_system->setUniform("batched_texture", "u_tex2d", textures);
 
@@ -348,7 +356,7 @@ namespace NIKE {
 
 		render_instances_texture.clear();
 
- 
+
 	}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
