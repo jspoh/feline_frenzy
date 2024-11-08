@@ -22,6 +22,24 @@ namespace NIKE {
 		lua_system->registerLuaSystem(system);
 	}
 
+	sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
+
+		//Run script
+		if (script_id == "") {
+			script_id = lua_system->loadScript(file_path);
+			b_loaded = true;
+			return lua_system->executeScript(script_id, function);
+		}
+		else if (b_loaded) {
+			return lua_system->executeScript(script_id, function);
+		}
+		else {
+			lua_system->reloadScript(script_id);
+			b_loaded = true;
+			return lua_system->executeScript(script_id, function);
+		}
+	}
+
 	void GameLogic::Manager::update() {
 
 		//Get layers
@@ -41,23 +59,55 @@ namespace NIKE {
 				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::Player>(entity)) {
 					auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Player>(entity);
 
-					//Skip if script has not been set
-					if (e_player.script == "")
+					//Skip if script  has not been set
+					if (e_player.script.script_path == "")
 						continue;
 
-					//Run script
-					if (e_player.script_id == "") {
-						e_player.script_id = lua_system->loadScript(e_player.script);
-						auto func = lua_system->executeScript(e_player.script_id, "update")(1, entity);
-						e_player.b_loaded = true;
-					}
-					else if (e_player.b_loaded) {
-						auto func = lua_system->executeScript(e_player.script_id, "update")(1, entity);
-					}
-					else {
-						lua_system->reloadScript(e_player.script_id);
-						auto func =lua_system->executeScript(e_player.script_id, "update")(1, entity);
-						e_player.b_loaded = true;
+					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(1, entity);
+				}
+
+				//Check for player logic comp
+				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::StateMachine>(entity)) {
+					auto& e_state_machine = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::StateMachine>(entity);
+
+					//Skip if script has not been set
+					if (e_state_machine.state_scripts.empty())
+						continue;
+
+					//State machine
+					switch (e_state_machine.curr_state) {
+					case InnerStates::ENTER:
+						if (e_state_machine.state_scripts.find(InnerStates::ENTER) != e_state_machine.state_scripts.end()) {
+
+							//Get script data
+							auto& script = e_state_machine.state_scripts.at(InnerStates::ENTER);
+
+							//Execute enter script
+							executeScript(script.script_path, script.script_id, script.b_loaded, script.function)(1, entity);
+						}
+						break;
+					case InnerStates::UPDATE:
+						if (e_state_machine.state_scripts.find(InnerStates::UPDATE) != e_state_machine.state_scripts.end()) {
+
+							//Get script data
+							auto& script = e_state_machine.state_scripts.at(InnerStates::UPDATE);
+
+							//Execute update script
+							executeScript(script.script_path, script.script_id, script.b_loaded, script.function)(1, entity);
+						}
+						break;
+					case InnerStates::EXIT:
+						if (e_state_machine.state_scripts.find(InnerStates::EXIT) != e_state_machine.state_scripts.end()) {
+
+							//Get script data
+							auto& script = e_state_machine.state_scripts.at(InnerStates::EXIT);
+
+							//Execute exit script
+							executeScript(script.script_path, script.script_id, script.b_loaded, script.function)(1, entity);
+						}
+						break;
+					default:
+						break;
 					}
 				}
 			}

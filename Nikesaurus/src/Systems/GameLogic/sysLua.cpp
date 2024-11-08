@@ -42,6 +42,13 @@ namespace NIKE {
                 cout << "[Lua] " << value << endl;
             }
             ));
+
+        //Define the noop function in Lua
+        (*lua_state).script(R"(
+            function noop()
+                -- No operation
+            end
+        )");
     }
 
     Lua::System::System()
@@ -153,10 +160,16 @@ namespace NIKE {
         //Access the script table
         sol::table script_table = it->second.second;
 
+        //Return if noop function if no function specified
+        if (function == "") {
+            return (*lua_state)["noop"];
+        }
+
         //Execute script
         sol::protected_function func = script_table[function];
         if (!func.valid()) {
-            throw std::runtime_error("Function not found in script.");
+            NIKEE_CORE_WARN("Invalid function called.");
+            return (*lua_state)["noop"];
         }
 
         //Return function
