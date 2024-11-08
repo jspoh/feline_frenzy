@@ -675,6 +675,15 @@ namespace NIKE {
 			pos_vertices.emplace_back(v.pos);
 		}
 
+		if (tex_coords.size() && tex_coords.size() != pos_vertices.size()) {
+			throw std::exception("Texture coordinates do not match number of vertices.");
+		}
+
+		// set texcoords into model vertex
+		for (int i{}; i < tex_coords.size(); i++) {
+			model.vertices[i].tex_coords = tex_coords[i];
+		}
+
 		if (tex_coords.size() == 0) {
 			if (for_batched_rendering) {
 				createBatchedBaseBuffers(model);

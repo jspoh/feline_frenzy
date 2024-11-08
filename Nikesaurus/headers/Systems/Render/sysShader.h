@@ -2,8 +2,8 @@
  * \file   sysShader.h
  * \brief
  *
- * \author Sean Gwee, g.boonxuensean@digipen.edu (90%)
- * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (10%)
+ * \author Sean Gwee, g.boonxuensean@digipen.edu (70%)
+ * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -33,10 +33,10 @@ namespace NIKE {
 			void setUniform(const std::string& shader_ref, const std::string& name, int value);
 			void setUniform(const std::string& shader_ref, const std::string& name, float value);
 			void setUniform(const std::string& shader_ref, const std::string& name, const Matrix_33& value);
-			void setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value);
-
-			//Sprite sheet
 			void setUniform(const std::string& shader_ref, const std::string& name, const Vector2f& value);
+			void setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value);
+			void setUniform(const std::string& shader_ref, const std::string& name, const Vector4f& value);
+			void setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals);
 		};
 	}
 }

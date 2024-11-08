@@ -96,8 +96,8 @@ namespace NIKE {
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
-			cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
-			NIKEE_CORE_ERROR("GL Debug Message: {0}\nSource: {1}", message, source);
+			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
+			//NIKEE_CORE_ERROR("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
 #endif
 	}

@@ -299,11 +299,57 @@ namespace NIKE {
 			Assets::Model m{ model };
 			for (Assets::Vertex& v : m.vertices) {
 				v.tex_hdl = render_instances_texture[i].tex;
-				v.tex_coords = 
 				v.transform = render_instances_texture[i].xform;
+				v.framesize = render_instances_texture[i].framesize;
+				v.uv_offset = render_instances_texture[i].uv_offset;
+				v.sampler_idx = i;
 			}
 
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
+		}
+
+		// populate vbo
+		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
+
+		// create buffer of indices for indexed rendering
+		std::vector<unsigned int> indices;
+		static constexpr int NUM_INDICES_FOR_QUAD = 6;
+		indices.reserve(render_instances_texture.size() * NUM_INDICES_FOR_QUAD);
+		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
+		for (size_t i{}; i < render_instances_texture.size(); i++) {
+			for (size_t j{}; j < model.indices.size(); j++) {
+				indices.push_back(model.indices[j] + static_cast<unsigned int>((i * NUM_VERTICES_IN_MODEL)));
+			}
+		}
+
+		// populate ebo
+		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
+
+		// create vector of texture handles
+		std::vector<unsigned int> textures;
+		textures.reserve(render_instances_texture.size());
+		for (const Assets::Vertex& v : vertices) {
+			textures.push_back(v.tex_hdl);
+		}
+		shader_system->setUniform("batched_texture", "u_tex2d", textures);
+
+		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
+
+		// use shader
+		shader_system->useShader("batched_texture");
+		// bind vao
+		glBindVertexArray(model.vaoid);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+
+		// cleanup
+		glBindVertexArray(0);
+		shader_system->unuseShader();
+
+		render_instances_texture.clear();
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
@@ -552,6 +598,7 @@ namespace NIKE {
 		}
 
 		batchRenderObject();		// at least 1 call to this is required every frame at the very end
+		batchRenderTextures();	// at least 1 call to this is required every frame at the very end
 
 		// render text last
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
