@@ -304,9 +304,9 @@ namespace NIKE
         static char new_entity_name[64] = "";
 
         // Set a default name for the clone if not already set
-        //if (strlen(new_entity_name) == 0) {
+        if (strlen(new_entity_name) == 0) {
             snprintf(new_entity_name, sizeof(new_entity_name), "%s_clone", NIKE_IMGUI_SERVICE->getSelectedEntityName().c_str());
-        // }
+        }
 
         bool is_popup_open = false;
 
@@ -319,10 +319,14 @@ namespace NIKE
                 // Check if an entity with the new name already exists
                 if (!NIKE_IMGUI_SERVICE->checkEntityExist(new_entity_name)) {
                     // Clone the selected entity with the new name
+                   
                     Entity::Type to_clone = NIKE_IMGUI_SERVICE->getEntityByName(NIKE_IMGUI_SERVICE->getSelectedEntityName());
-                    Entity::Type cloned_entity = NIKE_ECS_MANAGER->cloneEntity(to_clone);
+                    if(NIKE_ECS_MANAGER->checkEntity(to_clone))
+                    {
+                        Entity::Type cloned_entity = NIKE_ECS_MANAGER->cloneEntity(to_clone);
 
-                    NIKE_IMGUI_SERVICE->getEntityRef().emplace(new_entity_name, cloned_entity);
+                        NIKE_IMGUI_SERVICE->getEntityRef().emplace(new_entity_name, cloned_entity);
+                    }
 
                     // Reset the name buffer for the next use
                     memset(new_entity_name, 0, sizeof(new_entity_name));
@@ -338,6 +342,8 @@ namespace NIKE
             ImGui::SameLine();
 
             if (ImGui::Button("Cancel")) {
+                // Reset the name buffer for the next use
+                memset(new_entity_name, 0, sizeof(new_entity_name));
                 ImGui::CloseCurrentPopup();
                 is_popup_open = false;
             }
@@ -413,6 +419,8 @@ namespace NIKE
             if (ImGui::Button("Save")) {
                 // Serialize the prefab to the file path
                 NIKE_SERIALIZE_SERVICE->saveEntityToFile(entity, prefab_file_path);
+                // Clear buffer
+                memset(input, 0, sizeof(input));
                 ImGui::CloseCurrentPopup();
                 is_popup_open = false; 
             }
@@ -425,6 +433,7 @@ namespace NIKE
 
             // Button to cancel/save later
             if (ImGui::Button("Cancel")) {
+                memset(input, 0, sizeof(input));
                 ImGui::CloseCurrentPopup();
                 is_popup_open = false; 
             }
@@ -480,6 +489,43 @@ namespace NIKE
         }
 
         return deleted;
+    }
+
+    bool createAudioChannelPopup()
+    {
+        static bool is_open = true;
+        static char new_channel_name[300];
+        static bool channel_init = false;
+        if (!channel_init) {
+            // Ensure null-termination
+            new_channel_name[sizeof(new_channel_name) - 1] = '\0';
+            channel_init = true;
+        }
+
+        if (ImGui::BeginPopupModal("Create Channel Group", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Enter a name for the new channel:");
+            ImGui::InputText("##newChannelName", new_channel_name, IM_ARRAYSIZE(new_channel_name));
+
+            if (ImGui::Button("Create", ImVec2(120, 0)))
+            {
+                // Add the new channel
+                NIKE_AUDIO_SERVICE->createChannelGroup(new_channel_name);
+                is_open = false;  
+                ImGui::CloseCurrentPopup();
+                // Clear buffer
+                memset(new_channel_name, 0, sizeof(new_channel_name));
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel", ImVec2(120, 0)))
+            {
+                is_open = false;  
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+        return is_open;
     }
 
 }

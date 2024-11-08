@@ -50,6 +50,9 @@ namespace NIKE {
 
 	// Function to confirm to delete file
 	bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type);
+
+	// Function to show pop up to create audio channel
+	bool createAudioChannelPopup();
 }
 
 #endif
