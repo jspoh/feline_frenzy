@@ -41,6 +41,7 @@
     </ClCompile>
     <ClCompile Include="src\Components\cAnimation.cpp" />
     <ClCompile Include="src\Components\cAudio.cpp" />
+    <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Components\cPhysics.cpp" />
     <ClCompile Include="src\Components\cRender.cpp" />
@@ -58,6 +59,7 @@
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
+    <ClCompile Include="src\Managers\Services\sMap.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
@@ -93,6 +95,7 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_rectpack.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
+    <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
@@ -105,6 +108,7 @@
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
+    <ClInclude Include="headers\Managers\Services\sMap.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
@@ -216,15 +220,9 @@
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -252,15 +250,9 @@ xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Pla
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

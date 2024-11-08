@@ -15,6 +15,7 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Components/cPhysics.h"
 #include "Components/cTransform.h"
+#include "Components/cPathfinding.h"
 
 
 namespace NIKE {
@@ -110,6 +111,13 @@ namespace NIKE {
                     e_transform.position.x += e_dynamics.velocity.x * dt;
                     e_transform.position.y += e_dynamics.velocity.y * dt;
                 }
+
+                //Pathfinding
+                //if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity) &&
+                //    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
+                //    auto& e_pathfinding = NIKE_ECS_SERVICE->getEntityComponent<Pathfinding::Path>(entity);
+
+                //}
 
                 //Collision detection
                 if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&

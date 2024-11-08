@@ -44,6 +44,8 @@
     <ClCompile Include="src\Components\cPhysics.cpp" />
     <ClCompile Include="src\Components\cRender.cpp" />
     <ClCompile Include="src\Components\cTransform.cpp" />
+    <ClCompile Include="src\Managers\Services\sMap.cpp" />
+    <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysLua.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
@@ -103,6 +105,8 @@
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
+    <ClInclude Include="headers\Managers\Services\sMap.h" />
+    <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />

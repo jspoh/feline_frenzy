@@ -1417,6 +1417,10 @@ namespace NIKE {
 
 				NIKE_AUDIO_SERVICE->getChannelGroup(current_channel_input)->stop();
 			}
+			else {
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
 
 		}
 

@@ -15,6 +15,9 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/Render/sysRender.h"
 #include "Systems/Render/sysRender.h"
 
 namespace NIKE {
@@ -38,6 +41,9 @@ namespace NIKE {
 		//Register render components
 		Render::registerComponents();
 
+		//Register pathfinding components
+		Pathfinding::registerComponents();
+
 		//Register render components
 		GameLogic::registerComponents();
 	}
@@ -53,6 +59,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
 		game_logic_sys->registerLuaSystem(physics_sys);
 
 		//Register animation manager
@@ -87,6 +94,7 @@ namespace NIKE {
 		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
+		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<UI::Service>());
 
 		//Create console
