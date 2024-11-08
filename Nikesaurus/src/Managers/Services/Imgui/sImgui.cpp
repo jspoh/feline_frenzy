@@ -2,7 +2,8 @@
  * \file   sysImgui.cpp
  * \brief  Imgui system
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (80%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (20%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

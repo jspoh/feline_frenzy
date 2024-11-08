@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   ImguiUtils.cpp
+ * \file   ImguiWindows.cpp
  * \brief  imgui system
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (60%)

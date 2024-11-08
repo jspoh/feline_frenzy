@@ -24,7 +24,6 @@ namespace NIKE {
 	}
 
 	void Camera::System::onEvent(std::shared_ptr<Render::UpdateCamEvent> event) {
-		// !TODO remove hard coded values for the adjustments
 		// Zoom Controls with Clamp
 		const float min_zoom = 0.0f;
 		const float max_zoom = 2000.0f;  
