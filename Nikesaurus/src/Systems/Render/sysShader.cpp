@@ -92,10 +92,11 @@ namespace NIKE {
 
 		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
 		if (location >= 0) {
-			glUniform1iv(location, vals.size(), vals.data());
+			glUniform1iv(location, vals.size(), reinterpret_cast<const int*>(vals.data()));
 		}
 		else {
 			cerr << "Uniform location not found for: " << name << endl;
+			throw std::exception();
 		}
 
 		err = glGetError();
