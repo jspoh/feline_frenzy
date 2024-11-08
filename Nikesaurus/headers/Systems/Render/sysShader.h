@@ -36,7 +36,7 @@ namespace NIKE {
 			void setUniform(const std::string& shader_ref, const std::string& name, const Vector2f& value);
 			void setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value);
 			void setUniform(const std::string& shader_ref, const std::string& name, const Vector4f& value);
-			void setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals);
+			void setUniform(const std::string& shader_ref, const std::string& name, const std::vector<int>& vals);
 		};
 	}
 }

@@ -84,7 +84,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals) {
+	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<int>& vals) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
@@ -92,7 +92,7 @@ namespace NIKE {
 
 		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
 		if (location >= 0) {
-			glUniform1iv(location, vals.size(), reinterpret_cast<const int*>(vals.data()));
+			glUniform1iv(location, vals.size(), vals.data());
 		}
 		else {
 			cerr << "Uniform location not found for: " << name << endl;
