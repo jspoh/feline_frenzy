@@ -374,6 +374,21 @@ namespace NIKE {
 							{
 								texture_comp.texture_id = texture_id;
 							}
+							ImGui::SameLine();
+							// Save button to confirm changes 
+							if (ImGui::Button("Save")) {
+								if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id))
+								{
+									// Update texture ID in component
+									texture_comp.texture_id = texture_id;
+									ImGui::OpenPopup("VALID INPUT");
+									show_save_popup = true;
+								}
+								else {
+									ImGui::OpenPopup("INVALID INPUT");
+									show_error_popup = true;
+								}
+							}
 							// Begin drag-and-drop target for texture reference
 							if (ImGui::BeginDragDropTarget())
 							{
@@ -387,46 +402,32 @@ namespace NIKE {
 								}
 								ImGui::EndDragDropTarget();
 							}
-							ImGui::DragFloat4("Texture Color (RBGA)", &texture_comp.color.r, 0.1f);
-							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
-							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
-							ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.1f);
-							// Save button to confirm changes 
-							if (ImGui::Button("Save Texture ID")) {
-								if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id))
-								{
-									// Update audio ID in component
-									texture_comp.texture_id = texture_id;
-									ImGui::OpenPopup("VALID INPUT");
-									show_save_popup = true;
-								}
-								else {
-									ImGui::OpenPopup("INVALID INPUT");
-									show_error_popup = true;
-								}
-							}
+							
+							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1, 1 , 100);
+							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1, 1, 100);
+							
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
 							if (!texture_comp.texture_id.empty())
 							{
-								ImGui::Text("Stretch: %s", texture_comp.b_stretch ? "true" : "false");
-								if (ImGui::Button("Stretch")) {
-									texture_comp.b_stretch = !texture_comp.b_stretch;
+								ImGui::Spacing();
+								ImGui::Checkbox("Blend", &texture_comp.b_blend); 
+
+								if (texture_comp.b_blend) {
+									ImGui::DragFloat4("Texture Color (RGBA)", &texture_comp.color.r, 0.001f, 0.f, 1.f);
+									ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.001f, 0.f, 1.f);
 								}
-								ImGui::Text("Blend: %s", texture_comp.b_blend ? "true" : "false");
-								if (ImGui::Button("Blend")) {
-									texture_comp.b_blend = !texture_comp.b_blend;
-								}
-								ImGui::Text("Flip Horizontally: %s", texture_comp.b_flip.x ? "true" : "false");
-								if (ImGui::Button("Flip X")) {
-									texture_comp.b_flip.x = !texture_comp.b_flip.x;
-								}
-								ImGui::Text("Flip Vertically: %s", texture_comp.b_flip.y ? "true" : "false");
-								if (ImGui::Button("Flip Y")) {
-									texture_comp.b_flip.y = !texture_comp.b_flip.y;
-								}
+
+								ImGui::Checkbox("Stretch", &texture_comp.b_stretch);
+
+								ImGui::Checkbox("Flip Horizontally (x-axis)", &texture_comp.b_flip.x);
+								ImGui::Checkbox("Flip Vertically (y-axis)", &texture_comp.b_flip.y);
+
 							}
+
+							ImGui::Spacing();
+
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
@@ -438,9 +439,9 @@ namespace NIKE {
 
 							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
 							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
-							ImGui::DragFloat("Max Speed", &dynamics_comp.max_speed, 0.1f);
-							ImGui::DragFloat("Drag", &dynamics_comp.drag, 0.1f);
-							ImGui::DragFloat("Mass", &dynamics_comp.mass, 0.1f);
+							ImGui::DragFloat("Max Speed", &dynamics_comp.max_speed, 0.1f, 0.0f, 2000.f, "%3.f", ImGuiSliderFlags_AlwaysClamp);
+							ImGui::DragFloat("Drag", &dynamics_comp.drag, 0.1f, 0.0f, 100.f, "%3.f", ImGuiSliderFlags_AlwaysClamp);
+							ImGui::DragFloat("Mass", &dynamics_comp.mass, 0.1f, 1.0f, 1000.f, "%3.f", ImGuiSliderFlags_AlwaysClamp);
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -542,7 +543,7 @@ namespace NIKE {
 							if (ImGui::InputText("##shapeRef", input_model_ref, IM_ARRAYSIZE(input_model_ref))) {
 								// Optionally handle input change here if needed
 							}
-							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.1f);
+							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.001f, 0.f, 1.f);
 							// Save buttons to confirm changes
 							if (ImGui::Button("Save Font Ref")) {
 								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))
@@ -597,9 +598,9 @@ namespace NIKE {
 								// Stuff
 							}
 
-							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.1f);
-							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.02f);
-							text_comp.scale = std::clamp(text_comp.scale, EPSILON, 10.0f);
+							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.001f, 0.f, 1.f);
+							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.02f, 0.f, 10.f);
+
 							ImGui::Text((std::string("Text Size X: ") + std::to_string(text_comp.size.x)).c_str());
 							ImGui::Text((std::string("Text Size Y: ") + std::to_string(text_comp.size.y)).c_str());
 
