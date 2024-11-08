@@ -330,7 +330,7 @@ namespace NIKE {
 				}
 
 				//Hover
-				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
+				e_transform.scale = hover_container[entity.first].first.scale * 5.05f;
 			}
 			else {
 				entity.second.second = false;
