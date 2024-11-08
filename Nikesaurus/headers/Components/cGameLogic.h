@@ -38,12 +38,12 @@ namespace NIKE {
 			Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
 		};
 
-		//Player logic component
-		struct Player {
+		//Movement logic component
+		struct Movement {
 			Script script;
 
-			Player() : script() {}
-			Player(std::string const& script) : script(script) {}
+			Movement() : script() {}
+			Movement(std::string const& script) : script(script) {}
 		};
 
 		void registerComponents();

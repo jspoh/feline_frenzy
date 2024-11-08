@@ -769,8 +769,8 @@ namespace NIKE {
 								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
 							}
 						}
-						else if (component_name == "GameLogic::Player") {
-							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Player>(entity);
+						else if (component_name == "GameLogic::Movement") {
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
 
 							static char script_path[300];
 							static bool scripth_path_init = false;

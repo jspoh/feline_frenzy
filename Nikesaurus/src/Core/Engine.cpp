@@ -52,7 +52,7 @@ namespace NIKE {
 
 		//Register game logic manager
 		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
-		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Player>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 
 		//Register physics manager
 		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);

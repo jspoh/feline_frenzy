@@ -138,9 +138,8 @@ xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaur
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
-    <None Include="assets\Scripts\enemy.lua" />
+    <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\player.lua" />
-    <None Include="assets\Scripts\StateMachine.lua" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
     <None Include="assets\Shaders\batched_base.frag" />

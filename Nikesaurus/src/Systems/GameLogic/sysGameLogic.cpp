@@ -55,20 +55,16 @@ namespace NIKE {
 			for (auto& entity : entities) {
 				
 				//Check for player logic comp
-				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::Player>(entity)) {
-					auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Player>(entity);
+				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::Movement>(entity)) {
+					auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
 
 					//Skip if script  has not been set
 					if (e_player.script.script_path == "")
 						continue;
 
-					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(1, entity);
+					int move = static_cast<int>(Utility::randFloat() * 3);
+					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
 				}
-
-				////Check for player logic comp
-				//if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::StateMachine>(entity)) {
-				//	auto& e_state_machine = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::StateMachine>(entity);
-				//}
 			}
 		}
 	}

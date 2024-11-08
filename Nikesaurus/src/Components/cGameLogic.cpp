@@ -28,18 +28,18 @@ namespace NIKE {
 	void GameLogic::registerComponents() {
 
 		//Register logic components
-		NIKE_ECS_MANAGER->registerComponent<GameLogic::Player>();
+		NIKE_ECS_MANAGER->registerComponent<GameLogic::Movement>();
 		NIKE_ECS_MANAGER->registerComponent<GameLogic::StateMachine>();
 
 		//Register Player For Serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<GameLogic::Player>(
+		NIKE_SERIALIZE_SERVICE->registerComponent<GameLogic::Movement>(
 			//Serialize
-			[](GameLogic::Player const& comp) -> nlohmann::json {
+			[](GameLogic::Movement const& comp) -> nlohmann::json {
 				return	ScriptSerialize(comp.script);
 			},
 
 			//Deserialize
-			[](GameLogic::Player& comp, nlohmann::json const& data) {
+			[](GameLogic::Movement& comp, nlohmann::json const& data) {
 				ScriptDeserialize(comp.script, data);
 			}
 		);
