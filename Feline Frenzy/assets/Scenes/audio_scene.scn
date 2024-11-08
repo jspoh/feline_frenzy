@@ -7,7 +7,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "test_sound",
+                                "Audio_ID": "click-sound",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "MASTER",
                                 "Pitch": 1.0,
@@ -21,7 +21,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "click-sound",
+                                "Audio_ID": "begin",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "MASTER",
                                 "Pitch": 1.0,
