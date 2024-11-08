@@ -495,7 +495,7 @@ namespace NIKE {
 					continue;
 
 				//Skip entity if no transform is present
-				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity))
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
@@ -511,7 +511,7 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
 					transformAndRenderText(entity);
 				}
 			}

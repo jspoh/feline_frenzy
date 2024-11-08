@@ -1,9 +1,5 @@
 {
     "Components": {
-        "Physics::Collider": {
-            "B_Collided": false,
-            "Resolution": 0
-        },
         "Render::Texture": {
             "B_Blend": false,
             "B_Flip": {
@@ -26,17 +22,17 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Corner"
+            "Texture_ID": "Side_Middle_256px"
         },
         "Transform::Transform": {
             "Position": {
-                "x": -300.0,
-                "y": 200.0
+                "x": 0.0,
+                "y": 0.0
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 149.99998474121094,
-                "y": 149.99998474121094
+                "x": 49.99999237060547,
+                "y": 49.99999237060547
             }
         }
     }
