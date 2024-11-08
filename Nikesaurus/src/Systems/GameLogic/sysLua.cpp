@@ -68,6 +68,10 @@ namespace NIKE {
 
     std::string Lua::System::loadScript(std::string const& file_path) {
 
+        //Check for empty file path
+        if (file_path == "")
+            return "";
+
         //Create script id
         size_t lua_pos = file_path.find_first_of(".lua");
 

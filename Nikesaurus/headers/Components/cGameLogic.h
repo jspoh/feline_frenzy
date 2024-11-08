@@ -15,11 +15,16 @@
 namespace NIKE {
 	namespace GameLogic {
 
-		//Game Logic States
-		enum class InnerStates {
-			ENTER = 0,
-			UPDATE,
-			EXIT
+		struct State {
+			std::function<void()> onEnter;     // Lua function for enter action
+			std::function<void()> onExit;      // Lua function for exit action
+			std::unordered_map<std::string, std::string> transitions; // map of transition names to destination states
+		};
+
+		struct StateMachine {
+			std::string currentState;
+			std::unordered_map<std::string, State> states;
+			std::unordered_map<std::string, std::function<bool()>> transitions; // Use Lua functions as conditions
 		};
 
 		//Script data
@@ -31,17 +36,6 @@ namespace NIKE {
 
 			Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
 			Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
-		};
-
-		//State machine component
-		struct StateMachine {
-			InnerStates curr_state;
-
-			//State scripts ( first one is script id, second is script path )
-			std::unordered_map<InnerStates, Script> state_scripts;
-
-			StateMachine() : curr_state{ InnerStates::ENTER } {}
-			//StateMachine(InnerStates start_state) : curr_state { start_state } {}
 		};
 
 		//Player logic component

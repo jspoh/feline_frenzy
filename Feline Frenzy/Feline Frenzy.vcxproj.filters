@@ -59,5 +59,7 @@
     <None Include="assets\Shaders\batched_texture.vert" />
     <None Include="assets\Shaders\batched_texture.frag" />
     <None Include="assets\Scripts\player.lua" />
+    <None Include="assets\Scripts\StateMachine.lua" />
+    <None Include="assets\Scripts\enemy.lua" />
   </ItemGroup>
 </Project>

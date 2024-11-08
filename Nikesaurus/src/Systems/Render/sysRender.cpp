@@ -379,7 +379,6 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
@@ -495,7 +494,7 @@ namespace NIKE {
 					continue;
 
 				//Skip entity if no transform is present
-				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity))
+				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {

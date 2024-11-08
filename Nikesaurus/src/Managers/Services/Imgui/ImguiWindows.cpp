@@ -815,6 +815,13 @@ namespace NIKE {
 
 							ImGui::Text(std::string("Script Id: " + e_player.script.script_id).c_str());
 							ImGui::Text(std::string("Executing: " + e_player.script.function).c_str());
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_IMGUI_SERVICE->populateLists = false;
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
 						}
 						else
 						{

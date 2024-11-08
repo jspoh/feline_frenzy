@@ -23,7 +23,6 @@ namespace NIKE {
 	}
 
 	sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
-
 		//Run script
 		if (script_id == "") {
 			script_id = lua_system->loadScript(file_path);
@@ -66,50 +65,10 @@ namespace NIKE {
 					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(1, entity);
 				}
 
-				//Check for player logic comp
-				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::StateMachine>(entity)) {
-					auto& e_state_machine = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::StateMachine>(entity);
-
-					//Skip if script has not been set
-					if (e_state_machine.state_scripts.empty())
-						continue;
-
-					//State machine
-					switch (e_state_machine.curr_state) {
-					case InnerStates::ENTER:
-						if (e_state_machine.state_scripts.find(InnerStates::ENTER) != e_state_machine.state_scripts.end()) {
-
-							//Get script data
-							auto& script = e_state_machine.state_scripts.at(InnerStates::ENTER);
-
-							//Execute enter script
-							executeScript(script.script_path, script.script_id, script.b_loaded, script.function)(1, entity);
-						}
-						break;
-					case InnerStates::UPDATE:
-						if (e_state_machine.state_scripts.find(InnerStates::UPDATE) != e_state_machine.state_scripts.end()) {
-
-							//Get script data
-							auto& script = e_state_machine.state_scripts.at(InnerStates::UPDATE);
-
-							//Execute update script
-							executeScript(script.script_path, script.script_id, script.b_loaded, script.function)(1, entity);
-						}
-						break;
-					case InnerStates::EXIT:
-						if (e_state_machine.state_scripts.find(InnerStates::EXIT) != e_state_machine.state_scripts.end()) {
-
-							//Get script data
-							auto& script = e_state_machine.state_scripts.at(InnerStates::EXIT);
-
-							//Execute exit script
-							executeScript(script.script_path, script.script_id, script.b_loaded, script.function)(1, entity);
-						}
-						break;
-					default:
-						break;
-					}
-				}
+				////Check for player logic comp
+				//if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::StateMachine>(entity)) {
+				//	auto& e_state_machine = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::StateMachine>(entity);
+				//}
 			}
 		}
 	}
