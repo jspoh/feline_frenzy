@@ -61,16 +61,9 @@ namespace NIKE {
 			//Deserialize Entity
 			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
 
-			//Serialize layer
-			nlohmann::json serializeLayer(Scenes::Layer const& layer);
+			//current scene path string when (de-serialising)
+			std::string curr_scene_file = "";
 
-			//Deserialize layer
-			void deserializeEntity(Scenes::Layer& layer, nlohmann::json const& data);
-
-			//Create Tile
-			//void createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer);
 		public:
 			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
 			~Service() = default;
@@ -93,12 +86,8 @@ namespace NIKE {
 			//Load scene from file path
 			void loadSceneFromFile(std::string const& file_path);
 
-			//Load map from file path
-			//void loadMapFromFile(const std::string& file,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer,
-			//	std::vector<std::vector<int>>& grid,
-			//	const NIKE::Math::Vector2<float>& center);
+			//Get current scene file path
+			std::string const& getCurrSceneFile() const;
 		};
 
 		//Re-enable DLL Export warning

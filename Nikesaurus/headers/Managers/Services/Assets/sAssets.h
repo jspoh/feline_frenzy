@@ -61,6 +61,26 @@ namespace NIKE {
 
 			//Map of audios
 			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> audio_list;
+
+			/*****************************************************************//**
+			* File Paths for specific asset types
+			*********************************************************************/
+			std::string texture_path = "assets/Textures/";
+			std::string audio_path = "assets/Audios/";
+			std::string font_path = "assets/Fonts/";
+			std::string models_path = "assets/Models/";
+			std::string scenes_path = "assets/Scenes/";
+			std::string shaders_path = "assets/Shaders/";
+			std::string prefabs_path = "assets/Prefabs/";
+
+			/*****************************************************************//**
+			* Scn (Levels) private members
+			*********************************************************************/
+			std::unordered_map<std::string, std::filesystem::path> levels_list;
+
+			// Prefabs paths containers
+			std::unordered_map<std::string, std::filesystem::path> prefabs_list;
+
 		public:
 
 			//Default constructor
@@ -78,11 +98,20 @@ namespace NIKE {
 			//Register font
 			void loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
+			//Reload font
+			void reloadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+
 			//Unload font
 			void unloadFont(std::string const& fond_id);
 
+			//Unload all fonts
+			void unloadAllFonts();
+
 			//Get font
 			std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
+
+			//Get loaded fonts
+			const std::unordered_map<std::string, std::shared_ptr<Assets::Font>>& getLoadedFonts() const;
 
 			// Checker
 			bool checkFontExist(std::string const& font_id);
@@ -94,20 +123,38 @@ namespace NIKE {
 			//Load shader
 			void loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
 
+			//Reload shader
+			void reloadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+
 			//Unload shader
 			void unloadShader(std::string const& shader_id);
+
+			//Unload all shaders
+			void unloadAllShaders();
 
 			//Get shader
 			unsigned int getShader(std::string const& shader_id);
 
+			//Get shaders
+			const std::unordered_map<std::string, unsigned int>& getLoadedShaders();
+
 			//Load model
-			void loadModel(std::string const& model_id, std::string const& file_path);
+			void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
+
+			//Reload model
+			void reloadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
 
 			//Unload model
 			void unloadModel(std::string const& model_id);
 
+			//Unload all models
+			void unloadAllModels();
+
 			//Get model
 			std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
+
+			//Get models
+			const std::unordered_map<std::string, std::shared_ptr<Assets::Model>>& getLoadedModels();
 
 			// Check model
 			bool checkModelExist(std::string const& model_id);
@@ -115,14 +162,20 @@ namespace NIKE {
 			//Load texture
 			void loadTexture(std::string const& texture_id, std::string const& file_path);
 
-			//Unload texture
+			//Reload texture
+			void reloadTexture(std::string const& texture_id, std::string const& file_path);
+
+			// Unload texture
 			void unloadTexture(std::string const& texture_id);
+
+			// Unload all textures
+			void unloadAllTextures();
 
 			//Get texture
 			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
 
-			//Check if texture loaded
-			bool checkTextureLoaded(std::string const& texture_id);
+			//Check if texture exist
+			bool checkTextureExist(std::string const& texture_id);
 
 			//Check if texture loaded
 			const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
@@ -133,17 +186,64 @@ namespace NIKE {
 			// Load sound audio
 			void loadSound(std::string const& audio_id, std::string const& file_path);
 
+			// Reload sound
+			void reloadSound(std::string const& audio_id, std::string const& file_path);
+
 			//Load music audio
 			void loadMusic(std::string const& audio_id, std::string const& file_path);
+
+			// Reload music
+			void reloadMusic(std::string const& audio_id, std::string const& file_path);
 
 			//Unload Audio
 			void unloadAudio(std::string const& audio_id);
 
+			//Unload all audios
+			void unloadAllAudios();
+
 			//Get audio
 			std::shared_ptr<Audio::IAudio> getAudio(std::string const& audio_tag);
 
-			// Check for audio
+			//Get audios
+			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedAudios();
+
 			bool checkAudioExist(std::string const& audio_tag);
+
+			/*****************************************************************//**
+			* Scn File path
+			*********************************************************************/
+			void loadScn(const std::filesystem::directory_entry& entry);
+			void loadScnFiles();
+			bool checkScnFileExist(const std::string& entry);
+			void reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path);
+			std::unordered_map<std::string, std::filesystem::path>& getLevelsList();
+
+			/*****************************************************************//**
+			* Prefab File path
+			*********************************************************************/
+			void loadPrefab(const std::filesystem::directory_entry& entry);
+			void loadPrefabFiles();
+			bool checkPrefabFileExist(const std::string& entry);
+			void reloadPrefab(std::string const&, std::filesystem::path const&);
+			std::unordered_map<std::string, std::filesystem::path>& getLoadedPrefabs();
+
+			/*****************************************************************//**
+			* File path gettors
+			*********************************************************************/
+			std::string const& getTexturePath(); 
+			std::string const& getAudioPath(); 
+			std::string const& getFontPath(); 
+			std::string const& getModelsPath(); 
+			std::string const& getScenesPath(); 
+			std::string const& getShadersPath(); 
+			std::string const& getPrefabsPath();
+
+			/*****************************************************************//**
+			* Reload of specific asset types
+			*********************************************************************/
+			void reloadAssets(const std::string& asset_type);
+			bool deleteFile(std::string const& file_path);
+			bool deleteAllFiles(std::string const& file_path);
 		};
 
 		//Re-enable DLL Export warning

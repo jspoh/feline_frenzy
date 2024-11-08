@@ -117,15 +117,20 @@ namespace NIKE {
 
 	Matrix_33 Camera::System::getFixedWorldToNDCXform() const
 	{
+		//Default camera altributes
+		Render::Cam def;
+		def.position = { 0.0f, 0.0f };
+		def.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+
 		Matrix_33 view_xform{
-			1, 0,  -def_cam.position.x,
-			0, 1,  -def_cam.position.y,
+			1, 0,  -def.position.x,
+			0, 1,  -def.position.y,
 			0, 0, 1
 		};
 
 		Matrix_33 cam_to_ndc_xform{
-			2.0f / aspect_ratio / def_cam.height, 0, 0,
-			0, 2.0f / def_cam.height, 0,
+			2.0f / aspect_ratio / def.height, 0, 0,
+			0, 2.0f / def.height, 0,
 			0, 0, 1
 		};
 

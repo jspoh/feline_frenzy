@@ -17,7 +17,10 @@ namespace NIKE {
 	**********************************************************************/
 
 	// This function will create a pop up for user to input their entity name for easier UI
-	bool showCreateEntityPopUp(bool pop_up);
+	bool showCreateEntityPopUp();
+
+	// This function will create a pop up for user to input their entity name for easier UI
+	bool showCreateEntityPrefabPopUp(std::string const& file_path);
 
 	// This function will create a pop up for user to choose which component to add 
 	bool showAddComponentPopup(Entity::Type& entity, bool pop_up);
@@ -27,12 +30,9 @@ namespace NIKE {
 
 	// This function will create a pop up to tell user that the component has already been added to that entity
 	bool showComponentExistsPopup();
-	
-	// This function will create a pop up to ask the user if the user wants the asset to be loaded
-	bool showLoadAssetPopup(const std::string& asset_name);
 
 	// This function will create a pop up to ask the user if the user wants either the entity or component to removed
-	bool removeEntityPopup();
+	bool removeEntityPopup(std::string& entity);
 
 	// This function will create a pop up if there is an invalid string input to remove entity
 	bool showInvalidEntityPopup();
@@ -44,6 +44,15 @@ namespace NIKE {
 	bool cloneEntityPopup();
 	// Function to change layer
 	bool changeLayerPopup(Entity::Type entity);
+
+	// Function to save entity into scn file
+	bool savePrefabPopup(Entity::Type entity);
+
+	// Function to confirm to delete file
+	bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type);
+
+	// Function to show pop up to create audio channel
+	bool createAudioChannelPopup();
 }
 
 #endif

@@ -11,6 +11,12 @@
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
 
+ //Registered Systems
+#include "Systems/sysAudio.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/Render/sysRender.h"
+
 namespace NIKE {
 
 	void IMGUI::Service::init()
@@ -18,11 +24,16 @@ namespace NIKE {
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		// Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+
+		std::shared_ptr<IMGUI::Service> imgui_service_wrapped(this, [](IMGUI::Service*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(imgui_service_wrapped);
 
 		populateLists = false;
 		// For testing
@@ -60,6 +71,11 @@ namespace NIKE {
 		return false;
 	}
 
+	void IMGUI::Service::resetVariables()
+	{
+		entities_ref.clear();
+	}
+
 	std::unordered_map<std::string, Entity::Type>& IMGUI::Service::getEntityRef()
 	{
 		return entities_ref;
@@ -75,29 +91,95 @@ namespace NIKE {
 		return entities_ref[input];
 	}
 
+	bool IMGUI::Service::getImguiActive() const {
+		return b_show_imgui;
+	}
+	
+	void IMGUI::Service::setGamePaused(bool pause) {
+		b_pause_game = pause;
+
+		if (b_pause_game) {
+			//Set audio system pause
+			NIKE_ECS_MANAGER->setSystemState<Audio::Manager>(false);
+
+			//Set physics system pause
+			NIKE_ECS_MANAGER->setSystemState<Physics::Manager>(false);
+
+			//Set animation system pause
+			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(false);
+		}
+		else {
+			//Set audio system play
+			NIKE_ECS_MANAGER->setSystemState<Audio::Manager>(true);
+
+			//Set physics system play
+			NIKE_ECS_MANAGER->setSystemState<Physics::Manager>(true);
+
+			//Set animation system play
+			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(true);
+		}
+	}
+
+	void IMGUI::Service::setDebugMode(bool flag) {
+		b_debug_mode = flag;
+	}
+
+	bool IMGUI::Service::getGamePaused() const {
+		return b_pause_game;
+	}
+
+	bool IMGUI::Service::getDebugMode() const {
+		return b_debug_mode;
+	}
+
+	void IMGUI::Service::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
+		tex_id = event->tex_id;
+		event->setEventProcessed(true);
+	}
+
 	void IMGUI::Service::update()
 	{
-		// Main IMGUI loop
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		//Toggle imgui on off
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
+			b_show_imgui = !b_show_imgui;
+			b_dispatch_viewport = true;
+		}
 
-		imguiInputUpdate();
+		if (b_show_imgui) {
+			// Main IMGUI loop
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
 
-		// Window UI functions goes here
-		imguiEntityWindow();
-		imguiDebuggingWindow();
-		imguiFileSystemWindow();
-		imguiRenderEntityWindow();
-		imguiShowLoadedAssetsWindow();
-		imguiEntityComponentManagementWindow();
-		imguiShowGameViewport();
-		imguiCameraControl();
+			imguiInputUpdate();
 
-		//ImGui::ShowDemoWindow();
-		// THIS 2 CALL THE OPENGL DRAWING
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			imguiDockingSpace();
+
+			// Window UI functions goes here
+			imguiEntityWindow();
+			imguiDebuggingWindow();
+			// imguiFileSystemWindow();
+			imguiShowLoadedAssetsWindow();
+			imguiEntityComponentManagementWindow();
+			imguiShowGameViewport(b_dispatch_viewport, tex_id);
+			imguiCameraControl();
+			imguiLayerManagementWindow();
+			imguiShowLoadedLevelsWindow();
+			imguiAudioControl();
+
+			// THIS 2 CALL THE OPENGL DRAWING
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+
+		//Dispatch normal viewport
+		if (b_dispatch_viewport) {
+			//Dispatch viewport changes
+			Vector2f win_pos = { 0.0f, 0.0f };
+			Vector2f win_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<IMGUI::ViewPortEvent>(win_pos, win_size));
+			b_dispatch_viewport = false;
+		}
 	}
 
 }

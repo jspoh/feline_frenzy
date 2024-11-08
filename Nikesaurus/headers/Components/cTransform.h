@@ -23,7 +23,7 @@ namespace NIKE {
 			Vector2f scale;
 			float rotation;
 
-			Transform() : position(), scale(), rotation{ 0.0f } {}
+			Transform() : position(0.f, 0.f), scale(1.f, 1.f), rotation{ 0.0f } {}
 			Transform(Vector2f const& position, Vector2f const& scale, float rotation)
 				: position{ position }, scale{ scale }, rotation{ rotation } {}
 		};

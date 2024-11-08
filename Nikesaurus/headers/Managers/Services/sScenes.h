@@ -12,6 +12,8 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
+#include "sSerialization.h"
+
 namespace NIKE {
 	namespace Scenes {
 
@@ -23,15 +25,14 @@ namespace NIKE {
 
 		//Layer class
 		class NIKE_API Layer {
+		public:
+			using LayerMask = std::bitset<64>;
 		private:
 			//Friend of layer class
 			friend class IScene;
 
 			//Layer mask
-			std::bitset<64> mask;
-
-			//Layer index
-			unsigned int index;
+			LayerMask mask;
 
 			//Layer mask id
 			unsigned int id;
@@ -39,11 +40,8 @@ namespace NIKE {
 			//Layer state
 			bool b_state;
 		public:
-			Layer() : b_state{ true }, index{ 0 }, id{ 0 } {}
+			Layer() : b_state{ true }, id{ 0 } {}
 			~Layer() = default;
-
-			//Get layer index
-			unsigned int getLayerIndex() const;
 
 			//Get layer name
 			unsigned int getLayerID() const;
@@ -58,7 +56,13 @@ namespace NIKE {
 			void setLayerMask(unsigned int mask_id, bool state);
 
 			//Get layer mask
-			std::bitset<64> getLayerMask() const;
+			LayerMask getLayerMask() const;
+
+			//Serialize layer
+			nlohmann::json serialize() const;
+
+			//Deserialize layer
+			void deserialize(nlohmann::json const& data);
 		};
 
 		//Scene interface
@@ -68,14 +72,10 @@ namespace NIKE {
 			std::string file_path;
 
 			//Layers within scene
-			std::unordered_map<unsigned int, std::shared_ptr<Layer>> layers_map;
 			std::vector<std::shared_ptr<Layer>> layers;
-
-			//Layer count
-			unsigned int layer_count;
 		public:
 			//Default constructor
-			IScene() : layer_count{ 0 }{}
+			IScene() = default;
 
 			//Phases
 			virtual void load() = 0;
@@ -87,19 +87,19 @@ namespace NIKE {
 			std::shared_ptr<Layer> createLayer(int index = -1);
 
 			//Get layer
-			std::shared_ptr<Layer> getLayer(unsigned int mask_id);
+			std::shared_ptr<Layer> getLayer(unsigned int layer_id);
 
 			//Remove layer
-			void removeLayer(unsigned int mask_id);
+			void removeLayer(unsigned int layer_id);
 
 			//Check layer
-			bool checkLayer(unsigned int mask_id);
+			bool checkLayer(unsigned int layer_id);
 
 			//Get layer count
 			unsigned int getLayerCount() const;
 
 			//Get all layers
-			std::vector<std::shared_ptr<Layer>> const& getLayers() const;
+			std::vector<std::shared_ptr<Layer>>& getLayers();
 
 			//Default virtual destructor
 			virtual ~IScene() = default;
@@ -168,6 +168,9 @@ namespace NIKE {
 
 				//Construct scene obj
 				scenes.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
+
+				//Create first layer for scene
+				scenes.at(scene_id)->createLayer();
 
 				//Default starting state will be the first state registered
 				if (!curr_scene) {

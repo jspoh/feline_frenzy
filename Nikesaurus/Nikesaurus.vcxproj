@@ -42,6 +42,7 @@
     <ClCompile Include="src\Components\cAnimation.cpp" />
     <ClCompile Include="src\Components\cAudio.cpp" />
     <ClCompile Include="src\Components\cPathfinding.cpp" />
+    <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Components\cPhysics.cpp" />
     <ClCompile Include="src\Components\cRender.cpp" />
     <ClCompile Include="src\Components\cTransform.cpp" />
@@ -54,15 +55,17 @@
     <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiWindows.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
-    <ClCompile Include="src\Managers\Services\sCoordinator.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
+    <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysLua.cpp" />
     <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Systems\Render\sysCamera.cpp" />
@@ -93,6 +96,7 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />
+    <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
     <ClInclude Include="headers\Core\Core.h" />
@@ -102,13 +106,15 @@
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiWindows.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
-    <ClInclude Include="headers\Managers\Services\sCoordinator.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
+    <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysLua.h" />
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Systems\Render\sysCamera.h" />
@@ -209,14 +215,12 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;Lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
@@ -245,14 +249,12 @@ xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Pla
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;fmod_vc.lib;fmodL_vc.lib;freetype.lib;Lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\dependencies\lib\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 

@@ -61,6 +61,13 @@ namespace NIKE {
 				: edit_position{ pos }, edit_zoom { zoom } {}
 		};
 
+		//Viewport texture event
+		struct ViewportTexture : public Events::IEvent {
+			unsigned int tex_id;
+
+			ViewportTexture(unsigned int tex_id) : tex_id{ tex_id } {}
+		};
+
 		enum class TextOrigin {
 			CENTER = 0,
 			BOTTOM,
@@ -74,19 +81,27 @@ namespace NIKE {
 			std::string text;
 			Vector4f color;
 			float scale;
+			Vector2f size;
 			TextOrigin origin;
 
-			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, origin{ TextOrigin::CENTER } {}
+			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin { TextOrigin::CENTER } {}
 			Text(std::string const& font_id, std::string const& text, Vector4f const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
-				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, origin{ origin } {}
+				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin } {}
 		};
 
+		// set use_override_color to true if setting an override_color
 		struct Shape {
-			std::string model_id; 
-			Vector4f color;
+			std::string model_id;
+			Vector2f pos;
 
-			Shape() : model_id{ "" }, color() {}
-			Shape(std::string const& model_id, Vector4f const& color) : model_id{ model_id }, color{ color } {};
+			Vector4f color;
+			bool use_override_color;
+
+			Shape() :model_id{ "square" }, color(1.f, 1.f, 1.f, 1.f), pos{}, use_override_color { false } {}
+			Shape(std::string const& model_id, Vector2f const& pos) : model_id{ model_id }, pos{ pos }, color(), use_override_color{ false } {};
+			Shape(const std::string& model_id, const Vector4f& color, const Vector2f& pos)
+				: model_id{ model_id }, pos{ pos }, color{ color }, use_override_color{ true } {}
+			Shape(std::string const& model_id, Vector4f const& color) : model_id{ model_id }, color{ color }, pos{}, use_override_color{ true } {};
 		};
 
 		struct Texture {
@@ -99,7 +114,7 @@ namespace NIKE {
 			bool b_stretch;
 			Vector2b b_flip;
 
-			Texture() : texture_id{ "" }, color(), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(), frame_index(), b_flip{false, false} {}
+			Texture() : texture_id{ "placeholder" }, color(0.f,0.f,0.f,1.f), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(1,1), frame_index(0,0), b_flip{false, false} {}
 			Texture(std::string const& texture_id, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};

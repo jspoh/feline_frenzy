@@ -7,6 +7,7 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/pch.h"
+class NullStream nullstream;
 
 //Splash Scene
 #include "Scenes/SplashScene.h"
@@ -30,6 +31,9 @@ int WINAPI WinMain(
 	//Register Scenes
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
 	NIKE_SCENES_SERVICE->registerScene<Menu::Scene>("MENU");
+
+	// register built in model for batched quad rendering (!TODO: can be implemented in a different way if required)
+	NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
 
 	//NIKE_EVENTS_SERVICE.getService<NIKE::Coordinator::Service>()->
 

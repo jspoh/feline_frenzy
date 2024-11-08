@@ -16,7 +16,22 @@
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
 
+
+// batched rendering
+constexpr bool BATCHED_RENDERING = false;
+
 namespace NIKE {
+
+	Render::Manager::Manager() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {
+		render_instances_quad.reserve(MAX_INSTANCES);
+
+		if (BATCHED_RENDERING) {
+			NIKEE_INFO("Using batched rendering");
+		}
+		else {
+			NIKEE_INFO("Not using batched rendering");
+		}
+	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
@@ -56,84 +71,194 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
-		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		//GLenum err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		//}
+
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			glPolygonMode(GL_FRONT, GL_FILL);
+			glEnable(GL_BLEND);
+
+			// use shader
+			shader_system->useShader("base");
+
+			//Shader set uniform
+			shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
+			shader_system->setUniform("base", "f_opacity", e_shape.color.a);
+			shader_system->setUniform("base", "override_color", e_shape.use_override_color);
+			shader_system->setUniform("base", "model_to_ndc", x_form);
+
+			//Get model
+			auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
+
+			//Draw
+			glBindVertexArray(model->vaoid);
+			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_system->unuseShader();
+		}
+		else {
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.color = e_shape.color;
+
+			render_instances_quad.push_back(instance);
+
+			if (render_instances_quad.size() >= MAX_INSTANCES) {
+				batchRenderObject();
+			}
+		}
+
+		//err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		//}
+	}
+
+	void Render::Manager::batchRenderObject() {
+		// !TODO: considering implementing instanced too with glDrawElementsInstanced
+
+		//GLenum err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		//}
+
+		if (!BATCHED_RENDERING) {
+			return;
+		}
+		// !TODO: only implemented for quads..
+
+		if (render_instances_quad.empty()) {
+			return;
+		}
+
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+
+		// create buffer of vertices
+		std::vector<Assets::Vertex> vertices;
+		static constexpr int NUM_VERTICES_IN_MODEL = 4;
+		vertices.reserve(render_instances_quad.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances_quad.size(); i++) {
+			// create temp model to populate with current instance's data
+			Assets::Model m{ model };
+			for (Assets::Vertex& v : m.vertices) {
+				v.col = render_instances_quad[i].color;
+				v.transform = render_instances_quad[i].xform;
+			}
+
+			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
+		}
+
+		// populate vbo
+		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
+
+		// create buffer of indices for indexed rendering
+		std::vector<unsigned int> indices;
+		static constexpr int NUM_INDICES_FOR_QUAD = 6;
+		indices.reserve(render_instances_quad.size() * NUM_INDICES_FOR_QUAD);
+		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
+		for (size_t i{}; i < render_instances_quad.size(); i++) {
+			for (size_t j{}; j < model.indices.size(); j++) {
+				indices.push_back(model.indices[j] + static_cast<unsigned int>((i * NUM_VERTICES_IN_MODEL)));
+			}
+		}
+
+		// populate ebo
+		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
+
+
+		// vbo and ebo are already bound to vao
+		// but bind again just in case???
+		//glVertexArrayVertexBuffer(model.vaoid, 10, model.vboid, 0, sizeof(Assets::Vertex));
+		//glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
+		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
 
 		// use shader
-		shader_system->useShader("base");
+		shader_system->useShader("batched_base");
+		// bind vao
+		glBindVertexArray(model.vaoid);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
-		//Shader set uniform
-		shader_system->setUniform("base", "f_color", Vector3f(e_shape.color.r, e_shape.color.g, e_shape.color.b));
-		shader_system->setUniform("base", "f_opacity", e_shape.color.a);
-		shader_system->setUniform("base", "model_to_ndc", x_form);
-
-		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
-
-		//Draw
-		glBindVertexArray(model->vaoid);
-		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
-
-		//Unuse texture
+		// cleanup
 		glBindVertexArray(0);
 		shader_system->unuseShader();
+
+		render_instances_quad.clear();
+
+		//err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
+		//}
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
-		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			glPolygonMode(GL_FRONT, GL_FILL);
 
-		// use shader
-		shader_system->useShader("texture");
+			// use shader
+			shader_system->useShader("texture");
 
-		//Texture unit
-		constexpr int texture_unit = 6;
+			//Texture unit
+			constexpr int texture_unit = 6;
 
-		// set texture
-		glBindTextureUnit(
-			texture_unit, // texture unit (binding index)
-			NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
-		);
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
+			);
 
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		//Caculate UV Offset
-		Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
-		Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
+			//Caculate UV Offset
+			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
 
-		//Translate UV offset to bottom left
-		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+			//Translate UV offset to bottom left
+			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
 
-		//Set uniforms for texture rendering
-		shader_system->setUniform("texture", "u_tex2d", texture_unit);
-		shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
-		shader_system->setUniform("texture", "u_transform", x_form);
-		shader_system->setUniform("texture", "uvOffset", uv_offset);
-		shader_system->setUniform("texture", "frameSize", framesize);
+			//Set uniforms for texture rendering
+			shader_system->setUniform("texture", "u_tex2d", texture_unit);
+			shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
+			shader_system->setUniform("texture", "u_transform", x_form);
+			shader_system->setUniform("texture", "uvOffset", uv_offset);
+			shader_system->setUniform("texture", "frameSize", framesize);
 
-		//Blending options for texture
-		shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
-		shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
-		shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
+			//Blending options for texture
+			shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
+			shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
+			shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
-		//Flip texture options
-		shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-		shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+			//Flip texture options
+			shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
-		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+			//Get model
+			auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
 
-		//Draw
-		glBindVertexArray(model->vaoid);
-		glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+			//Draw
+			glBindVertexArray(model->vaoid);
+			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
 
-		//Unuse texture
-		glBindVertexArray(0);
-		shader_system->unuseShader();
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_system->unuseShader();
+		}
+		else {
+
+		}
 	}
 
-	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform) {
+	void batchRenderTextures() {}
+
+	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 
 		//Use text shader
 		shader_system->useShader("text");
@@ -147,16 +272,22 @@ namespace NIKE {
 		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VAO);
 
+		//Temp text size
+		Vector2f text_size;
+
 		//Calculate size of text
 		for (char c : e_text.text) {
 			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
 
 			//Calculate width
-			e_transform.scale.x += (ch.advance >> 6) * e_text.scale;
+			text_size.x += (ch.advance >> 6) * e_text.scale;
 
 			//Calculate height
-			e_transform.scale.y = ch.size.y * e_text.scale > e_transform.scale.y ? ch.size.y * e_text.scale : e_transform.scale.y;
+			text_size.y = ch.size.y * e_text.scale > text_size.y ? ch.size.y * e_text.scale : text_size.y;
 		}
+
+		//Assign size to e_text
+		e_text.size = text_size;
 
 		//Text rendering position based on bot left
 		Vector2f pos;
@@ -164,19 +295,19 @@ namespace NIKE {
 		//Get text bottom left position for rendering
 		switch (e_text.origin) {
 		case TextOrigin::CENTER:
-			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y / 2.0f };
+			pos = { -e_text.size.x / 2.0f, -e_text.size.y / 2.0f };
 			break;
 		case TextOrigin::BOTTOM:
-			pos = { -e_transform.scale.x / 2.0f, 0.0f };
+			pos = { -e_text.size.x / 2.0f, 0.0f };
 			break;
 		case TextOrigin::TOP:
-			pos = { -e_transform.scale.x / 2.0f, -e_transform.scale.y };
+			pos = { -e_text.size.x / 2.0f, -e_text.size.y };
 			break;
 		case TextOrigin::LEFT:
-			pos = { 0.0f, -e_transform.scale.y / 2.0f };
+			pos = { 0.0f, -e_text.size.y / 2.0f };
 			break;
 		case TextOrigin::RIGHT:
-			pos = { -e_transform.scale.x, -e_transform.scale.y / 2.0f };
+			pos = { -e_text.size.x, -e_text.size.y / 2.0f };
 			break;
 		default:
 			break;
@@ -248,38 +379,46 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-		
+
 		//Matrix used for rendering
 		Matrix_33 matrix;
+
+		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() : camera_system->getWorldToNDCXform();
 
 		//Get transform
 		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
-		//Check If Shape
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-
-			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
-
-			//Render Shape
-			renderObject(matrix, e_shape);
-		}
-		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
+		//Check If Texture
+		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
 			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
-			//Allow stretching of texture
-			if (!e_texture.b_stretch) {
-				//Copy transform for texture mapping ( Locks the transformation of a texture )
-				Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
-				e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+			//Check if texture is loaded
+			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
+				//Allow stretching of texture
+				if (!e_texture.b_stretch) {
+					//Copy transform for texture mapping ( Locks the transformation of a texture )
+					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
+					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+				}
+
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, cam_ndcx);
+
+				// Render Texture
+				renderObject(matrix, e_texture);
 			}
+		}
+		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
 
-			// Transform matrix here
-			transformMatrix(e_transform, matrix, camera_system->getWorldToNDCXform());
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+				// Transform matrix here
+				transformMatrix(e_transform, matrix, cam_ndcx);
 
-			// Render Texture
-			renderObject(matrix, e_texture);
+				//Render Shape
+				renderObject(matrix, e_shape);
+			}
 		}
 
 		if (debugMode) {
@@ -296,7 +435,7 @@ namespace NIKE {
 			}
 
 			//Calculate wireframe matrix
-			transformMatrixDebug(e_transform, matrix, camera_system->getWorldToNDCXform(), true);
+			transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
@@ -308,7 +447,7 @@ namespace NIKE {
 					dir_transform.scale.x = 1.0f;
 					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>((180.0f / M_PI));
 					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-					transformMatrixDebug(dir_transform, matrix, camera_system->getWorldToNDCXform(), false);
+					transformMatrixDebug(dir_transform, matrix, cam_ndcx, false);
 					renderWireFrame(matrix, wire_frame_color);
 				}
 			}
@@ -325,19 +464,26 @@ namespace NIKE {
 
 		auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
 
-		//Set transform scale to 1.0f for calculating matrix
-		e_transform.scale = { 1.0f, 1.0f };
+		//Make copy of transform, scale to 1.0f for calculating matrix
+		Transform::Transform copy = e_transform;
+		copy.scale = { 1.0f, 1.0f };
 
 		//Transform text matrix
-		transformMatrix(e_transform, matrix, camera_system->getFixedWorldToNDCXform());
+		transformMatrix(copy, matrix, camera_system->getFixedWorldToNDCXform());
 
 		//Render text
-		renderText(matrix, e_text, e_transform);
+		renderText(matrix, e_text);
 	}
 
 	void Render::Manager::renderViewport() {
-		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-		glClear(GL_COLOR_BUFFER_BIT);
+
+		//Render to frame buffer if imgui is active
+		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
+		}
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
 			//SKip inactive layer
@@ -348,17 +494,32 @@ namespace NIKE {
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
-					transformAndRenderText(entity);
-				}
-				else {
-					transformAndRenderEntity(entity, true);
+				//Skip entity if no transform is present
+				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+					continue;
+
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+					transformAndRenderEntity(entity, NIKE_IMGUI_SERVICE->getDebugMode());
 				}
 			}
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		batchRenderObject();		// at least 1 call to this is required every frame at the very end
 
+		// render text last
+		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			if (!layer->getLayerState())
+				continue;
+			for (auto& entity : entities) {
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+					transformAndRenderText(entity);
+				}
+			}
+		}
+
+		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		}
 	}
 
 	void Render::Manager::init() {
@@ -407,5 +568,8 @@ namespace NIKE {
 
 	void Render::Manager::update() {
 		renderViewport();
+
+		// moved to renderViewport to ensure it draws before text
+		//batchRenderObject();		// at least 1 call to this is required every frame at the very end
 	}
 }

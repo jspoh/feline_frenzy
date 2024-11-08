@@ -26,6 +26,11 @@
 namespace NIKE {
 	namespace Render {
 
+		struct RenderInstance {
+			Matrix_33 xform;
+			Vector4f color;
+		};
+
 		//Render Manager
 		class Manager : public System::ISystem {
 		private:
@@ -55,11 +60,22 @@ namespace NIKE {
 			//Render Shape
 			void renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape);
 
+			//
+			std::vector<RenderInstance> render_instances_quad;
+
+			// batch render shape
+			void batchRenderObject();
+
 			//Render Texture
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
+			std::vector<RenderInstance> render_instances_texture;
+
+			// batch render texture
+			void batchRenderTextures();
+
 			//Render text
-			void renderText(Matrix_33 const& x_form, Render::Text const& e_text, Transform::Transform& e_transform);
+			void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
 			//Render debugging wireframe
 			void renderWireFrame(Matrix_33 const& x_form, Vector4f const& e_color);
@@ -73,8 +89,10 @@ namespace NIKE {
 			//Helper function to encapsulate rendering text
 			void transformAndRenderText(Entity::Type entity);
 		public:
+			constexpr static unsigned int MAX_INSTANCES = 1000;
+
 			//Constructor
-			Manager() :frame_buffer{ 0 }, texture_color_buffer{ 0 }, VAO{ 0 }, VBO{ 0 } {}
+			Manager();
 
 			//Destructor
 			~Manager() = default;
@@ -82,10 +100,6 @@ namespace NIKE {
 			std::string getSysName()
 			{
 				return "Render System";
-			}
-
-			unsigned int getTextureColorBuffer() const {
-				return texture_color_buffer;
 			}
 
 			/**

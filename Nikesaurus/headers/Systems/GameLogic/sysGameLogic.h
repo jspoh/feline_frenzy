@@ -11,45 +11,47 @@
 #ifndef GAME_LOGIC_HPP
 #define GAME_LOGIC_HPP
 
-#include "../headers/Managers/ECS/mSystem.h"
-#include "../headers/Systems/Render/sysRender.h"
-#include "../headers/Core/Engine.h"
-#include "../headers/Components/cInput.h"
-#include "../headers/Components/cScene.h"
-#include "../headers/Managers/mEvents.h"
-#include "../headers/Components/cAnimation.h"
-#include "../headers/Components/cMove.h"
-#include "../headers/Systems/Physics/sysCollision.h"
+#include "Managers/ECS/mSystem.h"
+#include "sysLua.h"
 
-namespace GameLogic {
+namespace NIKE {
+    namespace GameLogic {
 
-	//Object type
-	struct ObjectSpawner{};
+	    class Manager : public System::ISystem {
+	    private:
+		    //Delete Copy Constructor & Copy Assignment
+		    Manager(Manager const& copy) = delete;
+		    void operator=(Manager const& copy) = delete;
 
-	class Manager : public System::ISystem {
-	private:
-		//Delete Copy Constructor & Copy Assignment
-		Manager(Manager const& copy) = delete;
-		void operator=(Manager const& copy) = delete;
+			//Internal lua system
+			std::unique_ptr<Lua::System> lua_system;
 
-	public:
-		//Default constructor
-		Manager() = default;
+			//Internal script management
+			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
-		//Init Inputs
-		void init() override;
+	    public:
+		    //Default constructor
+		    Manager() = default;
 
-		std::string getSysName() override
-		{
-			return "Game Logic System";
-		}
+			//Default Destructor
+			~Manager() = default;
 
-		//Update Inputs
-		void update() override;
+			//Get system name
+		    std::string getSysName() override
+		    {
+			    return "Game Logic System";
+		    }
 
-		//Default Destructor
-		~Manager() override = default;
-	};
+			//Init Inputs
+			void init() override;
+
+			//Register systems for lua
+			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+
+		    //Update Inputs
+		    void update() override;
+	    };
+    }
 }
 
 #endif //!GAME_LOGIC_HPP
