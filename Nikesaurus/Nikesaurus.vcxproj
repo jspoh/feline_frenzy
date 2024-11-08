@@ -222,11 +222,7 @@
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -256,11 +252,7 @@ xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Pla
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
-
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
