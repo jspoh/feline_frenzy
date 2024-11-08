@@ -15,14 +15,41 @@
 namespace NIKE {
 	namespace GameLogic {
 
-		//Player logic component
-		struct Player {
-			std::string script;
+		//Game Logic States
+		enum class InnerStates {
+			ENTER = 0,
+			UPDATE,
+			EXIT
+		};
+
+		//Script data
+		struct Script {
 			std::string script_id;
+			std::string script_path;
+			std::string function;
 			bool b_loaded;
 
-			Player() : script{ "" }, script_id { "" }, b_loaded{ false } {}
-			Player(std::string const& script) : script{ script }, script_id{ "" }, b_loaded{false} {}
+			Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
+			Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
+		};
+
+		//State machine component
+		struct StateMachine {
+			InnerStates curr_state;
+
+			//State scripts ( first one is script id, second is script path )
+			std::unordered_map<InnerStates, Script> state_scripts;
+
+			StateMachine() : curr_state{ InnerStates::ENTER } {}
+			//StateMachine(InnerStates start_state) : curr_state { start_state } {}
+		};
+
+		//Player logic component
+		struct Player {
+			Script script;
+
+			Player() : script() {}
+			Player(std::string const& script) : script(script) {}
 		};
 
 		void registerComponents();

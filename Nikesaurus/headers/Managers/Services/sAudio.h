@@ -420,6 +420,9 @@ namespace NIKE {
 			//Get channel
 			std::shared_ptr<Audio::IChannel> getChannel(std::string const& channel_id);
 
+			// Get all channels
+			std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>>& getAllChannelGroups();
+
 			// Checkers
 			bool checkChannelGroupExist(std::string const& channel_id);
 			bool checkChannelExist(std::string const& channel_id);

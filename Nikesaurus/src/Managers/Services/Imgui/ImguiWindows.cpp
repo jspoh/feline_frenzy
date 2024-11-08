@@ -771,27 +771,47 @@ namespace NIKE {
 
 							static char script_path[300];
 							static bool scripth_path_init = false;
+							static char function[300];
+							static bool functioninit = false;
 
-							//For initial initialization
-							if (!scripth_path_init || script_path != e_player.script.c_str()) {
-								// Ensure null-termination
-								script_path[sizeof(script_path) - 1] = '\0';
-								strcpy_s(script_path, e_player.script.c_str());
-								scripth_path_init = true;
-							}
+							////For script initial initialization
+							//if (!scripth_path_init || script_path != e_player.script.script_path.c_str()) {
+							//	// Ensure null-termination
+							//	script_path[sizeof(script_path) - 1] = '\0';
+							//	strcpy_s(script_path, e_player.script.script_path.c_str());
+							//	scripth_path_init = true;
+							//}
 
-							ImGui::Text("Enter a script:");
+							////For function initial initialization
+							//if (!functioninit || function != e_player.script.function.c_str()) {
+							//	// Ensure null-termination
+							//	function[sizeof(function) - 1] = '\0';
+							//	strcpy_s(function, e_player.script.function.c_str());
+							//	functioninit = true;
+							//}
+
+							ImGui::Text("Enter script:");
 							if (ImGui::InputText("##PlayerScript", script_path, IM_ARRAYSIZE(script_path))){
 
 							}
 
 							if (ImGui::Button("Save Script")) {
-								e_player.script = script_path;
+								e_player.script.script_path = script_path;
+							}
+
+							ImGui::Text("Enter function:");
+							if (ImGui::InputText("##FunctionPath", function, IM_ARRAYSIZE(function))) {
+
+							}
+
+							if (ImGui::Button("Save Function")) {
+								e_player.script.function = function;
 							}
 
 							ImGui::Separator();
 
-							ImGui::Text(std::string("Script Id: " + e_player.script_id).c_str());
+							ImGui::Text(std::string("Script Id: " + e_player.script.script_id).c_str());
+							ImGui::Text(std::string("Executing: " + e_player.script.function).c_str());
 						}
 						else
 						{
@@ -1102,6 +1122,7 @@ namespace NIKE {
 			dispatch = false;
 		}
 
+		// Normalise mouse pos to viewport imgui
 		ImVec2 mouse_pos = ImGui::GetMousePos();
 		ImVec2 scalar = { (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / window_size.x), (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / window_size.y) };
 		mouse_pos.x -= win_pos.x;
@@ -1279,6 +1300,100 @@ namespace NIKE {
 
 		}
 
+
+		ImGui::End();
+	}
+	void imguiAudioControl()
+	{
+		static int selected_channel = 0;
+		static int channel_counter = 1;
+		static bool show_save_popup = false;
+		static bool is_playing = false;
+		static bool is_paused = false;
+		static bool show_error_popup = false;
+		static bool open_channel_popup = false;
+
+		static char current_channel_input[300];
+		static bool music_init = false;
+		if (!music_init) {
+			// Ensure null-termination
+			current_channel_input[sizeof(current_channel_input) - 1] = '\0';
+			music_init = true;
+		}
+
+		std::string true_audio{};
+		std::string true_bgm_channel{};
+
+
+		ImGui::Begin("Audio Mangement");
+		static char current_audio_file[300];
+		static bool audio_init = false;
+		if (!audio_init) {
+			// Ensure null-termination
+			current_audio_file[sizeof(current_audio_file) - 1] = '\0';
+			audio_init = true;
+		}
+
+		// Create Audio channel
+		if (ImGui::Button("Create Channel Group"))
+		{
+			open_channel_popup = true;
+			ImGui::OpenPopup("Create Channel Group");
+		}
+
+		// Pop up for create audio channel
+		open_channel_popup = createAudioChannelPopup();
+
+		ImGui::Separator();
+
+		ImGui::Text("Available Channel groups");
+
+
+		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups())
+		{
+			ImGui::Text("%s", channel.first.c_str());
+		}
+
+
+		ImGui::Separator();
+
+		ImGui::Text("Play BGM");
+
+		// Input loaded audio file
+		ImGui::InputText("Audio File", current_audio_file, IM_ARRAYSIZE(current_audio_file));
+		ImGui::InputText("Channel", current_channel_input, IM_ARRAYSIZE(current_channel_input));
+
+		// Saving input
+		if (ImGui::Button("Save Audio Input")) {
+			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file)))
+			{
+				ImGui::OpenPopup("VALID INPUT");
+				show_save_popup = true;
+			}
+			else {
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+		}
+		// Saving input
+		if (ImGui::Button("Save Channel Input")) {
+			//if (NIKE_ASSETS_SERVICE->checkAudioExist(current_channel_input))
+			//{
+				ImGui::OpenPopup("VALID INPUT");
+				show_save_popup = true;
+			//}
+		}
+
+		// Show pop ups
+		show_error_popup = ShowErrorPopup();
+		show_save_popup = ShowSaveConfirmationPopup();
+
+		if (ImGui::Button("Play BGM"))
+		{
+			std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
+
+			NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0);
+		}
 
 		ImGui::End();
 	}

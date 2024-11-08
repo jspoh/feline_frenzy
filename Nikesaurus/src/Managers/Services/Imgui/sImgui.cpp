@@ -166,6 +166,7 @@ namespace NIKE {
 			imguiCameraControl();
 			imguiLayerManagementWindow();
 			imguiShowLoadedLevelsWindow();
+			imguiAudioControl();
 
 			// THIS 2 CALL THE OPENGL DRAWING
 			ImGui::Render();

@@ -26,6 +26,9 @@ namespace NIKE {
 			//Internal lua system
 			std::unique_ptr<Lua::System> lua_system;
 
+			//Internal script management
+			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+
 	    public:
 		    //Default constructor
 		    Manager() = default;

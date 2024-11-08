@@ -12,23 +12,35 @@
 #include "Components/cGameLogic.h"
 
 namespace NIKE {
+
+	nlohmann::json ScriptSerialize(GameLogic::Script const& comp) {
+		return	{
+				{ "Script_Path", comp.script_path },
+				{ "Function", comp.function },
+		};
+	}
+
+	void ScriptDeserialize(GameLogic::Script& comp, nlohmann::json const& data) {
+		comp.script_path = data.at("Script_Path").get<std::string>();
+		comp.function = data.at("Function").get<std::string>();
+	}
+
 	void GameLogic::registerComponents() {
 
-		//Register player logic component
+		//Register logic components
 		NIKE_ECS_MANAGER->registerComponent<GameLogic::Player>();
+		NIKE_ECS_MANAGER->registerComponent<GameLogic::StateMachine>();
 
 		//Register Player For Serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<GameLogic::Player>(
 			//Serialize
 			[](GameLogic::Player const& comp) -> nlohmann::json {
-				return	{
-						{ "Script_Path", comp.script }
-						};
+				return	ScriptSerialize(comp.script);
 			},
 
 			//Deserialize
 			[](GameLogic::Player& comp, nlohmann::json const& data) {
-				comp.script = data.at("Script_Path").get<std::string>();
+				ScriptDeserialize(comp.script, data);
 			}
 		);
 	}
