@@ -1,0 +1,561 @@
+/*****************************************************************//**
+ * \file   sysFont.cpp
+ * \brief	Font render manager
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \date   October 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
+#include "Core/stdafx.h"
+#include "Managers/Services/Assets/sLoader.h"
+#include "Systems/Render/sysRender.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "data/stb_image.h"
+
+namespace NIKE {
+	/*****************************************************************//**
+	* NIKE FONT LIB
+	*********************************************************************/
+	Assets::NIKEFontLib::NIKEFontLib() {
+		//Init free type library
+		if (FT_Init_FreeType(&ft_lib)) {
+			cerr << "Could not initialize FreeType library!" << endl;
+		}
+
+		NIKEE_CORE_INFO("Free Type init success");
+	}
+
+	Assets::Font Assets::NIKEFontLib::generateGlyphsTex(std::string const& file_path, FT_Face& font_face) {
+
+		//Return font
+		Assets::Font font;
+
+		//Set pixels
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		//Max ascii characters
+		const int max_ascii = 128;
+
+		//Get texture for each character
+		for (unsigned char c = 0; c < max_ascii; c++)
+		{
+			//Load character glyph
+			if (FT_Load_Char(font_face, c, FT_LOAD_RENDER))
+			{
+				cout << "Error loading glpyh for character: " << c << endl;
+			}
+
+			//Generate texture for character
+			unsigned int texture;
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				font_face->glyph->bitmap.width,
+				font_face->glyph->bitmap.rows,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				font_face->glyph->bitmap.buffer
+			);
+
+			//Set texture
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			//Store character variables
+			font.char_map[c] = {
+				texture,
+				{static_cast<float>(font_face->glyph->bitmap.width), static_cast<float>(font_face->glyph->bitmap.rows)},
+				{static_cast<float>(font_face->glyph->bitmap_left), static_cast<float>(font_face->glyph->bitmap_top)},
+				static_cast<unsigned int>(font_face->glyph->advance.x)
+			};
+		}
+
+		//Clean up
+		FT_Done_Face(font_face);
+		font_face = nullptr;
+
+		//Log
+		NIKEE_CORE_INFO("Sucessfully loaded font from " + file_path);
+
+		//Return glpyh textures
+		return font;
+	}
+
+	Assets::Font Assets::NIKEFontLib::generateFont(std::string const& file_path, Vector2f const& pixel_sizes) {
+		//Create free type font face
+		FT_Face face;
+
+		//Load font face
+		if (FT_New_Face(ft_lib, file_path.c_str(), 0, &face)) {
+			cerr << "Could not load font face!" << endl;
+		}
+
+		// Set the font size ( width and height of the glyph )
+		FT_Set_Pixel_Sizes(face, 0, static_cast<unsigned int>(pixel_sizes.y));
+
+		//Generate vector of textures
+		return generateGlyphsTex(file_path, face);
+	}
+
+	Assets::NIKEFontLib::~NIKEFontLib() {
+		FT_Done_FreeType(ft_lib);
+	}
+
+	/*****************************************************************//**
+	* FONT LOADER
+	*********************************************************************/
+	Assets::FontLoader::FontLoader() {
+		font_lib = std::make_shared<NIKEFontLib>();
+	}
+
+	std::shared_ptr<Assets::IFontLib> Assets::FontLoader::getFontLib() const {
+		return font_lib;
+	}
+
+	/*****************************************************************//**
+	* RENDER LOADER
+	*********************************************************************/
+	void Assets::RenderLoader::createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Assets::Model& model) {
+		// VBO (Vertex Buffer Object)
+		glCreateBuffers(1, &model.vboid);
+		glNamedBufferStorage(model.vboid,
+			sizeof(Vector2f) * vertices.size(),
+			nullptr, // nullptr means no data is transferred
+			GL_DYNAMIC_STORAGE_BIT);
+		glNamedBufferSubData(model.vboid, 0, sizeof(Vector2f) * vertices.size(), vertices.data());
+
+		// VAO (Vertex Array Object)
+		glCreateVertexArrays(1, &model.vaoid);
+
+		// Vertex Position Array
+		glEnableVertexArrayAttrib(model.vaoid, 0); // vertex attribute index 0
+		glVertexArrayVertexBuffer(model.vaoid, 0, model.vboid, 0, sizeof(Vector2f)); // buffer binding point 0
+		glVertexArrayAttribFormat(model.vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(model.vaoid, 0, 0);
+
+		// Create EBO
+		glCreateBuffers(1, &model.eboid);
+		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
+		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+	}
+
+	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model) {
+		// only handles drwaing quads
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		// create vao
+		glCreateVertexArrays(1, &model.vaoid);
+
+		// create vbo
+		glCreateBuffers(1, &model.vboid);
+
+		// create ebo
+		glCreateBuffers(1, &model.eboid);
+
+		// bind vbo and ebo to vao
+		constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int VERTEX_SIZE = sizeof(Vertex);
+		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
+		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+
+
+		// allocate space for vbo
+		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
+		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
+		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// allocate space for ebo
+		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
+		static constexpr int INDEX_SIZE = sizeof(unsigned int);
+		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
+		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// set vertex array attributes
+
+		// batched_base.vert location=0
+		static constexpr int POSITION_ATTRIB_INDEX = 0;
+		static constexpr int POSITION_ATTRIB_SIZE = 2;		// num elements (x,y)
+		static constexpr int POSITION_DATA_TYPE = GL_FLOAT;
+		glEnableVertexArrayAttrib(model.vaoid, POSITION_ATTRIB_INDEX);		// vertex attrib index 0
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			POSITION_ATTRIB_INDEX,
+			POSITION_ATTRIB_SIZE,
+			POSITION_DATA_TYPE,
+			false,		//normalized
+			offsetof(Vertex, pos)			// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, POSITION_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_base.vert location=1
+		static constexpr int COLOR_ATTRIB_INDEX = 1;
+		static constexpr int COLOR_ATTRIB_SIZE = 4;		// num elements (r,g,b,a)
+		static constexpr int COLOR_DATA_TYPE = GL_FLOAT;
+		static constexpr int COLOR_DATA_OFFSET = offsetof(Vertex, col);
+		glEnableVertexArrayAttrib(model.vaoid, COLOR_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			COLOR_ATTRIB_INDEX,
+			COLOR_ATTRIB_SIZE,
+			COLOR_DATA_TYPE,
+			false,		//normalized
+			COLOR_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, COLOR_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_base.vert location=4
+		static constexpr int XFORM_ATTRIB_INDEX_0 = 4;
+		static constexpr int XFORM_ATTRIB_SIZE = 3;		// num elements(row of 3x3 mtx)
+		static constexpr int XFORM_DATA_TYPE = GL_FLOAT;
+		static constexpr int XFORM_DATA_OFFSET_0 = offsetof(Vertex, transform);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_0);		// vertex attrib index 4
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_0,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_0		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_0, VBO_BINDING_INDEX);
+
+		static constexpr int XFORM_ATTRIB_INDEX_1 = 5;
+		static constexpr int XFORM_DATA_OFFSET_1 = XFORM_DATA_OFFSET_0 + sizeof(std::array<float, 3>);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_1);		// vertex attrib index 5
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_1,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_1		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_1, VBO_BINDING_INDEX);
+
+		static constexpr int XFORM_ATTRIB_INDEX_2 = 6;
+		static constexpr int XFORM_DATA_OFFSET_2 = XFORM_DATA_OFFSET_1 + sizeof(std::array<float, 3>);
+		glEnableVertexArrayAttrib(model.vaoid, XFORM_ATTRIB_INDEX_2);		// vertex attrib index 6
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			XFORM_ATTRIB_INDEX_2,
+			XFORM_ATTRIB_SIZE,
+			XFORM_DATA_TYPE,
+			false,		//normalized
+			XFORM_DATA_OFFSET_2		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, XFORM_ATTRIB_INDEX_2, VBO_BINDING_INDEX);
+
+		// vbo and ebo data population will be done in update
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Assets::RenderLoader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Assets::Model& model) {
+		// VBO (Vertex Buffer Object)
+		glCreateBuffers(1, &model.vboid);
+		glNamedBufferStorage(model.vboid,
+			sizeof(Vector2f) * vertices.size() + sizeof(Vector2f) * tex_coords.size(),
+			nullptr, // nullptr means no data is transferred
+			GL_DYNAMIC_STORAGE_BIT);
+		glNamedBufferSubData(model.vboid, 0, sizeof(Vector2f) * vertices.size(), vertices.data());
+		glNamedBufferSubData(model.vboid, sizeof(Vector2f) * vertices.size(), sizeof(Vector2f) * tex_coords.size(), tex_coords.data());
+
+		// VAO (Vertex Array Object)
+		glCreateVertexArrays(1, &model.vaoid);
+
+		// Vertex Position Array
+		glEnableVertexArrayAttrib(model.vaoid, 0); // vertex attribute index 0
+		glVertexArrayVertexBuffer(model.vaoid, 0, model.vboid, 0, sizeof(Vector2f)); // buffer binding point 0
+		glVertexArrayAttribFormat(model.vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(model.vaoid, 0, 0);
+
+		// Vertex texture coordinates
+		glEnableVertexArrayAttrib(model.vaoid, 2);
+		glVertexArrayVertexBuffer(model.vaoid, 1, model.vboid, sizeof(Vector2f) * vertices.size(), sizeof(Vector2f));
+		glVertexArrayAttribFormat(model.vaoid, 2, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(model.vaoid, 2, 1);
+
+		// Create EBO
+		glCreateBuffers(1, &model.eboid);
+		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
+		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+	}
+
+	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
+		// find file type
+		std::string junk, filetype;
+		std::stringstream ss{ path_to_texture };
+		std::getline(ss, junk, '.');
+		std::getline(ss, filetype, '.');
+
+		if (filetype == "tex") {
+			is_tex_or_png_ext = true;
+
+			width = 256;
+			height = 256;
+
+			std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
+			if (!texture_file.is_open()) {
+				cerr << "Failed to open texture file: " << path_to_texture << endl;
+				throw std::runtime_error("Failed to open texture file.");
+			}
+
+			// get tex_size of texture file
+			tex_size = static_cast<int>(texture_file.tellg());
+
+			// return to beginning of file
+			texture_file.seekg(0, std::ios::beg);
+
+			char* tex_data{ new char[tex_size] };
+
+			// read tex data into ptr
+			if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
+				cerr << "Failed to read texture file: " << path_to_texture << endl;
+				throw std::runtime_error("Failed to read texture file.");
+			}
+			texture_file.close();
+
+			return tex_data;
+		}
+
+		// is not .tex file
+		if (filetype == "png") {
+			is_tex_or_png_ext = true;
+		}
+		else {
+			is_tex_or_png_ext = false;
+		}
+
+		int channels;
+		stbi_set_flip_vertically_on_load(true);
+		char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
+		if (img_data == nullptr) {
+			cerr << "Failed to load image data: " << path_to_texture << endl;
+			throw std::runtime_error("Failed to load image data.");
+		}
+
+		tex_size = width * height * channels;
+
+		char* data = new char[tex_size];
+		for (int i{}; i < tex_size; i++) {
+			data[i] = img_data[i];
+		}
+		stbi_image_free(img_data);
+
+		return data;
+	}
+
+	unsigned int Assets::RenderLoader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+		// read and compile vertex shader
+		std::ifstream vtx_file{ vtx_path };
+		if (!vtx_file.is_open()) {
+			cerr << "Failed to open vertex shader file: " << vtx_path << endl;
+			throw std::exception();
+		}
+
+		std::stringstream vtx_buffer;
+		vtx_buffer << vtx_file.rdbuf();
+		vtx_file.close();
+		const std::string vtx_str = vtx_buffer.str();
+		const char* vtx_src = vtx_str.c_str();
+
+		unsigned int vtx_handle = glCreateShader(GL_VERTEX_SHADER);
+		if (!vtx_handle) {
+			cerr << "Failed to create vertex shader program " << shader_ref << endl;
+			throw std::exception();
+		}
+		glShaderSource(vtx_handle, 1, &vtx_src, nullptr);
+		glCompileShader(vtx_handle);
+
+		// read and compile fragment shader
+		std::ifstream frag_file{ frag_path };
+		if (!frag_file.is_open()) {
+			cerr << "Failed to open fragment shader file: " << frag_path << endl;
+			throw std::exception();
+		}
+
+		std::stringstream frag_buffer;
+		frag_buffer << frag_file.rdbuf();
+		frag_file.close();
+		const std::string frag_str = frag_buffer.str();
+		const char* frag_src = frag_str.c_str();
+
+		unsigned int frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
+		if (!frag_handle) {
+			cerr << "Failed to create fragment shader program " << shader_ref << endl;
+			throw std::exception();
+		}
+		glShaderSource(frag_handle, 1, &frag_src, nullptr);
+		glCompileShader(frag_handle);
+
+		// link shaders
+		unsigned int shader_handle = glCreateProgram();
+		if (!shader_handle) {
+			cerr << "Failed to create shader program " << shader_ref << endl;
+			throw std::exception();
+		}
+
+		glAttachShader(shader_handle, vtx_handle);
+		glAttachShader(shader_handle, frag_handle);
+		glLinkProgram(shader_handle);
+
+		// validate shader program
+		int success = false;
+		glGetProgramiv(shader_handle, GL_LINK_STATUS, &success);
+
+		if (!success) {
+			char info_log[512];
+			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
+			cerr << "Failed to link shader program " << shader_ref << ": " << info_log << endl;
+			//throw std::exception();
+		}
+
+		// cleanup shaders
+		glDeleteShader(vtx_handle);
+		glDeleteShader(frag_handle);
+
+		NIKEE_CORE_INFO("Sucessfully loaded shader from " + vtx_path + " " + frag_path);
+
+		return shader_handle;
+	}
+
+	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh, bool for_batched_rendering) {
+		Assets::Model model;
+
+		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
+		if (!mesh_file.is_open()) {
+			throw std::exception("Failed to open model file.");
+		}
+
+		mesh_file.seekg(0, std::ios::beg);
+
+		std::string line;
+		GLshort index;
+
+		// pos
+		std::vector<Vector2f> tex_coords;
+
+		// indices (indexed rendering with element buffer object)
+		std::vector<unsigned int> indices;
+
+		// line data type (eg. vertex, color, indices)
+		char type;
+
+		while (getline(mesh_file, line)) {
+			std::istringstream line_sstm{ line };
+
+			line_sstm >> type;
+
+			switch (type) {
+			case 'n': {// name
+				break;
+			}
+			case 'v': {// vertex
+				float ndc_x, ndc_y;
+				line_sstm >> ndc_x >> ndc_y;
+				Vertex v;
+				v.pos = { ndc_x, ndc_y };
+				model.vertices.emplace_back(v);
+				break;
+			}
+			case 't': {// triangle indices
+				if (model.primitive_type == 0) {
+					model.primitive_type = GL_TRIANGLES;
+				}
+				while (line_sstm >> index) { // Grab index position
+					indices.emplace_back(index);
+				}
+				break;
+			}
+			case 'i': {
+				float tex_x, tex_y;
+				line_sstm >> tex_x >> tex_y;
+				tex_coords.emplace_back(tex_x, tex_y);
+				break;
+			}
+			case 'f': {// fan indices
+				if (model.primitive_type == 0) {
+					model.primitive_type = GL_TRIANGLE_FAN;
+				}
+				while (line_sstm >> index) { // Grab index position
+					indices.emplace_back(index);
+				}
+				break;
+			}
+			default:
+				std::string error = "Unknown data type in mesh file: " + type;
+				throw std::exception(error.c_str());
+			}
+		}
+		mesh_file.close();
+
+		std::vector<Vector2f> pos_vertices;
+		pos_vertices.reserve(model.vertices.size());
+		for (const Vertex& v : model.vertices) {
+			pos_vertices.emplace_back(v.pos);
+		}
+
+		if (tex_coords.size() == 0) {
+			if (for_batched_rendering) {
+				createBatchedBaseBuffers(model);
+			}
+			else {
+				createBaseBuffers(pos_vertices, indices, model);
+			}
+		}
+		else {
+			createTextureBuffers(pos_vertices, indices, tex_coords, model);
+		}
+		model.draw_count = static_cast<GLuint>(indices.size());
+		model.indices = indices;
+
+		NIKEE_CORE_INFO("Sucessfully loaded model from " + path_to_mesh);
+
+		return model;
+	}
+
+	Assets::Texture Assets::RenderLoader::compileTexture(const std::string& path_to_texture) {
+		// find file type
+		std::string junk, filetype;
+		std::stringstream ss{ path_to_texture };
+		std::getline(ss, junk, '.');
+		std::getline(ss, filetype, '.');
+
+		int tex_width{};
+		int tex_height{};
+		int tex_size{};
+		bool is_tex_or_png_ext = false;
+		const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
+
+		// create texture
+		unsigned int tex_id;
+		glCreateTextures(GL_TEXTURE_2D, 1, &tex_id);
+		glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
+		glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, (is_tex_or_png_ext ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, tex_data);
+
+		// no longer needed
+		delete[] tex_data;
+
+		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
+
+		// Return texture
+		return Assets::Texture(tex_id, { tex_width, tex_height });
+	}
+}
+
+#undef STB_IMAGE_IMPLEMENTATION
