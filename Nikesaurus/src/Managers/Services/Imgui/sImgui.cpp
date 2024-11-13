@@ -92,6 +92,15 @@ namespace NIKE {
 		return entities_ref[input];
 	}
 
+	std::string IMGUI::Service::getEntityByType(Entity::Type type) {
+		for (const auto& [name, entityType] : getEntityRef()) {
+			if (entityType == type) {
+				return name;  // Return the first match
+			}
+		}
+		return "";  // Return an empty optional if no match is found
+	}
+
 	bool IMGUI::Service::getImguiActive() const {
 		return b_show_imgui;
 	}

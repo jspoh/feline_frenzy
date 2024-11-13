@@ -75,6 +75,7 @@ namespace NIKE {
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
 			std::string& getSelectedEntityName();
 			Entity::Type getEntityByName(std::string const& input);
+			std::string getEntityByType(Entity::Type);
 
 			//Gettor for seeing if imgui is active
 			bool getImguiActive() const;

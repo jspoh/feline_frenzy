@@ -34,6 +34,7 @@
                                 }
                             }
                         },
+                        "Entity Name": "text_01",
                         "Layer ID": 0
                     }
                 }
@@ -86,6 +87,7 @@
                                 }
                             }
                         },
+                        "Entity Name": "button_01",
                         "Layer ID": 1,
                         "UI ID": "Test"
                     }
