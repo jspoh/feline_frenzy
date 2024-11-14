@@ -171,6 +171,12 @@ namespace NIKE {
 			}
 
 			template<typename T>
+			std::string getSystemName()
+			{
+				return system_manager->getSystemName<T>();
+			}
+
+			template<typename T>
 			void addSystemComponentType(Component::Type component)
 			{
 				system_manager->addComponentType<T>(component);
@@ -183,6 +189,7 @@ namespace NIKE {
 
 			void updateSystems();
 
+			std::vector<std::shared_ptr<System::ISystem>>& getAllSystems();
 		};
 	}
 }

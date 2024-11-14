@@ -50,7 +50,8 @@
     <ClCompile Include="src\Systems\GameLogic\sysLua.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
-    <ClCompile Include="src\Managers\Services\Level Editor\sLevelEditor.cpp" />
+    <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
+    <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -112,7 +113,8 @@
     <ClInclude Include="headers\Systems\GameLogic\sysLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
-    <ClInclude Include="headers\Managers\Services\sLevelEditor.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

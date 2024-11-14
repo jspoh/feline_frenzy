@@ -209,6 +209,20 @@ namespace NIKE {
 				return it->first;
 			}
 
+			//Get System name
+			template<typename T>
+			std::string getSystemName() {
+				//Get iterator
+				auto it = systems_map.find(typeid(T).name());
+
+				//Check if system has already been added
+				if (it == systems_map.end()) {
+					throw std::runtime_error("System not registered. Checking of index failed");
+				}
+
+				return it->second.second->getSysName();
+			}
+
 			//Update entities list based on signature
 			void updateEntitiesList(Entity::Type entity, Component::Signature e_signature);
 
@@ -220,6 +234,9 @@ namespace NIKE {
 
 			//Update all systems
 			void updateSystems();
+
+			//Get all systems
+			std::vector<std::shared_ptr<System::ISystem>>& getAllSystems();
 		};
 	}
 }

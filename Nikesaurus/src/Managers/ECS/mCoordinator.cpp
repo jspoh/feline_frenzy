@@ -66,6 +66,10 @@ namespace NIKE {
 		system_manager->updateSystems();
 	}
 
+	std::vector<std::shared_ptr<System::ISystem>>& Coordinator::Manager::getAllSystems() {
+		return system_manager->getAllSystems();
+	}
+
 	/*****************************************************************//**
 	* Component Methods
 	*********************************************************************/

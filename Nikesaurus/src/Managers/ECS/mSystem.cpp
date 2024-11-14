@@ -164,4 +164,8 @@ namespace NIKE {
 			last_call_time = current_time;
 		}
 	}
+
+	std::vector<std::shared_ptr<System::ISystem>>& System::Manager::getAllSystems() {
+		return systems;
+	}
 }
