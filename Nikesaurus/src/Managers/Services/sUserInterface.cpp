@@ -102,7 +102,7 @@ namespace NIKE {
 	bool UI::Service::buttonHovered(Entity::Type entity) {
 		//Get bounding box
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-		if (e_transform_comp.has_value()) return false;
+		if (!e_transform_comp.has_value()) return false;
 		auto const& e_transform = e_transform_comp.value().get();
 
 		//Vertices
