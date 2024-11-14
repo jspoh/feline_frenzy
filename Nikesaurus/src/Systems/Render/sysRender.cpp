@@ -385,11 +385,13 @@ namespace NIKE {
 		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() : camera_system->getWorldToNDCXform();
 
 		//Get transform
-		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) return; //Handling no value scenarios
+		auto& e_transform = e_transform_comp.value().get();
 
 		//Check If Texture
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
-			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		if (auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);  e_texture_comp.has_value()) {
+			auto& e_texture = e_texture_comp.value().get();
 
 			//Check if texture is loaded
 			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
@@ -407,8 +409,8 @@ namespace NIKE {
 				renderObject(matrix, e_texture);
 			}
 		}
-		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		else if (auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);  e_shape_comp.has_value()) {
+			auto& e_shape = e_shape_comp.value().get();
 
 			//Check if model exists
 			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
@@ -425,8 +427,8 @@ namespace NIKE {
 			Vector4f wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
 
 			//Check for collider component
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
-				auto const& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+			if (auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);  e_collider_comp.has_value()) {
+				auto const& e_collider = e_collider_comp.value().get();
 
 				if (e_collider.b_collided) {
 					wire_frame_color = { 0.0f, 1.0f, 0.0f, 1.0f };
@@ -438,8 +440,8 @@ namespace NIKE {
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
-				auto const& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+			if (auto e_velo_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);  e_velo_comp.has_value()) {
+				auto const& e_velo = e_velo_comp.value().get();
 
 				if (e_velo.velocity.x != 0.0f || e_velo.velocity.y != 0.0f) {
 					Transform::Transform dir_transform = e_transform;
@@ -459,9 +461,14 @@ namespace NIKE {
 		Matrix_33 matrix;
 
 		//Get transform
-		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) return;
+		auto& e_transform = e_transform_comp.value().get();
 
-		auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+		//Get Text
+		auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+		if (!e_text_comp.has_value()) return;
+		auto& e_text = e_text_comp.value().get();
 
 		//Make copy of transform, scale to 1.0f for calculating matrix
 		Transform::Transform copy = e_transform;

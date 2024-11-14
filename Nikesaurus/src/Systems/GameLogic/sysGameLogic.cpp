@@ -55,8 +55,9 @@ namespace NIKE {
 			for (auto& entity : entities) {
 				
 				//Check for player logic comp
-				if (NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::Movement>(entity)) {
-					auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+				if (e_player_comp.has_value()) {
+					auto& e_player = e_player_comp.value().get();
 
 					//Skip if script  has not been set
 					if (e_player.script.script_path == "")

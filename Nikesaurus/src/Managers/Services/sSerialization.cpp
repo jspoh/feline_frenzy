@@ -193,8 +193,8 @@ namespace NIKE {
 				//Deserialize all entities
 				Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
 				deserializeEntity(entity, e_data.at("Entity"));
-				NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
 				NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
+				NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
 
 				//Check if entity is a UI entity
 				if (e_data.at("Entity").contains("UI ID")) {

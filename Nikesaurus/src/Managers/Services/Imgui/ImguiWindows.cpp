@@ -346,7 +346,7 @@ namespace NIKE {
 					// Create a collapsible header for the component
 					if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_None)) {
 						if (component_name == "Transform::Transform") {
-							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get();
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
 							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg");
@@ -357,7 +357,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Texture") {
-							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity).value().get();
 							static char texture_id[300];
 							static bool texture_initialized = false;
 
@@ -435,7 +435,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Physics::Dynamics") {
-							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity).value().get();
 
 							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
 							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
@@ -450,7 +450,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Cam") {
-							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity);
+							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity).value().get();
 
 							// Default value for cam height will be the window height if there is no adjustments
 							if (cam_comp.height <= 0.0f) {
@@ -469,7 +469,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Animation::Base") {
-							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity).value().get();
 
 							ImGui::DragInt("Number of Animations (If set to 0, infinite number of animations)", &animate_base_comp.animations_to_complete, 1);
 							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .1f);
@@ -510,7 +510,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Animation::Sprite") {
-							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity).value().get();
 
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
@@ -528,7 +528,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Shape") {
-							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).value().get();
 							static char input_model_ref[300];
 							static bool shape_initialized = false;
 
@@ -573,7 +573,7 @@ namespace NIKE {
 
 						}
 						else if (component_name == "Render::Text") {
-							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity).value().get();
 
 							static char input_font_id[300];
 							static char input_text[300];
@@ -655,7 +655,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Physics::Collider") {
-							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity).value().get();
 
 							// Variable to hold the selected resolution
 							static NIKE::Physics::Resolution selected_resolution = NIKE::Physics::Resolution::NONE;
@@ -686,7 +686,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Audio::SFX") {
-							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity).value().get();
 							static char input_audio_id[300];
 							static char input_channel_group_id[300];
 							static bool audio_initialized = false;
@@ -770,7 +770,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "GameLogic::Movement") {
-							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity).value().get();
 
 							static char script_path[300];
 							static bool scripth_path_init = false;

@@ -39,14 +39,19 @@ namespace NIKE {
             for (auto& entity : entities) {
 
                 //Skip entities that are not present within layer & entities without transform component
-                if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+                if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
                     continue;
 
+                //Skip entities with no transform
+                auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+                if(!e_transform_comp) continue;
+                auto& e_transform = e_transform_comp.value().get();
+
+
                 //Update entities with dynamics
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity) && 
-                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-                    auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                    auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                if (e_dynamics_comp) {
+                    auto& e_dynamics = e_dynamics_comp.value().get();
 
                     //// Retrieve the logic state to determine behavior
                     //if (NIKE_ECS_MANAGER->checkEntityComponent<Logic::State>(entity)) {
@@ -120,41 +125,49 @@ namespace NIKE {
                 //}
 
                 //Collision detection
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&
-                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity) &&
-                    NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)
-                    ) {
+                Physics::Dynamics def_dynamics;
+                auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+                if (e_collider_comp.has_value()) {
 
-                    //Get entity collider
-                    auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                    auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-                    auto& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+                    //Get collider & e_dynamics comp references
+                    auto& e_collider = e_collider_comp.value().get();
+                    auto& e_dynamics = e_dynamics_comp.has_value() ? e_dynamics_comp.value().get() : def_dynamics;
 
                     //Check for collision with other entities
                     for (auto& colliding_entity : entities) {
 
                         //Skip entities colliding entites that are not in the layer mask
                         if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
-                            entity == colliding_entity ||
-                            !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
+                            entity == colliding_entity)
                             continue;
 
-                        //Get colliding entity's data
-                        auto& other_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
-                        auto& other_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
-                        auto& other_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
+                        //Get colliding entity's transform
+                        auto other_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
+                        if (!other_transform_comp.has_value()) continue;
+                        auto& other_transform = other_transform_comp.value().get();
+
+                        //Get colliding entity's collider
+                        auto other_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
+                        if (!other_collider_comp.has_value()) continue;
+                        auto& other_collider = other_collider_comp.value().get();
+
+                        //Get colliding entity's dynamics
+                        auto other_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
+                        auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
                        
                         // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
                         std::string e_model_id;
                         std::string other_model_id;
-                        if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-                            e_model_id = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).model_id;
+                        auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+                        if (e_shape_comp.has_value()) {
+                            e_model_id = e_shape_comp.value().get().model_id;
                         }
                         else {
                             e_model_id = "square"; // Default to square for SAT
                         }
-                        if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(colliding_entity)) {
-                            other_model_id = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity).model_id;
+                        auto other_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity);
+                        if (other_shape_comp.has_value()) {
+                            other_model_id = other_shape_comp.value().get().model_id;
                         }
                         else {
                             other_model_id = "square"; // Default to square for SAT
@@ -198,8 +211,9 @@ namespace NIKE {
             return;
 
         //Get dynamics
-        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        e_dynamics.force.x = force;
+        auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+        if (!e_dynamics_comp.has_value()) return;
+        e_dynamics_comp.value().get().force.x = force;
     }
 
     void Physics::Manager::applyYForce(Entity::Type entity, float force) {
@@ -207,8 +221,9 @@ namespace NIKE {
             return;
 
         //Get dynamics
-        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        e_dynamics.force.y = force;
+        auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+        if (!e_dynamics_comp.has_value()) return;
+        e_dynamics_comp.value().get().force.y = force;
     }
 
     void Physics::Manager::registerLuaBindings(sol::state& lua_state) {

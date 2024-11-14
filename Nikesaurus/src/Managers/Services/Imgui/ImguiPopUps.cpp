@@ -96,9 +96,10 @@ namespace NIKE
                     std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
                     NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
-                    if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(new_id))
+                    auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
+                    if (e_transform_comp.has_value())
                     {
-                        NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id).position = {0.f,0.f};
+                        e_transform_comp.value().get().position = {0.f,0.f};
                     }
 
                     // Reset entity_name for the next use

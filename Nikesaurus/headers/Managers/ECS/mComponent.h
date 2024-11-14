@@ -74,14 +74,14 @@ namespace NIKE {
 			}
 
 			//Get entity component data
-			T& getComponent(Entity::Type entity) {
+			std::optional<std::reference_wrapper<T>> getComponent(Entity::Type entity) {
 				//Check if entity is present within components
 				if (component_array.find(entity) == component_array.end()) {
-					throw std::runtime_error("Entity not found. Unable to retrieve component array.");
+					return std::nullopt;
 				}
 
 				//Return component array
-				return component_array.at(entity);
+				return std::ref(component_array.at(entity));
 			}
 
 			//Get all entities with component type T
@@ -220,7 +220,7 @@ namespace NIKE {
 
 			//Retrieve component associated with entity type
 			template<typename T>
-			T& getEntityComponent(Entity::Type entity) {
+			std::optional<std::reference_wrapper<T>> getEntityComponent(Entity::Type entity) {
 				return getComponentArray<T>()->getComponent(entity);
 			}
 

@@ -56,7 +56,7 @@ namespace NIKE {
 		}
 
 		if (component_string == "") {
-			throw std::runtime_error("Component not registered. Adding new default component for entity failed.");
+			throw std::runtime_error("Component not registered. Fetching component of entity failed.");
 		}
 
 		return component_arrays.at(component_string)->getEntityComponent(entity);

@@ -121,7 +121,7 @@ namespace NIKE {
 			void removeEntityComponent(Entity::Type entity, Component::Type type);
 
 			template<typename T>
-			T& getEntityComponent(Entity::Type entity) {
+			std::optional<std::reference_wrapper<T>> getEntityComponent(Entity::Type entity) {
 				return component_manager->getEntityComponent<T>(entity);
 			}
 

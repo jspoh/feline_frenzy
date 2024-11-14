@@ -101,14 +101,17 @@ namespace NIKE {
 
 	bool UI::Service::buttonHovered(Entity::Type entity) {
 		//Get bounding box
-		auto const& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (e_transform_comp.has_value()) return false;
+		auto const& e_transform = e_transform_comp.value().get();
 
 		//Vertices
 		std::vector<Vector2f> vert;
 
 		//If Shape
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto const& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		if (e_shape_comp.has_value()) {
+			auto const& e_shape = e_shape_comp.value().get();
 
 			auto getVertices = [e_shape]() {
 				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
@@ -191,9 +194,13 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(shape));
 
+		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+
 		//Add transform into hover container
-		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
-		hover_container[btn_id].second = false;
+		if (btn_transform_comp.has_value()) {
+			hover_container[btn_id].first = btn_transform_comp.value().get();
+			hover_container[btn_id].second = false;
+		}
 
 		return ui_entities.at(btn_id).first;
 	}
@@ -213,9 +220,13 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(texture));
 
+		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+
 		//Add transform into hover container
-		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
-		hover_container[btn_id].second = false;
+		if (btn_transform_comp.has_value()) {
+			hover_container[btn_id].first = btn_transform_comp.value().get();
+			hover_container[btn_id].second = false;
+		}
 
 		return ui_entities.at(btn_id).first;
 	}
@@ -300,9 +311,15 @@ namespace NIKE {
 				input.second.first = false;
 			}
 
-			//Control the text scale
-			auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.first);
-			auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.first);
+			//Get transform comp
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.first);
+			if (!e_transform_comp.has_value()) continue;
+			auto& e_transform = e_transform_comp.value().get();
+
+			//Get text comp
+			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.first);
+			if (!e_text_comp.has_value()) continue;
+			auto& e_text = e_text_comp.value().get();
 
 			//Clamp Rectangle Size
 			e_transform.scale.x = std::clamp(e_transform.scale.x, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x));
