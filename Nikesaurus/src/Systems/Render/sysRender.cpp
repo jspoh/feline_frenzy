@@ -484,7 +484,7 @@ namespace NIKE {
 	void Render::Manager::renderViewport() {
 
 		//Render to frame buffer if imgui is active
-		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
 
@@ -523,7 +523,7 @@ namespace NIKE {
 			}
 		}
 
-		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}
 	}

@@ -47,14 +47,12 @@ namespace NIKE {
 			:	public Events::IEventListener<Input::KeyEvent>,
 				public Events::IEventListener<Input::MouseMovedEvent>,
 				public Events::IEventListener<Input::MouseBtnEvent>,
-				public Events::IEventListener<IMGUI::ViewPortEvent>,
 				public Events::IEventListener<ChangeBtnTxtRatio> {
 
 		//Friend class
 		friend class NIKE::Serialization::Service;
 
 		private:
-
 			//On key btn event
 			void onEvent(std::shared_ptr<Input::KeyEvent> event) override;
 
@@ -63,9 +61,6 @@ namespace NIKE {
 
 			//On mouse move event
 			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
-
-			//On new imgui viewport event
-			void onEvent(std::shared_ptr<IMGUI::ViewPortEvent> event) override;
 
 			//On Change btn txt ratio
 			void onEvent(std::shared_ptr<ChangeBtnTxtRatio> event) override;
@@ -92,12 +87,6 @@ namespace NIKE {
 			//Mouse Position
 			Vector2f mouse_pos;
 
-			//Window Pos
-			Vector2f window_pos;
-
-			//Window Size
-			Vector2f window_size;
-
 			//Button Txt Ratio
 			Vector2f btn_ratio;
 		public:
@@ -112,6 +101,9 @@ namespace NIKE {
 
 			//Create texture button
 			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture);
+
+			//Check button hovered
+			bool isButtonHovered(std::string const& btn_id) const;
 
 			//Check Button Clicked
 			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state);

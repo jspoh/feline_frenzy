@@ -12,31 +12,17 @@
 #ifndef LEVEL_EDITOR_HPP
 #define LEVEL_EDITOR_HPP
 
+//Imgui Events
 #include "../sEvents.h"
 #include "../sInput.h"
 #include "../sWindows.h"
+
+//Level Editor Helpers
 #include "sEditorActions.h"
+#include "sEditorPanels.h"
 
 namespace NIKE {
 	namespace LevelEditor {
-		//Panel Interface
-		class IPanel {
-		private:
-		public:
-			virtual ~IPanel() = default;
-
-			//Name
-			virtual std::string getName() const = 0;
-
-			//Init
-			virtual void init() {};
-
-			//Update
-			virtual void update() = 0;
-
-			//Render
-			virtual void render() = 0;
-		};
 
 		//Service
 		class Service : 
@@ -48,7 +34,7 @@ namespace NIKE {
 		{
 		private:
 
-			//Map NIKE To IMGUI
+			//Map NIKE To IMGUI Key & Button Codes
 			int mapCodeToIMGUICode(int code);
 
 			//On key btn event
@@ -72,9 +58,6 @@ namespace NIKE {
 			//End frame for Editor
 			void endFrame();
 
-			//Translate mouse to game window
-			Vector2f translateMouseToGameWindow();
-
 			//Update shortcuts
 			void updateShortCuts();
 
@@ -92,6 +75,9 @@ namespace NIKE {
 
 			//Map of editor panels
 			std::unordered_map<std::string, std::shared_ptr<IPanel>> panels;
+
+			//Game panel
+			std::shared_ptr<GameWindowPanel> game_panel;
 		public:
 			Service() : b_editor_active{ false }, b_debug_mode{ false }, b_game_state{ true }{}
 			~Service() = default;

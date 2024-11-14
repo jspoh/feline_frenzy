@@ -13,7 +13,7 @@
 #include "Systems/Render/sysRender.h"
 
 namespace NIKE {
-	// Mapping function (example)
+
 	int LevelEditor::Service::mapCodeToIMGUICode(int code) {
 
 		//Code within 0 - 9 range
@@ -89,6 +89,10 @@ namespace NIKE {
 
 	void LevelEditor::Service::onEvent(std::shared_ptr<Input::KeyEvent> event) {
 
+		//Check if editor is active
+		if (!b_editor_active)
+			return;
+
 		//Get input to set
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -126,6 +130,10 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::onEvent(std::shared_ptr<Input::MouseBtnEvent> event) {
+		//Check if editor is active
+		if (!b_editor_active)
+			return;
+
 		//Get input to set
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -135,15 +143,17 @@ namespace NIKE {
 			//Process key event
 			switch (event->state) {
 			case Input::States::PRESS: {
-				io.KeysDown[mapCodeToIMGUICode(event->code)] = true;
+				io.MouseDown[mapCodeToIMGUICode(event->code)] = true;
+				io.MouseClicked[mapCodeToIMGUICode(event->code)] = true;
 				break;
 			}
 			case Input::States::REPEAT: {
-				io.KeysDown[mapCodeToIMGUICode(event->code)] = true;
+				io.MouseDown[mapCodeToIMGUICode(event->code)] = true;
 				break;
 			}
 			case Input::States::RELEASE: {
-				io.KeysDown[mapCodeToIMGUICode(event->code)] = false;
+				io.MouseDown[mapCodeToIMGUICode(event->code)] = false;
+				io.MouseClicked[mapCodeToIMGUICode(event->code)] = false;
 				break;
 			}
 			default: {
@@ -157,6 +167,10 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::onEvent(std::shared_ptr<Input::MouseMovedEvent> event) {
+		//Check if editor is active
+		if (!b_editor_active)
+			return;
+
 		//Get input to set
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -168,8 +182,8 @@ namespace NIKE {
 			io.MousePos.y = event->pos.y;
 
 			//Check if current mouse pos is within game window
-			if (false) {
-				event->pos = translateMouseToGameWindow();
+			if (game_panel->isMouseInWindow()) {
+				event->pos = game_panel->getRelativeMousePos();
 			}
 			else {
 				//Mark event as processed
@@ -179,6 +193,10 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::onEvent(std::shared_ptr<Input::MouseScrollEvent> event) {
+		//Check if editor is active
+		if (!b_editor_active)
+			return;
+
 		//Get input to set
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -195,6 +213,10 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
+		//Check if editor is active
+		if (!b_editor_active)
+			return;
+
 		//Get input to set
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -216,19 +238,17 @@ namespace NIKE {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	Vector2f LevelEditor::Service::translateMouseToGameWindow() {
-		//Insert implementation
-
-		return Vector2f();
-	}
-
 	void LevelEditor::Service::updateShortCuts() {
 		ImGuiIO& io = ImGui::GetIO();
 
-		//Toggle Level Editor On & Off
-		if (io.KeysDown[ImGuiKey_Tab]) {
+		//Toggle Level Editor On & Off ( Use Global NIKE input to toggle on and off )
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
 			b_editor_active = !b_editor_active;
 		}
+
+		//Return if editor is not active
+		if (!b_editor_active)
+			return;
 
 		//Undo
 		if (io.KeyCtrl && io.KeysDown[ImGuiKey_Z]) {
@@ -242,6 +262,8 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::init() {
+
+		//Init Imgui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -252,6 +274,16 @@ namespace NIKE {
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+
+		//Init editor action manager
+		action_manager = std::make_unique<ActionManager>();
+
+		//Add level editor panels
+		game_panel = std::make_unique<GameWindowPanel>();
+		panels.insert({ game_panel->getName(), game_panel });
+
+		//Init all level editor panels
+		std::for_each(panels.begin(), panels.end(), [](std::pair<std::string, std::shared_ptr<IPanel>> panel) { panel.second->init(); });
 	}
 
 	void LevelEditor::Service::update() {
@@ -351,7 +383,7 @@ namespace NIKE {
 			throw std::runtime_error("Panel already added.");
 		}
 
-		panels.insert({ panel_id, panel });
+		panels.insert({ panel_id, std::move(panel) });
 	}
 
 	void LevelEditor::Service::removePanel(const std::string& panel_id) {
