@@ -54,6 +54,7 @@
     <ClCompile Include="src\Managers\Services\Imgui\ImguiPopUps.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
     <ClCompile Include="src\Managers\Services\Imgui\ImguiWindows.cpp" />
+    <ClCompile Include="src\Managers\Services\Level Editor\sLevelEditor.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
+    <ClInclude Include="headers\Managers\Services\sLevelEditor.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />

@@ -13,12 +13,6 @@
 #ifndef SERVICE_AUDIO_HPP
 #define SERVICE_AUDIO_HPP
 
-/************************************
-* SOME NOTES TO TAKE NOTE OF:
-* - AUDIO WILL BE PLAYED LIKE AE
-* - THERE WILL BE AUIDIO GROUP AND AUDIO
-/****************************************/
-
 namespace NIKE {
 	namespace Audio {
 		//Temporary Disable DLL Export Warning
