@@ -205,10 +205,6 @@ namespace NIKE {
 			//	}
 			//}
 
-			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-			//	cout << "TRUE" << endl;
-			//}
-
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 

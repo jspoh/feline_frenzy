@@ -36,6 +36,49 @@ namespace NIKE {
 			virtual void render() = 0;
 		};
 
+		//Main Panel ( Docking )
+		class MainPanel : public IPanel {
+		private:
+			//Panel window flags
+			int window_flags;
+
+			//Boolean for activating debug mode
+			bool b_debug_mode;
+
+			//Boolean for activating play/stop for game
+			bool b_game_state;
+
+			//Set Debug State
+			void setDebugState(bool state);
+
+			//Set Game State
+			void setGameState(bool state);
+
+		public:
+			MainPanel() :window_flags{ 0 }, b_debug_mode { false }, b_game_state{ true } {}
+			~MainPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "NIKE Level Editor";
+			}
+
+			//Public get debug state
+			bool getDebugState() const;
+
+			//Public get game state
+			bool getGameState() const;
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
 		//Game Window Panel
 		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
 		private:
@@ -49,7 +92,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
 
 		public:
-			GameWindowPanel() = default;
+			GameWindowPanel() : texture_id{ 0 } {}
 			~GameWindowPanel() = default;
 
 			//Panel Name
@@ -73,6 +116,27 @@ namespace NIKE {
 			void render() override;
 		};
 
+		//Class Entity Panel
+		class EntitiesPanel : public IPanel {
+		private:
+		public:
+			EntitiesPanel() = default;
+			~EntitiesPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Entities Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
 	}
 }
 

@@ -108,6 +108,7 @@
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiUtils.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\Imgui\ImguiWindows.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />

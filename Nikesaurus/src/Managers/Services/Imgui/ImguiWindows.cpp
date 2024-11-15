@@ -26,8 +26,6 @@ namespace NIKE {
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-
-
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
 		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();

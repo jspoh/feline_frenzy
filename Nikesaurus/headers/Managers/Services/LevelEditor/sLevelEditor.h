@@ -63,23 +63,23 @@ namespace NIKE {
 
 			//Boolean for activating editor
 			bool b_editor_active;
-			
-			//Boolean for activating debug mode
-			bool b_debug_mode;
-
-			//Boolean for activating play/stop for game
-			bool b_game_state;
 
 			//Undo Redo Manager
 			std::unique_ptr<ActionManager> action_manager;
 
+			//Vector of editor panels
+			std::vector<std::shared_ptr<IPanel>> panels;
+
 			//Map of editor panels
-			std::unordered_map<std::string, std::shared_ptr<IPanel>> panels;
+			std::unordered_map<std::string, std::shared_ptr<IPanel>> panels_map;
+
+			//Main panel
+			std::shared_ptr<MainPanel> main_panel;
 
 			//Game panel
 			std::shared_ptr<GameWindowPanel> game_panel;
 		public:
-			Service() : b_editor_active{ false }, b_debug_mode{ false }, b_game_state{ true }{}
+			Service() : b_editor_active{ false } {}
 			~Service() = default;
 
 			//Init Editor
@@ -100,23 +100,18 @@ namespace NIKE {
 			//Get Editor State
 			bool getEditorState() const;
 
-			//Set Debug State
-			void setDebugState(bool state);
 
 			//Get Debug State
 			bool getDebugState() const;
 
-			//Set Game State
-			void setGameState(bool state);
-
 			//Get Game State
 			bool getGameState() const;
 
-			//Add panel
-			void addPanel(const std::string& panelName, std::shared_ptr<IPanel> panel);
+			//Add panel ( added into map based on IPanel getName() )
+			void addPanel(std::shared_ptr<IPanel> panel);
 
-			//Remove panel
-			void removePanel(const std::string& panelName);
+			//Remove panel ( retrieved into map based on IPanel getName() )
+			void removePanel(const std::string& panel_id);
 
 			//Execute action made
 			void executeAction(Action const& action);

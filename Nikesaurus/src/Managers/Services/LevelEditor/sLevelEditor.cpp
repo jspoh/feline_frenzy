@@ -278,12 +278,23 @@ namespace NIKE {
 		//Init editor action manager
 		action_manager = std::make_unique<ActionManager>();
 
-		//Add level editor panels
-		game_panel = std::make_unique<GameWindowPanel>();
-		panels.insert({ game_panel->getName(), game_panel });
+		//Add main panel
+		main_panel = std::make_shared<MainPanel>();
+		panels.push_back(main_panel);
+		panels_map.insert({ main_panel->getName(), main_panel });
+
+		//Add game window panel
+		game_panel = std::make_shared<GameWindowPanel>();
+		panels.push_back(game_panel);
+		panels_map.insert({ game_panel->getName(), game_panel });
+
+		//Add entities management panel
+		auto entities_panel = std::make_shared<EntitiesPanel>();
+		panels.push_back(entities_panel);
+		panels_map.insert({ entities_panel->getName(), entities_panel });
 
 		//Init all level editor panels
-		std::for_each(panels.begin(), panels.end(), [](std::pair<std::string, std::shared_ptr<IPanel>> panel) { panel.second->init(); });
+		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
 	}
 
 	void LevelEditor::Service::update() {
@@ -306,7 +317,7 @@ namespace NIKE {
 
 		//Update all panels
 		for (auto& panel : panels) {
-			panel.second->update();
+			panel->update();
 		}
 	}
 
@@ -321,7 +332,7 @@ namespace NIKE {
 
 		//Render all panels
 		for (auto& panel : panels) {
-			panel.second->render();
+			panel->render();
 		}
 
 		//End render frame
@@ -342,57 +353,39 @@ namespace NIKE {
 		return b_editor_active;
 	}
 
-	void LevelEditor::Service::setDebugState(bool state) {
-		b_debug_mode = state;
-	}
-
 	bool LevelEditor::Service::getDebugState() const {
-		return b_debug_mode;
-	}
-
-	void LevelEditor::Service::setGameState(bool state) {
-		b_game_state = state;
-
-		//Get all ecs systems
-		auto& systems = NIKE_ECS_MANAGER->getAllSystems();
-
-		//Set the state of each systems based on new game state
-		if (b_game_state) {
-			std::for_each(systems.begin(), systems.end(),
-				[](std::shared_ptr<System::ISystem>& system) {
-					if (system->getSysName() != NIKE_ECS_MANAGER->getSystemName<Render::Manager>()) {
-						system->setActiveState(false);
-					}
-				});
-		}
-		else {
-			std::for_each(systems.begin(), systems.end(),
-				[](std::shared_ptr<System::ISystem>& system) {
-					system->setActiveState(true);
-				});
-		}
+		return main_panel->getDebugState();
 	}
 
 	bool LevelEditor::Service::getGameState() const {
-		return b_game_state;
+		return main_panel->getGameState();
 	}
 
-	void LevelEditor::Service::addPanel(const std::string& panel_id, std::shared_ptr<LevelEditor::IPanel> panel) {
-		auto it = panels.find(panel_id);
-		if (it != panels.end()) {
+	void LevelEditor::Service::addPanel(std::shared_ptr<LevelEditor::IPanel> panel) {
+		auto it = panels_map.find(panel->getName());
+		if (it != panels_map.end()) {
 			throw std::runtime_error("Panel already added.");
 		}
 
-		panels.insert({ panel_id, std::move(panel) });
+		panels.push_back(panel);
+		panels_map.insert({ panel->getName(), panel });
 	}
 
-	void LevelEditor::Service::removePanel(const std::string& panel_id) {
-		auto it = panels.find(panel_id);
-		if (it == panels.end()) {
+	void LevelEditor::Service::removePanel(std::string const& panel_id) {
+		auto it = panels_map.find(panel_id);
+		if (it == panels_map.end()) {
 			throw std::runtime_error("Panel doest not exist.");
 		}
 
-		panels.erase(it);
+		//Remove panel from panel vector
+		for (int i = 0; i < panels.size(); i++) {
+			if (panels.at(i) == it->second) {
+				panels.erase(panels.begin());
+				break;
+			}
+		}
+		//Remove from map
+		panels_map.erase(it);
 	}
 
 	void LevelEditor::Service::executeAction(Action const& action) {
