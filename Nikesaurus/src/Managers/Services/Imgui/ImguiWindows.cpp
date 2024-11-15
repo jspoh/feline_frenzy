@@ -1107,9 +1107,14 @@ namespace NIKE {
 		mouse_pos.x -= (viewport_width / 2.0f);
 		mouse_pos.y -= (viewport_height / 2.0f);
 		mouse_pos.y = -mouse_pos.y;
-
 		mouse_pos.x *= scalar.x;
 		mouse_pos.y *= scalar.y;
+
+		Vector2f main_mouse{ mouse_pos.x , mouse_pos.y };
+
+
+		// This function will handle the dragging and dropping in the viewport window
+		handleEntitySelectionAndDrag(main_mouse);
 
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 

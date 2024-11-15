@@ -47,7 +47,13 @@ namespace NIKE {
 	// This function will render out grid squares
 	void renderGrid(Vector2i grid_dimen, Vector2f);
 
+	// TEMP PLACEMENT! Should be in collision sys or smth
 	bool isMouseOverEntity(const Vector2f& mouse_pos, const Transform::Transform& transform);
+
+	// Static var for the entity selected for dragging to be here, cnt pass in as param due to warnings
+	static Entity::Type entity_select = 0;
+	// This handles the dragging of entities
+	void handleEntitySelectionAndDrag(const Vector2f& main_mouse);
 
 }
 
