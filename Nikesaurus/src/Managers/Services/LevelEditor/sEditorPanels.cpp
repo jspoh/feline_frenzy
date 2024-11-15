@@ -15,6 +15,8 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Panel Interface
 	*********************************************************************/
+	bool LevelEditor::IPanel::b_popup_showing = false;
+
 	void LevelEditor::IPanel::init() {
 	}
 
@@ -29,6 +31,7 @@ namespace NIKE {
 			throw std::runtime_error("Popup doest not exist");
 		}
 
+		b_popup_showing = true;
 		popups.at(popup_id).b_is_open = true;
 		ImGui::OpenPopup(popup_id.c_str());
 	}
@@ -40,6 +43,7 @@ namespace NIKE {
 			throw std::runtime_error("Popup doest not exist");
 		}
 
+		b_popup_showing = false;
 		popups.at(popup_id).b_is_open = false;
 		ImGui::CloseCurrentPopup();
 	}
@@ -53,6 +57,10 @@ namespace NIKE {
 				ImGui::EndPopup();
 			}
 		}
+	}
+
+	bool LevelEditor::IPanel::checkPopUpShowing() {
+		return b_popup_showing;
 	}
 
 	std::function<void()> LevelEditor::IPanel::errorPopUp(std::string const& error_id, std::string const& error_msg) {
@@ -281,17 +289,39 @@ namespace NIKE {
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+				//Temporary remove action
+				Action create;
+
 				//Creat new entity 
 				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
-					
+
 				//If entity name is not provided (Create a default)
 				if (entity_name.empty())
 				{
 					snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", new_id);
 				}
 
-				//Save entity name into entities ref
-				entities_ref.insert({ new_id, entity_name });
+				//Undo Action
+				create.undo_action = [&, new_id]() {
+
+					//Check if entity is still alive
+					if (NIKE_ECS_MANAGER->checkEntity(new_id)) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(new_id);
+
+						//Erase new entity ref
+						entities_ref.erase(new_id);
+					}
+				};
+
+				//Do Action
+				create.do_action = [&]() {
+					//Save entity name into entities ref
+					entities_ref.insert({ new_id, entity_name });
+				};
+
+				//Execute create entity action
+				NIKE_LVLEDITOR_SERVICE->executeAction(create);
 
 				//Reset entity name
 				entity_name.clear();
@@ -320,17 +350,54 @@ namespace NIKE {
 			//If enter or ok button is pressed
 			if (ImGui::Button("Remove") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
 
-				//Destroy entity
-				NIKE_ECS_MANAGER->destroyEntity(selected_entity);
+				//Temporary remove action
+				Action remove;
 
-				//Remove selected entity ref
-				entities_ref.erase(selected_entity);
+				//Get all entity comps for pass by value storage
+				auto comps = NIKE_ECS_MANAGER->getAllCopiedEntityComponents(selected_entity);
+				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
+				int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
+				std::string entity_ref = entities_ref.at(selected_entity);
 
-				//Update entities list
-				entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+				//Setup undo action for remove
+				remove.undo_action = [&, comps, comp_types, layer_id, entity_ref]() {
 
-				//Set selected entity back to first entity
-				selected_entity = entities.empty() ? 0 : *entities.begin();
+					//Creat new entity 
+					Entity::Type new_entity = NIKE_ECS_MANAGER->createEntity(layer_id);
+
+					//Add all the comps back
+					for (auto&& comp : comps) {
+						NIKE_ECS_MANAGER->addDefEntityComponent(new_entity, comp_types.at(comp.first));
+						NIKE_ECS_MANAGER->setEntityComponent(new_entity, comp_types.at(comp.first), comp.second);
+					}
+
+					//Save entity name into entities ref
+					entities_ref.insert({ new_entity, entity_ref });
+
+					//Update entities list
+					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+
+					//Set selected entity back to old entity
+					selected_entity = new_entity;
+				};
+
+				//Setup action for removing entity
+				remove.do_action = [&, entity_ref]() {
+					//Destroy entity
+					NIKE_ECS_MANAGER->destroyEntity(selected_entity);
+
+					//Remove selected entity ref
+					entities_ref.erase(selected_entity);
+
+					//Update entities list
+					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+
+					//Set selected entity back to first entity
+					selected_entity = entities.empty() ? 0 : *entities.begin();
+				};
+
+				//Execute remove action
+				NIKE_LVLEDITOR_SERVICE->executeAction(remove);
 
 				//Close popup
 				closePopUp(popup_id);

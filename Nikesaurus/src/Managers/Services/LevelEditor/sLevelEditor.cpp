@@ -182,7 +182,7 @@ namespace NIKE {
 			io.MousePos.y = event->pos.y;
 
 			//Check if current mouse pos is within game window
-			if (game_panel->isMouseInWindow()) {
+			if (game_panel->isMouseInWindow() && !game_panel->checkPopUpShowing()) {
 				event->pos = game_panel->getRelativeMousePos();
 			}
 			else {
@@ -251,13 +251,27 @@ namespace NIKE {
 			return;
 
 		//Undo
+		static bool z_triggered = false;
 		if (io.KeyCtrl && io.KeysDown[ImGuiKey_Z]) {
-			action_manager->undo();
+			if (!z_triggered) {
+				action_manager->undo();
+				z_triggered = true;
+			}
+		}
+		else {
+			z_triggered = false;
 		}
 
 		//Redo
+		static bool y_triggered = false;
 		if (io.KeyCtrl && io.KeysDown[ImGuiKey_Y]) {
-			action_manager->redo();
+			if (!y_triggered) {
+				action_manager->redo();
+				y_triggered = true;
+			}
+		}
+		else {
+			y_triggered = false;
 		}
 	}
 

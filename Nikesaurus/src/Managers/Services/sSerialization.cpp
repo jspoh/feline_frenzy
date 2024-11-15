@@ -30,8 +30,8 @@ namespace NIKE {
 		nlohmann::json data;
 
 		//Iterate through all comp
-		for (auto const& comp : NIKE_ECS_MANAGER->getAllComponents(entity)) {
-			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second);
+		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
 		return data;
@@ -53,7 +53,7 @@ namespace NIKE {
 			}
 
 			//Deserialize data into component
-			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type), comp_data);
+			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 		}
 	}
 

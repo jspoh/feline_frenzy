@@ -21,6 +21,9 @@ namespace NIKE {
 		class IPanel {
 		private:
 
+			//Static boolean for signalling popup showing
+			static bool b_popup_showing;
+
 			//Internal panel popup maangement
 			struct PopUp {
 				bool b_is_open = false;
@@ -56,6 +59,9 @@ namespace NIKE {
 
 			//Render popup
 			void renderPopUps();
+
+			//Check if popup is showing
+			static bool checkPopUpShowing();
 
 			//Error Popup
 			std::function<void()> errorPopUp(std::string const& error_id, std::string const& error_msg);

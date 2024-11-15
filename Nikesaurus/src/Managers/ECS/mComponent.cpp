@@ -46,7 +46,7 @@ namespace NIKE {
 		component_arrays.at(component_string)->removeComponent(entity);
 	}
 
-	void* Component::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
+	std::shared_ptr<void> Component::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
 		std::string component_string;
 		for (auto const& comp_type : component_types) {
 			if (comp_type.second == type) {
@@ -60,6 +60,22 @@ namespace NIKE {
 		}
 
 		return component_arrays.at(component_string)->getEntityComponent(entity);
+	}
+
+	void Component::Manager::setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp) {
+		std::string component_string;
+		for (auto const& comp_type : component_types) {
+			if (comp_type.second == type) {
+				component_string = comp_type.first;
+				break;
+			}
+		}
+
+		if (component_string == "") {
+			throw std::runtime_error("Component not registered. Fetching component of entity failed.");
+		}
+
+		component_arrays[component_string]->setEntityComponent(entity, comp);
 	}
 
 	Component::Type Component::Manager::getComponentType(std::string const& type) {
@@ -84,13 +100,26 @@ namespace NIKE {
 		}
 	}
 
-	std::unordered_map<std::string, void*> Component::Manager::getAllComponents(Entity::Type entity) const {
-		std::unordered_map<std::string, void* > comp_map;
+	std::unordered_map<std::string, std::shared_ptr<void>> Component::Manager::getAllEntityComponents(Entity::Type entity) const {
+		std::unordered_map<std::string, std::shared_ptr<void>> comp_map;
 
 		//Get all comp strings
 		for (auto const& comp : component_arrays) {
 			if (comp.second->checkEntity(entity)) {
 				comp_map.emplace(comp.first, comp.second->getEntityComponent(entity));
+			}
+		}
+
+		return comp_map;
+	}
+
+	std::unordered_map<std::string, std::shared_ptr<void>> Component::Manager::getAllCopiedEntityComponents(Entity::Type entity) const {
+		std::unordered_map<std::string, std::shared_ptr<void>> comp_map;
+
+		//Get all comp strings
+		for (auto const& comp : component_arrays) {
+			if (comp.second->checkEntity(entity)) {
+				comp_map.emplace(comp.first, comp.second->getCopiedEntityComponent(entity));
 			}
 		}
 

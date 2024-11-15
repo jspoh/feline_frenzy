@@ -21,11 +21,17 @@ namespace NIKE {
 		public:
 			virtual ~IArray() = default;
 
-			//Check entity
+			//Check entity comp
 			virtual bool checkEntity(Entity::Type entity) = 0;
 
-			//Get entity
-			virtual void* getEntityComponent(Entity::Type entity) = 0;
+			//Get entity comp
+			virtual std::shared_ptr<void> getEntityComponent(Entity::Type entity) = 0;
+
+			//Get entity comp deep copy
+			virtual std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity) = 0;
+
+			//Set entity comp
+			virtual void setEntityComponent(Entity::Type entity, std::shared_ptr<void> comp) = 0;
 
 			//Clone entity
 			virtual void cloneEntity(Entity::Type clone, Entity::Type copy) = 0;
@@ -94,14 +100,26 @@ namespace NIKE {
 				return temp_vec;
 			}
 
-			//Check entity
+			//Check entity component
 			bool checkEntity(Entity::Type entity) override {
 				return component_array.find(entity) != component_array.end();
 			}
 
-			//get entity
-			void* getEntityComponent(Entity::Type entity) override {
-				return &component_array.at(entity);
+			//get entity component
+			std::shared_ptr<void> getEntityComponent(Entity::Type entity) override {
+				T* raw_ptr = &component_array.at(entity);
+				return std::shared_ptr<void>(raw_ptr, [](void*){});
+			}
+
+			//Get copied entity component
+			std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity) override {
+				T copy = component_array.at(entity);
+				return std::make_shared<T>(copy);
+			}
+
+			//Set entity
+			void setEntityComponent(Entity::Type entity, std::shared_ptr<void> comp) override {
+				component_array[entity] = *std::static_pointer_cast<T>(comp);
 			}
 
 			//Clone entity
@@ -225,7 +243,10 @@ namespace NIKE {
 			}
 
 			//Retrieve a void* to component based on component type
-			void* getEntityComponent(Entity::Type entity, Component::Type type);
+			std::shared_ptr<void> getEntityComponent(Entity::Type entity, Component::Type type);
+
+			//Set entity component based on void* and comp type
+			void setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp);
 
 			//Get Component Type
 			template<typename T>
@@ -258,7 +279,10 @@ namespace NIKE {
 			void entityDestroyed(Entity::Type entity);
 
 			//Get all entity components
-			std::unordered_map<std::string, void*> getAllComponents(Entity::Type entity) const;
+			std::unordered_map<std::string, std::shared_ptr<void>> getAllEntityComponents(Entity::Type entity) const;
+
+			//Get all copied entity components
+			std::unordered_map<std::string, std::shared_ptr<void>> getAllCopiedEntityComponents(Entity::Type entity) const;
 
 			//Get all component types
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;

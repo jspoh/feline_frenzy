@@ -99,12 +99,20 @@ namespace NIKE {
 		system_manager->updateEntitiesList(entity, sign);
 	}
 
-	void* Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
+	std::shared_ptr<void> Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
 		return component_manager->getEntityComponent(entity, type);
 	}
 
-	std::unordered_map<std::string, void*> Coordinator::Manager::getAllComponents(Entity::Type entity) const {
-		return component_manager->getAllComponents(entity);
+	void Coordinator::Manager::setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp) {
+		component_manager->setEntityComponent(entity, type, comp);
+	}
+
+	std::unordered_map<std::string, std::shared_ptr<void>> Coordinator::Manager::getAllEntityComponents(Entity::Type entity) const {
+		return component_manager->getAllEntityComponents(entity);
+	}
+
+	std::unordered_map<std::string, std::shared_ptr<void>> Coordinator::Manager::getAllCopiedEntityComponents(Entity::Type entity) const {
+		return component_manager->getAllCopiedEntityComponents(entity);
 	}
 
 	std::unordered_map<std::string, Component::Type> Coordinator::Manager::getAllComponentTypes() const {
