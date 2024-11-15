@@ -147,7 +147,15 @@ namespace NIKE {
 			void render() override;
 		};
 
-		//Class Entity Panel
+		//Selected entity event ( Communication between entities panel & components panel )
+		struct SelectedEntityEvent : public Events::IEvent {
+			Entity::Type selected_entity;
+			std::string selected_entity_ref;
+			SelectedEntityEvent(Entity::Type selected_entity, std::string const& selected_entity_ref) 
+				: selected_entity{ selected_entity }, selected_entity_ref{ selected_entity_ref } {}
+		};
+
+		//Entities Management Panel
 		class EntitiesPanel : public IPanel {
 		private:
 
@@ -167,12 +175,46 @@ namespace NIKE {
 			std::function<void()> removeEntityPopUp(std::string const& popup_id);
 
 		public:
-			EntitiesPanel() : selected_entity{ 0 } {}
+			EntitiesPanel() : selected_entity{ UINT16_MAX } {}
 			~EntitiesPanel() = default;
 
 			//Panel Name
 			std::string getName() const override {
 				return "Entities Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
+		//Components Management Panel
+		class ComponentsPanel : public IPanel, public Events::IEventListener<SelectedEntityEvent> {
+		private:
+			//Current Selected entity
+			Entity::Type selected_entity;
+
+			//Current Selected Entity String Reference
+			std::string selected_entity_ref;
+
+			//On new selected entity event
+			void onEvent(std::shared_ptr<SelectedEntityEvent> event) override;
+
+			//Add Components popup
+			std::function<void()> addComponentPopUp(std::string const& popup_id);
+
+		public:
+			ComponentsPanel() : selected_entity{ UINT16_MAX }, selected_entity_ref{ "" } {}
+			~ComponentsPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Components Management";
 			}
 
 			//Init

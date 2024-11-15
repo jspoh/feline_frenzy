@@ -307,6 +307,11 @@ namespace NIKE {
 		panels.push_back(entities_panel);
 		panels_map.insert({ entities_panel->getName(), entities_panel });
 
+		//Add components management panel
+		auto components_panel = std::make_shared<ComponentsPanel>();
+		panels.push_back(components_panel);
+		panels_map.insert({ components_panel->getName(), components_panel });
+
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
 	}

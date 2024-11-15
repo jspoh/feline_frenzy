@@ -31,6 +31,15 @@ namespace NIKE {
 			throw std::runtime_error("Popup doest not exist");
 		}
 
+		//Calculate the center of the viewport
+		ImVec2 viewportSize = ImGui::GetMainViewport()->Size;
+		ImVec2 viewportPos = ImGui::GetMainViewport()->Pos;
+		ImVec2 popupPos = ImVec2(viewportPos.x + viewportSize.x * 0.5f, viewportPos.y + viewportSize.y * 0.5f);
+
+		//Center the popup
+		ImGui::SetNextWindowPos(popupPos, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		//Set pop management variables
 		b_popup_showing = true;
 		popups.at(popup_id).b_is_open = true;
 		ImGui::OpenPopup(popup_id.c_str());
@@ -419,32 +428,6 @@ namespace NIKE {
 		//Register popups
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
-
-		//Init active entities
-		entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
-
-		//Skip initialization if entities are empty
-		if (entities.empty())
-			return;
-
-		//Iterate through all active entities to init entities ref
-		std::for_each(entities.begin(), entities.end(),
-			[this](Entity::Type entity) {
-
-				//Check if entity ref has already been added
-				if (entities_ref.find(entity) == entities_ref.end()) {
-
-					//Create identifier for entity
-					char entity_name[32];
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity);
-
-					//Add entity to map of ref
-					entities_ref.insert({ entity, entity_name });
-				}
-			});
-
-		//Init selected entity
-		selected_entity = *entities.begin();
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
@@ -518,16 +501,131 @@ namespace NIKE {
 		//Add Spacing
 		ImGui::Spacing();
 
-		//Iterate through all active entities
-		for (auto entity : entities) {
+		//Check if there are entities present
+		if (entities.empty()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SelectedEntityEvent>((Entity::Type)0, std::string("")));
+		}
+		else {
+			//Iterate through all active entities
+			for (auto entity : entities) {
 
-			//Check if entity is selected
-			bool selected = (entities.find(selected_entity) != entities.end()) && entities_ref.at(entity).c_str() == entities_ref.at(selected_entity).c_str();
-			
-			//Show selectable
-			if (ImGui::Selectable(entities_ref.at(entity).c_str(), selected)) {
-				selected_entity = entity;
+				//Check if entity is selected
+				bool selected = (entities.find(selected_entity) != entities.end()) && entities_ref.at(entity).c_str() == entities_ref.at(selected_entity).c_str();
+
+				//Show selectable
+				if (ImGui::Selectable(entities_ref.at(entity).c_str(), selected)) {
+					selected_entity = entity;
+
+					//Get selected entity data
+					auto it = entities_ref.find(selected_entity);
+
+					//Dispatch new selected entity event
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SelectedEntityEvent>(it->first, it->second));
+				}
 			}
+		}
+
+		//Render popups
+		renderPopUps();
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
+	* Components Panel
+	*********************************************************************/
+	void LevelEditor::ComponentsPanel::onEvent(std::shared_ptr<SelectedEntityEvent> event) {
+		selected_entity = event->selected_entity;
+		selected_entity_ref = event->selected_entity_ref;
+		event->setEventProcessed(true);
+	}
+
+	std::function<void()> LevelEditor::ComponentsPanel::addComponentPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Select a component to add
+			ImGui::Text("Select a component to add:");
+
+			//Add spacing before components
+			ImGui::Spacing();
+
+			//Iterate over all registered components
+			for (const auto& component : NIKE_ECS_MANAGER->getAllComponentTypes()) {
+
+				//Check if component already exists
+				if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, component.second))
+					continue;
+
+				//Display each component as a button
+				if (ImGui::Button(component.first.c_str())) {
+
+					////Temporary remove action
+					//Action remove;
+
+					////Setup undo action for remove
+					//remove.undo_action = []() {
+					//};
+
+					////Setup action for removing entity
+					//remove.do_action = []() {
+					//};
+
+					////Execute remove action
+					//NIKE_LVLEDITOR_SERVICE->executeAction(remove);
+
+					//Close popup
+					closePopUp(popup_id);
+				}
+			}
+
+			//Add Spacing after components
+			ImGui::Spacing();
+
+			//Cancel removing entity
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
+	void LevelEditor::ComponentsPanel::init() {
+
+		//Setup event listening for selected entity
+		std::shared_ptr<LevelEditor::ComponentsPanel> comp_panel_wrapped(this, [](LevelEditor::ComponentsPanel*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<SelectedEntityEvent>(comp_panel_wrapped);
+
+		//Register add component popup
+		registerPopUp("Add Component", addComponentPopUp("Add Component"));
+	}
+
+	void LevelEditor::ComponentsPanel::update() {
+
+	}
+
+	void LevelEditor::ComponentsPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Check if an entity has been selected
+		if (!selected_entity_ref.empty()) {
+
+			//Print out selected entity string ref
+			ImGui::Text("Selected Entity: %s", selected_entity_ref.c_str());
+
+			//Print out selected entity component count
+			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(selected_entity));
+
+			//Print out selected entity layer id
+			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(selected_entity));
+
+			//Add component popup
+			if (ImGui::Button("Add Component")) {
+				openPopUp("Add Component");
+			}
+		}
+		else {
+			ImGui::Text("No active entities.");
 		}
 
 		//Render popups
