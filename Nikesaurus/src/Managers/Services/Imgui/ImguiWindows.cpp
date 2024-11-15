@@ -30,6 +30,8 @@ namespace NIKE {
 		ImGui::Begin("Level Editor", nullptr, window_flags);
 		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();
 		bool is_debug = NIKE_IMGUI_SERVICE->getDebugMode();
+		bool grid_active = NIKE_IMGUI_SERVICE->getGridActive();
+		static bool create_grid = false;
 
 		// Menu Bar for Play/Pause controls
 		if (ImGui::BeginMenuBar()) {
@@ -65,6 +67,28 @@ namespace NIKE {
 			}
 			ImGui::Spacing();
 
+			ImGui::SameLine();
+			// Button to create grid lines in editor
+			if (ImGui::Button("Create Grid"))
+			{
+				ImGui::OpenPopup("Grid Dimensions");
+				create_grid = true;
+			}
+
+			// Open pop up to create grid
+			create_grid = createGridPopup();
+
+			ImGui::Spacing();
+
+			ImGui::SameLine();
+
+			// Check box to show grid or not
+			ImGui::Text("Toggle Grid: ");
+			if (ImGui::Button(grid_active ? "Hide Gird" : "Show Grid")) {
+				NIKE_IMGUI_SERVICE->setShowGird(!grid_active);
+			}
+
+			ImGui::Spacing();
 
 			ImGui::EndMenuBar();
 		}
@@ -73,63 +97,6 @@ namespace NIKE {
 		ImGui::End();
 
 	}
-
-	//void imguiFileSystemWindow() {
-	//	// Check if the path exists
-	//	if (!std::filesystem::exists(GET_ASSETS_PATH())) {
-	//		ImGui::Text("Assets folder does not exist.");
-	//		return;
-	//	}
-
-	//	static bool show_load_popup = false;
-	//	static std::string selected_asset;
-
-
-	//	// Begin the ImGui window with a title
-	//	ImGui::Begin("Assets Browser");
-
-	//	// Display the current path
-	//	ImGui::Text("Current Path: %s", GET_ASSETS_PATH().string().c_str());
-
-	//	// Navigate back to the root directory
-	//	std::filesystem::path const root_assets_path = "assets/";
-	//	if (GET_ASSETS_PATH() != root_assets_path) {
-	//		if (ImGui::Button("Back")) {
-	//			// Go up one directory level
-	//			SET_ASSETS_PATH(GET_ASSETS_PATH().parent_path());
-	//			GET_ASSETS_PATH() = GET_ASSETS_PATH().parent_path();
-	//		}
-	//	}
-
-	//	// List directories and files
-	//	if (std::filesystem::is_directory(GET_ASSETS_PATH())) {
-	//		for (const auto& entry : std::filesystem::directory_iterator(GET_ASSETS_PATH())) {
-	//			const std::filesystem::path& path = entry.path();
-	//			std::string file_name = path.filename().string();
-
-	//			// If directory, make clickable
-	//			if (std::filesystem::is_directory(path)) {
-	//				if (ImGui::Selectable((file_name + "/").c_str(), false)) {
-	//					// Update to the new path when clicking a directory
-	//					SET_ASSETS_PATH(path);
-	//					GET_ASSETS_PATH() = path;
-	//				}
-	//			}
-	//			// Handle different asset types and drag-and-drop
-	//			else if (hasValidTextureExtension(path) || hasValidAudioExtension(path) || hasValidFontExtension(path)) {
-	//				if (ImGui::Selectable(file_name.c_str())) {
-	//					selected_asset = file_name;
-	//					show_load_popup = true;
-	//				}
-	//			}
-	//		}
-	//	}
-	//	else {
-	//		ImGui::Text("No valid directory or path.");
-	//	}
-
-	//	ImGui::End();
-	//}
 
 	void imguiDebuggingWindow() {
 
@@ -1114,6 +1081,8 @@ namespace NIKE {
 			viewport_width = window_size.y * aspect_ratio;
 		}
 
+		Vector2f viewport_size{viewport_width, viewport_height};
+
 		ImTextureID textureID = (ImTextureID)tex_id;
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
 		ImVec2 uv1(1.0f, 0.0f); // Top-right
@@ -1145,7 +1114,6 @@ namespace NIKE {
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		// Begin drag-and-drop target to create a new entity with the dropped texture
-		// Begin drag-and-drop target to create a new entity with the dropped texture
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture")) {
 				// Retrieve the texture ID from the payload
@@ -1162,7 +1130,8 @@ namespace NIKE {
 				// Register the entity with the generated reference
 				NIKE_IMGUI_SERVICE->addEntityRef(entity_ref, new_entity);
 
-				Vector2f def_size{ 100.0f, 100.0f };
+				// Texture size is in vec2i, hence this casting
+				Vector2f def_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.x), static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.y) };
 
 				// Convert to own vector
 				Vector2f own_mouse{mouse_pos.x , mouse_pos.y};
@@ -1176,6 +1145,11 @@ namespace NIKE {
 			ImGui::EndDragDropTarget();
 		}
 
+		if (NIKE_IMGUI_SERVICE->getGridActive())
+		{
+			renderGrid(NIKE_IMGUI_SERVICE->getGridDimen(), viewport_size);
+
+		}
 
 		ImGui::End();
 	}

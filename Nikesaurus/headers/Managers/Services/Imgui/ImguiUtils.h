@@ -11,6 +11,8 @@
 #ifndef IMGUI_UTILS
 #define IMGUI_UTILS
 
+#include "../headers/Components/cTransform.h"
+
 namespace NIKE {
 
 	// This function will be used to update imgui's input if needed
@@ -41,6 +43,11 @@ namespace NIKE {
 
 	// This function will be used to display assets of the given type
 	void displayAssetList(const std::string& assetType);
+
+	// This function will render out grid squares
+	void renderGrid(Vector2i grid_dimen, Vector2f);
+
+	bool isMouseOverEntity(const Vector2f& mouse_pos, const Transform::Transform& transform);
 
 }
 

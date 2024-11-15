@@ -101,6 +101,16 @@ namespace NIKE {
 		return "";  // Return an empty optional if no match is found
 	}
 
+	Vector2i& IMGUI::Service::getGridDimen()
+	{
+		return grid_dimensions;
+	}
+
+	float& IMGUI::Service::getTileSize()
+	{
+		return tile_size;
+	}
+
 	bool IMGUI::Service::getImguiActive() const {
 		return b_show_imgui;
 	}
@@ -132,6 +142,15 @@ namespace NIKE {
 
 	void IMGUI::Service::setDebugMode(bool flag) {
 		b_debug_mode = flag;
+	}
+
+	void IMGUI::Service::setShowGird(bool flag) {
+		b_show_grid = flag;
+	}
+
+	void IMGUI::Service::setTileSize(float size)
+	{
+		tile_size = size;
 	}
 
 	bool IMGUI::Service::getGamePaused() const {
@@ -190,6 +209,11 @@ namespace NIKE {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<IMGUI::ViewPortEvent>(win_pos, win_size));
 			b_dispatch_viewport = false;
 		}
+	}
+
+	bool NIKE::IMGUI::Service::getGridActive() const
+	{
+		return b_show_grid;
 	}
 
 }

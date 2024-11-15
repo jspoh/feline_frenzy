@@ -228,6 +228,50 @@ namespace NIKE
         ImGui::EndChild();
     }
 
+    void renderGrid(Vector2i grid_dimen, Vector2f viewport_size) 
+    {
+        // Get the position and size of the viewport window
+        ImVec2 start_pos = ImGui::GetWindowPos();
+
+        // Debug: Log viewport and grid dimensions
+        //cout << "Viewport Size (x, y): " << viewport_size.x << ", " << viewport_size.y
+        //    << " Grid Dimensions (x, y): " << grid_dimen.x << ", " << grid_dimen.y
+        //    << endl;
+
+        // Calculate the tile size to ensure the grid fits inside the viewport
+        float tile_size_x = viewport_size.x / grid_dimen.x;
+        float tile_size_y = viewport_size.y / grid_dimen.y;
+        float tile_size = min(tile_size_x, tile_size_y); 
+
+        cout << "Tile Size: " << tile_size << endl;
+
+        // Loop through grid rows and columns to draw the squares
+        for (int row = 0; row < grid_dimen.y; ++row) {
+            for (int col = 0; col < grid_dimen.x; ++col) {
+                // Calculate the top-left and bottom-right coordinates for each grid square
+                ImVec2 top_left(start_pos.x + col * tile_size, start_pos.y + row * tile_size);
+                ImVec2 bottom_right(start_pos.x + (col + 1) * tile_size, start_pos.y + (row + 1) * tile_size);
+
+                // Draw each grid square 
+                ImGui::GetWindowDrawList()->AddRect(top_left, bottom_right, IM_COL32(255, 255, 255, 255));
+            }
+        }
+    }
+
+    bool isMouseOverEntity(const Vector2f& mouse_pos, const Transform::Transform& transform) {
+        // Assuming the entity has a size component (e.g., width and height) for hit detection
+        float half_width = transform.scale.x / 2.0f;
+        float half_height = transform.scale.y / 2.0f;
+
+        // Check if mouse is within the entity's bounds
+        return mouse_pos.x >= (transform.position.x - half_width) &&
+            mouse_pos.x <= (transform.position.x + half_width) &&
+            mouse_pos.y >= (transform.position.y - half_height) &&
+            mouse_pos.y <= (transform.position.y + half_height);
+    }
+
+
+
 
 
 

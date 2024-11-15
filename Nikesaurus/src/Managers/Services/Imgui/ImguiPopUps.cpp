@@ -529,4 +529,42 @@ namespace NIKE
         return is_open;
     }
 
+    bool createGridPopup()
+    {
+        static bool is_open = true;
+        static Vector2i buffer_grid_dim{};
+
+        if (ImGui::BeginPopupModal("Grid Dimensions", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::InputInt("Grid Width", &buffer_grid_dim.x);
+            ImGui::InputInt("Grid Height", &buffer_grid_dim.y);
+            if (ImGui::Button("Apply")) {
+                NIKE_IMGUI_SERVICE->getGridDimen().x = buffer_grid_dim.x;
+                NIKE_IMGUI_SERVICE->getGridDimen().y = buffer_grid_dim.y;
+
+                // Reset the buffers after applying
+                buffer_grid_dim = { 0, 0 };
+
+                ImGui::CloseCurrentPopup();
+                is_open = false;
+            }
+
+            if (ImGui::Button("Cancel"))
+            {
+                // Reset the buffers after canceling
+                buffer_grid_dim = { 0, 0 };
+                is_open = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+        else
+        {
+            // Reset buffers if the popup closes for any reason
+            buffer_grid_dim = { 0, 0 };
+            is_open = false;
+        }
+        return is_open;
+    }
+
 }

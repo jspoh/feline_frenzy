@@ -53,6 +53,8 @@ namespace NIKE {
 
 	// Function to show pop up to create audio channel
 	bool createAudioChannelPopup();
+	// Function to show pop up to create grid
+	bool createGridPopup();
 }
 
 #endif
