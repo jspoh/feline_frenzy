@@ -12,6 +12,63 @@
 #include "Systems/Render/sysRender.h"
 
 namespace NIKE {
+	/*****************************************************************//**
+	* Panel Interface
+	*********************************************************************/
+	void LevelEditor::IPanel::init() {
+	}
+
+	void LevelEditor::IPanel::registerPopUp(std::string const& popup_id, std::function<void()> popup_func) {
+		popups[popup_id] = PopUp{ false, popup_func };
+	}
+
+	void LevelEditor::IPanel::openPopUp(std::string const& popup_id) {
+		auto it = popups.find(popup_id);
+
+		if (it == popups.end()) {
+			throw std::runtime_error("Popup doest not exist");
+		}
+
+		popups.at(popup_id).b_is_open = true;
+		ImGui::OpenPopup(popup_id.c_str());
+	}
+
+	void LevelEditor::IPanel::closePopUp(std::string const& popup_id) {
+		auto it = popups.find(popup_id);
+
+		if (it == popups.end()) {
+			throw std::runtime_error("Popup doest not exist");
+		}
+
+		popups.at(popup_id).b_is_open = false;
+		ImGui::CloseCurrentPopup();
+	}
+
+	void LevelEditor::IPanel::renderPopUps() {
+
+		//Iterate through all popup and render
+		for (auto& popup : popups) {
+			if (popup.second.b_is_open && ImGui::BeginPopupModal(popup.first.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+				popup.second.popUpFunction();
+				ImGui::EndPopup();
+			}
+		}
+	}
+
+	std::function<void()> LevelEditor::IPanel::errorPopUp(std::string const& error_id, std::string const& error_msg) {
+		return [this, error_id, error_msg]() {
+			//Show error message
+			ImGui::Text("%s", error_msg.c_str());
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//OK button to close the popup
+			if (ImGui::Button("OK")) {
+				closePopUp(error_id);
+			}
+		};
+	}
 
 	/*****************************************************************//**
 	* Main Panel
@@ -60,13 +117,13 @@ namespace NIKE {
 	}
 
 	void LevelEditor::MainPanel::update() {
+	}
+
+	void LevelEditor::MainPanel::render() {
 		//Set up main panel position for docking
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
 		ImGui::SetNextWindowSize(ImVec2(static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x),
 			static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y)));
-	}
-
-	void LevelEditor::MainPanel::render() {
 
 		//Begin Frame
 		ImGui::Begin(getName().c_str(), nullptr, static_cast<ImGuiWindowFlags>(window_flags));
@@ -200,14 +257,214 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entities Panel
 	*********************************************************************/
+	std::function<void()> LevelEditor::EntitiesPanel::createEntityPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string entity_name;
+
+			//Get entity text
+			ImGui::Text("Enter a name for the new entity:");
+			if(ImGui::InputText("##Entity Name", entity_name.data(), entity_name.capacity() + 1)){
+				entity_name.resize(strlen(entity_name.c_str()));
+			}
+
+			//Static layer id
+			static int layer_id = 0;
+
+			//Get entity layer id
+			ImGui::Text("Enter layer id for the new entity:");
+			ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
+
+			//Clamp layer ID
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+
+			//If enter or ok button is pressed
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+				//Creat new entity 
+				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+					
+				//If entity name is not provided (Create a default)
+				if (entity_name.empty())
+				{
+					snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", new_id);
+				}
+
+				//Save entity name into entities ref
+				entities_ref.insert({ new_id, entity_name });
+
+				//Reset entity name
+				entity_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel creating new entity
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
+	std::function<void()> LevelEditor::EntitiesPanel::removeEntityPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Confirm removal of entity
+			ImGui::Text("Are you sure you want to remove %s?", entities_ref.at(selected_entity).c_str());
+
+			//If enter or ok button is pressed
+			if (ImGui::Button("Remove") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+
+				//Destroy entity
+				NIKE_ECS_MANAGER->destroyEntity(selected_entity);
+
+				//Remove selected entity ref
+				entities_ref.erase(selected_entity);
+
+				//Update entities list
+				entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+
+				//Set selected entity back to first entity
+				selected_entity = entities.empty() ? 0 : *entities.begin();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel removing entity
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
+
+		//Register popups
+		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
+		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
+
+		//Init active entities
+		entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+
+		//Skip initialization if entities are empty
+		if (entities.empty())
+			return;
+
+		//Iterate through all active entities to init entities ref
+		std::for_each(entities.begin(), entities.end(),
+			[this](Entity::Type entity) {
+
+				//Check if entity ref has already been added
+				if (entities_ref.find(entity) == entities_ref.end()) {
+
+					//Create identifier for entity
+					char entity_name[32];
+					snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity);
+
+					//Add entity to map of ref
+					entities_ref.insert({ entity, entity_name });
+				}
+			});
+
+		//Init selected entity
+		selected_entity = *entities.begin();
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
+
+		//Get all active entities
+		entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+
+		//Check if number of refs matches the active entities size
+		if (entities.size() != entities_ref.size()) {
+
+			//Iterate through all active entities
+			std::for_each(entities.begin(), entities.end(), 
+				[this](Entity::Type entity) {
+
+					//Check if entity ref has already been added
+					if (entities_ref.find(entity) == entities_ref.end()) {
+
+						//Create identifier for entity
+						char entity_name[32];
+						snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity);
+
+						//Add entity to map of ref
+						entities_ref.insert({ entity, entity_name });
+					}
+				});
+
+			//Extra check for if entities were removed
+			if (entities.size() != entities_ref.size()) {
+
+				//Iterate through entities ref to check which entity has been removed
+				for (auto it = entities_ref.begin(); it != entities_ref.end();) {
+
+					//Find entity
+					auto active_it = entities.find(it->first);
+					//Check if entity is still active
+					if (active_it == entities.end()) {
+
+						//Add entity to map of ref
+						it = entities_ref.erase(it);
+					}
+					else {
+						it++;
+					}
+				}
+			}
+		}
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		// Button to create an entity, which triggers the popup
+		if (ImGui::Button("Create Entity") && entities.size() < Entity::MAX) {
+			openPopUp("Create Entity");
+		}
+
+		//Buttons Same Line
+		ImGui::SameLine();
+
+		// Button to remove an entity, which triggers the popup
+		if (ImGui::Button("Remove Entity") && !entities.empty()) {
+			openPopUp("Remove Entity");
+		}
+
+		//Add Spacing
+		ImGui::Spacing();
+
+		//Show number of entities in the level
+		ImGui::Text("Number of entities in level: %d", entities.size());
+
+		//Add Spacing
+		ImGui::Spacing();
+
+		//Iterate through all active entities
+		for (auto entity : entities) {
+
+			//Check if entity is selected
+			bool selected = (entities.find(selected_entity) != entities.end()) && entities_ref.at(entity).c_str() == entities_ref.at(selected_entity).c_str();
+			
+			//Show selectable
+			if (ImGui::Selectable(entities_ref.at(entity).c_str(), selected)) {
+				selected_entity = entity;
+			}
+		}
+
+		//Render popups
+		renderPopUps();
 
 		ImGui::End();
 	}

@@ -20,6 +20,16 @@ namespace NIKE {
 		//Panel Interface
 		class IPanel {
 		private:
+
+			//Internal panel popup maangement
+			struct PopUp {
+				bool b_is_open = false;
+				std::function<void()> popUpFunction;
+			};
+
+			//Map of popups
+			std::unordered_map<std::string, PopUp> popups;
+			
 		public:
 			virtual ~IPanel() = default;
 
@@ -27,13 +37,28 @@ namespace NIKE {
 			virtual std::string getName() const = 0;
 
 			//Init
-			virtual void init() {};
+			virtual void init();
 
 			//Update
 			virtual void update() = 0;
 
 			//Render
 			virtual void render() = 0;
+
+			//Register new popup
+			void registerPopUp(std::string const& popup_id, std::function<void()> popup_func);
+
+			//Open popup
+			void openPopUp(std::string const& popup_id);
+
+			//Close popup
+			void closePopUp(std::string const& popup_id);
+
+			//Render popup
+			void renderPopUps();
+
+			//Error Popup
+			std::function<void()> errorPopUp(std::string const& error_id, std::string const& error_msg);
 		};
 
 		//Main Panel ( Docking )
@@ -119,8 +144,24 @@ namespace NIKE {
 		//Class Entity Panel
 		class EntitiesPanel : public IPanel {
 		private:
+
+			//Set of active entities
+			std::set<Entity::Type> entities;
+
+			//Unordered map of entities ref
+			std::unordered_map<Entity::Type, std::string> entities_ref;
+
+			//Selected entity
+			Entity::Type selected_entity;
+
+			//Create entity popup
+			std::function<void()> createEntityPopUp(std::string const& popup_id);
+
+			//Remove Entity popup
+			std::function<void()> removeEntityPopUp(std::string const& popup_id);
+
 		public:
-			EntitiesPanel() = default;
+			EntitiesPanel() : selected_entity{ 0 } {}
 			~EntitiesPanel() = default;
 
 			//Panel Name
