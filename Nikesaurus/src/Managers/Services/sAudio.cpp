@@ -478,6 +478,11 @@ namespace NIKE {
 		return it->second;
 	}
 
+	std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>>& Audio::Service::getAllChannelGroups()
+	{
+		return channel_groups;
+	}
+
 	bool Audio::Service::checkChannelGroupExist(std::string const& channel_id)
 	{
 		if (channel_groups.find(channel_id) == channel_groups.end())
@@ -520,6 +525,7 @@ namespace NIKE {
 		else {
 			cout << "Error playing audio in channel!" << endl;
 		}
+
 	}
 
 	void Audio::Service::update() {

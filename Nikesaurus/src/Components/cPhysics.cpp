@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   cAudio.cpp
+ * \file   cPhysics.cpp
  * \brief	Physics components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu

@@ -22,7 +22,7 @@ void Splash::Scene::load() {
 
 void Splash::Scene::init() {
 
-	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/test.scn");
+	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/gui_scene.scn");
 
 	//NIKE_UI_SERVICE->createButton("Test",
 	//	NIKE::Transform::Transform({ 0.0f,0.0f }, { 200.0f, 100.0f }, 0.0f),
@@ -37,11 +37,11 @@ void Splash::Scene::init() {
 	//Creat Channel Group
 	NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
 
-	//Play Music
-	NIKE_AUDIO_SERVICE->playAudio("test_music", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
+	////Play Music
+	//NIKE_AUDIO_SERVICE->playAudio("test_music", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
 
 	//Set Music Volume
-	NIKE_AUDIO_SERVICE->getChannelGroup("MASTER")->setVolume(0.5f);
+	//NIKE_AUDIO_SERVICE->getChannelGroup("MASTER")->setVolume(0.5f);
 
 }
 

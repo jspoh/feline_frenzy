@@ -7,7 +7,7 @@
  *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
  * 
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -15,6 +15,7 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Components/cPhysics.h"
 #include "Components/cTransform.h"
+#include "Components/cPathfinding.h"
 
 
 namespace NIKE {
@@ -47,6 +48,43 @@ namespace NIKE {
                     auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 
+                    //// Retrieve the logic state to determine behavior
+                    //if (NIKE_ECS_MANAGER->checkEntityComponent<Logic::State>(entity)) {
+                    //    auto& e_state = NIKE_ECS_MANAGER->getEntityComponent<Logic::State>(entity);
+
+                    //    switch (e_state.current_state) {
+                    //    case Logic::EntityStateType::IDLE:
+                    //        // In IDLE, entity is stationary
+                    //        e_dynamics.velocity = Vector2f(0.0f, 0.0f);
+                    //        break;
+
+                    //    case Logic::EntityStateType::PATROLLING:
+                    //        // In PATROLLING, entity moves to random points in patrol radius
+                    //        if (e_dynamics.velocity.length() < 0.01f) {
+                    //            // Check if entity has reached patrol target, if so wait 2 seconds
+                    //            e_dynamics.velocity = getRandomDirection() * e_dynamics.max_speed;
+                    //        }
+                    //        e_transform.position += e_dynamics.velocity * dt;
+                    //        break;
+
+                    //    case Logic::EntityStateType::CHASING: {
+                    //        // In CHASING, entity moves toward the player
+                    //        auto player_entity = GameLogic::Manager::getPlayerEntity();
+                    //        if (player_entity && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(player_entity)) {
+                    //            auto& player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
+                    //            Vector2f chase_direction = (player_transform.position - e_transform.position).normalize();
+                    //            e_dynamics.velocity = chase_direction * e_dynamics.max_speed;
+                    //            e_transform.position += e_dynamics.velocity * dt;
+                    //        }
+                    //        break;
+                    //    }
+
+                    //    default:
+                    //        break;
+                    //    }
+                    //}
+
+
                     //Ensure that mass is not negative
                     e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
 
@@ -73,6 +111,13 @@ namespace NIKE {
                     e_transform.position.x += e_dynamics.velocity.x * dt;
                     e_transform.position.y += e_dynamics.velocity.y * dt;
                 }
+
+                //Pathfinding
+                //if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity) &&
+                //    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
+                //    auto& e_pathfinding = NIKE_ECS_SERVICE->getEntityComponent<Pathfinding::Path>(entity);
+
+                //}
 
                 //Collision detection
                 if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&
@@ -146,5 +191,32 @@ namespace NIKE {
     void Physics::Manager::onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) {
         collision_system->setRestitution(event->restitution);
         event->setEventProcessed(true);
+    }
+
+    void Physics::Manager::applyXForce(Entity::Type entity, float force) {
+        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
+            return;
+
+        //Get dynamics
+        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+        e_dynamics.force.x = force;
+    }
+
+    void Physics::Manager::applyYForce(Entity::Type entity, float force) {
+        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
+            return;
+
+        //Get dynamics
+        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+        e_dynamics.force.y = force;
+    }
+
+    void Physics::Manager::registerLuaBindings(sol::state& lua_state) {
+        lua_state.set_function("applyXForce", [this](unsigned int entity, float x_force) {
+            applyXForce(static_cast<Entity::Type>(entity), x_force);
+            });
+        lua_state.set_function("applyYForce", [this](unsigned int entity, float y_force) {
+            applyYForce(static_cast<Entity::Type>(entity), y_force);
+            });
     }
 }

@@ -17,8 +17,8 @@
 #include "Math/Mtx33.h"
 
 
- // batched rendering
-constexpr bool BATCHED_RENDERING = true;
+// batched rendering
+constexpr bool BATCHED_RENDERING = false;
 
 namespace NIKE {
 
@@ -71,10 +71,10 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
-		}
+		//GLenum err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		//}
 
 		if (!BATCHED_RENDERING) {
 			//Set polygon mode
@@ -114,19 +114,19 @@ namespace NIKE {
 			}
 		}
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
-		}
+		//err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		//}
 	}
 
 	void Render::Manager::batchRenderObject() {
 		// !TODO: considering implementing instanced too with glDrawElementsInstanced
 
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
-		}
+		//GLenum err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		//}
 
 		if (!BATCHED_RENDERING) {
 			return;
@@ -191,10 +191,10 @@ namespace NIKE {
 
 		render_instances_quad.clear();
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
-		}
+		//err = glGetError();
+		//if (err != GL_NO_ERROR) {
+		//	NIKEE_CORE_ERROR("OpenGL error at end of batchRenderObject: {0}", err);
+		//}
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
@@ -481,7 +481,6 @@ namespace NIKE {
 	}
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
@@ -583,6 +582,8 @@ namespace NIKE {
 		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 		}
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
@@ -599,7 +600,7 @@ namespace NIKE {
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-					transformAndRenderEntity(entity, true);
+					transformAndRenderEntity(entity, NIKE_IMGUI_SERVICE->getDebugMode());
 				}
 			}
 		}
@@ -612,7 +613,7 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity)) {
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
 					transformAndRenderText(entity);
 				}
 			}

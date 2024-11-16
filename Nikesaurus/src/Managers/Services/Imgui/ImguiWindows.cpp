@@ -1,3 +1,14 @@
+/*****************************************************************//**
+ * \file   ImguiWindows.cpp
+ * \brief  imgui system
+ *
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (60%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (40%)
+ * \Brief This file contains declarations of utility functions to be used
+ * \date   September 2024
+ * All content ? 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #include "Core/stdafx.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/Imgui/ImguiWindows.h"
@@ -19,15 +30,44 @@ namespace NIKE {
 
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
-		bool is_playing = NIKE_IMGUI_SERVICE->getGamePaused();
+		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();
+		bool is_debug = NIKE_IMGUI_SERVICE->getDebugMode();
+
 		// Menu Bar for Play/Pause controls
 		if (ImGui::BeginMenuBar()) {
 			ImGui::Spacing();
 			ImGui::Text("Play / Pause Controls : ");
-			if (ImGui::Button(is_playing ? "Pause" : "Play")) {
-				NIKE_IMGUI_SERVICE->setGamePaused(!is_playing);
+			if (ImGui::Button(is_paused ? "Play" : "Pause")) {
+				NIKE_IMGUI_SERVICE->setGamePaused(!is_paused);
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Reset Scene")) {
+				std::string scene_file_path = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+
+				if (!scene_file_path.empty() && std::filesystem::exists(scene_file_path)) {
+					NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
+
+					// Clear previous scene entities before loading the new one
+					NIKE_ECS_MANAGER->destroyAllEntities();
+					NIKE_IMGUI_SERVICE->getEntityRef().clear();
+
+					// Load the scene from the selected file path
+					NIKE_SERIALIZE_SERVICE->loadSceneFromFile(scene_file_path);
+					NIKE_IMGUI_SERVICE->populateLists = false;
+				}
+				else {
+
+					NIKEE_CORE_ERROR("Error: Scene file path is invalid or file does not exist.");
+				}
+			}
+			ImGui::SameLine();
+			ImGui::Text("Toggle Debug Box : ");
+			if (ImGui::Button(is_debug ? "Hide" : "Show")) {
+				NIKE_IMGUI_SERVICE->setDebugMode(!is_debug);
 			}
 			ImGui::Spacing();
+
+
 			ImGui::EndMenuBar();
 		}
 		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
@@ -347,15 +387,12 @@ namespace NIKE {
 								}
 								ImGui::EndDragDropTarget();
 							}
-							ImGui::DragFloat4("Texture Color (RBGA)", &texture_comp.color.r, 0.1f);
-							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1);
-							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1);
-							ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.1f);
+							ImGui::SameLine();
 							// Save button to confirm changes 
-							if (ImGui::Button("Save Texture ID")) {
+							if (ImGui::Button("Save")) {
 								if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id))
 								{
-									// Update audio ID in component
+									// Update texture ID in component
 									texture_comp.texture_id = texture_id;
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
@@ -365,28 +402,32 @@ namespace NIKE {
 									show_error_popup = true;
 								}
 							}
+							
+							ImGui::DragInt2("Frame Size", &texture_comp.frame_size.x, 1, 1 , 100);
+							ImGui::DragInt2("Frame Index", &texture_comp.frame_index.x, 1, 1, 100);
+							
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
 							if (!texture_comp.texture_id.empty())
 							{
-								ImGui::Text("Stretch: %s", texture_comp.b_stretch ? "true" : "false");
-								if (ImGui::Button("Stretch")) {
-									texture_comp.b_stretch = !texture_comp.b_stretch;
+								ImGui::Spacing();
+								ImGui::Checkbox("Blend", &texture_comp.b_blend); 
+
+								if (texture_comp.b_blend) {
+									ImGui::DragFloat4("Texture Color (RGBA)", &texture_comp.color.r, 0.001f, 0.f, 1.f);
+									ImGui::DragFloat("Intensity", &texture_comp.intensity, 0.001f, 0.f, 1.f);
 								}
-								ImGui::Text("Blend: %s", texture_comp.b_blend ? "true" : "false");
-								if (ImGui::Button("Blend")) {
-									texture_comp.b_blend = !texture_comp.b_blend;
-								}
-								ImGui::Text("Flip Horizontally: %s", texture_comp.b_flip.x ? "true" : "false");
-								if (ImGui::Button("Flip X")) {
-									texture_comp.b_flip.x = !texture_comp.b_flip.x;
-								}
-								ImGui::Text("Flip Vertically: %s", texture_comp.b_flip.y ? "true" : "false");
-								if (ImGui::Button("Flip Y")) {
-									texture_comp.b_flip.y = !texture_comp.b_flip.y;
-								}
+
+								ImGui::Checkbox("Stretch", &texture_comp.b_stretch);
+
+								ImGui::Checkbox("Flip Horizontally (x-axis)", &texture_comp.b_flip.x);
+								ImGui::Checkbox("Flip Vertically (y-axis)", &texture_comp.b_flip.y);
+
 							}
+
+							ImGui::Spacing();
+
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
 							{
@@ -398,9 +439,9 @@ namespace NIKE {
 
 							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
 							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
-							ImGui::DragFloat("Max Speed", &dynamics_comp.max_speed, 0.1f);
-							ImGui::DragFloat("Drag", &dynamics_comp.drag, 0.1f);
-							ImGui::DragFloat("Mass", &dynamics_comp.mass, 0.1f);
+							ImGui::DragFloat("Max Speed", &dynamics_comp.max_speed, 0.1f, 0.0f, 2000.f, "%3.f", ImGuiSliderFlags_AlwaysClamp);
+							ImGui::DragFloat("Drag", &dynamics_comp.drag, 0.1f, 0.0f, 100.f, "%3.f", ImGuiSliderFlags_AlwaysClamp);
+							ImGui::DragFloat("Mass", &dynamics_comp.mass, 0.1f, 1.0f, 1000.f, "%3.f", ImGuiSliderFlags_AlwaysClamp);
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -452,15 +493,15 @@ namespace NIKE {
 								animate_base_comp.animation_mode = selected_mode;
 							}
 
-							//ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
-							//if (ImGui::Button("Toggle Ping Pong")) {
-							//	animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
-							//}
-
-							ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
-							if (ImGui::Button("Toggle Reverse")) {
-								animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							ImGui::Text("Ping Pong? %s", animate_base_comp.b_pingpong ? "yes" : "no");
+							if (ImGui::Button("Toggle Ping Pong")) {
+								animate_base_comp.b_pingpong = !animate_base_comp.b_pingpong;
 							}
+
+							//ImGui::Text("Reverse Animation? %s", animate_base_comp.b_reverse ? "yes" : "no");
+							//if (ImGui::Button("Toggle Reverse")) {
+							//	animate_base_comp.b_reverse = !animate_base_comp.b_reverse;
+							//}
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -471,9 +512,11 @@ namespace NIKE {
 						else if (component_name == "Animation::Sprite") {
 							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
 
-							ImGui::DragInt2("Sheet Size", &animate_sprite_comp.sheet_size.x, 1);
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
+							ImGui::Text("Sheet Size:");
+							ImGui::BulletText("X = %d", animate_sprite_comp.sheet_size.x);
+							ImGui::BulletText("Y = %d", animate_sprite_comp.sheet_size.y);
 							ImGui::Text("Current Index:");
 							ImGui::BulletText("X = %d", animate_sprite_comp.curr_index.x);
 							ImGui::BulletText("Y = %d", animate_sprite_comp.curr_index.y);
@@ -500,9 +543,9 @@ namespace NIKE {
 							if (ImGui::InputText("##shapeRef", input_model_ref, IM_ARRAYSIZE(input_model_ref))) {
 								// Optionally handle input change here if needed
 							}
-							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.1f);
+							ImGui::DragFloat4("Color in RBGA", &shape_comp.color.r, 0.001f, 0.f, 1.f);
 							// Save buttons to confirm changes
-							if (ImGui::Button("Save Font Ref")) {
+							if (ImGui::Button("Save Shape Ref")) {
 								if (NIKE_ASSETS_SERVICE->checkModelExist(input_model_ref))
 								{
 									// Update channel ID in component
@@ -551,13 +594,13 @@ namespace NIKE {
 							}
 
 							ImGui::Text("Enter text to display:");
-							if (ImGui::InputText("##text", input_text, IM_ARRAYSIZE(input_text))) {
+							if (ImGui::InputText("##textww", input_text, IM_ARRAYSIZE(input_text))) {
 								// Stuff
 							}
 
-							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.1f);
-							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.02f);
-							text_comp.scale = std::clamp(text_comp.scale, EPSILON, 10.0f);
+							ImGui::DragFloat4("Text Color (RBGA)", &text_comp.color.r, 0.001f, 0.f, 1.f);
+							ImGui::DragFloat("Text Scale", &text_comp.scale, 0.02f, 0.f, 10.f);
+
 							ImGui::Text((std::string("Text Size X: ") + std::to_string(text_comp.size.x)).c_str());
 							ImGui::Text((std::string("Text Size Y: ") + std::to_string(text_comp.size.y)).c_str());
 
@@ -658,14 +701,13 @@ namespace NIKE {
 							}
 
 							ImGui::Text("Enter Audio ID:");
-							if (ImGui::InputText("##audioID", input_audio_id, IM_ARRAYSIZE(input_audio_id))) {
-								// Optionally handle input change here if needed
-							}
+							ImGui::InputText("##audioID", input_audio_id, IM_ARRAYSIZE(input_audio_id));
+							
 
 							ImGui::Text("Enter Channel ID:");
-							if (ImGui::InputText("##channelID", input_channel_group_id, IM_ARRAYSIZE(input_channel_group_id))) {
-								// Optionally handle input change here if needed
-							}
+							ImGui::InputText("##channelID", input_channel_group_id, IM_ARRAYSIZE(input_channel_group_id));
+
+							
 
 							// Set volume
 							ImGui::SliderFloat("Volume", &sfx_comp.volume, 0.f, 1.f, "%.2f");
@@ -688,12 +730,14 @@ namespace NIKE {
 								{
 									// Update channel ID in component
 									sfx_comp.channel_group_id = input_channel_group_id;
+									memset(input_channel_group_id, 0, sizeof(input_channel_group_id));
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
 								else
 								{
 									ImGui::OpenPopup("INVALID INPUT");
+									memset(input_channel_group_id, 0, sizeof(input_channel_group_id));
 									show_error_popup = true;
 								}
 							}
@@ -702,11 +746,13 @@ namespace NIKE {
 								{
 									// Update audio ID in component
 									sfx_comp.audio_id = input_audio_id;
+									memset(input_audio_id, 0 ,sizeof(input_audio_id));
 									ImGui::OpenPopup("VALID INPUT");
 									show_save_popup = true;
 								}
 								else
 								{
+									memset(input_audio_id, 0, sizeof(input_audio_id));
 									ImGui::OpenPopup("INVALID INPUT");
 									show_error_popup = true;
 								}
@@ -715,6 +761,60 @@ namespace NIKE {
 							// Show pop ups
 							show_error_popup = ShowErrorPopup();
 							show_save_popup = ShowSaveConfirmationPopup();
+
+							// Remove Component 
+							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
+							{
+								NIKE_IMGUI_SERVICE->populateLists = false;
+								NIKE_ECS_MANAGER->removeEntityComponent(entity, component_type);
+							}
+						}
+						else if (component_name == "GameLogic::Movement") {
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+
+							static char script_path[300];
+							static bool scripth_path_init = false;
+							static char function[300];
+							static bool functioninit = false;
+
+							////For script initial initialization
+							//if (!scripth_path_init || script_path != e_player.script.script_path.c_str()) {
+							//	// Ensure null-termination
+							//	script_path[sizeof(script_path) - 1] = '\0';
+							//	strcpy_s(script_path, e_player.script.script_path.c_str());
+							//	scripth_path_init = true;
+							//}
+
+							////For function initial initialization
+							//if (!functioninit || function != e_player.script.function.c_str()) {
+							//	// Ensure null-termination
+							//	function[sizeof(function) - 1] = '\0';
+							//	strcpy_s(function, e_player.script.function.c_str());
+							//	functioninit = true;
+							//}
+
+							ImGui::Text("Enter script:");
+							if (ImGui::InputText("##PlayerScript", script_path, IM_ARRAYSIZE(script_path))){
+
+							}
+
+							if (ImGui::Button("Save Script")) {
+								e_player.script.script_path = script_path;
+							}
+
+							ImGui::Text("Enter function:");
+							if (ImGui::InputText("##FunctionPath", function, IM_ARRAYSIZE(function))) {
+
+							}
+
+							if (ImGui::Button("Save Function")) {
+								e_player.script.function = function;
+							}
+
+							ImGui::Separator();
+
+							ImGui::Text(std::string("Script Id: " + e_player.script.script_id).c_str());
+							ImGui::Text(std::string("Executing: " + e_player.script.function).c_str());
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -1000,11 +1100,13 @@ namespace NIKE {
 		}
 	}
 
-	void imguiShowGameViewport(bool& dispatch){
+	void imguiShowGameViewport(bool& dispatch, unsigned int tex_id) {
 		ImGui::Begin("Game Viewport");
 
-		float aspect_ratio = 16.f / 9.f;
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
+
+		float aspect_ratio = 16.f / 9.f;
+		
 
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
@@ -1014,18 +1116,15 @@ namespace NIKE {
 			viewport_width = window_size.y * aspect_ratio;
 		}
 
-		ImTextureID textureID = (ImTextureID)NIKE_ECS_MANAGER->getSystemInstance<Render::Manager>()->getTextureColorBuffer();
-		// Define UV coordinates to flip the texture vertically
+		ImTextureID textureID = (ImTextureID)tex_id;
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
 		ImVec2 uv1(1.0f, 0.0f); // Top-right
 
-		//Dispatch window viewport events
+		// Dispatch window viewport events
 		static Vector2f win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
 
-		//Dispatch view port changes
 		if (win_pos != Vector2f(ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2) ||
 			dispatch) {
-			//Dispatch viewport changes
 			win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
 
 			Vector2f win_size = { viewport_width, viewport_height };
@@ -1033,9 +1132,57 @@ namespace NIKE {
 			dispatch = false;
 		}
 
+		// Normalise mouse pos to viewport imgui
+		ImVec2 mouse_pos = ImGui::GetMousePos();
+		ImVec2 scalar = { (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / window_size.x), (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / window_size.y) };
+		mouse_pos.x -= win_pos.x;
+		mouse_pos.y -= win_pos.y;
+		mouse_pos.x -= (viewport_width / 2.0f);
+		mouse_pos.y -= (viewport_height / 2.0f);
+		mouse_pos.y = -mouse_pos.y;
+
+		mouse_pos.x *= scalar.x;
+		mouse_pos.y *= scalar.y;
+
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
+
+		// Begin drag-and-drop target to create a new entity with the dropped texture
+		// Begin drag-and-drop target to create a new entity with the dropped texture
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture")) {
+				// Retrieve the texture ID from the payload
+				const char* dropped_texture = static_cast<const char*>(payload->Data);
+				std::string new_texture_id(dropped_texture);
+
+				// Static counter to generate unique entity reference strings
+				static int texture_counter = 1;
+				std::string entity_ref = "texture_" + std::to_string(texture_counter++); // Generate unique ID
+
+				// Create a new entity
+				Entity::Type new_entity = NIKE_ECS_MANAGER->createEntity();
+
+				// Register the entity with the generated reference
+				NIKE_IMGUI_SERVICE->addEntityRef(entity_ref, new_entity);
+
+				Vector2f def_size{ 100.0f, 100.0f };
+
+				// Convert to own vector
+				Vector2f own_mouse{mouse_pos.x , mouse_pos.y};
+
+				// Add a Transform component to the new entity with the calculated mouse position and random size
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(new_entity, Transform::Transform(own_mouse, def_size, 0.f));
+
+				// Add a Texture component to the new entity with the specified texture ID and default color
+				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(new_entity, Render::Texture(new_texture_id, { 1.0f, 1.0f, 1.0f, 1.0f }));
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+
 		ImGui::End();
 	}
+
+
 
 	void imguiCameraControl()
 	{
@@ -1163,6 +1310,130 @@ namespace NIKE {
 
 		}
 
+
+		ImGui::End();
+	}
+	void imguiAudioControl()
+	{
+		static int selected_channel = 0;
+		static int channel_counter = 1;
+		static bool show_save_popup = false;
+		static bool is_playing = false;
+		static bool is_paused = false;
+		static bool show_error_popup = false;
+		static bool open_channel_popup = false;
+
+		static char current_channel_input[300];
+		static bool music_init = false;
+		if (!music_init) {
+			// Ensure null-termination
+			current_channel_input[sizeof(current_channel_input) - 1] = '\0';
+			music_init = true;
+		}
+
+		std::string true_audio{};
+		std::string true_bgm_channel{};
+
+
+		ImGui::Begin("Audio Mangement");
+		static char current_audio_file[300];
+		static bool audio_init = false;
+		if (!audio_init) {
+			// Ensure null-termination
+			current_audio_file[sizeof(current_audio_file) - 1] = '\0';
+			audio_init = true;
+		}
+
+		// Create Audio channel
+		if (ImGui::Button("Create Channel Group"))
+		{
+			open_channel_popup = true;
+			ImGui::OpenPopup("Create Channel Group");
+		}
+
+		// Pop up for create audio channel
+		open_channel_popup = createAudioChannelPopup();
+
+		ImGui::Separator();
+
+		ImGui::Text("Available Channel groups");
+
+
+		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups())
+		{
+			ImGui::Text("%s", channel.first.c_str());
+		}
+
+
+		ImGui::Separator();
+
+		ImGui::Text("Play BGM");
+
+		// Input loaded audio file
+		ImGui::InputText("Audio File", current_audio_file, IM_ARRAYSIZE(current_audio_file));
+		ImGui::InputText("Channel", current_channel_input, IM_ARRAYSIZE(current_channel_input));
+
+		// Saving input
+		if (ImGui::Button("Save Audio Input")) {
+			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file)))
+			{
+				ImGui::OpenPopup("VALID INPUT");
+				show_save_popup = true;
+			}
+			else {
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+		}
+		// Saving input
+		if (ImGui::Button("Save Channel Input")) {
+			if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(current_channel_input))
+			{
+				ImGui::OpenPopup("VALID INPUT");
+				show_save_popup = true;
+			}
+			else
+			{
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+		}
+
+		if (ImGui::Button("Play BGM"))
+		{
+			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
+			{
+				std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
+
+				NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0);
+			}
+			else
+			{
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+
+		}
+
+		if (ImGui::Button("Stop BGM"))
+		{
+			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
+			{
+
+				NIKE_AUDIO_SERVICE->getChannelGroup(current_channel_input)->stop();
+			}
+			else {
+				ImGui::OpenPopup("INVALID INPUT");
+				show_error_popup = true;
+			}
+
+		}
+
+		// Show pop ups
+		show_error_popup = ShowErrorPopup();
+		show_save_popup = ShowSaveConfirmationPopup();
 
 		ImGui::End();
 	}

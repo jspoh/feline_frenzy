@@ -319,6 +319,8 @@ namespace NIKE {
 			//Clamp scale
 			e_text.scale = std::clamp(e_text.scale, EPSILON, 10.0f);
 
+			static bool play = true;
+
 			//Check if button is hovered
 			if (buttonHovered(entity.second.first)) {
 				entity.second.second = true;
@@ -331,6 +333,12 @@ namespace NIKE {
 
 				//Hover
 				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
+				if (play)
+				{
+					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 1.f,1.f,0);
+					play = false;
+				}
+				
 			}
 			else {
 				entity.second.second = false;
@@ -338,6 +346,7 @@ namespace NIKE {
 					e_transform.scale = hover_container[entity.first].first.scale;
 					hover_container[entity.first].second = false;
 				}
+				play = true;
 			}
 		}
 	}

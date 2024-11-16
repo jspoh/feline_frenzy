@@ -2,7 +2,8 @@
  * \file   sysImgui.cpp
  * \brief  Imgui system
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (80%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (20%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -10,6 +11,12 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
+
+ //Registered Systems
+#include "Systems/sysAudio.h"
+#include "../headers/Systems/Physics/sysPhysics.h"
+#include "../headers/Systems/Animation/sysAnimation.h"
+#include "../headers/Systems/Render/sysRender.h"
 
 namespace NIKE {
 
@@ -25,6 +32,9 @@ namespace NIKE {
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+
+		std::shared_ptr<IMGUI::Service> imgui_service_wrapped(this, [](IMGUI::Service*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(imgui_service_wrapped);
 
 		populateLists = false;
 		// For testing
@@ -88,10 +98,44 @@ namespace NIKE {
 	
 	void IMGUI::Service::setGamePaused(bool pause) {
 		b_pause_game = pause;
+
+		if (b_pause_game) {
+			//Set audio system pause
+			NIKE_ECS_MANAGER->setSystemState<Audio::Manager>(false);
+
+			//Set physics system pause
+			NIKE_ECS_MANAGER->setSystemState<Physics::Manager>(false);
+
+			//Set animation system pause
+			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(false);
+		}
+		else {
+			//Set audio system play
+			NIKE_ECS_MANAGER->setSystemState<Audio::Manager>(true);
+
+			//Set physics system play
+			NIKE_ECS_MANAGER->setSystemState<Physics::Manager>(true);
+
+			//Set animation system play
+			NIKE_ECS_MANAGER->setSystemState<Animation::Manager>(true);
+		}
+	}
+
+	void IMGUI::Service::setDebugMode(bool flag) {
+		b_debug_mode = flag;
 	}
 
 	bool IMGUI::Service::getGamePaused() const {
 		return b_pause_game;
+	}
+
+	bool IMGUI::Service::getDebugMode() const {
+		return b_debug_mode;
+	}
+
+	void IMGUI::Service::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
+		tex_id = event->tex_id;
+		event->setEventProcessed(true);
 	}
 
 	void IMGUI::Service::update()
@@ -118,10 +162,11 @@ namespace NIKE {
 			// imguiFileSystemWindow();
 			imguiShowLoadedAssetsWindow();
 			imguiEntityComponentManagementWindow();
-			imguiShowGameViewport(b_dispatch_viewport);
+			imguiShowGameViewport(b_dispatch_viewport, tex_id);
 			imguiCameraControl();
 			imguiLayerManagementWindow();
 			imguiShowLoadedLevelsWindow();
+			imguiAudioControl();
 
 			// THIS 2 CALL THE OPENGL DRAWING
 			ImGui::Render();

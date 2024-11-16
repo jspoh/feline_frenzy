@@ -5,7 +5,7 @@
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (90%)
  * \co-author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (10%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -122,18 +122,27 @@ namespace NIKE {
 
 		// Update all systems
 		for (auto const& system : systems) {
+			
 			if (system->getActiveState())
 			{
 				std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
 
-				//Break system update loop if system update returns true
-				system->update();
+				// When game is paused make sure all systems are not running except render (!TODO CHANGE TO Deactive Active state)
+				if (!NIKE_IMGUI_SERVICE->getGamePaused() || system->getSysName() == "Render System") {
+					//Break system update loop if system update returns true
+					system->update();
+				}
 
 				std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
 
 				// Calculate the time taken by the system
 				std::chrono::duration<double, std::milli> system_duration = system_end_time - system_start_time;
 				system_times.push_back(system_duration.count());
+
+			}
+			else {
+				//Push system no run time
+				system_times.push_back(0.0);
 			}
 		}
 		// Track total end time for the update call

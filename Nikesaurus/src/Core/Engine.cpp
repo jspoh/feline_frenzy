@@ -11,10 +11,14 @@
 #include "Core/Engine.h"
  //
  //Registered Systems
+#include "Systems/GameLogic/sysGameLogic.h"
+#include "Systems/Physics/sysPhysics.h"
+#include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
 #include "../headers/Systems/Physics/sysPhysics.h"
 #include "../headers/Systems/Animation/sysAnimation.h"
 #include "../headers/Systems/Render/sysRender.h"
+#include "Systems/Render/sysRender.h"
 
 namespace NIKE {
 
@@ -36,23 +40,36 @@ namespace NIKE {
 
 		//Register render components
 		Render::registerComponents();
+
+		//Register pathfinding components
+		Pathfinding::registerComponents();
+
+		//Register render components
+		GameLogic::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
-		//Register audio system
-		NIKE_ECS_MANAGER->registerSystem<Audio::Manager>();
-		NIKE_ECS_MANAGER->addSystemComponentType<Audio::Manager>(NIKE_ECS_MANAGER->getComponentType<Audio::SFX>());
+
+		//Register game logic manager
+		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 
 		//Register physics manager
-		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
+		game_logic_sys->registerLuaSystem(physics_sys);
 
-		////Register animation manager
+		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Animation::Manager>(NIKE_ECS_MANAGER->getComponentType<Animation::Base>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Animation::Manager>(NIKE_ECS_MANAGER->getComponentType<Animation::Sprite>());
+
+		//Register audio system
+		NIKE_ECS_MANAGER->registerSystem<Audio::Manager>();
+		NIKE_ECS_MANAGER->addSystemComponentType<Audio::Manager>(NIKE_ECS_MANAGER->getComponentType<Audio::SFX>());
 
 		//Register render manager
 		NIKE_ECS_MANAGER->registerSystem<Render::Manager>(false);
@@ -77,6 +94,7 @@ namespace NIKE {
 		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
+		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<UI::Service>());
 
 		//Create console
@@ -139,12 +157,6 @@ namespace NIKE {
 			//Calculate Delta Time
 			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
-			//Set Window Title
-			NIKE_WINDOWS_SERVICE->getWindow()->setWindowTitle(NIKE_WINDOWS_SERVICE->getWindow()->getWindowTitle() +
-				" | " + NIKE_SCENES_SERVICE->getCurrSceneID() +
-				" | " + std::to_string(NIKE_WINDOWS_SERVICE->getCurrentFPS()) + " fps" +
-				" | " + std::to_string(NIKE_ECS_MANAGER->getEntitiesCount()) + " entities");
-
 			//Update all audio pending actions
 			getService<Audio::Service>()->getAudioSystem()->update();
 
@@ -166,29 +178,26 @@ namespace NIKE {
 			NIKE_SCENES_SERVICE->update();
 
 			//Render entity to mouse click
-			if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			//if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
-				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+			//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
-				for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-					Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-					Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
-				}
-			}
+			//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
+			//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+			//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
+			//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+			//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
+			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
+			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+			//	}
+			//}
 
 			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
 			//	cout << "TRUE" << endl;
 			//}
 
 			//Update all systems
-			if (!NIKE_IMGUI_SERVICE->getGamePaused()) {
-				NIKE_ECS_MANAGER->updateSystems();
-			}
-
+			NIKE_ECS_MANAGER->updateSystems();
 
 			//ImGui Render & Update
 			NIKE_IMGUI_SERVICE->update();

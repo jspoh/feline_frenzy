@@ -21,6 +21,7 @@
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/Imgui/sImgui.h"
+#include "Managers/Services/sMap.h"
 #include "Managers/Services/sUserInterface.h"
 
 //Include all components here
@@ -29,6 +30,7 @@
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
 #include "Components/cAnimation.h"
+#include "Components/cGameLogic.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL
@@ -132,6 +134,7 @@ namespace NIKE {
 #define NIKE_SERIALIZE_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Serialization::Service>()
 #define NIKE_DEBUG_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Debug::Service>()
 #define NIKE_IMGUI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::IMGUI::Service>()
+#define NIKE_MAP_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Map::Service>()
 #define NIKE_UI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::UI::Service>()
 
 //ECS manager for internal usage

@@ -15,11 +15,16 @@
 #include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
+#include "Components/cPathfinding.h"
+#include "Systems/GameLogic/sysLua.h"
 
 namespace NIKE {
 	namespace Physics {
 
-		class Manager : public System::ISystem, public Events::IEventListener<Physics::ChangePhysicsEvent> {
+		class Manager : 
+			public System::ISystem,
+			public Lua::ILuaBind,
+			public Events::IEventListener<Physics::ChangePhysicsEvent> {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
@@ -28,6 +33,9 @@ namespace NIKE {
 			//Collision sub system
 			std::unique_ptr<Collision::System> collision_system;
 
+			//Apply forces
+			void applyXForce(Entity::Type entity, float force);
+			void applyYForce(Entity::Type entity, float force);
 		public:
 			//Default Constructor
 			Manager() = default;
@@ -46,6 +54,9 @@ namespace NIKE {
 
 			//Update
 			void update() override;
+
+			//Register lua bindings
+			void registerLuaBindings(sol::state& lua_state) override;
 
 			//On change physics event
 			void onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) override;

@@ -70,7 +70,7 @@ namespace NIKE {
 			Vector2i curr_index;
 
 			//Constructor
-			Sprite() : sheet_size(), start_index(), end_index(), curr_index() {}
+			Sprite() : sheet_size(), start_index(), end_index(), curr_index{start_index} {}
 
 			//Arguement constructor
 			Sprite(Vector2i const& sheet_size, Vector2i const& start_index, Vector2i const& end_index)

@@ -105,10 +105,6 @@ namespace NIKE {
 				return "Render System";
 			}
 
-			unsigned int getTextureColorBuffer() const {
-				return texture_color_buffer;
-			}
-
 			/**
 			* update all object's xform
 			* */
