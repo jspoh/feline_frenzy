@@ -74,6 +74,7 @@ namespace NIKE
 		// To track if we need to show the popup
 		static bool open_entity_prefab_popup = false;
 		static bool delete_file_popup = false;
+		static bool delete_all_files_popup = false;
 		// Stores the selected prefab name
 		static std::string selected_prefab;
 
@@ -149,52 +150,61 @@ namespace NIKE
 		}
 		else if (asset_type == "Prefabs")
 		{
-			if (ImGui::Button("Clear all Prefabs files"))
-			{
-				if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getPrefabsPath()))
-				{
-					NIKE_ASSETS_SERVICE->loadPrefabFiles();
-				}
+			if (NIKE_ASSETS_SERVICE->getLoadedPrefabs().empty()) {
+				NIKE_ASSETS_SERVICE->loadPrefabFiles();
 			}
 
 			for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
 			{
-				const std::string& prefab_name = prefab.first;
 
-				if (ImGui::Selectable(prefab_name.c_str())) {
-					selected_prefab = prefab_name;
-					open_entity_prefab_popup = true;
-					ImGui::OpenPopup("Create Entity with Prefab");
-				}
-				else if (ImGui::Button(("Remove " + prefab.first).c_str())) {
+				std::string buttonLabel = "X##" + prefab.first;
+
+				if (ImGui::SmallButton(buttonLabel.c_str())) {
 					selected_file_path = prefab.first;
 					delete_file_popup = true;
 					ImGui::OpenPopup("Confirm Delete");
 				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Selectable(prefab.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+					selected_prefab = prefab.first;
+					open_entity_prefab_popup = true;
+					ImGui::OpenPopup("Create Entity with Prefab");
+				}
+
+				ImGui::Separator();
+			}
+
+			if (ImGui::Button("Clear all Prefabs files", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+			{
+				delete_all_files_popup = true;
+				ImGui::OpenPopup("Confirm Deleting All Files");
+
 			}
 
 			open_entity_prefab_popup = showCreateEntityPrefabPopUp(selected_prefab);
 			delete_file_popup = showDeleteFilePopup(selected_file_path, "Prefabs");
+			delete_all_files_popup = showDeleteAllFilesPopup("Prefabs");
 		}
 		else if (asset_type == "Levels") {
 			if (NIKE_ASSETS_SERVICE->getLevelsList().empty()) {
 				NIKE_ASSETS_SERVICE->loadScnFiles();
 			}
 
-			ImGui::SameLine();
-
-			if (ImGui::Button("Clear all Level files"))
-			{
-				if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getScenesPath()))
-				{
-					NIKE_ASSETS_SERVICE->loadScnFiles();
-				}
-			}
-
-			ImGui::Separator();
-
 			for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
-				if (ImGui::Selectable(level.first.c_str())) {
+
+
+				std::string buttonLabel = "X##" + level.first; // Small button has to have unqiue id in order to delete
+				if (ImGui::SmallButton(buttonLabel.c_str())) {
+					selected_file_path = level.first;
+					delete_file_popup = true;
+					ImGui::OpenPopup("Confirm Delete");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Selectable(level.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
 					selected_file_path = level.first;
 					NIKE_IMGUI_SERVICE->getSelectedEntityName() = "";
 
@@ -207,15 +217,18 @@ namespace NIKE
 					}
 				}
 
-				if (ImGui::Button(("Remove " + level.first).c_str())) {
-					selected_file_path = level.first;
-					delete_file_popup = true;
-					ImGui::OpenPopup("Confirm Delete");
-				}
-
 				ImGui::Separator();
+
+			}
+			ImGui::Spacing();
+			if (ImGui::Button("Clear all Level files", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+			{
+				delete_all_files_popup = true;
+				ImGui::OpenPopup("Confirm Deleting All Files");
+
 			}
 			delete_file_popup = showDeleteFilePopup(selected_file_path, "Levels");
+			delete_all_files_popup = showDeleteAllFilesPopup("Levels");
 		}
 		else if (asset_type == "Shaders")
 		{
