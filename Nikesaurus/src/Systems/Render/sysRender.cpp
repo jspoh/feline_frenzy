@@ -198,7 +198,8 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
-		if (!BATCHED_RENDERING) {
+		// !TODO: batched rendering for texture incomplete
+		if (BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -604,7 +605,7 @@ namespace NIKE {
 		}
 
 		batchRenderObject();		// at least 1 call to this is required every frame at the very end
-		batchRenderTextures();	// at least 1 call to this is required every frame at the very end
+		//batchRenderTextures();	// at least 1 call to this is required every frame at the very end
 
 		// render text last
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
