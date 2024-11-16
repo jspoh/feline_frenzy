@@ -103,6 +103,10 @@ namespace NIKE {
 		return component_manager->getEntityComponent(entity, type);
 	}
 
+	std::shared_ptr<void> Coordinator::Manager::getCopiedEntityComponent(Entity::Type entity, Component::Type type) {
+		return component_manager->getCopiedEntityComponent(entity, type);
+	}
+
 	void Coordinator::Manager::setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp) {
 		component_manager->setEntityComponent(entity, type, comp);
 	}
@@ -117,5 +121,9 @@ namespace NIKE {
 
 	std::unordered_map<std::string, Component::Type> Coordinator::Manager::getAllComponentTypes() const {
 		return component_manager->getAllComponentTypes();
+	}
+
+	size_t Coordinator::Manager::getComponentsCount() const {
+		return component_manager->getComponentsCount();
 	}
 }

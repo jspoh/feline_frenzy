@@ -62,6 +62,22 @@ namespace NIKE {
 		return component_arrays.at(component_string)->getEntityComponent(entity);
 	}
 
+	std::shared_ptr<void> Component::Manager::getCopiedEntityComponent(Entity::Type entity, Component::Type type) {
+		std::string component_string;
+		for (auto const& comp_type : component_types) {
+			if (comp_type.second == type) {
+				component_string = comp_type.first;
+				break;
+			}
+		}
+
+		if (component_string == "") {
+			throw std::runtime_error("Component not registered. Fetching component of entity failed.");
+		}
+
+		return component_arrays.at(component_string)->getCopiedEntityComponent(entity);
+	}
+
 	void Component::Manager::setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp) {
 		std::string component_string;
 		for (auto const& comp_type : component_types) {
@@ -128,5 +144,9 @@ namespace NIKE {
 
 	std::unordered_map<std::string, Component::Type> Component::Manager::getAllComponentTypes() const {
 		return component_types;
+	}
+
+	size_t Component::Manager::getComponentsCount() const {
+		return component_types.size();
 	}
 }

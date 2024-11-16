@@ -100,7 +100,6 @@ namespace NIKE {
 			//Get Editor State
 			bool getEditorState() const;
 
-
 			//Get Debug State
 			bool getDebugState() const;
 

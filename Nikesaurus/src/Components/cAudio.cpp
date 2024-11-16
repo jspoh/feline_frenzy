@@ -38,5 +38,8 @@ namespace NIKE {
 				comp.pitch = data.at("Pitch").get<float>();
 			}
 		);
+
+		//Register SFX for level editor UI
+
 	}
 }

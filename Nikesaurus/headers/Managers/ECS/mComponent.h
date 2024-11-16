@@ -245,6 +245,9 @@ namespace NIKE {
 			//Retrieve a void* to component based on component type
 			std::shared_ptr<void> getEntityComponent(Entity::Type entity, Component::Type type);
 
+			//Retrieve a copied void* to component based on component type
+			std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity, Component::Type type);
+
 			//Set entity component based on void* and comp type
 			void setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp);
 
@@ -286,6 +289,9 @@ namespace NIKE {
 
 			//Get all component types
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
+
+			//Get components count
+			size_t getComponentsCount() const;
 		};
 	}
 }

@@ -302,33 +302,35 @@ namespace NIKE {
 				Action create;
 
 				//Create a shared id for do & undo functions
-				std::shared_ptr<Entity::Type> shared_id = std::make_shared<Entity::Type>();
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
+
+				//If entity name is not provided (Create a default)
+				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
+				{
+					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
+				}
 
 				//Do Action
 				create.do_action = [&, shared_id]() {
 					//Creat new entity 
-					*shared_id = NIKE_ECS_MANAGER->createEntity(layer_id);
-
-					//If entity name is not provided (Create a default)
-					if (entity_name.empty())
-					{
-						snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", *shared_id);
-					}
+					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Save entity name into entities ref
-					entities_ref.insert({ *shared_id, entity_name });
+					entity_to_name.insert({ new_id, shared_id->c_str() });
+					name_to_entity.insert({ shared_id->c_str(), new_id });
 				};
 
 				//Undo Action
 				create.undo_action = [&, shared_id]() {
 
 					//Check if entity is still alive
-					if (NIKE_ECS_MANAGER->checkEntity(*shared_id)) {
+					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
-						NIKE_ECS_MANAGER->destroyEntity(*shared_id);
+						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
 						//Erase new entity ref
-						entities_ref.erase(*shared_id);
+						entity_to_name.erase(name_to_entity.at(shared_id->data()));
+						name_to_entity.erase(shared_id->data());
 					}
 				};
 
@@ -357,7 +359,7 @@ namespace NIKE {
 		return [this, popup_id]() {
 
 			//Confirm removal of entity
-			ImGui::Text("Are you sure you want to remove %s?", entities_ref.at(selected_entity).c_str());
+			ImGui::Text("Are you sure you want to remove %s?", entity_to_name.at(selected_entity).c_str());
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("Remove") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
@@ -366,51 +368,53 @@ namespace NIKE {
 				Action remove;
 
 				//Create a shared id for do & undo functions
-				std::shared_ptr<Entity::Type> shared_id = std::make_shared<Entity::Type>(selected_entity);
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_to_name.at(selected_entity));
 
 				//Get all entity comps for pass by value storage
 				auto comps = NIKE_ECS_MANAGER->getAllCopiedEntityComponents(selected_entity);
 				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
 				int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
-				std::string entity_ref = entities_ref.at(selected_entity);
 
 				//Setup undo action for remove
-				remove.undo_action = [&, shared_id, comps, comp_types, layer_id, entity_ref]() {
+				remove.undo_action = [&, shared_id, comps, comp_types, layer_id]() {
 
 					//Creat new entity 
-					*shared_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Add all the comps back
 					for (auto&& comp : comps) {
-						NIKE_ECS_MANAGER->addDefEntityComponent(*shared_id, comp_types.at(comp.first));
-						NIKE_ECS_MANAGER->setEntityComponent(*shared_id, comp_types.at(comp.first), comp.second);
+						NIKE_ECS_MANAGER->addDefEntityComponent(new_id, comp_types.at(comp.first));
+						NIKE_ECS_MANAGER->setEntityComponent(new_id, comp_types.at(comp.first), comp.second);
 					}
 
 					//Save entity name into entities ref
-					entities_ref.insert({ *shared_id, entity_ref });
+					entity_to_name.insert({ new_id, shared_id->c_str() });
+					name_to_entity.insert({ shared_id->c_str(), new_id });
 
 					//Update entities list
 					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
 
 					//Set selected entity back to old entity
-					selected_entity = *shared_id;
+					selected_entity = name_to_entity.at(shared_id->data());
 				};
 
 				//Setup action for removing entity
 				remove.do_action = [&, shared_id]() {
+
 					//Check if entity is still alive
-					if (NIKE_ECS_MANAGER->checkEntity(*shared_id)) {
-					//Destroy entity
-					NIKE_ECS_MANAGER->destroyEntity(*shared_id);
+					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+						//Destroy entity
+						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
-					//Remove selected entity ref
-					entities_ref.erase(*shared_id);
+						//Erase new entity ref
+						entity_to_name.erase(name_to_entity.at(shared_id->data()));
+						name_to_entity.erase(shared_id->data());
 
-					//Update entities list
-					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
+						//Update entities list
+						entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
 
-					//Set selected entity back to first entity
-					selected_entity = entities.empty() ? 0 : *entities.begin();
+						//Set selected entity back to first entity
+						selected_entity = entities.empty() ? 0 : *entities.begin();
 					}
 				};
 
@@ -449,32 +453,42 @@ namespace NIKE {
 				//Temporary clone action
 				Action clone;
 
-				//Clone selected entity 
-				Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(selected_entity);
+				//Create a shared id for do & undo functions
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
 
 				//If entity name is not provided (Create a default)
-				if (entity_name.empty())
+				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
 				{
-					snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", new_id);
+					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
 				}
 
-				//Undo Action
-				clone.undo_action = [&, new_id]() {
+				//Clone entity for capturing by value
+				Entity::Type clone_entity = selected_entity;
 
-					//Check if entity is still alive
-					if (NIKE_ECS_MANAGER->checkEntity(new_id)) {
-						//Destroy new entity
-						NIKE_ECS_MANAGER->destroyEntity(new_id);
+				//Do Action
+				clone.do_action = [&, shared_id, clone]() {
+					if (NIKE_ECS_MANAGER->checkEntity(clone_entity)) {
+						//Clone entity 
+						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
 
-						//Erase new entity ref
-						entities_ref.erase(new_id);
+						//Save entity name into entities ref
+						entity_to_name.insert({ new_id, shared_id->c_str() });
+						name_to_entity.insert({ shared_id->c_str(), new_id });
 					}
 				};
 
-				//Do Action
-				clone.do_action = [&]() {
-					//Save entity name into entities ref
-					entities_ref.insert({ new_id, entity_name });
+				//Undo Action
+				clone.undo_action = [&, shared_id]() {
+
+					//Check if entity is still alive
+					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+
+						//Erase new entity ref
+						entity_to_name.erase(name_to_entity.at(shared_id->data()));
+						name_to_entity.erase(shared_id->data());
+					}
 				};
 
 				//Execute create entity action
@@ -512,29 +526,33 @@ namespace NIKE {
 		entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
 
 		//Check if number of refs matches the active entities size
-		if (entities.size() != entities_ref.size()) {
+		if (entities.size() != entity_to_name.size()) {
 
 			//Iterate through all active entities
-			std::for_each(entities.begin(), entities.end(), 
-				[this](Entity::Type entity) {
+			unsigned int count = 0;
+			for (auto entity : entities) {
+				//Check if entity ref has already been added
+				if (entity_to_name.find(entity) == entity_to_name.end()) {
 
-					//Check if entity ref has already been added
-					if (entities_ref.find(entity) == entities_ref.end()) {
+					//Create identifier for entity
+					char entity_name[32];
+					snprintf(entity_name, sizeof(entity_name), "entity_%04d", count);
 
-						//Create identifier for entity
-						char entity_name[32];
-						snprintf(entity_name, sizeof(entity_name), "entity_%04d", entity);
+					//Add entity to BiMap
+					entity_to_name.insert({ entity, entity_name });
+					name_to_entity.insert({ entity_name, entity });
+				}
 
-						//Add entity to map of ref
-						entities_ref.insert({ entity, entity_name });
-					}
-				});
+				++count;
+			}
 
 			//Extra check for if entities were removed
-			if (entities.size() != entities_ref.size()) {
+			if (entities.size() != entity_to_name.size()) {
 
 				//Iterate through entities ref to check which entity has been removed
-				for (auto it = entities_ref.begin(); it != entities_ref.end();) {
+				auto it = entity_to_name.begin();
+				auto rit = name_to_entity.begin();
+				for (;it != entity_to_name.end();) {
 
 					//Find entity
 					auto active_it = entities.find(it->first);
@@ -542,9 +560,11 @@ namespace NIKE {
 					if (active_it == entities.end()) {
 
 						//Add entity to map of ref
-						it = entities_ref.erase(it);
+						it = entity_to_name.erase(it);
+						rit = name_to_entity.erase(rit);
 					}
 					else {
+						rit++;
 						it++;
 					}
 				}
@@ -556,7 +576,7 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		// Button to create an entity, which triggers the popup
-		if (ImGui::Button("Create Entity") && entities.size() < Entity::MAX) {
+		if (ImGui::Button("Create") && entities.size() < Entity::MAX) {
 			openPopUp("Create Entity");
 		}
 
@@ -564,15 +584,15 @@ namespace NIKE {
 		ImGui::SameLine();
 
 		// Button to remove an entity, which triggers the popup
-		if (ImGui::Button("Remove Entity") && (entities.find(selected_entity) != entities.end()) && !entities.empty()) {
+		if (ImGui::Button("Remove") && (entities.find(selected_entity) != entities.end()) && !entities.empty()) {
 			openPopUp("Remove Entity");
 		}
 
 		//Buttons Same Line
 		ImGui::SameLine();
 
-		// Button to remove an entity, which triggers the popup
-		if (ImGui::Button("Clone Entity") && (entities.find(selected_entity) != entities.end()) && entities.size() < Entity::MAX) {
+		// Button to clone an entity, which triggers the popup
+		if (ImGui::Button("Clone") && (entities.find(selected_entity) != entities.end()) && entities.size() < Entity::MAX) {
 			openPopUp("Clone Entity");
 		}
 
@@ -594,14 +614,14 @@ namespace NIKE {
 			for (auto entity : entities) {
 
 				//Check if entity is selected
-				bool selected = (entities.find(selected_entity) != entities.end()) && entities_ref.at(entity).c_str() == entities_ref.at(selected_entity).c_str();
+				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity).c_str() == entity_to_name.at(selected_entity).c_str();
 
 				//Show selectable
-				if (ImGui::Selectable(entities_ref.at(entity).c_str(), selected)) {
+				if (ImGui::Selectable(entity_to_name.at(entity).c_str(), selected)) {
 					selected_entity = entity;
 
 					//Get selected entity data
-					auto it = entities_ref.find(selected_entity);
+					auto it = entity_to_name.find(selected_entity);
 
 					//Dispatch new selected entity event
 					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SelectedEntityEvent>(it->first, it->second));
@@ -634,7 +654,7 @@ namespace NIKE {
 			ImGui::Spacing();
 
 			//Iterate over all registered components
-			for (const auto& component : NIKE_ECS_MANAGER->getAllComponentTypes()) {
+			for (const auto& component : comps) {
 
 				//Check if component already exists
 				if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, component.second))
@@ -692,6 +712,19 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::update() {
 
+		//Update components list
+		if (comps.size() != NIKE_ECS_MANAGER->getComponentsCount()) {
+
+			//Get updated components list
+			comps = NIKE_ECS_MANAGER->getAllComponentTypes();
+
+			//Init comp ui funcs with empty funcs
+			std::for_each(comps.begin(), comps.end(), [&](std::pair<std::string, Component::Type> const& comp) {
+				if (comps_ui.find(comp.second) == comps_ui.end()) {
+					comps_ui.insert({ comp.second, []() {} });
+				}
+			});
+		}
 	}
 
 	void LevelEditor::ComponentsPanel::render() {
@@ -713,6 +746,45 @@ namespace NIKE {
 			if (ImGui::Button("Add Component")) {
 				openPopUp("Add Component");
 			}
+
+			//Retrieve and display all registered component types
+			for (const auto& comp : comps) {
+
+				//Check if the component exists in the entity
+				if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, comp.second)) {
+
+					//Create a collapsible header for the component
+					if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
+
+						//Display Component UI
+						comps_ui.at(comp.second)();
+
+						//Remove component button
+						if (ImGui::Button(std::string("Remove Component##" + comp.first).c_str())) {
+							Action remove_comp;
+
+							//Values to copy
+							Component::Type comp_type_copy = comp.second;
+							Entity::Type entity_copy = selected_entity;
+							auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(selected_entity, comp_type_copy);
+
+							//Do Action
+							remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
+								NIKE_ECS_MANAGER->removeEntityComponent(entity_copy, comp_type_copy);
+							};
+
+							//Undo Action
+							remove_comp.undo_action = [&, entity_copy, comp_type_copy, comp_copy]() {
+								NIKE_ECS_MANAGER->addDefEntityComponent(entity_copy, comp_type_copy);
+								NIKE_ECS_MANAGER->setEntityComponent(entity_copy, comp_type_copy, comp_copy);
+							};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_comp));
+						}
+					}
+				}
+			}
 		}
 		else {
 			ImGui::Text("No active entities.");
@@ -722,5 +794,13 @@ namespace NIKE {
 		renderPopUps();
 
 		ImGui::End();
+	}
+
+	void LevelEditor::ComponentsPanel::registerCompUIFunc(Component::Type comp_type, std::function<void()> comp_func) {
+		if (comps_ui.find(comp_type) != comps_ui.end()) {
+			throw std::runtime_error("Component UI function already registered");
+		}
+
+		comps_ui.insert({ comp_type, comp_func });
 	}
 }

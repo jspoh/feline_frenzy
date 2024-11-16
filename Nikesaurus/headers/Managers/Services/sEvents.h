@@ -52,7 +52,7 @@ namespace NIKE {
 			//Default virtual destructor
 			virtual ~IEventListener() = default;
 
-			//Virtual execute event
+			//Virtual execute event( !!! Only to be called by the events service )
 			void execute(std::shared_ptr<IEvent> event) override {
 				auto casted_event = std::dynamic_pointer_cast<T>(event);
 				if (casted_event)

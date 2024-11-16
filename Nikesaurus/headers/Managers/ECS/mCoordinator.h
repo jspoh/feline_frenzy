@@ -127,6 +127,8 @@ namespace NIKE {
 
 			std::shared_ptr<void> getEntityComponent(Entity::Type entity, Component::Type type);
 
+			std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity, Component::Type type);
+
 			void setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp);
 
 			template<typename T>
@@ -152,6 +154,8 @@ namespace NIKE {
 			std::unordered_map<std::string, std::shared_ptr<void>> getAllCopiedEntityComponents(Entity::Type entity) const;
 
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
+
+			size_t getComponentsCount() const;
 
 			/*****************************************************************//**
 			* System Methods

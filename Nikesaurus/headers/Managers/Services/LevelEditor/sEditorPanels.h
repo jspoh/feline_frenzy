@@ -162,8 +162,9 @@ namespace NIKE {
 			//Set of active entities
 			std::set<Entity::Type> entities;
 
-			//Unordered map of entities ref
-			std::unordered_map<Entity::Type, std::string> entities_ref;
+			//BI-Mapping of entity type to string * vice versa
+			std::unordered_map<Entity::Type, std::string> entity_to_name;
+			std::unordered_map<std::string, Entity::Type> name_to_entity;
 
 			//Selected entity
 			Entity::Type selected_entity;
@@ -211,6 +212,12 @@ namespace NIKE {
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
+			//Components Map
+			std::unordered_map<std::string, Component::Type> comps;
+
+			//Components to UI Function map
+			std::unordered_map<Component::Type, std::function<void()>> comps_ui;
+
 		public:
 			ComponentsPanel() : selected_entity{ UINT16_MAX }, selected_entity_ref{ "" } {}
 			~ComponentsPanel() = default;
@@ -228,6 +235,9 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			//Add component UI function
+			void registerCompUIFunc(Component::Type comp_type, std::function<void()> comp_func);
 		};
 	}
 }
