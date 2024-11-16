@@ -48,6 +48,9 @@ namespace NIKE {
 			//Toggle Full Screen Mode
 			virtual void setFullScreen(int value) = 0;
 
+			//Get full screen mode
+			virtual bool getFullScreen() const = 0;
+
 			//Setup Event Callbacks
 			virtual void setupEventCallbacks() = 0;
 
@@ -124,6 +127,8 @@ namespace NIKE {
 			int queryWindowMode(int mode) override;
 
 			void setFullScreen(int value) override;
+
+			bool getFullScreen() const override;
 
 			void setupEventCallbacks() override;
 

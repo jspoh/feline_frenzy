@@ -114,7 +114,7 @@ namespace NIKE {
 			void removePanel(const std::string& panel_id);
 
 			//Execute action made
-			void executeAction(Action const& action);
+			void executeAction(Action&& action);
 		};
 	}
 }

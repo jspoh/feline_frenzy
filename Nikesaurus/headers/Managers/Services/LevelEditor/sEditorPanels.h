@@ -174,6 +174,9 @@ namespace NIKE {
 			//Remove Entity popup
 			std::function<void()> removeEntityPopUp(std::string const& popup_id);
 
+			//Clone entity popup
+			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
+
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX } {}
 			~EntitiesPanel() = default;

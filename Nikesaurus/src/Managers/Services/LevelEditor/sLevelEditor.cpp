@@ -407,7 +407,7 @@ namespace NIKE {
 		panels_map.erase(it);
 	}
 
-	void LevelEditor::Service::executeAction(Action const& action) {
-		action_manager->executeAction(action);
+	void LevelEditor::Service::executeAction(Action&& action) {
+		action_manager->executeAction(std::move(action));
 	}
 }

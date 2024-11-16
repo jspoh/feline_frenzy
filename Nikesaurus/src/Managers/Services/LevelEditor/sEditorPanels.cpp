@@ -236,9 +236,12 @@ namespace NIKE {
 	void LevelEditor::GameWindowPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Actual Window Size
+		Vector2i win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
 		//Configure viewport size
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-		float aspect_ratio = 16.0f / 9.0f;
+		float aspect_ratio = (float)win_size.x / (float)win_size.y;
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
 		if (viewport_height > window_size.y) {
@@ -251,9 +254,6 @@ namespace NIKE {
 
 		//Get the position of the game window top-left corner
 		ImVec2 gameWindowPos = ImGui::GetCursorScreenPos();
-
-		//Actual Window Size
-		Vector2i win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
 		//Scale Factor
 		Vector2f scale{ (float)win_size.x / viewport_width, (float)win_size.y / viewport_height };
@@ -298,39 +298,42 @@ namespace NIKE {
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
-				//Temporary remove action
+				//Temporary create action
 				Action create;
 
-				//Creat new entity 
-				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+				//Create a shared id for do & undo functions
+				std::shared_ptr<Entity::Type> shared_id = std::make_shared<Entity::Type>();
 
-				//If entity name is not provided (Create a default)
-				if (entity_name.empty())
-				{
-					snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", new_id);
-				}
+				//Do Action
+				create.do_action = [&, shared_id]() {
+					//Creat new entity 
+					*shared_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+
+					//If entity name is not provided (Create a default)
+					if (entity_name.empty())
+					{
+						snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", *shared_id);
+					}
+
+					//Save entity name into entities ref
+					entities_ref.insert({ *shared_id, entity_name });
+				};
 
 				//Undo Action
-				create.undo_action = [&, new_id]() {
+				create.undo_action = [&, shared_id]() {
 
 					//Check if entity is still alive
-					if (NIKE_ECS_MANAGER->checkEntity(new_id)) {
+					if (NIKE_ECS_MANAGER->checkEntity(*shared_id)) {
 						//Destroy new entity
-						NIKE_ECS_MANAGER->destroyEntity(new_id);
+						NIKE_ECS_MANAGER->destroyEntity(*shared_id);
 
 						//Erase new entity ref
-						entities_ref.erase(new_id);
+						entities_ref.erase(*shared_id);
 					}
 				};
 
-				//Do Action
-				create.do_action = [&]() {
-					//Save entity name into entities ref
-					entities_ref.insert({ new_id, entity_name });
-				};
-
 				//Execute create entity action
-				NIKE_LVLEDITOR_SERVICE->executeAction(create);
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
 
 				//Reset entity name
 				entity_name.clear();
@@ -362,6 +365,9 @@ namespace NIKE {
 				//Temporary remove action
 				Action remove;
 
+				//Create a shared id for do & undo functions
+				std::shared_ptr<Entity::Type> shared_id = std::make_shared<Entity::Type>(selected_entity);
+
 				//Get all entity comps for pass by value storage
 				auto comps = NIKE_ECS_MANAGER->getAllCopiedEntityComponents(selected_entity);
 				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
@@ -369,44 +375,47 @@ namespace NIKE {
 				std::string entity_ref = entities_ref.at(selected_entity);
 
 				//Setup undo action for remove
-				remove.undo_action = [&, comps, comp_types, layer_id, entity_ref]() {
+				remove.undo_action = [&, shared_id, comps, comp_types, layer_id, entity_ref]() {
 
 					//Creat new entity 
-					Entity::Type new_entity = NIKE_ECS_MANAGER->createEntity(layer_id);
+					*shared_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Add all the comps back
 					for (auto&& comp : comps) {
-						NIKE_ECS_MANAGER->addDefEntityComponent(new_entity, comp_types.at(comp.first));
-						NIKE_ECS_MANAGER->setEntityComponent(new_entity, comp_types.at(comp.first), comp.second);
+						NIKE_ECS_MANAGER->addDefEntityComponent(*shared_id, comp_types.at(comp.first));
+						NIKE_ECS_MANAGER->setEntityComponent(*shared_id, comp_types.at(comp.first), comp.second);
 					}
 
 					//Save entity name into entities ref
-					entities_ref.insert({ new_entity, entity_ref });
+					entities_ref.insert({ *shared_id, entity_ref });
 
 					//Update entities list
 					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
 
 					//Set selected entity back to old entity
-					selected_entity = new_entity;
+					selected_entity = *shared_id;
 				};
 
 				//Setup action for removing entity
-				remove.do_action = [&, entity_ref]() {
+				remove.do_action = [&, shared_id]() {
+					//Check if entity is still alive
+					if (NIKE_ECS_MANAGER->checkEntity(*shared_id)) {
 					//Destroy entity
-					NIKE_ECS_MANAGER->destroyEntity(selected_entity);
+					NIKE_ECS_MANAGER->destroyEntity(*shared_id);
 
 					//Remove selected entity ref
-					entities_ref.erase(selected_entity);
+					entities_ref.erase(*shared_id);
 
 					//Update entities list
 					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
 
 					//Set selected entity back to first entity
 					selected_entity = entities.empty() ? 0 : *entities.begin();
+					}
 				};
 
 				//Execute remove action
-				NIKE_LVLEDITOR_SERVICE->executeAction(remove);
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove));
 
 				//Close popup
 				closePopUp(popup_id);
@@ -423,11 +432,78 @@ namespace NIKE {
 		};
 	}
 
+	std::function<void()> LevelEditor::EntitiesPanel::cloneEntityPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string entity_name;
+
+			//Get entity text
+			ImGui::Text("Enter a new name for the cloned entity:");
+			if (ImGui::InputText("##Entity Clone Name", entity_name.data(), entity_name.capacity() + 1)) {
+				entity_name.resize(strlen(entity_name.c_str()));
+			}
+
+			//If enter or clone button is pressed
+			if (ImGui::Button("Clone") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+				//Temporary clone action
+				Action clone;
+
+				//Clone selected entity 
+				Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(selected_entity);
+
+				//If entity name is not provided (Create a default)
+				if (entity_name.empty())
+				{
+					snprintf(entity_name.data(), entity_name.capacity() + 1, "entity_%04d", new_id);
+				}
+
+				//Undo Action
+				clone.undo_action = [&, new_id]() {
+
+					//Check if entity is still alive
+					if (NIKE_ECS_MANAGER->checkEntity(new_id)) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(new_id);
+
+						//Erase new entity ref
+						entities_ref.erase(new_id);
+					}
+				};
+
+				//Do Action
+				clone.do_action = [&]() {
+					//Save entity name into entities ref
+					entities_ref.insert({ new_id, entity_name });
+				};
+
+				//Execute create entity action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(clone));
+
+				//Reset entity name
+				entity_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel creating new entity
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Register popups
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
+		registerPopUp("Clone Entity", cloneEntityPopUp("Clone Entity"));
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
@@ -488,8 +564,16 @@ namespace NIKE {
 		ImGui::SameLine();
 
 		// Button to remove an entity, which triggers the popup
-		if (ImGui::Button("Remove Entity") && !entities.empty()) {
+		if (ImGui::Button("Remove Entity") && (entities.find(selected_entity) != entities.end()) && !entities.empty()) {
 			openPopUp("Remove Entity");
+		}
+
+		//Buttons Same Line
+		ImGui::SameLine();
+
+		// Button to remove an entity, which triggers the popup
+		if (ImGui::Button("Clone Entity") && (entities.find(selected_entity) != entities.end()) && entities.size() < Entity::MAX) {
+			openPopUp("Clone Entity");
 		}
 
 		//Add Spacing
@@ -559,19 +643,25 @@ namespace NIKE {
 				//Display each component as a button
 				if (ImGui::Button(component.first.c_str())) {
 
-					////Temporary remove action
-					//Action remove;
+					//Temporary add component action
+					Action add_comp;
 
-					////Setup undo action for remove
-					//remove.undo_action = []() {
-					//};
+					//Setup undo action for add component
+					add_comp.undo_action = [=]() {
+						if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, component.second)) {
+							NIKE_ECS_MANAGER->removeEntityComponent(selected_entity, component.second);
+						}
+					};
 
-					////Setup action for removing entity
-					//remove.do_action = []() {
-					//};
+					//Setup do action for add component
+					add_comp.do_action = [=]() {
 
-					////Execute remove action
-					//NIKE_LVLEDITOR_SERVICE->executeAction(remove);
+						//Add default comp to entity
+						NIKE_ECS_MANAGER->addDefEntityComponent(selected_entity, component.second);
+					};
+
+					//Execute add component action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(add_comp));
 
 					//Close popup
 					closePopUp(popup_id);
@@ -608,7 +698,7 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		//Check if an entity has been selected
-		if (!selected_entity_ref.empty()) {
+		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
 
 			//Print out selected entity string ref
 			ImGui::Text("Selected Entity: %s", selected_entity_ref.c_str());

@@ -41,7 +41,10 @@ namespace NIKE {
 			void redo();
 
 			//Excute action
-			void executeAction(Action const& action);
+			void executeAction(Action&& action);
+
+			//Clear Undo & Redo Stack
+			void clearStacks();
 		};
 
 	}

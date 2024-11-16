@@ -151,6 +151,10 @@ namespace NIKE {
 		}
 	}
 
+	bool Windows::NIKEWindow::getFullScreen() const {
+		return b_full_screen;
+	}
+
 	void Windows::NIKEWindow::setupEventCallbacks() {
 		glfwSetFramebufferSizeCallback(ptr_window, Events::Service::fbsize_cb);
 		glfwSetKeyCallback(ptr_window, Events::Service::key_cb);

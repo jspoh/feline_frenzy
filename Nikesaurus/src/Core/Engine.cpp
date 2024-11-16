@@ -205,6 +205,10 @@ namespace NIKE {
 			//	}
 			//}
 
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ENTER)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			}
+
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
