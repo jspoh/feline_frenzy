@@ -148,11 +148,6 @@ namespace NIKE {
 		b_show_grid = flag;
 	}
 
-	void IMGUI::Service::setSelectedEntityName(std::string const& name)
-	{
-		selected_entity_name = name;
-	}
-
 	void IMGUI::Service::setTileSize(float size)
 	{
 		tile_size = size;
