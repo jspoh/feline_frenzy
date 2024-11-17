@@ -610,8 +610,13 @@ namespace NIKE {
 							}
 
 							// Show pop ups
-							show_error_popup = ShowErrorPopup();
-							show_save_popup = ShowSaveConfirmationPopup();
+							if (show_error_popup) {
+								show_error_popup = ShowErrorPopup();  
+							}
+
+							if (show_save_popup) {
+								show_save_popup = ShowSaveConfirmationPopup();  
+							}
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))

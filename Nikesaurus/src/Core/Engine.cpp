@@ -152,9 +152,9 @@ namespace NIKE {
 
 		////Init Level Editor
 		//NIKE_LVLEDITOR_SERVICE->init();
-
+		 
 		//Init UI
-		NIKE_UI_SERVICE->init();
+		// NIKE_UI_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();
@@ -219,7 +219,7 @@ namespace NIKE {
 			NIKE_IMGUI_SERVICE->update();
 
 			////Render Level Editor
-			//NIKE_LVLEDITOR_SERVICE->render();
+			// NIKE_LVLEDITOR_SERVICE->render();
 		
 			//Control FPS
 			NIKE_WINDOWS_SERVICE->controlFPS();

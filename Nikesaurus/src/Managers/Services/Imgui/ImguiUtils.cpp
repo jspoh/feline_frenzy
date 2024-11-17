@@ -287,31 +287,41 @@ namespace NIKE
 	void handleEntitySelectionAndDrag(const Vector2f& main_mouse) {
 		// Select entity if mouse click on entity
 		if (ImGui::IsMouseClicked(0)) {
+			bool entity_found = false;
 			for (auto& entity : NIKE_IMGUI_SERVICE->getEntityRef()) {
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity.second))
 				{
 					auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second).value().get();
 					if (isMouseOverEntity(main_mouse, transform_comp)) {
+						NIKE_IMGUI_SERVICE->setSelectedEntityName(entity.first);
 						entity_select = entity.second;
+						entity_found = true;
 						break;
 					}
 				}
 
 			}
+			if (!entity_found) {
+				//NIKE_IMGUI_SERVICE->setSelectedEntityName("");  
+				entity_select = 0;  
+			}
 		}
 
 		// Update entity's position when mouse is moving and the mouse is held down
 		if (ImGui::IsMouseDown(0) && entity_select != 0) {
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity_select))
-			{
-				auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity_select).value().get();
-				transform_comp.position = main_mouse;
+			std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
+			if (!selected_entity_name.empty()) {
+				Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity_name);
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
+					auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get();
+					transform_comp.position = main_mouse;  
+				}
 			}
 		}
 
 		// Release the selected entity when the mouse button is released
 		if (ImGui::IsMouseReleased(0)) {
-			entity_select = 0;
+			// entity_select = 0;
 		}
 	}
 

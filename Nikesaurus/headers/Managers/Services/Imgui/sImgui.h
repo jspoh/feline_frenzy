@@ -72,6 +72,7 @@ namespace NIKE {
 			void setDebugMode(bool flag);
 			void setTileSize(float size);
 			void setShowGird(bool flag);
+			void setSelectedEntityName(std::string const& name);
 
 			// Gettors
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
