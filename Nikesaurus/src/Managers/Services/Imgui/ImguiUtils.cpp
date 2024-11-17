@@ -323,6 +323,27 @@ namespace NIKE
 		if (ImGui::IsMouseReleased(0)) {
 			// entity_select = 0;
 		}
+
+		// For deleting entity when delete key triggered
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_DELETE)) {
+			std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
+
+			if (!selected_entity_name.empty() && NIKE_IMGUI_SERVICE->checkEntityExist(selected_entity_name)) {
+				// Retrieve the selected entity from the name
+				Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity_name);
+
+				// Remove the entity from the reference map
+				NIKE_IMGUI_SERVICE->getEntityRef().erase(selected_entity_name);
+
+				// Destroy the entity from the ECS manager
+				NIKE_ECS_MANAGER->destroyEntity(entity);
+
+				// Reset selected entity name and select state
+				NIKE_IMGUI_SERVICE->setSelectedEntityName("");
+				entity_select = 0;  
+			}
+		}
+
 	}
 
 

@@ -1121,6 +1121,8 @@ namespace NIKE {
 		// This function will handle the dragging and dropping in the viewport window
 		handleEntitySelectionAndDrag(main_mouse);
 
+
+
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		// Begin drag-and-drop target to create a new entity with the dropped texture
