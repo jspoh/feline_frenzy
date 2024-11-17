@@ -22,11 +22,27 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class NIKE_API Service {
+		//File Drop Event
+		struct NIKE_API FileDropEvent : public Events::IEvent {
+			int count;
+			const char** paths;
+
+			FileDropEvent(int count, const char** paths)
+				: count{ count }, paths{ paths } {}
+		};
+
+		class NIKE_API Service 
+			: public Events::IEventListener<FileDropEvent> 
+
+		{
+
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
 			void operator=(Service const& copy) = delete;
+
+			// On drop event
+			void onEvent(std::shared_ptr<FileDropEvent> event) override;
 
 			/*****************************************************************//**
 			* Font Private Members

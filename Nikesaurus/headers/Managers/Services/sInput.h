@@ -60,22 +60,12 @@ namespace NIKE {
 				: offset{ offset } {}
 		};
 
-		//File Drop Event
-		struct NIKE_API FileDropEvent : public Events::IEvent {
-			int count;
-			const char** paths;
-
-			FileDropEvent(int count, const char** paths)
-				: count{ count }, paths{ paths } {}
-		};
-
 		//Input manager for input polling
 		class NIKE_API Service 
 			:	public Events::IEventListener<KeyEvent>,
 				public Events::IEventListener<MouseBtnEvent>,
 				public Events::IEventListener<MouseMovedEvent>,
-				public Events::IEventListener<MouseScrollEvent>,
-				public Events::IEventListener<FileDropEvent>
+				public Events::IEventListener<MouseScrollEvent>
 		{
 		private:
 
@@ -88,7 +78,6 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<MouseBtnEvent> event) override;
 			void onEvent(std::shared_ptr<MouseMovedEvent> event) override;
 			void onEvent(std::shared_ptr<MouseScrollEvent> event) override;
-			void onEvent(std::shared_ptr<FileDropEvent> event) override;
 
 			//Data structure of state
 			struct EventStates {

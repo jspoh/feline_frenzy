@@ -139,7 +139,7 @@ namespace NIKE {
 		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for drop files event
-		getService<Events::Service>()->addEventListeners<Input::FileDropEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
 
 		//Setup Audio
 		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
