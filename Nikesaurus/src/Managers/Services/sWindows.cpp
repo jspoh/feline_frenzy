@@ -161,6 +161,7 @@ namespace NIKE {
 		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
+	    glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value) {
