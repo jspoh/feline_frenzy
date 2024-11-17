@@ -437,7 +437,7 @@ namespace NIKE {
 							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity).value().get();
 
 							ImGui::DragInt("Number of Animations (If set to 0, infinite number of animations)", &animate_base_comp.animations_to_complete, 1);
-							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .1f);
+							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .001f);
 							ImGui::Text("Animation timer: %f", &animate_base_comp.timer);
 							ImGui::Text("Completed Animations: %d", animate_base_comp.completed_animations);
 

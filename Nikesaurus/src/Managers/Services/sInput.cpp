@@ -70,6 +70,15 @@ namespace NIKE {
 		}
 	}
 
+	void Input::Service::onEvent(std::shared_ptr<FileDropEvent> event) {
+		int fileCount = event->count;
+		const char** filePaths = event->paths;
+
+		for (int i = 0; i < fileCount; ++i) {
+			NIKEE_CORE_INFO(filePaths[i]);
+		}
+	}
+
 	void Input::Service::onEvent(std::shared_ptr<MouseMovedEvent> event) {
 		mouse.pos = event->pos;
 	}

@@ -41,4 +41,9 @@ namespace NIKE {
 	void Events::Service::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseScrollEvent>(Vector2f(static_cast<float>(xoffset), static_cast<float>(yoffset))));
 	}
+
+	void Events::Service::dropfile_cb([[maybe_unsued]] GLFWwindow* window, int count, const char** paths) {
+
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::FileDropEvent>(count, paths));
+	}
 }
