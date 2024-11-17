@@ -595,11 +595,11 @@ namespace NIKE {
 		else if (asset_type == "Audio") {
 
 			// Load new audio
-			for (const auto& audio_paths : std::filesystem::directory_iterator(getAudioPath())) {
+			for (const auto& audio_paths : std::filesystem::recursive_directory_iterator(getAudioPath())) {
 				if (hasValidAudioExtension(audio_paths)) {
 					std::string file_name = audio_paths.path().filename().string();
 
-					//string variables
+					// Extract file name without leading backslashes or extension
 					size_t start = file_name.find_first_not_of('\\');
 					size_t size = file_name.find_first_of('.', start) - start;
 
