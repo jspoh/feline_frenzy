@@ -72,12 +72,6 @@ namespace NIKE {
 
 			//Map of editor panels
 			std::unordered_map<std::string, std::shared_ptr<IPanel>> panels_map;
-
-			//Main panel
-			std::shared_ptr<MainPanel> main_panel;
-
-			//Game panel
-			std::shared_ptr<GameWindowPanel> game_panel;
 		public:
 			Service() : b_editor_active{ false } {}
 			~Service() = default;
@@ -109,11 +103,20 @@ namespace NIKE {
 			//Add panel ( added into map based on IPanel getName() )
 			void addPanel(std::shared_ptr<IPanel> panel);
 
-			//Remove panel ( retrieved into map based on IPanel getName() )
-			void removePanel(const std::string& panel_id);
+			//Remove panel ( remove map based on IPanel getName() )
+			void removePanel(std::string const& panel_id);
+
+			//Get panel ( remove map based on IPanel getName() )
+			std::shared_ptr<IPanel> getPanel(std::string const& panel_id);
 
 			//Execute action made
 			void executeAction(Action&& action);
+
+			//Register UI component function
+			template<typename T>
+			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
+				std::dynamic_pointer_cast<ComponentsPanel>(panels_map.at(ComponentsPanel::getStaticName()))->registerCompUIFunc<T>(comp_func);
+			}
 		};
 	}
 }

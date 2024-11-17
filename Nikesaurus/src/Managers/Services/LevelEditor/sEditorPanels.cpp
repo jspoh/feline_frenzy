@@ -21,7 +21,22 @@ namespace NIKE {
 	}
 
 	void LevelEditor::IPanel::registerPopUp(std::string const& popup_id, std::function<void()> popup_func) {
-		popups[popup_id] = PopUp{ false, popup_func };
+		//Check if popup has already been registered
+		if (popups.find(popup_id) != popups.end()) {
+			throw std::runtime_error("Popup already registered");
+		}
+
+		//Emplace popup
+		popups.emplace(popup_id, PopUp{ false, popup_func });
+	}
+
+	void LevelEditor::IPanel::editPopUp(std::string const& popup_id, std::function<void()> popup_func) {
+		//Check if popup has been registered
+		if (popups.find(popup_id) == popups.end()) {
+			throw std::runtime_error("Popup not yet registered");
+		}
+
+		popups.at(popup_id) = PopUp{ false, popup_func };
 	}
 
 	void LevelEditor::IPanel::openPopUp(std::string const& popup_id) {
@@ -72,17 +87,17 @@ namespace NIKE {
 		return b_popup_showing;
 	}
 
-	std::function<void()> LevelEditor::IPanel::errorPopUp(std::string const& error_id, std::string const& error_msg) {
-		return [this, error_id, error_msg]() {
+	std::function<void()> LevelEditor::IPanel::defPopUp(std::string const& id, std::shared_ptr<std::string> msg) {
+		return [this, id, msg]() {
 			//Show error message
-			ImGui::Text("%s", error_msg.c_str());
+			ImGui::Text("%s", msg->c_str());
 
 			//Add Spacing
 			ImGui::Spacing();
 
 			//OK button to close the popup
 			if (ImGui::Button("OK")) {
-				closePopUp(error_id);
+				closePopUp(id);
 			}
 		};
 	}
@@ -316,8 +331,8 @@ namespace NIKE {
 					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Save entity name into entities ref
-					entity_to_name.insert({ new_id, shared_id->c_str() });
-					name_to_entity.insert({ shared_id->c_str(), new_id });
+					entity_to_name.emplace(new_id, shared_id->c_str());
+					name_to_entity.emplace(shared_id->c_str(), new_id);
 				};
 
 				//Undo Action
@@ -337,6 +352,9 @@ namespace NIKE {
 				//Execute create entity action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
 
+				//Reset layer id
+				layer_id = 0;
+
 				//Reset entity name
 				entity_name.clear();
 
@@ -348,6 +366,12 @@ namespace NIKE {
 
 			//Cancel creating new entity
 			if (ImGui::Button("Cancel")) {
+
+				//Reset layer id
+				layer_id = 0;
+
+				//Reset entity name
+				entity_name.clear();
 
 				//Close popup
 				closePopUp(popup_id);
@@ -388,8 +412,8 @@ namespace NIKE {
 					}
 
 					//Save entity name into entities ref
-					entity_to_name.insert({ new_id, shared_id->c_str() });
-					name_to_entity.insert({ shared_id->c_str(), new_id });
+					entity_to_name.emplace(new_id, shared_id->c_str());
+					name_to_entity.emplace(shared_id->c_str(), new_id);
 
 					//Update entities list
 					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
@@ -472,8 +496,8 @@ namespace NIKE {
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
 
 						//Save entity name into entities ref
-						entity_to_name.insert({ new_id, shared_id->c_str() });
-						name_to_entity.insert({ shared_id->c_str(), new_id });
+						entity_to_name.emplace(new_id, shared_id->c_str());
+						name_to_entity.emplace(shared_id->c_str(), new_id);
 					}
 				};
 
@@ -505,6 +529,9 @@ namespace NIKE {
 
 			//Cancel creating new entity
 			if (ImGui::Button("Cancel")) {
+
+				//Reset entity name
+				entity_name.clear();
 
 				//Close popup
 				closePopUp(popup_id);
@@ -539,8 +566,8 @@ namespace NIKE {
 					snprintf(entity_name, sizeof(entity_name), "entity_%04d", count);
 
 					//Add entity to BiMap
-					entity_to_name.insert({ entity, entity_name });
-					name_to_entity.insert({ entity_name, entity });
+					entity_to_name.emplace(entity, entity_name);
+					name_to_entity.emplace(entity_name, entity);
 				}
 
 				++count;
@@ -708,6 +735,8 @@ namespace NIKE {
 
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
+		error_msg = std::make_shared<std::string>("Comp Error");
+		registerPopUp("Error", defPopUp("Error", error_msg));
 	}
 
 	void LevelEditor::ComponentsPanel::update() {
@@ -720,8 +749,8 @@ namespace NIKE {
 
 			//Init comp ui funcs with empty funcs
 			std::for_each(comps.begin(), comps.end(), [&](std::pair<std::string, Component::Type> const& comp) {
-				if (comps_ui.find(comp.second) == comps_ui.end()) {
-					comps_ui.insert({ comp.second, []() {} });
+				if (comps_ui.find(comp.first) == comps_ui.end()) {
+					comps_ui.emplace(comp.first, [](ComponentsPanel&, void*) {});
 				}
 			});
 		}
@@ -742,46 +771,51 @@ namespace NIKE {
 			//Print out selected entity layer id
 			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(selected_entity));
 
+			//Add Spacing
+			ImGui::Spacing();
+
 			//Add component popup
 			if (ImGui::Button("Add Component")) {
 				openPopUp("Add Component");
 			}
 
+			//Add Spacing
+			ImGui::Spacing();
+
 			//Retrieve and display all registered component types
-			for (const auto& comp : comps) {
+			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity)) {
 
-				//Check if the component exists in the entity
-				if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, comp.second)) {
+				//Create a collapsible header for the component
+				if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
 
-					//Create a collapsible header for the component
-					if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
+					//Display Component UI
+					comps_ui.at(comp.first)(*this, comp.second.get());
 
-						//Display Component UI
-						comps_ui.at(comp.second)();
+					//Add Spacing
+					ImGui::Spacing();
 
-						//Remove component button
-						if (ImGui::Button(std::string("Remove Component##" + comp.first).c_str())) {
-							Action remove_comp;
+					//Remove component button
+					if (ImGui::Button(std::string("Remove Component##" + comp.first).c_str())) {
+						Action remove_comp;
 
-							//Values to copy
-							Component::Type comp_type_copy = comp.second;
-							Entity::Type entity_copy = selected_entity;
-							auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(selected_entity, comp_type_copy);
+						//Values to copy
+						Component::Type comp_type_copy = comps.at(comp.first);
+						Entity::Type entity_copy = selected_entity;
+						auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(selected_entity, comp_type_copy);
 
-							//Do Action
-							remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
-								NIKE_ECS_MANAGER->removeEntityComponent(entity_copy, comp_type_copy);
-							};
+						//Do Action
+						remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
+							NIKE_ECS_MANAGER->removeEntityComponent(entity_copy, comp_type_copy);
+						};
 
-							//Undo Action
-							remove_comp.undo_action = [&, entity_copy, comp_type_copy, comp_copy]() {
-								NIKE_ECS_MANAGER->addDefEntityComponent(entity_copy, comp_type_copy);
-								NIKE_ECS_MANAGER->setEntityComponent(entity_copy, comp_type_copy, comp_copy);
-							};
+						//Undo Action
+						remove_comp.undo_action = [&, entity_copy, comp_type_copy, comp_copy]() {
+							NIKE_ECS_MANAGER->addDefEntityComponent(entity_copy, comp_type_copy);
+							NIKE_ECS_MANAGER->setEntityComponent(entity_copy, comp_type_copy, comp_copy);
+						};
 
-							//Execute action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_comp));
-						}
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_comp));
 					}
 				}
 			}
@@ -796,11 +830,7 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void LevelEditor::ComponentsPanel::registerCompUIFunc(Component::Type comp_type, std::function<void()> comp_func) {
-		if (comps_ui.find(comp_type) != comps_ui.end()) {
-			throw std::runtime_error("Component UI function already registered");
-		}
-
-		comps_ui.insert({ comp_type, comp_func });
+	void LevelEditor::ComponentsPanel::setPopUpErrorMsg(std::string const& msg) {
+		error_msg->assign(msg);
 	}
 }

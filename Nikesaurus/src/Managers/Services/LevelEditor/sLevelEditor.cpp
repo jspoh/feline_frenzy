@@ -181,6 +181,9 @@ namespace NIKE {
 			io.MousePos.x = event->pos.x;
 			io.MousePos.y = event->pos.y;
 
+			//Game game panel functions
+			auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
+
 			//Check if current mouse pos is within game window
 			if (game_panel->isMouseInWindow() && !game_panel->checkPopUpShowing()) {
 				event->pos = game_panel->getRelativeMousePos();
@@ -293,24 +296,24 @@ namespace NIKE {
 		action_manager = std::make_unique<ActionManager>();
 
 		//Add main panel
-		main_panel = std::make_shared<MainPanel>();
+		auto main_panel = std::make_shared<MainPanel>();
 		panels.push_back(main_panel);
-		panels_map.insert({ main_panel->getName(), main_panel });
+		panels_map.emplace(main_panel->getName(), main_panel);
 
 		//Add game window panel
-		game_panel = std::make_shared<GameWindowPanel>();
+		auto game_panel = std::make_shared<GameWindowPanel>();
 		panels.push_back(game_panel);
-		panels_map.insert({ game_panel->getName(), game_panel });
+		panels_map.emplace(game_panel->getName(), game_panel);
 
 		//Add entities management panel
 		auto entities_panel = std::make_shared<EntitiesPanel>();
 		panels.push_back(entities_panel);
-		panels_map.insert({ entities_panel->getName(), entities_panel });
+		panels_map.emplace(entities_panel->getName(), entities_panel);
 
 		//Add components management panel
 		auto components_panel = std::make_shared<ComponentsPanel>();
 		panels.push_back(components_panel);
-		panels_map.insert({ components_panel->getName(), components_panel });
+		panels_map.emplace(components_panel->getName(), components_panel);
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
@@ -373,11 +376,11 @@ namespace NIKE {
 	}
 
 	bool LevelEditor::Service::getDebugState() const {
-		return main_panel->getDebugState();
+		return std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getDebugState();
 	}
 
 	bool LevelEditor::Service::getGameState() const {
-		return main_panel->getGameState();
+		return std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getGameState();
 	}
 
 	void LevelEditor::Service::addPanel(std::shared_ptr<LevelEditor::IPanel> panel) {
@@ -387,7 +390,7 @@ namespace NIKE {
 		}
 
 		panels.push_back(panel);
-		panels_map.insert({ panel->getName(), panel });
+		panels_map.emplace(panel->getName(), panel);
 	}
 
 	void LevelEditor::Service::removePanel(std::string const& panel_id) {
@@ -405,6 +408,15 @@ namespace NIKE {
 		}
 		//Remove from map
 		panels_map.erase(it);
+	}
+
+	std::shared_ptr<LevelEditor::IPanel> LevelEditor::Service::getPanel(std::string const& panel_id) {
+		auto it = panels_map.find(panel_id);
+		if (it == panels_map.end()) {
+			throw std::runtime_error("Panel doest not exist.");
+		}
+
+		return panels_map.at(panel_id);
 	}
 
 	void LevelEditor::Service::executeAction(Action&& action) {

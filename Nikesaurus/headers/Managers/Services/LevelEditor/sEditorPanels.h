@@ -51,6 +51,9 @@ namespace NIKE {
 			//Register new popup
 			void registerPopUp(std::string const& popup_id, std::function<void()> popup_func);
 
+			//Edit registered popup
+			void editPopUp(std::string const& popup_id, std::function<void()> popup_func);
+
 			//Open popup
 			void openPopUp(std::string const& popup_id);
 
@@ -63,8 +66,8 @@ namespace NIKE {
 			//Check if popup is showing
 			static bool checkPopUpShowing();
 
-			//Error Popup
-			std::function<void()> errorPopUp(std::string const& error_id, std::string const& error_msg);
+			//Default Popup
+			std::function<void()> defPopUp(std::string const& id, std::shared_ptr<std::string> msg);
 		};
 
 		//Main Panel ( Docking )
@@ -91,6 +94,11 @@ namespace NIKE {
 
 			//Panel Name
 			std::string getName() const override {
+				return "NIKE Level Editor";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
 				return "NIKE Level Editor";
 			}
 
@@ -129,6 +137,11 @@ namespace NIKE {
 			//Panel Name
 			std::string getName() const override {
 				return "Game Viewport";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return  "Game Viewport";
 			}
 
 			//Get relative mouse position
@@ -212,11 +225,14 @@ namespace NIKE {
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
+			//Component setting error message ( Usage: Editing error popup message )
+			std::shared_ptr<std::string> error_msg;
+
 			//Components Map
 			std::unordered_map<std::string, Component::Type> comps;
 
 			//Components to UI Function map
-			std::unordered_map<Component::Type, std::function<void()>> comps_ui;
+			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>> comps_ui;
 
 		public:
 			ComponentsPanel() : selected_entity{ UINT16_MAX }, selected_entity_ref{ "" } {}
@@ -224,6 +240,11 @@ namespace NIKE {
 
 			//Panel Name
 			std::string getName() const override {
+				return "Components Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
 				return "Components Management";
 			}
 
@@ -236,8 +257,18 @@ namespace NIKE {
 			//Render
 			void render() override;
 
+			//Set error message for popup
+			void setPopUpErrorMsg(std::string const& msg);
+
 			//Add component UI function
-			void registerCompUIFunc(Component::Type comp_type, std::function<void()> comp_func);
+			template<typename T>
+			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
+				if (comps_ui.find(Utility::convertTypeString(typeid(T).name())) != comps_ui.end()) {
+					throw std::runtime_error("Component UI function already registered");
+				}
+
+				comps_ui.emplace(Utility::convertTypeString(typeid(T).name()), [comp_func](ComponentsPanel& comp_panel, void* comp) { comp_func(comp_panel, *static_cast<T*>(comp)); });
+			}
 		};
 	}
 }
