@@ -27,13 +27,55 @@ namespace NIKE {
 				return	{
 						{ "Position", comp.position.toJson() },
 						{ "Height", comp.height },
-						};
+				};
 			},
 
 			//Deserialize
 			[](Render::Cam& comp, nlohmann::json const& data) {
 				comp.position.fromJson(data.at("Position"));
 				comp.height = data.at("Height").get<float>();
+			}
+		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Cam& comp) {
+				ImGui::Text("Edit Camera variables");
+
+				// For cam height
+				{
+					//Position before change
+					static float before_change;
+
+					//Drag position
+					if (comp.height <= 0.0f) {
+						comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+					}
+					ImGui::DragFloat("Camera Height", &comp.height, 0.1f);
+
+					//Check if position has begun editing
+					if (ImGui::IsItemActivated()) {
+						before_change = comp.height;
+					}
+
+					//Check if position has finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_height;
+
+						//Change pos do action
+						change_height.do_action = [&, height = comp.height]() {
+							comp.height = height;
+							};
+
+						//Change pos undo action
+						change_height.undo_action = [&, height = before_change]() {
+							comp.height = height;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_height));
+					}
+
+				}
 			}
 		);
 
@@ -48,7 +90,7 @@ namespace NIKE {
 						{ "Scale", comp.scale },
 						{ "Size", comp.size.toJson() },
 						{ "Origin", static_cast<int>(comp.origin) }
-						};
+				};
 			},
 
 			//Deserialize
