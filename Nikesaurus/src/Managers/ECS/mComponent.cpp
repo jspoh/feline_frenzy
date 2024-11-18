@@ -104,6 +104,38 @@ namespace NIKE {
 		return component_types.at(type);
 	}
 
+	size_t Component::Manager::getComponentEntitiesCount(Component::Type type) {
+		std::string component_string;
+		for (auto const& comp_type : component_types) {
+			if (comp_type.second == type) {
+				component_string = comp_type.first;
+				break;
+			}
+		}
+
+		if (component_string == "") {
+			throw std::runtime_error("Component not registered. Fetching component of entity failed.");
+		}
+
+		return component_arrays.at(component_string)->getComponentEntitiesCount();
+	}
+
+	std::set<Entity::Type> Component::Manager::getAllComponentEntities(Component::Type type) {
+		std::string component_string;
+		for (auto const& comp_type : component_types) {
+			if (comp_type.second == type) {
+				component_string = comp_type.first;
+				break;
+			}
+		}
+
+		if (component_string == "") {
+			throw std::runtime_error("Component not registered. Fetching component of entity failed.");
+		}
+
+		return component_arrays.at(component_string)->getComponentEntities();
+	}
+
 	void Component::Manager::cloneEntity(Entity::Type clone, Entity::Type copy) {
 		for (auto& c_array : component_arrays) {
 			c_array.second->cloneEntity(clone, copy);

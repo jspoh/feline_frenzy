@@ -118,7 +118,7 @@ namespace NIKE {
 
 			NIKEWindow(Vector2i window_size, std::string window_title);
 
-			NIKEWindow(std::string const& file_path);
+			NIKEWindow(nlohmann::json const& config);
 
 			GLFWwindow* getWindowPtr() const;
 

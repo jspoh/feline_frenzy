@@ -16,30 +16,7 @@ NullStream nullstream;
 namespace NIKE {
 	namespace Debug
 	{
-		// DEPRECIATED
-		//void Service::logCrash()
-		//{
-		//	std::ofstream log_file("src/Services/Services/crash_log.txt", std::ios::app);
-		//	if (!log_file.is_open())
-		//	{
-		//		NIKEE_CORE_ERROR("file not found");
-		//	}
-		//	// Get current log crash time
-		//	std::chrono::system_clock::time_point current_time = std::chrono::system_clock::now();
-		//	// Convert to time_t for printing as calendar time
-		//	std::time_t crash_time = std::chrono::system_clock::to_time_t(current_time);
-
-		//	struct tm time_info;
-		//	localtime_s(&time_info, &crash_time);
-
-		//	log_file << "Crash occurred at: " << std::put_time(&time_info, "%Y-%m-%d %H:%M:%S") << endl;
-
-		//	// Close after logging
-		//	log_file.close();
-		//}
-
-
-		void Service::updateSystemPercentage(double gl_time, std::vector<double> const& sys_time, std::vector<std::shared_ptr<System::ISystem>> sys)
+		void Service::updateSystemPercentage(std::vector<double> const& sys_time, std::vector<std::shared_ptr<System::ISystem>> sys)
 		{
 			if (sys_time.empty()) {
 				NIKEE_CORE_INFO("No active systems to report on.");
@@ -56,14 +33,21 @@ namespace NIKE {
 				if (sys[i]->getActiveState())
 				{
 					// Calculate the percentage of the total time for each active system
-					double percentage = (sys_time[i] / gl_time) * 100.0;
-					system_percentages.push_back({ sys[i]->getSysName(), percentage });
+					system_percentages.push_back({ sys[i]->getSysName(), sys_time[i] });
 
 					// Accumulate total system time
-					total_system_time += percentage;
+					total_system_time += sys_time[i];
 				}
 			}
 
+		}
+
+		std::vector<std::pair<std::string, double>> Service::getSystemPercentages() const {
+			return system_percentages;
+		}
+
+		double Service::getTotalSystemTime() const {
+			return total_system_time;
 		}
 	}
 
