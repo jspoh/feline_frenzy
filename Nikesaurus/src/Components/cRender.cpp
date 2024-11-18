@@ -258,10 +258,32 @@ namespace NIKE {
 					static const char* origin_names[] = {"CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
 					// Hold the current selection and the previous value
 					static NIKE::Render::TextOrigin before_select_origin;
+					static int previous_origin = static_cast<int>(comp.origin);
 					int current_origin = static_cast<int>(comp.origin);
 					// Combo returns one bool check
 					if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
-						comp.origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
+						NIKE::Render::TextOrigin new_origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
+						if (new_origin != comp.origin) {
+							// Save action
+							LevelEditor::Action save_text;
+							save_text.do_action = [&, origin = new_origin]() {
+								comp.origin = origin;
+								cout << "Save action: Changed to " << origin_names[current_origin] << endl;
+								};
+
+							// Undo action
+							save_text.undo_action = [&, origin = before_select_origin]() {
+								comp.origin = origin;
+								cout << "Undo action: Reverted to " << origin_names[static_cast<int>(origin)] << endl;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+
+							// Update the previous value
+							before_select_origin = comp.origin;
+							// Apply the new origin
+							comp.origin = new_origin; 
+						}
 					}
 				}
 			}
