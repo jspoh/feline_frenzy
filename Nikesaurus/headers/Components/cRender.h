@@ -70,10 +70,10 @@ namespace NIKE {
 
 		enum class TextOrigin {
 			CENTER = 0,
-			TOP,
 			BOTTOM,
-			RIGHT,
-			LEFT
+			TOP,
+			LEFT,
+			RIGHT
 		};
 
 		struct Text {

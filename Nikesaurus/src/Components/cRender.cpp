@@ -112,10 +112,6 @@ namespace NIKE {
 				static std::string font_id;
 				static std::string text_input;
 
-				// Display a dropdown to select resolution
-				// For now this hard code it 
-				static const char* origin_names[] = { "CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT" };
-
 				//Initialization of string inputs upon collapsible shown
 				if (ImGui::IsItemActivated()) {
 					font_id = comp.font_id;
@@ -263,55 +259,9 @@ namespace NIKE {
 
 				// For Text Origin
 				{
-					// Variable to hold the selected resolution
-					static NIKE::Render::TextOrigin before_select_origin;
-					static bool is_editing = false;
-
-					int current_origin = static_cast<int>(comp.origin);
-					static int previous_origin = static_cast<int>(comp.origin); // Track the previous selected origin
-
-					// Combo box for selecting text origin
-					if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
-						comp.origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
-						//cout << "Combo selection changed to: " << origin_names[current_origin] << endl;
-					}
 					
-					//Check if begin editing
-					if (!is_editing && ImGui::IsItemActivated()) {
-						//cout << "Combo activated. Before: " << origin_names[static_cast<int>(before_select_origin)] << endl;
-						before_select_origin = comp.origin;
-						previous_origin = static_cast<int>(comp.origin);
-						is_editing = true;
-					}
-
-					//Check if finished editing
-					if (is_editing && !ImGui::IsItemActive()) {
-						// Reset the editing flag after the combo box is deactivated
-						is_editing = false;
-						// Action only occurs if the origin has actually changed
-						LevelEditor::Action change_origin;
-						//cout << "Combo deactivated. After: " << origin_names[current_origin] << endl;
-
-						// Action to apply the new value
-						change_origin.do_action = [&, origin = comp.origin]() {
-							comp.origin = origin;
-							//cout << "Redo action: Changed to " << origin_names[static_cast<int>(origin)] << endl;
-							};
-
-						// Action to revert to the previous value
-						change_origin.undo_action = [&, origin = before_select_origin]() {
-							comp.origin = origin;
-							//cout << "Undo action: Reverted to " << origin_names[static_cast<int>(origin)] << endl;
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_origin));
-					}
-
+					
 				}
-
-				// Display the selected text origin
-				// ImGui::Text("Current Text Origin: %s", origin_names[current_origin]);
 			}
 		);
 
