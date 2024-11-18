@@ -271,29 +271,98 @@ namespace NIKE
 		}
 	}
 
-	bool isMouseOverEntity(const Vector2f& mouse_pos, const Transform::Transform& transform) {
-		// Assuming the entity has a size component (e.g., width and height) for hit detection
-		float half_width = transform.scale.x / 2.0f;
-		float half_height = transform.scale.y / 2.0f;
+	bool isMouseOverEntity(const Entity::Type& entity) {
 
-		// Check if mouse is within the entity's bounds
-		return mouse_pos.x >= (transform.position.x - half_width) &&
-			mouse_pos.x <= (transform.position.x + half_width) &&
-			mouse_pos.y >= (transform.position.y - half_height) &&
-			mouse_pos.y <= (transform.position.y + half_height);
+		////Get bounding box
+		//auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		//if (!e_transform_comp.has_value()) return false;
+		//auto const& e_transform = e_transform_comp.value().get();
 
+		////Vertices
+		//std::vector<Vector2f> vert;
+
+		////If Shape
+		//auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		//if (e_shape_comp.has_value()) {
+		//	auto const& e_shape = e_shape_comp.value().get();
+
+		//	auto getVertices = [e_shape]() {
+		//		std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
+
+		//		std::vector<Vector2f> vert;
+		//		for (const Assets::Vertex& v : vertices) {
+		//			vert.push_back(v.pos);
+		//		}
+		//		return vert;
+		//		};
+
+		//	vert = getVertices();
+		//	for (auto& point : vert) {
+		//		point.x *= e_transform.scale.x;
+		//		point.y *= e_transform.scale.y;
+		//		point.x += e_transform.position.x;
+		//		point.y -= e_transform.position.y;
+
+		//		//Translate model to world coordinates
+		//		point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
+		//		point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
+		//	}
+		//}
+		//else {
+		//	auto getVertices = []() {
+		//		std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
+
+		//		std::vector<Vector2f> vert;
+		//		for (const Assets::Vertex& v : vertices) {
+		//			vert.push_back(v.pos);
+		//		}
+		//		return vert;
+		//		};
+
+		//	for (auto& point : vert) {
+		//		point.x *= e_transform.scale.x;
+		//		point.y *= e_transform.scale.y;
+		//		point.x += e_transform.position.x;
+		//		point.y -= e_transform.position.y;
+
+		//		//Translate model to world coordinates
+		//		point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
+		//		point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
+		//	}
+		//}
+
+		////Calculate vertices intersection with mouse
+		//int intersectCount = 0;
+
+		//for (size_t i = 0; i < vert.size(); i++) {
+		//	Vector2f v1 = vert[i];
+		//	Vector2f v2 = vert[(i + 1) % vert.size()];  // Wrap to the start for the last edge
+
+		//	// Check if the ray intersects the edge
+		//	bool isEdgeCrossing = ((v1.y > mouse.y) != (v2.y > mouse.y));
+		//	if (isEdgeCrossing) {
+		//		float intersectionX = v1.x + (mouse.y - v1.y) * (v2.x - v1.x) / (v2.y - v1.y);
+		//		if (mouse.x < intersectionX) {
+		//			intersectCount++;
+		//		}
+		//	}
+		//}
+
+		//// If intersect count is odd, the point is inside
+		//return (intersectCount % 2) == 1;
+		return false;
 	}
 
 	void handleEntitySelectionAndDrag(const Vector2f& main_mouse) {
-		// Select entity if mouse click on entity
+
 		if (ImGui::IsMouseClicked(0)) {
 			bool entity_found = false;
 			for (auto& entity : NIKE_IMGUI_SERVICE->getEntityRef()) {
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity.second))
 				{
-					auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second).value().get();
-					if (isMouseOverEntity(main_mouse, transform_comp)) {
+					if (isMouseOverEntity(entity.second)) {
 						NIKE_IMGUI_SERVICE->setSelectedEntityName(entity.first);
+						cout << "in" << endl;
 						entity_select = entity.second;
 						entity_found = true;
 						break;
@@ -302,7 +371,7 @@ namespace NIKE
 
 			}
 			if (!entity_found) {
-				//NIKE_IMGUI_SERVICE->setSelectedEntityName("");  
+				NIKE_IMGUI_SERVICE->setSelectedEntityName("");  
 				entity_select = 0;  
 			}
 		}
@@ -321,7 +390,7 @@ namespace NIKE
 
 		// Release the selected entity when the mouse button is released
 		if (ImGui::IsMouseReleased(0)) {
-			// entity_select = 0;
+			//entity_select = 0;
 		}
 
 		// For deleting entity when delete key triggered

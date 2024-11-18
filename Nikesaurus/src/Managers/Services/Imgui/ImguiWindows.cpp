@@ -1074,13 +1074,15 @@ namespace NIKE {
 		ImGui::Begin("Game Viewport");
 
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-
-		float aspect_ratio = 16.f / 9.f;
 		
+		//Actual Window Size
+		Vector2i size_win = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		//Configure viewport size
+		float aspect_ratio = (float)size_win.x / (float)size_win.y;
 
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
-
 		if (viewport_height > window_size.y) {
 			viewport_height = window_size.y;
 			viewport_width = window_size.y * aspect_ratio;
@@ -1088,9 +1090,17 @@ namespace NIKE {
 
 		Vector2f viewport_size{viewport_width, viewport_height};
 
-		ImTextureID textureID = (ImTextureID)tex_id;
-		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
-		ImVec2 uv1(1.0f, 0.0f); // Top-right
+		//Get mouse input
+		ImGuiIO& io = ImGui::GetIO();
+
+		//Get the position of the game window top-left corner
+		ImVec2 game_window_pos = ImGui::GetCursorScreenPos();
+
+		//Scale Factor
+		Vector2f scale{ (float)size_win.x / viewport_width, (float)size_win.y / viewport_height };
+
+		//Calculate mouse position relative to the game window
+		Vector2f mouse = { (io.MousePos.x - game_window_pos.x) * scale.x, (io.MousePos.y - game_window_pos.y) * scale.y };
 
 		// Dispatch window viewport events
 		static Vector2f win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
@@ -1104,25 +1114,14 @@ namespace NIKE {
 			dispatch = false;
 		}
 
-		// Normalise mouse pos to viewport imgui
-		ImVec2 mouse_pos = ImGui::GetMousePos();
-		ImVec2 scalar = { (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / window_size.x), (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / window_size.y) };
-		mouse_pos.x -= win_pos.x;
-		mouse_pos.y -= win_pos.y;
-		mouse_pos.x -= (viewport_width / 2.0f);
-		mouse_pos.y -= (viewport_height / 2.0f);
-		mouse_pos.y = -mouse_pos.y;
-		mouse_pos.x *= scalar.x;
-		mouse_pos.y *= scalar.y;
-
-		Vector2f main_mouse{ mouse_pos.x , mouse_pos.y };
-
 
 		// This function will handle the dragging and dropping in the viewport window
-		handleEntitySelectionAndDrag(main_mouse);
+		// handleEntitySelectionAndDrag(mouse);
 
 
-
+		ImTextureID textureID = (ImTextureID)tex_id;
+		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
+		ImVec2 uv1(1.0f, 0.0f); // Top-right
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		// Begin drag-and-drop target to create a new entity with the dropped texture
@@ -1145,11 +1144,8 @@ namespace NIKE {
 				// Texture size is in vec2i, hence this casting
 				Vector2f def_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.x), static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.y) };
 
-				// Convert to own vector
-				Vector2f own_mouse{mouse_pos.x , mouse_pos.y};
-
 				// Add a Transform component to the new entity with the calculated mouse position and random size
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(new_entity, Transform::Transform(own_mouse, def_size, 0.f));
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(new_entity, Transform::Transform(mouse, def_size, 0.f));
 
 				// Add a Texture component to the new entity with the specified texture ID and default color
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(new_entity, Render::Texture(new_texture_id, { 1.0f, 1.0f, 1.0f, 1.0f }));

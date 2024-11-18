@@ -66,7 +66,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<ChangeBtnTxtRatio> event) override;
 
 			//Button hover check
-			bool buttonHovered(Entity::Type entity);
+			bool buttonHovered(Entity::Type entity) const;
 
 			//Button hovering container
 			std::unordered_map<std::string, std::pair<Transform::Transform, bool>> hover_container;
