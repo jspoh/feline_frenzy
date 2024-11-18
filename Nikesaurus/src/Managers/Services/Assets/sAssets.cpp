@@ -61,9 +61,21 @@ namespace NIKE {
 		for (int i = 0; i < file_count; ++i) {
 			std::filesystem::path src_file_path { file_paths[i] };
 
-			if (valid_tex_ext.find(src_file_path.extension().string()) != valid_tex_ext.end()) {
+			// Makes sure extension isnt caps sensitive
+			std::string ext = src_file_path.extension().string();
+			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+			if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
 				std::filesystem::path tgt_file_path = assets_dir / "textures" / src_file_path.filename();
-				std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
+
+				try {
+					std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
+					NIKEE_CORE_INFO("File {} successfully copied into assets/textures", file_paths[i]);
+				}
+				catch (const std::filesystem::filesystem_error& e) {
+					NIKEE_CORE_ERROR("ERROR: Failed to copy {}: {}", file_paths[i], e.what());
+				}
+
 				NIKEE_CORE_INFO("File {} successfully copied into assets/textures", file_paths[i]);
 
 				// Check if texture exists
@@ -78,7 +90,7 @@ namespace NIKE {
 				
 			}
 			else {
-				NIKEE_CORE_ERROR("ERROR: Unsupported File Type");
+				NIKEE_CORE_ERROR("ERROR: Unsupported File Type for file: {}", file_paths[i]);
 			}
 		}
 

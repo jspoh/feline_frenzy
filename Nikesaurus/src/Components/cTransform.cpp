@@ -36,108 +36,108 @@ namespace NIKE {
 		);
 
 		//Register transform for level editor UI
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Transform>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Transform& comp) {
+		//NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Transform>(
+		//	[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Transform& comp) {
 
-				//Transform text
-				ImGui::Text("Edit Transform Variables:");
+		//		//Transform text
+		//		ImGui::Text("Edit Transform Variables:");
 
-				//Edit Position
-				{
-					//Position before change
-					static Vector2f pos_before_change;
+		//		//Edit Position
+		//		{
+		//			//Position before change
+		//			static Vector2f pos_before_change;
 
-					//Drag position
-					ImGui::DragFloat2("Position", &comp.position.x, 0.1f);
+		//			//Drag position
+		//			ImGui::DragFloat2("Position", &comp.position.x, 0.1f);
 
-					//Check if position has begun editing
-					if (ImGui::IsItemActivated()) {
-						pos_before_change = comp.position;
-					}
+		//			//Check if position has begun editing
+		//			if (ImGui::IsItemActivated()) {
+		//				pos_before_change = comp.position;
+		//			}
 
-					//Check if position has finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_pos;
+		//			//Check if position has finished editing
+		//			if (ImGui::IsItemDeactivatedAfterEdit()) {
+		//				LevelEditor::Action change_pos;
 
-						//Change pos do action
-						change_pos.do_action = [&, pos = comp.position]() {
-							comp.position = pos;
-							};
+		//				//Change pos do action
+		//				change_pos.do_action = [&, pos = comp.position]() {
+		//					comp.position = pos;
+		//					};
 
-						//Change pos undo action
-						change_pos.undo_action = [&, pos = pos_before_change]() {
-							comp.position = pos;
-							};
+		//				//Change pos undo action
+		//				change_pos.undo_action = [&, pos = pos_before_change]() {
+		//					comp.position = pos;
+		//					};
 
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pos));
-					}
-				}
+		//				//Execute action
+		//				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pos));
+		//			}
+		//		}
 
-				//Edit Scale
-				{
-					//Scale before change
-					static Vector2f scale_before_change;
+		//		//Edit Scale
+		//		{
+		//			//Scale before change
+		//			static Vector2f scale_before_change;
 
-					//Change scale
-					ImGui::DragFloat2("Scale", &comp.scale.x, 0.1f);
+		//			//Change scale
+		//			ImGui::DragFloat2("Scale", &comp.scale.x, 0.1f);
 
-					//Check if scale has beguin editing
-					if (ImGui::IsItemActivated()) {
-						scale_before_change = comp.scale;
-					}
+		//			//Check if scale has beguin editing
+		//			if (ImGui::IsItemActivated()) {
+		//				scale_before_change = comp.scale;
+		//			}
 
-					//Check if scale has finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_scale;
+		//			//Check if scale has finished editing
+		//			if (ImGui::IsItemDeactivatedAfterEdit()) {
+		//				LevelEditor::Action change_scale;
 
-						//Change scale do action
-						change_scale.do_action = [&, scale = comp.scale]() {
-							comp.scale = scale;
-							};
+		//				//Change scale do action
+		//				change_scale.do_action = [&, scale = comp.scale]() {
+		//					comp.scale = scale;
+		//					};
 
-						//Change scale undo action
-						change_scale.undo_action = [&, scale = scale_before_change]() {
-							comp.scale = scale;
-							};
+		//				//Change scale undo action
+		//				change_scale.undo_action = [&, scale = scale_before_change]() {
+		//					comp.scale = scale;
+		//					};
 
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_scale));
-					}
-				}
+		//				//Execute action
+		//				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_scale));
+		//			}
+		//		}
 
-				//Edit Rotation
-				{
-					//Rotation before change
-					static float rotation_before_change;
+		//		//Edit Rotation
+		//		{
+		//			//Rotation before change
+		//			static float rotation_before_change;
 
-					//Change rotation
-					ImGui::DragFloat("Rotation", &comp.rotation, 0.1f, -360.f, 360.f);
+		//			//Change rotation
+		//			ImGui::DragFloat("Rotation", &comp.rotation, 0.1f, -360.f, 360.f);
 
-					//Check if rotation has begun editing
-					if (ImGui::IsItemActivated()) {
-						rotation_before_change = comp.rotation;
-					}
+		//			//Check if rotation has begun editing
+		//			if (ImGui::IsItemActivated()) {
+		//				rotation_before_change = comp.rotation;
+		//			}
 
-					//Check if rotation has finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_rotation;
+		//			//Check if rotation has finished editing
+		//			if (ImGui::IsItemDeactivatedAfterEdit()) {
+		//				LevelEditor::Action change_rotation;
 
-						//Change rotation do action
-						change_rotation.do_action = [&, rotation = comp.rotation]() {
-							comp.rotation = rotation;
-							};
+		//				//Change rotation do action
+		//				change_rotation.do_action = [&, rotation = comp.rotation]() {
+		//					comp.rotation = rotation;
+		//					};
 
-						//Change rotation undo action
-						change_rotation.undo_action = [&, rotation = rotation_before_change]() {
-							comp.rotation = rotation;
-							};
+		//				//Change rotation undo action
+		//				change_rotation.undo_action = [&, rotation = rotation_before_change]() {
+		//					comp.rotation = rotation;
+		//					};
 
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
-					}
-				}
-			}
-		);
+		//				//Execute action
+		//				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
+		//			}
+		//		}
+		//	}
+		//);
 	}
 }
