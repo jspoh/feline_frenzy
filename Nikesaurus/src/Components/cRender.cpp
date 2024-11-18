@@ -119,7 +119,7 @@ namespace NIKE {
 					// Before change
 					static float before_change;
 
-					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f, EPSILON, 500.f);
+					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f, EPSILON);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -145,9 +145,6 @@ namespace NIKE {
 					}
 
 				}
-
-				ImGui::Text((std::string("Text Size X: ") + std::to_string(comp.size.x)).c_str());
-				ImGui::Text((std::string("Text Size Y: ") + std::to_string(comp.size.y)).c_str());
 
 				// For Text color
 				{
@@ -183,6 +180,12 @@ namespace NIKE {
 
 				// For Text font
 				{
+					// When init only, not everytime
+					if (!comp.font_id.empty() && font_id.empty())
+					{
+						font_id = comp.font_id;
+					}
+
 					ImGui::Text("Enter Font (wihtout the ttf):");
 					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 10)) {
 						font_id.resize(strlen(font_id.c_str()));
@@ -221,7 +224,13 @@ namespace NIKE {
 
 
 				// For Text input
-				{
+				{	
+					// When init only, not everytime
+					//if (!comp.text.empty() && text_input.empty())
+					//{
+					//	text_input = comp.text;
+					//}
+
 					ImGui::Text("Enter text:");
 					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
 						text_input.resize(strlen(text_input.c_str()));
@@ -233,20 +242,20 @@ namespace NIKE {
 					if (ImGui::Button("Save##TextInput")) {
 						LevelEditor::Action save_text;
 
-						// Capture the current value of comp.text and text_input
+						// Capture the current value of comp.text 
 						std::string before_change_text = comp.text;
 						std::string before_change_input = text_input;
 
 						//Save action
-						save_text.do_action = [&, text = text_input]() {
+						save_text.do_action = [&, text = before_change_input]() {
 							comp.text = text;
-							text_input = comp.text;
+							text_input = text;
 							};
 
 						//Undo action
-						save_text.undo_action = [&, text = comp.text]() {
+						save_text.undo_action = [&, text = before_change_text]() {
 							comp.text = text;
-							text_input = comp.text;
+							text_input = text;
 							};
 
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
@@ -268,13 +277,11 @@ namespace NIKE {
 							LevelEditor::Action save_text;
 							save_text.do_action = [&, origin = new_origin]() {
 								comp.origin = origin;
-								cout << "Save action: Changed to " << origin_names[current_origin] << endl;
 								};
 
 							// Undo action
 							save_text.undo_action = [&, origin = before_select_origin]() {
 								comp.origin = origin;
-								cout << "Undo action: Reverted to " << origin_names[static_cast<int>(origin)] << endl;
 								};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
