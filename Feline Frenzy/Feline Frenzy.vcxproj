@@ -78,7 +78,9 @@
       <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s  /r  /y  /q
-xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q</Command>
+xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q
+rm -r -Force "$(SolutionDir)installer\GAMEDIRECTORY\*"
+xcopy "$(OutDir)*" "$(SolutionDir)installer\GAMEDIRECTORY\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -108,7 +110,9 @@ xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q<
       <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s  /r  /y  /q
-xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q</Command>
+xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q
+rm -r -Force "$(SolutionDir)installer\GAMEDIRECTORY\*"
+xcopy "$(OutDir)*" "$(SolutionDir)installer\GAMEDIRECTORY\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
