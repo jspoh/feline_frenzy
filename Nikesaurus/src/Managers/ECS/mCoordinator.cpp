@@ -111,6 +111,14 @@ namespace NIKE {
 		component_manager->setEntityComponent(entity, type, comp);
 	}
 
+	size_t Coordinator::Manager::getComponentEntitiesCount(Component::Type comp_type) {
+		return component_manager->getComponentEntitiesCount(comp_type);
+	}
+
+	std::set<Entity::Type> Coordinator::Manager::getAllComponentEntities(Component::Type comp_type) {
+		return component_manager->getAllComponentEntities(comp_type);
+	}
+
 	std::unordered_map<std::string, std::shared_ptr<void>> Coordinator::Manager::getAllEntityComponents(Entity::Type entity) const {
 		return component_manager->getAllEntityComponents(entity);
 	}

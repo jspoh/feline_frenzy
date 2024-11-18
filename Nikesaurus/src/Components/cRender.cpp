@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
  * \date   October 2024
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -28,12 +28,14 @@ namespace NIKE {
 						{ "Position", comp.position.toJson() },
 						{ "Height", comp.height },
 				};
+						{ "Zoom", comp.zoom },
+						};
 			},
 
 			//Deserialize
 			[](Render::Cam& comp, nlohmann::json const& data) {
 				comp.position.fromJson(data.at("Position"));
-				comp.height = data.at("Height").get<float>();
+				comp.zoom = data.at("Zoom").get<float>();
 			}
 		);
 

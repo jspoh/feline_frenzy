@@ -103,8 +103,11 @@ namespace NIKE {
 		//Init Logger
 		NIKE::Log::Init();
 
+		//Deserialize Config File
+		auto json_config = NIKE_SERIALIZE_SERVICE->loadJsonFile(file_path);
+
 		//Setup window with config file
-		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
+		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(json_config));
 
 		//Set Target FPS
 		NIKE_WINDOWS_SERVICE->setTargetFPS(fps);
@@ -148,9 +151,9 @@ namespace NIKE {
 		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
 
 		//Init imgui
-		// NIKE_IMGUI_SERVICE->init();
+		//NIKE_IMGUI_SERVICE->init();
 
-		////Init Level Editor
+		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
 		 
 		//Init UI
@@ -179,11 +182,11 @@ namespace NIKE {
 			//Update all audio pending actions
 			NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
-			////Update Level Editor
+			//Update Level Editor
 			NIKE_LVLEDITOR_SERVICE->update();
 
 			//update UI First
-			//NIKE_UI_SERVICE->update();
+			NIKE_UI_SERVICE->update();
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
@@ -215,11 +218,11 @@ namespace NIKE {
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
-			//ImGui Render & Update
+			////ImGui Render & Update
 			//NIKE_IMGUI_SERVICE->update();
 
-			////Render Level Editor
-			NIKE_LVLEDITOR_SERVICE->render();
+			//Render Level Editor
+			 NIKE_LVLEDITOR_SERVICE->render();
 		
 			//Control FPS
 			NIKE_WINDOWS_SERVICE->controlFPS();

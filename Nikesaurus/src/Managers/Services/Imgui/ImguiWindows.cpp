@@ -120,7 +120,7 @@ namespace NIKE {
 
 				ImGui::Spacing();
 				// Display System Usage (Data all being handled in sDebug)
-				auto& sys_percentages = NIKE_DEBUG_SERVICE->system_percentages;
+				auto sys_percentages = NIKE_DEBUG_SERVICE->getSystemPercentages();
 				ImGui::Separator();
 				if (sys_percentages.empty()) {
 					ImGui::Text("No active systems to report on.");
@@ -134,7 +134,7 @@ namespace NIKE {
 						ImGui::ProgressBar(static_cast<float>(barPercent), ImVec2(-1, 0));
 					}
 					ImGui::Spacing();
-					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->total_system_time);
+					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->getTotalSystemTime());
 				}
 
 				ImGui::EndTabItem();
@@ -418,13 +418,13 @@ namespace NIKE {
 							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity).value().get();
 
 							// Default value for cam height will be the window height if there is no adjustments
-							if (cam_comp.height <= 0.0f) {
-								cam_comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+							if (cam_comp.zoom <= 0.0f) {
+								cam_comp.zoom = 1.0f;
 							}
 
 							// Don't add position
 							//ImGui::DragFloat2("Position", &cam_comp.position.x, 0.1f);
-							ImGui::DragFloat("Height", &cam_comp.height, 0.1f);
+							ImGui::DragFloat("Height", &cam_comp.zoom, 0.01f);
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))

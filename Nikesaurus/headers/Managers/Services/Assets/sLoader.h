@@ -139,6 +139,8 @@ namespace NIKE {
 			 */
 			void createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Model& model);
 
+			bool checkFileSignature(const std::string& path);
+
 			/**
 			 * all .tex files should be 256x256 in RGBA8 format.
 			 *
