@@ -8,7 +8,7 @@
 ; !!NOTE!!: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click "Tools" | "Create GUID" inside the Visual Studio IDE.)
-AppId={DBE1979A-0CA9-4A8B-81DE-029260E99EE2}
+AppId={{DBE1979A-0CA9-4A8B-81DE-029260E99EE2}
 
 ; Standard app data stuff
 ; !!NOTE!!: Replace all instances of "Feline-Frenzy" with your game name.
@@ -87,10 +87,10 @@ Source: .\REDIST\VC_redist.x64.exe; DestDir: {tmp}; Flags: ignoreversion
 ;   {group} is the start menu location that the game will install shortcuts to.
 ;   {commondesktop} is your Windows desktop directory.
 [Icons]
-Name: {group}\Feline-Frenzy; Filename: {app}\Feline-Frenzy.exe; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
+Name: {group}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
 Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe}
 Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe};  IconFilename: "{app}\Icon.ico"
-Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline-Frenzy.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
+Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
 
 ; List of items to execute in the installer.
 ; Note that this will run all executables in their silent versions as required by the TCRs.
@@ -101,7 +101,7 @@ Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline-Frenzy.exe; Tasks: d
 ;Filename: {tmp}\vc_redist.x86.exe; Parameters: /q; StatusMsg: Installing Visual C++ 2015 Redistributable...
 Filename: {tmp}\VC_redist.x64.exe; Parameters: /q; StatusMsg: Installing Visual C++ 2022 Redistributable...
 ;Filename: {tmp}\dxwebsetup.exe; Parameters: /q; StatusMsg: Installing DirectX...
-Filename: {app}\Feline-Frenzy.exe; Description: {cm:LaunchProgram,Feline-Frenzy}; Flags: nowait postinstall skipifsilent
+Filename: {app}\Feline Frenzy.exe; Description: {cm:LaunchProgram,Feline-Frenzy}; Flags: nowait postinstall skipifsilent
 
 
 ;To be able to run and generate the Feline-Frenzy_Setup.exe you need to download and install "Inno Setup" application, then open this file with the application.
