@@ -104,6 +104,167 @@ namespace NIKE {
 			}
 		);
 
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
+				ImGui::Text("Edit Text variables");
+
+				//Static variables for string input management
+				static std::string font_id;
+				static std::string text_input;
+
+				//Initialization of string inputs upon collapsible shown
+				if (ImGui::IsItemActivated()) {
+					font_id = comp.font_id;
+					text_input = comp.text;
+				}
+
+				// For Text Scale
+				{
+					// Before change
+					static float before_change;
+
+					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f, EPSILON, 500.f);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change = comp.scale;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_text_scale;
+
+						//Change pos do action
+						change_text_scale.do_action = [&, scale = comp.scale]() {
+							comp.scale = scale;
+							};
+
+						//Change pos undo action
+						change_text_scale.undo_action = [&, scale = before_change]() {
+							comp.scale = scale;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_text_scale));
+					}
+
+				}
+
+				ImGui::Text((std::string("Text Size X: ") + std::to_string(comp.size.x)).c_str());
+				ImGui::Text((std::string("Text Size Y: ") + std::to_string(comp.size.y)).c_str());
+
+				// For Text color
+				{
+					// Before change
+					static Vector4f before_change;
+
+					ImGui::DragFloat4("Text Color", &comp.color.x, 0.1f);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change = comp.color;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_color;
+
+						//Change pos do action
+						change_color.do_action = [&, color = comp.color]() {
+							comp.color = color;
+							};
+
+						//Change pos undo action
+						change_color.undo_action = [&, color = before_change]() {
+							comp.color = color;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_color));
+					}
+
+				}
+
+				// For Text font
+				{
+					ImGui::Text("Enter Font (wihtout the ttf):");
+					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 1)) {
+						font_id.resize(strlen(font_id.c_str()));
+					}
+
+					ImGui::SameLine();
+
+					//Save font ID Button
+					if (ImGui::Button("Save##FontID")) {
+						if (NIKE_ASSETS_SERVICE->checkFontExist(font_id))
+						{
+							LevelEditor::Action save_font_id;
+
+							//Save font id action
+							save_font_id.do_action = [&, id = font_id]() {
+								comp.font_id = id;
+								font_id = comp.font_id;
+								};
+
+							//Undo save font id action
+							save_font_id.undo_action = [&, id = comp.font_id]() {
+								comp.font_id = id;
+								font_id = comp.font_id;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_font_id));
+						}
+						else {
+							comp_panel.setPopUpErrorMsg("Font Does Not Exist!");
+							comp_panel.openPopUp("Error");
+							font_id = comp.font_id;
+						}
+					}
+
+				}
+
+
+				// For Text input
+				{
+					ImGui::Text("Enter text:");
+					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
+						text_input.resize(strlen(text_input.c_str()));
+					}
+
+					ImGui::SameLine();
+
+					//Save font ID Button
+					if (ImGui::Button("Save##TextInput")) {
+						LevelEditor::Action save_text;
+
+						// Capture the current value of comp.text and text_input
+						std::string before_change_text = comp.text;
+						std::string before_change_input = text_input;
+
+						//Save action
+						save_text.do_action = [&, text = text_input]() {
+							comp.text = text;
+							text_input = comp.text;
+							};
+
+						//Undo action
+						save_text.undo_action = [&, text = comp.text]() {
+							comp.text = text;
+							text_input = comp.text;
+							};
+
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+					}
+				}
+
+				// For Text Origin
+				{
+					
+					
+				}
+			}
+		);
+
 		//Register shape for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Shape>(
 			//Serialize

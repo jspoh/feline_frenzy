@@ -47,12 +47,12 @@ namespace NIKE {
 		}
 
 		//Calculate the center of the viewport
-		ImVec2 viewportSize = ImGui::GetMainViewport()->Size;
-		ImVec2 viewportPos = ImGui::GetMainViewport()->Pos;
-		ImVec2 popupPos = ImVec2(viewportPos.x + viewportSize.x * 0.5f, viewportPos.y + viewportSize.y * 0.5f);
+		ImVec2 viewport_size = ImGui::GetMainViewport()->Size;
+		ImVec2 viewport_pos = ImGui::GetMainViewport()->Pos;
+		ImVec2 popup_pos = ImVec2(viewport_pos.x + viewport_size.x * 0.5f, viewport_pos.y + viewport_size.y * 0.5f);
 
 		//Center the popup
-		ImGui::SetNextWindowPos(popupPos, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowPos(popup_pos, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
 		//Set pop management variables
 		b_popup_showing = true;
