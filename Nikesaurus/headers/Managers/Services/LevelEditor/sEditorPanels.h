@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -82,11 +82,17 @@ namespace NIKE {
 			//Boolean for activating play/stop for game
 			bool b_game_state;
 
+			//Boolean for showing/hide grid
+			bool b_grid_state;
+
 			//Set Debug State
 			void setDebugState(bool state);
 
 			//Set Game State
 			void setGameState(bool state);
+
+			//Set Grid State
+			void setGridState(bool state);
 
 		public:
 			MainPanel() :window_flags{ 0 }, b_debug_mode { false }, b_game_state{ true } {}
@@ -107,6 +113,9 @@ namespace NIKE {
 
 			//Public get game state
 			bool getGameState() const;
+
+			//Public get grid state
+			bool getGridState() const;
 
 			//Init
 			void init() override;
@@ -359,6 +368,33 @@ namespace NIKE {
 			//Static panel name
 			static std::string getStaticName() {
 				return "Camera Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
+		//Grid Management Panel
+		class TileMapPanel : public IPanel {
+		private:
+		public:
+			TileMapPanel() = default;
+			~TileMapPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Tile Map Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Tile Map Management";
 			}
 
 			//Init
