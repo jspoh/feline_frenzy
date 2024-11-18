@@ -14,7 +14,6 @@ namespace NIKE {
 	Camera::System::System() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, aspect_ratio{ 0.0f } { }
 
 	void Camera::System::onEvent(std::shared_ptr<Windows::WindowResized> event) {
-		def_cam.height = static_cast<float>(event->frame_buffer.y);
 		aspect_ratio = static_cast<float>(event->frame_buffer.x) / static_cast<float>(event->frame_buffer.y);
 	}
 
@@ -26,7 +25,7 @@ namespace NIKE {
 	void Camera::System::onEvent(std::shared_ptr<Render::UpdateCamEvent> event) {
 		// Zoom Controls with Clamp
 		const float min_zoom = 0.0f;
-		const float max_zoom = 2000.0f;  
+		const float max_zoom = 100.0f;  
 
 		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
 		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value())
@@ -50,16 +49,16 @@ namespace NIKE {
 		}
 
 		if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_IN) {
-			active_cam.height -= 10.f;
+			active_cam.zoom -= 0.01f;
 		}
 		else if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_OUT) {
-			active_cam.height += 10.f;
+			active_cam.zoom += 0.01f;
 		}
 		else if (event->edit_zoom == NIKE::Render::CamZoom::RESET_ZOOM) {
-			active_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+			active_cam.zoom = 1.0f;
 		}
 		// Clamp the zoom height
-		active_cam.height = std::clamp(active_cam.height, min_zoom, max_zoom);
+		active_cam.zoom = std::clamp(active_cam.zoom, min_zoom, max_zoom);
 
 		event->setEventProcessed(true);
 	}
@@ -80,7 +79,7 @@ namespace NIKE {
 
 		//Setup default camera
 		def_cam.position = { 0.0f, 0.0f };
-		def_cam.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+		def_cam.zoom = 1.0f;
 	}
 
 	Entity::Type Camera::System::getCamId() const {
@@ -114,8 +113,8 @@ namespace NIKE {
 		};
 
 		Matrix_33 cam_to_ndc_xform {
-			2.0f / aspect_ratio / cam.height, 0, 0,
-			0, 2.0f / cam.height, 0,
+			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * cam.zoom), 0, 0,
+			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * cam.zoom), 0,
 			0, 0, 1
 		};
 
@@ -127,7 +126,7 @@ namespace NIKE {
 		//Default camera altributes
 		Render::Cam def;
 		def.position = { 0.0f, 0.0f };
-		def.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+		def.zoom = 1.0f;
 
 		Matrix_33 view_xform{
 			1, 0,  -def.position.x,
@@ -136,8 +135,8 @@ namespace NIKE {
 		};
 
 		Matrix_33 cam_to_ndc_xform{
-			2.0f / aspect_ratio / def.height, 0, 0,
-			0, 2.0f / def.height, 0,
+			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def.zoom), 0, 0,
+			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def.zoom), 0,
 			0, 0, 1
 		};
 
@@ -156,8 +155,8 @@ namespace NIKE {
 		};
 
 		Matrix_33 cam_to_ndc_xform{
-			2.0f / aspect_ratio / def_cam.height, 0, 0,
-			0, 2.0f / def_cam.height, 0,
+			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam.zoom), 0, 0,
+			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam.zoom), 0,
 			0, 0, 1
 		};
 

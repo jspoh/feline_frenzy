@@ -21,29 +21,21 @@ namespace NIKE {
 	{
 	}
 
-	Windows::NIKEWindow::NIKEWindow(std::string const& file_path)
+	Windows::NIKEWindow::NIKEWindow(nlohmann::json const& config)
 		: ptr_window{ nullptr }, b_full_screen{ false }
 	{
-		//Get file stream
-		std::fstream fileStream;
-		fileStream.open(file_path, std::ios::in);
-
-		//Temp string
-		std::string temp;
-
-		//Extract data from file stream
-		if (fileStream) {
-			std::string data;
-			std::getline(fileStream, data);
-			window_title = data.substr(data.find_first_of('"') + 1, data.find_last_of('"') - data.find_first_of('"') - 1);
-			std::getline(fileStream, data);
-			std::stringstream(data) >> temp >> window_size.x;
-			std::getline(fileStream, data);
-			std::stringstream(data) >> temp >> window_size.y;
+		try {
+			auto const& data = config.at("WindowsConfig");
+			window_title = data.at("Title").get<std::string>();
+			window_size.fromJson(data.at("Window_Size"));
 		}
+		catch(const nlohmann::json::exception& e) {
+			NIKEE_CORE_WARN(e.what());
+			NIKEE_CORE_WARN("Window config invalid! Reverting to default window config");
 
-		//Close file stream
-		fileStream.close();
+			window_title = "Window";
+			window_size = { 1600, 900 };
+		}
 
 		//Configure Window Setup
 		configWindow();

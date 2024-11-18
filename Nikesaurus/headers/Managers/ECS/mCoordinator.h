@@ -73,7 +73,7 @@ namespace NIKE {
 			template<typename T>
 			void removeComponent() {
 
-				std::vector<Entity::Type> entities = component_manager->getAllEntities<T>();
+				std::vector<Entity::Type> entities = component_manager->getAllComponentEntities(component_manager->getComponentType<T>());
 				for (Entity::Type entity : entities) {
 					//Set bit signature of component to false
 					Component::Signature sign = entity_manager->getSignature(entity);
@@ -148,6 +148,10 @@ namespace NIKE {
 			Component::Type getComponentType(std::string const& type) {
 				return component_manager->getComponentType(type);
 			}
+
+			size_t getComponentEntitiesCount(Component::Type comp_type);
+
+			std::set<Entity::Type> getAllComponentEntities(Component::Type comp_type);
 
 			std::unordered_map<std::string, std::shared_ptr<void>> getAllEntityComponents(Entity::Type entity) const;
 

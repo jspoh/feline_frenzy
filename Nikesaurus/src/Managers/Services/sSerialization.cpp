@@ -210,6 +210,24 @@ namespace NIKE {
 		curr_scene_file = file_path;
 	}
 
+	nlohmann::json Serialization::Service::loadJsonFile(std::string const& file_path) {
+		//Json Data
+		nlohmann::json data;
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::in);
+
+		//Return empty data if there is no data
+		if (!std::filesystem::exists(file_path))
+			return data;
+
+		//Read data from file
+		file >> data;
+
+		//Return loaded json data
+		return data;
+	}
+
 	std::string const& Serialization::Service::getCurrSceneFile() const {
 		return curr_scene_file;
 	}

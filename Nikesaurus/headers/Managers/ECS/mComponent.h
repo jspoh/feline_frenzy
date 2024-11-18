@@ -24,6 +24,12 @@ namespace NIKE {
 			//Check entity comp
 			virtual bool checkEntity(Entity::Type entity) = 0;
 
+			//Get count of entity with current comp
+			virtual size_t getComponentEntitiesCount() = 0;
+
+			//Get all entity with current comp
+			virtual std::set<Entity::Type> getComponentEntities() = 0;
+
 			//Get entity comp
 			virtual std::shared_ptr<void> getEntityComponent(Entity::Type entity) = 0;
 
@@ -90,19 +96,22 @@ namespace NIKE {
 				return std::ref(component_array.at(entity));
 			}
 
-			//Get all entities with component type T
-			std::vector<Entity::Type> getAllEntities() {
-				std::vector<Entity::Type> temp_vec;
-				for (auto const& entity : component_array) {
-					temp_vec.push_back(entity.first);
-				}
-
-				return temp_vec;
-			}
-
 			//Check entity component
 			bool checkEntity(Entity::Type entity) override {
 				return component_array.find(entity) != component_array.end();
+			}
+
+			size_t getComponentEntitiesCount() override {
+				return component_array.size();
+			}
+
+			//Get all entities with current component
+			std::set<Entity::Type> getComponentEntities() override {
+				std::set<Entity::Type> entities_set;
+				for (auto entity_comp : component_array) {
+					entities_set.insert(entity_comp.first);
+				}
+				return entities_set;
 			}
 
 			//get entity component
@@ -269,11 +278,11 @@ namespace NIKE {
 			//Get Component Type string overload
 			Component::Type getComponentType(std::string const& type);
 
-			// Get all entities with that component
-			template<typename T>
-			std::vector<Entity::Type> getAllEntities() {
-				return getComponentArray<T>()->getAllEntities();
-			}
+			//Get count of entities with that component
+			size_t getComponentEntitiesCount(Component::Type comp_type);
+
+			//Get all entities with that component
+			std::set<Entity::Type> getAllComponentEntities(Component::Type comp_type);
 
 			//Clone entity
 			void cloneEntity(Entity::Type clone, Entity::Type copy);

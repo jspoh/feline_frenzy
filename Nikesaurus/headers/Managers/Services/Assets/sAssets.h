@@ -33,9 +33,7 @@ namespace NIKE {
 
 		class NIKE_API Service 
 			: public Events::IEventListener<FileDropEvent> 
-
 		{
-
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
@@ -223,6 +221,7 @@ namespace NIKE {
 			//Get audios
 			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedAudios();
 
+			//Check if audio exits
 			bool checkAudioExist(std::string const& audio_tag);
 
 			/*****************************************************************//**

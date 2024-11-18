@@ -82,11 +82,17 @@ namespace NIKE {
 			//Boolean for activating play/stop for game
 			bool b_game_state;
 
+			//Boolean for showing/hide grid
+			bool b_grid_state;
+
 			//Set Debug State
 			void setDebugState(bool state);
 
 			//Set Game State
 			void setGameState(bool state);
+
+			//Set Grid State
+			void setGridState(bool state);
 
 		public:
 			MainPanel() :window_flags{ 0 }, b_debug_mode { false }, b_game_state{ true } {}
@@ -107,6 +113,9 @@ namespace NIKE {
 
 			//Public get game state
 			bool getGameState() const;
+
+			//Public get grid state
+			bool getGridState() const;
 
 			//Init
 			void init() override;
@@ -200,6 +209,11 @@ namespace NIKE {
 				return "Entities Management";
 			}
 
+			//Static panel name
+			static std::string getStaticName() {
+				return "Entities Management";
+			}
+
 			//Init
 			void init() override;
 
@@ -208,6 +222,9 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			//Get entity name
+			std::string getEntityName(Entity::Type entity);
 		};
 
 		//Components Management Panel
@@ -224,6 +241,9 @@ namespace NIKE {
 
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
+
+			//Set Layer ID popup
+			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
 
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
@@ -271,8 +291,120 @@ namespace NIKE {
 			}
 		};
 
+		//Debug Management Panel
+		class DebugPanel : public IPanel {
+		private:
+		public:
+			DebugPanel() = default;
+			~DebugPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Debugging Tools";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Debugging Tools";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
 		//Assets Management Panel
-		class AssetsPanel : public IPanel {
+		class ResourcePanel : public IPanel {
+		private:
+		public:
+			ResourcePanel() = default;
+			~ResourcePanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Resource Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Resource Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
+		//Camera Management Panel
+		class CameraPanel : public IPanel {
+		private:
+			//List of camera entities
+			std::unordered_map<Entity::Type, std::string> cam_entities;
+
+			//Entities panel for string reference
+			std::shared_ptr<EntitiesPanel> entities_panel;
+
+			//Combo index for selecting camera
+			int combo_index;
+		public:
+			CameraPanel() = default;
+			~CameraPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Camera Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Camera Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
+		//Grid Management Panel
+		class TileMapPanel : public IPanel {
+		private:
+		public:
+			TileMapPanel() = default;
+			~TileMapPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Tile Map Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Tile Map Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
 		};
 	}
 }

@@ -34,11 +34,11 @@ namespace NIKE {
 
 		struct Cam {
 			Vector2f position;	// Position of camera
-			float height;	// represents how much of the world is visible vertically (zoom level).
+			float zoom;	// represents how much of the world is visible vertically (zoom level).
 
-			Cam() : position(), height{ 0.0f } {}
-			Cam(float height) : position(), height{height} {}
-			Cam(Vector2f const& position, float height) : position{ position }, height{ height } {}
+			Cam() : position(), zoom{ 1.0f } {}
+			Cam(float zoom) : position(), zoom{ zoom } {}
+			Cam(Vector2f const& position, float zoom) : position{ position }, zoom{ zoom } {}
 		};
 
 		//Change camera event

@@ -26,14 +26,14 @@ namespace NIKE {
 			[](Render::Cam const& comp) -> nlohmann::json {
 				return	{
 						{ "Position", comp.position.toJson() },
-						{ "Height", comp.height },
+						{ "Zoom", comp.zoom },
 						};
 			},
 
 			//Deserialize
 			[](Render::Cam& comp, nlohmann::json const& data) {
 				comp.position.fromJson(data.at("Position"));
-				comp.height = data.at("Height").get<float>();
+				comp.zoom = data.at("Zoom").get<float>();
 			}
 		);
 

@@ -32,11 +32,10 @@ namespace NIKE {
 
 			//System active
 			bool b_system_active;
-
 		public:
 
 			//Constructor
-			ISystem() : system_signature {}, b_components_linked{ true }, b_system_active{ true } {}
+			ISystem() : system_signature{}, b_components_linked{ true }, b_system_active{ true } {}
 
 			//Virtual Init
 			virtual void init() {}
@@ -240,5 +239,6 @@ namespace NIKE {
 		};
 	}
 }
+
 
 #endif //!M_SYSTEM_HPP

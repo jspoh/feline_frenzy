@@ -120,7 +120,7 @@ namespace NIKE {
 		auto& systems = NIKE_ECS_MANAGER->getAllSystems();
 
 		//Set the state of each systems based on new game state
-		if (b_game_state) {
+		if (!b_game_state) {
 			std::for_each(systems.begin(), systems.end(),
 				[](std::shared_ptr<System::ISystem>& system) {
 					if (system->getSysName() != NIKE_ECS_MANAGER->getSystemName<Render::Manager>()) {
@@ -138,6 +138,14 @@ namespace NIKE {
 
 	bool LevelEditor::MainPanel::getGameState() const {
 		return b_game_state;
+	}
+
+	void LevelEditor::MainPanel::setGridState(bool state) {
+		b_grid_state = state;
+	}
+
+	bool LevelEditor::MainPanel::getGridState() const {
+		return b_grid_state;
 	}
 
 	void LevelEditor::MainPanel::init() {
@@ -167,14 +175,21 @@ namespace NIKE {
 			ImGui::Spacing();
 			ImGui::Text("Play / Pause Controls : ");
 			if (ImGui::Button(b_game_state ? "Play" : "Pause")) {
-				b_game_state = !b_game_state;
+				setGameState(!b_game_state);
 			}
 
 			//Debug Mode Switching
 			ImGui::Spacing();
 			ImGui::Text("Toggle Debug Mode : ");
-			if (ImGui::Button(b_debug_mode ? "Show" : "Hide")) {
+			if (ImGui::Button(b_debug_mode ? "Show##DebugMode" : "Hide##DebugMode")) {
 				b_debug_mode = !b_debug_mode;
+			}
+
+			//Debug Mode Switching
+			ImGui::Spacing();
+			ImGui::Text("Show Grid : ");
+			if (ImGui::Button(b_grid_state ? "Show##GridState" : "Hide##GridState")) {
+				b_grid_state = !b_grid_state;
 			}
 
 			//Reset Scene
@@ -251,12 +266,15 @@ namespace NIKE {
 	void LevelEditor::GameWindowPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Get Imgui input
+		ImGuiIO& io = ImGui::GetIO();
+
 		//Actual Window Size
-		Vector2i win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		Vector2f win_size = { io.DisplaySize.x , io.DisplaySize.y };
 
 		//Configure viewport size
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-		float aspect_ratio = (float)win_size.x / (float)win_size.y;
+		float aspect_ratio = win_size.x / win_size.y;
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
 		if (viewport_height > window_size.y) {
@@ -264,14 +282,11 @@ namespace NIKE {
 			viewport_width = window_size.y * aspect_ratio;
 		}
 
-		//Get mous input
-		ImGuiIO& io = ImGui::GetIO();
-
 		//Get the position of the game window top-left corner
 		ImVec2 gameWindowPos = ImGui::GetCursorScreenPos();
 
 		//Scale Factor
-		Vector2f scale{ (float)win_size.x / viewport_width, (float)win_size.y / viewport_height };
+		Vector2f scale{ win_size.x / viewport_width, win_size.y / viewport_height };
 
 		//Calculate mouse position relative to the game window
 		relative_mouse_pos = { (io.MousePos.x - gameWindowPos.x) * scale.x, (io.MousePos.y - gameWindowPos.y) * scale.y };
@@ -662,6 +677,16 @@ namespace NIKE {
 		ImGui::End();
 	}
 
+	std::string LevelEditor::EntitiesPanel::getEntityName(Entity::Type entity) {
+		auto it = entity_to_name.find(entity);
+
+		if (it == entity_to_name.end()) {
+			throw std::runtime_error("Entity not found");
+		}
+
+		return it->second;
+	}
+
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
@@ -727,6 +752,62 @@ namespace NIKE {
 		};
 	}
 
+	std::function<void()> LevelEditor::ComponentsPanel::setLayerIDPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Set a layer ID
+			ImGui::Text("Set Layer ID For Entity");
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Static layer id
+			static int layer_id = 0;
+			if (ImGui::IsItemActivated()) {
+				layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
+			}
+
+			//Input int
+			ImGui::InputInt("##NewLayerID", &layer_id, 1);
+
+			//Clamp layer ID
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+
+			//Click set to set layer
+			if (ImGui::Button("Set")) {
+
+				//Temporary set layer action
+				Action set_layer;
+
+				//Setup undo action for set layer
+				set_layer.undo_action = [&, id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity)]() {
+					NIKE_ECS_MANAGER->setEntityLayerID(selected_entity, id);
+					};
+
+				//Setup do action for set layer
+				set_layer.do_action = [&, id = layer_id]() {
+					NIKE_ECS_MANAGER->setEntityLayerID(selected_entity, id);
+					};
+
+				//Execute set layer action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_layer));
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Cancel setting layer id
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
 	void LevelEditor::ComponentsPanel::init() {
 
 		//Setup event listening for selected entity
@@ -735,6 +816,7 @@ namespace NIKE {
 
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
+		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
 		error_msg = std::make_shared<std::string>("Comp Error");
 		registerPopUp("Error", defPopUp("Error", error_msg));
 	}
@@ -777,6 +859,13 @@ namespace NIKE {
 			//Add component popup
 			if (ImGui::Button("Add Component")) {
 				openPopUp("Add Component");
+			}
+
+			ImGui::SameLine();
+
+			//Set layer id popup
+			if (ImGui::Button("Set Layer ID")) {
+				openPopUp("Set Layer ID");
 			}
 
 			//Add Spacing
@@ -832,5 +921,287 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::setPopUpErrorMsg(std::string const& msg) {
 		error_msg->assign(msg);
+	}
+
+	/*****************************************************************//**
+	* Debugging Tools Panel
+	*********************************************************************/
+	void LevelEditor::DebugPanel::init() {
+
+	}
+
+	void LevelEditor::DebugPanel::update() {
+
+	}
+
+	void LevelEditor::DebugPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Begin tab bar
+		if (ImGui::BeginTabBar("TabBar")) {
+
+			// Performance Viewer Tab
+			if (ImGui::BeginTabItem("Performance Viewer")) {
+
+				// Display FPS 
+				float fps = ImGui::GetIO().Framerate;
+				ImGui::Text("FPS: %.2f", fps);
+
+				// Display a FPS in a graph
+				static float fpsValues[100] = { 0 };
+				static int fpsIndex = 0;
+				fpsValues[fpsIndex] = fps;
+				fpsIndex = (fpsIndex + 1) % IM_ARRAYSIZE(fpsValues);
+				ImGui::PlotLines("FPS", fpsValues, IM_ARRAYSIZE(fpsValues), 0, NULL, 0.0f, 120.0f, ImVec2(0, 80));
+
+				ImGui::Spacing();
+				// Display System Usage (Data all being handled in sDebug)
+				auto sys_percentages = NIKE_DEBUG_SERVICE->getSystemPercentages();
+				ImGui::Separator();
+				if (sys_percentages.empty()) {
+					ImGui::Text("No active systems to report on.");
+				}
+				else {
+					ImGui::Text("System Performance (Percentage of total game loop time):");
+					ImGui::Spacing();
+					for (const auto& [name, time] : sys_percentages) {
+						double barPercent = time / NIKE_DEBUG_SERVICE->getTotalSystemTime();
+						ImGui::Text("%s : %.2f ms", name.c_str(), time);
+						ImGui::ProgressBar(static_cast<float>(barPercent), ImVec2(-1, 0));
+					}
+					ImGui::Spacing();
+					ImGui::Text("Total Active System Time: %.2f ms", NIKE_DEBUG_SERVICE->getTotalSystemTime());
+				}
+
+				ImGui::EndTabItem();
+			}
+
+			// Crash Logger Tab
+			if (ImGui::BeginTabItem("Crash Logger")) {
+				// Open crash log file
+				std::ifstream crashLogFile("logs/crash-log.txt");
+
+				if (crashLogFile.is_open()) {
+					std::string line;
+					std::string logs;
+
+					while (std::getline(crashLogFile, line)) {
+						logs += line + "\n";
+					}
+					crashLogFile.close();
+
+					ImGui::BeginChild("CrashLogScrollArea", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+					ImGui::TextUnformatted(logs.c_str());
+					ImGui::EndChild();
+				}
+				else {
+					ImGui::Text("Crash log file could not be found!");
+				}
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+
+		//Render popups
+		renderPopUps();
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
+	* Resource Management Panel
+	*********************************************************************/
+	void LevelEditor::ResourcePanel::init() {
+
+	}
+
+	void LevelEditor::ResourcePanel::update() {
+
+	}
+
+	void LevelEditor::ResourcePanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		// Tabs for different asset types
+		if (ImGui::BeginTabBar("Asset Types"))
+		{
+			// Levels tab for .prefabs files
+			if (ImGui::BeginTabItem("Prefabs"))
+			{
+				displayAssetList("Prefabs");
+				ImGui::EndTabItem();
+			}
+
+			// Textures tab
+			if (ImGui::BeginTabItem("Textures"))
+			{
+				displayAssetList("Textures");
+				ImGui::EndTabItem();
+			}
+
+			// Models tab
+			//if (ImGui::BeginTabItem("Models"))
+			//{
+			//	displayAssetList("Models");
+			//	ImGui::EndTabItem();
+			//}
+
+			// Font tab
+			if (ImGui::BeginTabItem("Fonts"))
+			{
+				displayAssetList("Fonts");
+				ImGui::EndTabItem();
+			}
+
+			// Shaders tab
+			//if (ImGui::BeginTabItem("Shaders"))
+			//{
+			//	displayAssetList("Shaders");
+			//	ImGui::EndTabItem();
+			//}
+
+			// Audio tab
+			if (ImGui::BeginTabItem("Audio"))
+			{
+				displayAssetList("Audio");
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
+	* Camera Management Panel
+	*********************************************************************/
+	void LevelEditor::CameraPanel::init() {
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+	}
+
+	void LevelEditor::CameraPanel::update() {
+
+		//Update list of camera entities
+		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
+			cam_entities.clear();
+			cam_entities.emplace(UINT16_MAX, "Free Cam");
+			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
+				cam_entities.emplace(entity, entities_panel->getEntityName(entity));
+			}
+		}
+	}
+
+	void LevelEditor::CameraPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Select camera
+		ImGui::Text("Select Camera:");
+
+		//Lamda for retrieving camera name
+		auto cam_name = [](void* data, int idx, const char** out_text) -> bool {
+			const auto& names = *static_cast<std::unordered_map<Entity::Type, std::string>*> (data);
+			if (idx < 0 || idx >= names.size()) return false;
+			auto it = names.begin();
+			std::advance(it, idx);
+
+			//Retrieve the entity name and assign it to out_text
+			*out_text = it->second.c_str();
+			return true;
+		};
+
+		// Use the lambda with ImGui::Combo
+		if (ImGui::Combo("##CameraSelector", &combo_index, cam_name, &cam_entities, static_cast<int>(cam_entities.size()))) {
+			// Dispatch an event when the camera selection changes
+			auto it = cam_entities.begin();
+			std::advance(it, combo_index);
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(it->first));
+		}
+
+		ImGui::Spacing();
+
+		//If currently selected is free cam
+		auto it = cam_entities.begin();
+		std::advance(it, combo_index);
+		if (it->first == UINT16_MAX) {
+			// Position Controls
+			ImGui::Text("Position:");
+
+			if (ImGui::Button("Up") || ImGui::IsItemActive()) {
+				// Move camera position up
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Down") || ImGui::IsItemActive()) {
+				// Move camera position down
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Left") || ImGui::IsItemActive()) {
+				// Move camera position left
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Right") || ImGui::IsItemActive()) {
+				// Move camera position right
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+			}
+
+			ImGui::Spacing();
+
+			if (ImGui::Button("Reset Position")) {
+				// Move camera position right
+				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RESET_POS));
+			}
+
+			ImGui::Spacing();
+		}
+
+		// Zoom Controls
+		ImGui::Text("Zoom:");
+		if (ImGui::Button("Zoom In") || ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Zoom Out") || ImGui::IsItemActive()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
+		}
+
+		ImGui::Spacing();
+
+		if (ImGui::Button("Reset Cam")) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::RESET_ZOOM));
+		}
+
+		//Render popups
+		renderPopUps();
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
+	* Tile Map Management Panel
+	*********************************************************************/
+	void LevelEditor::TileMapPanel::init() {
+
+	}
+
+	void LevelEditor::TileMapPanel::update() {
+
+	}
+
+	void LevelEditor::TileMapPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		ImGui::End();
 	}
 }

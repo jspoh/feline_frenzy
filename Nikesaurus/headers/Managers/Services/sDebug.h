@@ -23,19 +23,22 @@ namespace NIKE {
 		class NIKE_API Service
 		{
 		public:
-			Service() = default;
+			Service() : total_system_time{ 0.0 }{}
 			~Service() = default;
 
-			std::vector<std::pair<std::string, double>> system_percentages;
-			double total_system_time = 0.0;
-
-
-			void logCrash();
 			// Check for system runtime 
-			void updateSystemPercentage(double gl_time, std::vector<double> const& sys_time, std::vector<std::shared_ptr<System::ISystem>> sys);
+			void updateSystemPercentage(std::vector<double> const& sys_time, std::vector<std::shared_ptr<System::ISystem>> sys);
 
+			//Get system percentages
+			std::vector<std::pair<std::string, double>> getSystemPercentages() const;
 
+			//Get total system time
+			double getTotalSystemTime() const;
 		private:
+
+			std::vector<std::pair<std::string, double>> system_percentages;
+			double total_system_time;
+
 			//Delete Copy Constructor & Copy Assignment
 			Service(Service const& copy) = delete;
 			void operator=(Service const& copy) = delete;
