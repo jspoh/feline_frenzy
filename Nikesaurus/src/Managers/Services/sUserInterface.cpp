@@ -105,7 +105,7 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
-	bool UI::Service::buttonHovered(Entity::Type entity) {
+	bool UI::Service::buttonHovered(Entity::Type entity) const {
 		//Get bounding box
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value()) return false;

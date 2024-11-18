@@ -270,6 +270,10 @@ namespace NIKE {
 				comps_ui.emplace(Utility::convertTypeString(typeid(T).name()), [comp_func](ComponentsPanel& comp_panel, void* comp) { comp_func(comp_panel, *static_cast<T*>(comp)); });
 			}
 		};
+
+		//Assets Management Panel
+		class AssetsPanel : public IPanel {
+		};
 	}
 }
 
