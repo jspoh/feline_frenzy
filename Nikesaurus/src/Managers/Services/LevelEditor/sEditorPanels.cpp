@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/LevelEditor/sEditorPanels.h"
@@ -140,6 +140,14 @@ namespace NIKE {
 		return b_game_state;
 	}
 
+	void LevelEditor::MainPanel::setGridState(bool state) {
+		b_grid_state = state;
+	}
+
+	bool LevelEditor::MainPanel::getGridState() const {
+		return b_grid_state;
+	}
+
 	void LevelEditor::MainPanel::init() {
 
 		//Setup window flags
@@ -173,8 +181,15 @@ namespace NIKE {
 			//Debug Mode Switching
 			ImGui::Spacing();
 			ImGui::Text("Toggle Debug Mode : ");
-			if (ImGui::Button(b_debug_mode ? "Show" : "Hide")) {
+			if (ImGui::Button(b_debug_mode ? "Show##DebugMode" : "Hide##DebugMode")) {
 				b_debug_mode = !b_debug_mode;
+			}
+
+			//Debug Mode Switching
+			ImGui::Spacing();
+			ImGui::Text("Show Grid : ");
+			if (ImGui::Button(b_grid_state ? "Show##GridState" : "Hide##GridState")) {
+				b_grid_state = !b_grid_state;
 			}
 
 			//Reset Scene
@@ -1068,8 +1083,8 @@ namespace NIKE {
 
 	void LevelEditor::CameraPanel::update() {
 
-		//Update list of camer entities
-		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
+		//Update list of camera entities
+		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
 			cam_entities.clear();
 			cam_entities.emplace(UINT16_MAX, "Free Cam");
 			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
@@ -1169,6 +1184,23 @@ namespace NIKE {
 
 		//Render popups
 		renderPopUps();
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
+	* Tile Map Management Panel
+	*********************************************************************/
+	void LevelEditor::TileMapPanel::init() {
+
+	}
+
+	void LevelEditor::TileMapPanel::update() {
+
+	}
+
+	void LevelEditor::TileMapPanel::render() {
+		ImGui::Begin(getName().c_str());
 
 		ImGui::End();
 	}

@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -326,6 +326,11 @@ namespace NIKE {
 		auto camera_panel = std::make_shared<CameraPanel>();
 		panels.push_back(camera_panel);
 		panels_map.emplace(camera_panel->getName(), camera_panel);
+
+		//Add Tile Map management panel
+		auto tile_map_panel = std::make_shared<TileMapPanel>();
+		panels.push_back(tile_map_panel);
+		panels_map.emplace(tile_map_panel->getName(), tile_map_panel);
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
