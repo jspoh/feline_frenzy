@@ -1,18 +1,17 @@
-Project Settings:
-    Debug Mode for project:
+~~~~~~ NIKESAURUS STUDIOS PROJECT GUIDE ~~~~~~
 
-    - Able to see systems' time consumption per game loop, in %. 
+1. Project Settings and Configurations
 
-    Release Mode for project:
+Build Modes:
+- **Debug Mode**: Use this mode for development and debugging. Includes extra logging and debugging symbols to help track down issues.
+- **Release Mode**: This mode is optimized for performance. Debug symbols and extra logging are turned off, providing a faster runtime.
 
-    - Able to see 2.5k object rendering with 60 FPS in only release mode.
+2. Level Editor Activation
 
-To toggle between scenes: 
-- Press 'Enter' key to go to the next scene
+Turning On/Off the Level Editor
+- **Real-Time Activation**:
+  - Press 'TAB' to toggle the level editor on or off while the engine is running.
 
-- Press 'C' key to crash the game and log the crash in src/Managers/crash_log.txt
-
-Total of 3 scenes: 
-- Animation scnene (press space button to show the animations)
-- Collision scene (Left mouse click to clone entities)
-- Performance scene (Left click to clone 500 entities at one click)
+3. Player Logic Script
+- Go to "Levels" Tab next to "Assets List"
+- Load animation_scene.scn, WASD to move the character, W to move up, A to move left, S to move down, D to move right.

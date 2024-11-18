@@ -52,7 +52,7 @@ namespace NIKE {
 			//Default virtual destructor
 			virtual ~IEventListener() = default;
 
-			//Virtual execute event
+			//Virtual execute event( !!! Only to be called by the events service )
 			void execute(std::shared_ptr<IEvent> event) override {
 				auto casted_event = std::dynamic_pointer_cast<T>(event);
 				if (casted_event)
@@ -90,6 +90,7 @@ namespace NIKE {
 			static void mousebutton_cb(GLFWwindow* window, int button, int action, int mods);
 			static void mousepos_cb(GLFWwindow* window, double xpos, double ypos);
 			static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
+			static void dropfile_cb(GLFWwindow* window, int count, const char** paths);
 
 			#endif //Expose implementation only to NIKE Engine
 

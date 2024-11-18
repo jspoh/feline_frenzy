@@ -96,9 +96,10 @@ namespace NIKE
                     std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
                     NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
-                    if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(new_id))
+                    auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
+                    if (e_transform_comp.has_value())
                     {
-                        NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id).position = {0.f,0.f};
+                        e_transform_comp.value().get().position = {0.f,0.f};
                     }
 
                     // Reset entity_name for the next use
@@ -464,6 +465,9 @@ namespace NIKE
                     // Retrieve the prefab file path for deletion
                     full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(file_path).string();
                 }
+                else if (asset_type == "All_Prefabs") {
+
+                }
 
                 // Attempt to delete the selected file
                 if (NIKE_ASSETS_SERVICE->deleteFile(full_file_path)) {
@@ -476,6 +480,47 @@ namespace NIKE
                     }
                     deleted = true;
                 }
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("No")) {
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+
+        return deleted;
+    }
+
+    bool showDeleteAllFilesPopup(const std::string& asset_type) {
+        bool deleted = false;
+
+        // Confirmation popup for deleting a file
+        if (ImGui::BeginPopupModal("Confirm Deleting All Files", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Are you sure you want to delete EVERY file?");
+            ImGui::Separator();
+
+            if (ImGui::Button("Yes")) {
+
+                // Determine which asset type to delete
+                if (asset_type == "Levels") {
+                    if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getScenesPath()))
+                    {
+                        NIKE_ASSETS_SERVICE->loadScnFiles();
+                    }
+                }
+                else if (asset_type == "Prefabs") {
+                    if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getPrefabsPath()))
+                    {
+                        NIKE_ASSETS_SERVICE->loadPrefabFiles();
+                    }
+                }
+
+
+                
                 ImGui::CloseCurrentPopup();
             }
 
@@ -524,6 +569,44 @@ namespace NIKE
             }
 
             ImGui::EndPopup();
+        }
+        return is_open;
+    }
+
+    bool createGridPopup()
+    {
+        static bool is_open = true;
+        static Vector2i buffer_grid_dim{};
+
+        if (ImGui::BeginPopupModal("Grid Dimensions", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::InputInt("Grid Width", &buffer_grid_dim.x);
+            ImGui::InputInt("Grid Height", &buffer_grid_dim.y);
+            if (ImGui::Button("Apply")) {
+                NIKE_IMGUI_SERVICE->getGridDimen().x = buffer_grid_dim.x;
+                NIKE_IMGUI_SERVICE->getGridDimen().y = buffer_grid_dim.y;
+
+                // Reset the buffers after applying
+                buffer_grid_dim = { 0, 0 };
+
+                ImGui::CloseCurrentPopup();
+                is_open = false;
+            }
+
+            if (ImGui::Button("Cancel"))
+            {
+                // Reset the buffers after canceling
+                buffer_grid_dim = { 0, 0 };
+                is_open = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+        else
+        {
+            // Reset buffers if the popup closes for any reason
+            buffer_grid_dim = { 0, 0 };
+            is_open = false;
         }
         return is_open;
     }

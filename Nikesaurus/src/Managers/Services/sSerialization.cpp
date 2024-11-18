@@ -30,8 +30,8 @@ namespace NIKE {
 		nlohmann::json data;
 
 		//Iterate through all comp
-		for (auto const& comp : NIKE_ECS_MANAGER->getAllComponents(entity)) {
-			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second);
+		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
 		return data;
@@ -53,7 +53,7 @@ namespace NIKE {
 			}
 
 			//Deserialize data into component
-			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type), comp_data);
+			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 		}
 	}
 
@@ -114,6 +114,7 @@ namespace NIKE {
 
 			//Serialize layer
 			nlohmann::json l_data;
+
 			l_data["Layer"] = layer->serialize();
 
 			//Create json array
@@ -130,6 +131,7 @@ namespace NIKE {
 
 				//Serialize entity
 				e_data["Entity"] = serializeEntity(entity);
+				e_data["Entity"]["Entity Name"] = NIKE_IMGUI_SERVICE->getEntityByType(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
 				//If entity is a UI Entity
@@ -191,6 +193,7 @@ namespace NIKE {
 				//Deserialize all entities
 				Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
 				deserializeEntity(entity, e_data.at("Entity"));
+				NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
 				NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
 
 				//Check if entity is a UI entity

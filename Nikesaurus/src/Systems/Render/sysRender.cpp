@@ -33,6 +33,25 @@ namespace NIKE {
 		}
 	}
 
+	void Render::Manager::onEvent(std::shared_ptr<Windows::WindowResized> event) {
+		glGenFramebuffers(1, &frame_buffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
+		// Create a color attachment texture
+		glGenTextures(1, &texture_color_buffer);
+		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, event->frame_buffer.x, event->frame_buffer.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
+
+		// Check if framebuffer is complete
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
 		Matrix_33 result, scale_mat, rot_mat, trans_mat;
@@ -385,11 +404,13 @@ namespace NIKE {
 		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? camera_system->getFixedWorldToNDCXform() : camera_system->getWorldToNDCXform();
 
 		//Get transform
-		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) return; //Handling no value scenarios
+		auto& e_transform = e_transform_comp.value().get();
 
 		//Check If Texture
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
-			auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		if (auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);  e_texture_comp.has_value()) {
+			auto& e_texture = e_texture_comp.value().get();
 
 			//Check if texture is loaded
 			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
@@ -407,8 +428,8 @@ namespace NIKE {
 				renderObject(matrix, e_texture);
 			}
 		}
-		else if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		else if (auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);  e_shape_comp.has_value()) {
+			auto& e_shape = e_shape_comp.value().get();
 
 			//Check if model exists
 			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
@@ -425,8 +446,8 @@ namespace NIKE {
 			Vector4f wire_frame_color{ 1.0f, 0.0f, 0.0f, 1.0f };
 
 			//Check for collider component
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity)) {
-				auto const& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+			if (auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);  e_collider_comp.has_value()) {
+				auto const& e_collider = e_collider_comp.value().get();
 
 				if (e_collider.b_collided) {
 					wire_frame_color = { 0.0f, 1.0f, 0.0f, 1.0f };
@@ -438,8 +459,8 @@ namespace NIKE {
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
-			if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)) {
-				auto const& e_velo = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+			if (auto e_velo_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);  e_velo_comp.has_value()) {
+				auto const& e_velo = e_velo_comp.value().get();
 
 				if (e_velo.velocity.x != 0.0f || e_velo.velocity.y != 0.0f) {
 					Transform::Transform dir_transform = e_transform;
@@ -459,9 +480,14 @@ namespace NIKE {
 		Matrix_33 matrix;
 
 		//Get transform
-		auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) return;
+		auto& e_transform = e_transform_comp.value().get();
 
-		auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+		//Get Text
+		auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+		if (!e_text_comp.has_value()) return;
+		auto& e_text = e_text_comp.value().get();
 
 		//Make copy of transform, scale to 1.0f for calculating matrix
 		Transform::Transform copy = e_transform;
@@ -477,11 +503,9 @@ namespace NIKE {
 	void Render::Manager::renderViewport() {
 
 		//Render to frame buffer if imgui is active
-		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
-
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 		}
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
@@ -516,7 +540,8 @@ namespace NIKE {
 			}
 		}
 
-		if (NIKE_IMGUI_SERVICE->getImguiActive()) {
+		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}
 	}
@@ -539,6 +564,10 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		//Setup event listening for frame buffer resize
+		std::shared_ptr<Render::Manager> render_sys_wrapped(this, [](Render::Manager*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(render_sys_wrapped);
 
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();

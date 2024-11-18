@@ -28,8 +28,9 @@ namespace NIKE {
 		const float min_zoom = 0.0f;
 		const float max_zoom = 2000.0f;  
 
-		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(cam_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) 
-			? NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id) : def_cam;
+		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
+		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value())
+			? e_cam_comp.value().get() : def_cam;
 
 		// !TODO remove hard coded values for the adjustments
 		if (event->edit_position == NIKE::Render::CamPosition::UP) {
@@ -89,11 +90,18 @@ namespace NIKE {
 	Matrix_33 Camera::System::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
-		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(cam_id)) {
-			if(NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(cam_id))
-			NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).position = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id).position;
+		//Check if camera entity exists
+		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
+		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value()) {
 
-			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
+			//Check if camera attached to entity has a transform
+			auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id);
+
+			//Apply transformation to camera position
+			if(e_transform_comp.has_value()) e_cam_comp.value().get().position = e_transform_comp.value().get().position;
+
+			//Set camera value
+			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).value();
 		}
 		else {
 			cam = def_cam;

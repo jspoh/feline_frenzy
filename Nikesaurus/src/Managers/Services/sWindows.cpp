@@ -151,12 +151,17 @@ namespace NIKE {
 		}
 	}
 
+	bool Windows::NIKEWindow::getFullScreen() const {
+		return b_full_screen;
+	}
+
 	void Windows::NIKEWindow::setupEventCallbacks() {
 		glfwSetFramebufferSizeCallback(ptr_window, Events::Service::fbsize_cb);
 		glfwSetKeyCallback(ptr_window, Events::Service::key_cb);
 		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
+	    glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value) {

@@ -23,6 +23,7 @@
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/sMap.h"
 #include "Managers/Services/sUserInterface.h"
+#include "Managers/Services/LevelEditor/sLevelEditor.h"
 
 //Include all components here
 #include "Components/cAudio.h"
@@ -136,6 +137,7 @@ namespace NIKE {
 #define NIKE_IMGUI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::IMGUI::Service>()
 #define NIKE_MAP_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Map::Service>()
 #define NIKE_UI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::UI::Service>()
+#define NIKE_LVLEDITOR_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::LevelEditor::Service>()
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

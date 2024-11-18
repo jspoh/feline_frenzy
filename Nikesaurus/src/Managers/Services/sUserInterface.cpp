@@ -86,12 +86,18 @@ namespace NIKE {
 	}
 
 	void UI::Service::onEvent(std::shared_ptr<Input::MouseMovedEvent> event) {
-		mouse_pos = event->pos;
-	}
 
-	void UI::Service::onEvent(std::shared_ptr<IMGUI::ViewPortEvent> event) {
-		window_pos = event->window_pos;
-		window_size = event->window_size;
+		//Get mouse position
+		mouse_pos = event->pos;
+
+		//Check if mouse is over any entity currently
+		std::for_each(ui_entities.begin(), ui_entities.end(), 
+			[&event](std::pair<std::string, std::pair<Entity::Type, bool>> entity){
+				if (entity.second.second) {
+					event->setEventProcessed(true);
+					return;
+				}
+			});
 	}
 
 	void UI::Service::onEvent(std::shared_ptr<ChangeBtnTxtRatio> event) {
@@ -101,14 +107,17 @@ namespace NIKE {
 
 	bool UI::Service::buttonHovered(Entity::Type entity) {
 		//Get bounding box
-		auto const& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) return false;
+		auto const& e_transform = e_transform_comp.value().get();
 
 		//Vertices
 		std::vector<Vector2f> vert;
 
 		//If Shape
-		if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-			auto const& e_shape = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+		if (e_shape_comp.has_value()) {
+			auto const& e_shape = e_shape_comp.value().get();
 
 			auto getVertices = [e_shape]() {
 				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
@@ -122,14 +131,14 @@ namespace NIKE {
 
 			vert = getVertices();
 				for (auto& point : vert) {
-					point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-					point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
-					point.x += e_transform.position.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-					point.y -= e_transform.position.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+					point.x *= e_transform.scale.x;
+					point.y *= e_transform.scale.y;
+					point.x += e_transform.position.x;
+					point.y -= e_transform.position.y;
 
-					//Translate model to mouse window coords
-					point.x += (window_size.x / 2.0f) + window_pos.x;
-					point.y += (window_size.y / 2.0f) + window_pos.y;
+					//Translate model to world coordinates
+					point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
+					point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
 				}
 		}
 		else {
@@ -144,14 +153,14 @@ namespace NIKE {
 			};
 
 			for (auto& point : vert) {
-				point.x *= e_transform.scale.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-				point.y *= e_transform.scale.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
-				point.x += e_transform.position.x * (window_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-				point.y -= e_transform.position.y * (window_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+				point.x *= e_transform.scale.x;
+				point.y *= e_transform.scale.y;
+				point.x += e_transform.position.x;
+				point.y -= e_transform.position.y;
 
-				//Translate model to mouse window coords
-				point.x += (window_size.x / 2.0f) + window_pos.x;
-				point.y += (window_size.y / 2.0f) + window_pos.y;
+				//Translate model to world coordinates
+				point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
+				point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
 			}
 		}
 
@@ -191,9 +200,13 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(shape));
 
+		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+
 		//Add transform into hover container
-		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
-		hover_container[btn_id].second = false;
+		if (btn_transform_comp.has_value()) {
+			hover_container[btn_id].first = btn_transform_comp.value().get();
+			hover_container[btn_id].second = false;
+		}
 
 		return ui_entities.at(btn_id).first;
 	}
@@ -213,11 +226,27 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(texture));
 
+		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+
 		//Add transform into hover container
-		hover_container[btn_id].first = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
-		hover_container[btn_id].second = false;
+		if (btn_transform_comp.has_value()) {
+			hover_container[btn_id].first = btn_transform_comp.value().get();
+			hover_container[btn_id].second = false;
+		}
 
 		return ui_entities.at(btn_id).first;
+	}
+
+	bool UI::Service::isButtonHovered(std::string const& btn_id) const {
+
+		//Check if button exists
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button doesnt exist.");
+		}
+
+		//Return hover state
+		return it->second.second;
 	}
 
 	bool UI::Service::isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state) {
@@ -268,11 +297,7 @@ namespace NIKE {
 	}
 
 	void UI::Service::init() {
-		window_pos = { 0.0f ,0.0f };
-		window_size = { (float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x ,(float)NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
 		btn_ratio = { 0.5f, 0.5f };
-		std::shared_ptr<UI::Service> ui_service_wrapped(this, [](UI::Service*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<IMGUI::ViewPortEvent>(ui_service_wrapped);
 	}
 
 	void UI::Service::update() {
@@ -300,9 +325,15 @@ namespace NIKE {
 				input.second.first = false;
 			}
 
-			//Control the text scale
-			auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.first);
-			auto& e_text = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.first);
+			//Get transform comp
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.first);
+			if (!e_transform_comp.has_value()) continue;
+			auto& e_transform = e_transform_comp.value().get();
+
+			//Get text comp
+			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.first);
+			if (!e_text_comp.has_value()) continue;
+			auto& e_text = e_text_comp.value().get();
 
 			//Clamp Rectangle Size
 			e_transform.scale.x = std::clamp(e_transform.scale.x, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x));
@@ -335,7 +366,7 @@ namespace NIKE {
 				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
 				if (play)
 				{
-					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 1.f,1.f,0);
+					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f,0);
 					play = false;
 				}
 				

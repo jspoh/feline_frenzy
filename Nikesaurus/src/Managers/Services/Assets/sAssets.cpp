@@ -13,6 +13,7 @@
 #include "Managers/Services/sAudio.h"
 
 namespace NIKE {
+
 	Assets::Service::~Service() {
 
 		//Clear fonts
@@ -41,6 +42,47 @@ namespace NIKE {
 
 		//Clear audios
 		audio_system = nullptr;
+	}
+
+	// Drop file event listener
+	void Assets::Service::onEvent(std::shared_ptr<Assets::FileDropEvent> event) {
+		int file_count = event->count;
+		const char** file_paths = event->paths;
+
+		std::filesystem::path assets_dir = "assets";
+		const std::set<std::string> valid_tex_ext = { ".png", ".jpg", ".jpeg", ".tex"};
+
+		if (!std::filesystem::exists(assets_dir)) {
+			std::filesystem::create_directories(assets_dir);
+			NIKEE_CORE_INFO("Created filepath");
+		}
+
+
+		for (int i = 0; i < file_count; ++i) {
+			std::filesystem::path src_file_path { file_paths[i] };
+
+			if (valid_tex_ext.find(src_file_path.extension().string()) != valid_tex_ext.end()) {
+				std::filesystem::path tgt_file_path = assets_dir / "textures" / src_file_path.filename();
+				std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
+				NIKEE_CORE_INFO("File {} successfully copied into assets/textures", file_paths[i]);
+
+				// Check if texture exists
+				if (checkTextureExist(src_file_path.filename().string())) {
+					// If it exists reload the updated texture
+					reloadTexture(src_file_path.filename().string(), tgt_file_path.string());
+				}
+				else {
+					// If it does not exist load the texture
+					loadTexture(src_file_path.filename().string(), tgt_file_path.string());
+				}
+				
+			}
+			else {
+				NIKEE_CORE_ERROR("ERROR: Unsupported File Type");
+			}
+		}
+
+
 	}
 
 	void Assets::Service::configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
@@ -251,10 +293,10 @@ namespace NIKE {
 	void Assets::Service::loadTexture(std::string const& texture_id, std::string const& file_path) {
 		if (textures_list.find(texture_id) != textures_list.end())
 		{
-			throw std::runtime_error("TEXTURES ALREADY EXISTS");
+			throw std::runtime_error("TEXTURE ALREADY EXISTS");
 		}
 
-		NIKEE_CORE_INFO("Loading texture to '" + texture_id + "'");
+		NIKEE_CORE_INFO("Loading texture '" + texture_id + "'");
 		textures_list.emplace(std::piecewise_construct, std::forward_as_tuple(texture_id), std::forward_as_tuple(std::make_shared<Assets::Texture>(render_loader->compileTexture(file_path))));
 	}
 
@@ -321,7 +363,7 @@ namespace NIKE {
 			throw std::runtime_error("AUDIO ALREADY EXISTS");
 		}
 
-		NIKEE_CORE_INFO("Loading sound to '" + audio_id + "'");
+		NIKEE_CORE_INFO("Loading sound '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createSound(file_path))));
 	}
@@ -338,7 +380,7 @@ namespace NIKE {
 			throw std::runtime_error("AUDIO ALREADY EXISTS");
 		}
 
-		NIKEE_CORE_INFO("Loading music to '" + audio_id + "'");
+		NIKEE_CORE_INFO("Loading music '" + audio_id + "'");
 		//Emplace in audio list
 		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createStream(file_path))));
 	}
@@ -553,11 +595,11 @@ namespace NIKE {
 		else if (asset_type == "Audio") {
 
 			// Load new audio
-			for (const auto& audio_paths : std::filesystem::directory_iterator(getAudioPath())) {
+			for (const auto& audio_paths : std::filesystem::recursive_directory_iterator(getAudioPath())) {
 				if (hasValidAudioExtension(audio_paths)) {
 					std::string file_name = audio_paths.path().filename().string();
 
-					//string variables
+					// Extract file name without leading backslashes or extension
 					size_t start = file_name.find_first_not_of('\\');
 					size_t size = file_name.find_first_of('.', start) - start;
 

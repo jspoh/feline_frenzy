@@ -15,9 +15,6 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
-#include "../headers/Systems/Physics/sysPhysics.h"
-#include "../headers/Systems/Animation/sysAnimation.h"
-#include "../headers/Systems/Render/sysRender.h"
 #include "Systems/Render/sysRender.h"
 
 namespace NIKE {
@@ -96,6 +93,7 @@ namespace NIKE {
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<UI::Service>());
+		provideService(std::make_shared<LevelEditor::Service>());
 
 		//Create console
 		#ifndef NDEBUG
@@ -117,19 +115,31 @@ namespace NIKE {
 		//Setup input modes
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
-		//Add Event Listeners
+		//Add event listeners for window resized
 		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
-		//Add event listener for UI
+		//Add event listeners for key event
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+
+		//Add event listeners for mouse event
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+
+		//Add event listeners for mouse move event
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 
-		//Add event listener for Input
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		//Add event listeners for mouse scroll event
 		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for drop files event
+		getService<Events::Service>()->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
 
 		//Setup Audio
 		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
@@ -140,8 +150,11 @@ namespace NIKE {
 		//Init imgui
 		NIKE_IMGUI_SERVICE->init();
 
+		////Init Level Editor
+		//NIKE_LVLEDITOR_SERVICE->init();
+		 
 		//Init UI
-		NIKE_UI_SERVICE->init();
+		// NIKE_UI_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();
@@ -157,25 +170,28 @@ namespace NIKE {
 			//Calculate Delta Time
 			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
-			//Update all audio pending actions
-			getService<Audio::Service>()->getAudioSystem()->update();
-
 			//Poll system events
 			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
 			//Clear buffer ( Temp )
 			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-			//Escape Key Testing //!MOVE OUT SOON
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
-			}
+			//Update all audio pending actions
+			NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+
+			////Update Level Editor
+			//NIKE_LVLEDITOR_SERVICE->update();
 
 			//update UI First
 			NIKE_UI_SERVICE->update();
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
+
+			//Escape Key Testing //!MOVE OUT SOON
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+			}
 
 			//Render entity to mouse click
 			//if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
@@ -192,15 +208,18 @@ namespace NIKE {
 			//	}
 			//}
 
-			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-			//	cout << "TRUE" << endl;
-			//}
+			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ENTER)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			}
 
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
 			//ImGui Render & Update
 			NIKE_IMGUI_SERVICE->update();
+
+			////Render Level Editor
+			// NIKE_LVLEDITOR_SERVICE->render();
 		
 			//Control FPS
 			NIKE_WINDOWS_SERVICE->controlFPS();
@@ -211,6 +230,5 @@ namespace NIKE {
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();
-
 	}
 }

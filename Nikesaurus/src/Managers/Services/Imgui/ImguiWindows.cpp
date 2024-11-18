@@ -26,12 +26,12 @@ namespace NIKE {
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-
-
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
 		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();
 		bool is_debug = NIKE_IMGUI_SERVICE->getDebugMode();
+		bool grid_active = NIKE_IMGUI_SERVICE->getGridActive();
+		static bool create_grid = false;
 
 		// Menu Bar for Play/Pause controls
 		if (ImGui::BeginMenuBar()) {
@@ -67,6 +67,28 @@ namespace NIKE {
 			}
 			ImGui::Spacing();
 
+			ImGui::SameLine();
+			// Button to create grid lines in editor
+			if (ImGui::Button("Create Grid"))
+			{
+				ImGui::OpenPopup("Grid Dimensions");
+				create_grid = true;
+			}
+
+			// Open pop up to create grid
+			create_grid = createGridPopup();
+
+			ImGui::Spacing();
+
+			ImGui::SameLine();
+
+			// Check box to show grid or not
+			ImGui::Text("Toggle Grid: ");
+			if (ImGui::Button(grid_active ? "Hide Gird" : "Show Grid")) {
+				NIKE_IMGUI_SERVICE->setShowGird(!grid_active);
+			}
+
+			ImGui::Spacing();
 
 			ImGui::EndMenuBar();
 		}
@@ -75,63 +97,6 @@ namespace NIKE {
 		ImGui::End();
 
 	}
-
-	//void imguiFileSystemWindow() {
-	//	// Check if the path exists
-	//	if (!std::filesystem::exists(GET_ASSETS_PATH())) {
-	//		ImGui::Text("Assets folder does not exist.");
-	//		return;
-	//	}
-
-	//	static bool show_load_popup = false;
-	//	static std::string selected_asset;
-
-
-	//	// Begin the ImGui window with a title
-	//	ImGui::Begin("Assets Browser");
-
-	//	// Display the current path
-	//	ImGui::Text("Current Path: %s", GET_ASSETS_PATH().string().c_str());
-
-	//	// Navigate back to the root directory
-	//	std::filesystem::path const root_assets_path = "assets/";
-	//	if (GET_ASSETS_PATH() != root_assets_path) {
-	//		if (ImGui::Button("Back")) {
-	//			// Go up one directory level
-	//			SET_ASSETS_PATH(GET_ASSETS_PATH().parent_path());
-	//			GET_ASSETS_PATH() = GET_ASSETS_PATH().parent_path();
-	//		}
-	//	}
-
-	//	// List directories and files
-	//	if (std::filesystem::is_directory(GET_ASSETS_PATH())) {
-	//		for (const auto& entry : std::filesystem::directory_iterator(GET_ASSETS_PATH())) {
-	//			const std::filesystem::path& path = entry.path();
-	//			std::string file_name = path.filename().string();
-
-	//			// If directory, make clickable
-	//			if (std::filesystem::is_directory(path)) {
-	//				if (ImGui::Selectable((file_name + "/").c_str(), false)) {
-	//					// Update to the new path when clicking a directory
-	//					SET_ASSETS_PATH(path);
-	//					GET_ASSETS_PATH() = path;
-	//				}
-	//			}
-	//			// Handle different asset types and drag-and-drop
-	//			else if (hasValidTextureExtension(path) || hasValidAudioExtension(path) || hasValidFontExtension(path)) {
-	//				if (ImGui::Selectable(file_name.c_str())) {
-	//					selected_asset = file_name;
-	//					show_load_popup = true;
-	//				}
-	//			}
-	//		}
-	//	}
-	//	else {
-	//		ImGui::Text("No valid directory or path.");
-	//	}
-
-	//	ImGui::End();
-	//}
 
 	void imguiDebuggingWindow() {
 
@@ -346,7 +311,7 @@ namespace NIKE {
 					// Create a collapsible header for the component
 					if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_None)) {
 						if (component_name == "Transform::Transform") {
-							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get();
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
 							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg");
@@ -357,7 +322,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Texture") {
-							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity).value().get();
 							static char texture_id[300];
 							static bool texture_initialized = false;
 
@@ -435,7 +400,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Physics::Dynamics") {
-							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity).value().get();
 
 							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
 							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
@@ -450,7 +415,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Cam") {
-							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity);
+							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity).value().get();
 
 							// Default value for cam height will be the window height if there is no adjustments
 							if (cam_comp.height <= 0.0f) {
@@ -469,10 +434,10 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Animation::Base") {
-							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity).value().get();
 
 							ImGui::DragInt("Number of Animations (If set to 0, infinite number of animations)", &animate_base_comp.animations_to_complete, 1);
-							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .1f);
+							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .001f);
 							ImGui::Text("Animation timer: %f", &animate_base_comp.timer);
 							ImGui::Text("Completed Animations: %d", animate_base_comp.completed_animations);
 
@@ -510,7 +475,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Animation::Sprite") {
-							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity).value().get();
 
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
@@ -528,7 +493,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Shape") {
-							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).value().get();
 							static char input_model_ref[300];
 							static bool shape_initialized = false;
 
@@ -573,7 +538,7 @@ namespace NIKE {
 
 						}
 						else if (component_name == "Render::Text") {
-							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity).value().get();
 
 							static char input_font_id[300];
 							static char input_text[300];
@@ -645,8 +610,13 @@ namespace NIKE {
 							}
 
 							// Show pop ups
-							show_error_popup = ShowErrorPopup();
-							show_save_popup = ShowSaveConfirmationPopup();
+							if (show_error_popup) {
+								show_error_popup = ShowErrorPopup();  
+							}
+
+							if (show_save_popup) {
+								show_save_popup = ShowSaveConfirmationPopup();  
+							}
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -655,7 +625,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Physics::Collider") {
-							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity).value().get();
 
 							// Variable to hold the selected resolution
 							static NIKE::Physics::Resolution selected_resolution = NIKE::Physics::Resolution::NONE;
@@ -686,7 +656,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Audio::SFX") {
-							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity).value().get();
 							static char input_audio_id[300];
 							static char input_channel_group_id[300];
 							static bool audio_initialized = false;
@@ -770,7 +740,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "GameLogic::Movement") {
-							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity).value().get();
 
 							static char script_path[300];
 							static bool scripth_path_init = false;
@@ -1116,6 +1086,8 @@ namespace NIKE {
 			viewport_width = window_size.y * aspect_ratio;
 		}
 
+		Vector2f viewport_size{viewport_width, viewport_height};
+
 		ImTextureID textureID = (ImTextureID)tex_id;
 		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
 		ImVec2 uv1(1.0f, 0.0f); // Top-right
@@ -1140,13 +1112,19 @@ namespace NIKE {
 		mouse_pos.x -= (viewport_width / 2.0f);
 		mouse_pos.y -= (viewport_height / 2.0f);
 		mouse_pos.y = -mouse_pos.y;
-
 		mouse_pos.x *= scalar.x;
 		mouse_pos.y *= scalar.y;
 
+		Vector2f main_mouse{ mouse_pos.x , mouse_pos.y };
+
+
+		// This function will handle the dragging and dropping in the viewport window
+		handleEntitySelectionAndDrag(main_mouse);
+
+
+
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 
-		// Begin drag-and-drop target to create a new entity with the dropped texture
 		// Begin drag-and-drop target to create a new entity with the dropped texture
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture")) {
@@ -1164,7 +1142,8 @@ namespace NIKE {
 				// Register the entity with the generated reference
 				NIKE_IMGUI_SERVICE->addEntityRef(entity_ref, new_entity);
 
-				Vector2f def_size{ 100.0f, 100.0f };
+				// Texture size is in vec2i, hence this casting
+				Vector2f def_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.x), static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.y) };
 
 				// Convert to own vector
 				Vector2f own_mouse{mouse_pos.x , mouse_pos.y};
@@ -1178,6 +1157,11 @@ namespace NIKE {
 			ImGui::EndDragDropTarget();
 		}
 
+		if (NIKE_IMGUI_SERVICE->getGridActive())
+		{
+			renderGrid(NIKE_IMGUI_SERVICE->getGridDimen(), viewport_size);
+
+		}
 
 		ImGui::End();
 	}

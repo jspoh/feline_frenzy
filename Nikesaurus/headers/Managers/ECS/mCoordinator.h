@@ -121,11 +121,15 @@ namespace NIKE {
 			void removeEntityComponent(Entity::Type entity, Component::Type type);
 
 			template<typename T>
-			T& getEntityComponent(Entity::Type entity) {
+			std::optional<std::reference_wrapper<T>> getEntityComponent(Entity::Type entity) {
 				return component_manager->getEntityComponent<T>(entity);
 			}
 
-			void* getEntityComponent(Entity::Type entity, Component::Type type);
+			std::shared_ptr<void> getEntityComponent(Entity::Type entity, Component::Type type);
+
+			std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity, Component::Type type);
+
+			void setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp);
 
 			template<typename T>
 			bool checkEntityComponent(Entity::Type entity) {
@@ -145,9 +149,13 @@ namespace NIKE {
 				return component_manager->getComponentType(type);
 			}
 
-			std::unordered_map<std::string, void *> getAllComponents(Entity::Type entity) const;
+			std::unordered_map<std::string, std::shared_ptr<void>> getAllEntityComponents(Entity::Type entity) const;
+
+			std::unordered_map<std::string, std::shared_ptr<void>> getAllCopiedEntityComponents(Entity::Type entity) const;
 
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
+
+			size_t getComponentsCount() const;
 
 			/*****************************************************************//**
 			* System Methods
@@ -171,6 +179,12 @@ namespace NIKE {
 			}
 
 			template<typename T>
+			std::string getSystemName()
+			{
+				return system_manager->getSystemName<T>();
+			}
+
+			template<typename T>
 			void addSystemComponentType(Component::Type component)
 			{
 				system_manager->addComponentType<T>(component);
@@ -183,6 +197,7 @@ namespace NIKE {
 
 			void updateSystems();
 
+			std::vector<std::shared_ptr<System::ISystem>>& getAllSystems();
 		};
 	}
 }

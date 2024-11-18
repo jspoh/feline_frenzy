@@ -70,16 +70,23 @@ namespace NIKE {
 			// Setters
 			void setGamePaused(bool pause);
 			void setDebugMode(bool flag);
+			void setTileSize(float size);
+			void setShowGird(bool flag);
+			void setSelectedEntityName(std::string const& name);
 
 			// Gettors
 			std::unordered_map<std::string, Entity::Type>& getEntityRef();
 			std::string& getSelectedEntityName();
 			Entity::Type getEntityByName(std::string const& input);
+			std::string getEntityByType(Entity::Type);
+			Vector2i& getGridDimen();
+			float& getTileSize();
 
 			//Gettor for seeing if imgui is active
 			bool getImguiActive() const;
 			bool getGamePaused() const;
 			bool getDebugMode() const;
+			bool getGridActive() const;
 
 			//Viewport texture event
 			void onEvent(std::shared_ptr<Render::ViewportTexture> event) override;
@@ -101,6 +108,11 @@ namespace NIKE {
 			bool b_dispatch_viewport = false;
 			bool b_pause_game = false;
 			bool b_debug_mode = false;
+			bool b_show_grid = false;
+
+			// Variables to store grid properties
+			Vector2i grid_dimensions;
+			float tile_size;
 
 			//Viewport tex_id
 			unsigned int tex_id;
