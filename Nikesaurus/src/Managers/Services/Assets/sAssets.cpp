@@ -63,7 +63,9 @@ namespace NIKE {
 
 			// Makes sure extension isnt caps sensitive
 			std::string ext = src_file_path.extension().string();
-			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+			std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) {
+				return static_cast<unsigned char>(std::tolower(c));
+				});
 
 			if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
 				std::filesystem::path tgt_file_path = assets_dir / "textures" / src_file_path.filename();

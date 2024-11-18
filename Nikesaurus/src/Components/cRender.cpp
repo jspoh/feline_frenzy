@@ -26,9 +26,7 @@ namespace NIKE {
 			[](Render::Cam const& comp) -> nlohmann::json {
 				return	{
 						{ "Position", comp.position.toJson() },
-						{ "Height", comp.height },
-				};
-						{ "Zoom", comp.zoom },
+						{ "Zoom", comp.zoom }
 						};
 			},
 
@@ -48,33 +46,29 @@ namespace NIKE {
 					//Position before change
 					static float before_change;
 
-					//Drag position
-					if (comp.height <= 0.0f) {
-						comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
-					}
-					ImGui::DragFloat("Camera Height", &comp.height, 0.1f);
+					ImGui::DragFloat("Camera Zoom", &comp.zoom, 0.1f);
 
 					//Check if position has begun editing
 					if (ImGui::IsItemActivated()) {
-						before_change = comp.height;
+						before_change = comp.zoom;
 					}
 
 					//Check if position has finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_height;
+						LevelEditor::Action change_zoom;
 
 						//Change pos do action
-						change_height.do_action = [&, height = comp.height]() {
-							comp.height = height;
+						change_zoom.do_action = [&, zoom = comp.zoom]() {
+							comp.zoom = zoom;
 							};
 
 						//Change pos undo action
-						change_height.undo_action = [&, height = before_change]() {
-							comp.height = height;
+						change_zoom.undo_action = [&, zoom = before_change]() {
+							comp.zoom = zoom;
 							};
 
 						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_height));
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_zoom));
 					}
 
 				}
@@ -190,7 +184,7 @@ namespace NIKE {
 				// For Text font
 				{
 					ImGui::Text("Enter Font (wihtout the ttf):");
-					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 1)) {
+					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 10)) {
 						font_id.resize(strlen(font_id.c_str()));
 					}
 
@@ -261,8 +255,14 @@ namespace NIKE {
 
 				// For Text Origin
 				{
-					
-					
+					static const char* origin_names[] = {"CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
+					// Hold the current selection and the previous value
+					static NIKE::Render::TextOrigin before_select_origin;
+					int current_origin = static_cast<int>(comp.origin);
+					// Combo returns one bool check
+					if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
+						comp.origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
+					}
 				}
 			}
 		);
@@ -283,6 +283,62 @@ namespace NIKE {
 				comp.color.fromJson(data.at("Color"));
 			}
 		);
+
+		// UI for shape
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
+				ImGui::Text("Edit Shape variables");
+
+				//Static variables for string input management
+				static std::string shape_model_input;
+
+				//Initialization of string inputs upon collapsible shown
+				if (ImGui::IsItemActivated()) {
+					shape_model_input = comp.model_id;
+				}
+
+				// For shape model
+				{
+					ImGui::Text("Enter shape model:");
+					if (ImGui::InputText("##ShapeInput", shape_model_input.data(), shape_model_input.capacity() + 1)) {
+						shape_model_input.resize(strlen(shape_model_input.c_str()));
+					}
+
+					ImGui::SameLine();
+
+					//Save Shape model ID Button
+					if (ImGui::Button("Save##ShapeModelID")) {
+						if (NIKE_ASSETS_SERVICE->checkModelExist(shape_model_input))
+						{
+							LevelEditor::Action save_shape_model;
+
+							//Save action
+							save_shape_model.do_action = [&, shape_model = shape_model_input]() {
+								comp.model_id = shape_model;
+								shape_model_input = comp.model_id;
+								};
+
+							//Undo action
+							save_shape_model.undo_action = [&, shape_model = comp.model_id]() {
+								comp.model_id = shape_model;
+								shape_model_input = comp.model_id;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_shape_model));
+						}
+						else
+						{
+							comp_panel.setPopUpErrorMsg("Shape Model Does Not Exist!");
+							comp_panel.openPopUp("Error");
+							shape_model_input = comp.model_id;
+						}
+
+					}
+				}
+
+			}
+		);
+
 
 		//Register shape for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
