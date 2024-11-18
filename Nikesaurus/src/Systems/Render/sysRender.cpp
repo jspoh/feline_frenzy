@@ -316,16 +316,16 @@ namespace NIKE {
 		case TextOrigin::CENTER:
 			pos = { -e_text.size.x / 2.0f, -e_text.size.y / 2.0f };
 			break;
-		case TextOrigin::BOTTOM:
+		case TextOrigin::TOP:
 			pos = { -e_text.size.x / 2.0f, 0.0f };
 			break;
-		case TextOrigin::TOP:
+		case TextOrigin::BOTTOM:
 			pos = { -e_text.size.x / 2.0f, -e_text.size.y };
 			break;
-		case TextOrigin::LEFT:
+		case TextOrigin::RIGHT:
 			pos = { 0.0f, -e_text.size.y / 2.0f };
 			break;
-		case TextOrigin::RIGHT:
+		case TextOrigin::LEFT:
 			pos = { -e_text.size.x, -e_text.size.y / 2.0f };
 			break;
 		default:

@@ -117,13 +117,13 @@ namespace NIKE {
 				// For Text Scale
 				{
 					// Before change
-					static float before_change;
+					static float editing_initial_scale = 0.0f;
 
 					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f, EPSILON);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
-						before_change = comp.scale;
+						editing_initial_scale = comp.scale;
 					}
 
 					//Check if finished editing
@@ -136,7 +136,7 @@ namespace NIKE {
 							};
 
 						//Change pos undo action
-						change_text_scale.undo_action = [&, scale = before_change]() {
+						change_text_scale.undo_action = [&, scale = editing_initial_scale]() {
 							comp.scale = scale;
 							};
 
@@ -229,10 +229,10 @@ namespace NIKE {
 				// For Text input
 				{	
 					// When init only, not everytime
-					//if (!comp.text.empty() && text_input.empty())
-					//{
-					//	text_input = comp.text;
-					//}
+					if (!comp.text.empty() && text_input.empty())
+					{
+						text_input = comp.text;
+					}
 
 					ImGui::Text("Enter text:");
 					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
@@ -269,7 +269,7 @@ namespace NIKE {
 
 				// For Text Origin
 				{
-					static const char* origin_names[] = {"CENTER", "BOTTOM", "TOP", "LEFT", "RIGHT"};
+					static const char* origin_names[] = {"CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT"};
 					// Hold the current selection and the previous value
 					static NIKE::Render::TextOrigin before_select_origin;
 					static int previous_origin = static_cast<int>(comp.origin);
