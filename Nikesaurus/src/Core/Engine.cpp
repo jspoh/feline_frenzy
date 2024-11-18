@@ -148,13 +148,13 @@ namespace NIKE {
 		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
 
 		//Init imgui
-		// NIKE_IMGUI_SERVICE->init();
+		//NIKE_IMGUI_SERVICE->init();
 
 		////Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
 		 
 		//Init UI
-		NIKE_UI_SERVICE->init();
+		//NIKE_UI_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();
@@ -183,7 +183,7 @@ namespace NIKE {
 			NIKE_LVLEDITOR_SERVICE->update();
 
 			//update UI First
-			//NIKE_UI_SERVICE->update();
+			NIKE_UI_SERVICE->update();
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
