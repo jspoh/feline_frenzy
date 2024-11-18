@@ -818,7 +818,9 @@ namespace NIKE {
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
 		error_msg = std::make_shared<std::string>("Comp Error");
+		success_msg = std::make_shared<std::string>("Saving Success");
 		registerPopUp("Error", defPopUp("Error", error_msg));
+		registerPopUp("Success", defPopUp("Success", success_msg));
 	}
 
 	void LevelEditor::ComponentsPanel::update() {
@@ -921,6 +923,11 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::setPopUpErrorMsg(std::string const& msg) {
 		error_msg->assign(msg);
+	}
+
+	void LevelEditor::ComponentsPanel::setPopUpSuccessMsg(std::string const& msg)
+	{
+		success_msg->assign(msg);
 	}
 
 	/*****************************************************************//**

@@ -248,6 +248,9 @@ namespace NIKE {
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
 
+			//Component setting success message ( Usage: Editing success popup message )
+			std::shared_ptr<std::string> success_msg;
+
 			//Components Map
 			std::unordered_map<std::string, Component::Type> comps;
 
@@ -279,6 +282,9 @@ namespace NIKE {
 
 			//Set error message for popup
 			void setPopUpErrorMsg(std::string const& msg);
+
+			//Set error message for popup
+			void setPopUpSuccessMsg(std::string const& msg);
 
 			//Add component UI function
 			template<typename T>

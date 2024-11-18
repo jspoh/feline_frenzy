@@ -212,6 +212,9 @@ namespace NIKE {
 								};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_font_id));
+							comp_panel.setPopUpSuccessMsg("Font Saved successfully");
+							comp_panel.openPopUp("Success");
+
 						}
 						else {
 							comp_panel.setPopUpErrorMsg("Font Does Not Exist!");
@@ -259,6 +262,8 @@ namespace NIKE {
 							};
 
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+						comp_panel.setPopUpSuccessMsg("Text Saved successfully");
+						comp_panel.openPopUp("Success");
 					}
 				}
 
@@ -354,6 +359,8 @@ namespace NIKE {
 								};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_shape_model));
+							comp_panel.setPopUpSuccessMsg("Shape Model Saved!");
+							comp_panel.openPopUp("Success");
 						}
 						else
 						{
