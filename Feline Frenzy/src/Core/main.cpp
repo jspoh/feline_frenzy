@@ -26,7 +26,7 @@ int WINAPI WinMain(
 	#endif
 
 	//Init Engine
-	NIKE_ENGINE.init("src/Core/Config.txt", 60, "Welcome To Nikesaurus.");
+	NIKE_ENGINE.init("Config.txt", 60, "Welcome To Nikesaurus.");
 
 	//Register Scenes
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
