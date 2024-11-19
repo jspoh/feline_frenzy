@@ -160,10 +160,12 @@ namespace NIKE {
 	}
 
 	void LevelEditor::MainPanel::render() {
+		//Get ImGui IO
+		ImGuiIO& io = ImGui::GetIO();
+
 		//Set up main panel position for docking
 		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-		ImGui::SetNextWindowSize(ImVec2(static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x),
-			static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y)));
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y));
 
 		//Begin Frame
 		ImGui::Begin(getName().c_str(), nullptr, static_cast<ImGuiWindowFlags>(window_flags));
@@ -258,6 +260,12 @@ namespace NIKE {
 	void LevelEditor::GameWindowPanel::init() {
 		std::shared_ptr<GameWindowPanel> game_window_listener (this, [](GameWindowPanel*){});
 		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(game_window_listener);
+
+		//Usage of tile map panel for rendering grid
+		tile_map_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
+
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 	}
 
 	void LevelEditor::GameWindowPanel::update() {
@@ -297,6 +305,15 @@ namespace NIKE {
 
 		//Render game to viewport
 		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
+
+		//If grid is showing
+		if (main_panel->getGridState()) {
+			//Get imgui draw list for custom rendering
+			ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+			//Render grid
+			tile_map_panel->renderGrid(draw_list, Vector2f(viewport_width, viewport_height));
+		}
 
 		ImGui::End();
 	}
@@ -1191,17 +1208,210 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Tile Map Management Panel
 	*********************************************************************/
+	ImVec2 LevelEditor::TileMapPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) const {
+		//Get window position ( Relative to top left corner of the rendering point in window )
+		Vector2f window_pos = { ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
+
+		//Get scale relative to the world size
+		Vector2f scale { render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+
+		//Return screen coordinates
+		return { window_pos.x + (render_size.x / 2.0f) + (pos.x * scale.x), window_pos.y + (render_size.y / 2.0f) + (pos.y * scale.y) };
+	}
+
 	void LevelEditor::TileMapPanel::init() {
 
 	}
 
 	void LevelEditor::TileMapPanel::update() {
-
+		grid_scale = { 
+			NIKE_MAP_SERVICE->getGridSize().x * NIKE_MAP_SERVICE->getCellSize().x,
+			NIKE_MAP_SERVICE->getGridSize().y * NIKE_MAP_SERVICE->getCellSize().y 
+		};
 	}
 
 	void LevelEditor::TileMapPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Show Grid Scale
+		{
+			ImGui::Text("Grid scale: %.3f, %.3f", grid_scale.x, grid_scale.y);
+		}
+
+		ImGui::Spacing();
+
+		//Adjust grid size
+		{
+			//Static grid size
+			static Vector2i grid_size = NIKE_MAP_SERVICE->getGridSize();
+			static Vector2i grid_size_before_change;
+
+			//Adjust grid size
+			ImGui::Text("Adjust grid size: ");
+			ImGui::DragInt2("Grid Size", &grid_size.x, 0.1f, 0, INT16_MAX);
+
+			//Check if grid has begun editing
+			if (ImGui::IsItemActivated()) {
+				grid_size_before_change = NIKE_MAP_SERVICE->getGridSize();
+			}
+
+			//Check if grid has finished editing
+			if (ImGui::IsItemDeactivatedAfterEdit()) {
+				Action change_grid_size;
+
+				//Change grid size action
+				change_grid_size.do_action = [&, grid = grid_size]() {
+					NIKE_MAP_SERVICE->setGridSize(grid);
+					grid_size = grid;
+					};
+
+				//Undo change grid size
+				change_grid_size.undo_action = [&, grid = grid_size_before_change]() {
+					NIKE_MAP_SERVICE->setGridSize(grid);
+					grid_size = grid;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_grid_size));
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Adjust cell size
+		{
+			//Static cell size
+			static Vector2f cell_size = NIKE_MAP_SERVICE->getCellSize();
+			static Vector2f cell_size_before_change;
+
+			//Adjust cell size
+			ImGui::Text("Adjust cell size: ");
+			ImGui::DragFloat2("Cell Size", &cell_size.x, 0.1f, 0, INT16_MAX);
+
+			//Check if cell has begun editing
+			if (ImGui::IsItemActivated()) {
+				cell_size_before_change = NIKE_MAP_SERVICE->getCellSize();
+			}
+
+			//Check if cell has finished editing
+			if (ImGui::IsItemDeactivatedAfterEdit()) {
+				Action change_cell_size;
+
+				//Change cell size action
+				change_cell_size.do_action = [&, cell = cell_size]() {
+					NIKE_MAP_SERVICE->setCellSize(cell);
+					cell_size = cell;
+					};
+
+				//Undo change cell size
+				change_cell_size.undo_action = [&, cell = cell_size_before_change]() {
+					NIKE_MAP_SERVICE->setCellSize(cell);
+					cell_size = cell;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cell_size));
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Adjust grid color
+		{
+			static Vector4f color_before_change;
+			ImGui::Text("Adjust grid color: ");
+			ImGui::ColorPicker4("Grid Color", &grid_color.r, ImGuiColorEditFlags_AlphaBar);
+
+			//Check if color has begun editing
+			if (ImGui::IsItemActivated()) {
+				color_before_change = grid_color;
+			}
+
+			//Check if thickness has finished editing
+			if (ImGui::IsItemDeactivatedAfterEdit()) {
+				Action change_color;
+
+				//Change color action
+				change_color.do_action = [&, color = grid_color]() {
+					grid_color = color;
+					};
+
+				//Undo change color
+				change_color.undo_action = [&, color = color_before_change]() {
+					grid_color = color;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_color));
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Adjust grid thickness
+		{
+			static float thickness_before_change = 0.0f;
+			ImGui::Text("Adjust grid thickness: ");
+			ImGui::DragFloat("Grid Thickness", &grid_thickness, 0.1f, 1.0f, 10.0f);
+
+			//Check if thickness has begun editing
+			if (ImGui::IsItemActivated()) {
+				thickness_before_change = grid_thickness;
+			}
+
+			//Check if thickness has finished editing
+			if (ImGui::IsItemDeactivatedAfterEdit()) {
+				Action change_thickness;
+
+				//Change thickness action
+				change_thickness.do_action = [&, thickness = grid_thickness]() {
+					grid_thickness = thickness;
+					};
+
+				//Undo change thickness
+				change_thickness.undo_action = [&, thickness = thickness_before_change]() {
+					grid_thickness = thickness;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_thickness));
+			}
+		}
+
 		ImGui::End();
+	}
+
+	void LevelEditor::TileMapPanel::renderGrid(void* draw_list, Vector2f const& render_size) {
+
+		//Internal imgui draw
+		auto draw = static_cast<ImDrawList*>(draw_list);
+
+		//Get Grid Size
+		auto grid_size = NIKE_MAP_SERVICE->getGridSize();
+
+		//Get cell size
+		auto cell_size = NIKE_MAP_SERVICE->getCellSize();
+
+		//Calculate limits
+		float top =		-(grid_scale.y / 2.0f);
+		float bot =		(grid_scale.y / 2.0f);
+		float left =	-(grid_scale.x / 2.0f);
+		float right	=	(grid_scale.x / 2.0f);
+
+		//Convert rendersize
+		ImVec2 rendersize = { render_size.x, render_size.y };
+
+		//Convert color
+		ImU32 color = IM_COL32(grid_color.r * 255, grid_color.g * 255, grid_color.b * 255, grid_color.a * 255);
+
+		//Add lines for grid for rows
+		for (int i = 0; i <= grid_size.y; i++) {
+			draw->AddLine(worldToScreen({ left, top + (cell_size.y * i) }, rendersize), worldToScreen({ right, top + (cell_size.y * i)}, rendersize), color, grid_thickness);
+		}
+
+		//Add lines for grid for cols
+		for (int j = 0; j <= grid_size.x; j++) {
+			draw->AddLine(worldToScreen({ left + (cell_size.x * j), top }, rendersize), worldToScreen({ left + (cell_size.x * j) , bot }, rendersize), color, grid_thickness);
+		}
 	}
 }

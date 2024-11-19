@@ -95,7 +95,7 @@ namespace NIKE {
 			void setGridState(bool state);
 
 		public:
-			MainPanel() :window_flags{ 0 }, b_debug_mode { false }, b_game_state{ true } {}
+			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ true }, b_grid_state{ false } {}
 			~MainPanel() = default;
 
 			//Panel Name
@@ -127,6 +127,9 @@ namespace NIKE {
 			void render() override;
 		};
 
+		//Forward declaration of the tilemap panel
+		class TileMapPanel;
+
 		//Game Window Panel
 		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
 		private:
@@ -135,6 +138,12 @@ namespace NIKE {
 
 			//Mouse position relative to Game Window
 			Vector2f relative_mouse_pos;
+
+			//Grid management panel
+			std::shared_ptr<TileMapPanel> tile_map_panel;
+
+			//Main panel
+			std::shared_ptr<MainPanel> main_panel;
 
 			//Game window render event
 			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
@@ -383,8 +392,21 @@ namespace NIKE {
 		//Grid Management Panel
 		class TileMapPanel : public IPanel {
 		private:
+			#ifdef NIKE_BUILD_DLL
+			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) const;
+			#endif // DEBUG
+
+			//Grid scale
+			Vector2f grid_scale;
+
+			//Grid thickness
+			float grid_thickness;
+
+			//Grid Color
+			Vector4f grid_color;
+
 		public:
-			TileMapPanel() = default;
+			TileMapPanel() : grid_scale(), grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f } {}
 			~TileMapPanel() = default;
 
 			//Panel Name
@@ -405,6 +427,9 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			//Render grid
+			void renderGrid(void* draw_list, Vector2f const& render_size);
 		};
 	}
 }

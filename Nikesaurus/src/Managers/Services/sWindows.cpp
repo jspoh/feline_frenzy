@@ -112,8 +112,6 @@ namespace NIKE {
 		GLFWmonitor* monitor;
 		const GLFWvidmode* mode;
 
-		//Static Window Size For Remembering Size Before FullScreen
-		static Vector2i win_size;
 
 		if (value == GLFW_TRUE && !b_full_screen) {
 			//Get FullScreen Attributes
@@ -122,7 +120,7 @@ namespace NIKE {
 
 			// Get the window position and size
 			glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
-			glfwGetWindowSize(ptr_window, &win_size.x, &win_size.y);
+			glfwGetWindowSize(ptr_window, &size_before_fullscreen.x, &size_before_fullscreen.y);
 
 			// Recreate the window in fullscreen mode
 			glfwSetWindowMonitor(ptr_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
@@ -136,7 +134,7 @@ namespace NIKE {
 			monitor = nullptr;
 
 			// Recreate the window in windowed mode at the stored position and size
-			glfwSetWindowMonitor(ptr_window, nullptr, window_pos.x, window_pos.y, win_size.x, win_size.y, 0);
+			glfwSetWindowMonitor(ptr_window, nullptr, window_pos.x, window_pos.y, size_before_fullscreen.x, size_before_fullscreen.y, 0);
 
 			//Set Full Screen Mode False
 			b_full_screen = false;
@@ -189,7 +187,12 @@ namespace NIKE {
 	}
 
 	Vector2i Windows::NIKEWindow::getWindowSize() const {
-		return window_size;
+		if (b_full_screen) {
+			return size_before_fullscreen;
+		}
+		else {
+			return window_size;
+		}
 	}
 
 	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const {

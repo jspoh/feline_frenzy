@@ -522,7 +522,7 @@ namespace NIKE {
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-					transformAndRenderEntity(entity, NIKE_IMGUI_SERVICE->getDebugMode());
+					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
 				}
 			}
 		}
