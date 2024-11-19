@@ -102,17 +102,20 @@ namespace NIKE {
 
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
-				ImGui::Text("Edit Text variables");
 
 				//Static variables for string input management
 				static std::string font_id;
 				static std::string text_input;
 
 				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated()) {
+				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
 					font_id = comp.font_id;
 					text_input = comp.text;
 				}
+
+				ImGui::Text("Edit Text variables");
+
+				ImGui::Spacing();
 
 				// For Text Scale
 				{
@@ -121,7 +124,6 @@ namespace NIKE {
 
 					// Allow scale adjustment UI
 					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f);
-
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -148,6 +150,8 @@ namespace NIKE {
 
 				}
 
+				ImGui::Spacing();
+
 				//ImGui::Text((std::string("Text Size X: ") + std::to_string(comp.size.x)).c_str());
 				//ImGui::Text((std::string("Text Size Y: ") + std::to_string(comp.size.y)).c_str());
 
@@ -155,6 +159,8 @@ namespace NIKE {
 				{
 					// Before change
 					static Vector4f before_change;
+
+					ImGui::Text("Adjust text color:");
 
 					ImGui::ColorPicker4("Text Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
@@ -183,16 +189,10 @@ namespace NIKE {
 
 				}
 
+				ImGui::Spacing();
+
 				// For Text font
 				{
-
-					// When init only, not everytime
-					if (!comp.font_init && font_id != comp.font_id)
-					{
-						font_id = comp.font_id;
-						comp.font_init = true;
-					}
-
 					ImGui::Text("Enter Font (wihtout the ttf):");
 					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 10)) {
 						font_id.resize(strlen(font_id.c_str()));
@@ -232,41 +232,32 @@ namespace NIKE {
 
 				}
 
+				ImGui::Spacing();
 
-				// For Text input
+				//Set Text input
 				{
-					// When init only, not everytime
-					if (!comp.text_init && text_input != comp.text)
-					{
-						text_input = comp.text;
-						comp.text_init = true;
-					}
-
-					ImGui::Text("Enter text:");
+					//Set Text input
+					ImGui::Text("Enter Text:");
 					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
 						text_input.resize(strlen(text_input.c_str()));
 					}
 
 					ImGui::SameLine();
 
-					//Save font ID Button
+					//Save text input Button
 					if (ImGui::Button("Save##TextInput")) {
 						LevelEditor::Action save_text;
 
-						// Capture the current value of comp.text 
-						std::string before_change_text = comp.text;
-						std::string before_change_input = text_input;
-
-						//Save action
-						save_text.do_action = [&, text = before_change_input]() {
+						//Save texrt action
+						save_text.do_action = [&, text = text_input]() {
 							comp.text = text;
-							text_input = text;
+							text_input = comp.text;
 							};
 
-						//Undo action
-						save_text.undo_action = [&, text = before_change_text]() {
+						//Undo save text action
+						save_text.undo_action = [&, text = comp.text]() {
 							comp.text = text;
-							text_input = text;
+							text_input = comp.text;
 							};
 
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
@@ -275,8 +266,11 @@ namespace NIKE {
 					}
 				}
 
+				ImGui::Spacing();
+
 				// For Text Origin
 				{
+					ImGui::Text("Adjust text origin:");
 					static const char* origin_names[] = { "CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT" };
 					// Hold the current selection and the previous value
 					static NIKE::Render::TextOrigin before_select_origin;
@@ -329,15 +323,17 @@ namespace NIKE {
 		// UI for shape
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
-				ImGui::Text("Edit Shape variables");
-
 				//Static variables for string input management
 				static std::string shape_model_input;
 
 				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated()) {
+				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
 					shape_model_input = comp.model_id;
 				}
+
+				ImGui::Text("Edit Shape variables");
+
+				ImGui::Spacing();
 
 				// For shape model
 				{
@@ -380,11 +376,14 @@ namespace NIKE {
 					}
 				}
 
+				ImGui::Spacing();
 
 				// For shape color
 				{
 					// Before change
 					static Vector4f before_change;
+
+					ImGui::Text("Adjust shape color:");
 
 					ImGui::ColorPicker4("Shape Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
@@ -449,7 +448,6 @@ namespace NIKE {
 
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
-				ImGui::Text("Edit Texture variables");
 
 				//Static variables for string input management
 				static std::string texture_id_input;
@@ -459,14 +457,12 @@ namespace NIKE {
 					texture_id_input = comp.texture_id;
 				}
 
+				ImGui::Text("Edit Texture variables");
+
+				ImGui::Spacing();
+
 				// For texture id
 				{
-					// When init only, not everytime
-					//if (texture_id_input != comp.texture_id)
-					//{
-					//	texture_id_input = comp.texture_id;
-					//}
-
 					ImGui::Text("Enter Texture id:");
 					if (ImGui::InputText("##TextureIDInput", texture_id_input.data(), texture_id_input.capacity() + 10)) {
 						texture_id_input.resize(strlen(texture_id_input.c_str()));
@@ -506,6 +502,8 @@ namespace NIKE {
 					}
 				}
 
+				ImGui::Spacing();
+
 				if (!comp.texture_id.empty())
 				{
 					// For texture frame size
@@ -544,6 +542,8 @@ namespace NIKE {
 						}
 					}
 
+					ImGui::Spacing();
+
 					// For texture frame index
 					{
 						// Before change
@@ -580,10 +580,14 @@ namespace NIKE {
 						}
 					}
 
+					ImGui::Spacing();
+
 					// For texture color
 					{
 						// Before change
 						static Vector4f texture_color_before_change;
+
+						ImGui::Text("Adjust texture blend color:");
 
 						ImGui::ColorPicker4("Texture Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
@@ -611,6 +615,8 @@ namespace NIKE {
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_color));
 						}
 					}
+
+					ImGui::Spacing();
 
 					// For texture intensity
 					{
@@ -644,6 +650,8 @@ namespace NIKE {
 						}
 					}
 
+					ImGui::Spacing();
+
 					// Stretch checkbox
 					{
 						static bool before_bool_stretch = comp.b_stretch;
@@ -670,6 +678,8 @@ namespace NIKE {
 
 						}
 					}
+
+					ImGui::Spacing();
 
 					// Blend checkbox
 					{
@@ -698,6 +708,8 @@ namespace NIKE {
 						}
 					}
 
+					ImGui::Spacing();
+
 					// Flip x-axis checkbox
 					{
 						static bool before_bool_flip_x = comp.b_flip.x;
@@ -725,6 +737,7 @@ namespace NIKE {
 						}
 					}
 
+					ImGui::Spacing();
 
 					// Flip y-axis checkbox
 					{

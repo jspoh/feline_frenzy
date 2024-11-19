@@ -710,6 +710,7 @@ namespace NIKE {
 	void LevelEditor::ComponentsPanel::onEvent(std::shared_ptr<SelectedEntityEvent> event) {
 		selected_entity = event->selected_entity;
 		selected_entity_ref = event->selected_entity_ref;
+		b_entity_changed = true;
 		event->setEventProcessed(true);
 	}
 
@@ -935,7 +936,14 @@ namespace NIKE {
 		//Render popups
 		renderPopUps();
 
+		//Reset entity changed flag
+		b_entity_changed = false;
+
 		ImGui::End();
+	}
+
+	bool LevelEditor::ComponentsPanel::isEntityChanged() const {
+		return b_entity_changed;
 	}
 
 	void LevelEditor::ComponentsPanel::setPopUpErrorMsg(std::string const& msg) {
@@ -1346,6 +1354,12 @@ namespace NIKE {
 			NIKE_MAP_SERVICE->getGridSize().x * NIKE_MAP_SERVICE->getCellSize().x,
 			NIKE_MAP_SERVICE->getGridSize().y * NIKE_MAP_SERVICE->getCellSize().y 
 		};
+
+		//Clicking to set map cells to blocked
+		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+		if (b_grid_mode && game_window->isMouseInWindow() && NIKE_MAP_SERVICE->getCursorCell().has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+			NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked = !NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked;
+		}
 	}
 
 	void LevelEditor::TileMapPanel::render() {
@@ -1429,6 +1443,34 @@ namespace NIKE {
 
 				//Execute action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cell_size));
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Adjust grid mode
+		{
+			//Adjust cell size
+			ImGui::Text("Set grid mode: ");
+			ImGui::SameLine();
+			ImGui::Button(b_grid_mode ? "Editing" : "View");
+
+			//Check if button has been activated
+			if (ImGui::IsItemActivated()) {
+				Action set_grid_mode;
+
+				//Do grid mode
+				set_grid_mode.do_action = [&, mode = !b_grid_mode]() {
+					b_grid_mode = mode;
+					};
+
+				//Undo grid mode
+				set_grid_mode.undo_action = [&, mode = b_grid_mode]() {
+					b_grid_mode = mode;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_grid_mode));
 			}
 		}
 
@@ -1530,6 +1572,15 @@ namespace NIKE {
 		//Add lines for grid for cols
 		for (int j = 0; j <= grid_size.x; j++) {
 			draw->AddLine(worldToScreen({ left + (cell_size.x * j), top }, rendersize), worldToScreen({ left + (cell_size.x * j) , bot }, rendersize), color, grid_thickness);
+		}
+
+		//Render dark hue over blocked squares
+		for (auto const& row : NIKE_MAP_SERVICE->getGrid()) {
+			for (auto const& cell : row) {
+				if (cell.b_blocked) {
+					draw->AddRectFilled(worldToScreen({ cell.position.x - (cell_size.x / 2.0f),  cell.position.y - (cell_size.y / 2.0f) }, rendersize), worldToScreen({ cell.position.x + (cell_size.x / 2.0f),  cell.position.y + (cell_size.y / 2.0f) }, rendersize), IM_COL32(0, 0, 0, 100));
+				}
+			}
 		}
 	}
 }

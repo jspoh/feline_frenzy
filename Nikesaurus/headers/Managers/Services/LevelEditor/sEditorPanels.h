@@ -245,6 +245,9 @@ namespace NIKE {
 			//Current Selected Entity String Reference
 			std::string selected_entity_ref;
 
+			//Entity changed event boolean
+			bool b_entity_changed;
+
 			//On new selected entity event
 			void onEvent(std::shared_ptr<SelectedEntityEvent> event) override;
 
@@ -267,7 +270,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>> comps_ui;
 
 		public:
-			ComponentsPanel() : selected_entity{ UINT16_MAX }, selected_entity_ref{ "" } {}
+			ComponentsPanel() : selected_entity{ UINT16_MAX }, selected_entity_ref{ "" }, b_entity_changed{ false } {}
 			~ComponentsPanel() = default;
 
 			//Panel Name
@@ -288,6 +291,9 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			//Get entity changed boolean
+			bool isEntityChanged() const;
 
 			//Set error message for popup
 			void setPopUpErrorMsg(std::string const& msg);
@@ -420,11 +426,14 @@ namespace NIKE {
 			//Grid Color
 			Vector4f grid_color;
 
+			//Boolean for grid mode
+			bool b_grid_mode;
+
 			//Camera panel reference
 			std::shared_ptr<CameraPanel> cam_panel;
 
 		public:
-			TileMapPanel() : grid_scale(), grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f } {}
+			TileMapPanel() : grid_scale(), grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_mode{ false } {}
 			~TileMapPanel() = default;
 
 			//Panel Name
