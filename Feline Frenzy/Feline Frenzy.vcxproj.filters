@@ -60,5 +60,6 @@
     <None Include="assets\Shaders\batched_texture.frag" />
     <None Include="assets\Scripts\player.lua" />
     <None Include="assets\Scripts\move.lua" />
+    <None Include="assets\Scripts\createBullet.lua" />
   </ItemGroup>
 </Project>

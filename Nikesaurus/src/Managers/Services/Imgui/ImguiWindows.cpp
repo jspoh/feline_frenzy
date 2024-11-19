@@ -1119,7 +1119,7 @@ namespace NIKE {
 
 
 		// This function will handle the dragging and dropping in the viewport window
-		handleEntitySelectionAndDrag(main_mouse);
+		//handleEntitySelectionAndDrag(main_mouse);
 
 
 

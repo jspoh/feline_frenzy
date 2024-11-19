@@ -12,6 +12,28 @@
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
+    void Lua::System::createEntityFromPrefab(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
+        if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+            // Create entity function call ( Defaulted to the base layer for now )
+            Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+
+            // If empty string, assign default string
+            std::string name = entity_name.empty() ? "entity_" + std::to_string(new_id) : entity_name;
+
+            // Save entity_name string
+            NIKE_IMGUI_SERVICE->addEntityRef(name, new_id);
+
+            // Load entity with prefab
+            std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
+            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
+
+            // Set entity position to default (0, 0)
+            auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
+            if (e_transform_comp.has_value()) {
+                e_transform_comp.value().get().position = { 0.f, 0.f };
+            }
+        }
+    }
 
     void Lua::System::registerBindings() {
 
@@ -32,6 +54,12 @@ namespace NIKE {
         lua_state->set_function("isKeyPressed", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyPressed(key); });
         lua_state->set_function("isKeyTriggered", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyTriggered(key); });
         lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
+
+        //Register lua binding for prefab loading
+        lua_state->set_function("createEntityFromPrefab", [this](int layer_id, const std::string& file_path, const std::string& entity_name) {
+            this->createEntityFromPrefab(layer_id, file_path, entity_name);
+            });
+
 
         //Bind Cout for lua
         lua_state->set_function("cout", sol::overload(

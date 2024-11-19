@@ -56,6 +56,9 @@ namespace NIKE {
 			//Reload all lua scripts
 			void reloadAllScripts();
 
+			//Create entity from prefab
+			void createEntityFromPrefab(int layer_id, const std::string& file_path, const std::string& entity_name);
+
 			//Execute lua scripts
 			sol::protected_function executeScript(std::string const& script_id, std::string const& function);
 		};
