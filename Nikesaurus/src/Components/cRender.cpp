@@ -443,5 +443,61 @@ namespace NIKE {
 				comp.b_flip.fromJson(data.at("B_Flip"));
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
+				ImGui::Text("Edit Texture variables");
+
+				//Static variables for string input management
+				static std::string texture_id_input;
+
+				//Initialization of string inputs upon collapsible shown
+				if (ImGui::IsItemActivated()) {
+					texture_id_input = comp.texture_id;
+				}
+
+				// For texture id
+				{
+					ImGui::Text("Enter Texture id:");
+					if (ImGui::InputText("##TextureIDInput", texture_id_input.data(), texture_id_input.capacity() + 10)) {
+						texture_id_input.resize(strlen(texture_id_input.c_str()));
+					}
+
+					ImGui::SameLine();
+
+					//Save Shape model ID Button
+					if (ImGui::Button("Save##TextureID")) {
+						if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id_input))
+						{
+							LevelEditor::Action save_texture_id;
+
+							//Save action
+							save_texture_id.do_action = [&, texture_id = texture_id_input]() {
+								comp.texture_id = texture_id;
+								texture_id_input = comp.texture_id;
+								};
+
+							//Undo action
+							save_texture_id.undo_action = [&, texture_id = comp.texture_id]() {
+								comp.texture_id = texture_id;
+								texture_id_input = comp.texture_id;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_texture_id));
+							comp_panel.setPopUpSuccessMsg("Texture ID Saved!");
+							comp_panel.openPopUp("Success");
+						}
+						else
+						{
+							comp_panel.setPopUpErrorMsg("Texture ID Does Not Exist!");
+							comp_panel.openPopUp("Error");
+							texture_id_input = comp.texture_id;
+						}
+
+					}
+				}
+
+			}
+				);
 	}
 }
