@@ -295,33 +295,10 @@ namespace NIKE {
 		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
-	bool Assets::RenderLoader::checkFileSignature(const std::string& path) {
-
-		std::ifstream file(path, std::ios::binary);
-		if (!file.is_open()) {
-			NIKEE_CORE_ERROR("Failed to open file: ", path);
-			return false;
-		}
-		unsigned char signature[8] = {};
-		file.read(reinterpret_cast<char*>(signature), 8);
-		file.close();
-
-		// PNG signature: 89 50 4E 47 0D 0A 1A 0A
-		const unsigned char png_signature[8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-		if (memcmp(signature, png_signature, 8) == 0) {
-			return true;
-		}
-		else {
-			NIKEE_CORE_ERROR("File is not a valid PNG!");
-			return false;
-		}
-	}
 
 	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
 		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
-
-
 
 		if (filetype == "tex") {
 			is_tex_or_png_ext = true;
@@ -331,13 +308,16 @@ namespace NIKE {
 
 			std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
 			if (!texture_file.is_open()) {
-				cerr << "Failed to open texture file: " << path_to_texture << endl;
-				throw std::runtime_error("Failed to open texture file.");
+				NIKEE_CORE_ERROR("Failed to open texture file: {}", path_to_texture);
+				return nullptr;
 			}
 
 			// get tex_size of texture file
 			tex_size = static_cast<int>(texture_file.tellg());
-
+			if (tex_size <= 0) {
+				NIKEE_CORE_ERROR("Texture file is empty or invalid: {}", path_to_texture);
+				return nullptr;
+			}
 			// return to beginning of file
 			texture_file.seekg(0, std::ios::beg);
 
@@ -345,8 +325,9 @@ namespace NIKE {
 
 			// read tex data into ptr
 			if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
-				cerr << "Failed to read texture file: " << path_to_texture << endl;
-				throw std::runtime_error("Failed to read texture file.");
+				NIKEE_CORE_ERROR("Failed to read texture file: {}", path_to_texture);
+				delete[] tex_data;  // Free memory before returning
+				return nullptr;
 			}
 			texture_file.close();
 
@@ -354,11 +335,8 @@ namespace NIKE {
 		}
 
 		// is not .tex file
-		if (filetype == "png") {
-			if (!checkFileSignature(path_to_texture)) {
-				NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
-				return NULL;
-			}
+		if (filetype == "png" || filetype == "PNG") {
+
 			is_tex_or_png_ext = true;
 		}
 		else {
@@ -369,21 +347,15 @@ namespace NIKE {
 		stbi_set_flip_vertically_on_load(true);
 		const int desired_channels = 4;
 		char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels));
-		if (img_data == nullptr) {
+		if (img_data == nullptr || width == 0 || height == 0) {
 			NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
 			NIKEE_CORE_ERROR("stb_image error:  {}", stbi_failure_reason());
-			throw std::runtime_error("Failed to load image data.");
+			return nullptr; // Return nullptr if loading fails
 		}
 
-		tex_size = width * height * channels;
+		tex_size = width * height * 4;
 
-		char* data = new char[tex_size];
-		for (int i{}; i < tex_size; i++) {
-			data[i] = img_data[i];
-		}
-		stbi_image_free(img_data);
-
-		return data;
+		return img_data; 
 	}
 
 	unsigned int Assets::RenderLoader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
@@ -557,10 +529,9 @@ namespace NIKE {
 
 	Assets::Texture Assets::RenderLoader::compileTexture(const std::string& path_to_texture) {
 		// find file type
-		std::string junk, filetype;
-		std::stringstream ss{ path_to_texture };
-		std::getline(ss, junk, '.');
-		std::getline(ss, filetype, '.');
+		std::filesystem::path file_path(path_to_texture);
+		std::string filetype = file_path.extension().string();
+		filetype = filetype.substr(1);  // Remove the leading '.' character
 
 		int tex_width{};
 		int tex_height{};

@@ -194,6 +194,9 @@ namespace NIKE {
 			//Check if texture loaded
 			const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
 
+			//Handle drop for textures
+			void handleTextureDrop(const std::filesystem::path& src_file_path);
+
 			/*****************************************************************//**
 			* Audio
 			*********************************************************************/
@@ -223,6 +226,9 @@ namespace NIKE {
 
 			//Check if audio exits
 			bool checkAudioExist(std::string const& audio_tag);
+
+			//Handle drop for textures
+			void handleAudioDrop(const std::filesystem::path& src_file_path);
 
 			/*****************************************************************//**
 			* Scn File path
