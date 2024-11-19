@@ -176,7 +176,7 @@ namespace NIKE {
 			//Poll system events
 			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-			//Clear buffer ( Temp )
+			//Clear buffer
 			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
 			//Update all audio pending actions
@@ -191,8 +191,8 @@ namespace NIKE {
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
 
-			//Escape Key Testing //!MOVE OUT SOON
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+			//Escape Key
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 			}
 
@@ -211,7 +211,7 @@ namespace NIKE {
 			//	}
 			//}
 
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ENTER)) {
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 			}
 
@@ -230,6 +230,9 @@ namespace NIKE {
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 		}
+
+		//Clean up level editor
+		NIKE_LVLEDITOR_SERVICE->cleanUp();
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();

@@ -178,27 +178,30 @@ namespace NIKE {
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
-			//Deserialize layer
-			if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
-				auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
-				layer->deserialize(l_data.at("Layer"));
-			}
-			else {
-				NIKE_SCENES_SERVICE->getCurrScene()->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
-			}
+			//If data contains layer
+			if (l_data.contains("Layer")) {
+				//Deserialize layer
+				if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
+					auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+					layer->deserialize(l_data.at("Layer"));
+				}
+				else {
+					NIKE_SCENES_SERVICE->getCurrScene()->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
+				}
 
-			//Iterate through all entities within layer
-			for (const auto& e_data : l_data["Layer"]["Entities"]) {
+				//Iterate through all entities within layer
+				for (const auto& e_data : l_data["Layer"]["Entities"]) {
 
-				//Deserialize all entities
-				Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-				deserializeEntity(entity, e_data.at("Entity"));
-				NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
-				NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
+					//Deserialize all entities
+					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+					deserializeEntity(entity, e_data.at("Entity"));
+					NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
+					NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
 
-				//Check if entity is a UI entity
-				if (e_data.at("Entity").contains("UI ID")) {
-					NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), std::make_pair(entity, false));
+					//Check if entity is a UI entity
+					if (e_data.at("Entity").contains("UI ID")) {
+						NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), std::make_pair(entity, false));
+					}
 				}
 			}
 		}

@@ -1287,6 +1287,7 @@ namespace NIKE {
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In") || ImGui::IsItemActive()) {
 			active_cam.zoom -= 0.01f;
+			active_cam.zoom = std::clamp(active_cam.zoom, 0.0f, (float)UINT16_MAX);
 		}
 
 		cameraChangeAction(active_cam, cam_before_change);
@@ -1295,6 +1296,7 @@ namespace NIKE {
 
 		if (ImGui::Button("Zoom Out") || ImGui::IsItemActive()) {
 			active_cam.zoom += 0.01f;
+			active_cam.zoom = std::clamp(active_cam.zoom, 0.0f, (float)UINT16_MAX);
 		}
 
 		cameraChangeAction(active_cam, cam_before_change);

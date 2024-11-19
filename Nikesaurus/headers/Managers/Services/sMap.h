@@ -21,13 +21,14 @@ namespace NIKE {
 
 		struct Cell {
 			bool b_blocked;
+			Vector2f position;
 
 			Cell() : b_blocked{ false } {}
 		};
 
 		class NIKE_API Service {
 		public:
-			Service() : grid_size{ 1, 1 }, cell_size{ 1.0f, 1.0f } {}
+			Service();
 			~Service() = default;
 
 			//Init
@@ -51,9 +52,18 @@ namespace NIKE {
 			//Get cell size
 			Vector2f getCellSize() const;
 
+			//Serialize map
+			nlohmann::json serialize() const;
+
+			//Deserialize map
+			void deserialize(nlohmann::json const& data);
+
 			//// Pathfinding
 			//std::vector<NIKE::Math::Vector2f> findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal);
 		private:
+
+			//Internal cell pos update
+			void updateCells();
 
 			//Grid vector
 			std::vector<std::vector<Cell>> grid;

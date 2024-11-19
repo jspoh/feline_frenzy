@@ -215,10 +215,6 @@ namespace NIKE {
 
 	void Windows::NIKEWindow::cleanUp() {
 		//Clean up window
-		// These 3 functions are from cleanup() in imgui sys, this is temp, theres no accessSys anymore sadly
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
 		glfwDestroyWindow(ptr_window);
 		glfwTerminate();
 	}

@@ -11,15 +11,45 @@
 
 namespace NIKE {
 
+	Map::Service::Service() 
+		: grid_size{ 1, 1 }, cell_size{ 1.0f, 1.0f } {
+
+		//Initialize grid
+		grid.resize(grid_size.y);
+		for (size_t i = 0; i < grid_size.y; ++i) {
+			grid.at(i).resize(grid_size.x);
+		}
+
+		updateCells();
+	}
+
+	void Map::Service::updateCells() {
+
+		Vector2f grid_scale = { grid_size.x * cell_size.x, grid_size.y * cell_size.y };
+
+		//Update cells with correct position
+		float top = -(grid_scale.y / 2.0f);
+		for (size_t i = 0; i < grid_size.y; ++i) {
+			float left = -(grid_scale.x / 2.0f);
+			for (size_t j = 0; j < grid_size.x; ++j) {
+				grid.at(i).at(j).position = { top + (cell_size.x / 2.0f), left + (cell_size.y / 2.0f) };
+				left += cell_size.x;
+			}
+			top += cell_size.y;
+		}
+	}
+
 	void Map::Service::init(Vector2i const& gridsize, Vector2f const& cellsize) {
 		grid_size = gridsize;
 		cell_size = cellsize;
 
 		//Initialize grid
 		grid.resize(grid_size.y);
-		for (size_t i = 0; i < grid_size.y; i++) {
+		for (size_t i = 0; i < grid_size.y; ++i) {
 			grid.at(i).resize(grid_size.x);
 		}
+
+		updateCells();
 	}
 
 	void Map::Service::setCellBlocked(size_t x, size_t y, bool blocked) {
@@ -41,9 +71,11 @@ namespace NIKE {
 
 		//Initialize grid
 		grid.resize(grid_size.y);
-		for (size_t i = 0; i < grid_size.y; i++) {
+		for (size_t i = 0; i < grid_size.y; ++i) {
 			grid.at(i).resize(grid_size.x);
 		}
+
+		updateCells();
 	}
 
 	Vector2i Map::Service::getGridSize() const {
@@ -52,10 +84,55 @@ namespace NIKE {
 
 	void Map::Service::setCellSize(Vector2f const& size) {
 		cell_size = size;
+
+		updateCells();
 	}
 
 	Vector2f Map::Service::getCellSize() const {
 		return cell_size;
+	}
+
+	nlohmann::json Map::Service::serialize() const {
+		nlohmann::json data;
+
+		data =	{
+				{"Grid_Size", grid_size.toJson() },
+				{"Cell_Size", cell_size.toJson() }
+				};
+
+		//Serialize grid
+		data["Grid"] = nlohmann::json::array();
+		for (const auto& row : grid) {
+			nlohmann::json row_json = nlohmann::json::array();
+			for (const auto& cell : row) {
+				nlohmann::json cell_json;
+				cell_json = { {"Blocked", cell.b_blocked}, {"Position", cell.position.toJson()} };
+				row_json.push_back(cell_json);
+			}
+			data["Grid"].push_back(row_json);
+		}
+
+		return data;
+	}
+
+	void Map::Service::deserialize(nlohmann::json const& data) {
+		grid_size.fromJson(data.at("Grid_Size"));
+		cell_size.fromJson(data.at("Cell_Size"));
+
+		//Deserialize grid
+		grid.clear();
+		for (const auto& row_json : data["Grid"]) {
+			std::vector<Cell> row;
+			for (const auto& cell_json : row_json) {
+				Cell cell;
+				cell.b_blocked = cell_json.at("Blocked").get<bool>();
+				cell.position.fromJson(cell_json.at("Position"));
+				row.push_back(cell);
+			}
+			grid.push_back(row);
+		}
+
+		updateCells();
 	}
 
   //  std::vector<NIKE::Math::Vector2f> Map::Service::findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal) {
