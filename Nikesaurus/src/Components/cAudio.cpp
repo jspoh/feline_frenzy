@@ -48,7 +48,7 @@ namespace NIKE {
 				static std::string channel_group_id;
 
 				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated()) {
+				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
 					audio_id = comp.audio_id;
 					channel_group_id = comp.channel_group_id;
 				}
@@ -81,6 +81,8 @@ namespace NIKE {
 							};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_audio));
+							comp_panel.setPopUpSuccessMsg("Audio Saved!");
+							comp_panel.openPopUp("Success");
 						}
 						else {
 							comp_panel.setPopUpErrorMsg("Audio Does Not Exist!");
@@ -118,6 +120,8 @@ namespace NIKE {
 								};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_channel_group));
+							comp_panel.setPopUpSuccessMsg("Audio Channel Group Saved!");
+							comp_panel.openPopUp("Success");
 						}
 						else {
 							comp_panel.setPopUpErrorMsg("Channel Group Does Not Exist!");
