@@ -156,7 +156,7 @@ namespace NIKE {
 					// Before change
 					static Vector4f before_change;
 
-					ImGui::DragFloat4("Text Color", &comp.color.x, 0.1f);
+					ImGui::ColorPicker4("Text Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -186,7 +186,7 @@ namespace NIKE {
 				// For Text font
 				{
 					// When init only, not everytime
-					if (!comp.font_id.empty() && font_id.empty())
+					if (comp.font_id != font_id)
 					{
 						font_id = comp.font_id;
 					}
@@ -234,10 +234,10 @@ namespace NIKE {
 				// For Text input
 				{
 					// When init only, not everytime
-					//if (!comp.text.empty() && text_input.empty())
-					//{
-					//	text_input = comp.text;
-					//}
+					if (text_input != comp.text)
+					{
+						text_input = comp.text;
+					}
 
 					ImGui::Text("Enter text:");
 					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
@@ -383,7 +383,7 @@ namespace NIKE {
 					// Before change
 					static Vector4f before_change;
 
-					ImGui::DragFloat4("Shape Color", &comp.color.x, 0.1f);
+					ImGui::ColorPicker4("Shape Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -494,6 +494,14 @@ namespace NIKE {
 							texture_id_input = comp.texture_id;
 						}
 
+					}
+
+					// For texture frame
+					if (!comp.texture_id.empty())
+					{
+						{
+
+						}
 					}
 				}
 
