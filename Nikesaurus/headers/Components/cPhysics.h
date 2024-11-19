@@ -18,14 +18,23 @@
 namespace NIKE {
     namespace Physics {
 
+        struct Force {
+            Vector2f direction;
+            float life_time;
+
+            Force(Vector2f const& direction, float life_time)
+                : direction{ direction }, life_time{ life_time } {}
+        };
+
         struct Dynamics {
             float max_speed;
             float drag;
             float mass;
             Vector2f velocity;
-            Vector2f force;
+            Vector2f force; //Depricated to be removed
+            std::vector<Force> forces;
 
-            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ 0.0001f }, velocity(), force() {}
+            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ EPSILON }, velocity(), force() {}
             Dynamics(float max_speed, float drag, float mass)
                 : max_speed{ max_speed }, drag{ drag }, mass{ mass }, velocity(), force() {}
         };
