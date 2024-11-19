@@ -1,8 +1,8 @@
 -- Define a module table
-local M = {}
+local Bullet = {}
 
 -- Function to create a bullet from a prefab
-function M.createBullet(layer, prefab_path)
+function Bullet.createBullet(layer, prefab_path)
     -- Call C++ function to create a bullet from the prefab
     createEntityFromPrefab(layer, prefab_path, "bullet_" .. prefab_path)
 
@@ -19,5 +19,5 @@ function M.createBullet(layer, prefab_path)
 end
 
 -- Return the module table
-return M
+return Bullet
 

@@ -41,7 +41,6 @@ namespace NIKE {
 	}
 
 	void GameLogic::Manager::update() {
-
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
 
@@ -72,25 +71,24 @@ namespace NIKE {
 
 		// Create bullet test
 		if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_KEY_1)) {
-			try {
+			// DEBUG
+			std::string mouseDebug = "Mouse: " + std::to_string(NIKE_INPUT_SERVICE->getMousePos().x) + " " + std::to_string(NIKE_INPUT_SERVICE->getMousePos().y);
+			NIKEE_CORE_INFO(mouseDebug);
 
-				std::string script_path = "assets/Scripts/createBullet.lua";
-				std::string function_name = "createBullet";
+			std::string script_path = "assets/Scripts/createBullet.lua";
+			std::string function_name = "createBullet";
 
-				std::string script_id = lua_system->loadScript(script_path);
-				sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
+			// Load Lua Script
+			std::string script_id = lua_system->loadScript(script_path);
 
-				int layer_id = 1;
-				std::string prefab_path = "bullet.prefab";
-				create_bullet_func(layer_id, prefab_path);
+			// Execute Lua Script
+			sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
 
-				NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+			int layer_id = 1;
+			std::string prefab_path = "bullet.prefab";
+			create_bullet_func(layer_id, prefab_path);
 
-			}
-			catch (const std::exception& e) {
-				// Handle errors (e.g., script not found or execution issues)
-				NIKEE_CORE_ERROR("Error executing Lua script: {}", e.what());
-			}
+			NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
 		}
 	}
 

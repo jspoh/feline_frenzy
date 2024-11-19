@@ -27,10 +27,28 @@ namespace NIKE {
             std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
-            // Set entity position to default (0, 0)
+            Vector2f bulletPos = { 0.f, 0.f };
+            // Transform: Set entity position to default (0, 0) for now
             auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
             if (e_transform_comp.has_value()) {
-                e_transform_comp.value().get().position = { 0.f, 0.f };
+                e_transform_comp.value().get().position = bulletPos;
+            }
+
+            // Physics
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(new_id);
+            if (e_physics_comp.has_value()) {
+                // Get mouse position
+                Vector2f mousePos = NIKE_INPUT_SERVICE->getMousePos();
+                mousePos.x += NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x;
+                mousePos.y += NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
+
+                // Calculate direction vector
+                Vector2f direction = mousePos - bulletPos;
+
+                // Normalizing direction vector
+                direction.normalize();
+
+                e_physics_comp.value().get().velocity = { direction.x * 100.f, direction.y * 100.f };
             }
         }
     }
