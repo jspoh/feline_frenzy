@@ -27,7 +27,7 @@ namespace NIKE {
 				return	{
 						{ "Position", comp.position.toJson() },
 						{ "Zoom", comp.zoom }
-						};
+				};
 			},
 
 			//Deserialize
@@ -119,7 +119,9 @@ namespace NIKE {
 					// Before change
 					static float editing_initial_scale = 0.0f;
 
-					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f, EPSILON);
+					// Allow scale adjustment UI
+					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f);
+
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -145,6 +147,9 @@ namespace NIKE {
 					}
 
 				}
+
+				//ImGui::Text((std::string("Text Size X: ") + std::to_string(comp.size.x)).c_str());
+				//ImGui::Text((std::string("Text Size Y: ") + std::to_string(comp.size.y)).c_str());
 
 				// For Text color
 				{
@@ -227,12 +232,12 @@ namespace NIKE {
 
 
 				// For Text input
-				{	
+				{
 					// When init only, not everytime
-					if (!comp.text.empty() && text_input.empty())
-					{
-						text_input = comp.text;
-					}
+					//if (!comp.text.empty() && text_input.empty())
+					//{
+					//	text_input = comp.text;
+					//}
 
 					ImGui::Text("Enter text:");
 					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
@@ -269,7 +274,7 @@ namespace NIKE {
 
 				// For Text Origin
 				{
-					static const char* origin_names[] = {"CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT"};
+					static const char* origin_names[] = { "CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT" };
 					// Hold the current selection and the previous value
 					static NIKE::Render::TextOrigin before_select_origin;
 					static int previous_origin = static_cast<int>(comp.origin);
@@ -294,7 +299,7 @@ namespace NIKE {
 							// Update the previous value
 							before_select_origin = comp.origin;
 							// Apply the new origin
-							comp.origin = new_origin; 
+							comp.origin = new_origin;
 						}
 					}
 				}
@@ -370,6 +375,40 @@ namespace NIKE {
 						}
 
 					}
+				}
+
+
+				// For shape color
+				{
+					// Before change
+					static Vector4f before_change;
+
+					ImGui::DragFloat4("Shape Color", &comp.color.x, 0.1f);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change = comp.color;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_shape_color;
+
+						//Change pos do action
+						change_shape_color.do_action = [&, color = comp.color]() {
+							comp.color = color;
+							};
+
+						//Change pos undo action
+						change_shape_color.undo_action = [&, color = before_change]() {
+							comp.color = color;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_shape_color));
+					}
+
+					
 				}
 
 			}
