@@ -71,10 +71,6 @@ namespace NIKE {
 
 		// Create bullet test
 		if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_KEY_1)) {
-			// DEBUG
-			std::string mouseDebug = "Mouse: " + std::to_string(NIKE_INPUT_SERVICE->getMousePos().x) + " " + std::to_string(NIKE_INPUT_SERVICE->getMousePos().y);
-			NIKEE_CORE_INFO(mouseDebug);
-
 			std::string script_path = "assets/Scripts/createBullet.lua";
 			std::string function_name = "createBullet";
 
@@ -88,7 +84,7 @@ namespace NIKE {
 			std::string prefab_path = "bullet.prefab";
 			create_bullet_func(layer_id, prefab_path);
 
-			NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+			//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
 		}
 	}
 

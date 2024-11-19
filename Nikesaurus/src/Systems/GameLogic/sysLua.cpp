@@ -28,19 +28,21 @@ namespace NIKE {
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
             Vector2f bulletPos = { 0.f, 0.f };
-            // Transform: Set entity position to default (0, 0) for now
+            // Transform
             auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
             if (e_transform_comp.has_value()) {
-                e_transform_comp.value().get().position = bulletPos;
+                //Set entity position to (0, 0) for now
+                e_transform_comp.value().get().position = { 0.f,0.f };
             }
 
             // Physics
             auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(new_id);
             if (e_physics_comp.has_value()) {
                 // Get mouse position
-                Vector2f mousePos = NIKE_INPUT_SERVICE->getMousePos();
-                mousePos.x += NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x;
-                mousePos.y += NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
+                Vector2f mousePos = {
+                    NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2),
+                    -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2))
+                };
 
                 // Calculate direction vector
                 Vector2f direction = mousePos - bulletPos;
@@ -48,7 +50,7 @@ namespace NIKE {
                 // Normalizing direction vector
                 direction.normalize();
 
-                e_physics_comp.value().get().velocity = { direction.x * 100.f, direction.y * 100.f };
+                e_physics_comp.value().get().velocity = { direction.x * 500.f, direction.y * 500.f };
             }
         }
     }
