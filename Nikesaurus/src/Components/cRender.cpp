@@ -462,10 +462,10 @@ namespace NIKE {
 				// For texture id
 				{
 					// When init only, not everytime
-					if (texture_id_input != comp.texture_id)
-					{
-						texture_id_input = comp.texture_id;
-					}
+					//if (texture_id_input != comp.texture_id)
+					//{
+					//	texture_id_input = comp.texture_id;
+					//}
 
 					ImGui::Text("Enter Texture id:");
 					if (ImGui::InputText("##TextureIDInput", texture_id_input.data(), texture_id_input.capacity() + 10)) {
@@ -504,76 +504,258 @@ namespace NIKE {
 						}
 
 					}
+				}
 
-					if (!comp.texture_id.empty())
+				if (!comp.texture_id.empty())
+				{
+					// For texture frame size
 					{
-						// For texture frame size
-						{
-							//Rotation before change
-							static Vector2i frame_size_before_change;
+						//Before change
+						static Vector2i frame_size_before_change;
 
-							//Change rotation
-							ImGui::DragInt2("Frame Size", &comp.frame_size.x, 1, 1, 100);
-
-							//Check if rotation has begun editing
-							if (ImGui::IsItemActivated()) {
-								frame_size_before_change = comp.frame_size;
-							}
-
-							//Check if rotation has finished editing
-							if (ImGui::IsItemDeactivatedAfterEdit()) {
-								LevelEditor::Action change_frame_size;
-
-								//Change rotation do action
-								change_frame_size.do_action = [&, frame_size = comp.frame_size]() {
-									comp.frame_size = frame_size;
-									};
-
-								//Change rotation undo action
-								change_frame_size.undo_action = [&, frame_size = frame_size_before_change]() {
-									comp.frame_size = frame_size;
-									};
-
-								//Execute action
-								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_frame_size));
-							}
+						//Change frame size
+						if (ImGui::DragInt2("Frame Size", &comp.frame_size.x, 1, 1, 100)) {
+							// Ensure frame size is never zero by clamping the values
+							comp.frame_size.x = max(comp.frame_size.x, 1);
+							comp.frame_size.y = max(comp.frame_size.y, 1);
 						}
 
-						// For texture frame index
-						{
-							//Rotation before change
-							static Vector2i frame_index_before_change;
+						//Check if begun editing
+						if (ImGui::IsItemActivated()) {
+							frame_size_before_change = comp.frame_size;
+						}
 
-							//Change rotation
-							ImGui::DragInt2("Frame Index", &comp.frame_index.x, 1, 1, 100);
+						//Check if finished editing
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_frame_size;
 
-							//Check if rotation has begun editing
-							if (ImGui::IsItemActivated()) {
-								frame_index_before_change = comp.frame_index;
-							}
+							//Change do action
+							change_frame_size.do_action = [&, frame_size = comp.frame_size]() {
+								comp.frame_size = frame_size;
+								};
 
-							//Check if rotation has finished editing
-							if (ImGui::IsItemDeactivatedAfterEdit()) {
-								LevelEditor::Action change_frame_index;
+							//Change undo action
+							change_frame_size.undo_action = [&, frame_size = frame_size_before_change]() {
+								comp.frame_size = frame_size;
+								};
 
-								//Change rotation do action
-								change_frame_index.do_action = [&, frame_index = comp.frame_size]() {
-									comp.frame_index = frame_index;
-									};
-
-								//Change rotation undo action
-								change_frame_index.undo_action = [&, frame_index = frame_index_before_change]() {
-									comp.frame_index = frame_index;
-									};
-
-								//Execute action
-								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_frame_index));
-							}
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_frame_size));
 						}
 					}
+
+					// For texture frame index
+					{
+						// Before change
+						static Vector2i frame_index_before_change;
+
+						//Change rotation
+						if (ImGui::DragInt2("Frame Index", &comp.frame_index.x, 1, 1, 100))
+						{
+							comp.frame_index.x = max(comp.frame_index.x, 1);
+							comp.frame_index.y = max(comp.frame_index.y, 1);
+						}
+
+						//Check if begun editing
+						if (ImGui::IsItemActivated()) {
+							frame_index_before_change = comp.frame_index;
+						}
+
+						//Check if finished editing
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_frame_index;
+
+							//Change do action
+							change_frame_index.do_action = [&, frame_index = comp.frame_size]() {
+								comp.frame_index = frame_index;
+								};
+
+							//Change undo action
+							change_frame_index.undo_action = [&, frame_index = frame_index_before_change]() {
+								comp.frame_index = frame_index;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_frame_index));
+						}
+					}
+
+					// For texture color
+					{
+						// Before change
+						static Vector4f texture_color_before_change;
+
+						ImGui::ColorPicker4("Texture Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
+
+
+						//Check if has begun editing
+						if (ImGui::IsItemActivated()) {
+							texture_color_before_change = comp.color;
+						}
+
+						//Check if  finished editing
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_color;
+
+							//Change do action
+							change_color.do_action = [&, color = comp.color]() {
+								comp.color = color;
+								};
+
+							//Change undo action
+							change_color.undo_action = [&, color = texture_color_before_change]() {
+								comp.color = color;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_color));
+						}
+					}
+
+					// For texture intensity
+					{
+						// Before change
+						static float intensity_bef_change;
+
+						ImGui::DragFloat("Texture Intensity", &comp.intensity, 0.001f, 0.f, 1.f);
+
+
+						//Check if has begun editing
+						if (ImGui::IsItemActivated()) {
+							intensity_bef_change = comp.intensity;
+						}
+
+						//Check if  finished editing
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_intensity;
+
+							//Change do action
+							change_intensity.do_action = [&, intensity = comp.intensity]() {
+								comp.intensity = intensity;
+								};
+
+							//Change undo action
+							change_intensity.undo_action = [&, intensity = intensity_bef_change]() {
+								comp.intensity = intensity;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_intensity));
+						}
+					}
+
+					// Stretch checkbox
+					{
+						static bool before_bool_stretch = comp.b_stretch;
+						if (ImGui::Checkbox("Stretch", &comp.b_stretch))
+						{
+							if (comp.b_stretch != before_bool_stretch)
+							{
+								// Save action
+								LevelEditor::Action change_stretch;
+								change_stretch.do_action = [&, stretch = comp.b_stretch]() {
+									comp.b_stretch = stretch;
+									};
+
+								// Undo action
+								change_stretch.undo_action = [&, stretch = before_bool_stretch]() {
+									comp.b_stretch = stretch;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_stretch));
+
+								// Update the previous value
+								before_bool_stretch = comp.b_stretch;
+							}
+
+						}
+					}
+
+					// Blend checkbox
+					{
+						static bool before_bool_blend = comp.b_blend;
+						if (ImGui::Checkbox("Blend", &comp.b_blend))
+						{
+							if (comp.b_blend != before_bool_blend)
+							{
+								// Save action
+								LevelEditor::Action change_blend;
+								change_blend.do_action = [&, blend = comp.b_blend]() {
+									comp.b_blend = blend;
+									};
+
+								// Undo action
+								change_blend.undo_action = [&, blend = before_bool_blend]() {
+									comp.b_blend = blend;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_blend));
+
+								// Update the previous value
+								before_bool_blend = comp.b_blend;
+							}
+
+						}
+					}
+
+					// Flip x-axis checkbox
+					{
+						static bool before_bool_flip_x = comp.b_flip.x;
+						if (ImGui::Checkbox("Flip Horizontally (x-axis) ", &comp.b_flip.x))
+						{
+							if (comp.b_flip.x != before_bool_flip_x)
+							{
+								// Save action
+								LevelEditor::Action change_flip_x;
+								change_flip_x.do_action = [&, flip_x = comp.b_flip.x]() {
+									comp.b_flip.x = flip_x;
+									};
+
+								// Undo action
+								change_flip_x.undo_action = [&, flip_x = before_bool_flip_x]() {
+									comp.b_flip.x = flip_x;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_flip_x));
+
+								// Update the previous value
+								before_bool_flip_x = comp.b_flip.x;
+							}
+
+						}
+					}
+
+
+					// Flip y-axis checkbox
+					{
+						static bool before_bool_flip_y = comp.b_flip.y;
+						if (ImGui::Checkbox("Flip Horizontally (y-axis) ", &comp.b_flip.y))
+						{
+							if (comp.b_flip.y != before_bool_flip_y)
+							{
+								// Save action
+								LevelEditor::Action change_flip_y;
+								change_flip_y.do_action = [&, flip_y = comp.b_flip.y]() {
+									comp.b_flip.y = flip_y;
+									};
+
+								// Undo action
+								change_flip_y.undo_action = [&, flip_y = before_bool_flip_y]() {
+									comp.b_flip.y = flip_y;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_flip_y));
+
+								// Update the previous value
+								before_bool_flip_y = comp.b_flip.y;
+							}
+
+						}
+					}
+					
 				}
 
 			}
-				);
+		);
 	}
 }
