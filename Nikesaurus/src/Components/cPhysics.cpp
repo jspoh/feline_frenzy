@@ -222,5 +222,42 @@ namespace NIKE {
 				comp.resolution = static_cast<Resolution>(data.at("Resolution").get<int>());
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Collider>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Collider& comp) {
+				// For collider response
+				{
+					ImGui::Text("Choose Collider Resolution:");
+					static const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
+					// Hold the current selection and the previous value
+					static NIKE::Physics::Resolution before_select_resolution;
+					static int previous_resolution = static_cast<int>(comp.resolution);
+					int current_resolution = static_cast<int>(comp.resolution);
+					// Combo returns one bool check
+					if (ImGui::Combo("##ColliderChoice", &current_resolution, resolution_names, IM_ARRAYSIZE(resolution_names))) {
+						NIKE::Physics::Resolution new_resolution = static_cast<NIKE::Physics::Resolution>(current_resolution);
+						if (new_resolution != comp.resolution) {
+							// Save action
+							LevelEditor::Action save_resolution;
+							save_resolution.do_action = [&, resolution = new_resolution]() {
+								comp.resolution = resolution;
+								};
+
+							// Undo action
+							save_resolution.undo_action = [&, resolution = before_select_resolution]() {
+								comp.resolution = resolution;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_resolution));
+
+							// Update the previous value
+							before_select_resolution = comp.resolution;
+							// Apply the new origin
+							comp.resolution = new_resolution;
+						}
+					}
+				}
+			}
+				);
 	}
 }
