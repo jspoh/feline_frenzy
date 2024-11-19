@@ -12,7 +12,7 @@
 namespace NIKE {
 
 	Map::Service::Service() 
-		: grid_size{ 1, 1 }, cell_size{ 1.0f, 1.0f } {
+		: grid_size{ 1, 1 }, cell_size{ 1.0f, 1.0f }, cursor_pos{ 0.0f, 0.0f } {
 
 		//Initialize grid
 		grid.resize(grid_size.y);
@@ -32,11 +32,15 @@ namespace NIKE {
 		for (size_t i = 0; i < grid_size.y; ++i) {
 			float left = -(grid_scale.x / 2.0f);
 			for (size_t j = 0; j < grid_size.x; ++j) {
-				grid.at(i).at(j).position = { top + (cell_size.x / 2.0f), left + (cell_size.y / 2.0f) };
+				grid.at(i).at(j).position = { left + (cell_size.y / 2.0f), top + (cell_size.x / 2.0f) };
 				left += cell_size.x;
 			}
 			top += cell_size.y;
 		}
+	}
+
+	void Map::Service::onEvent(std::shared_ptr<Input::MouseMovedEvent> event) {
+		cursor_pos = event->pos;
 	}
 
 	void Map::Service::init(Vector2i const& gridsize, Vector2f const& cellsize) {
@@ -90,6 +94,24 @@ namespace NIKE {
 
 	Vector2f Map::Service::getCellSize() const {
 		return cell_size;
+	}
+
+	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCursorCell() {
+
+		//Get index for cell
+		Vector2i index{ static_cast<int>(cursor_pos.x / cell_size.x), static_cast<int>(cursor_pos.y / cell_size.y) };
+
+		//Check if index is valid
+		if (index.x < 0 || index.x >= grid_size.x || index.y < 0 || index.y >= grid_size.y) {
+			return std::nullopt;
+		}
+		else {
+			return grid.at(index.y).at(index.x);
+		}
+	}
+
+	std::vector<std::vector<Map::Cell>>const& Map::Service::getGrid() const {
+		return grid;
 	}
 
 	nlohmann::json Map::Service::serialize() const {

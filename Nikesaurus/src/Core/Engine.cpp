@@ -135,6 +135,7 @@ namespace NIKE {
 		//Add event listeners for mouse move event
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse scroll event

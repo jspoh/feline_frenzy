@@ -26,7 +26,7 @@ namespace NIKE {
 			Cell() : b_blocked{ false } {}
 		};
 
-		class NIKE_API Service {
+		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
 		public:
 			Service();
 			~Service() = default;
@@ -52,6 +52,12 @@ namespace NIKE {
 			//Get cell size
 			Vector2f getCellSize() const;
 
+			//Get cell cursor is in
+			std::optional<std::reference_wrapper<Map::Cell>> getCursorCell();
+
+			//Get grid
+			std::vector<std::vector<Cell>>const& getGrid() const;
+
 			//Serialize map
 			nlohmann::json serialize() const;
 
@@ -65,6 +71,9 @@ namespace NIKE {
 			//Internal cell pos update
 			void updateCells();
 
+			//On mouse move event
+			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
+
 			//Grid vector
 			std::vector<std::vector<Cell>> grid;
 
@@ -73,6 +82,9 @@ namespace NIKE {
 
 			//Cell size
 			Vector2f cell_size;
+
+			//Cursor position relative to game window
+			Vector2f cursor_pos;
 		};
 
 		//Re-enable DLL Export warning

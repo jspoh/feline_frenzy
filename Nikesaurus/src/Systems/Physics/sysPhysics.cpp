@@ -93,6 +93,21 @@ namespace NIKE {
                     //Ensure that mass is not negative
                     e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
 
+                    //Calculate netforce
+                    Vector2f net_force;
+
+                    //iterate through forces to get net force and remove inactive forces
+                    for (auto it = e_dynamics.forces.begin(); it != e_dynamics.forces.end();) {
+                        it->life_time -= NIKE_WINDOWS_SERVICE->getDeltaTime();
+                        if (it->life_time > 0.0f) {
+                            net_force += it->direction;
+                            it++;
+                        }
+                        else {
+                            it = e_dynamics.forces.erase(it);
+                        }
+                    }
+
                     //Apply forces & mass to calculate direction
                     Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
 

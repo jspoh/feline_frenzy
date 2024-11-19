@@ -74,7 +74,7 @@ namespace NIKE {
 			Vector2f size;
 			TextOrigin origin;
 
-			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin { TextOrigin::CENTER } {}
+			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin{ TextOrigin::CENTER } {}
 			Text(std::string const& font_id, std::string const& text, Vector4f const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
 				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin } {}
 		};
@@ -104,7 +104,7 @@ namespace NIKE {
 			bool b_stretch;
 			Vector2b b_flip;
 
-			Texture() : texture_id{ "placeholder" }, color(0.f,0.f,0.f,1.f), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(1,1), frame_index(0,0), b_flip{false, false} {}
+			Texture() : texture_id{}, color(0.f,0.f,0.f,1.f), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(1,1), frame_index(0,0), b_flip{false, false} {}
 			Texture(std::string const& texture_id, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
