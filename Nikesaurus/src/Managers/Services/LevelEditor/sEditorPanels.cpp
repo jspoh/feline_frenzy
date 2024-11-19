@@ -1122,6 +1122,14 @@ namespace NIKE {
 		}
 	}
 
+	Render::Cam LevelEditor::CameraPanel::getActiveCamera() const {
+		auto it = cam_entities.begin();
+		std::advance(it, combo_index);
+		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(it->first);
+		return (NIKE_ECS_MANAGER->checkEntity(it->first) && e_cam_comp.has_value())
+			? e_cam_comp.value().get() : *free_cam;
+	}
+
 	void LevelEditor::CameraPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
@@ -1308,7 +1316,7 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Tile Map Management Panel
 	*********************************************************************/
-	ImVec2 LevelEditor::TileMapPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) const {
+	ImVec2 LevelEditor::TileMapPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) {
 		//Get window position ( Relative to top left corner of the rendering point in window )
 		Vector2f window_pos = { ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
 
@@ -1316,11 +1324,12 @@ namespace NIKE {
 		Vector2f scale { render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
 
 		//Return screen coordinates
-		return { window_pos.x + (render_size.x / 2.0f) + (pos.x * scale.x), window_pos.y + (render_size.y / 2.0f) + (pos.y * scale.y) };
+		return { window_pos.x + (render_size.x / 2.0f) + ((-cam_panel->getActiveCamera().position.x + pos.x) * scale.x / cam_panel->getActiveCamera().zoom), window_pos.y + (render_size.y / 2.0f) + ((cam_panel->getActiveCamera().position.y + pos.y) * scale.y / cam_panel->getActiveCamera().zoom)};
 	}
 
 	void LevelEditor::TileMapPanel::init() {
-
+		//Setup cam panel reference
+		cam_panel = std::dynamic_pointer_cast<CameraPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(CameraPanel::getStaticName()));
 	}
 
 	void LevelEditor::TileMapPanel::update() {

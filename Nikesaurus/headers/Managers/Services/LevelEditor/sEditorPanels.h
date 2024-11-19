@@ -385,6 +385,9 @@ namespace NIKE {
 			//Camera change action
 			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
 
+			//Get active camera
+			Render::Cam getActiveCamera() const;
+
 			//Init
 			void init() override;
 
@@ -399,7 +402,7 @@ namespace NIKE {
 		class TileMapPanel : public IPanel {
 		private:
 			#ifdef NIKE_BUILD_DLL
-			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) const;
+			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
 			#endif // DEBUG
 
 			//Grid scale
@@ -410,6 +413,9 @@ namespace NIKE {
 
 			//Grid Color
 			Vector4f grid_color;
+
+			//Camera panel reference
+			std::shared_ptr<CameraPanel> cam_panel;
 
 		public:
 			TileMapPanel() : grid_scale(), grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f } {}
