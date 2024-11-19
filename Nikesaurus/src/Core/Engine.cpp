@@ -222,7 +222,7 @@ namespace NIKE {
 			//NIKE_IMGUI_SERVICE->update();
 
 			//Render Level Editor
-			 NIKE_LVLEDITOR_SERVICE->render();
+			NIKE_LVLEDITOR_SERVICE->render();
 		
 			//Control FPS
 			NIKE_WINDOWS_SERVICE->controlFPS();
