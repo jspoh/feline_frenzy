@@ -185,10 +185,12 @@ namespace NIKE {
 
 				// For Text font
 				{
+
 					// When init only, not everytime
-					if (comp.font_id != font_id)
+					if (!comp.font_init && font_id != comp.font_id)
 					{
 						font_id = comp.font_id;
+						comp.font_init = true;
 					}
 
 					ImGui::Text("Enter Font (wihtout the ttf):");
@@ -234,9 +236,10 @@ namespace NIKE {
 				// For Text input
 				{
 					// When init only, not everytime
-					if (text_input != comp.text)
+					if (!comp.text_init && text_input != comp.text)
 					{
 						text_input = comp.text;
+						comp.text_init = true;
 					}
 
 					ImGui::Text("Enter text:");
@@ -458,6 +461,12 @@ namespace NIKE {
 
 				// For texture id
 				{
+					// When init only, not everytime
+					if (texture_id_input != comp.texture_id)
+					{
+						texture_id_input = comp.texture_id;
+					}
+
 					ImGui::Text("Enter Texture id:");
 					if (ImGui::InputText("##TextureIDInput", texture_id_input.data(), texture_id_input.capacity() + 10)) {
 						texture_id_input.resize(strlen(texture_id_input.c_str()));
@@ -496,11 +505,70 @@ namespace NIKE {
 
 					}
 
-					// For texture frame
 					if (!comp.texture_id.empty())
 					{
+						// For texture frame size
 						{
+							//Rotation before change
+							static Vector2i frame_size_before_change;
 
+							//Change rotation
+							ImGui::DragInt2("Frame Size", &comp.frame_size.x, 1, 1, 100);
+
+							//Check if rotation has begun editing
+							if (ImGui::IsItemActivated()) {
+								frame_size_before_change = comp.frame_size;
+							}
+
+							//Check if rotation has finished editing
+							if (ImGui::IsItemDeactivatedAfterEdit()) {
+								LevelEditor::Action change_frame_size;
+
+								//Change rotation do action
+								change_frame_size.do_action = [&, frame_size = comp.frame_size]() {
+									comp.frame_size = frame_size;
+									};
+
+								//Change rotation undo action
+								change_frame_size.undo_action = [&, frame_size = frame_size_before_change]() {
+									comp.frame_size = frame_size;
+									};
+
+								//Execute action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_frame_size));
+							}
+						}
+
+						// For texture frame index
+						{
+							//Rotation before change
+							static Vector2i frame_index_before_change;
+
+							//Change rotation
+							ImGui::DragInt2("Frame Index", &comp.frame_index.x, 1, 1, 100);
+
+							//Check if rotation has begun editing
+							if (ImGui::IsItemActivated()) {
+								frame_index_before_change = comp.frame_index;
+							}
+
+							//Check if rotation has finished editing
+							if (ImGui::IsItemDeactivatedAfterEdit()) {
+								LevelEditor::Action change_frame_index;
+
+								//Change rotation do action
+								change_frame_index.do_action = [&, frame_index = comp.frame_size]() {
+									comp.frame_index = frame_index;
+									};
+
+								//Change rotation undo action
+								change_frame_index.undo_action = [&, frame_index = frame_index_before_change]() {
+									comp.frame_index = frame_index;
+									};
+
+								//Execute action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_frame_index));
+							}
 						}
 					}
 				}

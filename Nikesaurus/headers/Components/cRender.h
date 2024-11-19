@@ -74,9 +74,13 @@ namespace NIKE {
 			Vector2f size;
 			TextOrigin origin;
 
-			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin { TextOrigin::CENTER } {}
+			// For string inputs 
+			bool font_init;
+			bool text_init;
+
+			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin{ TextOrigin::CENTER }, font_init{false}, text_init{ false } {}
 			Text(std::string const& font_id, std::string const& text, Vector4f const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
-				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin } {}
+				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin }, font_init{ false }, text_init{false} {}
 		};
 
 		// set use_override_color to true if setting an override_color
