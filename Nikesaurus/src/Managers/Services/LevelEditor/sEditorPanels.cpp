@@ -1094,8 +1094,39 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Camera Management Panel
 	*********************************************************************/
+	void LevelEditor::CameraPanel::cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change) {
+
+		if (ImGui::IsItemActivated()) {
+			cam_before_change = active_cam;
+		}
+
+		//Check if any item is active
+		if (ImGui::IsItemDeactivated()) {
+			//Camera variables changed
+			Action camera_change;
+
+			//Camera change do action
+			camera_change.do_action = [&, change = active_cam]() {
+				active_cam = change;
+				cam_before_change = change;
+				};
+
+			//Camera change undo action
+			camera_change.undo_action = [&, change = cam_before_change]() {
+				active_cam = change;
+				cam_before_change = change;
+				};
+
+			//Execute action
+			NIKE_LVLEDITOR_SERVICE->executeAction(std::move(camera_change));
+		}
+	}
+
 	void LevelEditor::CameraPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+
+		//Setup free cam to be referenced as default camera in camera system
+		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
 	}
 
 	void LevelEditor::CameraPanel::update() {
@@ -1116,6 +1147,10 @@ namespace NIKE {
 		//Select camera
 		ImGui::Text("Select Camera:");
 
+		//Static for tracking last dispatched index & dispatching of new camera
+		static bool dispatch = true;
+		static int last_dispatched_index = 0;
+
 		//Lamda for retrieving camera name
 		auto cam_name = [](void* data, int idx, const char** out_text) -> bool {
 			const auto& names = *static_cast<std::unordered_map<Entity::Type, std::string>*> (data);
@@ -1126,57 +1161,116 @@ namespace NIKE {
 			//Retrieve the entity name and assign it to out_text
 			*out_text = it->second.c_str();
 			return true;
-		};
+			};
 
 		// Use the lambda with ImGui::Combo
-		if (ImGui::Combo("##CameraSelector", &combo_index, cam_name, &cam_entities, static_cast<int>(cam_entities.size()))) {
+		if(ImGui::Combo("##CameraSelector", &combo_index, cam_name, &cam_entities, static_cast<int>(cam_entities.size()))) {
+			dispatch = true;
+		}
+
+		//If dispatch is actived
+		if (dispatch) {
 			// Dispatch an event when the camera selection changes
 			auto it = cam_entities.begin();
 			std::advance(it, combo_index);
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(it->first));
+			auto before_it = cam_entities.begin();
+			std::advance(before_it, last_dispatched_index);
+
+			//Change camera action
+			Action change_cam_action;
+
+			//Change cam do action
+			change_cam_action.do_action = [&, cam = it->first, index = combo_index]() {
+				if (cam == UINT16_MAX) {
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
+				}
+				else {
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
+				}
+
+				combo_index = index;
+				last_dispatched_index = index;
+			};
+
+			//Change cam undo action
+			change_cam_action.undo_action = [&, cam = before_it->first, index = last_dispatched_index]() {
+				if (cam == UINT16_MAX) {
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
+				}
+				else {
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
+				}
+
+				combo_index = index;
+				last_dispatched_index = index;
+			};
+
+			//Execute action
+			NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cam_action));
+
+			//Update dispatch to false
+			dispatch = false;
 		}
 
 		ImGui::Spacing();
 
-		//If currently selected is free cam
+		//Render cam reference
 		auto it = cam_entities.begin();
 		std::advance(it, combo_index);
+		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(it->first);
+		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(it->first) && e_cam_comp.has_value())
+			? e_cam_comp.value().get() : *free_cam;
+
+		//Static camera variables for undo/redo
+		static Render::Cam cam_before_change = active_cam;
+
+		//If free camera is active
 		if (it->first == UINT16_MAX) {
 			// Position Controls
 			ImGui::Text("Position:");
 
 			if (ImGui::Button("Up") || ImGui::IsItemActive()) {
 				// Move camera position up
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+				active_cam.position.y += 5.0f;
 			}
+
+			cameraChangeAction(active_cam, cam_before_change);
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("Down") || ImGui::IsItemActive()) {
 				// Move camera position down
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+				active_cam.position.y -= 5.0f;
 			}
+
+			cameraChangeAction(active_cam, cam_before_change);
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("Left") || ImGui::IsItemActive()) {
 				// Move camera position left
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+				active_cam.position.x -= 5.0f;
 			}
+
+			cameraChangeAction(active_cam, cam_before_change);
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("Right") || ImGui::IsItemActive()) {
 				// Move camera position right
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+				active_cam.position.x += 5.0f;
 			}
+
+			cameraChangeAction(active_cam, cam_before_change);
 
 			ImGui::Spacing();
 
 			if (ImGui::Button("Reset Position")) {
 				// Move camera position right
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RESET_POS));
+				active_cam.position = { 0.0f, 0.0f };
 			}
+
+			cameraChangeAction(active_cam, cam_before_change);
 
 			ImGui::Spacing();
 		}
@@ -1184,20 +1278,26 @@ namespace NIKE {
 		// Zoom Controls
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In") || ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
+			active_cam.zoom -= 0.01f;
 		}
+
+		cameraChangeAction(active_cam, cam_before_change);
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Zoom Out") || ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
+			active_cam.zoom += 0.01f;
 		}
+
+		cameraChangeAction(active_cam, cam_before_change);
 
 		ImGui::Spacing();
 
-		if (ImGui::Button("Reset Cam")) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::RESET_ZOOM));
+		if (ImGui::Button("Reset Zoom")) {
+			active_cam.zoom = 1.0f;
 		}
+
+		cameraChangeAction(active_cam, cam_before_change);
 
 		//Render popups
 		renderPopUps();

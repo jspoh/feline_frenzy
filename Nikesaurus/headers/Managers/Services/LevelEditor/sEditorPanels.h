@@ -365,8 +365,11 @@ namespace NIKE {
 
 			//Combo index for selecting camera
 			int combo_index;
+
+			//Free camera
+			std::shared_ptr<Render::Cam> free_cam;
 		public:
-			CameraPanel() = default;
+			CameraPanel() : combo_index{ 0 } {}
 			~CameraPanel() = default;
 
 			//Panel Name
@@ -378,6 +381,9 @@ namespace NIKE {
 			static std::string getStaticName() {
 				return "Camera Management";
 			}
+
+			//Camera change action
+			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
 
 			//Init
 			void init() override;

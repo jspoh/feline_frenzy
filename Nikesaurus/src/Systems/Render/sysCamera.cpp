@@ -18,47 +18,15 @@ namespace NIKE {
 	}
 
 	void Camera::System::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
-		cam_id = event->entity_id;
-		event->setEventProcessed(true);
-	}
-
-	void Camera::System::onEvent(std::shared_ptr<Render::UpdateCamEvent> event) {
-		// Zoom Controls with Clamp
-		const float min_zoom = 0.0f;
-		const float max_zoom = 100.0f;  
-
-		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
-		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value())
-			? e_cam_comp.value().get() : def_cam;
-
-		// !TODO remove hard coded values for the adjustments
-		if (event->edit_position == NIKE::Render::CamPosition::UP) {
-			active_cam.position.y += 5.f;
+		if (NIKE_ECS_MANAGER->checkEntity(event->entity_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(event->entity_id)) {
+			cam_id = event->entity_id;
 		}
-		else if (event->edit_position == NIKE::Render::CamPosition::DOWN) {
-			active_cam.position.y -= 5.f;
+		else {
+			if (event->fallback_cam != nullptr) {
+				cam_id = event->entity_id;
+				def_cam = event->fallback_cam;
+			}
 		}
-		else if (event->edit_position == NIKE::Render::CamPosition::LEFT) {
-			active_cam.position.x -= 5.f;
-		}
-		else if (event->edit_position == NIKE::Render::CamPosition::RIGHT) {
-			active_cam.position.x += 5.f;
-		}
-		else if (event->edit_position == NIKE::Render::CamPosition::RESET_POS) {
-			active_cam.position = Vector2f(0.f, 0.f);
-		}
-
-		if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_IN) {
-			active_cam.zoom -= 0.01f;
-		}
-		else if (event->edit_zoom == NIKE::Render::CamZoom::ZOOM_OUT) {
-			active_cam.zoom += 0.01f;
-		}
-		else if (event->edit_zoom == NIKE::Render::CamZoom::RESET_ZOOM) {
-			active_cam.zoom = 1.0f;
-		}
-		// Clamp the zoom height
-		active_cam.zoom = std::clamp(active_cam.zoom, min_zoom, max_zoom);
 
 		event->setEventProcessed(true);
 	}
@@ -75,11 +43,9 @@ namespace NIKE {
 		std::shared_ptr<Camera::System> cam_sys_wrapped(this, [](Camera::System*){});
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
 		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
-		NIKE_EVENTS_SERVICE->addEventListeners<Render::UpdateCamEvent>(cam_sys_wrapped);
 
 		//Setup default camera
-		def_cam.position = { 0.0f, 0.0f };
-		def_cam.zoom = 1.0f;
+		def_cam = std::make_shared<Render::Cam>(Vector2f( 0.0f, 0.0f ), 1.0f);
 	}
 
 	Entity::Type Camera::System::getCamId() const {
@@ -103,7 +69,7 @@ namespace NIKE {
 			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).value();
 		}
 		else {
-			cam = def_cam;
+			cam = *def_cam.get();
 		}
 
 		Matrix_33 view_xform {
@@ -149,14 +115,14 @@ namespace NIKE {
 		float ndcY = 1.0f - (2.0f * pos.y) / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
 
 		Matrix_33 view_xform{
-			1, 0,  -def_cam.position.x,
-			0, 1,  -def_cam.position.y,
+			1, 0,  -def_cam->position.x,
+			0, 1,  -def_cam->position.y,
 			0, 0, 1
 		};
 
 		Matrix_33 cam_to_ndc_xform{
-			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam.zoom), 0, 0,
-			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam.zoom), 0,
+			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam->zoom), 0, 0,
+			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam->zoom), 0,
 			0, 0, 1
 		};
 

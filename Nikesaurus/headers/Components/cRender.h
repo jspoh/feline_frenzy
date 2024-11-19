@@ -44,21 +44,11 @@ namespace NIKE {
 		//Change camera event
 		struct ChangeCamEvent : public Events::IEvent {
 			Entity::Type entity_id;
+			std::shared_ptr<Render::Cam> fallback_cam;
 
 			//If a entity id does not have a camera attached, default camera is deployed
-			ChangeCamEvent(Entity::Type entity_id)
-				: entity_id{ entity_id } {}
-		};
-
-		//Update camera event
-		struct UpdateCamEvent : public Events::IEvent {
-			std::optional<CamPosition> edit_position; // Optional position change
-			std::optional<CamZoom> edit_zoom;      // Optional zoom level change
-
-			UpdateCamEvent(
-				std::optional<CamPosition> pos = std::nullopt,
-				std::optional<CamZoom> zoom = std::nullopt)
-				: edit_position{ pos }, edit_zoom { zoom } {}
+			ChangeCamEvent(Entity::Type entity_id, std::shared_ptr<Render::Cam> fallback_cam = nullptr)
+				: entity_id{ entity_id }, fallback_cam{ fallback_cam } {}
 		};
 
 		//Viewport texture event
