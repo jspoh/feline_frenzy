@@ -3,6 +3,7 @@
  * \brief  Assets manager function definitions
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu 
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -58,27 +59,30 @@ namespace NIKE {
 			NIKEE_CORE_INFO("Created filepath assets");
 		}
 
-		for (int i = 0; i < file_count; ++i) {
-			std::filesystem::path src_file_path { file_paths[i] };
+		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 
-			// Makes sure extension isnt caps sensitive
-			std::string ext = src_file_path.extension().string();
-			// Transform each character in string ext to lowercase
-			std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
+			for (int i = 0; i < file_count; ++i) {
+				std::filesystem::path src_file_path{ file_paths[i] };
 
-			if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
-				handleTextureDrop(src_file_path);
+				// Makes sure extension isnt caps sensitive
+				std::string ext = src_file_path.extension().string();
+				// Transform each character in string ext to lowercase
+				for (char& c : ext) {
+					c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+				}
 
-			}
-			else if (valid_audio_ext.find(ext) != valid_audio_ext.end()) {
-				handleAudioDrop(src_file_path);
-			}
-			else {
-				NIKEE_CORE_ERROR("ERROR: Unsupported File Type for file: {}", file_paths[i]);
+				if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
+					handleTextureDrop(src_file_path);
+
+				}
+				else if (valid_audio_ext.find(ext) != valid_audio_ext.end()) {
+					handleAudioDrop(src_file_path);
+				}
+				else {
+					NIKEE_CORE_ERROR("ERROR: Unsupported File Type for file: {}", file_paths[i]);
+				}
 			}
 		}
-
-
 	}
 
 	void Assets::Service::configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
@@ -139,7 +143,7 @@ namespace NIKE {
 
 		if (it == fonts_list.end())
 		{
-			LOG_CRASH("Font {} could not be found.", font_id);
+			LOG_CRASH("Font could not be found.");
 		}
 
 		return it->second;
@@ -366,8 +370,6 @@ namespace NIKE {
 		catch (const std::filesystem::filesystem_error& e) {
 			NIKEE_CORE_ERROR("ERROR: Failed to copy {}: {}", src_file_path.string(), e.what());
 		}
-
-		NIKEE_CORE_INFO("File {} successfully copied into assets/textures", src_file_path.string());
 
 		// Check if texture exists
 		if (checkTextureExist(src_file_path.filename().string())) {

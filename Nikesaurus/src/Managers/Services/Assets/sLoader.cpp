@@ -3,6 +3,7 @@
  * \brief	Font render manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
  * \date   October 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -335,27 +336,40 @@ namespace NIKE {
 		}
 
 		// is not .tex file
-		if (filetype == "png" || filetype == "PNG") {
-
+		if (filetype == "png" || filetype == "PNG" || filetype == "jpg" || filetype == "jpeg" || filetype == "JPG" || filetype == "JPEG") {
 			is_tex_or_png_ext = true;
 		}
 		else {
 			is_tex_or_png_ext = false;
 		}
 
-		int channels;
-		stbi_set_flip_vertically_on_load(true);
-		const int desired_channels = 4;
-		char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels));
-		if (img_data == nullptr || width == 0 || height == 0) {
-			NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
-			NIKEE_CORE_ERROR("stb_image error:  {}", stbi_failure_reason());
-			return nullptr; // Return nullptr if loading fails
+		if (is_tex_or_png_ext) {
+			int channels;
+			stbi_set_flip_vertically_on_load(true);
+			const int desired_channels = 4;
+			char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels));
+			if (img_data == nullptr || width == 0 || height == 0) {
+				NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
+				NIKEE_CORE_ERROR("stb_image error:  {}", stbi_failure_reason());
+				stbi_image_free(img_data); // Free memory
+				return nullptr; // Return nullptr if loading fails
+			}
+
+			// Reject if the image is larger than 4K 
+			if (width > 4096 || height > 4096) {
+				NIKEE_CORE_ERROR("Image is larger than 4K resolution: {} ({}x{})", path_to_texture, width, height);
+				stbi_image_free(img_data); // Free memory
+				return nullptr; // Return nullptr if image is too large
+			}
+
+			tex_size = width * height * 4;  // RGBA format
+
+			return img_data;
 		}
 
-		tex_size = width * height * 4;
-
-		return img_data; 
+		// If the file type is unsupported (not .tex, .png, .jpg, or .jpeg)
+		NIKEE_CORE_ERROR("Unsupported file format: {}", path_to_texture);
+		return nullptr;
 	}
 
 	unsigned int Assets::RenderLoader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
@@ -538,6 +552,11 @@ namespace NIKE {
 		int tex_size{};
 		bool is_tex_or_png_ext = false;
 		const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
+
+		if (tex_data == nullptr) {
+			NIKEE_CORE_ERROR("Failed to load image : {} ", path_to_texture);
+			return Assets::Texture(-1, { 256, 256 });
+		}
 
 		// create texture
 		unsigned int tex_id;
