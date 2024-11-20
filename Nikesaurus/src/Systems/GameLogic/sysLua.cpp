@@ -12,7 +12,7 @@
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
-    void Lua::System::createEntityFromPrefab(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
+    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
             // Create entity function call ( Defaulted to the base layer for now )
             Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
@@ -77,8 +77,8 @@ namespace NIKE {
         lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
 
         //Register lua binding for prefab loading
-        lua_state->set_function("createEntityFromPrefab", [this](int layer_id, const std::string& file_path, const std::string& entity_name) {
-            this->createEntityFromPrefab(layer_id, file_path, entity_name);
+        lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name) {
+            this->shootBullet(layer_id, file_path, entity_name);
             });
 
 
