@@ -184,9 +184,17 @@ namespace NIKE {
 			int target_fps;
 			float actual_fps;
 
+			//Current number of steps ( Fixed DT )
+			int curr_num_steps;
+
+			//Accumulated time ( Fixed DT )
+			double accumulated_time;
+
 		public:
 			//Default constructor
-			Service() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+			Service() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, 
+						actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 }, 
+						accumulated_time{ 0.0 } {}
 
 			//Arguement Constructor
 			Service(std::shared_ptr<IWindow> window);
@@ -209,11 +217,17 @@ namespace NIKE {
 			//Get Delta Time
 			float getDeltaTime() const;
 
+			//Get fixed delta time
+			float getFixedDeltaTime() const;
+
+			//Get current number of steps
+			int getCurrentNumOfSteps() const;
+
+			//Get interpolation factor
+			float getInterpolationFactor() const;
+
 			//Calculate Delta Time
 			void calculateDeltaTime();
-
-			//FPS control
-			void controlFPS();
 		};
 
 		//Re-enable DLL Export warning

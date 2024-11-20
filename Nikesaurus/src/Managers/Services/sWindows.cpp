@@ -234,7 +234,9 @@ namespace NIKE {
 	* Window Service
 	*********************************************************************/
 	Windows::Service::Service(std::shared_ptr<IWindow> window)
-		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+		:	ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, 
+			actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 },
+			accumulated_time{ 0.0 } {}
 
 	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {
 		ptr_window = window;
@@ -271,6 +273,18 @@ namespace NIKE {
 		return delta_time;
 	}
 
+	float Windows::Service::getFixedDeltaTime() const {
+		return (static_cast<float>(1) / target_fps);
+	}
+
+	int Windows::Service::getCurrentNumOfSteps() const {
+		return curr_num_steps;
+	}
+
+	float Windows::Service::getInterpolationFactor() const {
+		return static_cast<float>(accumulated_time / (static_cast<float>(1) / target_fps));
+	}
+
 	void Windows::Service::calculateDeltaTime() {
 		//Static prev time
 		static double prev_time = glfwGetTime();
@@ -280,15 +294,15 @@ namespace NIKE {
 		delta_time = static_cast<float>(curr_time - prev_time);
 		actual_fps = 1.0f / delta_time;
 		prev_time = curr_time;
-	}
 
-	void Windows::Service::controlFPS() {
+		//Reset curr num of steps
+		curr_num_steps = 0;
 
-		//Target delta time
-		double target_frame_time = 1.0 / target_fps;
-
-		//Limit FPS based on target frame time
-		while (glfwGetTime() - curr_time < target_frame_time) {
+		//control frame rate
+		accumulated_time += delta_time;
+		while (accumulated_time >= (static_cast<double>(1) / target_fps)) {
+			accumulated_time -= (static_cast<double>(1) / target_fps);
+			curr_num_steps++;
 		}
 	}
 }
