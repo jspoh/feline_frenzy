@@ -202,5 +202,79 @@ namespace NIKE {
 				comp.curr_index.fromJson(data.at("Curr_Index"));
 			}
 		);
+
+		// Animation base comp UI
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Animation::Sprite>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Animation::Sprite& comp) {
+
+				// For animation sprite start index
+				{
+					static Vector2i before_start_change;
+
+					ImGui::DragInt2("Start Index", &comp.start_index.x, 1);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_start_change = comp.start_index;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_start_index;
+
+						//Change pos do action
+						change_start_index.do_action = [&, start_index = comp.start_index]() {
+							comp.start_index = start_index;
+							};
+
+						//Change pos undo action
+						change_start_index.undo_action = [&, start_index = before_start_change]() {
+							comp.start_index = start_index;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_start_index));
+					}
+				}
+
+				// For animation sprite end index
+				{
+					static Vector2i before_end_change;
+
+					ImGui::DragInt2("End Index", &comp.end_index.x, 1);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_end_change = comp.end_index;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_end_index;
+
+						//Change pos do action
+						change_end_index.do_action = [&, end_index = comp.end_index]() {
+							comp.end_index = end_index;
+							};
+
+						//Change pos undo action
+						change_end_index.undo_action = [&, end_index = before_end_change]() {
+							comp.end_index = end_index;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_end_index));
+					}
+				}
+
+				// Some data to show for animation sprite
+				ImGui::Text("Sheet Size:");
+				ImGui::BulletText("X = %d", comp.sheet_size.x);
+				ImGui::BulletText("Y = %d", comp.sheet_size.y);
+				ImGui::Text("Current Index:");
+				ImGui::BulletText("X = %d", comp.curr_index.x);
+				ImGui::BulletText("Y = %d", comp.curr_index.y);
+			}
+		);
 	}
 }
