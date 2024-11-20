@@ -770,6 +770,79 @@ namespace NIKE {
 		};
 	}
 
+	std::function<void()> LevelEditor::ComponentsPanel::savePrefabPopUp(std::string const& popup_id) {
+		return[this, popup_id]() {
+		
+			static std::string prefab_file_path;
+
+			ImGui::Text("Enter file path to save prefab:");
+			if (ImGui::InputText("##PrefabFilePath", prefab_file_path.data(), prefab_file_path.capacity() + 1)) {
+				prefab_file_path.resize(strlen(prefab_file_path.c_str()));
+			}
+
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+				//Temporary create action
+				Action save_prefab;
+
+				// For saving of the prefab file with the extension
+				std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + prefab_file_path + ".prefab";
+
+				//Create a shared id for do & undo functions
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(prefab_full_path);
+
+				//Do Action
+				save_prefab.do_action = [&, shared_id]() {
+					// Serialize the prefab to the file path
+					NIKE_SERIALIZE_SERVICE->saveEntityToFile(selected_entity, *shared_id);
+					setPopUpSuccessMsg("Prefab file saved!");
+					openPopUp("Success");
+
+					};
+
+				//Undo Action
+				save_prefab.undo_action = [&, shared_id]() {
+
+					const std::string& file_to_delete = *shared_id;
+
+					// Check if file exists before deleting
+					if (std::filesystem::exists(file_to_delete)) {
+						try {
+							std::filesystem::remove(file_to_delete);
+						}
+						catch (const std::filesystem::filesystem_error& e) {
+							// Log error if file deletion fails
+							NIKEE_CORE_WARN("Failed to delete prefab file during undo: " + std::string(e.what()));
+						}
+					}
+					else {
+						NIKEE_CORE_WARN("File does not exist for undo: " + file_to_delete);
+					}
+					};
+
+				//Execute create entity action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_prefab));
+
+				//Reset entity name
+				prefab_file_path.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel saving prefab
+			if (ImGui::Button("Cancel")) {
+
+				//Reset entity name
+				prefab_file_path.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
 	std::function<void()> LevelEditor::ComponentsPanel::setLayerIDPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -835,6 +908,7 @@ namespace NIKE {
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
+		registerPopUp("Save Prefab", savePrefabPopUp("Save Prefab"));
 		error_msg = std::make_shared<std::string>("Comp Error");
 		success_msg = std::make_shared<std::string>("Saving Success");
 		registerPopUp("Error", defPopUp("Error", error_msg));
@@ -886,6 +960,13 @@ namespace NIKE {
 			//Set layer id popup
 			if (ImGui::Button("Set Layer ID")) {
 				openPopUp("Set Layer ID");
+			}
+
+			ImGui::SameLine();
+
+			//Save prefab popup
+			if (ImGui::Button("Save Prefab")) {
+				openPopUp("Save Prefab");
 			}
 
 			//Add Spacing
