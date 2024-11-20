@@ -43,6 +43,9 @@ namespace NIKE {
 
 		//Register render components
 		GameLogic::registerComponents();
+
+		//Register shooting components
+		Shooting::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {

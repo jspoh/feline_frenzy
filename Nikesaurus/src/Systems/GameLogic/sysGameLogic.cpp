@@ -66,25 +66,37 @@ namespace NIKE {
 					int move = static_cast<int>(Utility::randFloat() * 3);
 					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
 				}
+
+				// Check for shooting comp
+				auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
+				if (e_shoot_comp.has_value()) {
+					// Get entity's position
+					auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+					Vector2f shooter_pos = e_transform_comp.value().get().position;
+
+					// Create bullet
+					//if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_MOUSE_BUTTON_LEFT)) {
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_KEY_1)) {
+						std::string script_path = "assets/Scripts/createBullet.lua";
+						std::string function_name = "createBullet";
+						std::string prefab_path = "bullet.prefab";
+
+						// Load Lua Script
+						std::string script_id = lua_system->loadScript(script_path);
+
+						// Execute Lua Script
+						sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
+
+						int layer_id = 0;
+						
+						create_bullet_func(layer_id, prefab_path);
+						//create_bullet_func(layer_id, prefab_path, shooter_pos);
+
+						//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+						//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
+					}
+				}
 			}
-		}
-
-		// Create bullet test
-		if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_KEY_1)) {
-			std::string script_path = "assets/Scripts/createBullet.lua";
-			std::string function_name = "createBullet";
-
-			// Load Lua Script
-			std::string script_id = lua_system->loadScript(script_path);
-
-			// Execute Lua Script
-			sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
-
-			int layer_id = 1;
-			std::string prefab_path = "bullet.prefab";
-			create_bullet_func(layer_id, prefab_path);
-
-			//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
 		}
 	}
 
