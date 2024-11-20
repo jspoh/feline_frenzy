@@ -271,7 +271,7 @@ namespace NIKE
 		}
 	}
 
-	bool isMouseOverEntity(const Entity::Type& entity) {
+	bool isMouseOverEntity([[maybe_unused]] const Entity::Type& entity) {
 
 		////Get bounding box
 		//auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
