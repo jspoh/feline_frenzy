@@ -295,13 +295,33 @@ namespace NIKE {
 		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
+	bool Assets::RenderLoader::checkFileSignature(const std::string& path) {
+
+		std::ifstream file(path, std::ios::binary);
+		if (!file.is_open()) {
+			NIKEE_CORE_ERROR("Failed to open file: ", path);
+			return false;
+		}
+		unsigned char signature[8] = {};
+		file.read(reinterpret_cast<char*>(signature), 8);
+		file.close();
+
+		// PNG signature: 89 50 4E 47 0D 0A 1A 0A
+		const unsigned char png_signature[8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+		if (memcmp(signature, png_signature, 8) == 0) {
+			return true;
+		}
+		else {
+			NIKEE_CORE_ERROR("File is not a valid PNG!");
+			return false;
+		}
+	}
 
 	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
-		std::string junk, filetype;
-		std::stringstream ss{ path_to_texture };
-		std::getline(ss, junk, '.');
-		std::getline(ss, filetype, '.');
+		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
+
+
 
 		if (filetype == "tex") {
 			is_tex_or_png_ext = true;
@@ -335,6 +355,10 @@ namespace NIKE {
 
 		// is not .tex file
 		if (filetype == "png") {
+			if (!checkFileSignature(path_to_texture)) {
+				NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
+				return NULL;
+			}
 			is_tex_or_png_ext = true;
 		}
 		else {
@@ -343,9 +367,11 @@ namespace NIKE {
 
 		int channels;
 		stbi_set_flip_vertically_on_load(true);
-		char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
+		const int desired_channels = 4;
+		char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels));
 		if (img_data == nullptr) {
-			cerr << "Failed to load image data: " << path_to_texture << endl;
+			NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
+			NIKEE_CORE_ERROR("stb_image error:  {}", stbi_failure_reason());
 			throw std::runtime_error("Failed to load image data.");
 		}
 

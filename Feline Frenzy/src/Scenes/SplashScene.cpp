@@ -22,7 +22,7 @@ void Splash::Scene::load() {
 
 void Splash::Scene::init() {
 
-	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/gui_scene.scn");
+	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/animation_scene.scn");
 
 	//NIKE_UI_SERVICE->createButton("Test",
 	//	NIKE::Transform::Transform({ 0.0f,0.0f }, { 200.0f, 100.0f }, 0.0f),
@@ -46,7 +46,7 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
-	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/test.scn");
+	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/animation_scene.scn");
 }
 
 void Splash::Scene::unload() {

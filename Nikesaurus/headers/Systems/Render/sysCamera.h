@@ -20,8 +20,7 @@ namespace NIKE {
 
 		class System
 			: public Events::IEventListener<Windows::WindowResized>,
-			public Events::IEventListener<Render::ChangeCamEvent>,
-			public Events::IEventListener<Render::UpdateCamEvent>
+			public Events::IEventListener<Render::ChangeCamEvent>
 		{
 		public:
 			System();
@@ -50,7 +49,7 @@ namespace NIKE {
 			Entity::Type cam_id;
 
 			//Default Camera
-			Render::Cam def_cam;
+			std::shared_ptr<Render::Cam> def_cam;
 
 			//Camera aspect ratio
 			float aspect_ratio;
@@ -60,9 +59,6 @@ namespace NIKE {
 
 			//On change camera event
 			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
-
-			//On update camera event
-			void onEvent(std::shared_ptr<Render::UpdateCamEvent> event) override;
 		};
 	}
 }

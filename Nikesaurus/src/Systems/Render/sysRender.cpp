@@ -52,6 +52,25 @@ namespace NIKE {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	Transform::Transform Render::Manager::getRenderTransform(Transform::Transform const& e_transform) {
+		//Interpolated render transform for smoother rendering
+		Transform::Transform render_transform;
+
+		//Interpolate position
+		render_transform.position = e_transform.prev_position * (1.0f - NIKE_WINDOWS_SERVICE->getInterpolationFactor()) +
+			e_transform.position * NIKE_WINDOWS_SERVICE->getInterpolationFactor();
+
+		//Interpolate scale
+		render_transform.scale = e_transform.prev_scale * (1.0f - NIKE_WINDOWS_SERVICE->getInterpolationFactor()) +
+			e_transform.scale * NIKE_WINDOWS_SERVICE->getInterpolationFactor();
+
+		//Interpolate rotation
+		render_transform.rotation = e_transform.prev_rotation * (1.0f - NIKE_WINDOWS_SERVICE->getInterpolationFactor()) +
+			e_transform.rotation * NIKE_WINDOWS_SERVICE->getInterpolationFactor();
+
+		return render_transform;
+	}
+
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
 		Matrix_33 result, scale_mat, rot_mat, trans_mat;
@@ -316,16 +335,16 @@ namespace NIKE {
 		case TextOrigin::CENTER:
 			pos = { -e_text.size.x / 2.0f, -e_text.size.y / 2.0f };
 			break;
-		case TextOrigin::BOTTOM:
+		case TextOrigin::TOP:
 			pos = { -e_text.size.x / 2.0f, 0.0f };
 			break;
-		case TextOrigin::TOP:
+		case TextOrigin::BOTTOM:
 			pos = { -e_text.size.x / 2.0f, -e_text.size.y };
 			break;
-		case TextOrigin::LEFT:
+		case TextOrigin::RIGHT:
 			pos = { 0.0f, -e_text.size.y / 2.0f };
 			break;
-		case TextOrigin::RIGHT:
+		case TextOrigin::LEFT:
 			pos = { -e_text.size.x, -e_text.size.y / 2.0f };
 			break;
 		default:
@@ -422,7 +441,7 @@ namespace NIKE {
 				}
 
 				// Transform matrix here
-				transformMatrix(e_transform, matrix, cam_ndcx);
+				transformMatrix(getRenderTransform(e_transform), matrix, cam_ndcx);
 
 				// Render Texture
 				renderObject(matrix, e_texture);
@@ -434,7 +453,7 @@ namespace NIKE {
 			//Check if model exists
 			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
 				// Transform matrix here
-				transformMatrix(e_transform, matrix, cam_ndcx);
+				transformMatrix(getRenderTransform(e_transform), matrix, cam_ndcx);
 
 				//Render Shape
 				renderObject(matrix, e_shape);
@@ -455,7 +474,7 @@ namespace NIKE {
 			}
 
 			//Calculate wireframe matrix
-			transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
+			transformMatrixDebug(getRenderTransform(e_transform), matrix, cam_ndcx, true);
 			renderWireFrame(matrix, wire_frame_color);
 
 			//Calculate direction matrix
@@ -494,7 +513,7 @@ namespace NIKE {
 		copy.scale = { 1.0f, 1.0f };
 
 		//Transform text matrix
-		transformMatrix(copy, matrix, camera_system->getFixedWorldToNDCXform());
+		transformMatrix(getRenderTransform(e_transform), matrix, camera_system->getFixedWorldToNDCXform());
 
 		//Render text
 		renderText(matrix, e_text);
@@ -522,7 +541,7 @@ namespace NIKE {
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-					transformAndRenderEntity(entity, NIKE_IMGUI_SERVICE->getDebugMode());
+					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
 				}
 			}
 		}

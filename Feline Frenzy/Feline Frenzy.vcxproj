@@ -130,7 +130,6 @@ xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /
     <Text Include="assets\Models\square-texture.txt" />
     <Text Include="assets\Models\square.txt" />
     <Text Include="assets\Models\triangle.txt" />
-    <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
@@ -147,6 +146,7 @@ xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /
     <None Include="assets\Shaders\text.vert" />
     <None Include="assets\Shaders\texture.frag" />
     <None Include="assets\Shaders\texture.vert" />
+    <None Include="src\Core\Config.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nikesaurus\Nikesaurus.vcxproj">

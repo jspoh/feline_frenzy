@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -216,9 +216,6 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
-		//Check if editor is active
-		if (!b_editor_active)
-			return;
 
 		//Get input to set
 		ImGuiIO& io = ImGui::GetIO();
@@ -314,6 +311,26 @@ namespace NIKE {
 		auto components_panel = std::make_shared<ComponentsPanel>();
 		panels.push_back(components_panel);
 		panels_map.emplace(components_panel->getName(), components_panel);
+
+		//Add debug management panel
+		auto debug_panel = std::make_shared<DebugPanel>();
+		panels.push_back(debug_panel);
+		panels_map.emplace(debug_panel->getName(), debug_panel);
+
+		//Add resource management panel
+		auto resource_panel = std::make_shared<ResourcePanel>();
+		panels.push_back(resource_panel);
+		panels_map.emplace(resource_panel->getName(), resource_panel);
+
+		//Add camera management panel
+		auto camera_panel = std::make_shared<CameraPanel>();
+		panels.push_back(camera_panel);
+		panels_map.emplace(camera_panel->getName(), camera_panel);
+
+		//Add Tile Map management panel
+		auto tile_map_panel = std::make_shared<TileMapPanel>();
+		panels.push_back(tile_map_panel);
+		panels_map.emplace(tile_map_panel->getName(), tile_map_panel);
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });

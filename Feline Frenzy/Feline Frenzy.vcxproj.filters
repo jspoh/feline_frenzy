@@ -44,7 +44,6 @@
     <Text Include="assets\Models\square.txt" />
     <Text Include="assets\Models\square-texture.txt" />
     <Text Include="assets\Models\triangle.txt" />
-    <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
@@ -61,5 +60,6 @@
     <None Include="assets\Scripts\player.lua" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\createBullet.lua" />
+    <None Include="src\Core\Config.json" />
   </ItemGroup>
 </Project>
