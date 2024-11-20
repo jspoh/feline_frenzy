@@ -254,6 +254,9 @@ namespace NIKE {
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
+			//Save Prefab popup
+			std::function<void()> savePrefabPopUp(std::string const& popup_id);
+
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
 
