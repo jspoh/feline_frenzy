@@ -12,11 +12,13 @@
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
-    //void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "", const Vector2f& shooter_pos = { 0.f, 0.f }) {
-    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
+    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "", const Vector2f& shooter_pos = { 0.f, 0.f }) {
+    //void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
+        NIKEE_CORE_INFO("SHOOT BULLET CALLED");
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
             // Create entity function call ( Defaulted to the base layer for now )
             Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+            NIKEE_CORE_INFO("Bullet entity created with ID: " + std::to_string(new_id));
 
             // If empty string, assign default string
             std::string name = entity_name.empty() ? "entity_" + std::to_string(new_id) : entity_name;
@@ -28,7 +30,7 @@ namespace NIKE {
             std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
-            Vector2f bullet_pos = { 0.f, 0.f };
+            Vector2f bullet_pos = shooter_pos;
             // Transform
             auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
             if (e_transform_comp.has_value()) {
@@ -52,7 +54,7 @@ namespace NIKE {
                 // Normalizing direction vector
                 direction.normalize();
 
-                e_physics_comp.value().get().velocity = { direction.x * 500.f, direction.y * 500.f };
+                e_physics_comp.value().get().velocity = { direction.x * 1000.f, direction.y * 1000.f };
             }
         }
     }
@@ -78,20 +80,9 @@ namespace NIKE {
         lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
 
         //Register lua binding for prefab loading
-        //lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, const sol::table& shooter_pos_table) {
-        lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name) {
-            //Vector2f shooter_pos;
-
-            //if (shooter_pos_table.valid()) {
-            //    shooter_pos.x = shooter_pos_table["x"];
-            //    shooter_pos.y = shooter_pos_table["y"];
-            //}
-            //else {
-            //    // Default to (0, 0) if no position
-            //    shooter_pos = { 0.f, 0.f }; 
-            //}
-
-            this->shootBullet(layer_id, file_path, entity_name);
+        lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float shooter_x, float shooter_y) {
+            Vector2f shooter_pos{ shooter_x, shooter_y };
+            this->shootBullet(layer_id, file_path, entity_name, shooter_pos);
             });
 
 
