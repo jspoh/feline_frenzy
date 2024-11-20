@@ -32,6 +32,7 @@ namespace NIKE {
             auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
             if (e_transform_comp.has_value()) {
                 //Set entity position to (0, 0) for now
+                // Will change this to the coord of whatever is spawning the boolet
                 e_transform_comp.value().get().position = { 0.f,0.f };
             }
 

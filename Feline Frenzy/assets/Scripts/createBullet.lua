@@ -9,11 +9,8 @@ function Bullet.createBullet(layer, prefab_path)
     -- Create a bullet from the prefab
     local bullet_id = createBulletFromPrefab(layer, prefab_path)
 
-    -- Set Velocity (optional, uncomment if needed)
-    -- setBulletVelocity(bullet_id, 0.0, 0.0) 
-
     -- Log creation success
-    cout("Bullet created, ID: " .. bullet_id)
+    -- cout("Bullet created, ID: " .. bullet_id)
     
     return bullet_id
 end

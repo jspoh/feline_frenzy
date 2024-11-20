@@ -53,6 +53,7 @@
     <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp" />
+    <ClCompile Include="src\Components\cShooting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
+    <ClInclude Include="headers\Components\cShooting.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
