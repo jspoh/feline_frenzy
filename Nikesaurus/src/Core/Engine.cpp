@@ -197,21 +197,7 @@ namespace NIKE {
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 			}
 
-			//Render entity to mouse click
-			//if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
-
-			//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
-
-			//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-			//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-			//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-			//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-			//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
-			//	}
-			//}
-
+			//Toggle full screen
 			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 			}
@@ -224,9 +210,6 @@ namespace NIKE {
 
 			//Render Level Editor
 			NIKE_LVLEDITOR_SERVICE->render();
-		
-			//Control FPS
-			NIKE_WINDOWS_SERVICE->controlFPS();
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();

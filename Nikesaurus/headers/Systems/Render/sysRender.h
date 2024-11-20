@@ -54,6 +54,9 @@ namespace NIKE {
 			//Quad rendering variables
 			unsigned int VAO, VBO;
 
+			//For smoother rendering
+			Transform::Transform getRenderTransform(Transform::Transform const& e_transform);
+
 			//Transform matrix
 			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
 
