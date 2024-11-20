@@ -17,7 +17,6 @@
 #include "Managers/ECS/mSystem.h"
 
 #include "Systems/Render/sysShader.h"
-#include "Systems/Render/sysCamera.h"
 
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
@@ -45,17 +44,11 @@ namespace NIKE {
 			//Shader system
 			std::unique_ptr<Shader::Manager> shader_system;
 
-			//Camera System
-			std::shared_ptr<Camera::System> camera_system;
-
 			//For rendering viewport
 			unsigned int frame_buffer, texture_color_buffer;
 
 			//Quad rendering variables
 			unsigned int VAO, VBO;
-
-			//For smoother rendering
-			Transform::Transform getRenderTransform(Transform::Transform const& e_transform);
 
 			//Transform matrix
 			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);

@@ -46,10 +46,11 @@ namespace NIKE {
 
 		//Mouse Moved Event
 		struct NIKE_API MouseMovedEvent : public Events::IEvent {
-			Vector2f pos;
+			Vector2f window_pos;
+			Vector2f world_pos;
 
-			MouseMovedEvent(Vector2f pos)
-				: pos{ pos } {}
+			MouseMovedEvent(Vector2f const& window_pos, Vector2f const& world_pos)
+				: window_pos{ window_pos }, world_pos{ world_pos } {}
 		};
 
 		//Mouse Scroll Event

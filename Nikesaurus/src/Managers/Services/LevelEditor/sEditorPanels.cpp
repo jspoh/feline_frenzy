@@ -102,6 +102,17 @@ namespace NIKE {
 		};
 	}
 
+	ImVec2 LevelEditor::IPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) {
+		//Get window position ( Relative to top left corner of the rendering point in window )
+		Vector2f window_pos = { ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
+
+		//Get scale relative to the world size
+		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+
+		//Return screen coordinates
+		return { window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+	}
+
 	/*****************************************************************//**
 	* Main Panel
 	*********************************************************************/
@@ -225,96 +236,6 @@ namespace NIKE {
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
 		//End Frame
-		ImGui::End();
-	}
-
-	/*****************************************************************//**
-	* Game Window Panel
-	*********************************************************************/
-	void LevelEditor::GameWindowPanel::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
-		texture_id = event->tex_id;
-		event->setEventProcessed(true);
-	}
-
-	Vector2f LevelEditor::GameWindowPanel::getRelativeMousePos() const {
-		return relative_mouse_pos;
-	}
-
-	bool LevelEditor::GameWindowPanel::isMouseInWindow() const {
-		//Get window size
-		Vector2i win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
-
-		//Check if relative cursor is within window size
-		if (relative_mouse_pos.x >= 0.0f &&
-			relative_mouse_pos.y >= 0.0f &&
-			relative_mouse_pos.x <= static_cast<float>(win_size.x) &&
-			relative_mouse_pos.y <= static_cast<float>(win_size.y)) 
-		{
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	void LevelEditor::GameWindowPanel::init() {
-		std::shared_ptr<GameWindowPanel> game_window_listener (this, [](GameWindowPanel*){});
-		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(game_window_listener);
-
-		//Usage of tile map panel for rendering grid
-		tile_map_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
-
-		//Main panel reference
-		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
-	}
-
-	void LevelEditor::GameWindowPanel::update() {
-	}
-
-	void LevelEditor::GameWindowPanel::render() {
-		ImGui::Begin(getName().c_str());
-
-		//Get Imgui input
-		ImGuiIO& io = ImGui::GetIO();
-
-		//Actual Window Size
-		Vector2f win_size = { io.DisplaySize.x , io.DisplaySize.y };
-
-		//Configure viewport size
-		ImVec2 window_size = ImGui::GetContentRegionAvail();
-		float aspect_ratio = win_size.x / win_size.y;
-		float viewport_width = window_size.x;
-		float viewport_height = window_size.x / aspect_ratio;
-		if (viewport_height > window_size.y) {
-			viewport_height = window_size.y;
-			viewport_width = window_size.y * aspect_ratio;
-		}
-
-		//Get the position of the game window top-left corner
-		ImVec2 gameWindowPos = ImGui::GetCursorScreenPos();
-
-		//Scale Factor
-		Vector2f scale{ win_size.x / viewport_width, win_size.y / viewport_height };
-
-		//Calculate mouse position relative to the game window
-		relative_mouse_pos = { (io.MousePos.x - gameWindowPos.x) * scale.x, (io.MousePos.y - gameWindowPos.y) * scale.y };
-
-		//Configure UV Offsets
-		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
-		ImVec2 uv1(1.0f, 0.0f); // Top-right
-
-		//Render game to viewport
-		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
-
-		//If grid is showing
-		if (main_panel->getGridState()) {
-			//Get imgui draw list for custom rendering
-			ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-			//Render grid
-			tile_map_panel->renderGrid(draw_list, Vector2f(viewport_width, viewport_height));
-		}
-
 		ImGui::End();
 	}
 
@@ -571,12 +492,36 @@ namespace NIKE {
 		};
 	}
 
+	bool LevelEditor::EntitiesPanel::isCursorInEntity(Entity::Type entity) const {
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (e_transform_comp.has_value()) {
+			auto const& e_transform = e_transform_comp.value().get();
+
+			//Check if cursor is within bounds
+			if (game_panel->getWorldMousePos().x >= e_transform.position.x - (e_transform.scale.x / 2.0f) &&
+				game_panel->getWorldMousePos().x <= e_transform.position.x + (e_transform.scale.x / 2.0f) &&
+				game_panel->getWorldMousePos().y >= e_transform.position.y - (e_transform.scale.y / 2.0f) &&
+				game_panel->getWorldMousePos().y <= e_transform.position.y + (e_transform.scale.y / 2.0f)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Register popups
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
 		registerPopUp("Clone Entity", cloneEntityPopUp("Clone Entity"));
+
+		//Game panel reference
+		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
@@ -643,7 +588,7 @@ namespace NIKE {
 		ImGui::SameLine();
 
 		// Button to remove an entity, which triggers the popup
-		if (ImGui::Button("Remove") && (entities.find(selected_entity) != entities.end()) && !entities.empty()) {
+		if ((ImGui::Button("Remove") || ImGui::GetIO().KeysDown[ImGuiKey_Delete]) && (entities.find(selected_entity) != entities.end()) && !entities.empty()) {
 			openPopUp("Remove Entity");
 		}
 
@@ -664,26 +609,67 @@ namespace NIKE {
 		//Add Spacing
 		ImGui::Spacing();
 
+		//Reset entity changed
+		b_entity_changed = false;
+
 		//Check if there are entities present
-		if (entities.empty()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SelectedEntityEvent>((Entity::Type)0, std::string("")));
-		}
-		else {
-			//Iterate through all active entities
-			for (auto entity : entities) {
+		if (!entities.empty()) {
+
+			//Reverse Iterate through layers to check for entity being clicked
+			static bool entity_clicked = false;
+			entity_clicked = false;
+			for (auto layer = NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rbegin(); 
+				!checkPopUpShowing() && game_panel->isMouseInWindow() && !entity_clicked && layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
+				layer++) {
+
+				//SKip inactive layer
+				if (!layer->get()->getLayerState())
+					continue;
+
+				//Iterate through all entities
+				for (auto& entity : entities) {
+
+					//Skip entities not on curr layer
+					if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+						continue;
+
+					//Check for entity clicking
+					if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+						selected_entity = entity;
+
+						//Get selected entity data
+						auto it = entity_to_name.find(selected_entity);
+
+						//Signal entity changed
+						b_entity_changed = true;
+
+						//Signal that an entity has been clicked
+						entity_clicked = true;
+						break;
+					}
+				}
+			}
+
+			//Iterate through all entities to showcase active entities
+			for (auto& entity : entities) {
 
 				//Check if entity is selected
 				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity).c_str() == entity_to_name.at(selected_entity).c_str();
 
 				//Show selectable
 				if (ImGui::Selectable(entity_to_name.at(entity).c_str(), selected)) {
-					selected_entity = entity;
 
-					//Get selected entity data
-					auto it = entity_to_name.find(selected_entity);
+					if (selected_entity != entity) {
+						selected_entity = entity;
 
-					//Dispatch new selected entity event
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SelectedEntityEvent>(it->first, it->second));
+						//Get selected entity data
+						auto it = entity_to_name.find(selected_entity);
+						b_entity_changed = true;
+					}
+					else {
+						selected_entity = UINT16_MAX;
+						b_entity_changed = true;
+					}
 				}
 			}
 		}
@@ -704,16 +690,29 @@ namespace NIKE {
 		return it->second;
 	}
 
+	Entity::Type LevelEditor::EntitiesPanel::getSelectedEntity() const {
+		return selected_entity;
+	}
+
+	std::string LevelEditor::EntitiesPanel::getSelectedEntityName() const {
+		//Get selected entity data
+		auto it = entity_to_name.find(selected_entity);
+
+		if (it != entity_to_name.end()) {
+			return it->second;
+		}
+		else {
+			return "";
+		}
+	}
+
+	bool LevelEditor::EntitiesPanel::isEntityChanged() const {
+		return b_entity_changed;
+	}
+
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
-	void LevelEditor::ComponentsPanel::onEvent(std::shared_ptr<SelectedEntityEvent> event) {
-		selected_entity = event->selected_entity;
-		selected_entity_ref = event->selected_entity_ref;
-		b_entity_changed = true;
-		event->setEventProcessed(true);
-	}
-
 	std::function<void()> LevelEditor::ComponentsPanel::addComponentPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -727,7 +726,7 @@ namespace NIKE {
 			for (const auto& component : comps) {
 
 				//Check if component already exists
-				if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, component.second))
+				if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel->getSelectedEntity(), component.second))
 					continue;
 
 				//Display each component as a button
@@ -738,8 +737,8 @@ namespace NIKE {
 
 					//Setup undo action for add component
 					add_comp.undo_action = [=]() {
-						if (NIKE_ECS_MANAGER->checkEntityComponent(selected_entity, component.second)) {
-							NIKE_ECS_MANAGER->removeEntityComponent(selected_entity, component.second);
+						if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel->getSelectedEntity(), component.second)) {
+							NIKE_ECS_MANAGER->removeEntityComponent(entities_panel->getSelectedEntity(), component.second);
 						}
 					};
 
@@ -747,7 +746,7 @@ namespace NIKE {
 					add_comp.do_action = [=]() {
 
 						//Add default comp to entity
-						NIKE_ECS_MANAGER->addDefEntityComponent(selected_entity, component.second);
+						NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel->getSelectedEntity(), component.second);
 					};
 
 					//Execute add component action
@@ -793,7 +792,7 @@ namespace NIKE {
 				//Do Action
 				save_prefab.do_action = [&, shared_id]() {
 					// Serialize the prefab to the file path
-					NIKE_SERIALIZE_SERVICE->saveEntityToFile(selected_entity, *shared_id);
+					NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel->getSelectedEntity(), *shared_id);
 					setPopUpSuccessMsg("Prefab file saved!");
 					openPopUp("Success");
 
@@ -855,7 +854,7 @@ namespace NIKE {
 			//Static layer id
 			static int layer_id = 0;
 			if (ImGui::IsItemActivated()) {
-				layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
+				layer_id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel->getSelectedEntity());
 			}
 
 			//Input int
@@ -871,13 +870,13 @@ namespace NIKE {
 				Action set_layer;
 
 				//Setup undo action for set layer
-				set_layer.undo_action = [&, id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity)]() {
-					NIKE_ECS_MANAGER->setEntityLayerID(selected_entity, id);
+				set_layer.undo_action = [&, id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel->getSelectedEntity())]() {
+					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel->getSelectedEntity(), id);
 					};
 
 				//Setup do action for set layer
 				set_layer.do_action = [&, id = layer_id]() {
-					NIKE_ECS_MANAGER->setEntityLayerID(selected_entity, id);
+					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel->getSelectedEntity(), id);
 					};
 
 				//Execute set layer action
@@ -901,9 +900,8 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::init() {
 
-		//Setup event listening for selected entity
-		std::shared_ptr<LevelEditor::ComponentsPanel> comp_panel_wrapped(this, [](LevelEditor::ComponentsPanel*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<SelectedEntityEvent>(comp_panel_wrapped);
+		//Entities panel reference
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
@@ -936,16 +934,16 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		//Check if an entity has been selected
-		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
+		if (NIKE_ECS_MANAGER->checkEntity(entities_panel->getSelectedEntity())) {
 
 			//Print out selected entity string ref
-			ImGui::Text("Selected Entity: %s", selected_entity_ref.c_str());
+			ImGui::Text("Selected Entity: %s", entities_panel->getSelectedEntityName().c_str());
 
 			//Print out selected entity component count
-			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(selected_entity));
+			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entities_panel->getSelectedEntity()));
 
 			//Print out selected entity layer id
-			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(selected_entity));
+			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel->getSelectedEntity()));
 
 			//Add Spacing
 			ImGui::Spacing();
@@ -973,7 +971,7 @@ namespace NIKE {
 			ImGui::Spacing();
 
 			//Retrieve and display all registered component types
-			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity)) {
+			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel->getSelectedEntity())) {
 
 				//Create a collapsible header for the component
 				if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
@@ -990,8 +988,8 @@ namespace NIKE {
 
 						//Values to copy
 						Component::Type comp_type_copy = comps.at(comp.first);
-						Entity::Type entity_copy = selected_entity;
-						auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(selected_entity, comp_type_copy);
+						Entity::Type entity_copy = entities_panel->getSelectedEntity();
+						auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(entities_panel->getSelectedEntity(), comp_type_copy);
 
 						//Do Action
 						remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
@@ -1017,14 +1015,11 @@ namespace NIKE {
 		//Render popups
 		renderPopUps();
 
-		//Reset entity changed flag
-		b_entity_changed = false;
-
 		ImGui::End();
 	}
 
 	bool LevelEditor::ComponentsPanel::isEntityChanged() const {
-		return b_entity_changed;
+		return entities_panel->isEntityChanged();
 	}
 
 	void LevelEditor::ComponentsPanel::setPopUpErrorMsg(std::string const& msg) {
@@ -1034,6 +1029,56 @@ namespace NIKE {
 	void LevelEditor::ComponentsPanel::setPopUpSuccessMsg(std::string const& msg)
 	{
 		success_msg->assign(msg);
+	}
+
+	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
+
+		//Get transform component
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel->getSelectedEntity());
+		if (!e_transform_comp.has_value())
+			return;
+
+		auto const& e_transform = e_transform_comp.value().get();
+
+		//Internal imgui draw
+		auto draw = static_cast<ImDrawList*>(draw_list);
+
+		//Convert rendersize
+		ImVec2 rendersize = { render_size.x, render_size.y };
+
+		//Convert color
+		ImU32 color = IM_COL32(255, 255, 255, 255);
+
+		//Calculate radian angle
+		float rad_angle = -e_transform.rotation * ((float)M_PI / 180.0f);  // Ensure degrees to radians
+
+		//Calculate cos & sin
+		float s = sin(rad_angle);
+		float c = cos(rad_angle);
+
+		//Calculate half scale
+		ImVec2 half_scale = { e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f };
+
+		//Initialize the corners
+		ImVec2 corners[4] = {
+			{ -half_scale.x, -half_scale.y }, // Top-left
+			{  half_scale.x, -half_scale.y }, // Top-right
+			{  half_scale.x,  half_scale.y }, // Bottom-right
+			{ -half_scale.x,  half_scale.y }  // Bottom-left
+		};
+
+		//Rotate and translate each corner
+		for (int i = 0; i < 4; ++i) {
+			float rotated_x = corners[i].x * c - corners[i].y * s;
+			float rotated_y = corners[i].x * s + corners[i].y * c;
+
+			//Translate to the world position
+			corners[i].x = rotated_x + e_transform.position.x;
+			corners[i].y = rotated_y - e_transform.position.y;
+		}
+
+		//Draw quad bounding box
+		draw->AddQuad(worldToScreen(corners[0], rendersize), worldToScreen(corners[1], rendersize), worldToScreen(corners[2], rendersize), worldToScreen(corners[3], rendersize), color, 5.0f);
 	}
 
 	/*****************************************************************//**
@@ -1218,14 +1263,6 @@ namespace NIKE {
 		}
 	}
 
-	Render::Cam LevelEditor::CameraPanel::getActiveCamera() const {
-		auto it = cam_entities.begin();
-		std::advance(it, combo_index);
-		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(it->first);
-		return (NIKE_ECS_MANAGER->checkEntity(it->first) && e_cam_comp.has_value())
-			? e_cam_comp.value().get() : *free_cam;
-	}
-
 	void LevelEditor::CameraPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
@@ -1383,7 +1420,7 @@ namespace NIKE {
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In") || ImGui::IsItemActive()) {
 			active_cam.zoom -= 0.01f;
-			active_cam.zoom = std::clamp(active_cam.zoom, 0.0f, (float)UINT16_MAX);
+			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
 		}
 
 		cameraChangeAction(active_cam, cam_before_change);
@@ -1392,7 +1429,7 @@ namespace NIKE {
 
 		if (ImGui::Button("Zoom Out") || ImGui::IsItemActive()) {
 			active_cam.zoom += 0.01f;
-			active_cam.zoom = std::clamp(active_cam.zoom, 0.0f, (float)UINT16_MAX);
+			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
 		}
 
 		cameraChangeAction(active_cam, cam_before_change);
@@ -1414,31 +1451,14 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Tile Map Management Panel
 	*********************************************************************/
-	ImVec2 LevelEditor::TileMapPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) {
-		//Get window position ( Relative to top left corner of the rendering point in window )
-		Vector2f window_pos = { ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
-
-		//Get scale relative to the world size
-		Vector2f scale { render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
-
-		//Return screen coordinates
-		return { window_pos.x + (render_size.x / 2.0f) + ((-cam_panel->getActiveCamera().position.x + pos.x) * scale.x / cam_panel->getActiveCamera().zoom), window_pos.y + (render_size.y / 2.0f) + ((cam_panel->getActiveCamera().position.y + pos.y) * scale.y / cam_panel->getActiveCamera().zoom)};
-	}
-
 	void LevelEditor::TileMapPanel::init() {
-		//Setup cam panel reference
-		cam_panel = std::dynamic_pointer_cast<CameraPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(CameraPanel::getStaticName()));
 	}
 
 	void LevelEditor::TileMapPanel::update() {
-		grid_scale = { 
-			NIKE_MAP_SERVICE->getGridSize().x * NIKE_MAP_SERVICE->getCellSize().x,
-			NIKE_MAP_SERVICE->getGridSize().y * NIKE_MAP_SERVICE->getCellSize().y 
-		};
 
 		//Clicking to set map cells to blocked
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
-		if (b_grid_mode && game_window->isMouseInWindow() && NIKE_MAP_SERVICE->getCursorCell().has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+		if (!checkPopUpShowing() && b_grid_mode && game_window->isMouseInWindow() && NIKE_MAP_SERVICE->getCursorCell().has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
 			NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked = !NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked;
 		}
 	}
@@ -1448,6 +1468,7 @@ namespace NIKE {
 
 		//Show Grid Scale
 		{
+			auto grid_scale = NIKE_MAP_SERVICE->getGridScale();
 			ImGui::Text("Grid scale: %.3f, %.3f", grid_scale.x, grid_scale.y);
 		}
 
@@ -1633,6 +1654,9 @@ namespace NIKE {
 		//Get cell size
 		auto cell_size = NIKE_MAP_SERVICE->getCellSize();
 
+		//Get grid scale
+		auto grid_scale = NIKE_MAP_SERVICE->getGridScale();
+
 		//Calculate limits
 		float top =		-(grid_scale.y / 2.0f);
 		float bot =		(grid_scale.y / 2.0f);
@@ -1645,23 +1669,135 @@ namespace NIKE {
 		//Convert color
 		ImU32 color = IM_COL32(grid_color.r * 255, grid_color.g * 255, grid_color.b * 255, grid_color.a * 255);
 
+		//Calculate grid render thickness
+		float gird_render_thickness = grid_thickness / NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
 		//Add lines for grid for rows
 		for (int i = 0; i <= grid_size.y; i++) {
-			draw->AddLine(worldToScreen({ left, top + (cell_size.y * i) }, rendersize), worldToScreen({ right, top + (cell_size.y * i)}, rendersize), color, grid_thickness);
+			draw->AddLine(worldToScreen({ left, top + (cell_size.y * i) }, rendersize), worldToScreen({ right, top + (cell_size.y * i)}, rendersize), color, gird_render_thickness);
 		}
 
 		//Add lines for grid for cols
 		for (int j = 0; j <= grid_size.x; j++) {
-			draw->AddLine(worldToScreen({ left + (cell_size.x * j), top }, rendersize), worldToScreen({ left + (cell_size.x * j) , bot }, rendersize), color, grid_thickness);
+			draw->AddLine(worldToScreen({ left + (cell_size.x * j), top }, rendersize), worldToScreen({ left + (cell_size.x * j) , bot }, rendersize), color, gird_render_thickness);
 		}
 
 		//Render dark hue over blocked squares
 		for (auto const& row : NIKE_MAP_SERVICE->getGrid()) {
 			for (auto const& cell : row) {
 				if (cell.b_blocked) {
-					draw->AddRectFilled(worldToScreen({ cell.position.x - (cell_size.x / 2.0f),  cell.position.y - (cell_size.y / 2.0f) }, rendersize), worldToScreen({ cell.position.x + (cell_size.x / 2.0f),  cell.position.y + (cell_size.y / 2.0f) }, rendersize), IM_COL32(0, 0, 0, 100));
+					draw->AddRectFilled(worldToScreen({ cell.position.x - (cell_size.x / 2.0f) + grid_thickness,  cell.position.y - (cell_size.y / 2.0f) + grid_thickness }, rendersize), worldToScreen({ cell.position.x + (cell_size.x / 2.0f) - grid_thickness,  cell.position.y + (cell_size.y / 2.0f) - grid_thickness }, rendersize), IM_COL32(0, 0, 0, 100));
 				}
 			}
 		}
+	}
+
+	/*****************************************************************//**
+	* Game Window Panel
+	*********************************************************************/
+	void LevelEditor::GameWindowPanel::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
+		texture_id = event->tex_id;
+		event->setEventProcessed(true);
+	}
+
+	Vector2f LevelEditor::GameWindowPanel::getWorldMousePos() const {
+		return world_mouse_pos;
+	}
+
+	Vector2f LevelEditor::GameWindowPanel::getWindowMousePos() const {
+		return window_mouse_pos;
+	}
+
+	bool LevelEditor::GameWindowPanel::isMouseInWindow() const {
+		//Get window size
+		Vector2i win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		//Check if relative cursor is within window size
+		if (window_mouse_pos.x >= 0.0f &&
+			window_mouse_pos.y >= 0.0f &&
+			window_mouse_pos.x <= static_cast<float>(win_size.x) &&
+			window_mouse_pos.y <= static_cast<float>(win_size.y))
+		{
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	void LevelEditor::GameWindowPanel::init() {
+		std::shared_ptr<GameWindowPanel> game_window_listener(this, [](GameWindowPanel*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(game_window_listener);
+
+		//Usage of tile map panel for rendering grid
+		tile_map_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
+
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
+
+		//Components panel reference
+		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
+	}
+
+	void LevelEditor::GameWindowPanel::update() {
+	}
+
+	void LevelEditor::GameWindowPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Get Imgui input
+		ImGuiIO& io = ImGui::GetIO();
+
+		//Get imgui draw list for custom rendering
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+		//Actual Window Size
+		Vector2f win_size = { static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x) , static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y) };
+
+		//Configure viewport size
+		ImVec2 window_size = ImGui::GetContentRegionAvail();
+		float aspect_ratio = win_size.x / win_size.y;
+		float viewport_width = window_size.x;
+		float viewport_height = window_size.x / aspect_ratio;
+		if (viewport_height > window_size.y) {
+			viewport_height = window_size.y;
+			viewport_width = window_size.y * aspect_ratio;
+		}
+
+		//Get the position of the game window top-left corner
+		ImVec2 window_pos = ImGui::GetCursorScreenPos();
+
+		//World Scale Factor
+		Vector2f scale{ win_size.x / (viewport_width / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), win_size.y / (viewport_height / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+
+		//Calculate world mouse position
+		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x , (io.MousePos.y - window_pos.y) * scale.y };
+		world_mouse_pos.x = world_mouse_pos.x - ((viewport_width * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
+		world_mouse_pos.y = world_mouse_pos.y - ((viewport_height * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y;
+
+		//Fixed window scale factor
+		scale = { win_size.x / viewport_width, win_size.y / viewport_height };
+
+		//Calculate window mouse position
+		window_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x , (io.MousePos.y - window_pos.y) * scale.y };
+
+		//Configure UV Offsets3fc
+		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
+		ImVec2 uv1(1.0f, 0.0f); // Top-right
+
+		//Render game to viewport
+		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
+
+		//If grid is showing
+		if (main_panel->getGridState()) {
+
+			//Render grid
+			tile_map_panel->renderGrid(draw_list, Vector2f(viewport_width, viewport_height));
+		}
+
+		//Render selected entity bounding box
+		comps_panel->renderEntityBoundingBox(draw_list, Vector2f(viewport_width, viewport_height));
+
+		ImGui::End();
 	}
 }

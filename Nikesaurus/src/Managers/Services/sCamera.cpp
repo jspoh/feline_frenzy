@@ -7,17 +7,17 @@
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
-#include "Systems/Render/sysCamera.h"
+#include "Managers/Services/sCamera.h"
 #include "Core/Engine.h"
 
 namespace NIKE {
-	Camera::System::System() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, aspect_ratio{ 0.0f } { }
+	Camera::Service::Service() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, aspect_ratio{ 0.0f } { }
 
-	void Camera::System::onEvent(std::shared_ptr<Windows::WindowResized> event) {
+	void Camera::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
 		aspect_ratio = static_cast<float>(event->frame_buffer.x) / static_cast<float>(event->frame_buffer.y);
 	}
 
-	void Camera::System::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
+	void Camera::Service::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(event->entity_id)) {
 			cam_id = event->entity_id;
 		}
@@ -31,7 +31,7 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
-	void Camera::System::init() {
+	void Camera::Service::init() {
 		// !TODO set height as a constant from the config
 		aspect_ratio = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x) / static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 		float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
@@ -40,7 +40,7 @@ namespace NIKE {
 		target = Vector2(cos(angleDisp), sin(angleDisp));
 
 		//Setup events listening
-		std::shared_ptr<Camera::System> cam_sys_wrapped(this, [](Camera::System*){});
+		std::shared_ptr<Camera::Service> cam_sys_wrapped(this, [](Camera::Service*){});
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
 		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
 
@@ -48,11 +48,11 @@ namespace NIKE {
 		def_cam = std::make_shared<Render::Cam>(Vector2f( 0.0f, 0.0f ), 1.0f);
 	}
 
-	Entity::Type Camera::System::getCamId() const {
+	Entity::Type Camera::Service::getCamId() const {
 		return cam_id;
 	}
 
-	Matrix_33 Camera::System::getWorldToNDCXform() const
+	Matrix_33 Camera::Service::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
 		//Check if camera entity exists
@@ -87,7 +87,7 @@ namespace NIKE {
 		return cam_to_ndc_xform * view_xform;
 	};
 
-	Matrix_33 Camera::System::getFixedWorldToNDCXform() const
+	Matrix_33 Camera::Service::getFixedWorldToNDCXform() const
 	{
 		//Default camera altributes
 		Render::Cam def;
@@ -109,7 +109,7 @@ namespace NIKE {
 		return cam_to_ndc_xform * view_xform;
 	};
 
-	const Vector3f Camera::System::getPosToWorld(const Vector2f& pos) const
+	const Vector3f Camera::Service::getPosToWorld(const Vector2f& pos) const
 	{
 		float ndcX = (2.0f * pos.x) / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x - 1.0f;
 		float ndcY = 1.0f - (2.0f * pos.y) / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
@@ -134,4 +134,26 @@ namespace NIKE {
 
 		return world_coords;
 	};
+
+	Render::Cam Camera::Service::getActiveCamera() const {
+		Render::Cam cam;
+		//Check if camera entity exists
+		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
+		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value()) {
+
+			//Check if camera attached to entity has a transform
+			auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id);
+
+			//Apply transformation to camera position
+			if (e_transform_comp.has_value()) e_cam_comp.value().get().position = e_transform_comp.value().get().position;
+
+			//Set camera value
+			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).value();
+		}
+		else {
+			cam = *def_cam.get();
+		}
+
+		return cam;
+	}
 }

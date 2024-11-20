@@ -74,7 +74,7 @@ namespace NIKE {
 			Vector2f size;
 			TextOrigin origin;
 
-			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin{ TextOrigin::CENTER } {}
+			Text() : font_id{ "" }, text{ "" }, color{0.0f, 0.0f, 0.0f, 1.0f}, scale{ 1.0f }, size(), origin{ TextOrigin::CENTER } {}
 			Text(std::string const& font_id, std::string const& text, Vector4f const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
 				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin } {}
 		};

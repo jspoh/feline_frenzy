@@ -88,7 +88,7 @@ namespace NIKE {
 	void UI::Service::onEvent(std::shared_ptr<Input::MouseMovedEvent> event) {
 
 		//Get mouse position
-		mouse_pos = event->pos;
+		mouse_pos = event->window_pos;
 
 		//Check if mouse is over any entity currently
 		std::for_each(ui_entities.begin(), ui_entities.end(), 
@@ -345,6 +345,7 @@ namespace NIKE {
 			float txtscale{ ratio.x - btn_ratio.x > ratio.y - btn_ratio.y
 				? std::clamp((e_transform.scale.x * btn_ratio.x) / e_text.size.x, 0.0f, maxScale)
 				: std::clamp((e_transform.scale.y * btn_ratio.y) / e_text.size.y, 0.0f, maxScale) };
+
 			e_text.scale *= txtscale;
 
 			//Clamp scale
