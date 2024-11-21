@@ -236,7 +236,18 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
-		NIKEE_CORE_WARN("window focus event");
+		if (event->focused) {
+			glfwRestoreWindow(ptr_window);
+
+			int width, height;
+			glfwGetFramebufferSize(ptr_window, &width, &height);
+			glViewport(0, 0, width, height);
+
+			glfwMakeContextCurrent(ptr_window);
+		}
+		else {
+			glfwIconifyWindow(ptr_window);
+		}
 	}
 
 	/*****************************************************************//**
