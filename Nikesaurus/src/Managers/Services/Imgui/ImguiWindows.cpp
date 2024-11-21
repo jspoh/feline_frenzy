@@ -26,12 +26,12 @@ namespace NIKE {
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-
-
 		// Create a full-screen docking space
 		ImGui::Begin("Level Editor", nullptr, window_flags);
 		bool is_paused = NIKE_IMGUI_SERVICE->getGamePaused();
 		bool is_debug = NIKE_IMGUI_SERVICE->getDebugMode();
+		bool grid_active = NIKE_IMGUI_SERVICE->getGridActive();
+		static bool create_grid = false;
 
 		// Menu Bar for Play/Pause controls
 		if (ImGui::BeginMenuBar()) {
@@ -67,6 +67,28 @@ namespace NIKE {
 			}
 			ImGui::Spacing();
 
+			ImGui::SameLine();
+			// Button to create grid lines in editor
+			if (ImGui::Button("Create Grid"))
+			{
+				ImGui::OpenPopup("Grid Dimensions");
+				create_grid = true;
+			}
+
+			// Open pop up to create grid
+			create_grid = createGridPopup();
+
+			ImGui::Spacing();
+
+			ImGui::SameLine();
+
+			// Check box to show grid or not
+			ImGui::Text("Toggle Grid: ");
+			if (ImGui::Button(grid_active ? "Hide Gird" : "Show Grid")) {
+				NIKE_IMGUI_SERVICE->setShowGird(!grid_active);
+			}
+
+			ImGui::Spacing();
 
 			ImGui::EndMenuBar();
 		}
@@ -75,63 +97,6 @@ namespace NIKE {
 		ImGui::End();
 
 	}
-
-	//void imguiFileSystemWindow() {
-	//	// Check if the path exists
-	//	if (!std::filesystem::exists(GET_ASSETS_PATH())) {
-	//		ImGui::Text("Assets folder does not exist.");
-	//		return;
-	//	}
-
-	//	static bool show_load_popup = false;
-	//	static std::string selected_asset;
-
-
-	//	// Begin the ImGui window with a title
-	//	ImGui::Begin("Assets Browser");
-
-	//	// Display the current path
-	//	ImGui::Text("Current Path: %s", GET_ASSETS_PATH().string().c_str());
-
-	//	// Navigate back to the root directory
-	//	std::filesystem::path const root_assets_path = "assets/";
-	//	if (GET_ASSETS_PATH() != root_assets_path) {
-	//		if (ImGui::Button("Back")) {
-	//			// Go up one directory level
-	//			SET_ASSETS_PATH(GET_ASSETS_PATH().parent_path());
-	//			GET_ASSETS_PATH() = GET_ASSETS_PATH().parent_path();
-	//		}
-	//	}
-
-	//	// List directories and files
-	//	if (std::filesystem::is_directory(GET_ASSETS_PATH())) {
-	//		for (const auto& entry : std::filesystem::directory_iterator(GET_ASSETS_PATH())) {
-	//			const std::filesystem::path& path = entry.path();
-	//			std::string file_name = path.filename().string();
-
-	//			// If directory, make clickable
-	//			if (std::filesystem::is_directory(path)) {
-	//				if (ImGui::Selectable((file_name + "/").c_str(), false)) {
-	//					// Update to the new path when clicking a directory
-	//					SET_ASSETS_PATH(path);
-	//					GET_ASSETS_PATH() = path;
-	//				}
-	//			}
-	//			// Handle different asset types and drag-and-drop
-	//			else if (hasValidTextureExtension(path) || hasValidAudioExtension(path) || hasValidFontExtension(path)) {
-	//				if (ImGui::Selectable(file_name.c_str())) {
-	//					selected_asset = file_name;
-	//					show_load_popup = true;
-	//				}
-	//			}
-	//		}
-	//	}
-	//	else {
-	//		ImGui::Text("No valid directory or path.");
-	//	}
-
-	//	ImGui::End();
-	//}
 
 	void imguiDebuggingWindow() {
 
@@ -155,7 +120,7 @@ namespace NIKE {
 
 				ImGui::Spacing();
 				// Display System Usage (Data all being handled in sDebug)
-				auto& sys_percentages = NIKE_DEBUG_SERVICE->system_percentages;
+				auto sys_percentages = NIKE_DEBUG_SERVICE->getSystemPercentages();
 				ImGui::Separator();
 				if (sys_percentages.empty()) {
 					ImGui::Text("No active systems to report on.");
@@ -169,7 +134,7 @@ namespace NIKE {
 						ImGui::ProgressBar(static_cast<float>(barPercent), ImVec2(-1, 0));
 					}
 					ImGui::Spacing();
-					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->total_system_time);
+					ImGui::Text("Total Active System Time: %.2f%%", NIKE_DEBUG_SERVICE->getTotalSystemTime());
 				}
 
 				ImGui::EndTabItem();
@@ -346,7 +311,7 @@ namespace NIKE {
 					// Create a collapsible header for the component
 					if (ImGui::CollapsingHeader(component_name.c_str(), ImGuiTreeNodeFlags_None)) {
 						if (component_name == "Transform::Transform") {
-							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+							auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get();
 							ImGui::DragFloat2("Position", &transform_comp.position.x, 0.1f);
 							ImGui::DragFloat2("Scale", &transform_comp.scale.x, 0.1f);
 							ImGui::SliderFloat("Rotation", &transform_comp.rotation, -360.f, 360.f, "%.2f deg");
@@ -357,7 +322,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Texture") {
-							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							auto& texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity).value().get();
 							static char texture_id[300];
 							static bool texture_initialized = false;
 
@@ -435,7 +400,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Physics::Dynamics") {
-							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity).value().get();
 
 							ImGui::DragFloat2("Velocity", &dynamics_comp.velocity.x, 0.1f);
 							ImGui::DragFloat2("Force", &dynamics_comp.force.x, 0.1f);
@@ -450,16 +415,16 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Cam") {
-							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity);
+							auto& cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(entity).value().get();
 
 							// Default value for cam height will be the window height if there is no adjustments
-							if (cam_comp.height <= 0.0f) {
-								cam_comp.height = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+							if (cam_comp.zoom <= 0.0f) {
+								cam_comp.zoom = 1.0f;
 							}
 
 							// Don't add position
 							//ImGui::DragFloat2("Position", &cam_comp.position.x, 0.1f);
-							ImGui::DragFloat("Height", &cam_comp.height, 0.1f);
+							ImGui::DragFloat("Height", &cam_comp.zoom, 0.01f);
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -469,10 +434,10 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Animation::Base") {
-							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+							auto& animate_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity).value().get();
 
 							ImGui::DragInt("Number of Animations (If set to 0, infinite number of animations)", &animate_base_comp.animations_to_complete, 1);
-							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .1f);
+							ImGui::DragFloat("Frame Duration", &animate_base_comp.frame_duration, .001f);
 							ImGui::Text("Animation timer: %f", &animate_base_comp.timer);
 							ImGui::Text("Completed Animations: %d", animate_base_comp.completed_animations);
 
@@ -510,7 +475,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Animation::Sprite") {
-							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+							auto& animate_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity).value().get();
 
 							ImGui::DragInt2("Start Index", &animate_sprite_comp.start_index.x, 1);
 							ImGui::DragInt2("End Index", &animate_sprite_comp.end_index.x, 1);
@@ -528,7 +493,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Render::Shape") {
-							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+							auto& shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).value().get();
 							static char input_model_ref[300];
 							static bool shape_initialized = false;
 
@@ -573,7 +538,7 @@ namespace NIKE {
 
 						}
 						else if (component_name == "Render::Text") {
-							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
+							auto& text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity).value().get();
 
 							static char input_font_id[300];
 							static char input_text[300];
@@ -645,8 +610,13 @@ namespace NIKE {
 							}
 
 							// Show pop ups
-							show_error_popup = ShowErrorPopup();
-							show_save_popup = ShowSaveConfirmationPopup();
+							if (show_error_popup) {
+								show_error_popup = ShowErrorPopup();  
+							}
+
+							if (show_save_popup) {
+								show_save_popup = ShowSaveConfirmationPopup();  
+							}
 
 							// Remove Component 
 							if (ImGui::Button((std::string("Remove Component##") + component_name).c_str()))
@@ -655,7 +625,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Physics::Collider") {
-							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+							auto& dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity).value().get();
 
 							// Variable to hold the selected resolution
 							static NIKE::Physics::Resolution selected_resolution = NIKE::Physics::Resolution::NONE;
@@ -686,7 +656,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "Audio::SFX") {
-							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+							auto& sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity).value().get();
 							static char input_audio_id[300];
 							static char input_channel_group_id[300];
 							static bool audio_initialized = false;
@@ -770,7 +740,7 @@ namespace NIKE {
 							}
 						}
 						else if (component_name == "GameLogic::Movement") {
-							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+							auto& e_player = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity).value().get();
 
 							static char script_path[300];
 							static bool scripth_path_init = false;
@@ -1104,21 +1074,33 @@ namespace NIKE {
 		ImGui::Begin("Game Viewport");
 
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-
-		float aspect_ratio = 16.f / 9.f;
 		
+		//Actual Window Size
+		Vector2i size_win = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		//Configure viewport size
+		float aspect_ratio = (float)size_win.x / (float)size_win.y;
 
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
-
 		if (viewport_height > window_size.y) {
 			viewport_height = window_size.y;
 			viewport_width = window_size.y * aspect_ratio;
 		}
 
-		ImTextureID textureID = (ImTextureID)tex_id;
-		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
-		ImVec2 uv1(1.0f, 0.0f); // Top-right
+		Vector2f viewport_size{viewport_width, viewport_height};
+
+		//Get mouse input
+		ImGuiIO& io = ImGui::GetIO();
+
+		//Get the position of the game window top-left corner
+		ImVec2 game_window_pos = ImGui::GetCursorScreenPos();
+
+		//Scale Factor
+		Vector2f scale{ (float)size_win.x / viewport_width, (float)size_win.y / viewport_height };
+
+		//Calculate mouse position relative to the game window
+		Vector2f mouse = { (io.MousePos.x - game_window_pos.x) * scale.x, (io.MousePos.y - game_window_pos.y) * scale.y };
 
 		// Dispatch window viewport events
 		static Vector2f win_pos = { ImGui::GetWindowPos().x + ImGui::GetStyle().FramePadding.x * 2, ImGui::GetWindowPos().y + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.y * 2 };
@@ -1132,21 +1114,16 @@ namespace NIKE {
 			dispatch = false;
 		}
 
-		// Normalise mouse pos to viewport imgui
-		ImVec2 mouse_pos = ImGui::GetMousePos();
-		ImVec2 scalar = { (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / window_size.x), (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / window_size.y) };
-		mouse_pos.x -= win_pos.x;
-		mouse_pos.y -= win_pos.y;
-		mouse_pos.x -= (viewport_width / 2.0f);
-		mouse_pos.y -= (viewport_height / 2.0f);
-		mouse_pos.y = -mouse_pos.y;
 
-		mouse_pos.x *= scalar.x;
-		mouse_pos.y *= scalar.y;
+		// This function will handle the dragging and dropping in the viewport window
+		// handleEntitySelectionAndDrag(mouse);
 
+
+		ImTextureID textureID = (ImTextureID)tex_id;
+		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
+		ImVec2 uv1(1.0f, 0.0f); // Top-right
 		ImGui::Image(textureID, ImVec2(viewport_width, viewport_height), uv0, uv1);
 
-		// Begin drag-and-drop target to create a new entity with the dropped texture
 		// Begin drag-and-drop target to create a new entity with the dropped texture
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture")) {
@@ -1164,20 +1141,17 @@ namespace NIKE {
 				// Register the entity with the generated reference
 				NIKE_IMGUI_SERVICE->addEntityRef(entity_ref, new_entity);
 
-				Vector2f def_size{ 100.0f, 100.0f };
-
-				// Convert to own vector
-				Vector2f own_mouse{mouse_pos.x , mouse_pos.y};
+				// Texture size is in vec2i, hence this casting
+				Vector2f def_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.x), static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(new_texture_id)->size.y) };
 
 				// Add a Transform component to the new entity with the calculated mouse position and random size
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(new_entity, Transform::Transform(own_mouse, def_size, 0.f));
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(new_entity, Transform::Transform(mouse, def_size, 0.f));
 
 				// Add a Texture component to the new entity with the specified texture ID and default color
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(new_entity, Render::Texture(new_texture_id, { 1.0f, 1.0f, 1.0f, 1.0f }));
 			}
 			ImGui::EndDragDropTarget();
 		}
-
 
 		ImGui::End();
 	}
@@ -1186,132 +1160,132 @@ namespace NIKE {
 
 	void imguiCameraControl()
 	{
-		ImGui::Begin("Camera Control");
+		//ImGui::Begin("Camera Control");
 
-		static int selectedCameraIndex = 0; // Index of the currently selected camera ( REMEMBER TO CHANGE BACK TO 0)
-		static std::vector<std::pair<std::string, Entity::Type>> cameraEntities; // Store camera names and their entities
+		//static int selectedCameraIndex = 0; // Index of the currently selected camera ( REMEMBER TO CHANGE BACK TO 0)
+		//static std::vector<std::pair<std::string, Entity::Type>> cameraEntities; // Store camera names and their entities
 
-		if (!NIKE_IMGUI_SERVICE->populateLists) {
-			cameraEntities.clear();
+		//if (!NIKE_IMGUI_SERVICE->populateLists) {
+		//	cameraEntities.clear();
 
-			cameraEntities.emplace_back(std::string("Free Cam"), static_cast<Entity::Type>(-1));
-			// Populate the cameraEntities list only once
-			for (const auto& elem : NIKE_IMGUI_SERVICE->getEntityRef()) {
-				if (NIKE_IMGUI_SERVICE->checkEntityExist(elem.first)) {
-					Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(elem.first);
+		//	cameraEntities.emplace_back(std::string("Free Cam"), static_cast<Entity::Type>(-1));
+		//	// Populate the cameraEntities list only once
+		//	for (const auto& elem : NIKE_IMGUI_SERVICE->getEntityRef()) {
+		//		if (NIKE_IMGUI_SERVICE->checkEntityExist(elem.first)) {
+		//			Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(elem.first);
 
-					// Check if the entity has a camera component
-					if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(entity)) {
-						cameraEntities.emplace_back(elem.first, entity);
-					}
-				}
-			}
-			NIKE_IMGUI_SERVICE->populateLists = true; // Mark as initialized to avoid re-populating
-		}
+		//			// Check if the entity has a camera component
+		//			if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(entity)) {
+		//				cameraEntities.emplace_back(elem.first, entity);
+		//			}
+		//		}
+		//	}
+		//	NIKE_IMGUI_SERVICE->populateLists = true; // Mark as initialized to avoid re-populating
+		//}
 
-		// !TODO update currently selected cam id during init to reflect in drop down
-		// Create a combo box for camera selection
-		if (!cameraEntities.empty()) {
-			ImGui::Text("Select Camera:");
+		//// !TODO update currently selected cam id during init to reflect in drop down
+		//// Create a combo box for camera selection
+		//if (!cameraEntities.empty()) {
+		//	ImGui::Text("Select Camera:");
 
-			// Lambda to retrieve items from cameraEntities for ImGui::Combo
-			auto cameraNameGetter = [](void* data, int idx, const char** out_text) {
-				const auto& names = *static_cast<std::vector<std::pair<std::string, Entity::Type>>*>(data);
-				if (idx < 0 || idx >= names.size()) return false;
-				*out_text = names[idx].first.c_str();
-				return true;
-				};
+		//	// Lambda to retrieve items from cameraEntities for ImGui::Combo
+		//	auto cameraNameGetter = [](void* data, int idx, const char** out_text) {
+		//		const auto& names = *static_cast<std::vector<std::pair<std::string, Entity::Type>>*>(data);
+		//		if (idx < 0 || idx >= names.size()) return false;
+		//		*out_text = names[idx].first.c_str();
+		//		return true;
+		//		};
 
-			// Use the lambda with ImGui::Combo
-			if (ImGui::Combo("##CameraSelector", &selectedCameraIndex, cameraNameGetter, &cameraEntities, static_cast<int>(cameraEntities.size()))) {
-				// Dispatch an event when the camera selection changes
-				Entity::Type entity = cameraEntities[selectedCameraIndex].second;
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(entity));
+		//	// Use the lambda with ImGui::Combo
+		//	if (ImGui::Combo("##CameraSelector", &selectedCameraIndex, cameraNameGetter, &cameraEntities, static_cast<int>(cameraEntities.size()))) {
+		//		// Dispatch an event when the camera selection changes
+		//		Entity::Type entity = cameraEntities[selectedCameraIndex].second;
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::ChangeCamEvent>(entity));
 
-			}
-		}
-		else {
-			ImGui::Text("No cameras available.");
-		}
-		ImGui::Spacing();
+		//	}
+		//}
+		//else {
+		//	ImGui::Text("No cameras available.");
+		//}
+		//ImGui::Spacing();
 
-		// If camera selected is free cam
-		if (selectedCameraIndex == 0) {
-			// Position Controls
-			ImGui::Text("Position:");
+		//// If camera selected is free cam
+		//if (selectedCameraIndex == 0) {
+		//	// Position Controls
+		//	ImGui::Text("Position:");
 
-			if (ImGui::Button("Up")) {
-				// Move camera position up
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
-			}
-			if (ImGui::IsItemActive()) {
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
-			}
-
-
-			ImGui::SameLine();
-			if (ImGui::Button("Down")) {
-				// Move camera position down
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
-			}
-			if (ImGui::IsItemActive()) {
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
-			}
+		//	if (ImGui::Button("Up")) {
+		//		// Move camera position up
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+		//	}
+		//	if (ImGui::IsItemActive()) {
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::UP));
+		//	}
 
 
-			ImGui::SameLine();
-			if (ImGui::Button("Left")) {
-				// Move camera position left
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
-			}
-			if (ImGui::IsItemActive()) {
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
-			}
+		//	ImGui::SameLine();
+		//	if (ImGui::Button("Down")) {
+		//		// Move camera position down
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+		//	}
+		//	if (ImGui::IsItemActive()) {
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::DOWN));
+		//	}
 
 
-			ImGui::SameLine();
-			if (ImGui::Button("Right")) {
-				// Move camera position right
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
-			}
-			if (ImGui::IsItemActive()) {
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
-			}
-
-			if (ImGui::Button("Reset Position")) {
-				// Move camera position right
-				NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RESET_POS));
-
-			}
-
-			ImGui::Spacing();
-		}
-
-		// Zoom Controls
-		ImGui::Text("Zoom:");
-		if (ImGui::Button("Zoom In")) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
-		}
-		if (ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
-		}
-
-		ImGui::SameLine();
-		if (ImGui::Button("Zoom Out")) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
-		}
-		if (ImGui::IsItemActive()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
-		}
-
-		if (ImGui::Button("Reset Cam")) {
-
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::RESET_ZOOM));
-
-		}
+		//	ImGui::SameLine();
+		//	if (ImGui::Button("Left")) {
+		//		// Move camera position left
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+		//	}
+		//	if (ImGui::IsItemActive()) {
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::LEFT));
+		//	}
 
 
-		ImGui::End();
+		//	ImGui::SameLine();
+		//	if (ImGui::Button("Right")) {
+		//		// Move camera position right
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+		//	}
+		//	if (ImGui::IsItemActive()) {
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RIGHT));
+		//	}
+
+		//	if (ImGui::Button("Reset Position")) {
+		//		// Move camera position right
+		//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::RESET_POS));
+
+		//	}
+
+		//	ImGui::Spacing();
+		//}
+
+		//// Zoom Controls
+		//ImGui::Text("Zoom:");
+		//if (ImGui::Button("Zoom In")) {
+		//	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
+		//}
+		//if (ImGui::IsItemActive()) {
+		//	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_IN));
+		//}
+
+		//ImGui::SameLine();
+		//if (ImGui::Button("Zoom Out")) {
+		//	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
+		//}
+		//if (ImGui::IsItemActive()) {
+		//	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::ZOOM_OUT));
+		//}
+
+		//if (ImGui::Button("Reset Cam")) {
+
+		//	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<NIKE::Render::UpdateCamEvent>(NIKE::Render::CamPosition::NONE, NIKE::Render::CamZoom::RESET_ZOOM));
+
+		//}
+
+
+		//ImGui::End();
 	}
 	void imguiAudioControl()
 	{

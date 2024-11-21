@@ -11,6 +11,8 @@
 #ifndef IMGUI_UTILS
 #define IMGUI_UTILS
 
+#include "../headers/Components/cTransform.h"
+
 namespace NIKE {
 
 	// This function will be used to update imgui's input if needed
@@ -30,6 +32,10 @@ namespace NIKE {
 
 	// Checks if the file has a valid vertex shader extension (e.g .vert).
 	bool hasValidVertExtension(const std::filesystem::path& filePath);
+
+	// Checks if the file has a valid vertex shader extension (e.g .lua).
+	bool hasValidScriptExtension(const std::filesystem::path& filePath);
+
 	// This function will be used to display assets of the given type
 	void displayAssetList(const std::string& assetType);
 

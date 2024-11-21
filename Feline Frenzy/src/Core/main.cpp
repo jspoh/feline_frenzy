@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/pch.h"
 class NullStream nullstream;
@@ -26,7 +26,7 @@ int WINAPI WinMain(
 	#endif
 
 	//Init Engine
-	NIKE_ENGINE.init("Config.txt", 60, "Welcome To Nikesaurus.");
+	NIKE_ENGINE.init("Config.json", 60, "Welcome To Nikesaurus.");
 
 	//Register Scenes
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");

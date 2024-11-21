@@ -103,6 +103,7 @@ extern "C" {
 #include <chrono>
 #include <thread>
 #include <optional>
+#include <stack>
 
  /*****************************************************************//**
  * Data (json)

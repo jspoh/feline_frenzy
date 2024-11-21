@@ -21,11 +21,23 @@ namespace NIKE {
 		public:
 			virtual ~IArray() = default;
 
-			//Check entity
+			//Check entity comp
 			virtual bool checkEntity(Entity::Type entity) = 0;
 
-			//Get entity
-			virtual void* getEntityComponent(Entity::Type entity) = 0;
+			//Get count of entity with current comp
+			virtual size_t getComponentEntitiesCount() = 0;
+
+			//Get all entity with current comp
+			virtual std::set<Entity::Type> getComponentEntities() = 0;
+
+			//Get entity comp
+			virtual std::shared_ptr<void> getEntityComponent(Entity::Type entity) = 0;
+
+			//Get entity comp deep copy
+			virtual std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity) = 0;
+
+			//Set entity comp
+			virtual void setEntityComponent(Entity::Type entity, std::shared_ptr<void> comp) = 0;
 
 			//Clone entity
 			virtual void cloneEntity(Entity::Type clone, Entity::Type copy) = 0;
@@ -74,34 +86,49 @@ namespace NIKE {
 			}
 
 			//Get entity component data
-			T& getComponent(Entity::Type entity) {
+			std::optional<std::reference_wrapper<T>> getComponent(Entity::Type entity) {
 				//Check if entity is present within components
 				if (component_array.find(entity) == component_array.end()) {
-					throw std::runtime_error("Entity not found. Unable to retrieve component array.");
+					return std::nullopt;
 				}
 
 				//Return component array
-				return component_array.at(entity);
+				return std::ref(component_array.at(entity));
 			}
 
-			//Get all entities with component type T
-			std::vector<Entity::Type> getAllEntities() {
-				std::vector<Entity::Type> temp_vec;
-				for (auto const& entity : component_array) {
-					temp_vec.push_back(entity.first);
-				}
-
-				return temp_vec;
-			}
-
-			//Check entity
+			//Check entity component
 			bool checkEntity(Entity::Type entity) override {
 				return component_array.find(entity) != component_array.end();
 			}
 
-			//get entity
-			void* getEntityComponent(Entity::Type entity) override {
-				return &component_array.at(entity);
+			size_t getComponentEntitiesCount() override {
+				return component_array.size();
+			}
+
+			//Get all entities with current component
+			std::set<Entity::Type> getComponentEntities() override {
+				std::set<Entity::Type> entities_set;
+				for (auto entity_comp : component_array) {
+					entities_set.insert(entity_comp.first);
+				}
+				return entities_set;
+			}
+
+			//get entity component
+			std::shared_ptr<void> getEntityComponent(Entity::Type entity) override {
+				T* raw_ptr = &component_array.at(entity);
+				return std::shared_ptr<void>(raw_ptr, [](void*){});
+			}
+
+			//Get copied entity component
+			std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity) override {
+				T copy = component_array.at(entity);
+				return std::make_shared<T>(copy);
+			}
+
+			//Set entity
+			void setEntityComponent(Entity::Type entity, std::shared_ptr<void> comp) override {
+				component_array[entity] = *std::static_pointer_cast<T>(comp);
 			}
 
 			//Clone entity
@@ -220,12 +247,18 @@ namespace NIKE {
 
 			//Retrieve component associated with entity type
 			template<typename T>
-			T& getEntityComponent(Entity::Type entity) {
+			std::optional<std::reference_wrapper<T>> getEntityComponent(Entity::Type entity) {
 				return getComponentArray<T>()->getComponent(entity);
 			}
 
 			//Retrieve a void* to component based on component type
-			void* getEntityComponent(Entity::Type entity, Component::Type type);
+			std::shared_ptr<void> getEntityComponent(Entity::Type entity, Component::Type type);
+
+			//Retrieve a copied void* to component based on component type
+			std::shared_ptr<void> getCopiedEntityComponent(Entity::Type entity, Component::Type type);
+
+			//Set entity component based on void* and comp type
+			void setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp);
 
 			//Get Component Type
 			template<typename T>
@@ -245,11 +278,11 @@ namespace NIKE {
 			//Get Component Type string overload
 			Component::Type getComponentType(std::string const& type);
 
-			// Get all entities with that component
-			template<typename T>
-			std::vector<Entity::Type> getAllEntities() {
-				return getComponentArray<T>()->getAllEntities();
-			}
+			//Get count of entities with that component
+			size_t getComponentEntitiesCount(Component::Type comp_type);
+
+			//Get all entities with that component
+			std::set<Entity::Type> getAllComponentEntities(Component::Type comp_type);
 
 			//Clone entity
 			void cloneEntity(Entity::Type clone, Entity::Type copy);
@@ -258,10 +291,16 @@ namespace NIKE {
 			void entityDestroyed(Entity::Type entity);
 
 			//Get all entity components
-			std::unordered_map<std::string, void*> getAllComponents(Entity::Type entity) const;
+			std::unordered_map<std::string, std::shared_ptr<void>> getAllEntityComponents(Entity::Type entity) const;
+
+			//Get all copied entity components
+			std::unordered_map<std::string, std::shared_ptr<void>> getAllCopiedEntityComponents(Entity::Type entity) const;
 
 			//Get all component types
 			std::unordered_map<std::string, Component::Type> getAllComponentTypes() const;
+
+			//Get components count
+			size_t getComponentsCount() const;
 		};
 	}
 }

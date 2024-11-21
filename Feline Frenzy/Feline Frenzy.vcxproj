@@ -78,7 +78,7 @@
       <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s  /r  /y  /q
-xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q</Command>
+xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.json" "$(OutDir)" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -105,10 +105,24 @@ xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q<
       <AdditionalLibraryDirectories>$(SolutionDir)Nikesaurus\dependencies\lib\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
-xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
-xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s  /r  /y  /q
-xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q</Command>
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s /r /y /q
+xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*.pdb" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.json" "$(OutDir)" /s /r /y /q
+
+rem Delete all files in GAMEDIRECTORY
+del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*" &gt;nul 2&gt;&amp;1
+
+rem Remove all directories in GAMEDIRECTORY
+for /d %%i in ("$(SolutionDir)installer\GAMEDIRECTORY\*") do rd /s /q "%%i"
+
+rem Copy everything from OutDir to GAMEDIRECTORY
+xcopy "$(OutDir)*" "$(SolutionDir)installer\GAMEDIRECTORY\" /s /r /y /q
+
+rem Remove all .pdb files from GAMEDIRECTORY
+del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -132,7 +146,6 @@ xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q<
     <Text Include="assets\Models\square-texture.txt" />
     <Text Include="assets\Models\square.txt" />
     <Text Include="assets\Models\triangle.txt" />
-    <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
@@ -148,6 +161,7 @@ xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q<
     <None Include="assets\Shaders\text.vert" />
     <None Include="assets\Shaders\texture.frag" />
     <None Include="assets\Shaders\texture.vert" />
+    <None Include="src\Core\Config.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nikesaurus\Nikesaurus.vcxproj">

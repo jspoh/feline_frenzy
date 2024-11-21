@@ -15,9 +15,6 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
-#include "../headers/Systems/Physics/sysPhysics.h"
-#include "../headers/Systems/Animation/sysAnimation.h"
-#include "../headers/Systems/Render/sysRender.h"
 #include "Systems/Render/sysRender.h"
 
 namespace NIKE {
@@ -34,7 +31,7 @@ namespace NIKE {
 
 		//Register physics components
 		Physics::registerComponents();
-		
+
 		//Register animation components
 		Animation::registerComponents();
 
@@ -95,18 +92,23 @@ namespace NIKE {
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Map::Service>());
+		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
+		provideService(std::make_shared<LevelEditor::Service>());
 
 		//Create console
-		#ifndef NDEBUG
+#ifndef NDEBUG
 		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
-		#endif
+#endif
 
 		//Init Logger
 		NIKE::Log::Init();
 
+		//Deserialize Config File
+		auto json_config = NIKE_SERIALIZE_SERVICE->loadJsonFile(file_path);
+
 		//Setup window with config file
-		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
+		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(json_config));
 
 		//Set Target FPS
 		NIKE_WINDOWS_SERVICE->setTargetFPS(fps);
@@ -117,19 +119,33 @@ namespace NIKE {
 		//Setup input modes
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
-		//Add Event Listeners
+		//Add event listeners for window resized
 		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		getService<Events::Service>()->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
+		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
-		//Add event listener for UI
+		//Add event listeners for key event
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+
+		//Add event listeners for mouse event
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+
+		//Add event listeners for mouse move event
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
 		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 
-		//Add event listener for Input
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		//Add event listeners for mouse scroll event
 		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for drop files event
+		getService<Events::Service>()->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
 
 		//Setup Audio
 		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
@@ -138,7 +154,13 @@ namespace NIKE {
 		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
 
 		//Init imgui
-		NIKE_IMGUI_SERVICE->init();
+		//NIKE_IMGUI_SERVICE->init();
+
+		//Init camera
+		NIKE_CAMERA_SERVICE->init();
+
+		//Init Level Editor
+		NIKE_LVLEDITOR_SERVICE->init();
 
 		//Init UI
 		NIKE_UI_SERVICE->init();
@@ -157,60 +179,65 @@ namespace NIKE {
 			//Calculate Delta Time
 			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
-			//Update all audio pending actions
-			getService<Audio::Service>()->getAudioSystem()->update();
-
 			//Poll system events
 			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-			//Clear buffer ( Temp )
+			//Clear buffer
 			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-			//Escape Key Testing //!MOVE OUT SOON
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
-			}
+			//Update all audio pending actions
+			NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
 			//update UI First
 			NIKE_UI_SERVICE->update();
 
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
-
 			//Render entity to mouse click
-			//if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			if (0 && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
-			//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
-			//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-			//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-			//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-			//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-			//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
-			//	}
-			//}
+				for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
+					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+					Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
+					Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+				}
+			}
 
-			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-			//	cout << "TRUE" << endl;
-			//}
+			//Escape Key
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+			}
+
+			//Toggle full screen
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			}
 
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
-			//ImGui Render & Update
-			NIKE_IMGUI_SERVICE->update();
-		
-			//Control FPS
-			NIKE_WINDOWS_SERVICE->controlFPS();
+			////ImGui Render & Update
+			//NIKE_IMGUI_SERVICE->update();
+
+			//Update Level Editor
+			NIKE_LVLEDITOR_SERVICE->update();
+
+			//Render Level Editor
+			NIKE_LVLEDITOR_SERVICE->render();
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 		}
 
+		//Clean up level editor
+		NIKE_LVLEDITOR_SERVICE->cleanUp();
+
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();
-
 	}
 }

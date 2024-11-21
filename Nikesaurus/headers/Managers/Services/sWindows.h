@@ -31,8 +31,18 @@ namespace NIKE {
 				:frame_buffer{ width, height } {}
 		};
 
+		// Window Focus class
+		struct WindowFocusEvent : Events::IEvent {
+			int focused;
+
+			WindowFocusEvent(int focused)
+				: focused{ focused } {}
+		};
+
 		//Abstract Window Class
-		class IWindow : public Events::IEventListener<WindowResized> {
+		class IWindow 
+			: public Events::IEventListener<WindowResized>, 
+			public Events::IEventListener<WindowFocusEvent> {
 		private:
 		public:
 			//Defaults
@@ -47,6 +57,9 @@ namespace NIKE {
 
 			//Toggle Full Screen Mode
 			virtual void setFullScreen(int value) = 0;
+
+			//Get full screen mode
+			virtual bool getFullScreen() const = 0;
 
 			//Setup Event Callbacks
 			virtual void setupEventCallbacks() = 0;
@@ -90,6 +103,8 @@ namespace NIKE {
 		private:
 			//Window Event
 			virtual void onEvent(std::shared_ptr<WindowResized> event) override = 0;
+
+			virtual void onEvent(std::shared_ptr<WindowFocusEvent> event) override = 0;
 		};
 
 		/*****************************************************************//**
@@ -108,6 +123,7 @@ namespace NIKE {
 			Vector2i window_size;
 			std::string window_title;
 			bool b_full_screen;
+			Vector2i size_before_fullscreen;
 
 			//Configure Window
 			void configWindow();
@@ -115,7 +131,7 @@ namespace NIKE {
 
 			NIKEWindow(Vector2i window_size, std::string window_title);
 
-			NIKEWindow(std::string const& file_path);
+			NIKEWindow(nlohmann::json const& config);
 
 			GLFWwindow* getWindowPtr() const;
 
@@ -124,6 +140,8 @@ namespace NIKE {
 			int queryWindowMode(int mode) override;
 
 			void setFullScreen(int value) override;
+
+			bool getFullScreen() const override;
 
 			void setupEventCallbacks() override;
 
@@ -154,6 +172,8 @@ namespace NIKE {
 			~NIKEWindow() override;
 
 			void onEvent(std::shared_ptr<WindowResized> event) override;
+
+			void onEvent(std::shared_ptr<WindowFocusEvent> event) override;
 		};
 
 		#endif //Expose implementation only to NIKE Engine
@@ -178,9 +198,17 @@ namespace NIKE {
 			int target_fps;
 			float actual_fps;
 
+			//Current number of steps ( Fixed DT )
+			int curr_num_steps;
+
+			//Accumulated time ( Fixed DT )
+			double accumulated_time;
+
 		public:
 			//Default constructor
-			Service() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+			Service() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, 
+						actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 }, 
+						accumulated_time{ 0.0 } {}
 
 			//Arguement Constructor
 			Service(std::shared_ptr<IWindow> window);
@@ -203,11 +231,17 @@ namespace NIKE {
 			//Get Delta Time
 			float getDeltaTime() const;
 
+			//Get fixed delta time
+			float getFixedDeltaTime() const;
+
+			//Get current number of steps
+			int getCurrentNumOfSteps() const;
+
+			//Get interpolation factor
+			float getInterpolationFactor() const;
+
 			//Calculate Delta Time
 			void calculateDeltaTime();
-
-			//FPS control
-			void controlFPS();
 		};
 
 		//Re-enable DLL Export warning

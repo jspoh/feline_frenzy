@@ -3,6 +3,7 @@
  * \brief	Font render manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
  * \date   October 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -463,10 +464,7 @@ namespace NIKE {
 
 	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
-		std::string junk, filetype;
-		std::stringstream ss{ path_to_texture };
-		std::getline(ss, junk, '.');
-		std::getline(ss, filetype, '.');
+		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
 
 		if (filetype == "tex") {
 			is_tex_or_png_ext = true;
@@ -476,13 +474,16 @@ namespace NIKE {
 
 			std::ifstream texture_file{ path_to_texture, std::ios::binary | std::ios::ate };
 			if (!texture_file.is_open()) {
-				cerr << "Failed to open texture file: " << path_to_texture << endl;
-				throw std::runtime_error("Failed to open texture file.");
+				NIKEE_CORE_ERROR("Failed to open texture file: {}", path_to_texture);
+				return nullptr;
 			}
 
 			// get tex_size of texture file
 			tex_size = static_cast<int>(texture_file.tellg());
-
+			if (tex_size <= 0) {
+				NIKEE_CORE_ERROR("Texture file is empty or invalid: {}", path_to_texture);
+				return nullptr;
+			}
 			// return to beginning of file
 			texture_file.seekg(0, std::ios::beg);
 
@@ -490,8 +491,9 @@ namespace NIKE {
 
 			// read tex data into ptr
 			if (!texture_file.read(reinterpret_cast<char*>(tex_data), tex_size)) {
-				cerr << "Failed to read texture file: " << path_to_texture << endl;
-				throw std::runtime_error("Failed to read texture file.");
+				NIKEE_CORE_ERROR("Failed to read texture file: {}", path_to_texture);
+				delete[] tex_data;  // Free memory before returning
+				return nullptr;
 			}
 			texture_file.close();
 
@@ -499,30 +501,40 @@ namespace NIKE {
 		}
 
 		// is not .tex file
-		if (filetype == "png") {
+		if (filetype == "png" || filetype == "PNG" || filetype == "jpg" || filetype == "jpeg" || filetype == "JPG" || filetype == "JPEG") {
 			is_tex_or_png_ext = true;
 		}
 		else {
 			is_tex_or_png_ext = false;
 		}
 
-		int channels;
-		stbi_set_flip_vertically_on_load(true);
-		char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, 0));
-		if (img_data == nullptr) {
-			cerr << "Failed to load image data: " << path_to_texture << endl;
-			throw std::runtime_error("Failed to load image data.");
+		if (is_tex_or_png_ext) {
+			int channels;
+			stbi_set_flip_vertically_on_load(true);
+			const int desired_channels = 4;
+			char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels));
+			if (img_data == nullptr || width == 0 || height == 0) {
+				NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
+				NIKEE_CORE_ERROR("stb_image error:  {}", stbi_failure_reason());
+				stbi_image_free(img_data); // Free memory
+				return nullptr; // Return nullptr if loading fails
+			}
+
+			// Reject if the image is larger than 4K 
+			if (width > 4096 || height > 4096) {
+				NIKEE_CORE_ERROR("Image is larger than 4K resolution: {} ({}x{})", path_to_texture, width, height);
+				stbi_image_free(img_data); // Free memory
+				return nullptr; // Return nullptr if image is too large
+			}
+
+			tex_size = width * height * 4;  // RGBA format
+
+			return img_data;
 		}
 
-		tex_size = width * height * channels;
-
-		char* data = new char[tex_size];
-		for (int i{}; i < tex_size; i++) {
-			data[i] = img_data[i];
-		}
-		stbi_image_free(img_data);
-
-		return data;
+		// If the file type is unsupported (not .tex, .png, .jpg, or .jpeg)
+		NIKEE_CORE_ERROR("Unsupported file format: {}", path_to_texture);
+		return nullptr;
 	}
 
 	unsigned int Assets::RenderLoader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
@@ -710,16 +722,22 @@ namespace NIKE {
 
 	Assets::Texture Assets::RenderLoader::compileTexture(const std::string& path_to_texture) {
 		// find file type
-		std::string junk, filetype;
-		std::stringstream ss{ path_to_texture };
-		std::getline(ss, junk, '.');
-		std::getline(ss, filetype, '.');
+		std::filesystem::path file_path(path_to_texture);
+		std::string filetype = file_path.extension().string();
+		filetype = filetype.substr(1);  // Remove the leading '.' character
 
 		int tex_width{};
 		int tex_height{};
 		int tex_size{};
 		bool is_tex_or_png_ext = false;
 		const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
+
+		if (tex_data == nullptr) {
+			NIKEE_CORE_ERROR("Failed to load image : {} ", path_to_texture);
+			int invalid = -1;
+			int def_size = 256;
+			return Assets::Texture(static_cast<unsigned>(invalid), { def_size, def_size });
+		}
 
 		// create texture
 		unsigned int tex_id;

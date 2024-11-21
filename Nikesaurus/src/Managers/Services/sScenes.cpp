@@ -52,6 +52,14 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Scene Interface
 	*********************************************************************/
+	void Scenes::IScene::setScnPath(std::string const& path) {
+		scn_file_path = path;
+	}
+
+	std::string Scenes::IScene::getScnPath() const {
+		return scn_file_path;
+	}
+
 	std::shared_ptr<Scenes::Layer> Scenes::IScene::createLayer(int index) {
 		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
 		//Insert layers at back
