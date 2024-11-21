@@ -242,8 +242,14 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
+		static bool is_fullscreen;
+
 		if (event->focused) {
 			glfwRestoreWindow(ptr_window);
+
+			if (is_fullscreen) {
+				setFullScreen(true);
+			}
 
 			// in case of resizes
 			int width, height;
@@ -256,6 +262,9 @@ namespace NIKE {
 			NIKE_AUDIO_SERVICE->resumeAllChannels();
 		}
 		else {
+			GLFWmonitor* monitor = glfwGetWindowMonitor(ptr_window);
+			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
+
 			NIKE_AUDIO_SERVICE->pauseAllChannels();
 			glfwIconifyWindow(ptr_window);
 		}
