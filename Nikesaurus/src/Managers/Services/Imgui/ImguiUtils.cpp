@@ -137,8 +137,21 @@ namespace NIKE
 		{
 			for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedAudios())
 			{
+				std::string buttonLabel = "X##" + audio.first;
+
+				if (ImGui::SmallButton(buttonLabel.c_str())) {
+					selected_file_path = audio.first;
+					delete_file_popup = true;
+					ImGui::OpenPopup("Confirm Delete");
+				}
+
+				ImGui::SameLine();
 				ImGui::Text("%s", audio.first.c_str());
+				ImGui::Separator();
+
+				
 			}
+			delete_file_popup = showDeleteFilePopup(selected_file_path, "Audio");
 		}
 		else if (asset_type == "Fonts")
 		{

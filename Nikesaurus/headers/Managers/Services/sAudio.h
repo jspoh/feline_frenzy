@@ -33,6 +33,9 @@ namespace NIKE {
 			//Release Audio
 			virtual void release() = 0;
 
+			//Get audio file path
+			virtual std::string getFilePath() const = 0;
+
 			//Get length of audio ( Milliseconds )
 			virtual unsigned int getLength() const = 0;
 
@@ -217,13 +220,17 @@ namespace NIKE {
 		class NIKEAudio : public IAudio {
 		private:
 			FMOD::Sound* sound{ nullptr };
+			std::string file_path;
+
 		public:
-			NIKEAudio(FMOD::Sound* sound);
+			NIKEAudio(FMOD::Sound* sound, const std::string& path);
 			~NIKEAudio() = default;
 
 			FMOD::Sound* getAudio();
 
 			void release() override;
+
+			std::string getFilePath() const override;
 
 			unsigned int getLength() const override;
 

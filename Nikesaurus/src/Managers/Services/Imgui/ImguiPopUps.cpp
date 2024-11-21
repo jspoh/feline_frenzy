@@ -465,12 +465,17 @@ namespace NIKE
                     // Retrieve the prefab file path for deletion
                     full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(file_path).string();
                 }
+                else if (asset_type == "Audio") {
+                    // Retrieve the prefab file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedAudios().at(file_path)->getFilePath();
+
+                }
                 else if (asset_type == "All_Prefabs") {
 
                 }
 
                 // Attempt to delete the selected file
-                if (NIKE_ASSETS_SERVICE->deleteFile(full_file_path)) {
+                if (NIKE_ASSETS_SERVICE->deleteFile(full_file_path, asset_type)) {
                     // Refresh the respective list after deletion
                     if (asset_type == "Levels") {
                         NIKE_ASSETS_SERVICE->loadScnFiles();
@@ -478,6 +483,10 @@ namespace NIKE
                     else if (asset_type == "Prefabs") {
                         NIKE_ASSETS_SERVICE->loadPrefabFiles();
                     }
+                    else if (asset_type == "Audio") {
+
+                    }
+                    
                     deleted = true;
                 }
                 ImGui::CloseCurrentPopup();

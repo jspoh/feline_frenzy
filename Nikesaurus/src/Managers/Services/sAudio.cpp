@@ -17,8 +17,8 @@ namespace NIKE {
 	/*****************************************************************//**
 	* NIKE AUDIO
 	*********************************************************************/
-	Audio::NIKEAudio::NIKEAudio(FMOD::Sound* sound)
-		:sound{ sound } {}
+	Audio::NIKEAudio::NIKEAudio(FMOD::Sound* sound, const std::string& path)
+		:sound{ sound }, file_path{path} {}
 
 	FMOD::Sound* Audio::NIKEAudio::getAudio() {
 		return sound;
@@ -26,6 +26,10 @@ namespace NIKE {
 
 	void Audio::NIKEAudio::release() {
 		sound->release();
+	}
+
+	std::string Audio::NIKEAudio::getFilePath() const{
+		return file_path;
 	}
 
 	unsigned int Audio::NIKEAudio::getLength() const {
@@ -312,7 +316,7 @@ namespace NIKE {
 
 		NIKEE_CORE_INFO("Sucessfully loaded sound from " + file_path);
 
-		return std::make_shared<Audio::NIKEAudio>(temp_audio);
+		return std::make_shared<Audio::NIKEAudio>(temp_audio, file_path);
 	}
 
 	std::shared_ptr<Audio::IAudio> Audio::NIKEAudioSystem::createStream(std::string const& file_path) {
@@ -332,7 +336,7 @@ namespace NIKE {
 
 		NIKEE_CORE_INFO("Sucessfully loaded music from " + file_path);
 
-		return std::make_shared<Audio::NIKEAudio>(temp_audio);
+		return std::make_shared<Audio::NIKEAudio>(temp_audio, file_path);
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::NIKEAudioSystem::createChannelGroup(std::string const& identifier) {

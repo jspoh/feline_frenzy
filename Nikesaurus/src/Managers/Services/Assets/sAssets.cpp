@@ -866,9 +866,34 @@ namespace NIKE {
 			}
 	}
 
-	bool Assets::Service::deleteFile(std::string const& file_path)
+	bool Assets::Service::deleteFile(std::string const& file_path, const std::string& asset_type)
 	{
-		return std::filesystem::remove(file_path);
+		if (asset_type == "Audio") {
+			// FMOD free before deleting the sound
+			for (auto it = audio_list.begin(); it != audio_list.end(); it++) {
+				const auto& audio = *it;
+				if (audio.second && audio.second->getFilePath() == file_path) {
+					audio.second->release();   // Release the sound
+					audio_list.erase(it);   // Remove from the audio list
+					break;
+				}
+			}
+		}
+		// Delete the file
+		try {
+
+			if (std::filesystem::remove(file_path)) {
+				return true;
+			}
+			else {
+				NIKEE_CORE_WARN("File not found: " + file_path);
+			}
+		}
+		catch (const std::filesystem::filesystem_error& e) {
+			NIKEE_CORE_ERROR("Error deleting file: " + file_path + ". Exception: " + e.what());
+		}
+
+		return false;
 	}
 
 	bool Assets::Service::deleteAllFiles(std::string const& file_path)

@@ -281,7 +281,7 @@ namespace NIKE {
 			* Reload of specific asset types
 			*********************************************************************/
 			void reloadAssets(const std::string& asset_type);
-			bool deleteFile(std::string const& file_path);
+			bool deleteFile(std::string const& file_path, const std::string& asset_type);
 			bool deleteAllFiles(std::string const& file_path);
 		};
 
