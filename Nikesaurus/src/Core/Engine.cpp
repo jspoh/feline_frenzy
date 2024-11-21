@@ -179,7 +179,7 @@ namespace NIKE {
 			NIKE_SCENES_SERVICE->update();
 
 			//Render entity to mouse click
-			if (1 && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			if (0 && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
 				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
