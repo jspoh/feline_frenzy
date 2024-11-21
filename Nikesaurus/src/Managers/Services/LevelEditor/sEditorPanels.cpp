@@ -492,27 +492,6 @@ namespace NIKE {
 		};
 	}
 
-	bool LevelEditor::EntitiesPanel::isCursorInEntity(Entity::Type entity) const {
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-		if (e_transform_comp.has_value()) {
-			auto const& e_transform = e_transform_comp.value().get();
-
-			//Check if cursor is within bounds
-			if (game_panel->getWorldMousePos().x >= e_transform.position.x - (e_transform.scale.x / 2.0f) &&
-				game_panel->getWorldMousePos().x <= e_transform.position.x + (e_transform.scale.x / 2.0f) &&
-				game_panel->getWorldMousePos().y >= e_transform.position.y - (e_transform.scale.y / 2.0f) &&
-				game_panel->getWorldMousePos().y <= e_transform.position.y + (e_transform.scale.y / 2.0f)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-			return false;
-		}
-	}
-
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Register popups
@@ -710,9 +689,103 @@ namespace NIKE {
 		return b_entity_changed;
 	}
 
+	std::vector<Vector2f> LevelEditor::EntitiesPanel::convertTransformToVert(Transform::Transform const& e_transform) const {
+
+		//Calculate angle in radians
+		float angle_rad = -e_transform.rotation * ((float)M_PI / 180.0f);
+		float s = sin(angle_rad);
+		float c = cos(angle_rad);
+
+		//Calculate half scale
+		Vector2f half_scale = { e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f };
+
+		//Get corners before rotation
+		std::vector<Vector2f> corners = {
+			{ -half_scale.x, -half_scale.y },
+			{  half_scale.x, -half_scale.y },
+			{  half_scale.x,  half_scale.y },
+			{ -half_scale.x,  half_scale.y }
+		};
+
+		//Rotate vertices
+		for (int i = 0; i < corners.size(); ++i) {
+			float rotated_x = corners[i].x * c - corners[i].y * s + e_transform.position.x;
+			float rotated_y = corners[i].x * s + corners[i].y * c - e_transform.position.y;
+			corners[i] = { rotated_x, rotated_y };
+		}
+
+		return corners;
+	}
+
+	bool LevelEditor::EntitiesPanel::isCursorInEntity(Entity::Type entity) const {
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (e_transform_comp.has_value()) {
+
+			//Get transform
+			const auto& e_transform = e_transform_comp.value().get();
+
+			// Retrieve the cursor position in world space
+			Vector2f cursorWorldPos = game_panel->getWorldMousePos();
+
+			//Convert transform to vertices
+			auto corners = convertTransformToVert(e_transform);
+
+			// Ray-casting algorithm to check if point is inside polygon
+			int intersectCount = 0;
+			for (size_t i = 0; i < 4; i++) {
+				Vector2f v1 = corners[i];
+				Vector2f v2 = corners[(i + 1) % 4];  // Wrap to the first vertex for the last edge
+
+				// Check if the ray intersects the edge
+				bool isEdgeCrossing = ((v1.y > cursorWorldPos.y) != (v2.y > cursorWorldPos.y));
+				if (isEdgeCrossing) {
+					float intersectionX = v1.x + (cursorWorldPos.y - v1.y) * (v2.x - v1.x) / (v2.y - v1.y);
+					if (cursorWorldPos.x < intersectionX) {
+						intersectCount++;
+					}
+				}
+			}
+
+			// If intersect count is odd, the point is inside
+			return (intersectCount % 2) == 1;
+		}
+		else {
+			return false;
+		}
+	}
+
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
+	void LevelEditor::ComponentsPanel::dragEntity(bool snap_to_grid) {
+		//Logic for moving entities
+		if (game_panel->isMouseInWindow() && (b_dragging_entity || entities_panel->isCursorInEntity(entities_panel->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel->getSelectedEntity());
+			if (e_transform_comp.has_value()) {
+				auto& e_transform = e_transform_comp.value().get();
+				e_transform.position = { game_panel->getWorldMousePos().x, -game_panel->getWorldMousePos().y };
+			}
+			b_dragging_entity = true;
+		}
+
+		//When entity is released
+		if (snap_to_grid && b_dragging_entity && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel->getSelectedEntity());
+			if (e_transform_comp.has_value()) {
+				auto& e_transform = e_transform_comp.value().get();
+
+				Vector2f new_position;
+				auto cursor_cell = NIKE_MAP_SERVICE->getCursorCell();
+				if (cursor_cell.has_value()) {
+					new_position = cursor_cell.value().get().position;
+				}
+
+				e_transform.position = { new_position.x, -new_position.y };
+			}
+			b_dragging_entity = false;
+		}
+	}
+
 	std::function<void()> LevelEditor::ComponentsPanel::addComponentPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -903,6 +976,9 @@ namespace NIKE {
 		//Entities panel reference
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
+		//Game panel reference
+		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
@@ -969,6 +1045,9 @@ namespace NIKE {
 
 			//Add Spacing
 			ImGui::Spacing();
+
+			//Logic for dragging entity
+			dragEntity(false);
 
 			//Retrieve and display all registered component types
 			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel->getSelectedEntity())) {
@@ -1049,36 +1128,18 @@ namespace NIKE {
 		//Convert color
 		ImU32 color = IM_COL32(255, 255, 255, 255);
 
-		//Calculate radian angle
-		float rad_angle = -e_transform.rotation * ((float)M_PI / 180.0f);  // Ensure degrees to radians
-
-		//Calculate cos & sin
-		float s = sin(rad_angle);
-		float c = cos(rad_angle);
-
-		//Calculate half scale
-		ImVec2 half_scale = { e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f };
-
-		//Initialize the corners
-		ImVec2 corners[4] = {
-			{ -half_scale.x, -half_scale.y }, // Top-left
-			{  half_scale.x, -half_scale.y }, // Top-right
-			{  half_scale.x,  half_scale.y }, // Bottom-right
-			{ -half_scale.x,  half_scale.y }  // Bottom-left
-		};
-
-		//Rotate and translate each corner
-		for (int i = 0; i < 4; ++i) {
-			float rotated_x = corners[i].x * c - corners[i].y * s;
-			float rotated_y = corners[i].x * s + corners[i].y * c;
-
-			//Translate to the world position
-			corners[i].x = rotated_x + e_transform.position.x;
-			corners[i].y = rotated_y - e_transform.position.y;
-		}
+		//Convert transform to vertices
+		auto corners = entities_panel->convertTransformToVert(e_transform);
 
 		//Draw quad bounding box
-		draw->AddQuad(worldToScreen(corners[0], rendersize), worldToScreen(corners[1], rendersize), worldToScreen(corners[2], rendersize), worldToScreen(corners[3], rendersize), color, 5.0f);
+		draw->AddQuad(	worldToScreen(ImVec2(corners[0].x, corners[0].y), rendersize), 
+						worldToScreen(ImVec2(corners[1].x, corners[1].y), rendersize),
+						worldToScreen(ImVec2(corners[2].x, corners[2].y), rendersize),
+						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f);
+	}
+
+	bool LevelEditor::ComponentsPanel::checkEntityDragged() const {
+		return b_dragging_entity;
 	}
 
 	/*****************************************************************//**

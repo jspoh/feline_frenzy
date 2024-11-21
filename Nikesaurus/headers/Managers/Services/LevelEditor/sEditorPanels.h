@@ -13,6 +13,7 @@
 #define EDITOR_PANELS_HPP
 
 #include "Components/cRender.h"
+#include "Components/cTransform.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -163,10 +164,6 @@ namespace NIKE {
 
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
-
-			//Check if cusor is in entity
-			bool isCursorInEntity(Entity::Type entity) const;
-
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -201,6 +198,12 @@ namespace NIKE {
 
 			//Check entity changed
 			bool isEntityChanged() const;
+
+			//Convert entity's transform to vertices
+			std::vector<Vector2f> convertTransformToVert(Transform::Transform const& e_transform) const;
+
+			//Check if cusor is in entity
+			bool isCursorInEntity(Entity::Type entity) const;
 		};
 
 		//Components Management Panel
@@ -209,6 +212,15 @@ namespace NIKE {
 
 			//Reference to game window panel
 			std::shared_ptr<EntitiesPanel> entities_panel;
+
+			//Reference to game window panel
+			std::shared_ptr<GameWindowPanel> game_panel;
+
+			//Boolean to signal dragging of entity
+			bool b_dragging_entity;
+
+			//Drag entity function
+			void dragEntity(bool snap_to_grid);
 
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
@@ -275,6 +287,9 @@ namespace NIKE {
 
 			//Render selected entity bounding box
 			void renderEntityBoundingBox(void* draw_list, Vector2f const& render_size);
+
+			//Check if entity is being dragged
+			bool checkEntityDragged() const;
 		};
 
 		//Debug Management Panel
