@@ -32,6 +32,10 @@ namespace NIKE {
 
 	// Checks if the file has a valid vertex shader extension (e.g .vert).
 	bool hasValidVertExtension(const std::filesystem::path& filePath);
+
+	// Checks if the file has a valid vertex shader extension (e.g .lua).
+	bool hasValidScriptExtension(const std::filesystem::path& filePath);
+
 	// This function will be used to display assets of the given type
 	void displayAssetList(const std::string& assetType);
 
@@ -43,17 +47,6 @@ namespace NIKE {
 
 	// This function will be used to display assets of the given type
 	void displayAssetList(const std::string& assetType);
-
-	// This function will render out grid squares
-	void renderGrid(Vector2i grid_dimen, Vector2f);
-
-	// TEMP PLACEMENT! Should be in collision sys or smth
-	bool isMouseOverEntity(Entity::Type const& );
-
-	// Static var for the entity selected for dragging to be here, cnt pass in as param due to warnings
-	static Entity::Type entity_select = 0;
-	// This handles the dragging of entities
-	void handleEntitySelectionAndDrag(const Vector2f& main_mouse);
 
 }
 

@@ -1153,12 +1153,6 @@ namespace NIKE {
 			ImGui::EndDragDropTarget();
 		}
 
-		if (NIKE_IMGUI_SERVICE->getGridActive())
-		{
-			renderGrid(NIKE_IMGUI_SERVICE->getGridDimen(), viewport_size);
-
-		}
-
 		ImGui::End();
 	}
 

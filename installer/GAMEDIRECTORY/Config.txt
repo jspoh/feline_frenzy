@@ -1,0 +1,3 @@
+Window-Title: "Feline Frenzy"
+Window-Width: 1600
+Window-Height: 900

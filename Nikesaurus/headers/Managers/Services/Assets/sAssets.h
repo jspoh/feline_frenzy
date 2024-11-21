@@ -86,14 +86,22 @@ namespace NIKE {
 			std::string scenes_path = "assets/Scenes/";
 			std::string shaders_path = "assets/Shaders/";
 			std::string prefabs_path = "assets/Prefabs/";
+			std::string scripts_path = "assets/Scripts/";
 
 			/*****************************************************************//**
 			* Scn (Levels) private members
 			*********************************************************************/
 			std::unordered_map<std::string, std::filesystem::path> levels_list;
 
-			// Prefabs paths containers
+			/*****************************************************************//**
+			* Prefabs private members
+			*********************************************************************/
 			std::unordered_map<std::string, std::filesystem::path> prefabs_list;
+
+			/*****************************************************************//**
+			* Scripts private members
+			*********************************************************************/
+			std::unordered_map<std::string, std::filesystem::path> scripts_list;
 
 		public:
 
@@ -249,6 +257,15 @@ namespace NIKE {
 			std::unordered_map<std::string, std::filesystem::path>& getLoadedPrefabs();
 
 			/*****************************************************************//**
+			* Script File path
+			*********************************************************************/
+			void loadScript(const std::filesystem::directory_entry& entry);
+			void loadScriptFiles();
+			bool checkScriptFileExist(const std::string& entry);
+			void reloadScript(std::string const&, std::filesystem::path const&);
+			std::unordered_map<std::string, std::filesystem::path>& getLoadedScripts();
+
+			/*****************************************************************//**
 			* File path gettors
 			*********************************************************************/
 			std::string const& getTexturePath(); 
@@ -258,6 +275,7 @@ namespace NIKE {
 			std::string const& getScenesPath(); 
 			std::string const& getShadersPath(); 
 			std::string const& getPrefabsPath();
+			std::string const& getScriptsPath();
 
 			/*****************************************************************//**
 			* Reload of specific asset types

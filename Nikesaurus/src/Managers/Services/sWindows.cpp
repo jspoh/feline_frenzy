@@ -5,12 +5,13 @@
 * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
 * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
 * \date   September 2024
-* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+* All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 *********************************************************************/
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sWindows.h"
 #include "Managers/Services/sEvents.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -151,6 +152,7 @@ namespace NIKE {
 		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
+		glfwSetWindowFocusCallback(ptr_window, Events::Service::windowfocus_cb);
 	    glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
 	}
 
@@ -228,6 +230,45 @@ namespace NIKE {
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowResized> event) {
 		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
 		window_size = event->frame_buffer;
+	}
+
+	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		static bool is_fullscreen;
+
+		if (event->focused) {
+			glfwRestoreWindow(ptr_window);
+
+			if (is_fullscreen) {
+				setFullScreen(true);
+			}
+
+			// in case of resizes
+			int width, height;
+			glfwGetFramebufferSize(ptr_window, &width, &height);
+			glViewport(0, 0, width, height);
+
+			// just in case
+			glfwMakeContextCurrent(ptr_window);
+
+			NIKE_AUDIO_SERVICE->resumeAllChannels();
+		}
+		else {
+			GLFWmonitor* monitor = glfwGetWindowMonitor(ptr_window);
+			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
+
+			NIKE_AUDIO_SERVICE->pauseAllChannels();
+			glfwIconifyWindow(ptr_window);
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	/*****************************************************************//**

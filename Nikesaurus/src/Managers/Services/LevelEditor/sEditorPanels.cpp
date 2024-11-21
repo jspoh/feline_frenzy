@@ -1308,12 +1308,12 @@ namespace NIKE {
 				ImGui::EndTabItem();
 			}
 
-			// Shaders tab
-			//if (ImGui::BeginTabItem("Shaders"))
-			//{
-			//	displayAssetList("Shaders");
-			//	ImGui::EndTabItem();
-			//}
+			// Scripts tab
+			if (ImGui::BeginTabItem("Script"))
+			{
+				displayAssetList("Scripts");
+				ImGui::EndTabItem();
+			}
 
 			// Audio tab
 			if (ImGui::BeginTabItem("Audio"))
