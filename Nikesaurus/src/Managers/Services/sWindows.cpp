@@ -244,10 +244,12 @@ namespace NIKE {
 		if (event->focused) {
 			glfwRestoreWindow(ptr_window);
 
+			// in case of resizes
 			int width, height;
 			glfwGetFramebufferSize(ptr_window, &width, &height);
 			glViewport(0, 0, width, height);
 
+			// just in case
 			glfwMakeContextCurrent(ptr_window);
 		}
 		else {
