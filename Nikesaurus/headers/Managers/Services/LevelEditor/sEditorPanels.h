@@ -154,7 +154,7 @@ namespace NIKE {
 			bool b_entity_changed;
 
 			//Reference to game window panel
-			std::shared_ptr<GameWindowPanel> game_panel;
+			std::weak_ptr<GameWindowPanel> game_panel;
 
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
@@ -211,10 +211,10 @@ namespace NIKE {
 		private:
 
 			//Reference to game window panel
-			std::shared_ptr<EntitiesPanel> entities_panel;
+			std::weak_ptr<EntitiesPanel> entities_panel;
 
 			//Reference to game window panel
-			std::shared_ptr<GameWindowPanel> game_panel;
+			std::weak_ptr<GameWindowPanel> game_panel;
 
 			//Boolean to signal dragging of entity
 			bool b_dragging_entity;
@@ -353,7 +353,7 @@ namespace NIKE {
 			std::unordered_map<Entity::Type, std::string> cam_entities;
 
 			//Entities panel for string reference
-			std::shared_ptr<EntitiesPanel> entities_panel;
+			std::weak_ptr<EntitiesPanel> entities_panel;
 
 			//Combo index for selecting camera
 			int combo_index;
@@ -439,13 +439,13 @@ namespace NIKE {
 			Vector2f world_mouse_pos;
 
 			//Grid management panel
-			std::shared_ptr<TileMapPanel> tile_map_panel;
+			std::weak_ptr<TileMapPanel> tile_map_panel;
 
 			//Main panel reference
-			std::shared_ptr<MainPanel> main_panel;
+			std::weak_ptr<MainPanel> main_panel;
 
 			//Entities panel reference
-			std::shared_ptr<ComponentsPanel> comps_panel;
+			std::weak_ptr<ComponentsPanel> comps_panel;
 
 			//Game window render event
 			void onEvent(std::shared_ptr<Render::ViewportTexture> event);

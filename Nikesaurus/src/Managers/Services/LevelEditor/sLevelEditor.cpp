@@ -298,11 +298,6 @@ namespace NIKE {
 		panels.push_back(main_panel);
 		panels_map.emplace(main_panel->getName(), main_panel);
 
-		//Add game window panel
-		auto game_panel = std::make_shared<GameWindowPanel>();
-		panels.push_back(game_panel);
-		panels_map.emplace(game_panel->getName(), game_panel);
-
 		//Add entities management panel
 		auto entities_panel = std::make_shared<EntitiesPanel>();
 		panels.push_back(entities_panel);
@@ -332,6 +327,11 @@ namespace NIKE {
 		auto tile_map_panel = std::make_shared<TileMapPanel>();
 		panels.push_back(tile_map_panel);
 		panels_map.emplace(tile_map_panel->getName(), tile_map_panel);
+
+		//Add game window panel
+		auto game_panel = std::make_shared<GameWindowPanel>();
+		panels.push_back(game_panel);
+		panels_map.emplace(game_panel->getName(), game_panel);
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });

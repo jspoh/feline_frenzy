@@ -598,7 +598,7 @@ namespace NIKE {
 			static bool entity_clicked = false;
 			entity_clicked = false;
 			for (auto layer = NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rbegin(); 
-				!checkPopUpShowing() && game_panel->isMouseInWindow() && !entity_clicked && layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
+				!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !entity_clicked && layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
 				layer++) {
 
 				//SKip inactive layer
@@ -725,7 +725,7 @@ namespace NIKE {
 			const auto& e_transform = e_transform_comp.value().get();
 
 			// Retrieve the cursor position in world space
-			Vector2f cursorWorldPos = game_panel->getWorldMousePos();
+			Vector2f cursorWorldPos = game_panel.lock()->getWorldMousePos();
 
 			//Convert transform to vertices
 			auto corners = convertTransformToVert(e_transform);
@@ -759,18 +759,18 @@ namespace NIKE {
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::dragEntity(bool snap_to_grid) {
 		//Logic for moving entities
-		if (game_panel->isMouseInWindow() && (b_dragging_entity || entities_panel->isCursorInEntity(entities_panel->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
-			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel->getSelectedEntity());
+		if (game_panel.lock()->isMouseInWindow() && (b_dragging_entity || entities_panel.lock()->isCursorInEntity(entities_panel.lock()->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
 			if (e_transform_comp.has_value()) {
 				auto& e_transform = e_transform_comp.value().get();
-				e_transform.position = { game_panel->getWorldMousePos().x, -game_panel->getWorldMousePos().y };
+				e_transform.position = { game_panel.lock()->getWorldMousePos().x, -game_panel.lock()->getWorldMousePos().y };
 			}
 			b_dragging_entity = true;
 		}
 
 		//When entity is released
 		if (snap_to_grid && b_dragging_entity && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
-			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel->getSelectedEntity());
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
 			if (e_transform_comp.has_value()) {
 				auto& e_transform = e_transform_comp.value().get();
 
@@ -799,7 +799,7 @@ namespace NIKE {
 			for (const auto& component : comps) {
 
 				//Check if component already exists
-				if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel->getSelectedEntity(), component.second))
+				if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second))
 					continue;
 
 				//Display each component as a button
@@ -810,8 +810,8 @@ namespace NIKE {
 
 					//Setup undo action for add component
 					add_comp.undo_action = [=]() {
-						if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel->getSelectedEntity(), component.second)) {
-							NIKE_ECS_MANAGER->removeEntityComponent(entities_panel->getSelectedEntity(), component.second);
+						if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second)) {
+							NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
 						}
 					};
 
@@ -819,7 +819,7 @@ namespace NIKE {
 					add_comp.do_action = [=]() {
 
 						//Add default comp to entity
-						NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel->getSelectedEntity(), component.second);
+						NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
 					};
 
 					//Execute add component action
@@ -865,7 +865,7 @@ namespace NIKE {
 				//Do Action
 				save_prefab.do_action = [&, shared_id]() {
 					// Serialize the prefab to the file path
-					NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel->getSelectedEntity(), *shared_id);
+					NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel.lock()->getSelectedEntity(), *shared_id);
 					setPopUpSuccessMsg("Prefab file saved!");
 					openPopUp("Success");
 
@@ -927,7 +927,7 @@ namespace NIKE {
 			//Static layer id
 			static int layer_id = 0;
 			if (ImGui::IsItemActivated()) {
-				layer_id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel->getSelectedEntity());
+				layer_id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity());
 			}
 
 			//Input int
@@ -943,13 +943,13 @@ namespace NIKE {
 				Action set_layer;
 
 				//Setup undo action for set layer
-				set_layer.undo_action = [&, id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel->getSelectedEntity())]() {
-					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel->getSelectedEntity(), id);
+				set_layer.undo_action = [&, id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity())]() {
+					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel.lock()->getSelectedEntity(), id);
 					};
 
 				//Setup do action for set layer
 				set_layer.do_action = [&, id = layer_id]() {
-					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel->getSelectedEntity(), id);
+					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel.lock()->getSelectedEntity(), id);
 					};
 
 				//Execute set layer action
@@ -1010,16 +1010,16 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		//Check if an entity has been selected
-		if (NIKE_ECS_MANAGER->checkEntity(entities_panel->getSelectedEntity())) {
+		if (NIKE_ECS_MANAGER->checkEntity(entities_panel.lock()->getSelectedEntity())) {
 
 			//Print out selected entity string ref
-			ImGui::Text("Selected Entity: %s", entities_panel->getSelectedEntityName().c_str());
+			ImGui::Text("Selected Entity: %s", entities_panel.lock()->getSelectedEntityName().c_str());
 
 			//Print out selected entity component count
-			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entities_panel->getSelectedEntity()));
+			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entities_panel.lock()->getSelectedEntity()));
 
 			//Print out selected entity layer id
-			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel->getSelectedEntity()));
+			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity()));
 
 			//Add Spacing
 			ImGui::Spacing();
@@ -1050,7 +1050,7 @@ namespace NIKE {
 			dragEntity(false);
 
 			//Retrieve and display all registered component types
-			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel->getSelectedEntity())) {
+			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity())) {
 
 				//Create a collapsible header for the component
 				if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
@@ -1067,8 +1067,8 @@ namespace NIKE {
 
 						//Values to copy
 						Component::Type comp_type_copy = comps.at(comp.first);
-						Entity::Type entity_copy = entities_panel->getSelectedEntity();
-						auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(entities_panel->getSelectedEntity(), comp_type_copy);
+						Entity::Type entity_copy = entities_panel.lock()->getSelectedEntity();
+						auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
 
 						//Do Action
 						remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
@@ -1098,7 +1098,7 @@ namespace NIKE {
 	}
 
 	bool LevelEditor::ComponentsPanel::isEntityChanged() const {
-		return entities_panel->isEntityChanged();
+		return entities_panel.lock()->isEntityChanged();
 	}
 
 	void LevelEditor::ComponentsPanel::setPopUpErrorMsg(std::string const& msg) {
@@ -1113,7 +1113,7 @@ namespace NIKE {
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
 		if (!e_transform_comp.has_value())
 			return;
 
@@ -1129,7 +1129,7 @@ namespace NIKE {
 		ImU32 color = IM_COL32(255, 255, 255, 255);
 
 		//Convert transform to vertices
-		auto corners = entities_panel->convertTransformToVert(e_transform);
+		auto corners = entities_panel.lock()->convertTransformToVert(e_transform);
 
 		//Draw quad bounding box
 		draw->AddQuad(	worldToScreen(ImVec2(corners[0].x, corners[0].y), rendersize), 
@@ -1338,7 +1338,7 @@ namespace NIKE {
 			cam_entities.clear();
 			cam_entities.emplace(UINT16_MAX, "Free Cam");
 			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
-				cam_entities.emplace(entity, entities_panel->getEntityName(entity));
+				cam_entities.emplace(entity, entities_panel.lock()->getEntityName(entity));
 			}
 		}
 	}
@@ -1850,14 +1850,14 @@ namespace NIKE {
 		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		//If grid is showing
-		if (main_panel->getGridState()) {
+		if (main_panel.lock()->getGridState()) {
 
 			//Render grid
-			tile_map_panel->renderGrid(draw_list, Vector2f(viewport_width, viewport_height));
+			tile_map_panel.lock()->renderGrid(draw_list, Vector2f(viewport_width, viewport_height));
 		}
 
 		//Render selected entity bounding box
-		comps_panel->renderEntityBoundingBox(draw_list, Vector2f(viewport_width, viewport_height));
+		comps_panel.lock()->renderEntityBoundingBox(draw_list, Vector2f(viewport_width, viewport_height));
 
 		ImGui::End();
 	}
