@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -53,6 +53,9 @@ namespace NIKE {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseScrollEvent>(Vector2f(static_cast<float>(xoffset), static_cast<float>(yoffset))));
 	}
 
+	void Events::Service::windowfocus_cb([[maybe_unused]] GLFWwindow* window, int focused) {
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Windows::WindowFocusEvent>(focused));
+	}
 	void Events::Service::dropfile_cb([[maybe_unused]] GLFWwindow* window, int count, const char** paths) {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Assets::FileDropEvent>(count, paths));
 	}

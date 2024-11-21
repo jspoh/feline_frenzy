@@ -232,9 +232,8 @@
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
-if not exist "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" mkdir "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy"
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+REM copy all files (including pdb) to main startup project outdir
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -267,9 +266,8 @@ xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Pla
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
-if not exist "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" mkdir "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy"
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+REM copy all files (including pdb) to main startup project outdir
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
