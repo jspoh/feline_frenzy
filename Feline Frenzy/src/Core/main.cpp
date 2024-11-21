@@ -34,6 +34,7 @@ int WINAPI WinMain(
 
 	// register built in model for batched quad rendering (!TODO: can be implemented in a different way if required)
 	NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
+	NIKE_ASSETS_SERVICE->loadModel("batched_texture", "assets/Models/square-texture.txt", true);
 
 	//NIKE_EVENTS_SERVICE.getService<NIKE::Coordinator::Service>()->
 

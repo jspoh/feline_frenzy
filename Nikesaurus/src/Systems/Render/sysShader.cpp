@@ -2,8 +2,8 @@
  * \file   sysShader.cpp
  * \brief
  *
- * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu(90%)
- * \coauthor Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (10%)
+ * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu(70%)
+ * \coauthor Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -73,4 +73,36 @@ namespace NIKE {
 			cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
+
+	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector4f& value) {
+		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (location >= 0) {
+			glUniform4f(location, value.x, value.y, value.z, value.w);
+		}
+		else {
+			cerr << "Uniform location not found for: " << name << endl;
+		}
+	}
+
+	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<int>& vals) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+
+		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (location >= 0) {
+			glUniform1iv(location, static_cast<GLsizei>(vals.size()), reinterpret_cast<const int*>(vals.data()));
+		}
+		else {
+			cerr << "Uniform location not found for: " << name << endl;
+			throw std::exception();
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
 }

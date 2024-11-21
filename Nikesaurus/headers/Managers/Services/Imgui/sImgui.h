@@ -111,11 +111,11 @@ namespace NIKE {
 			bool b_show_grid = false;
 
 			// Variables to store grid properties
-			Vector2i grid_dimensions;
-			float tile_size;
+			Vector2i grid_dimensions{};
+			float tile_size{};
 
 			//Viewport tex_id
-			unsigned int tex_id;
+			unsigned int tex_id{};
 		};
 
 		// Defines to reduce the long line
