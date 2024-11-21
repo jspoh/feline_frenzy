@@ -13,7 +13,7 @@ layout (location=0) out	vec4 out_color;
 uniform sampler2DArray u_tex2d;	// 1000 because that is the MAX_INSTANCES for rendering textures
 
 void main() {
-	vec4 tex_color = texture(u_tex2d, vec3(f_texcoord, f_sampler_idx));
+	vec4 tex_color = texture(u_tex2d, vec3(f_texcoord, f_sampler_idx));		// layer is specified with f_sampler_idx for sampler2DArray u_tex2d
 
 	out_color = tex_color;
 }

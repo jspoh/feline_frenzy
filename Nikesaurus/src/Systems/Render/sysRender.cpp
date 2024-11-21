@@ -220,7 +220,7 @@ namespace NIKE {
 		// !TODO: batched rendering for texture incomplete
 		static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = false;
 
-		if (!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
+		if constexpr(!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 
