@@ -14,11 +14,11 @@
 namespace NIKE {
     void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "", const Vector2f& shooter_pos = { 0.f, 0.f }) {
     //void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
-        NIKEE_CORE_INFO("SHOOT BULLET CALLED");
+        //NIKEE_CORE_INFO("SHOOT BULLET CALLED");
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
             // Create entity function call ( Defaulted to the base layer for now )
             Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
-            NIKEE_CORE_INFO("Bullet entity created with ID: " + std::to_string(new_id));
+            //NIKEE_CORE_INFO("Bullet entity created with ID: " + std::to_string(new_id));
 
             // If empty string, assign default string
             std::string name = entity_name.empty() ? "entity_" + std::to_string(new_id) : entity_name;

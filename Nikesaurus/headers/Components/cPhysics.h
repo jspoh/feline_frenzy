@@ -42,7 +42,8 @@ namespace NIKE {
         enum class Resolution {
             NONE = 0,
             SLIDE,
-            BOUNCE
+            BOUNCE,
+            DESTROY
         };
 
         struct Collider {

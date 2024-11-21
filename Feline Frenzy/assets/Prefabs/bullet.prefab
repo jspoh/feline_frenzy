@@ -39,7 +39,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "placeholder"
+            "Texture_ID": "Player_Bullet"
         },
         "Transform::Transform": {
             "Position": {
