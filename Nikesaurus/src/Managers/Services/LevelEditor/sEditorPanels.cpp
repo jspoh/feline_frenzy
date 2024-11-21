@@ -1142,6 +1142,9 @@ namespace NIKE {
 		//Convert color
 		ImU32 color = IM_COL32(255, 255, 255, 255);
 
+		//Camera zoom
+		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
 		//Convert transform to vertices
 		auto corners = entities_panel.lock()->convertTransformToVert(e_transform);
 
@@ -1149,28 +1152,28 @@ namespace NIKE {
 		draw->AddQuad(	worldToScreen(ImVec2(corners[0].x, corners[0].y), rendersize), 
 						worldToScreen(ImVec2(corners[1].x, corners[1].y), rendersize),
 						worldToScreen(ImVec2(corners[2].x, corners[2].y), rendersize),
-						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f);
+						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f / zoom);
 
 		//Draw line up
 		draw->AddLine(	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
 						worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-						IM_COL32(0, 255, 0, 255), 5.0f);
+						IM_COL32(0, 255, 0, 255), 5.0f / zoom);
 
 		//Add gizmo point
 		draw->AddCircleFilled(	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f, IM_COL32(0, 255, 0, 255));
+								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(0, 255, 0, 255));
 
 		//Draw line right
 		draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
 			worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-			IM_COL32(255, 0, 0, 255), 5.0f);
+			IM_COL32(255, 0, 0, 255), 5.0f / zoom);
 
 		//Add gizmo point
 		draw->AddCircleFilled(	worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f, IM_COL32(255, 0, 0, 255));
+								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(255, 0, 0, 255));
 
 		//Draw gizmo center
-		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize), Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f, color);
+		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize), Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, color);
 	}
 
 	bool LevelEditor::ComponentsPanel::checkEntityDragged() const {
@@ -1232,6 +1235,8 @@ namespace NIKE {
 
 			// Crash Logger Tab
 			if (ImGui::BeginTabItem("Crash Logger")) {
+				ImGui::Text("Crash logs:");
+
 				// Open crash log file
 				std::ifstream crashLogFile("logs/crash-log.txt");
 

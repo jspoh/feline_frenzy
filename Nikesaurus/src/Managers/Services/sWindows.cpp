@@ -113,14 +113,13 @@ namespace NIKE {
 		GLFWmonitor* monitor;
 		const GLFWvidmode* mode;
 
-
 		if (value == GLFW_TRUE && !b_full_screen) {
 			//Get FullScreen Attributes
 			monitor = glfwGetPrimaryMonitor();
 			mode = glfwGetVideoMode(monitor);
 
 			// Get the window position and size
-			glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
+			glfwGetWindowPos(ptr_window, &pos_before_fullscreen.x, &pos_before_fullscreen.y);
 			glfwGetWindowSize(ptr_window, &size_before_fullscreen.x, &size_before_fullscreen.y);
 
 			// Recreate the window in fullscreen mode
@@ -135,7 +134,7 @@ namespace NIKE {
 			monitor = nullptr;
 
 			// Recreate the window in windowed mode at the stored position and size
-			glfwSetWindowMonitor(ptr_window, nullptr, window_pos.x, window_pos.y, size_before_fullscreen.x, size_before_fullscreen.y, 0);
+			glfwSetWindowMonitor(ptr_window, nullptr, pos_before_fullscreen.x, pos_before_fullscreen.y, size_before_fullscreen.x, size_before_fullscreen.y, 0);
 
 			//Set Full Screen Mode False
 			b_full_screen = false;

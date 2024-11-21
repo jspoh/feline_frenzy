@@ -124,6 +124,7 @@ namespace NIKE {
 			std::string window_title;
 			bool b_full_screen;
 			Vector2i size_before_fullscreen;
+			Vector2i pos_before_fullscreen;
 
 			//Configure Window
 			void configWindow();
