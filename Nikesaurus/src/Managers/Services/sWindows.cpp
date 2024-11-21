@@ -11,6 +11,7 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/sWindows.h"
 #include "Managers/Services/sEvents.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -251,8 +252,11 @@ namespace NIKE {
 
 			// just in case
 			glfwMakeContextCurrent(ptr_window);
+
+			NIKE_AUDIO_SERVICE->resumeAllChannels();
 		}
 		else {
+			NIKE_AUDIO_SERVICE->pauseAllChannels();
 			glfwIconifyWindow(ptr_window);
 		}
 

@@ -434,6 +434,18 @@ namespace NIKE {
 
 			//Update Loop
 			void update();
+
+			/**
+			 * pauses all audio.
+			 * 
+			 */
+			void pauseAllChannels();
+
+			/**
+			 * resumes all audio.
+			 * 
+			 */
+			void resumeAllChannels();
 		};
 
 		//Re-enable DLL Export warning
