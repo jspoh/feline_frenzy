@@ -53,6 +53,12 @@ namespace NIKE
 		return (extension == ".frag" || extension == ".vert");
 	}
 
+	bool hasValidScriptExtension(const std::filesystem::path& filePath)
+	{
+		std::string extension = filePath.extension().string();
+		return (extension == ".lua");
+	}
+
 	bool hasValidModelExtension(const std::filesystem::path& filePath)
 	{
 		std::string extension = filePath.extension().string();
@@ -230,9 +236,9 @@ namespace NIKE
 			delete_file_popup = showDeleteFilePopup(selected_file_path, "Levels");
 			delete_all_files_popup = showDeleteAllFilesPopup("Levels");
 		}
-		else if (asset_type == "Shaders")
+		else if (asset_type == "Scripts")
 		{
-			for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedShaders())
+			for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedScripts())
 			{
 				ImGui::Text("%s", shader.first.c_str());
 			}
@@ -240,187 +246,6 @@ namespace NIKE
 
 		ImGui::EndChild();
 	}
-
-	void renderGrid(Vector2i grid_dimen, Vector2f viewport_size)
-	{
-		// Get the position and size of the viewport window
-		ImVec2 start_pos = ImGui::GetWindowPos();
-
-		// Debug: Log viewport and grid dimensions
-		//cout << "Viewport Size (x, y): " << viewport_size.x << ", " << viewport_size.y
-		//    << " Grid Dimensions (x, y): " << grid_dimen.x << ", " << grid_dimen.y
-		//    << endl;
-
-		// Calculate the tile size to ensure the grid fits inside the viewport
-		float tile_size_x = viewport_size.x / grid_dimen.x;
-		float tile_size_y = viewport_size.y / grid_dimen.y;
-		float tile_size = min(tile_size_x, tile_size_y);
-
-		cout << "Tile Size: " << tile_size << endl;
-
-		// Loop through grid rows and columns to draw the squares
-		for (int row = 0; row < grid_dimen.y; ++row) {
-			for (int col = 0; col < grid_dimen.x; ++col) {
-				// Calculate the top-left and bottom-right coordinates for each grid square
-				ImVec2 top_left(start_pos.x + col * tile_size, start_pos.y + row * tile_size);
-				ImVec2 bottom_right(start_pos.x + (col + 1) * tile_size, start_pos.y + (row + 1) * tile_size);
-
-				// Draw each grid square 
-				ImGui::GetWindowDrawList()->AddRect(top_left, bottom_right, IM_COL32(255, 255, 255, 255));
-			}
-		}
-	}
-
-	bool isMouseOverEntity([[maybe_unused]] const Entity::Type& entity) {
-
-		////Get bounding box
-		//auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-		//if (!e_transform_comp.has_value()) return false;
-		//auto const& e_transform = e_transform_comp.value().get();
-
-		////Vertices
-		//std::vector<Vector2f> vert;
-
-		////If Shape
-		//auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-		//if (e_shape_comp.has_value()) {
-		//	auto const& e_shape = e_shape_comp.value().get();
-
-		//	auto getVertices = [e_shape]() {
-		//		std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
-
-		//		std::vector<Vector2f> vert;
-		//		for (const Assets::Vertex& v : vertices) {
-		//			vert.push_back(v.pos);
-		//		}
-		//		return vert;
-		//		};
-
-		//	vert = getVertices();
-		//	for (auto& point : vert) {
-		//		point.x *= e_transform.scale.x;
-		//		point.y *= e_transform.scale.y;
-		//		point.x += e_transform.position.x;
-		//		point.y -= e_transform.position.y;
-
-		//		//Translate model to world coordinates
-		//		point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-		//		point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
-		//	}
-		//}
-		//else {
-		//	auto getVertices = []() {
-		//		std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
-
-		//		std::vector<Vector2f> vert;
-		//		for (const Assets::Vertex& v : vertices) {
-		//			vert.push_back(v.pos);
-		//		}
-		//		return vert;
-		//		};
-
-		//	for (auto& point : vert) {
-		//		point.x *= e_transform.scale.x;
-		//		point.y *= e_transform.scale.y;
-		//		point.x += e_transform.position.x;
-		//		point.y -= e_transform.position.y;
-
-		//		//Translate model to world coordinates
-		//		point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-		//		point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
-		//	}
-		//}
-
-		////Calculate vertices intersection with mouse
-		//int intersectCount = 0;
-
-		//for (size_t i = 0; i < vert.size(); i++) {
-		//	Vector2f v1 = vert[i];
-		//	Vector2f v2 = vert[(i + 1) % vert.size()];  // Wrap to the start for the last edge
-
-		//	// Check if the ray intersects the edge
-		//	bool isEdgeCrossing = ((v1.y > mouse.y) != (v2.y > mouse.y));
-		//	if (isEdgeCrossing) {
-		//		float intersectionX = v1.x + (mouse.y - v1.y) * (v2.x - v1.x) / (v2.y - v1.y);
-		//		if (mouse.x < intersectionX) {
-		//			intersectCount++;
-		//		}
-		//	}
-		//}
-
-		//// If intersect count is odd, the point is inside
-		//return (intersectCount % 2) == 1;
-		return false;
-	}
-
-	void handleEntitySelectionAndDrag(const Vector2f& main_mouse) {
-
-		if (ImGui::IsMouseClicked(0)) {
-			bool entity_found = false;
-			for (auto& entity : NIKE_IMGUI_SERVICE->getEntityRef()) {
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity.second))
-				{
-					if (isMouseOverEntity(entity.second)) {
-						NIKE_IMGUI_SERVICE->setSelectedEntityName(entity.first);
-						cout << "in" << endl;
-						entity_select = entity.second;
-						entity_found = true;
-						break;
-					}
-				}
-
-			}
-			if (!entity_found) {
-				NIKE_IMGUI_SERVICE->setSelectedEntityName("");  
-				entity_select = 0;  
-			}
-		}
-
-		// Update entity's position when mouse is moving and the mouse is held down
-		if (ImGui::IsMouseDown(0) && entity_select != 0) {
-			std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
-			if (!selected_entity_name.empty()) {
-				Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity_name);
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-					auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get();
-					transform_comp.position = main_mouse;  
-				}
-			}
-		}
-
-		// Release the selected entity when the mouse button is released
-		if (ImGui::IsMouseReleased(0)) {
-			//entity_select = 0;
-		}
-
-		// For deleting entity when delete key triggered
-		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_DELETE)) {
-			std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
-
-			if (!selected_entity_name.empty() && NIKE_IMGUI_SERVICE->checkEntityExist(selected_entity_name)) {
-				// Retrieve the selected entity from the name
-				Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity_name);
-
-				// Remove the entity from the reference map
-				NIKE_IMGUI_SERVICE->getEntityRef().erase(selected_entity_name);
-
-				// Destroy the entity from the ECS manager
-				NIKE_ECS_MANAGER->destroyEntity(entity);
-
-				// Reset selected entity name and select state
-				NIKE_IMGUI_SERVICE->setSelectedEntityName("");
-				entity_select = 0;  
-			}
-		}
-
-	}
-
-
-
-
-
-
-
 
 }
 

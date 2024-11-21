@@ -555,7 +555,9 @@ namespace NIKE {
 
 		if (tex_data == nullptr) {
 			NIKEE_CORE_ERROR("Failed to load image : {} ", path_to_texture);
-			return Assets::Texture(-1, { 256, 256 });
+			int invalid = -1;
+			int def_size = 256;
+			return Assets::Texture(static_cast<unsigned>(invalid), { def_size, def_size });
 		}
 
 		// create texture
