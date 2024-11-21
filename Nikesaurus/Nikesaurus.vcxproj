@@ -223,7 +223,10 @@
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
+
+REM copy all files (including pdb) to main startup project outdir
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -254,7 +257,10 @@ xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)$(ProjectName)\db\data.json" "$(OutDir)" /s  /r  /y  /q
 
-xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q</Command>
+xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
+
+REM copy all files (including pdb) to main startup project outdir
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

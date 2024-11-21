@@ -236,6 +236,11 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
 		if (event->focused) {
 			glfwRestoreWindow(ptr_window);
 
@@ -247,6 +252,11 @@ namespace NIKE {
 		}
 		else {
 			glfwIconifyWindow(ptr_window);
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
