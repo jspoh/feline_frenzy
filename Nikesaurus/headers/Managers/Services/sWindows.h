@@ -31,8 +31,18 @@ namespace NIKE {
 				:frame_buffer{ width, height } {}
 		};
 
+		// Window Focus class
+		struct WindowFocusEvent : Events::IEvent {
+			int focused;
+
+			WindowFocusEvent(int focused)
+				: focused{ focused } {}
+		};
+
 		//Abstract Window Class
-		class IWindow : public Events::IEventListener<WindowResized> {
+		class IWindow 
+			: public Events::IEventListener<WindowResized>, 
+			public Events::IEventListener<WindowFocusEvent> {
 		private:
 		public:
 			//Defaults
@@ -93,6 +103,8 @@ namespace NIKE {
 		private:
 			//Window Event
 			virtual void onEvent(std::shared_ptr<WindowResized> event) override = 0;
+
+			virtual void onEvent(std::shared_ptr<WindowFocusEvent> event) override = 0;
 		};
 
 		/*****************************************************************//**
@@ -160,6 +172,8 @@ namespace NIKE {
 			~NIKEWindow() override;
 
 			void onEvent(std::shared_ptr<WindowResized> event) override;
+
+			void onEvent(std::shared_ptr<WindowFocusEvent> event) override;
 		};
 
 		#endif //Expose implementation only to NIKE Engine
