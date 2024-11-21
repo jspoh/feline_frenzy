@@ -41,6 +41,8 @@
     </ClCompile>
     <ClCompile Include="src\Components\cAnimation.cpp" />
     <ClCompile Include="src\Components\cAudio.cpp" />
+    <ClCompile Include="src\Components\cDamage.cpp" />
+    <ClCompile Include="src\Components\cHealth.cpp" />
     <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Components\cPhysics.cpp" />
@@ -99,6 +101,8 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_rectpack.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
+    <ClInclude Include="headers\Components\cDamage.h" />
+    <ClInclude Include="headers\Components\cHealth.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />

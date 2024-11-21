@@ -1,7 +1,6 @@
-#pragma once
 /*****************************************************************//**
  * \file   cShooting.h
- * \brief
+ * \brief	Defines the components used for Shooting 
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
  * \date   November 2024

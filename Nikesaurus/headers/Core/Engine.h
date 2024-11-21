@@ -34,6 +34,8 @@
 #include "Components/cAnimation.h"
 #include "Components/cGameLogic.h"
 #include "Components/cShooting.h"
+#include "Components/cHealth.h"
+#include "Components/cDamage.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

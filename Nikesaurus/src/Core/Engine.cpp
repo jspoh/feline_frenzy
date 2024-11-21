@@ -44,8 +44,15 @@ namespace NIKE {
 		//Register render components
 		GameLogic::registerComponents();
 
+		// The following components cannot be edited in IMGUI:
 		//Register shooting components
 		Shooting::registerComponents();
+
+		//Register Health components
+		Health::registerComponents();
+
+		//Register Damage components
+		Damage::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {

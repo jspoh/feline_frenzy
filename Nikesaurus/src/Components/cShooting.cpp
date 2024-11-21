@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   cShooting.cpp
- * \brief
+ * \brief  Shooting components
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
  * \date   November 2024

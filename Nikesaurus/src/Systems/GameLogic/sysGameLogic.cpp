@@ -77,8 +77,7 @@ namespace NIKE {
 					Vector2f shooter_pos = e_transform_comp.value().get().position;
 
 					// Create bullet
-					if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_MOUSE_BUTTON_LEFT)) {
-					//if (NIKE_INPUT_SERVICE->isKeyTriggered(GLFW_KEY_1)) {
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
 						std::string script_path = "assets/Scripts/createBullet.lua";
 						std::string function_name = "createBullet";
 						std::string prefab_path = "bullet.prefab";
