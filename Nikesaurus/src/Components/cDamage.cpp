@@ -30,5 +30,42 @@ namespace NIKE {
 				comp.damage = data.at("Damage").get<float>();
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Damage>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Damage& comp) {
+
+				ImGui::Text("Edit Damage Variables");
+
+				// For shooting damage
+				{
+					static float before_change_damage;
+
+					ImGui::DragFloat("Shot damage", &comp.damage, 0.1f);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_damage = comp.damage;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_damage;
+
+						//Change do action
+						change_damage.do_action = [&, damage = comp.damage]() {
+							comp.damage = damage;
+							};
+
+						//Change undo action
+						change_damage.undo_action = [&, damage = before_change_damage]() {
+							comp.damage = damage;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_damage));
+					}
+				}
+			}
+		);
 	}
 }
