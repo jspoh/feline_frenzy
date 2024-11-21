@@ -107,7 +107,7 @@ namespace NIKE {
 		Vector2f window_pos = { ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
 
 		//Get scale relative to the world size
-		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y };
+		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
 
 		//Return screen coordinates
 		return { window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
@@ -1154,14 +1154,39 @@ namespace NIKE {
 						worldToScreen(ImVec2(corners[2].x, corners[2].y), rendersize),
 						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f / zoom);
 
+		draw->AddText(worldToScreen(ImVec2(corners[1].x + 20.0f, corners[1].y - 10.0f), rendersize), color, "Pos: ");
+		draw->AddText(worldToScreen(ImVec2(corners[1].x + 20.0f, corners[1].y + 10.0f), rendersize), color, "Scale: ");
+		draw->AddText(worldToScreen(ImVec2(corners[1].x + 20.0f, corners[1].y + 30.0f), rendersize), color, "Rot: ");
+	}
+
+	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
+		//Get transform component
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		if (!e_transform_comp.has_value())
+			return;
+
+		auto const& e_transform = e_transform_comp.value().get();
+
+		//Internal imgui draw
+		auto draw = static_cast<ImDrawList*>(draw_list);
+
+		//Convert rendersize
+		ImVec2 rendersize = { render_size.x, render_size.y };
+
+		//Convert color
+		ImU32 color = IM_COL32(255, 255, 255, 255);
+
+		//Camera zoom
+		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
 		//Draw line up
-		draw->AddLine(	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
-						worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-						IM_COL32(0, 255, 0, 255), 5.0f / zoom);
+		draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
+			worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
+			IM_COL32(0, 255, 0, 255), 5.0f / zoom);
 
 		//Add gizmo point
-		draw->AddCircleFilled(	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(0, 255, 0, 255));
+		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
+			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(0, 255, 0, 255));
 
 		//Draw line right
 		draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
@@ -1169,8 +1194,8 @@ namespace NIKE {
 			IM_COL32(255, 0, 0, 255), 5.0f / zoom);
 
 		//Add gizmo point
-		draw->AddCircleFilled(	worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(255, 0, 0, 255));
+		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
+			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(255, 0, 0, 255));
 
 		//Draw gizmo center
 		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize), Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, color);
@@ -1811,13 +1836,13 @@ namespace NIKE {
 
 	bool LevelEditor::GameWindowPanel::isMouseInWindow() const {
 		//Get window size
-		Vector2i win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		Vector2i window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
 		//Check if relative cursor is within window size
 		if (window_mouse_pos.x >= 0.0f &&
 			window_mouse_pos.y >= 0.0f &&
-			window_mouse_pos.x <= static_cast<float>(win_size.x) &&
-			window_mouse_pos.y <= static_cast<float>(win_size.y))
+			window_mouse_pos.x <= static_cast<float>(window_size.x) &&
+			window_mouse_pos.y <= static_cast<float>(window_size.y))
 		{
 			return true;
 		}
@@ -1857,7 +1882,7 @@ namespace NIKE {
 
 		//Configure viewport size
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-		float aspect_ratio = win_size.x / win_size.y;
+		float aspect_ratio = NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio();
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
 		if (viewport_height > window_size.y) {
@@ -1869,10 +1894,10 @@ namespace NIKE {
 		ImVec2 window_pos = ImGui::GetCursorScreenPos();
 
 		//World Scale Factor
-		Vector2f scale{ win_size.x / (viewport_width / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), win_size.y / (viewport_height / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+		Vector2f scale{ NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x / (viewport_width / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),  NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y / (viewport_height / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
 
 		//Calculate world mouse position
-		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x , (io.MousePos.y - window_pos.y) * scale.y };
+		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x, (io.MousePos.y - window_pos.y) * scale.y };
 		world_mouse_pos.x = world_mouse_pos.x - ((viewport_width * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
 		world_mouse_pos.y = world_mouse_pos.y - ((viewport_height * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y;
 
@@ -1882,9 +1907,16 @@ namespace NIKE {
 		//Calculate window mouse position
 		window_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x , (io.MousePos.y - window_pos.y) * scale.y };
 
+		//Calculate UV coordinates for cropping when there are gaps
+		Vector2f gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		float u_min = gaps.x / 2.0f / win_size.x;
+		float u_max = 1.0f - u_min;
+		float v_min = gaps.y / 2.0f / win_size.y;
+		float v_max = 1.0f - v_min;
+
 		//Configure UV Offsets3fc
-		ImVec2 uv0(0.0f, 1.0f); // Bottom-left
-		ImVec2 uv1(1.0f, 0.0f); // Top-right
+		ImVec2 uv0(u_min, -v_min); // Bottom-left
+		ImVec2 uv1(u_max, -v_max); // Top-right
 
 		//Render game to viewport
 		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
@@ -1898,6 +1930,9 @@ namespace NIKE {
 
 		//Render selected entity bounding box
 		comps_panel.lock()->renderEntityBoundingBox(draw_list, Vector2f(viewport_width, viewport_height));
+
+		//Render selected entity gizmo
+		comps_panel.lock()->renderEntityGizmo(draw_list, Vector2f(viewport_width, viewport_height));
 
 		ImGui::End();
 	}

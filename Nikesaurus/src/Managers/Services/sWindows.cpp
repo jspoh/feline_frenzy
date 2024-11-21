@@ -18,17 +18,20 @@ namespace NIKE {
 	* NIKE Window
 	*********************************************************************/
 	Windows::NIKEWindow::NIKEWindow(Vector2i window_size, std::string window_title)
-		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }, aspect_ratio{ 0.0f }
 	{
 	}
 
 	Windows::NIKEWindow::NIKEWindow(nlohmann::json const& config)
-		: ptr_window{ nullptr }, b_full_screen{ false }
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }, aspect_ratio{ 0.0f }
 	{
 		try {
 			auto const& data = config.at("WindowsConfig");
 			window_title = data.at("Title").get<std::string>();
 			window_size.fromJson(data.at("Window_Size"));
+			world_size.fromJson(data.at("World_Size"));
+			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+			calculateViewport();
 		}
 		catch(const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -36,6 +39,9 @@ namespace NIKE {
 
 			window_title = "Window";
 			window_size = { 1600, 900 };
+			world_size = { 1600.0f, 900.0f };
+			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+			calculateViewport();
 		}
 
 		//Configure Window Setup
@@ -95,8 +101,14 @@ namespace NIKE {
 #endif
 	}
 
-	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
-		return ptr_window;
+	void Windows::NIKEWindow::calculateViewport() {
+		//Manage aspect ratio
+		viewport_size.x = static_cast<float>(window_size.x);
+		viewport_size.y = viewport_size.x / aspect_ratio;
+		if (viewport_size.y > static_cast<float>(window_size.y)) {
+			viewport_size.y = static_cast<float>(window_size.y);
+			viewport_size.x = viewport_size.y * aspect_ratio;
+		}
 	}
 
 	void Windows::NIKEWindow::setWindowMode(int mode, int value) {
@@ -180,6 +192,10 @@ namespace NIKE {
 		return window_title;
 	}
 
+	Vector2f Windows::NIKEWindow::getWorldSize() const {
+		return world_size;
+	}
+
 	void Windows::NIKEWindow::setWindowSize(int width, int height) {
 		window_size.x = width;
 		window_size.y = height;
@@ -188,12 +204,27 @@ namespace NIKE {
 	}
 
 	Vector2i Windows::NIKEWindow::getWindowSize() const {
-		if (b_full_screen) {
-			return size_before_fullscreen;
-		}
-		else {
-			return window_size;
-		}
+		return window_size;
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportSize() const {
+		return viewport_size;
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportRatio() const {
+		return { std::clamp(viewport_size.x / window_size.x, 0.0f, 1.0f), std::clamp(viewport_size.y / window_size.y, 0.0f, 1.0f) };
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportWindowGap() const {
+		return { std::clamp(window_size.x - viewport_size.x, 0.0f, (float)UINT16_MAX), std::clamp(window_size.y - viewport_size.y, 0.0f, (float)UINT16_MAX) };
+	}
+
+	void Windows::NIKEWindow::setAspectRatio(float ratio) {
+		aspect_ratio = ratio;
+	}
+
+	float Windows::NIKEWindow::getAspectRatio() const {
+		return aspect_ratio;
 	}
 
 	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const {
@@ -227,8 +258,19 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowResized> event) {
-		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
+
+		//Window size
 		window_size = event->frame_buffer;
+
+		//Calculate viewport
+		calculateViewport();
+
+		//Center the viewport within the window
+		int x_offset = (window_size.x - static_cast<int>(viewport_size.x)) / 2;
+		int y_offset = (window_size.y - static_cast<int>(viewport_size.y)) / 2;
+
+		//Set viewport
+		glViewport(x_offset, y_offset, static_cast<GLsizei>(viewport_size.x), static_cast<GLsizei>(viewport_size.y));
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
@@ -277,6 +319,10 @@ namespace NIKE {
 		:	ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, 
 			actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 },
 			accumulated_time{ 0.0 } {}
+
+	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
+		return ptr_window;
+	}
 
 	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {
 		ptr_window = window;

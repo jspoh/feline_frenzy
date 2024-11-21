@@ -11,11 +11,7 @@
 #include "Core/Engine.h"
 
 namespace NIKE {
-	Camera::Service::Service() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, aspect_ratio{ 0.0f } { }
-
-	void Camera::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
-		aspect_ratio = static_cast<float>(event->frame_buffer.x) / static_cast<float>(event->frame_buffer.y);
-	}
+	Camera::Service::Service() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, cam_height{ 0.0f } { }
 
 	void Camera::Service::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(event->entity_id)) {
@@ -31,9 +27,8 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
-	void Camera::Service::init() {
+	void Camera::Service::init(nlohmann::json config) {
 		// !TODO set height as a constant from the config
-		aspect_ratio = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x) / static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 		float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
 
 		up = Vector2(-sin(angleDisp), cos(angleDisp));
@@ -41,11 +36,22 @@ namespace NIKE {
 
 		//Setup events listening
 		std::shared_ptr<Camera::Service> cam_sys_wrapped(this, [](Camera::Service*){});
-		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(cam_sys_wrapped);
 		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
 
-		//Setup default camera
-		def_cam = std::make_shared<Render::Cam>(Vector2f( 0.0f, 0.0f ), 1.0f);
+		try {
+			auto const& data = config.at("CameraConfig");
+			cam_height = data.at("Height").get<float>();
+			Vector2f pos;
+			pos.fromJson(data.at("Position"));
+			def_cam = std::make_shared<Render::Cam>(pos, data.at("Zoom").get<float>());
+		}
+		catch (const nlohmann::json::exception& e) {
+			NIKEE_CORE_WARN(e.what());
+			NIKEE_CORE_WARN("Camera config invalid! Reverting to default camera config");
+
+			cam_height = 900.0f;
+			def_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
+		}
 	}
 
 	Entity::Type Camera::Service::getCamId() const {
@@ -79,8 +85,8 @@ namespace NIKE {
 		};
 
 		Matrix_33 cam_to_ndc_xform {
-			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * cam.zoom), 0, 0,
-			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * cam.zoom), 0,
+			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
+			0, 2.0f / (cam_height * cam.zoom), 0,
 			0, 0, 1
 		};
 
@@ -101,8 +107,8 @@ namespace NIKE {
 		};
 
 		Matrix_33 cam_to_ndc_xform{
-			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def.zoom), 0, 0,
-			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def.zoom), 0,
+			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * def.zoom), 0, 0,
+			0, 2.0f / (cam_height * def.zoom), 0,
 			0, 0, 1
 		};
 
@@ -121,8 +127,8 @@ namespace NIKE {
 		};
 
 		Matrix_33 cam_to_ndc_xform{
-			2.0f / aspect_ratio / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam->zoom), 0, 0,
-			0, 2.0f / (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y * def_cam->zoom), 0,
+			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * def_cam->zoom), 0, 0,
+			0, 2.0f / (cam_height * def_cam->zoom), 0,
 			0, 0, 1
 		};
 
@@ -155,5 +161,13 @@ namespace NIKE {
 		}
 
 		return cam;
+	}
+
+	void Camera::Service::setCameraHeight(float height) {
+		cam_height = height;
+	}
+
+	float Camera::Service::getCameraHeight() const {
+		return cam_height;
 	}
 }

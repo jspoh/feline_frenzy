@@ -157,7 +157,7 @@ namespace NIKE {
 		//NIKE_IMGUI_SERVICE->init();
 
 		//Init camera
-		NIKE_CAMERA_SERVICE->init();
+		NIKE_CAMERA_SERVICE->init(json_config);
 
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();

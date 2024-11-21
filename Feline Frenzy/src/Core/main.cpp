@@ -36,7 +36,6 @@ int WINAPI WinMain(
 	NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
 	NIKE_ASSETS_SERVICE->loadModel("batched_texture", "assets/Models/square-texture.txt", true);
 
-	//NIKE_EVENTS_SERVICE.getService<NIKE::Coordinator::Service>()->
 
 	//Change Scene To Main Menu
 	//NIKE_SCENES_SERVICE->queueSceneEvent(NIKE::Scenes::SceneEvent(NIKE::Scenes::Actions::CHANGE, "MENU"));

@@ -288,6 +288,9 @@ namespace NIKE {
 			//Render selected entity bounding box
 			void renderEntityBoundingBox(void* draw_list, Vector2f const& render_size);
 
+			//Render selected entity gizmo
+			void renderEntityGizmo(void* draw_list, Vector2f const& render_size);
+
 			//Check if entity is being dragged
 			bool checkEntityDragged() const;
 		};
