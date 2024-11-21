@@ -135,7 +135,7 @@ namespace NIKE {
 		//float timePerAnimation{ base_component.animation_duration / frameCount(sprite_component) };
 
 		//Increment timer with delta time
-		base_component.timer += NIKE_WINDOWS_SERVICE->getDeltaTime();
+		base_component.timer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
 		//Wait For Next Iteration
 		if (base_component.timer >= base_component.frame_duration && (base_component.animation_mode == Mode::PLAYING)) {

@@ -17,7 +17,6 @@
 #include "Managers/ECS/mSystem.h"
 
 #include "Systems/Render/sysShader.h"
-#include "Systems/Render/sysCamera.h"
 
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
@@ -32,18 +31,18 @@ namespace NIKE {
 		};
 
 		//Render Manager
-		class Manager : public System::ISystem {
+		class Manager : public System::ISystem, public Events::IEventListener<Windows::WindowResized> {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
+			//On windows resized event
+			void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
+
 			//Shader system
 			std::unique_ptr<Shader::Manager> shader_system;
-
-			//Camera System
-			std::shared_ptr<Camera::System> camera_system;
 
 			//For rendering viewport
 			unsigned int frame_buffer, texture_color_buffer;

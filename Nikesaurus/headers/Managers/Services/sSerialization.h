@@ -86,6 +86,9 @@ namespace NIKE {
 			//Load scene from file path
 			void loadSceneFromFile(std::string const& file_path);
 
+			//Load json file path
+			nlohmann::json loadJsonFile(std::string const& file_path);
+
 			//Get current scene file path
 			std::string const& getCurrSceneFile() const;
 		};

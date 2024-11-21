@@ -69,7 +69,7 @@ namespace NIKE {
 		class NIKE_API IScene {
 		private:
 			//File path to scene
-			std::string file_path;
+			std::string scn_file_path;
 
 			//Layers within scene
 			std::vector<std::shared_ptr<Layer>> layers;
@@ -82,6 +82,12 @@ namespace NIKE {
 			virtual void init() = 0;
 			virtual void exit() = 0;
 			virtual void unload() = 0;
+
+			//Get Scn File Path
+			void setScnPath(std::string const& path);
+
+			//Get Scn File Path
+			std::string getScnPath() const;
 
 			//Create layer
 			std::shared_ptr<Layer> createLayer(int index = -1);

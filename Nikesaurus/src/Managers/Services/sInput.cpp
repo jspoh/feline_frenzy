@@ -71,7 +71,7 @@ namespace NIKE {
 	}
 
 	void Input::Service::onEvent(std::shared_ptr<MouseMovedEvent> event) {
-		mouse.pos = event->pos;
+		mouse.pos = event->window_pos;
 	}
 
 	void Input::Service::onEvent(std::shared_ptr<MouseScrollEvent> event) {

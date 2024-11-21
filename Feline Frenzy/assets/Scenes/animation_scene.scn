@@ -42,6 +42,7 @@
                                 }
                             }
                         },
+                        "Entity Name": "background",
                         "Layer ID": 0
                     }
                 }
@@ -56,98 +57,99 @@
             "Entities": [
                 {
                     "Entity": {
-                      "Components": {
-                        "Animation::Base": {
-                          "Animation_Count": 0,
-                          "B_PingPong": false,
-                          "B_Reverse": false,
-                          "Completed_Animations": 356,
-                          "Frame_Duration": 0.20000000298023224,
-                          "Mode": 0,
-                          "Timer": 0.016838600859045982
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Completed_Animations": 361,
+                                "Frame_Duration": 0.20000000298023224,
+                                "Mode": 0,
+                                "Timer": 0.1363734006881714
+                            },
+                            "Animation::Sprite": {
+                                "Curr_Index": {
+                                    "x": 5,
+                                    "y": 0
+                                },
+                                "End_Index": {
+                                    "x": 9,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 10,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "GameLogic::Movement": {
+                                "Function": "update",
+                                "Script_Path": "assets/Scripts/player.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Collided": false,
+                                "Resolution": 2
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.800000011920929,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 2.0,
+                                "Max_Speed": 150.0,
+                                "Velocity": {
+                                  "x": 0.0,
+                                  "y": 0.0
+                                }
+                            },
+                            "Render::Cam": {
+                                "Zoom": 1.0,
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 200.0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 5,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 10,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_Walk_Front_Spritesheet"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -24.892953872680664,
+                                    "y": -14.90953540802002
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 149.99998474121094,
+                                    "y": 149.99998474121094
+                                }
+                            }
                         },
-                        "Animation::Sprite": {
-                          "Curr_Index": {
-                            "x": 1,
-                            "y": 0
-                          },
-                          "End_Index": {
-                            "x": 9,
-                            "y": 0
-                          },
-                          "Sheet_Size": {
-                            "x": 10,
-                            "y": 1
-                          },
-                          "Start_Index": {
-                            "x": 0,
-                            "y": 0
-                          }
-                        },
-                        "GameLogic::Movement": {
-                          "Function": "update",
-                          "Script_Path": "assets/Scripts/player.lua"
-                        },
-                        "Physics::Collider": {
-                          "B_Collided": false,
-                          "Resolution": 2
-                        },
-                        "Physics::Dynamics": {
-                          "Drag": 0.800000011920929,
-                          "Force": {
-                            "x": 0.0,
-                            "y": 0.0
-                          },
-                          "Mass": 2.0,
-                          "Max_Speed": 150.0,
-                          "Velocity": {
-                            "x": -0.23248231410980225,
-                            "y": -0.18807779252529144
-                          }
-                        },
-                        "Render::Cam": {
-                          "Height": 500.0,
-                          "Position": {
-                            "x": 0.0,
-                            "y": 200.0
-                          }
-                        },
-                        "Render::Texture": {
-                          "B_Blend": false,
-                          "B_Flip": {
-                            "x": false,
-                            "y": false
-                          },
-                          "B_Stretch": false,
-                          "Color": {
-                            "w": 1.0,
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                          },
-                          "Frame_Index": {
-                            "x": 1,
-                            "y": 0
-                          },
-                          "Frame_Size": {
-                            "x": 10,
-                            "y": 1
-                          },
-                          "Intensity": 0.0,
-                          "Texture_ID": "Player_Walk_Front_Spritesheet"
-                        },
-                        "Transform::Transform": {
-                          "Position": {
-                            "x": -12.186805725097656,
-                            "y": -2.8846046924591064
-                          },
-                          "Rotation": 0.0,
-                          "Scale": {
-                            "x": 149.99998474121094,
-                            "y": 149.99998474121094
-                          }
-                        }
-                      },
+                        "Entity Name": "player",
                         "Layer ID": 1
                     }
                 }

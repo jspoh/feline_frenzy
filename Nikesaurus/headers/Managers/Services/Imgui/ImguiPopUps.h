@@ -51,8 +51,13 @@ namespace NIKE {
 	// Function to confirm to delete file
 	bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type);
 
+	// Function to confirm to delete all files
+	bool showDeleteAllFilesPopup(const std::string& asset_type);
+
 	// Function to show pop up to create audio channel
 	bool createAudioChannelPopup();
+	// Function to show pop up to create grid
+	bool createGridPopup();
 }
 
 #endif

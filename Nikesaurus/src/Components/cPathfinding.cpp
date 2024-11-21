@@ -21,7 +21,7 @@ namespace NIKE {
             [](Pathfinding::Path const& comp) -> nlohmann::json {
                 nlohmann::json path_json;
                 for (auto const& point : comp.path) {
-                    path_json.push_back(point.toJson()); // Assuming toJson() is defined for Vector2f
+                    path_json.push_back(point.toJson()); 
                 }
                 return {
                     { "Path", path_json },
@@ -35,7 +35,7 @@ namespace NIKE {
                 comp.path.clear();
                 for (auto const& point_data : data.at("Path")) {
                     NIKE::Math::Vector2f point;
-                    point.fromJson(point_data); // Assuming fromJson() is defined for Vector2f
+                    point.fromJson(point_data); 
                     comp.path.push_back(point);
                 }
                 comp.current_index = data.at("CurrentIndex").get<int>();

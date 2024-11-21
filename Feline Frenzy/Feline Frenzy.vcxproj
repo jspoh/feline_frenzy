@@ -146,7 +146,6 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
     <Text Include="assets\Models\square-texture.txt" />
     <Text Include="assets\Models\square.txt" />
     <Text Include="assets\Models\triangle.txt" />
-    <Text Include="src\Core\Config.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
@@ -162,6 +161,7 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
     <None Include="assets\Shaders\text.vert" />
     <None Include="assets\Shaders\texture.frag" />
     <None Include="assets\Shaders\texture.vert" />
+    <None Include="src\Core\Config.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nikesaurus\Nikesaurus.vcxproj">
