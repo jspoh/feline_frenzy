@@ -119,6 +119,7 @@ namespace NIKE {
 
 		//Add Event Listeners
 		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		getService<Events::Service>()->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
 
 		//Add event listener for UI
 		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);

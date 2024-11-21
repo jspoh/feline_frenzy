@@ -41,4 +41,8 @@ namespace NIKE {
 	void Events::Service::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseScrollEvent>(Vector2f(static_cast<float>(xoffset), static_cast<float>(yoffset))));
 	}
+
+	void Events::Service::windowfocus_cb([[maybe_unused]] GLFWwindow* window, int focused) {
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Windows::WindowFocusEvent>(focused));
+	}
 }

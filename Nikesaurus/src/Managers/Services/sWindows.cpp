@@ -157,6 +157,7 @@ namespace NIKE {
 		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
+		glfwSetWindowFocusCallback(ptr_window, Events::Service::windowfocus_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value) {
@@ -232,6 +233,10 @@ namespace NIKE {
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowResized> event) {
 		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
 		window_size = event->frame_buffer;
+	}
+
+	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
+		NIKEE_CORE_WARN("window focus event");
 	}
 
 	/*****************************************************************//**

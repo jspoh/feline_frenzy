@@ -108,6 +108,7 @@ xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q<
       <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s /r /y /q
 xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s /r /y /q
 xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*.pdb" "$(OutDir)" /s /r /y /q
 xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.txt" "$(OutDir)" /s /r /y /q
 
 rem Delete all files in GAMEDIRECTORY
