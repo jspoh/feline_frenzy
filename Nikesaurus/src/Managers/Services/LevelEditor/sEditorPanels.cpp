@@ -760,29 +760,43 @@ namespace NIKE {
 	void LevelEditor::ComponentsPanel::dragEntity(bool snap_to_grid) {
 		//Logic for moving entities
 		if (game_panel.lock()->isMouseInWindow() && (b_dragging_entity || entities_panel.lock()->isCursorInEntity(entities_panel.lock()->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			
+			//Entity position follows mouse cursor
 			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
 			if (e_transform_comp.has_value()) {
 				auto& e_transform = e_transform_comp.value().get();
 				e_transform.position = { game_panel.lock()->getWorldMousePos().x, -game_panel.lock()->getWorldMousePos().y };
 			}
+
+			//Dragging entity flag is true
 			b_dragging_entity = true;
 		}
 
 		//When entity is released
-		if (snap_to_grid && b_dragging_entity && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
-			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
-			if (e_transform_comp.has_value()) {
-				auto& e_transform = e_transform_comp.value().get();
+		if (b_dragging_entity && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
 
-				Vector2f new_position;
-				auto cursor_cell = NIKE_MAP_SERVICE->getCursorCell();
-				if (cursor_cell.has_value()) {
-					new_position = cursor_cell.value().get().position;
-				}
-
-				e_transform.position = { new_position.x, -new_position.y };
-			}
+			//Reset dragging entity flag
 			b_dragging_entity = false;
+
+			//If snap to grid is not active return
+			if (snap_to_grid) {
+
+				//Get cursor position to snap to cell
+				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+				if (e_transform_comp.has_value()) {
+					auto& e_transform = e_transform_comp.value().get();
+
+					//Get cursor pos
+					Vector2f new_position;
+					auto cursor_cell = NIKE_MAP_SERVICE->getCursorCell();
+					if (cursor_cell.has_value()) {
+						new_position = cursor_cell.value().get().position;
+					}
+
+					//Snap to cell
+					e_transform.position = { new_position.x, -new_position.y };
+				}
+			}
 		}
 	}
 
@@ -1136,6 +1150,27 @@ namespace NIKE {
 						worldToScreen(ImVec2(corners[1].x, corners[1].y), rendersize),
 						worldToScreen(ImVec2(corners[2].x, corners[2].y), rendersize),
 						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f);
+
+		//Draw line up
+		draw->AddLine(	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
+						worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
+						IM_COL32(0, 255, 0, 255), 5.0f);
+
+		//Add gizmo point
+		draw->AddCircleFilled(	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
+								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f, IM_COL32(0, 255, 0, 255));
+
+		//Draw line right
+		draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
+			worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
+			IM_COL32(255, 0, 0, 255), 5.0f);
+
+		//Add gizmo point
+		draw->AddCircleFilled(	worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
+								Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f, IM_COL32(255, 0, 0, 255));
+
+		//Draw gizmo center
+		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize), Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f, color);
 	}
 
 	bool LevelEditor::ComponentsPanel::checkEntityDragged() const {
