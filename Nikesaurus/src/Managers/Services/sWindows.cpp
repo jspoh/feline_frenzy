@@ -261,7 +261,7 @@ namespace NIKE {
 			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
 
 			NIKE_AUDIO_SERVICE->pauseAllChannels();
-			glfwIconifyWindow(ptr_window);
+			//glfwIconifyWindow(ptr_window); // minimize the window if unfocused
 		}
 
 		err = glGetError();

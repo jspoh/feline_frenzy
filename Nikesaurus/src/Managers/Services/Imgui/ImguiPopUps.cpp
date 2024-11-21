@@ -445,7 +445,7 @@ namespace NIKE
         return is_popup_open;
     }
 
-    bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type) {
+    bool showDeleteFilePopup(const std::string& key, const std::string& asset_type) {
         bool deleted = false;
 
         // Confirmation popup for deleting a file
@@ -459,15 +459,20 @@ namespace NIKE
                 // Determine which asset type to delete
                 if (asset_type == "Levels") {
                     // Retrieve the scene file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(file_path).string();
+                    full_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(key).string();
                 }
                 else if (asset_type == "Prefabs") {
                     // Retrieve the prefab file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(file_path).string();
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(key).string();
+                }
+                else if (asset_type == "Textures") {
+                    // Retrieve the texture file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedTextures().at(key)->file_path;
+
                 }
                 else if (asset_type == "Audio") {
-                    // Retrieve the prefab file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedAudios().at(file_path)->getFilePath();
+                    // Retrieve the audio file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedAudios().at(key)->getFilePath();
 
                 }
                 else if (asset_type == "All_Prefabs") {
@@ -483,8 +488,11 @@ namespace NIKE
                     else if (asset_type == "Prefabs") {
                         NIKE_ASSETS_SERVICE->loadPrefabFiles();
                     }
+                    else if (asset_type == "Textures") {
+                        NIKE_ASSETS_SERVICE->unloadTexture(key);
+                    }
                     else if (asset_type == "Audio") {
-
+                        // Not needed to reload
                     }
                     
                     deleted = true;

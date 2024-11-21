@@ -113,9 +113,11 @@ namespace NIKE {
 		struct Texture {
 			unsigned int gl_data;
 			Vector2i size;
+			std::string file_path;
 
-			Texture() : gl_data{ 0 }, size() {}
-			Texture(unsigned int gl_data, Vector2i&& size) : gl_data{ gl_data }, size{ size } {}
+			Texture() : gl_data{ 0 }, size{}, file_path{ "" } {}
+			Texture(unsigned int gl_data, Vector2i size, std::string file_path)
+				: gl_data{ gl_data }, size{ std::move(size) }, file_path{ std::move(file_path) } {}
 		};
 
 		//Shader/Model/Texture Loader

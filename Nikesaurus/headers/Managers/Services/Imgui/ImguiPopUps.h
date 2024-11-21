@@ -49,7 +49,7 @@ namespace NIKE {
 	bool savePrefabPopup(Entity::Type entity);
 
 	// Function to confirm to delete file
-	bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type);
+	bool showDeleteFilePopup(const std::string& key, const std::string& asset_type);
 
 	// Function to confirm to delete all files
 	bool showDeleteAllFilesPopup(const std::string& asset_type);

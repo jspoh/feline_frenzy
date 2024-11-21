@@ -736,7 +736,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("Failed to load image : {} ", path_to_texture);
 			int invalid = -1;
 			int def_size = 256;
-			return Assets::Texture(static_cast<unsigned>(invalid), { def_size, def_size });
+			return Assets::Texture(static_cast<unsigned>(invalid), { def_size, def_size }, path_to_texture);
 		}
 
 		// create texture
@@ -751,7 +751,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
 
 		// Return texture
-		return Assets::Texture(tex_id, { tex_width, tex_height });
+		return Assets::Texture(tex_id, { tex_width, tex_height }, path_to_texture);
 	}
 }
 

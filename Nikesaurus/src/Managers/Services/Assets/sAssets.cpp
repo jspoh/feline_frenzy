@@ -879,6 +879,7 @@ namespace NIKE {
 				}
 			}
 		}
+
 		// Delete the file
 		try {
 

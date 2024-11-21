@@ -117,7 +117,8 @@ namespace NIKE
 				ImGui::Text("%s", texture.first.c_str());
 			}
 			if (!selected_texture.empty()) {
-				ImGui::Begin("Selected Texture");
+
+				ImGui::Begin("Selected Texture", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize);
 				ImGui::Text("Texture: %s", selected_texture.c_str());
 
 				auto textureData = NIKE_ASSETS_SERVICE->getLoadedTextures().find(selected_texture);
@@ -127,9 +128,22 @@ namespace NIKE
 					ImGui::Image((intptr_t)textureData->second->gl_data, ImVec2(256, 256), uv0, uv1);
 				}
 
+				if (ImGui::Button("Delete")) {
+					delete_file_popup = true;
+					ImGui::OpenPopup("Confirm Delete");
+				}
+
+				ImGui::SameLine();
+
 				if (ImGui::Button("Close")) {
 					selected_texture.clear();
 				}
+
+
+				if (delete_file_popup = showDeleteFilePopup(selected_texture, "Textures")) {
+					selected_texture.clear();
+				}
+
 				ImGui::End();
 			}
 		}
