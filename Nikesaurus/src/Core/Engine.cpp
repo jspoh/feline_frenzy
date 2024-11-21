@@ -31,7 +31,7 @@ namespace NIKE {
 
 		//Register physics components
 		Physics::registerComponents();
-		
+
 		//Register animation components
 		Animation::registerComponents();
 
@@ -97,9 +97,9 @@ namespace NIKE {
 		provideService(std::make_shared<LevelEditor::Service>());
 
 		//Create console
-		#ifndef NDEBUG
+#ifndef NDEBUG
 		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
-		#endif
+#endif
 
 		//Init Logger
 		NIKE::Log::Init();
@@ -161,7 +161,7 @@ namespace NIKE {
 
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
-		 
+
 		//Init UI
 		NIKE_UI_SERVICE->init();
 
@@ -206,6 +206,8 @@ namespace NIKE {
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
 				}
+			}
+
 			//Escape Key
 			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
