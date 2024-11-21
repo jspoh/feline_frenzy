@@ -544,13 +544,13 @@ namespace NIKE {
 	}
 
 	void Audio::Service::pauseAllChannels() {
-		for (auto& pair : channels) {
+		for (auto& pair : getAllChannelGroups()) {
 			pair.second->setPaused(true);
 		}
 	}
 
 	void Audio::Service::resumeAllChannels() {
-		for (auto& pair : channels) {
+		for (auto& pair : getAllChannelGroups()) {
 			pair.second->setPaused(false);
 		}
 	}
