@@ -108,7 +108,7 @@ namespace NIKE {
 			//Get all entities with current component
 			std::set<Entity::Type> getComponentEntities() override {
 				std::set<Entity::Type> entities_set;
-				for (auto entity_comp : component_array) {
+				for (const auto& entity_comp : component_array) {
 					entities_set.insert(entity_comp.first);
 				}
 				return entities_set;

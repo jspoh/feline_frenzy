@@ -218,7 +218,9 @@ namespace NIKE {
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		// !TODO: batched rendering for texture incomplete
-		if (BATCHED_RENDERING) {
+		static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = false;
+
+		if (!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -322,7 +324,7 @@ namespace NIKE {
 				v.transform = render_instances_texture[i].xform;
 				v.framesize = render_instances_texture[i].framesize;
 				v.uv_offset = render_instances_texture[i].uv_offset;
-				v.sampler_idx = i;
+				v.sampler_idx = static_cast<unsigned int>(i);
 			}
 
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
