@@ -60,5 +60,6 @@
     <None Include="assets\Scripts\player.lua" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="src\Core\Config.json" />
+    <None Include="assets\Scenes\main_menu.scn" />
   </ItemGroup>
 </Project>
