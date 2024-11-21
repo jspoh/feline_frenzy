@@ -17,6 +17,9 @@
 namespace NIKE {
 	namespace LevelEditor {
 
+		//Forward declaration of the game window panel
+		class GameWindowPanel;
+
 		//Panel Interface
 		class IPanel {
 		private:
@@ -68,6 +71,11 @@ namespace NIKE {
 
 			//Default Popup
 			std::function<void()> defPopUp(std::string const& id, std::shared_ptr<std::string> msg);
+
+			#ifdef NIKE_BUILD_DLL
+			//World to screen
+			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
+			#endif // Only in nike build
 		};
 
 		//Main Panel ( Docking )
@@ -127,65 +135,6 @@ namespace NIKE {
 			void render() override;
 		};
 
-		//Forward declaration of the tilemap panel
-		class TileMapPanel;
-
-		//Game Window Panel
-		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
-		private:
-			//Game texture
-			unsigned int texture_id;
-
-			//Mouse position relative to Game Window
-			Vector2f relative_mouse_pos;
-
-			//Grid management panel
-			std::shared_ptr<TileMapPanel> tile_map_panel;
-
-			//Main panel
-			std::shared_ptr<MainPanel> main_panel;
-
-			//Game window render event
-			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
-
-		public:
-			GameWindowPanel() : texture_id{ 0 } {}
-			~GameWindowPanel() = default;
-
-			//Panel Name
-			std::string getName() const override {
-				return "Game Viewport";
-			}
-
-			//Static panel name
-			static std::string getStaticName() {
-				return  "Game Viewport";
-			}
-
-			//Get relative mouse position
-			Vector2f getRelativeMousePos() const;
-
-			//Check if mouse is in game window
-			bool isMouseInWindow() const;
-
-			//Init
-			void init() override;
-
-			//Update
-			void update() override;
-
-			//Render
-			void render() override;
-		};
-
-		//Selected entity event ( Communication between entities panel & components panel )
-		struct SelectedEntityEvent : public Events::IEvent {
-			Entity::Type selected_entity;
-			std::string selected_entity_ref;
-			SelectedEntityEvent(Entity::Type selected_entity, std::string const& selected_entity_ref) 
-				: selected_entity{ selected_entity }, selected_entity_ref{ selected_entity_ref } {}
-		};
-
 		//Entities Management Panel
 		class EntitiesPanel : public IPanel {
 		private:
@@ -200,6 +149,12 @@ namespace NIKE {
 			//Selected entity
 			Entity::Type selected_entity;
 
+			//Entity changed event boolean
+			bool b_entity_changed;
+
+			//Reference to game window panel
+			std::shared_ptr<GameWindowPanel> game_panel;
+
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 
@@ -209,8 +164,11 @@ namespace NIKE {
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
 
+			//Check if cusor is in entity
+			bool isCursorInEntity(Entity::Type entity) const;
+
 		public:
-			EntitiesPanel() : selected_entity{ UINT16_MAX } {}
+			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
 
 			//Panel Name
@@ -234,25 +192,29 @@ namespace NIKE {
 
 			//Get entity name
 			std::string getEntityName(Entity::Type entity);
+
+			//Get selected entity
+			Entity::Type getSelectedEntity() const;
+			
+			//Get selected entity name
+			std::string getSelectedEntityName() const;
+
+			//Check entity changed
+			bool isEntityChanged() const;
 		};
 
 		//Components Management Panel
-		class ComponentsPanel : public IPanel, public Events::IEventListener<SelectedEntityEvent> {
+		class ComponentsPanel : public IPanel {
 		private:
-			//Current Selected entity
-			Entity::Type selected_entity;
 
-			//Current Selected Entity String Reference
-			std::string selected_entity_ref;
-
-			//Entity changed event boolean
-			bool b_entity_changed;
-
-			//On new selected entity event
-			void onEvent(std::shared_ptr<SelectedEntityEvent> event) override;
+			//Reference to game window panel
+			std::shared_ptr<EntitiesPanel> entities_panel;
 
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
+
+			//Save Prefab popup
+			std::function<void()> savePrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
@@ -270,7 +232,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>> comps_ui;
 
 		public:
-			ComponentsPanel() : selected_entity{ UINT16_MAX }, selected_entity_ref{ "" }, b_entity_changed{ false } {}
+			ComponentsPanel() = default;
 			~ComponentsPanel() = default;
 
 			//Panel Name
@@ -310,6 +272,9 @@ namespace NIKE {
 
 				comps_ui.emplace(Utility::convertTypeString(typeid(T).name()), [comp_func](ComponentsPanel& comp_panel, void* comp) { comp_func(comp_panel, *static_cast<T*>(comp)); });
 			}
+
+			//Render selected entity bounding box
+			void renderEntityBoundingBox(void* draw_list, Vector2f const& render_size);
 		};
 
 		//Debug Management Panel
@@ -397,9 +362,6 @@ namespace NIKE {
 			//Camera change action
 			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
 
-			//Get active camera
-			Render::Cam getActiveCamera() const;
-
 			//Init
 			void init() override;
 
@@ -413,13 +375,6 @@ namespace NIKE {
 		//Grid Management Panel
 		class TileMapPanel : public IPanel {
 		private:
-			#ifdef NIKE_BUILD_DLL
-			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
-			#endif // DEBUG
-
-			//Grid scale
-			Vector2f grid_scale;
-
 			//Grid thickness
 			float grid_thickness;
 
@@ -429,11 +384,8 @@ namespace NIKE {
 			//Boolean for grid mode
 			bool b_grid_mode;
 
-			//Camera panel reference
-			std::shared_ptr<CameraPanel> cam_panel;
-
 		public:
-			TileMapPanel() : grid_scale(), grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_mode{ false } {}
+			TileMapPanel() : grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_mode{ false } {}
 			~TileMapPanel() = default;
 
 			//Panel Name
@@ -457,6 +409,63 @@ namespace NIKE {
 
 			//Render grid
 			void renderGrid(void* draw_list, Vector2f const& render_size);
+		};
+
+		//Game Window Panel
+		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
+		private:
+			//Game texture
+			unsigned int texture_id;
+
+			//Mouse position relative to Game Window
+			Vector2f window_mouse_pos;
+
+			//Mouse position relative to world
+			Vector2f world_mouse_pos;
+
+			//Grid management panel
+			std::shared_ptr<TileMapPanel> tile_map_panel;
+
+			//Main panel reference
+			std::shared_ptr<MainPanel> main_panel;
+
+			//Entities panel reference
+			std::shared_ptr<ComponentsPanel> comps_panel;
+
+			//Game window render event
+			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
+
+		public:
+			GameWindowPanel() : texture_id{ 0 } {}
+			~GameWindowPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Game Viewport";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return  "Game Viewport";
+			}
+
+			//Get world mouse position ( Center of world being 0,0 )
+			Vector2f getWorldMousePos() const;
+
+			//Get window mouse position ( Top left of game window 0,0 )
+			Vector2f getWindowMousePos() const;
+
+			//Check if mouse is in game window
+			bool isMouseInWindow() const;
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
 		};
 	}
 }

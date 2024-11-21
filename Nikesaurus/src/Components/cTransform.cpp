@@ -32,11 +32,6 @@ namespace NIKE {
 				comp.position.fromJson(data.at("Position"));
 				comp.scale.fromJson(data.at("Scale"));
 				comp.rotation = data.at("Rotation").get<float>();
-
-				//Update prev positions
-				comp.prev_position = comp.position;
-				comp.prev_scale = comp.scale;
-				comp.prev_rotation = comp.rotation;
 			}
 		);
 
@@ -67,13 +62,11 @@ namespace NIKE {
 						//Change pos do action
 						change_pos.do_action = [&, pos = comp.position]() {
 							comp.position = pos;
-							comp.prev_position = comp.position;
 							};
 
 						//Change pos undo action
 						change_pos.undo_action = [&, pos = pos_before_change]() {
 							comp.position = pos;
-							comp.prev_position = comp.position;
 							};
 
 						//Execute action
@@ -101,13 +94,11 @@ namespace NIKE {
 						//Change scale do action
 						change_scale.do_action = [&, scale = comp.scale]() {
 							comp.scale = scale;
-							comp.prev_scale = comp.scale;
 							};
 
 						//Change scale undo action
 						change_scale.undo_action = [&, scale = scale_before_change]() {
 							comp.scale = scale;
-							comp.prev_scale = comp.scale;
 							};
 
 						//Execute action
@@ -135,13 +126,11 @@ namespace NIKE {
 						//Change rotation do action
 						change_rotation.do_action = [&, rotation = comp.rotation]() {
 							comp.rotation = rotation;
-							comp.prev_rotation = comp.rotation;
 							};
 
 						//Change rotation undo action
 						change_rotation.undo_action = [&, rotation = rotation_before_change]() {
 							comp.rotation = rotation;
-							comp.prev_rotation = comp.rotation;
 							};
 
 						//Execute action

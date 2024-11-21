@@ -178,15 +178,16 @@ namespace NIKE {
 		if (io.WantCaptureMouse) {
 
 			//Update imgui mouse position
-			io.MousePos.x = event->pos.x;
-			io.MousePos.y = event->pos.y;
+			io.MousePos.x = event->window_pos.x;
+			io.MousePos.y = event->window_pos.y;
 
 			//Game game panel functions
 			auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
 
 			//Check if current mouse pos is within game window
 			if (game_panel->isMouseInWindow() && !game_panel->checkPopUpShowing()) {
-				event->pos = game_panel->getRelativeMousePos();
+				event->world_pos = game_panel->getWorldMousePos();
+				event->window_pos = game_panel->getWindowMousePos();
 			}
 			else {
 				//Mark event as processed

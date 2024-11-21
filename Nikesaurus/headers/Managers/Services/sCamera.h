@@ -18,12 +18,12 @@
 namespace NIKE {
 	namespace Camera {
 
-		class System
+		class Service
 			: public Events::IEventListener<Windows::WindowResized>,
 			public Events::IEventListener<Render::ChangeCamEvent>
 		{
 		public:
-			System();
+			Service();
 
 			//Init camera
 			void init();
@@ -39,8 +39,10 @@ namespace NIKE {
 
 			// Get Pos to World coordinates
 			const Vector3f getPosToWorld(const Vector2f& pos) const;
-		private:
 
+			//Get active camera
+			Render::Cam getActiveCamera() const;
+		private:
 			//Targets
 			Vector2f target;
 			Vector2f up;

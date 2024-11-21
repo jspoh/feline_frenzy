@@ -51,6 +51,6 @@ namespace NIKE {
 #define LOG_CRASH(message) \
     do { \
         NIKE::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \
-		NIKE_EVENTS_SERVICE.getService<NIKE::Windows::Service>()->getWindow()->cleanUp(); \
+		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp(); \
 		assert(false && message); \
     } while (0)

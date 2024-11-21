@@ -52,6 +52,9 @@ namespace NIKE {
 			//Get cell size
 			Vector2f getCellSize() const;
 
+			//Get grid scale
+			Vector2f getGridScale() const;
+
 			//Get cell cursor is in
 			std::optional<std::reference_wrapper<Map::Cell>> getCursorCell();
 
@@ -82,6 +85,9 @@ namespace NIKE {
 
 			//Cell size
 			Vector2f cell_size;
+
+			//Grid scale
+			Vector2f grid_scale;
 
 			//Cursor position relative to game window
 			Vector2f cursor_pos;

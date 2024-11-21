@@ -53,6 +53,8 @@ namespace NIKE {
 
 			//Iterate through all entities
 			for (auto& entity : entities) {
+				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+					continue;
 				
 				//Check for player logic comp
 				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);

@@ -23,14 +23,9 @@ namespace NIKE {
 			Vector2f scale;
 			float rotation;
 
-			//Previous data variables for interpolation rendering
-			Vector2f prev_position;
-			Vector2f prev_scale;
-			float prev_rotation;
-
-			Transform() : position(0.f, 0.f), scale(1.f, 1.f), rotation{ 0.0f }, prev_position{ position }, prev_scale{ scale }, prev_rotation{ rotation } {}
+			Transform() : position(0.f, 0.f), scale(1.f, 1.f), rotation{ 0.0f } {}
 			Transform(Vector2f const& position, Vector2f const& scale, float rotation)
-				: position{ position }, scale{ scale }, rotation{ rotation }, prev_position{ position }, prev_scale{ scale }, prev_rotation{ rotation } {}
+				: position{ position }, scale{ scale }, rotation{ rotation } {}
 		};
 
 		void registerComponents();

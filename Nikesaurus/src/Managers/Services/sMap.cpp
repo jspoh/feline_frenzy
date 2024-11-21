@@ -25,7 +25,7 @@ namespace NIKE {
 
 	void Map::Service::updateCells() {
 
-		Vector2f grid_scale = { grid_size.x * cell_size.x, grid_size.y * cell_size.y };
+		grid_scale = { grid_size.x * cell_size.x, grid_size.y * cell_size.y };
 
 		//Update cells with correct position
 		float top = -(grid_scale.y / 2.0f);
@@ -40,7 +40,7 @@ namespace NIKE {
 	}
 
 	void Map::Service::onEvent(std::shared_ptr<Input::MouseMovedEvent> event) {
-		cursor_pos = event->pos;
+		cursor_pos = event->world_pos;
 	}
 
 	void Map::Service::init(Vector2i const& gridsize, Vector2f const& cellsize) {
@@ -96,10 +96,16 @@ namespace NIKE {
 		return cell_size;
 	}
 
+	Vector2f Map::Service::getGridScale() const {
+		return grid_scale;
+	}
+
 	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCursorCell() {
 
+		Vector2f translated_cursor { cursor_pos.x + (grid_scale.x / 2.0f), cursor_pos.y + (grid_scale.y / 2.0f) };
+
 		//Get index for cell
-		Vector2i index{ static_cast<int>(cursor_pos.x / cell_size.x), static_cast<int>(cursor_pos.y / cell_size.y) };
+		Vector2i index{ static_cast<int>(translated_cursor.x / cell_size.x), static_cast<int>(translated_cursor.y / cell_size.y) };
 
 		//Check if index is valid
 		if (index.x < 0 || index.x >= grid_size.x || index.y < 0 || index.y >= grid_size.y) {

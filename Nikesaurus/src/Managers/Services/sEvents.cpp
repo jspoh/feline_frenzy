@@ -35,7 +35,18 @@ namespace NIKE {
 	}
 
 	void Events::Service::mousepos_cb([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
-		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseMovedEvent>(Vector2f(static_cast<float>(xpos), static_cast<float>(ypos))));
+		auto win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		auto win_pos = NIKE_WINDOWS_SERVICE->getWindow()->getWindowPos();
+		//World Scale Factor
+		Vector2f scale{ (float)win_size.x / ((float)win_size.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), (float)win_size.y / ((float)win_size.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+
+		//Calculate world mouse position
+		Vector2f world_mouse_pos = { ((float)xpos - win_pos.x) * scale.x , ((float)ypos - win_pos.y) * scale.y };
+		world_mouse_pos.x = world_mouse_pos.x - ((win_size.x * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
+		world_mouse_pos.y = world_mouse_pos.y - ((win_size.y * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y;
+
+		//Dispatch mouse event
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseMovedEvent>(Vector2f(static_cast<float>(xpos), static_cast<float>(ypos)), world_mouse_pos));
 	}
 
 	void Events::Service::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {

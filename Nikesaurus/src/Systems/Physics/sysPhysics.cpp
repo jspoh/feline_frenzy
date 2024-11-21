@@ -93,11 +93,6 @@ namespace NIKE {
                         //    }
                         //}
 
-                        //Update all previous transform data
-                        e_transform.prev_position = e_transform.position;
-                        e_transform.prev_scale = e_transform.scale;
-                        e_transform.prev_rotation = e_transform.rotation;
-
                         //Ensure that mass is not negative
                         e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
 

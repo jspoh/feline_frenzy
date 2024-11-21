@@ -95,6 +95,7 @@ namespace NIKE {
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Map::Service>());
+		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
 		provideService(std::make_shared<LevelEditor::Service>());
 
@@ -156,6 +157,9 @@ namespace NIKE {
 
 		//Init imgui
 		//NIKE_IMGUI_SERVICE->init();
+
+		//Init camera
+		NIKE_CAMERA_SERVICE->init();
 
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();

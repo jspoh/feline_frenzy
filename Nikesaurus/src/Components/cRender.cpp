@@ -125,6 +125,9 @@ namespace NIKE {
 					// Allow scale adjustment UI
 					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f);
 
+					//Clamp scale
+					comp.scale = std::clamp(comp.scale, EPSILON, 10.0f);
+
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
 						editing_initial_scale = comp.scale;
@@ -453,7 +456,7 @@ namespace NIKE {
 				static std::string texture_id_input;
 
 				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated()) {
+				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
 					texture_id_input = comp.texture_id;
 				}
 

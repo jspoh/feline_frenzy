@@ -29,9 +29,9 @@ void Splash::Scene::init() {
 	//	NIKE::Render::Text("Montserrat-Bold", "PLAY", { 1.0f, 1.0f, 1.0f, 1.0f }, 1.0f),
 	//	NIKE::Render::Shape("square", { 1.0f, 0.0f, 0.0f, 1.0f }));
 
-	//NIKE_UI_SERVICE->createButton("Test1",
-	//	NIKE::Transform::Transform({ 0.0f,400.0f }, { 200.0f, 100.0f }, 0.0f),
-	//	NIKE::Render::Text("Montserrat-Bold", "PLAY", { 1.0f, 1.0f, 1.0f, 1.0f }, 1.0f),
+	//NIKE_UI_SERVICE->createButton("Button",
+	//	NIKE::Transform::Transform({ 0.0f, 0.0f }, { 200.0f, 100.0f }, 0.0f),
+	//	NIKE::Render::Text("Montserrat-Bold", "Button", { 1.0f, 1.0f, 1.0f, 1.0f }, 1.0f),
 	//	NIKE::Render::Shape("square", { 1.0f, 0.0f, 0.0f, 1.0f }));
 
 	//Creat Channel Group
@@ -46,7 +46,7 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
-	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/animation_scene.scn");
+	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/gui_scene.scn");
 }
 
 void Splash::Scene::unload() {
