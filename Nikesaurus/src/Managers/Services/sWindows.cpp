@@ -160,8 +160,8 @@ namespace NIKE {
 	}
 
 	Vector2f Windows::NIKEWindow::getFullScreenScale() const {
-		return { std::clamp(static_cast<float>(window_size.x) / static_cast<float>(size_before_fullscreen.x), 0.0f, (float)UINT16_MAX),
-					std::clamp(static_cast<float>(window_size.y) / static_cast<float>(size_before_fullscreen.y), 0.0f, (float)UINT16_MAX) };
+		return { std::clamp(static_cast<float>(viewport_size.x) / static_cast<float>(size_before_fullscreen.x), 0.0f, (float)UINT16_MAX),
+					std::clamp(static_cast<float>(viewport_size.y) / static_cast<float>(size_before_fullscreen.y), 0.0f, (float)UINT16_MAX) };
 	}
 
 	void Windows::NIKEWindow::setupEventCallbacks() {

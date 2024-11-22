@@ -21,6 +21,7 @@ namespace NIKE {
 		//Forward declaration of panels
 		class GameWindowPanel;
 		class TileMapPanel;
+		class ComponentsPanel;
 
 		//Panel Interface
 		class IPanel {
@@ -174,6 +175,9 @@ namespace NIKE {
 			//Reference to game window panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
+			//Reference to component panel
+			std::weak_ptr<ComponentsPanel> comp_panel;
+
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 
@@ -229,11 +233,38 @@ namespace NIKE {
 			//Check entity changed
 			bool isEntityChanged() const;
 
-			//Convert entity's transform to vertices
-			std::vector<Vector2f> convertTransformToVert(Transform::Transform const& e_transform) const;
-
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
+		};
+
+		//Gizmo modes
+		enum class GizmoMode {
+			Translate = 0,
+			Scale,
+			Rotate
+		};
+
+		//Gizmode object
+		struct Gizmo {
+			//Gizmo mode
+			GizmoMode mode;
+
+			//Gizmo start 
+			Vector2f world_start;
+
+			//boolean for checking interaction with gizmo
+			bool b_interacting;
+
+			//Drag up
+			bool b_dragging_vert;
+
+			//Drag down
+			bool b_dragging_hori;
+
+			//Gizmo objects
+			std::unordered_map<std::string, Transform::Transform> objects;
+
+			Gizmo() : mode{ GizmoMode::Translate }, world_start(), b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false } {}
 		};
 
 		//Components Management Panel
@@ -252,8 +283,14 @@ namespace NIKE {
 			//Boolean to signal dragging of entity
 			bool b_dragging_entity;
 
+			//Boolean to manage changing gizmos
+			Gizmo gizmo;
+
 			//Drag entity function
 			void dragEntity(bool snap_to_grid);
+
+			//Gizmo interaction
+			void interactGizmo();
 
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
@@ -277,7 +314,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>> comps_ui;
 
 		public:
-			ComponentsPanel() : b_dragging_entity{ false } {};
+			ComponentsPanel() : b_dragging_entity{ false }, gizmo() {};
 			~ComponentsPanel() = default;
 
 			//Panel Name
@@ -326,6 +363,9 @@ namespace NIKE {
 
 			//Check if entity is being dragged
 			bool checkEntityDragged() const;
+
+			//Check if there is interaction with gizmo
+			bool checkGizmoInteraction() const;
 		};
 
 		//Debug Management Panel

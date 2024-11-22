@@ -80,7 +80,7 @@ namespace NIKE {
 					static Vector2f scale_before_change;
 
 					//Change scale
-					ImGui::DragFloat2("Scale", &comp.scale.x, 0.1f);
+					ImGui::DragFloat2("Scale", &comp.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
 
 					//Check if scale has beguin editing
 					if (ImGui::IsItemActivated()) {

@@ -147,6 +147,7 @@ namespace NIKE {
 			Vector2i size_before_fullscreen;
 			Vector2i pos_before_fullscreen;
 			float aspect_ratio;
+			Vector2f viewport_size_before_fullscreen;
 			Vector2f viewport_size;
 			Vector2f world_size;
 
