@@ -61,6 +61,9 @@ namespace NIKE {
 			//Get full screen mode
 			virtual bool getFullScreen() const = 0;
 
+			//Get fullscreen scale
+			virtual Vector2f getFullScreenScale() const = 0;
+
 			//Setup Event Callbacks
 			virtual void setupEventCallbacks() = 0;
 
@@ -167,6 +170,8 @@ namespace NIKE {
 			void setFullScreen(int value) override;
 
 			bool getFullScreen() const override;
+
+			Vector2f getFullScreenScale() const override;
 
 			void setupEventCallbacks() override;
 

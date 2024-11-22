@@ -29,6 +29,7 @@ namespace NIKE {
 			auto const& data = config.at("WindowsConfig");
 			window_title = data.at("Title").get<std::string>();
 			window_size.fromJson(data.at("Window_Size"));
+			size_before_fullscreen = window_size;
 			world_size.fromJson(data.at("World_Size"));
 			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
 			calculateViewport();
@@ -39,6 +40,7 @@ namespace NIKE {
 
 			window_title = "Window";
 			window_size = { 1600, 900 };
+			size_before_fullscreen = window_size;
 			world_size = { 1600.0f, 900.0f };
 			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
 			calculateViewport();
@@ -155,6 +157,11 @@ namespace NIKE {
 
 	bool Windows::NIKEWindow::getFullScreen() const {
 		return b_full_screen;
+	}
+
+	Vector2f Windows::NIKEWindow::getFullScreenScale() const {
+		return { std::clamp(static_cast<float>(window_size.x) / static_cast<float>(size_before_fullscreen.x), 0.0f, (float)UINT16_MAX),
+					std::clamp(static_cast<float>(window_size.y) / static_cast<float>(size_before_fullscreen.y), 0.0f, (float)UINT16_MAX) };
 	}
 
 	void Windows::NIKEWindow::setupEventCallbacks() {

@@ -109,17 +109,17 @@ namespace NIKE {
 		//Get scale relative to the world size
 		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
 
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
+
 		//Return screen coordinates
-		return { window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+		return {	window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),
+					window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
 	}
 
 	/*****************************************************************//**
 	* Main Panel
 	*********************************************************************/
-	void LevelEditor::MainPanel::setDebugState(bool state) {
-		b_debug_mode = state;
-	}
-
 	bool LevelEditor::MainPanel::getDebugState() const {
 		return b_debug_mode;
 	}
@@ -151,12 +151,12 @@ namespace NIKE {
 		return b_game_state;
 	}
 
-	void LevelEditor::MainPanel::setGridState(bool state) {
-		b_grid_state = state;
-	}
-
 	bool LevelEditor::MainPanel::getGridState() const {
 		return b_grid_state;
+	}
+
+	bool LevelEditor::MainPanel::getGizmoState() const {
+		return b_gizmo_state;
 	}
 
 	void LevelEditor::MainPanel::init() {
@@ -184,25 +184,108 @@ namespace NIKE {
 		//Start Main Panel Menu Bar
 		if (ImGui::BeginMenuBar()) {
 
+			ImGui::Spacing();
+
 			//Game State Switching
-			ImGui::Spacing();
-			ImGui::Text("Play / Pause Controls : ");
-			if (ImGui::Button(b_game_state ? "Play" : "Pause")) {
-				setGameState(!b_game_state);
+			{
+				ImGui::Text("Play / Pause Simulation : ");
+				ImGui::Button(b_game_state ? "Play" : "Pause");
+
+				//Check if button has been activated
+				if (ImGui::IsItemActivated()) {
+					Action set_game_state;
+
+					//Do game mode
+					set_game_state.do_action = [&, mode = !b_game_state]() {
+						setGameState(mode);
+						};
+
+					//Undo game mode
+					set_game_state.undo_action = [&, mode = b_game_state]() {
+						setGameState(mode);
+						};
+
+					//Execute action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_game_state));
+				}
 			}
 
-			//Debug Mode Switching
 			ImGui::Spacing();
-			ImGui::Text("Toggle Debug Mode : ");
-			if (ImGui::Button(b_debug_mode ? "Show##DebugMode" : "Hide##DebugMode")) {
-				b_debug_mode = !b_debug_mode;
-			}
 
 			//Debug Mode Switching
+			{
+				ImGui::Text("Toggle Debug Mode : ");
+				ImGui::Button(b_debug_mode ? "Show##DebugMode" : "Hide##DebugMode");
+
+				//Check if button has been activated
+				if (ImGui::IsItemActivated()) {
+					Action set_debug_state;
+
+					//Do debug mode
+					set_debug_state.do_action = [&, mode = !b_debug_mode]() {
+						b_debug_mode = mode;
+						};
+
+					//Undo debug mode
+					set_debug_state.undo_action = [&, mode = b_debug_mode]() {
+						b_debug_mode = mode;
+						};
+
+					//Execute action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_debug_state));
+				}
+			}
+
 			ImGui::Spacing();
-			ImGui::Text("Show Grid : ");
-			if (ImGui::Button(b_grid_state ? "Show##GridState" : "Hide##GridState")) {
-				b_grid_state = !b_grid_state;
+
+			//Grid Mode Switching
+			{
+				ImGui::Text("Show Grid : ");
+				ImGui::Button(b_grid_state ? "Show##GridState" : "Hide##GridState");
+
+				//Check if button has been activated
+				if (ImGui::IsItemActivated()) {
+					Action set_grid_mode;
+
+					//Do grid mode
+					set_grid_mode.do_action = [&, mode = !b_grid_state]() {
+						b_grid_state = mode;
+						};
+
+					//Undo grid mode
+					set_grid_mode.undo_action = [&, mode = b_grid_state]() {
+						b_grid_state = mode;
+						};
+
+					//Execute action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_grid_mode));
+				}
+			}
+
+			ImGui::Spacing();
+
+			//Gizmo usage showing
+			{
+				ImGui::Text("Transfomation Gizmo : ");
+				ImGui::Button(b_gizmo_state ? "Enable##Gizmo" : "Disable##Gizmo");
+
+				//Check if button has been activated
+				if (ImGui::IsItemActivated()) {
+					Action set_gizmo_mode;
+
+					//Do gizmo mode
+					set_gizmo_mode.do_action = [&, mode = !b_gizmo_state]() {
+						b_gizmo_state = mode;
+						};
+
+					//Undo gizmo mode
+					set_gizmo_mode.undo_action = [&, mode = b_gizmo_state]() {
+						b_gizmo_state = mode;
+						};
+
+					//Execute action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_mode));
+				}
 			}
 
 			//Reset Scene
@@ -284,6 +367,7 @@ namespace NIKE {
 					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Save entity name into entities ref
+					entities.emplace(new_id, EditorEntity());
 					entity_to_name.emplace(new_id, shared_id->c_str());
 					name_to_entity.emplace(shared_id->c_str(), new_id);
 				};
@@ -297,6 +381,7 @@ namespace NIKE {
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
 						//Erase new entity ref
+						entities.erase(name_to_entity.at(shared_id->data()));
 						entity_to_name.erase(name_to_entity.at(shared_id->data()));
 						name_to_entity.erase(shared_id->data());
 					}
@@ -364,12 +449,12 @@ namespace NIKE {
 						NIKE_ECS_MANAGER->setEntityComponent(new_id, comp_types.at(comp.first), comp.second);
 					}
 
+					//Update entities list
+					entities.emplace(new_id, EditorEntity());
+
 					//Save entity name into entities ref
 					entity_to_name.emplace(new_id, shared_id->c_str());
 					name_to_entity.emplace(shared_id->c_str(), new_id);
-
-					//Update entities list
-					entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
 
 					//Set selected entity back to old entity
 					selected_entity = name_to_entity.at(shared_id->data());
@@ -383,15 +468,15 @@ namespace NIKE {
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
+						//Update entities list
+						entities.erase(name_to_entity.at(shared_id->data()));
+
 						//Erase new entity ref
 						entity_to_name.erase(name_to_entity.at(shared_id->data()));
 						name_to_entity.erase(shared_id->data());
 
-						//Update entities list
-						entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
-
 						//Set selected entity back to first entity
-						selected_entity = entities.empty() ? 0 : *entities.begin();
+						selected_entity = entities.empty() ? 0 : entities.begin()->first;
 					}
 				};
 
@@ -443,12 +528,13 @@ namespace NIKE {
 				Entity::Type clone_entity = selected_entity;
 
 				//Do Action
-				clone.do_action = [&, shared_id, clone]() {
+				clone.do_action = [&, shared_id, clone_entity]() {
 					if (NIKE_ECS_MANAGER->checkEntity(clone_entity)) {
 						//Clone entity 
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
 
 						//Save entity name into entities ref
+						entities.emplace(new_id, EditorEntity());
 						entity_to_name.emplace(new_id, shared_id->c_str());
 						name_to_entity.emplace(shared_id->c_str(), new_id);
 					}
@@ -463,6 +549,7 @@ namespace NIKE {
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
 						//Erase new entity ref
+						entities.erase(name_to_entity.at(shared_id->data()));
 						entity_to_name.erase(name_to_entity.at(shared_id->data()));
 						name_to_entity.erase(shared_id->data());
 					}
@@ -501,21 +588,22 @@ namespace NIKE {
 
 		//Game panel reference
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+
+		//Tile map panel reference
+		tilemap_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
 
 		//Get all active entities
-		entities = std::move(NIKE_ECS_MANAGER->getAllEntities());
-
-		//Check if number of refs matches the active entities size
-		if (entities.size() != entity_to_name.size()) {
-
+		if (entities.size() != NIKE_ECS_MANAGER->getEntitiesCount()) {
+			auto entities_set = NIKE_ECS_MANAGER->getAllEntities();
 			//Iterate through all active entities
 			unsigned int count = 0;
-			for (auto entity : entities) {
-				//Check if entity ref has already been added
-				if (entity_to_name.find(entity) == entity_to_name.end()) {
+			for (auto entity : entities_set) {
+				if (entities.find(entity) == entities.end()) {
+					//Emplace entity
+					entities.emplace(entity, EditorEntity());
 
 					//Create identifier for entity
 					char entity_name[32];
@@ -526,29 +614,23 @@ namespace NIKE {
 					name_to_entity.emplace(entity_name, entity);
 				}
 
-				++count;
+				count++;
 			}
 
-			//Extra check for if entities were removed
-			if (entities.size() != entity_to_name.size()) {
-
+			if (entities.size() != entities_set.size()) {
 				//Iterate through entities ref to check which entity has been removed
-				auto it = entity_to_name.begin();
-				auto rit = name_to_entity.begin();
-				for (;it != entity_to_name.end();) {
-
-					//Find entity
-					auto active_it = entities.find(it->first);
-					//Check if entity is still active
-					if (active_it == entities.end()) {
-
-						//Add entity to map of ref
-						it = entity_to_name.erase(it);
-						rit = name_to_entity.erase(rit);
+				auto enit = entity_to_name.begin();
+				auto neit = name_to_entity.begin();
+				for (decltype(entities)::iterator it = entities.begin(); it != entities.end();) {
+					if (entities_set.find(it->first) == entities_set.end()) {
+						it = entities.erase(it);
+						enit = entity_to_name.erase(enit);
+						neit = name_to_entity.erase(neit);
 					}
 					else {
-						rit++;
-						it++;
+						++it;
+						++enit;
+						++neit;
 					}
 				}
 			}
@@ -609,12 +691,12 @@ namespace NIKE {
 				for (auto& entity : entities) {
 
 					//Skip entities not on curr layer
-					if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+					if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
 						continue;
 
 					//Check for entity clicking
-					if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-						selected_entity = entity;
+					if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+						selected_entity = entity.first;
 
 						//Get selected entity data
 						auto it = entity_to_name.find(selected_entity);
@@ -633,24 +715,29 @@ namespace NIKE {
 			for (auto& entity : entities) {
 
 				//Check if entity is selected
-				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity).c_str() == entity_to_name.at(selected_entity).c_str();
+				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity.first).c_str() == entity_to_name.at(selected_entity).c_str();
 
 				//Show selectable
-				if (ImGui::Selectable(entity_to_name.at(entity).c_str(), selected)) {
+				if (ImGui::Selectable(entity_to_name.at(entity.first).c_str(), selected)) {
 
-					if (selected_entity != entity) {
-						selected_entity = entity;
+					if (selected_entity != entity.first) {
+						selected_entity = entity.first;
 
 						//Get selected entity data
 						auto it = entity_to_name.find(selected_entity);
 						b_entity_changed = true;
 					}
 					else {
-						selected_entity = UINT16_MAX;
+						unselectEntity();
 						b_entity_changed = true;
 					}
 				}
 			}
+		}
+
+		//Check here if tilemap is editing grid
+		if (tilemap_panel.lock()->checkGridEditing()) {
+			unselectEntity();
 		}
 
 		//Render popups
@@ -673,7 +760,7 @@ namespace NIKE {
 		return selected_entity;
 	}
 
-	std::string LevelEditor::EntitiesPanel::getSelectedEntityName() const {
+	std::optional<std::string> LevelEditor::EntitiesPanel::getSelectedEntityName() const {
 		//Get selected entity data
 		auto it = entity_to_name.find(selected_entity);
 
@@ -682,6 +769,34 @@ namespace NIKE {
 		}
 		else {
 			return "";
+		}
+	}
+
+	void LevelEditor::EntitiesPanel::unselectEntity() {
+		selected_entity = UINT16_MAX;
+	}
+
+	std::optional<std::reference_wrapper<LevelEditor::EditorEntity>> LevelEditor::EntitiesPanel::getSelectedEntityEditor() {
+		//Get selected entity data
+		auto it = entities.find(selected_entity);
+
+		if (it != entities.end()) {
+			return it->second;
+		}
+		else {
+			return std::nullopt;
+		}
+	}
+
+	void LevelEditor::EntitiesPanel::lockAllEntities() {
+		for (auto& entity : entities) {
+			entity.second.b_locked = true;
+		}
+	}
+
+	void LevelEditor::EntitiesPanel::unlockAllEntities() {
+		for (auto& entity : entities) {
+			entity.second.b_locked = false;
 		}
 	}
 
@@ -759,7 +874,7 @@ namespace NIKE {
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::dragEntity(bool snap_to_grid) {
 		//Logic for moving entities
-		if (game_panel.lock()->isMouseInWindow() && (b_dragging_entity || entities_panel.lock()->isCursorInEntity(entities_panel.lock()->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+		if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && (b_dragging_entity || entities_panel.lock()->isCursorInEntity(entities_panel.lock()->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 			
 			//Entity position follows mouse cursor
 			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
@@ -993,6 +1108,9 @@ namespace NIKE {
 		//Game panel reference
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
+
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
@@ -1027,13 +1145,46 @@ namespace NIKE {
 		if (NIKE_ECS_MANAGER->checkEntity(entities_panel.lock()->getSelectedEntity())) {
 
 			//Print out selected entity string ref
-			ImGui::Text("Selected Entity: %s", entities_panel.lock()->getSelectedEntityName().c_str());
+			ImGui::Text("Selected Entity: %s", entities_panel.lock()->getSelectedEntityName().value_or("").c_str());
 
 			//Print out selected entity component count
 			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entities_panel.lock()->getSelectedEntity()));
 
 			//Print out selected entity layer id
 			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity()));
+
+			//Entity locking
+			{
+				//Lock entity
+				ImGui::Text("Lock Entity: ");
+				ImGui::SameLine();
+				if (entities_panel.lock()->getSelectedEntityEditor().has_value()) {
+					auto& locked = entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked;
+					if (ImGui::SmallButton(locked ? "Locked" : "Unlocked")) {
+						locked = !locked;
+					}
+
+					//Return if entity is locked
+					if (locked) {
+						ImGui::End();
+						return;
+					}
+				}
+				else {
+					//Return if entity editor does not have value
+					return;
+				}
+			}
+
+			//Entity gizmo
+			{
+				////Lock entity
+				//ImGui::Text("Transformation Gizmo: ");
+				//ImGui::SameLine();
+				//if (ImGui::SmallButton()) {
+
+				//}
+			}
 
 			//Add Spacing
 			ImGui::Spacing();
@@ -1126,6 +1277,11 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
 
+		//Check if entity is locked
+		if (!entities_panel.lock()->getSelectedEntityEditor().has_value() || entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked) {
+			return;
+		}
+
 		//Get transform component
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
 		if (!e_transform_comp.has_value())
@@ -1144,6 +1300,9 @@ namespace NIKE {
 
 		//Camera zoom
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
 
 		//Convert transform to vertices
 		auto corners = entities_panel.lock()->convertTransformToVert(e_transform);
@@ -1152,14 +1311,15 @@ namespace NIKE {
 		draw->AddQuad(	worldToScreen(ImVec2(corners[0].x, corners[0].y), rendersize), 
 						worldToScreen(ImVec2(corners[1].x, corners[1].y), rendersize),
 						worldToScreen(ImVec2(corners[2].x, corners[2].y), rendersize),
-						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f / zoom);
-
-		draw->AddText(worldToScreen(ImVec2(corners[1].x + 20.0f, corners[1].y - 10.0f), rendersize), color, "Pos: ");
-		draw->AddText(worldToScreen(ImVec2(corners[1].x + 20.0f, corners[1].y + 10.0f), rendersize), color, "Scale: ");
-		draw->AddText(worldToScreen(ImVec2(corners[1].x + 20.0f, corners[1].y + 30.0f), rendersize), color, "Rot: ");
+						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, 5.0f / zoom * fullscreen_scale.x);
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
+		//Check if entity is locked
+		if (!entities_panel.lock()->getSelectedEntityEditor().has_value() || entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked) {
+			return;
+		}
+		
 		//Get transform component
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
 		if (!e_transform_comp.has_value())
@@ -1179,26 +1339,30 @@ namespace NIKE {
 		//Camera zoom
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
+
 		//Draw line up
 		draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
 			worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-			IM_COL32(0, 255, 0, 255), 5.0f / zoom);
+			IM_COL32(0, 255, 0, 255), 5.0f / zoom * fullscreen_scale.x);
 
 		//Add gizmo point
 		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(0, 255, 0, 255));
+			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom * fullscreen_scale.x, IM_COL32(0, 255, 0, 255));
 
 		//Draw line right
 		draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
 			worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-			IM_COL32(255, 0, 0, 255), 5.0f / zoom);
+			IM_COL32(255, 0, 0, 255), 5.0f / zoom * fullscreen_scale.x);
 
 		//Add gizmo point
 		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, IM_COL32(255, 0, 0, 255));
+			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom * fullscreen_scale.x, IM_COL32(255, 0, 0, 255));
 
 		//Draw gizmo center
-		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize), Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom, color);
+		draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize), 
+			Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom * fullscreen_scale.x, color);
 	}
 
 	bool LevelEditor::ComponentsPanel::checkEntityDragged() const {
@@ -1498,7 +1662,7 @@ namespace NIKE {
 
 			if (ImGui::Button("Up") || ImGui::IsItemActive()) {
 				// Move camera position up
-				active_cam.position.y += 5.0f;
+				active_cam.position.y += 500.0f * ImGui::GetIO().DeltaTime;
 			}
 
 			cameraChangeAction(active_cam, cam_before_change);
@@ -1507,7 +1671,7 @@ namespace NIKE {
 
 			if (ImGui::Button("Down") || ImGui::IsItemActive()) {
 				// Move camera position down
-				active_cam.position.y -= 5.0f;
+				active_cam.position.y -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
 
 			cameraChangeAction(active_cam, cam_before_change);
@@ -1516,7 +1680,7 @@ namespace NIKE {
 
 			if (ImGui::Button("Left") || ImGui::IsItemActive()) {
 				// Move camera position left
-				active_cam.position.x -= 5.0f;
+				active_cam.position.x -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
 
 			cameraChangeAction(active_cam, cam_before_change);
@@ -1525,7 +1689,7 @@ namespace NIKE {
 
 			if (ImGui::Button("Right") || ImGui::IsItemActive()) {
 				// Move camera position right
-				active_cam.position.x += 5.0f;
+				active_cam.position.x += 500.0f * ImGui::GetIO().DeltaTime;
 			}
 
 			cameraChangeAction(active_cam, cam_before_change);
@@ -1545,7 +1709,7 @@ namespace NIKE {
 		// Zoom Controls
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In") || ImGui::IsItemActive()) {
-			active_cam.zoom -= 0.01f;
+			active_cam.zoom -= 1.0f * ImGui::GetIO().DeltaTime;
 			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
 		}
 
@@ -1554,7 +1718,7 @@ namespace NIKE {
 		ImGui::SameLine();
 
 		if (ImGui::Button("Zoom Out") || ImGui::IsItemActive()) {
-			active_cam.zoom += 0.01f;
+			active_cam.zoom += 1.0f * ImGui::GetIO().DeltaTime;
 			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
 		}
 
@@ -1681,7 +1845,7 @@ namespace NIKE {
 			//Adjust cell size
 			ImGui::Text("Set grid mode: ");
 			ImGui::SameLine();
-			ImGui::Button(b_grid_mode ? "Editing" : "View");
+			ImGui::SmallButton(b_grid_mode ? "Editing" : "View");
 
 			//Check if button has been activated
 			if (ImGui::IsItemActivated()) {
@@ -1783,6 +1947,9 @@ namespace NIKE {
 		//Get grid scale
 		auto grid_scale = NIKE_MAP_SERVICE->getGridScale();
 
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
+
 		//Calculate limits
 		float top =		-(grid_scale.y / 2.0f);
 		float bot =		(grid_scale.y / 2.0f);
@@ -1800,22 +1967,27 @@ namespace NIKE {
 
 		//Add lines for grid for rows
 		for (int i = 0; i <= grid_size.y; i++) {
-			draw->AddLine(worldToScreen({ left, top + (cell_size.y * i) }, rendersize), worldToScreen({ right, top + (cell_size.y * i)}, rendersize), color, gird_render_thickness);
+			draw->AddLine(worldToScreen({ left, top + (cell_size.y * i) }, rendersize), worldToScreen({ right, top + (cell_size.y * i)}, rendersize), color, gird_render_thickness * fullscreen_scale.x);
 		}
 
 		//Add lines for grid for cols
 		for (int j = 0; j <= grid_size.x; j++) {
-			draw->AddLine(worldToScreen({ left + (cell_size.x * j), top }, rendersize), worldToScreen({ left + (cell_size.x * j) , bot }, rendersize), color, gird_render_thickness);
+			draw->AddLine(worldToScreen({ left + (cell_size.x * j), top }, rendersize), worldToScreen({ left + (cell_size.x * j) , bot }, rendersize), color, gird_render_thickness * fullscreen_scale.x);
 		}
 
-		//Render dark hue over blocked squares
+		//Render dark hue over blocked squaress
 		for (auto const& row : NIKE_MAP_SERVICE->getGrid()) {
 			for (auto const& cell : row) {
 				if (cell.b_blocked) {
-					draw->AddRectFilled(worldToScreen({ cell.position.x - (cell_size.x / 2.0f) + grid_thickness,  cell.position.y - (cell_size.y / 2.0f) + grid_thickness }, rendersize), worldToScreen({ cell.position.x + (cell_size.x / 2.0f) - grid_thickness,  cell.position.y + (cell_size.y / 2.0f) - grid_thickness }, rendersize), IM_COL32(0, 0, 0, 100));
+					draw->AddRectFilled(worldToScreen({ cell.position.x - (cell_size.x / 2.0f) + (grid_thickness / fullscreen_scale.x),  cell.position.y - (cell_size.y / 2.0f) + (grid_thickness / fullscreen_scale.x) }, rendersize),
+										worldToScreen({ cell.position.x + (cell_size.x / 2.0f) - (grid_thickness / fullscreen_scale.x),  cell.position.y + (cell_size.y / 2.0f) - (grid_thickness / fullscreen_scale.x) }, rendersize), IM_COL32(0, 0, 0, 100));
 				}
 			}
 		}
+	}
+
+	bool LevelEditor::TileMapPanel::checkGridEditing() {
+		return b_grid_mode;
 	}
 
 	/*****************************************************************//**
@@ -1931,8 +2103,11 @@ namespace NIKE {
 		//Render selected entity bounding box
 		comps_panel.lock()->renderEntityBoundingBox(draw_list, Vector2f(viewport_width, viewport_height));
 
-		//Render selected entity gizmo
-		comps_panel.lock()->renderEntityGizmo(draw_list, Vector2f(viewport_width, viewport_height));
+		//Check if gizmo state is active
+		if (main_panel.lock()->getGizmoState()) {
+			//Render selected entity gizmo
+			comps_panel.lock()->renderEntityGizmo(draw_list, Vector2f(viewport_width, viewport_height));
+		}
 
 		ImGui::End();
 	}

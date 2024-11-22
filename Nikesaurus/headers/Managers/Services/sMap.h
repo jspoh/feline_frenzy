@@ -58,6 +58,9 @@ namespace NIKE {
 			//Get cell cursor is in
 			std::optional<std::reference_wrapper<Map::Cell>> getCursorCell();
 
+			//Get cell based on position
+			std::optional<std::reference_wrapper<Map::Cell>> getCellAtPosition(Vector2f const& position);
+
 			//Get grid
 			std::vector<std::vector<Cell>>const& getGrid() const;
 

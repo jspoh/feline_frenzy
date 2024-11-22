@@ -116,6 +116,23 @@ namespace NIKE {
 		}
 	}
 
+	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCellAtPosition(Vector2f const& position) {
+
+		//Translate position
+		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), position.y + (grid_scale.y / 2.0f) };
+
+		//Get index for cell
+		Vector2i index{ static_cast<int>(translated_pos.x / cell_size.x), static_cast<int>(translated_pos.y / cell_size.y) };
+
+		//Check if index is valid
+		if (index.x < 0 || index.x >= grid_size.x || index.y < 0 || index.y >= grid_size.y) {
+			return std::nullopt;
+		}
+		else {
+			return grid.at(index.y).at(index.x);
+		}
+	}
+
 	std::vector<std::vector<Map::Cell>>const& Map::Service::getGrid() const {
 		return grid;
 	}

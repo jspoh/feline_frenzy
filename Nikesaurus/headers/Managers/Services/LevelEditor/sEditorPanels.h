@@ -18,8 +18,9 @@
 namespace NIKE {
 	namespace LevelEditor {
 
-		//Forward declaration of the game window panel
+		//Forward declaration of panels
 		class GameWindowPanel;
+		class TileMapPanel;
 
 		//Panel Interface
 		class IPanel {
@@ -94,17 +95,14 @@ namespace NIKE {
 			//Boolean for showing/hide grid
 			bool b_grid_state;
 
-			//Set Debug State
-			void setDebugState(bool state);
+			//Boolean for enabling/disabling transform gizmo
+			bool b_gizmo_state;
 
 			//Set Game State
 			void setGameState(bool state);
 
-			//Set Grid State
-			void setGridState(bool state);
-
 		public:
-			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ true }, b_grid_state{ false } {}
+			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ true }, b_grid_state{ false }, b_gizmo_state{ false } {}
 			~MainPanel() = default;
 
 			//Panel Name
@@ -126,6 +124,9 @@ namespace NIKE {
 			//Public get grid state
 			bool getGridState() const;
 
+			//Public get gizmo state
+			bool getGizmoState() const;
+
 			//Init
 			void init() override;
 
@@ -136,12 +137,26 @@ namespace NIKE {
 			void render() override;
 		};
 
+		//Entities management structure
+		struct EditorEntity {
+			bool b_locked;
+
+			EditorEntity() :b_locked{ false } {}
+			EditorEntity(bool b_locked) : b_locked{ b_locked }{}
+		};
+
 		//Entities Management Panel
 		class EntitiesPanel : public IPanel {
 		private:
+			//Sort entities
+			struct EntitySorter{
+				bool operator()(Entity::Type const& e1, Entity::Type const& e2) const {
+					return e1 < e2;
+				}
+			};
 
 			//Set of active entities
-			std::set<Entity::Type> entities;
+			std::map<Entity::Type, EditorEntity, EntitySorter> entities;
 
 			//BI-Mapping of entity type to string * vice versa
 			std::unordered_map<Entity::Type, std::string> entity_to_name;
@@ -155,6 +170,9 @@ namespace NIKE {
 
 			//Reference to game window panel
 			std::weak_ptr<GameWindowPanel> game_panel;
+
+			//Reference to game window panel
+			std::weak_ptr<TileMapPanel> tilemap_panel;
 
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
@@ -194,7 +212,19 @@ namespace NIKE {
 			Entity::Type getSelectedEntity() const;
 			
 			//Get selected entity name
-			std::string getSelectedEntityName() const;
+			std::optional<std::string> getSelectedEntityName() const;
+
+			//Unselect entity
+			void unselectEntity();
+
+			//Get selected entity editor variables
+			std::optional<std::reference_wrapper<LevelEditor::EditorEntity>> getSelectedEntityEditor();
+
+			//Lock all entities
+			void lockAllEntities();
+
+			//Unlock all entities
+			void unlockAllEntities();
 
 			//Check entity changed
 			bool isEntityChanged() const;
@@ -215,6 +245,9 @@ namespace NIKE {
 
 			//Reference to game window panel
 			std::weak_ptr<GameWindowPanel> game_panel;
+
+			//Reference to main panel
+			std::weak_ptr<MainPanel> main_panel;
 
 			//Boolean to signal dragging of entity
 			bool b_dragging_entity;
@@ -244,7 +277,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>> comps_ui;
 
 		public:
-			ComponentsPanel() = default;
+			ComponentsPanel() : b_dragging_entity{ false } {};
 			~ComponentsPanel() = default;
 
 			//Panel Name
@@ -427,6 +460,9 @@ namespace NIKE {
 
 			//Render grid
 			void renderGrid(void* draw_list, Vector2f const& render_size);
+
+			//Get grid editing mode
+			bool checkGridEditing();
 		};
 
 		//Game Window Panel
