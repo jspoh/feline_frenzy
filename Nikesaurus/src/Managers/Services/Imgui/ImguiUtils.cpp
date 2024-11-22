@@ -139,8 +139,9 @@ namespace NIKE
 					selected_texture.clear();
 				}
 
+				delete_file_popup = showDeleteFilePopup(selected_texture, "Textures");
 
-				if (delete_file_popup = showDeleteFilePopup(selected_texture, "Textures")) {
+				if (delete_file_popup) {
 					selected_texture.clear();
 				}
 
