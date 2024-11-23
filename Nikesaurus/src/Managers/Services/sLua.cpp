@@ -240,4 +240,15 @@ namespace NIKE {
         // If no function is found, return empty string
         return "";
     }
+
+    std::filesystem::path Lua::Service::getScriptPath(const std::string& script_id) const {
+        auto it = scripts.find(script_id);
+        if (it != scripts.end()) {
+            // Return the path associated with the script ID
+            return it->second.first; 
+        }
+        NIKEE_CORE_ERROR("Script ID '{}' not found.", script_id);
+        // Return an empty path if not found
+        return {}; 
+    }
 }

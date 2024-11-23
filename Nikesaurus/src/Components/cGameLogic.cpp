@@ -68,10 +68,11 @@ namespace NIKE {
 
 					//Save Button
 					if (ImGui::Button("Save##Script")) {
-						if (NIKE_LUA_SERVICE->checkScriptFileExist(script_input))
+						std::filesystem::path script_path = NIKE_LUA_SERVICE->getScriptPath(script_input);
+						if (!script_path.empty() && NIKE_LUA_SERVICE->checkScriptFileExist(script_input))
 						{
+							comp.script.script_path = script_path.string();
 							comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script_input);
-							NIKE_LUA_SERVICE->executeScript(script_input, comp.script.function);
 							LevelEditor::Action save_script_id;
 
 							//Save script id action

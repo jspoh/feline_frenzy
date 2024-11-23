@@ -71,6 +71,8 @@ namespace NIKE {
 
 			// For UI runtime loading
 			std::string extractFunctionFromScript(const std::string& script_id);
+
+			std::filesystem::path getScriptPath(const std::string& script_id) const;
 		};
 	}
 	//Re-enable DLL Export warning
