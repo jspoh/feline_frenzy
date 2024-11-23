@@ -465,6 +465,12 @@ namespace NIKE {
 	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
 		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
+		const std::set<std::string> valid_tex_ext = { "png", "jpg", "jpeg" }; // accepted file types
+
+		// Transform each character in string ext to lowercase
+		for (char& c : filetype) {
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		}
 
 		if (filetype == "tex") {
 			is_tex_or_png_ext = true;
@@ -501,14 +507,8 @@ namespace NIKE {
 		}
 
 		// is not .tex file
-		if (filetype == "png" || filetype == "PNG" || filetype == "jpg" || filetype == "jpeg" || filetype == "JPG" || filetype == "JPEG") {
+		if (valid_tex_ext.find(filetype) != valid_tex_ext.end()) {
 			is_tex_or_png_ext = true;
-		}
-		else {
-			is_tex_or_png_ext = false;
-		}
-
-		if (is_tex_or_png_ext) {
 			int channels;
 			stbi_set_flip_vertically_on_load(true);
 			const int desired_channels = 4;
@@ -531,8 +531,9 @@ namespace NIKE {
 
 			return img_data;
 		}
-
+			
 		// If the file type is unsupported (not .tex, .png, .jpg, or .jpeg)
+		is_tex_or_png_ext = false;
 		NIKEE_CORE_ERROR("Unsupported file format: {}", path_to_texture);
 		return nullptr;
 	}

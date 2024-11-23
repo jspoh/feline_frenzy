@@ -511,7 +511,7 @@ namespace NIKE {
 		auto assets_service = NIKE_ASSETS_SERVICE;
 
 		//Play sound & get channel that sound is playing under
-		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(assets_service->getAudio(audio_id), getChannelGroup(channel_group_id), start_paused);
+		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(assets_service->getSfx(audio_id), getChannelGroup(channel_group_id), start_paused);
 
 		//Add channel to the channel map
 		if (new_channel) {

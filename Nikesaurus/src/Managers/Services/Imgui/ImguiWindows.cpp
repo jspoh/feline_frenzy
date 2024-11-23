@@ -712,7 +712,7 @@ namespace NIKE {
 								}
 							}
 							if (ImGui::Button("Save Audio ID")) {
-								if (NIKE_ASSETS_SERVICE->checkAudioExist(input_audio_id))
+								if (NIKE_ASSETS_SERVICE->checkSfxExist(input_audio_id))
 								{
 									// Update audio ID in component
 									sfx_comp.audio_id = input_audio_id;
@@ -1349,7 +1349,7 @@ namespace NIKE {
 
 		// Saving input
 		if (ImGui::Button("Save Audio Input")) {
-			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file)))
+			if (NIKE_ASSETS_SERVICE->checkSfxExist(std::string(current_audio_file)))
 			{
 				ImGui::OpenPopup("VALID INPUT");
 				show_save_popup = true;
@@ -1375,7 +1375,7 @@ namespace NIKE {
 
 		if (ImGui::Button("Play BGM"))
 		{
-			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+			if (NIKE_ASSETS_SERVICE->checkSfxExist(std::string(current_audio_file))
 				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
 			{
 				std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
@@ -1392,7 +1392,7 @@ namespace NIKE {
 
 		if (ImGui::Button("Stop BGM"))
 		{
-			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+			if (NIKE_ASSETS_SERVICE->checkSfxExist(std::string(current_audio_file))
 				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
 			{
 

@@ -73,20 +73,22 @@ namespace NIKE {
 			//Fmod System
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
 
-			//Map of audios
-			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> audio_list;
+			//Map of audios split into sfx and music
+			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> sfx_list;
+			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> music_list;
 
 			/*****************************************************************//**
 			* File Paths for specific asset types
 			*********************************************************************/
-			std::string texture_path = "assets/Textures/";
-			std::string audio_path = "assets/Audios/";
-			std::string font_path = "assets/Fonts/";
-			std::string models_path = "assets/Models/";
-			std::string scenes_path = "assets/Scenes/";
-			std::string shaders_path = "assets/Shaders/";
-			std::string prefabs_path = "assets/Prefabs/";
-			std::string scripts_path = "assets/Scripts/";
+			std::string texture_path = "assets\\Textures\\";
+			std::string sfx_path = "assets\\Audios\\SFX";
+			std::string music_path = "assets\\Audios\\Music";
+			std::string font_path = "assets\\Fonts\\";
+			std::string models_path = "assets\\Models\\";
+			std::string scenes_path = "assets\\Scenes\\";
+			std::string shaders_path = "assets\\Shaders\\";
+			std::string prefabs_path = "assets\\Prefabs\\";
+			std::string scripts_path = "assets\\Scripts\\";
 
 			/*****************************************************************//**
 			* Scn (Levels) private members
@@ -208,32 +210,32 @@ namespace NIKE {
 			/*****************************************************************//**
 			* Audio
 			*********************************************************************/
-			// Load sound audio
-			void loadSound(std::string const& audio_id, std::string const& file_path);
-
-			// Reload sound
-			void reloadSound(std::string const& audio_id, std::string const& file_path);
-
-			//Load music audio
+			// Load audio
+			void loadSfx(std::string const& audio_id, std::string const& file_path);
 			void loadMusic(std::string const& audio_id, std::string const& file_path);
 
-			// Reload music
+			// Reload audio
+			void reloadSfx(std::string const& audio_id, std::string const& file_path);
 			void reloadMusic(std::string const& audio_id, std::string const& file_path);
 
-			//Unload Audio
-			void unloadAudio(std::string const& audio_id);
+			//Unload specific audio
+			void unloadSfx(const std::string& audio_id);
+			void unloadMusic(const std::string& audio_id);
 
 			//Unload all audios
 			void unloadAllAudios();
 
 			//Get audio
-			std::shared_ptr<Audio::IAudio> getAudio(std::string const& audio_tag);
+			std::shared_ptr<Audio::IAudio> getSfx(std::string const& audio_tag);
+			std::shared_ptr<Audio::IAudio> getMusic(std::string const& audio_tag);
 
 			//Get audios
-			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedAudios();
+			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedSfx();
+			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedMusic();
 
 			//Check if audio exits
-			bool checkAudioExist(std::string const& audio_tag);
+			bool checkSfxExist(std::string const& audio_tag);
+			bool checkMusicExist(std::string const& audio_tag);
 
 			//Handle drop for textures
 			void handleAudioDrop(const std::filesystem::path& src_file_path);
@@ -269,7 +271,8 @@ namespace NIKE {
 			* File path gettors
 			*********************************************************************/
 			std::string const& getTexturePath(); 
-			std::string const& getAudioPath(); 
+			std::string const& getSfxPath(); 
+			std::string const& getMusicPath();
 			std::string const& getFontPath(); 
 			std::string const& getModelsPath(); 
 			std::string const& getScenesPath(); 
