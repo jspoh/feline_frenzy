@@ -294,7 +294,7 @@ namespace NIKE {
 
 			//Game State Switching
 			{
-				ImGui::Text("Play / Pause Simulation : ");
+				ImGui::Text("Play/Pause Game: ");
 				ImGui::Button(b_game_state ? "Play" : "Pause");
 
 				//Check if button has been activated
@@ -320,7 +320,7 @@ namespace NIKE {
 
 			//Debug Mode Switching
 			{
-				ImGui::Text("Toggle Debug Mode : ");
+				ImGui::Text("Show Debug: ");
 				ImGui::Button(b_debug_mode ? "Show##DebugMode" : "Hide##DebugMode");
 
 				//Check if button has been activated
@@ -346,7 +346,7 @@ namespace NIKE {
 
 			//Grid Mode Switching
 			{
-				ImGui::Text("Show Grid : ");
+				ImGui::Text("Show Grid: ");
 				ImGui::Button(b_grid_state ? "Show##GridState" : "Hide##GridState");
 
 				//Check if button has been activated
@@ -372,7 +372,7 @@ namespace NIKE {
 
 			//Gizmo usage showing
 			{
-				ImGui::Text("Transfomation Gizmo : ");
+				ImGui::Text("Transfomation Gizmo: ");
 				ImGui::Button(b_gizmo_state ? "Enable##Gizmo" : "Disable##Gizmo");
 
 				//Check if button has been activated
@@ -394,25 +394,28 @@ namespace NIKE {
 				}
 			}
 
-			//Reset Scene
 			ImGui::Spacing();
-			ImGui::Text("Reset Scene :");
-			if (ImGui::Button("Reset")) {
 
-				//Get scn file path tagged to active scene
-				std::string curr_scn_file = NIKE_SCENES_SERVICE->getCurrScene()->getScnPath();
+			//Reset Scene
+			{
+				ImGui::Text("Reset Scene:");
+				if (ImGui::Button("Reset")) {
 
-				//Resetting Curr Scn File
-				if (!curr_scn_file.empty() && std::filesystem::exists(curr_scn_file)) {
+					//Get scn file path tagged to active scene
+					std::string curr_scn_file = NIKE_SCENES_SERVICE->getCurrScene()->getScnPath();
 
-					// Clear previous scene entities before loading the new one
-					NIKE_ECS_MANAGER->destroyAllEntities();
+					//Resetting Curr Scn File
+					if (!curr_scn_file.empty() && std::filesystem::exists(curr_scn_file)) {
 
-					// Load the scene from the selected file path
-					NIKE_SERIALIZE_SERVICE->loadSceneFromFile(curr_scn_file);
-				}
-				else {
-					NIKEE_CORE_ERROR("Error: Scene file path is invalid or file does not exist.");
+						// Clear previous scene entities before loading the new one
+						NIKE_ECS_MANAGER->destroyAllEntities();
+
+						// Load the scene from the selected file path
+						NIKE_SERIALIZE_SERVICE->loadSceneFromFile(curr_scn_file);
+					}
+					else {
+						NIKEE_CORE_ERROR("Error: Scene file path is invalid or file does not exist.");
+					}
 				}
 			}
 
@@ -691,6 +694,8 @@ namespace NIKE {
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
 		registerPopUp("Clone Entity", cloneEntityPopUp("Clone Entity"));
+		error_msg = std::make_shared<std::string>("Error");
+		registerPopUp("Error", defPopUp("Error", error_msg));
 
 		//Game panel reference
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
@@ -785,38 +790,43 @@ namespace NIKE {
 		//Check if there are entities present
 		if (!entities.empty()) {
 
-			//Reverse Iterate through layers to check for entity being clicked
-			static bool entity_clicked = false;
-			entity_clicked = false;
-			for (auto layer = NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rbegin();
-				!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !entity_clicked &&
-				layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
-				layer++) {
+			//Check for disable entity interaction flag
+			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
 
-				//SKip inactive layer
-				if (!layer->get()->getLayerState())
-					continue;
+				//Reverse Iterate through layers to check for entity being clicked
+				static bool entity_clicked = false;
+				entity_clicked = false;
 
-				//Iterate through all entities
-				for (auto& entity : entities) {
+				//Iterate through entities from top layer down
+				for (auto layer = NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rbegin();
+					!entity_clicked && layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
+					layer++) {
 
-					//Skip entities not on curr layer
-					if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
+					//SKip inactive layer
+					if (!layer->get()->getLayerState())
 						continue;
 
-					//Check for entity clicking
-					if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-						selected_entity = entity.first;
+					//Iterate through all entities
+					for (auto& entity : entities) {
 
-						//Get selected entity data
-						auto it = entity_to_name.find(selected_entity);
+						//Skip entities not on curr layer
+						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
+							continue;
 
-						//Signal entity changed
-						b_entity_changed = true;
+						//Check for entity clicking
+						if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+							selected_entity = entity.first;
 
-						//Signal that an entity has been clicked
-						entity_clicked = true;
-						break;
+							//Get selected entity data
+							auto it = entity_to_name.find(selected_entity);
+
+							//Signal entity changed
+							b_entity_changed = true;
+
+							//Signal that an entity has been clicked
+							entity_clicked = true;
+							break;
+						}
 					}
 				}
 			}
@@ -830,6 +840,7 @@ namespace NIKE {
 				//Show selectable
 				if (ImGui::Selectable(entity_to_name.at(entity.first).c_str(), selected)) {
 
+					//Select entity
 					if (selected_entity != entity.first) {
 						selected_entity = entity.first;
 
@@ -841,13 +852,15 @@ namespace NIKE {
 						unselectEntity();
 						b_entity_changed = true;
 					}
+
+					//Check here if tilemap is editing grid
+					if (tilemap_panel.lock()->checkGridEditing()) {
+						error_msg->assign("Editing grid now, unable to select entity.");
+						openPopUp("Error");
+						unselectEntity();
+					}
 				}
 			}
-		}
-
-		//Check here if tilemap is editing grid
-		if (tilemap_panel.lock()->checkGridEditing()) {
-			unselectEntity();
 		}
 
 		//Render popups
@@ -963,9 +976,15 @@ namespace NIKE {
 			gizmo.objects["Move Box"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
 
 			//Interaction with move box
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Move Box"])) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || ((!gizmo.b_dragging_hori && !gizmo.b_dragging_vert) && Utility::isCursorInTransform(world_mouse, gizmo.objects["Move Box"]))) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+				//Set dragging flags
 				gizmo.b_dragging_hori = true;
 				gizmo.b_dragging_vert = true;
+
+				//Update prev transform
+				gizmo.prev_transform = e_transform;
+
+				//Apply transformation
 				e_transform.position = { world_mouse.x - (e_transform.scale.x * 0.75f),  -world_mouse.y - (e_transform.scale.y * 0.75f) };
 			}
 
@@ -982,6 +1001,9 @@ namespace NIKE {
 				//Set dragging flags
 				gizmo.b_dragging_vert = true;
 				gizmo.b_dragging_hori = false;
+
+				//Update prev transform
+				gizmo.prev_transform = e_transform;
 
 				//Static variables to store initial values
 				static float initial_mouse_y = 0.0f;
@@ -1014,6 +1036,9 @@ namespace NIKE {
 				//Set dragging flags
 				gizmo.b_dragging_vert = false;
 				gizmo.b_dragging_hori = true;
+
+				//Update prev transform
+				gizmo.prev_transform = e_transform;
 				
 				//Static variables to store initial values
 				static float initial_mouse_x = 0.0f;
@@ -1043,13 +1068,33 @@ namespace NIKE {
 				gizmo.b_dragging_hori = false;
 				gizmo.b_dragging_vert = false;
 
-				//Get snapped to cell position
-				auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(e_transform.position);
-				if (cursor_cell.has_value()) {
+				//Check if grid snapping is enabled
+				if (checkGridSnapping()) {
 
-					//Snap to cell
-					e_transform.position = cursor_cell.value().get().position;
+					//Get snapped to cell position
+					auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(e_transform.position);
+					if (cursor_cell.has_value()) {
+
+						//Snap to cell
+						e_transform.position = cursor_cell.value().get().position;
+					}
 				}
+
+				//Apply action
+				LevelEditor::Action change_pos;
+
+				//Change pos do action
+				change_pos.do_action = [&, pos = e_transform.position]() {
+					e_transform.position = pos;
+					};
+
+				//Change pos undo action
+				change_pos.undo_action = [&, pos = gizmo.prev_transform.position]() {
+					e_transform.position = pos;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pos));
 			}
 
 			break;
@@ -1069,6 +1114,9 @@ namespace NIKE {
 				//Set dragging flags
 				gizmo.b_dragging_vert = true;
 				gizmo.b_dragging_hori = false;
+
+				//Update prev transform
+				gizmo.prev_transform = e_transform;
 
 				//Static variables to store initial values
 				static float initial_mouse_y = 0.0f;
@@ -1111,6 +1159,9 @@ namespace NIKE {
 				gizmo.b_dragging_vert = false;
 				gizmo.b_dragging_hori = true;
 
+				//Update prev transform
+				gizmo.prev_transform = e_transform;
+
 				//Static variables to store initial values
 				static float initial_mouse_x = 0.0f;
 				static float initial_scale_x = 0.0f;
@@ -1146,11 +1197,28 @@ namespace NIKE {
 				//Reset dragging flags
 				gizmo.b_dragging_hori = false;
 				gizmo.b_dragging_vert = false;
+
+				//Apply action
+				LevelEditor::Action change_scale;
+
+				//Change scale do action
+				change_scale.do_action = [&, scale = e_transform.scale]() {
+					e_transform.scale = scale;
+					};
+
+				//Change scale undo action
+				change_scale.undo_action = [&, scale = gizmo.prev_transform.scale]() {
+					e_transform.scale = scale;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_scale));
 			}
 
 			break;
 		}
 		case GizmoMode::Rotate: {
+
 			break;
 		}
 		default: {
@@ -1366,6 +1434,9 @@ namespace NIKE {
 		//Main panel reference
 		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 
+		//Tilemap panel reference
+		tilemap_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
+
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
@@ -1431,84 +1502,87 @@ namespace NIKE {
 				}
 			}
 
-			//Add Spacing
-			ImGui::Spacing();
+			//Transformation gizmo is enabled
+			if (main_panel.lock()->getGizmoState()) {
+				//Add Spacing
+				ImGui::Spacing();
 
-			//Add Separator
-			ImGui::Separator();
+				//Add Separator
+				ImGui::Separator();
 
-			//Add Spacing
-			ImGui::Spacing();
+				//Add Spacing
+				ImGui::Spacing();
 
-			//Gizmo functionalities
-			{
-				//Toggle gizmo state
+				//Gizmo functionalities
 				{
-					ImGui::Text("Gizmo Mode: ");
+					//Toggle gizmo state
+					{
+						ImGui::Text("Gizmo Mode: ");
 
-					//Array of gizmo mode names
-					const char* gizmo_mode_names[] = { "Translate", "Scale", "Rotate" };
-					int current_mode = static_cast<int>(gizmo.mode);
-					static int prev_mode = static_cast<int>(gizmo.mode);
+						//Array of gizmo mode names
+						const char* gizmo_mode_names[] = { "Translate", "Scale", "Rotate" };
+						int current_mode = static_cast<int>(gizmo.mode);
+						static int prev_mode = static_cast<int>(gizmo.mode);
 
-					//Render the dropdown
-					if (ImGui::Combo("##Gizmo Mode", &current_mode, gizmo_mode_names, IM_ARRAYSIZE(gizmo_mode_names))) {
+						//Render the dropdown
+						if (ImGui::Combo("##Gizmo Mode", &current_mode, gizmo_mode_names, IM_ARRAYSIZE(gizmo_mode_names))) {
 
-						//Set gizmo mode
-						Action set_gizmo_mode;
+							//Set gizmo mode
+							Action set_gizmo_mode;
 
-						//Do gizmo mode
-						set_gizmo_mode.do_action = [&, mode = current_mode]() {
-							gizmo.mode = static_cast<GizmoMode>(mode);
-							};
+							//Do gizmo mode
+							set_gizmo_mode.do_action = [&, mode = current_mode]() {
+								gizmo.mode = static_cast<GizmoMode>(mode);
+								};
 
-						//Undo gizmo mode
-						set_gizmo_mode.undo_action = [&, mode = prev_mode]() {
-							gizmo.mode = static_cast<GizmoMode>(mode);
-							};
+							//Undo gizmo mode
+							set_gizmo_mode.undo_action = [&, mode = prev_mode]() {
+								gizmo.mode = static_cast<GizmoMode>(mode);
+								};
 
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_mode));
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_mode));
 
-						//Set prev mode to current mode
-						prev_mode = current_mode;
-					}
-				}
-
-				//Set Gizmo Sensitivity
-				{
-					ImGui::Text("Set Gizmo Sensitivity: ");
-					ImGui::DragFloat("##GizmoSensitivity", &gizmo.sensitivity, 0.01f, 0.0f, 5.0f);
-
-					//Before editing
-					static float sensitivity_before_change = gizmo.sensitivity;
-					if (ImGui::IsItemActivated()) {
-						sensitivity_before_change = gizmo.sensitivity;
+							//Set prev mode to current mode
+							prev_mode = current_mode;
+						}
 					}
 
-					//Upon editing finish
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						//Set gizmo sensi
-						Action set_gizmo_sensi;
+					//Set Gizmo Sensitivity
+					{
+						ImGui::Text("Set Gizmo Sensitivity: ");
+						ImGui::DragFloat("##GizmoSensitivity", &gizmo.sensitivity, 0.01f, 0.0f, 5.0f);
 
-						//Do gizmo sensi
-						set_gizmo_sensi.do_action = [&, sensi = gizmo.sensitivity]() {
-							gizmo.sensitivity = sensi;
-							};
+						//Before editing
+						static float sensitivity_before_change = gizmo.sensitivity;
+						if (ImGui::IsItemActivated()) {
+							sensitivity_before_change = gizmo.sensitivity;
+						}
 
-						//Undo gizmo sensi
-						set_gizmo_sensi.undo_action = [&, sensi = sensitivity_before_change]() {
-							gizmo.sensitivity = sensi;
-							};
+						//Upon editing finish
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							//Set gizmo sensi
+							Action set_gizmo_sensi;
 
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_sensi));
+							//Do gizmo sensi
+							set_gizmo_sensi.do_action = [&, sensi = gizmo.sensitivity]() {
+								gizmo.sensitivity = sensi;
+								};
+
+							//Undo gizmo sensi
+							set_gizmo_sensi.undo_action = [&, sensi = sensitivity_before_change]() {
+								gizmo.sensitivity = sensi;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_sensi));
+						}
 					}
-				}
 
-				//Interact with gizmo
-				if (main_panel.lock()->getGizmoState()) {
-					interactGizmo();
+					//Interact with gizmo
+					if (main_panel.lock()->getGizmoState()) {
+						interactGizmo();
+					}
 				}
 			}
 
@@ -1694,6 +1768,10 @@ namespace NIKE {
 
 	bool LevelEditor::ComponentsPanel::checkGizmoInteraction() const {
 		return gizmo.b_interacting;
+	}
+
+	bool LevelEditor::ComponentsPanel::checkGridSnapping() const {
+		return tilemap_panel.lock()->checkGridSnapping();
 	}
 
 	/*****************************************************************//**
@@ -2069,13 +2147,14 @@ namespace NIKE {
 	* Tile Map Management Panel
 	*********************************************************************/
 	void LevelEditor::TileMapPanel::init() {
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 	}
 
 	void LevelEditor::TileMapPanel::update() {
 
 		//Clicking to set map cells to blocked
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
-		if (!checkPopUpShowing() && b_grid_mode && game_window->isMouseInWindow() && NIKE_MAP_SERVICE->getCursorCell().has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+		if (!checkPopUpShowing() && b_grid_edit && game_window->isMouseInWindow() && NIKE_MAP_SERVICE->getCursorCell().has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
 			NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked = !NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked;
 		}
 	}
@@ -2083,7 +2162,64 @@ namespace NIKE {
 	void LevelEditor::TileMapPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-		//Show Grid Scale
+		//Adjust grid mode
+		{
+			//Adjust grid mode
+			ImGui::Text("Set grid mode: ");
+			ImGui::SameLine();
+			ImGui::SmallButton(b_grid_edit ? "Editing" : "View");
+
+			//Check if button has been activated
+			if (ImGui::IsItemActivated()) {
+				Action set_grid_mode;
+
+				//Do grid mode
+				set_grid_mode.do_action = [&, mode = !b_grid_edit]() {
+					b_grid_edit = mode;
+					entities_panel.lock()->unselectEntity();
+					};
+
+				//Undo grid mode
+				set_grid_mode.undo_action = [&, mode = b_grid_edit]() {
+					b_grid_edit = mode;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_grid_mode));
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Adjust snap to grid mode
+		{
+			//Adjust cell size
+			ImGui::Text("Snap entity to grid: ");
+			ImGui::SameLine();
+			ImGui::SmallButton(b_snap_to_grid ? "Enable##Snapping" : "Disable##Snapping");
+
+			//Check if button has been activated
+			if (ImGui::IsItemActivated()) {
+				Action set_grid_snapping;
+
+				//Do grid snapping
+				set_grid_snapping.do_action = [&, mode = !b_snap_to_grid]() {
+					b_snap_to_grid = mode;
+					};
+
+				//Undo grid snapping
+				set_grid_snapping.undo_action = [&, mode = b_snap_to_grid]() {
+					b_snap_to_grid = mode;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_grid_snapping));
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Show grid scale
 		{
 			auto grid_scale = NIKE_MAP_SERVICE->getGridScale();
 			ImGui::Text("Grid scale: %.3f, %.3f", grid_scale.x, grid_scale.y);
@@ -2099,7 +2235,7 @@ namespace NIKE {
 
 			//Adjust grid size
 			ImGui::Text("Adjust grid size: ");
-			ImGui::DragInt2("Grid Size", &grid_size.x, 0.1f, 0, INT16_MAX);
+			ImGui::DragInt2("##Grid Size", &grid_size.x, 0.1f, 0, INT16_MAX);
 
 			//Check if grid has begun editing
 			if (ImGui::IsItemActivated()) {
@@ -2137,7 +2273,7 @@ namespace NIKE {
 
 			//Adjust cell size
 			ImGui::Text("Adjust cell size: ");
-			ImGui::DragFloat2("Cell Size", &cell_size.x, 0.1f, 0, INT16_MAX);
+			ImGui::DragFloat2("##Cell Size", &cell_size.x, 0.1f, 0, INT16_MAX);
 
 			//Check if cell has begun editing
 			if (ImGui::IsItemActivated()) {
@@ -2162,34 +2298,6 @@ namespace NIKE {
 
 				//Execute action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cell_size));
-			}
-		}
-
-		ImGui::Spacing();
-
-		//Adjust grid mode
-		{
-			//Adjust cell size
-			ImGui::Text("Set grid mode: ");
-			ImGui::SameLine();
-			ImGui::SmallButton(b_grid_mode ? "Editing" : "View");
-
-			//Check if button has been activated
-			if (ImGui::IsItemActivated()) {
-				Action set_grid_mode;
-
-				//Do grid mode
-				set_grid_mode.do_action = [&, mode = !b_grid_mode]() {
-					b_grid_mode = mode;
-					};
-
-				//Undo grid mode
-				set_grid_mode.undo_action = [&, mode = b_grid_mode]() {
-					b_grid_mode = mode;
-					};
-
-				//Execute action
-				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_grid_mode));
 			}
 		}
 
@@ -2231,7 +2339,7 @@ namespace NIKE {
 		{
 			static float thickness_before_change = 0.0f;
 			ImGui::Text("Adjust grid thickness: ");
-			ImGui::DragFloat("Grid Thickness", &grid_thickness, 0.1f, 1.0f, 10.0f);
+			ImGui::DragFloat("##Grid Thickness", &grid_thickness, 0.1f, 1.0f, 10.0f);
 
 			//Check if thickness has begun editing
 			if (ImGui::IsItemActivated()) {
@@ -2313,8 +2421,12 @@ namespace NIKE {
 		}
 	}
 
-	bool LevelEditor::TileMapPanel::checkGridEditing() {
-		return b_grid_mode;
+	bool LevelEditor::TileMapPanel::checkGridEditing() const {
+		return b_grid_edit;
+	}
+
+	bool LevelEditor::TileMapPanel::checkGridSnapping() const {
+		return b_snap_to_grid;
 	}
 
 	/*****************************************************************//**

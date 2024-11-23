@@ -57,6 +57,19 @@ namespace NIKE {
 
 					//Check if position has finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						
+						//Check for grid snapping
+						if (comp_panel.checkGridSnapping()) {
+							//Get snapped to cell position
+							auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(comp.position);
+							if (cursor_cell.has_value()) {
+
+								//Snap to cell
+								comp.position = cursor_cell.value().get().position;
+							}
+						}
+
+						//Apply action
 						LevelEditor::Action change_pos;
 
 						//Change pos do action

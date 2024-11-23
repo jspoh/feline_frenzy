@@ -199,6 +199,9 @@ namespace NIKE {
 			//Reference to component panel
 			std::weak_ptr<ComponentsPanel> comp_panel;
 
+			//Error msg
+			std::shared_ptr<std::string> error_msg;
+
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 
@@ -304,6 +307,9 @@ namespace NIKE {
 			//Reference to main panel
 			std::weak_ptr<MainPanel> main_panel;
 
+			//Reference to tilemap panel
+			std::weak_ptr<TileMapPanel> tilemap_panel;
+
 			//Boolean to signal dragging of entity
 			bool b_dragging_entity;
 
@@ -387,6 +393,9 @@ namespace NIKE {
 
 			//Check if there is interaction with gizmo
 			bool checkGizmoInteraction() const;
+
+			//Check if entity is snapping to grid
+			bool checkGridSnapping() const;
 		};
 
 		//Debug Management Panel
@@ -494,10 +503,16 @@ namespace NIKE {
 			Vector4f grid_color;
 
 			//Boolean for grid mode
-			bool b_grid_mode;
+			bool b_grid_edit;
+
+			//Booelean for snapping entities to grid
+			bool b_snap_to_grid;
+
+			//Reference to game window panel
+			std::weak_ptr<EntitiesPanel> entities_panel;
 
 		public:
-			TileMapPanel() : grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_mode{ false } {}
+			TileMapPanel() : grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_edit{ false }, b_snap_to_grid{ false } {}
 			~TileMapPanel() = default;
 
 			//Panel Name
@@ -523,7 +538,10 @@ namespace NIKE {
 			void renderGrid(void* draw_list, Vector2f const& render_size);
 
 			//Get grid editing mode
-			bool checkGridEditing();
+			bool checkGridEditing() const;
+
+			//Get grid snapping
+			bool checkGridSnapping() const;
 		};
 
 		//Game Window Panel
