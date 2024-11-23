@@ -166,6 +166,10 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Rendering
 	*********************************************************************/
+
+	/*****************************************************************//**
+	* Shaders
+	*********************************************************************/
 	void Assets::Service::loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
 		if (shaders_list.find(shader_id) != shaders_list.end())
 		{
@@ -224,7 +228,9 @@ namespace NIKE {
 	{
 		return shaders_list;
 	}
-
+	/*****************************************************************//**
+	* Models
+	*********************************************************************/
 	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering) {
 		if (models_list.find(model_id) != models_list.end())
 		{
@@ -295,7 +301,9 @@ namespace NIKE {
 		}
 		return true;
 	}
-
+	/*****************************************************************//**
+	* Textures
+	*********************************************************************/
 	void Assets::Service::loadTexture(std::string const& texture_id, std::string const& file_path) {
 		if (textures_list.find(texture_id) != textures_list.end())
 		{
@@ -361,11 +369,11 @@ namespace NIKE {
 	}
 
 	void Assets::Service::handleTextureDrop(const std::filesystem::path& src_file_path) {
-		std::filesystem::path tgt_file_path = "assets/textures" / src_file_path.filename();
+		std::filesystem::path tgt_file_path = "assets\\textures" / src_file_path.filename();
 
 		try {
 			std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
-			NIKEE_CORE_INFO("File {} successfully copied into assets/textures", src_file_path.string());
+			NIKEE_CORE_INFO("File {} successfully copied into assets\\textures", src_file_path.string());
 		}
 		catch (const std::filesystem::filesystem_error& e) {
 			NIKEE_CORE_ERROR("ERROR: Failed to copy {}: {}", src_file_path.string(), e.what());
@@ -534,11 +542,11 @@ namespace NIKE {
 	}
 
 	void Assets::Service::handleAudioDrop(const std::filesystem::path& src_file_path) {
-		std::filesystem::path tgt_file_path = "assets/Audios" / src_file_path.filename();
+		std::filesystem::path tgt_file_path = "assets\\Audios" / src_file_path.filename();
 
 		try {
 			// std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
-			NIKEE_CORE_INFO("File {} successfully copied into assets/Audios", src_file_path.string());
+			NIKEE_CORE_INFO("File {} successfully copied into assets\\Audios", src_file_path.string());
 		}
 		catch (const std::filesystem::filesystem_error& e) {
 			NIKEE_CORE_ERROR("ERROR: Failed to copy {}: {}", src_file_path.string(), e.what());
@@ -658,9 +666,14 @@ namespace NIKE {
 		return texture_path; 
 	}
 
-	std::string const& Assets::Service::getAudioPath() 
+	std::string const& Assets::Service::getSfxPath() 
 	{
-		return audio_path; 
+		return sfx_path; 
+	}
+
+	std::string const& Assets::Service::getMusicPath()
+	{
+		return music_path;
 	}
 
 	std::string const& Assets::Service::getFontPath() 
@@ -719,7 +732,7 @@ namespace NIKE {
 		else if (asset_type == "Audio") {
 
 			// Load new audio
-			for (const auto& audio_paths : std::filesystem::recursive_directory_iterator(getAudioPath())) {
+			for (const auto& audio_paths : std::filesystem::recursive_directory_iterator(getSfxPath())) {
 				if (hasValidAudioExtension(audio_paths)) {
 					std::string file_name = audio_paths.path().filename().string();
 
@@ -733,6 +746,23 @@ namespace NIKE {
 					}
 					else {
 						reloadSfx(file_name.substr(start, size), audio_paths.path().string());
+					}
+				}
+			}
+			for (const auto& audio_paths : std::filesystem::recursive_directory_iterator(getMusicPath())) {
+				if (hasValidAudioExtension(audio_paths)) {
+					std::string file_name = audio_paths.path().filename().string();
+
+					// Extract file name without leading backslashes or extension
+					size_t start = file_name.find_first_not_of('\\');
+					size_t size = file_name.find_first_of('.', start) - start;
+
+					// Check if the audio already exists before loading
+					if (!checkSfxExist(file_name.substr(start, size))) {
+						loadMusic(file_name.substr(start, size), audio_paths.path().string());
+					}
+					else {
+						reloadMusic(file_name.substr(start, size), audio_paths.path().string());
 					}
 				}
 			}
@@ -890,13 +920,24 @@ namespace NIKE {
 
 	bool Assets::Service::deleteFile(std::string const& file_path, const std::string& asset_type)
 	{
-		if (asset_type == "Audio") {
+		if (asset_type == "Sfx") {
 			// FMOD free before deleting the sound
 			for (auto it = sfx_list.begin(); it != sfx_list.end(); it++) {
 				const auto& audio = *it;
 				if (audio.second && audio.second->getFilePath() == file_path) {
 					audio.second->release();   // Release the sound
 					sfx_list.erase(it);   // Remove from the audio list
+					break;
+				}
+			}
+		}
+		else if (asset_type == "Music") {
+			// FMOD free before deleting the sound
+			for (auto it = music_list.begin(); it != music_list.end(); it++) {
+				const auto& audio = *it;
+				if (audio.second && audio.second->getFilePath() == file_path) {
+					audio.second->release();   // Release the sound
+					music_list.erase(it);   // Remove from the audio list
 					break;
 				}
 			}

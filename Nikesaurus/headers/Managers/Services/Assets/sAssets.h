@@ -80,14 +80,15 @@ namespace NIKE {
 			/*****************************************************************//**
 			* File Paths for specific asset types
 			*********************************************************************/
-			std::string texture_path = "assets/Textures/";
-			std::string audio_path = "assets/Audios/";
-			std::string font_path = "assets/Fonts/";
-			std::string models_path = "assets/Models/";
-			std::string scenes_path = "assets/Scenes/";
-			std::string shaders_path = "assets/Shaders/";
-			std::string prefabs_path = "assets/Prefabs/";
-			std::string scripts_path = "assets/Scripts/";
+			std::string texture_path = "assets\\Textures\\";
+			std::string sfx_path = "assets\\Audios\\SFX";
+			std::string music_path = "assets\\Audios\\Music";
+			std::string font_path = "assets\\Fonts\\";
+			std::string models_path = "assets\\Models\\";
+			std::string scenes_path = "assets\\Scenes\\";
+			std::string shaders_path = "assets\\Shaders\\";
+			std::string prefabs_path = "assets\\Prefabs\\";
+			std::string scripts_path = "assets\\Scripts\\";
 
 			/*****************************************************************//**
 			* Scn (Levels) private members
@@ -270,7 +271,8 @@ namespace NIKE {
 			* File path gettors
 			*********************************************************************/
 			std::string const& getTexturePath(); 
-			std::string const& getAudioPath(); 
+			std::string const& getSfxPath(); 
+			std::string const& getMusicPath();
 			std::string const& getFontPath(); 
 			std::string const& getModelsPath(); 
 			std::string const& getScenesPath(); 

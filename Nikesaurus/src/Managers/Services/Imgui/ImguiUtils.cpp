@@ -100,7 +100,7 @@ namespace NIKE
 				ImVec2 uv0(0.0f, 1.0f);
 				ImVec2 uv1(1.0f, 0.0f);
 
-				std::string unique_id = "##" + texture.first;
+				std::string unique_id = "X##TEXTURE_" + texture.first;
 				if (ImGui::ImageButton(unique_id.c_str(), (intptr_t)texture.second->gl_data, ImVec2(64, 64), uv0, uv1)) {
 					selected_texture = texture.first;
 				}
@@ -150,23 +150,53 @@ namespace NIKE
 		}
 		else if (asset_type == "Audio")
 		{
-			for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedSfx())
+			if (ImGui::BeginTabBar("AudioTabs"))
 			{
-				std::string buttonLabel = "X##" + audio.first;
+				if (ImGui::BeginTabItem("SFX"))
+				{
+					for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedSfx())
+					{
+						std::string buttonLabel = "X##SFX_" + audio.first;
 
-				if (ImGui::SmallButton(buttonLabel.c_str())) {
-					selected_file_path = audio.first;
-					delete_file_popup = true;
-					ImGui::OpenPopup("Confirm Delete");
+						if (ImGui::SmallButton(buttonLabel.c_str())) {
+							selected_file_path = audio.first;
+							delete_file_popup = true;
+							ImGui::OpenPopup("Confirm Delete");
+						}
+
+						ImGui::SameLine();
+						ImGui::Text("%s", audio.first.c_str());
+						ImGui::Separator();
+
+
+					}
+					delete_file_popup = showDeleteFilePopup(selected_file_path, "SFX");
+					ImGui::EndTabItem();
 				}
 
-				ImGui::SameLine();
-				ImGui::Text("%s", audio.first.c_str());
-				ImGui::Separator();
+				if (ImGui::BeginTabItem("Music"))
+				{
+					for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedMusic())
+					{
+						std::string buttonLabel = "X##MUSIC_" + audio.first;
 
-				
+						if (ImGui::SmallButton(buttonLabel.c_str())) {
+							selected_file_path = audio.first;
+							delete_file_popup = true;
+							ImGui::OpenPopup("Confirm Delete");
+						}
+
+						ImGui::SameLine();
+						ImGui::Text("%s", audio.first.c_str());
+						ImGui::Separator();
+
+
+					}
+					delete_file_popup = showDeleteFilePopup(selected_file_path, "Music");
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
 			}
-			delete_file_popup = showDeleteFilePopup(selected_file_path, "Audio");
 		}
 		else if (asset_type == "Fonts")
 		{
@@ -191,7 +221,7 @@ namespace NIKE
 			for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
 			{
 
-				std::string buttonLabel = "X##" + prefab.first;
+				std::string buttonLabel = "X##PREFAB_" + prefab.first;
 
 				if (ImGui::SmallButton(buttonLabel.c_str())) {
 					selected_file_path = prefab.first;
@@ -229,7 +259,7 @@ namespace NIKE
 			for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
 
 
-				std::string button_label = "X##" + level.first; // Small button has to have unqiue id in order to delete
+				std::string button_label = "X##LEVEL_" + level.first; // Small button has to have unqiue id in order to delete
 				if (ImGui::SmallButton(button_label.c_str())) {
 					selected_file_path = level.first;
 					delete_file_popup = true;
@@ -274,7 +304,7 @@ namespace NIKE
 
 			for (const auto& script : NIKE_LUA_SERVICE->getAllScripts())
 			{
-				std::string button_label = "X##" + script.first; // Small button has to have unqiue id in order to delete
+				std::string button_label = "X##SCRIPT_" + script.first; // Small button has to have unqiue id in order to delete
 				if (ImGui::SmallButton(button_label.c_str())) {
 					selected_file_path = script.first;
 					delete_file_popup = true;
