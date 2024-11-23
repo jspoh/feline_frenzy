@@ -807,7 +807,6 @@ namespace NIKE {
 
 			//Check for disable entity interaction flag
 			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
-
 				//Reverse Iterate through layers to check for entity being clicked
 				static bool entity_clicked = false;
 				entity_clicked = false;
@@ -979,9 +978,6 @@ namespace NIKE {
 
 		//Get mouse pos
 		Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
-
-		//Reset gizmo interaction
-		gizmo.b_interacting = false;
 
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
@@ -1259,13 +1255,16 @@ namespace NIKE {
 				float prev_angle = e_transform.rotation;
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2(-(world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2(-(world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+
+				//Wrap angle
+				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
 
 				//Convert angle from radians to degrees
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
 				//Update the entity's rotation angle
-				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
+				e_transform.rotation = std::clamp(angle_deg, 0.0f, 360.0f);
 
 				//Apply action
 				LevelEditor::Action change_rotation;
@@ -1306,17 +1305,16 @@ namespace NIKE {
 				}
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2(-(world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2(-(world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+
+				//Wrap angle
+				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
 
 				//Convert angle from radians to degrees
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
-				// Handle angle wrapping (crossing 0° or 360°)
-				if (angle_deg < 180.0f) angle_deg -= 360.0f;
-				if (angle_deg > -180.0f) angle_deg += 360.0f;
-
 				//Update the entity's rotation angle
-				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
+				e_transform.rotation = std::clamp(angle_deg, 0.0f, 360.0f);
 			}
 
 			//Dragging stopped
@@ -1352,14 +1350,18 @@ namespace NIKE {
 		//Iterate through all gizmo objects and add hover interaction
 		for (auto& object : gizmo.objects) {
 
-			//Skip the rotation circle
-			if (object.first == "Rot Circle") {
-				return;
-			}
-
 			//Apply small scale when cursor is in gizmo object
 			if (Utility::isCursorInTransform(world_mouse, object.second.first)) {
+
+				//Set flag for interaction with gizmo
 				gizmo.b_interacting = true;
+
+				//Skip the rotation circle
+				if (object.first == "Rot Circle") {
+					continue;
+				}
+
+				//Objects hover factor
 				object.second.first.scale.x *= 1.1f;
 				object.second.first.scale.y *= 1.1f;
 				object.second.second.r = static_cast<int>(object.second.second.r * 0.85f);
@@ -1598,6 +1600,9 @@ namespace NIKE {
 	void LevelEditor::ComponentsPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Reset gizmo interaction
+		gizmo.b_interacting = false;
+
 		//Check if an entity has been selected
 		if (NIKE_ECS_MANAGER->checkEntity(entities_panel.lock()->getSelectedEntity())) {
 
@@ -1676,6 +1681,9 @@ namespace NIKE {
 
 							//Set prev mode to current mode
 							prev_mode = current_mode;
+
+							//Clear gizmo objects
+							gizmo.objects.clear();
 						}
 					}
 
@@ -1787,7 +1795,7 @@ namespace NIKE {
 			}
 		}
 		else {
-			ImGui::Text("No active entities.");
+			ImGui::Text("Select an entity.");
 		}
 
 		//Render popups
@@ -1828,7 +1836,7 @@ namespace NIKE {
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
 
-		if (gizmo.mode == GizmoMode::Rotate) {
+		if (gizmo.mode == GizmoMode::Rotate && main_panel.lock()->getGizmoState()) {
 			//Render rotation circle
 			auto const& rotation_circle = gizmo.objects["Rot Circle"];
 			worldCircle(draw, rotation_circle.first, rendersize, IM_COL32(rotation_circle.second.r, rotation_circle.second.g, rotation_circle.second.b, rotation_circle.second.a), (e_transform.scale.length() * 0.02f));
@@ -2626,7 +2634,6 @@ namespace NIKE {
 			}
 		};
 	}
-
 
 	void LevelEditor::TileMapPanel::renderGrid(void* draw_list, Vector2f const& render_size) {
 
