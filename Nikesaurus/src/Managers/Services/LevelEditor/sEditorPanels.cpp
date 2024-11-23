@@ -614,6 +614,8 @@ namespace NIKE {
 
 		//Check if there are entities present
 		if (!entities.empty()) {
+			// Get entities marked for deletion
+			auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
 
 			//Reverse Iterate through layers to check for entity being clicked
 			static bool entity_clicked = false;
@@ -628,6 +630,9 @@ namespace NIKE {
 
 				//Iterate through all entities
 				for (auto& entity : entities) {
+					// Skip entities marked for deletion
+					if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
+						continue;
 
 					//Skip entities not on curr layer
 					if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))

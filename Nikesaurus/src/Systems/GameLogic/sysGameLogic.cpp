@@ -44,83 +44,94 @@ namespace NIKE {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
 
+		// Get entities marked for deletion
+		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
 
-			//SKip inactive layer
+			//Skip inactive layer
 			if (!(*layer)->getLayerState())
 				continue;
 
 			//Iterate through all entities
 			for (auto& entity : entities) {
-				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
-				
-				//Check for player logic comp
-				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
-				if (e_player_comp.has_value()) {
-					auto& e_player = e_player_comp.value().get();
-
-					//Skip if script  has not been set
-					if (e_player.script.script_path == "")
+				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+					// Skip entities marked for deletion
+					if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
 						continue;
 
-					int move = static_cast<int>(Utility::randFloat() * 3);
-					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
-				}
-
-				// Check for shooting comp
-				auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
-				if (e_shoot_comp.has_value()) {
-					// Get entity's position
-					auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-					Vector2f shooter_pos = e_transform_comp.value().get().position;
-
-					// Create bullet
-					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
-						std::string script_path = "assets/Scripts/createBullet.lua";
-						std::string function_name = "createBullet";
-						std::string prefab_path = "bullet.prefab";
-
-						// Load Lua Script
-						std::string script_id = lua_system->loadScript(script_path);
-
-						// Check if the script is loaded successfully
-						if (script_id.empty()) {
-							NIKEE_CORE_ERROR("Failed to load script: " + script_path);
-						}
-
-						// Execute Lua Script
-						sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
+					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+						continue;
 
 
-						int layer_id = 0;
+					//Check for player logic comp
+					auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+					if (e_player_comp.has_value()) {
+						auto& e_player = e_player_comp.value().get();
 
-						if (!create_bullet_func.valid()) {
-							NIKEE_CORE_ERROR("Failed to execute Lua script: " + script_path);
-						}
-						else {
-							// Function was valid 
-							sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y);
+						//Skip if script  has not been set
+						if (e_player.script.script_path == "")
+							continue;
 
+						int move = static_cast<int>(Utility::randFloat() * 3);
+						executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
+					}
 
-							if (!result.valid()) {
-								sol::error err = result;
-								NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
+					// Check for shooting comp
+					auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
+					if (e_shoot_comp.has_value()) {
+						// Get entity's position
+						auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+						Vector2f shooter_pos = e_transform_comp.value().get().position;
+						//auto& shoot_values = e_shoot_comp.value().get();
+
+						// Create bullet
+						if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
+							// TODO: Add cooldown check HERE
+							std::string script_path = "assets/Scripts/createBullet.lua";
+							std::string function_name = "createBullet";
+							std::string prefab_path = "damageBullet.prefab";
+							int layer_id = 0; // Placeholder
+
+							// Load Lua Script
+							std::string script_id = lua_system->loadScript(script_path);
+
+							// Check if the script is loaded successfully
+							if (script_id.empty()) {
+								NIKEE_CORE_ERROR("Failed to load script: " + script_path);
 							}
+
+							// Execute Lua Script
+							sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
+
+
+							// Checking if something went wrong w cpp func
+							if (!create_bullet_func.valid()) {
+								NIKEE_CORE_ERROR("Failed to execute Lua script: " + script_path);
+							}
+							else {
+								// Function was valid 
+								sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y);
+
+								// Checking if something went wrong with lua func
+								if (!result.valid()) {
+									sol::error err = result;
+									NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
+								}
+							}
+							//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+							//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
 						}
-
-						
-						//create_bullet_func(layer_id, prefab_path);
-
-						//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
-						//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
 					}
 				}
 			}
 		}
+		// Destroy all entities that are marked for deletion
+		//NIKEE_CORE_INFO("GG TO DESTROY MARKED ENTITIES");
+		NIKE_ECS_MANAGER->destroyMarkedEntities();
 	}
-
+}
 	//void GameLogic::Manager::init() {
 
 	//	// Variable to store player entity ID
@@ -335,5 +346,5 @@ namespace NIKE {
 	//	// If no player entity is found, return default entity...
 	//	return Entity::Type{}; // Need to adjust if no player entity in scene
 	//}
-}
+
 

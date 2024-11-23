@@ -508,12 +508,20 @@ namespace NIKE {
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
+		// Get entities marked for deletion
+		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
 
 			for (auto& entity : entities) {
+
+				// Skip entities marked for deletion
+				if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
+					continue;
+
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 

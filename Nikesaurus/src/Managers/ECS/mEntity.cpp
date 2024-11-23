@@ -89,9 +89,23 @@ namespace NIKE {
 	}
 
 	unsigned int Entity::Manager::getLayerID(Entity::Type entity) const {
+
 		//Check if entity has alr been created
 		if (entities.find(entity) == entities.end()) {
 			throw std::runtime_error("Entity not found.");
+		}
+
+		// Get entities marked for deletion
+		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+		// Skip entities marked for deletion
+		if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
+			throw std::runtime_error("Entity marked for deletion.");
+
+		try {
+		//NIKEE_CORE_INFO("Checking entity: {}", entity);
+		}
+		catch (const std::exception& e) {
+			NIKEE_CORE_ERROR("Error accessing entity layer ID: {}", e.what());
 		}
 
 		//Get Signature

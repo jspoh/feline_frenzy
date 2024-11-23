@@ -16,6 +16,7 @@
 #include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
 #include "Systems/Render/sysRender.h"
+#include "Systems/GameLogic/sysInteraction.h"
 
 namespace NIKE {
 
@@ -44,7 +45,6 @@ namespace NIKE {
 		//Register render components
 		GameLogic::registerComponents();
 
-		// The following components cannot be edited in IMGUI:
 		//Register shooting components
 		Shooting::registerComponents();
 
@@ -84,6 +84,13 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Text>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Shape>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
+
+		//Register interaction manager
+		auto interaction_sys = NIKE_ECS_MANAGER->registerSystem<Interaction::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Health::Health>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Damage::Damage>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
+
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {

@@ -28,7 +28,7 @@ namespace NIKE {
         // Calculate impulse magnitude based on collision response
         float impulse_magnitude = -(1 + restitution) * normal_vel;
 
-        // Calculate the reflection vector for angular bounce
+        // Calculate the reflection vector for angular bounce   
         Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
@@ -319,13 +319,33 @@ namespace NIKE {
     }
 
     void Collision::System::collisionResolution(
-        Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
-        Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
+        Entity::Type entity_a, Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
+        Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
+
+        // Notify systems of collision
+        auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
+        NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
+
+        // Destroy Resolution
+        // TODO: FIX THIS CRASH
+        if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
+            //NIKEE_CORE_INFO("entity a marked for deletion");
+            NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_a);
+            NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
+            return;
+        }
+
+        if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
+            //NIKEE_CORE_INFO("entity b marked for deletion");
+            NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_b);
+            NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
+            return;
+        }
 
         // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
-            bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+            bounceResolution(transform_a, dynamics_b, collider_a, transform_b, dynamics_a, collider_b, info);
             return;
         }
 

@@ -31,6 +31,9 @@ namespace NIKE {
         //Delta time
         float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
+        // Get entities marked for deletion
+        auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+
         //Iteration every fixed step for fixed delta time
         for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
 
@@ -43,9 +46,25 @@ namespace NIKE {
                 //Iterate through all entities
                 for (auto& entity : entities) {
 
-                    //Skip entities that are not present within layer & entities without transform component
-                    if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+                    // Skip entities marked for deletion
+                    if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end()) {
+                        NIKEE_CORE_INFO("Skipping entity {} marked for deletion", entity);
                         continue;
+                    }
+
+                    try {
+                        if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+                            continue;
+                    }
+                    catch (const std::exception& e) {
+                        NIKEE_CORE_ERROR("Error accessing entity layer ID: {}", e.what());
+                        continue;
+                    }
+
+
+                    //Skip entities that are not present within layer & entities without transform component
+                    //if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+                    //    continue;
 
                     //Skip entities with no transform
                     auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -198,7 +217,7 @@ namespace NIKE {
                                 other_collider.b_collided = true;
 
                                 //Collision resolution
-                                collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
+                                collision_system->collisionResolution(entity, e_transform, e_dynamics, e_collider, colliding_entity, other_transform, other_dynamics, other_collider, info);
                             }
                             else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_id, other_model_id, info)) {
                                 //Set the flag of colliders
@@ -206,7 +225,7 @@ namespace NIKE {
                                 other_collider.b_collided = true;
 
                                 //Collision resolution
-                                collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
+                                collision_system->collisionResolution(entity, e_transform, e_dynamics, e_collider, colliding_entity, other_transform, other_dynamics, other_collider, info);
                             }
                             else {
                                 //Set the flag of colliders

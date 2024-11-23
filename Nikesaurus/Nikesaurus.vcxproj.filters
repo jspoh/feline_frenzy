@@ -56,6 +56,7 @@
     <ClCompile Include="src\Components\cShooting.cpp" />
     <ClCompile Include="src\Components\cHealth.cpp" />
     <ClCompile Include="src\Components\cDamage.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -124,6 +125,7 @@
     <ClInclude Include="headers\Components\cShooting.h" />
     <ClInclude Include="headers\Components\cHealth.h" />
     <ClInclude Include="headers\Components\cDamage.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
