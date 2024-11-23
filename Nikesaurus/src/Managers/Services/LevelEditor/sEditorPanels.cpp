@@ -1331,7 +1331,6 @@ namespace NIKE {
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
 			}
 
-
 			break;
 		}
 		default: {
@@ -1800,6 +1799,10 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
+		//Check if entity is locked
+		if (!entities_panel.lock()->getSelectedEntityEditor().has_value() || entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked) {
+			return;
+		}
 
 		//Get transform component
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
