@@ -63,6 +63,10 @@ namespace NIKE {
 
 		bool isCursorInTransform(Vector2f const& mouse_pos, Transform::Transform const& transform);
 
+		std::string extractFileName(const std::string& file_path);
+
+		std::string makeRelativePath(const std::string& base_path, const std::string& target_path);
+
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)
 	}

@@ -100,6 +100,10 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+		// Add the map file path at the top of the scene JSON
+		std::string map_file_path = NIKE_ASSETS_SERVICE->getMapsPath() + Utility::extractFileName(file_path) + ".map";
+		data["Map_File"] = Utility::makeRelativePath(file_path, map_file_path);
+
 		//Layers in scene
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
 
@@ -175,6 +179,26 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
+		// Load map grid if a map file path is specified
+		//if (data.contains("Map File")) {
+		//	std::string map_file_path = data.at("Map File").get<std::string>();
+		//	std::string full_map_path = std::filesystem::path(file_path).parent_path() / map_file_path;
+
+		//	if (std::filesystem::exists(full_map_path)) {
+		//		// Deserialize map grid
+		//		std::ifstream map_file(full_map_path, std::ios::in);
+		//		nlohmann::json map_data;
+		//		map_file >> map_data;
+		//		map_file.close();
+
+		//		NIKE_MAP_SERVICE->deserialize(map_data);
+		//	}
+		//	else {
+		//		// Log error or handle missing map file
+		//		NIKEE_CORE_ERROR("Map file not found: " + full_map_path);
+		//	}
+		//}
+
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
@@ -233,6 +257,38 @@ namespace NIKE {
 
 	std::string const& Serialization::Service::getCurrSceneFile() const {
 		return curr_scene_file;
+	}
+
+	void Serialization::Service::saveGridToFile(const std::string& file_path)
+	{
+		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::in);
+
+		if (!std::filesystem::exists(file_path))
+			NIKEE_CORE_ERROR("File does not exist!");
+		
+		// Save data into file
+		file << grid_data.dump(4);
+
+		file.close();
+	}
+
+	void Serialization::Service::loadGridFromFile(const std::string& file_path)
+	{
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::out);
+
+		if (!file.is_open()) {
+			NIKEE_CORE_ERROR("Failed to open .map file for loading: " + file_path);
+		}
+
+		nlohmann::json grid_data;
+		file >> grid_data;
+		file.close();
+
+		NIKE_MAP_SERVICE->deserialize(grid_data);
 	}
 
 	//void Serialization::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {

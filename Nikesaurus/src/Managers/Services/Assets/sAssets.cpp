@@ -706,6 +706,11 @@ namespace NIKE {
 		return scripts_path;
 	}
 
+	std::string const& Assets::Service::getMapsPath()
+	{
+		return map_path;
+	}
+
 	void Assets::Service::reloadAssets(const std::string& asset_type)
 	{
 		if (asset_type == "Textures") {

@@ -2148,6 +2148,7 @@ namespace NIKE {
 	*********************************************************************/
 	void LevelEditor::TileMapPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+		registerPopUp("Save Grid", saveGridPopUp("Save Grid"));
 	}
 
 	void LevelEditor::TileMapPanel::update() {
@@ -2161,6 +2162,16 @@ namespace NIKE {
 
 	void LevelEditor::TileMapPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+
+		ImGui::Spacing();
+
+
+		if (ImGui::Button("Save Grid"))
+		{
+			openPopUp("Save Grid");
+		}
+
 
 		//Adjust grid mode
 		{
@@ -2365,8 +2376,68 @@ namespace NIKE {
 			}
 		}
 
+		renderPopUps();
+
 		ImGui::End();
 	}
+
+	std::function<void()> LevelEditor::TileMapPanel::saveGridPopUp(std::string const& popup_id)
+	{
+		return [this, popup_id]() {
+			// Static buffer for file name input
+			static std::string file_name;
+
+			// Ask user for a file name to save the grid
+			ImGui::Text("Enter a name for the grid file:");
+			if (ImGui::InputText("##GridFileName", file_name.data(), file_name.capacity() + 1)) {
+				file_name.resize(strlen(file_name.c_str()));
+			}
+
+			// Check if the file name is valid (not empty)
+			if (file_name.empty()) {
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "File name cannot be empty!");
+			}
+
+			// If the user clicks "OK" or presses Enter, serialize the grid
+			if ((ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) && !file_name.empty()) {
+
+				// For saving of the prefab file with the extension
+				std::string grid_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_name + ".map";
+
+				// Serialize the grid data using the grid service
+				nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+				// Open the file for writing
+				std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
+
+				// Check if the file opened successfully
+				if (!file.is_open()) {
+					NIKEE_CORE_ERROR("FILE CANNOT BE OPEN");
+				}
+
+				// Write the serialized grid data to the file
+				file << grid_data.dump(4);
+				file.close();
+
+				// Close the popup after saving
+				closePopUp(popup_id);
+
+				// Clear the file name for future saves
+				file_name.clear();
+			}
+
+			ImGui::SameLine();
+
+			// If the user clicks "Cancel", reset and close the popup
+			if (ImGui::Button("Cancel")) {
+				file_name.clear();  
+
+				// Close the popup
+				closePopUp(popup_id);
+			}
+		};
+	}
+
 
 	void LevelEditor::TileMapPanel::renderGrid(void* draw_list, Vector2f const& render_size) {
 
