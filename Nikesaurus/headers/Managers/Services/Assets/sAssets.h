@@ -89,7 +89,7 @@ namespace NIKE {
 			std::string shaders_path = "assets\\Shaders\\";
 			std::string prefabs_path = "assets\\Prefabs\\";
 			std::string scripts_path = "assets\\Scripts\\";
-			std::string map_path = "assets\\Map\\";
+			std::string grid_path = "assets\\Grids\\";
 
 			/*****************************************************************//**
 			* Scn (Levels) private members
@@ -280,7 +280,7 @@ namespace NIKE {
 			std::string const& getShadersPath(); 
 			std::string const& getPrefabsPath();
 			std::string const& getScriptsPath();
-			std::string const& getMapsPath();
+			std::string const& getGridsPath();
 
 			/*****************************************************************//**
 			* Reload of specific asset types

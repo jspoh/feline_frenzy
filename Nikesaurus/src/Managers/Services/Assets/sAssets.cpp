@@ -706,9 +706,9 @@ namespace NIKE {
 		return scripts_path;
 	}
 
-	std::string const& Assets::Service::getMapsPath()
+	std::string const& Assets::Service::getGridsPath()
 	{
-		return map_path;
+		return grid_path;
 	}
 
 	void Assets::Service::reloadAssets(const std::string& asset_type)

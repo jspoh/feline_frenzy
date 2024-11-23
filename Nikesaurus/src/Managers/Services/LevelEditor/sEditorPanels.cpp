@@ -2580,7 +2580,7 @@ namespace NIKE {
 			if ((ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) && !file_name.empty()) {
 
 				// For saving of the prefab file with the extension
-				std::string grid_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_name + ".map";
+				std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + file_name + ".grid";
 
 				// Serialize the grid data using the grid service
 				nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();

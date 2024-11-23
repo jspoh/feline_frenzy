@@ -1,6 +1,6 @@
 [
     {
-        "Map Path": "..\\Map\\collision_scene.map"
+        "Grid Path": "..\\Grid\\default.grid"
     },
     {
         "Layer": {

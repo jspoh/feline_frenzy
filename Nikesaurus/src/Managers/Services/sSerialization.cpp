@@ -101,9 +101,9 @@ namespace NIKE {
 		nlohmann::json data;
 
 		// Add the map file path at the top of the scene JSON
-		std::string map_file_path = NIKE_ASSETS_SERVICE->getMapsPath() + Utility::extractFileName(file_path) + ".map";
+		std::string grid_file_path = NIKE_ASSETS_SERVICE->getGridsPath() + Utility::extractFileName(file_path) + ".grid";
 		nlohmann::json m_data;
-		m_data["Map Path"] = Utility::makeRelativePath(file_path, map_file_path);
+		m_data["Grid Path"] = Utility::makeRelativePath(file_path, grid_file_path);
 		data.push_back(m_data);
 
 		//Layers in scene
