@@ -99,6 +99,9 @@ namespace NIKE {
 
 			//Render filled triangle to draw list
 			void worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color);
+
+			//Render line to draw list
+			void worldLine(ImDrawList* draw_list, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
 			#endif // Only in nike build
 		};
 
@@ -261,42 +264,42 @@ namespace NIKE {
 			bool isCursorInEntity(Entity::Type entity) const;
 		};
 
-		//Gizmo modes
-		enum class GizmoMode {
-			Translate = 0,
-			Scale,
-			Rotate
-		};
-
-		//Gizmo object
-		struct Gizmo {
-			//Gizmo mode
-			GizmoMode mode;
-
-			//Gizmo sensitivity
-			float sensitivity;
-
-			//boolean for checking interaction with gizmo
-			bool b_interacting;
-
-			//Drag up
-			bool b_dragging_vert;
-
-			//Drag down
-			bool b_dragging_hori;
-
-			//Prev transform
-			Transform::Transform prev_transform;
-
-			//Gizmo objects
-			std::unordered_map<std::string, Transform::Transform> objects;
-
-			Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
-		};
-
 		//Components Management Panel
 		class ComponentsPanel : public IPanel {
 		private:
+
+			//Gizmo modes
+			enum class GizmoMode {
+				Translate = 0,
+				Scale,
+				Rotate
+			};
+
+			//Gizmo object
+			struct Gizmo {
+				//Gizmo mode
+				GizmoMode mode;
+
+				//Gizmo sensitivity
+				float sensitivity;
+
+				//boolean for checking interaction with gizmo
+				bool b_interacting;
+
+				//Drag up
+				bool b_dragging_vert;
+
+				//Drag down
+				bool b_dragging_hori;
+
+				//Prev transform
+				Transform::Transform prev_transform;
+
+				//Gizmo objects ( transform & color )
+				std::unordered_map<std::string, std::pair<Transform::Transform, Vector4i>> objects;
+
+				Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
+			};
 
 			//Reference to game window panel
 			std::weak_ptr<EntitiesPanel> entities_panel;

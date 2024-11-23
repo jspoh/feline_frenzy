@@ -173,12 +173,15 @@ namespace NIKE {
 		//World scale factor
 		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
 
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
+
 		//Get zoom
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Render filled circle
 		draw_list->AddCircle(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), render_size),
-			(e_transform.scale.x * scale.x) / 2.0f / zoom, color, 0, thickness);
+			(e_transform.scale.x * scale.x) / 2.0f / zoom, color, 0, thickness / zoom * fullscreen_scale.x);
 	}
 
 	void LevelEditor::IPanel::worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color) {
@@ -221,6 +224,18 @@ namespace NIKE {
 			break;
 		}
 		}
+	}
+
+	void LevelEditor::IPanel::worldLine(ImDrawList* draw_list, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness) {
+
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
+
+		//Get zoom
+		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
+		//Draw line of rotation
+		draw_list->AddLine(worldToScreen(ImVec2(point1.x, -point1.y), render_size), worldToScreen(ImVec2(point2.x, -point2.y), render_size), color, thickness / zoom * fullscreen_scale.x);
 	}
 
 	/*****************************************************************//**
@@ -972,38 +987,41 @@ namespace NIKE {
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
 			//Extra object for translate ( Move box )
-			gizmo.objects["Move Box"].position = { e_transform.position.x + (e_transform.scale.x * 0.75f), e_transform.position.y + (e_transform.scale.y * 0.75f) };
-			gizmo.objects["Move Box"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Move Box"].first.position = { e_transform.position.x + (e_transform.scale.x * 0.75f), e_transform.position.y + (e_transform.scale.y * 0.75f) };
+			gizmo.objects["Move Box"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Move Box"].second = { 100, 100, 100, 255 };
 
 			//Interaction with move box
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || ((!gizmo.b_dragging_hori && !gizmo.b_dragging_vert) && Utility::isCursorInTransform(world_mouse, gizmo.objects["Move Box"]))) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || ((!gizmo.b_dragging_hori && !gizmo.b_dragging_vert) && Utility::isCursorInTransform(world_mouse, gizmo.objects["Move Box"].first))) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 				//Set dragging flags
 				gizmo.b_dragging_hori = true;
 				gizmo.b_dragging_vert = true;
 
-				//Update prev transform
-				gizmo.prev_transform = e_transform;
+				//Initialize on mouse click
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+					//Update prev transform
+					gizmo.prev_transform = e_transform;
+				}
 
 				//Apply transformation
 				e_transform.position = { world_mouse.x - (e_transform.scale.x * 0.75f),  -world_mouse.y - (e_transform.scale.y * 0.75f) };
 			}
 
 			//Add gizmo up
-			gizmo.objects["Up"].position = { e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f) };
-			gizmo.objects["Up"].scale = { e_transform.scale.x * 0.05f, e_transform.scale.y };
+			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f) };
+			gizmo.objects["Up"].first.scale = { e_transform.scale.x * 0.05f, e_transform.scale.y };
+			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].position = { e_transform.position.x, e_transform.position.y + e_transform.scale.y };
-			gizmo.objects["Up Point"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + e_transform.scale.y };
+			gizmo.objects["Up Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
 			//Interaction with up
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((!gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up"]) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up Point"])) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((!gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up"].first) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up Point"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 				//Set dragging flags
 				gizmo.b_dragging_vert = true;
 				gizmo.b_dragging_hori = false;
-
-				//Update prev transform
-				gizmo.prev_transform = e_transform;
 
 				//Static variables to store initial values
 				static float initial_mouse_y = 0.0f;
@@ -1013,6 +1031,9 @@ namespace NIKE {
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 					initial_mouse_y = world_mouse.y;
 					initial_position_y = e_transform.position.y;
+
+					//Update prev transform
+					gizmo.prev_transform = e_transform;
 				}
 
 				//Calculate the Y-axis delta
@@ -1023,22 +1044,21 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].position = { e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y };
-			gizmo.objects["Right"].scale = { e_transform.scale.x, e_transform.scale.y * 0.05f };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y };
+			gizmo.objects["Right"].first.scale = { e_transform.scale.x, e_transform.scale.y * 0.05f };
+			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].position = { e_transform.position.x + e_transform.scale.x, e_transform.position.y };
-			gizmo.objects["Right Point"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + e_transform.scale.x, e_transform.position.y };
+			gizmo.objects["Right Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
 			//Interaction with right
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && !gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right"]) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right Point"])) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && !gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right"].first) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right Point"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 				
 				//Set dragging flags
 				gizmo.b_dragging_vert = false;
 				gizmo.b_dragging_hori = true;
-
-				//Update prev transform
-				gizmo.prev_transform = e_transform;
 				
 				//Static variables to store initial values
 				static float initial_mouse_x = 0.0f;
@@ -1048,6 +1068,9 @@ namespace NIKE {
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 					initial_mouse_x = world_mouse.x;
 					initial_position_x = e_transform.position.x;
+
+					//Update prev transform
+					gizmo.prev_transform = e_transform;
 				}
 
 				//Calculate the X-axis delta
@@ -1058,8 +1081,9 @@ namespace NIKE {
 			}
 
 			//Add gizmo center
-			gizmo.objects["Center"].position = { e_transform.position.x, e_transform.position.y };
-			gizmo.objects["Center"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Center"].first.position = { e_transform.position.x, e_transform.position.y };
+			gizmo.objects["Center"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Center"].second = { 255, 255, 255, 255 };
 
 			//Dragging stopped
 			if ((gizmo.b_dragging_hori || gizmo.b_dragging_vert) && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
@@ -1101,22 +1125,21 @@ namespace NIKE {
 		}
 		case GizmoMode::Scale: {
 			//Add gizmo up
-			gizmo.objects["Up"].position = { e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f) };
-			gizmo.objects["Up"].scale = { e_transform.scale.x * 0.05f, e_transform.scale.y };
+			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f) };
+			gizmo.objects["Up"].first.scale = { e_transform.scale.x * 0.05f, e_transform.scale.y };
+			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].position = { e_transform.position.x, e_transform.position.y + e_transform.scale.y };
-			gizmo.objects["Up Point"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + e_transform.scale.y };
+			gizmo.objects["Up Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
 			//Interaction with up
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((!gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up"]) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up Point"])) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((!gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up"].first) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Up Point"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 
 				//Set dragging flags
 				gizmo.b_dragging_vert = true;
 				gizmo.b_dragging_hori = false;
-
-				//Update prev transform
-				gizmo.prev_transform = e_transform;
 
 				//Static variables to store initial values
 				static float initial_mouse_y = 0.0f;
@@ -1126,6 +1149,9 @@ namespace NIKE {
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 					initial_mouse_y = world_mouse.y;
 					initial_scale_y = e_transform.scale.y;
+					
+					//Update prev transform
+					gizmo.prev_transform = e_transform;
 				}
 
 				//Calculate scale sensitivity
@@ -1145,22 +1171,21 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].position = { e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y };
-			gizmo.objects["Right"].scale = { e_transform.scale.x, e_transform.scale.y * 0.05f };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y };
+			gizmo.objects["Right"].first.scale = { e_transform.scale.x, e_transform.scale.y * 0.05f };
+			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].position = { e_transform.position.x + e_transform.scale.x, e_transform.position.y };
-			gizmo.objects["Right Point"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + e_transform.scale.x, e_transform.position.y };
+			gizmo.objects["Right Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
 			//Interaction with right
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && !gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right"]) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right Point"])) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && !gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right"].first) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Right Point"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 
 				//Set dragging flags
 				gizmo.b_dragging_vert = false;
 				gizmo.b_dragging_hori = true;
-
-				//Update prev transform
-				gizmo.prev_transform = e_transform;
 
 				//Static variables to store initial values
 				static float initial_mouse_x = 0.0f;
@@ -1170,6 +1195,9 @@ namespace NIKE {
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 					initial_mouse_x = world_mouse.x;
 					initial_scale_x = e_transform.scale.x;
+
+					//Update prev transform
+					gizmo.prev_transform = e_transform;
 				}
 
 				//Calculate scale sensitivity
@@ -1189,8 +1217,9 @@ namespace NIKE {
 			}
 
 			//Add gizmo center
-			gizmo.objects["Center"].position = { e_transform.position.x, e_transform.position.y };
-			gizmo.objects["Center"].scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Center"].first.position = { e_transform.position.x, e_transform.position.y };
+			gizmo.objects["Center"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Center"].second = { 255, 255, 255, 255 };
 
 			//Dragging stopped
 			if ((gizmo.b_dragging_hori || gizmo.b_dragging_vert) && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
@@ -1219,6 +1248,96 @@ namespace NIKE {
 		}
 		case GizmoMode::Rotate: {
 
+			//Add rotation circle
+			gizmo.objects["Rot Circle"].first.position = { e_transform.position.x, e_transform.position.y };
+			gizmo.objects["Rot Circle"].first.scale = { Utility::getMax(e_transform.scale.x * 1.5f, e_transform.scale.y * 1.5f), Utility::getMax(e_transform.scale.x * 1.5f, e_transform.scale.y * 1.5f) };
+			gizmo.objects["Rot Circle"].second = { 255, 255, 255, 255 };
+
+			//Click on circle and change rotation point
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && Utility::isCursorInTransform(world_mouse, gizmo.objects["Rot Circle"].first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+				//Prev angle for undo and redo
+				float prev_angle = e_transform.rotation;
+
+				//Calculate mouse angle relative to the circle's center
+				float angle = atan2(-(world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+
+				//Convert angle from radians to degrees
+				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
+
+				//Update the entity's rotation angle
+				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
+				
+				//Apply action
+				LevelEditor::Action change_rotation;
+
+				//Change rotation do action
+				change_rotation.do_action = [&, rotation = e_transform.rotation]() {
+					e_transform.rotation = rotation;
+					};
+
+				//Change rotation undo action
+				change_rotation.undo_action = [&, rotation = prev_angle]() {
+					e_transform.rotation = rotation;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
+			}
+
+			//Add rotation point
+			gizmo.objects["Rot Point"].first.position = {
+				gizmo.objects["Rot Circle"].first.position.x + (gizmo.objects["Rot Circle"].first.scale.x * 0.5f) * cos(e_transform.rotation * static_cast<float>(M_PI) / 180.0f),
+				gizmo.objects["Rot Circle"].first.position.y + (gizmo.objects["Rot Circle"].first.scale.x * 0.5f) * sin(e_transform.rotation * static_cast<float>(M_PI) / 180.0f)
+			};
+			gizmo.objects["Rot Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Rot Point"].second = { 100, 100, 100, 255 };
+
+			//Check for interactiom with rotation point
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Rot Point"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+
+				//Set dragging flags
+				gizmo.b_dragging_vert = true;
+				gizmo.b_dragging_hori = true;
+
+				//Initialize on mouse click
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+					//Update prev transform
+					gizmo.prev_transform = e_transform;
+				}
+
+				//Calculate mouse angle relative to the circle's center
+				float angle = atan2(-(world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+
+				//Convert angle from radians to degrees
+				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
+
+				//Update the entity's rotation angle
+				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
+			}
+
+			//Dragging stopped
+			if ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
+				//Reset dragging flags
+				gizmo.b_dragging_hori = false;
+				gizmo.b_dragging_vert = false;
+
+				//Apply action
+				LevelEditor::Action change_rotation;
+
+				//Change rotation do action
+				change_rotation.do_action = [&, rotation = e_transform.rotation]() {
+					e_transform.rotation = rotation;
+					};
+
+				//Change rotation undo action
+				change_rotation.undo_action = [&, rotation = gizmo.prev_transform.rotation]() {
+					e_transform.rotation = rotation;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
+			}
+
 			break;
 		}
 		default: {
@@ -1230,10 +1349,20 @@ namespace NIKE {
 		for (auto& object : gizmo.objects) {
 
 			//Apply small scale when cursor is in gizmo object
-			if (Utility::isCursorInTransform(world_mouse, object.second)) {
+			if (Utility::isCursorInTransform(world_mouse, object.second.first)) {
 				gizmo.b_interacting = true;
-				object.second.scale.x *= 1.1f;
-				object.second.scale.y *= 1.1f;
+
+				//Skip the rotation circle
+				if (object.first == "Rot Circle") {
+					continue;
+				}
+
+				//Apply transformation
+				object.second.first.scale.x *= 1.1f;
+				object.second.first.scale.y *= 1.1f;
+				object.second.second.r = static_cast<int>(object.second.second.r * 0.85f);
+				object.second.second.g = static_cast<int>(object.second.second.g * 0.85f);
+				object.second.second.b = static_cast<int>(object.second.second.b * 0.85f);
 			}
 		}
 	}
@@ -1679,6 +1808,10 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
+		//Check if entity is locked
+		if (!entities_panel.lock()->getSelectedEntityEditor().has_value() || entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked) {
+			return;
+		}
 
 		//Get transform component
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
@@ -1693,8 +1826,15 @@ namespace NIKE {
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
 
-		//Render rotated rectangle
-		worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (e_transform.scale.length() * 0.02f));
+		if (gizmo.mode == GizmoMode::Rotate) {
+			//Render rotation circle
+			auto const& rotation_circle = gizmo.objects["Rot Circle"];
+			worldCircle(draw, rotation_circle.first, rendersize, IM_COL32(rotation_circle.second.r, rotation_circle.second.g, rotation_circle.second.b, rotation_circle.second.a), (e_transform.scale.length() * 0.02f));
+		}
+		else {
+			//Render rotated rectangle
+			worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (e_transform.scale.length() * 0.02f));
+		}
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
@@ -1703,62 +1843,109 @@ namespace NIKE {
 			return;
 		}
 
+		//Get transform component
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		if (!e_transform_comp.has_value())
+			return;
+
+		//Gizmo text buffer
+		std::string gizmo_text;
+		gizmo_text.resize(64);
+
+		//Get transform
+		auto& e_transform = e_transform_comp.value().get();
+
 		//Internal imgui draw
 		auto draw = static_cast<ImDrawList*>(draw_list);
 
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
 
-		//Full Screen scale
-		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
-
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
+
+			//Edit gizmo text buffer
+			std::snprintf(gizmo_text.data(), gizmo_text.capacity() + 1, "X: %.2f Y: %.2f", e_transform.position.x, e_transform.position.y);
+
 			//Draw move box
-			worldRectFilled(draw, gizmo.objects["Move Box"], rendersize, IM_COL32(100, 100, 100, 100));
+			auto const& move_box = gizmo.objects["Move Box"];
+			worldRectFilled(draw, move_box.first, rendersize, IM_COL32(move_box.second.r, move_box.second.g, move_box.second.b, move_box.second.a));
 
 			//Draw up arrow
-			worldRectFilled(draw, gizmo.objects["Up"], rendersize, IM_COL32(0, 255, 0, 255));
+			auto const& up = gizmo.objects["Up"];
+			worldRectFilled(draw, up.first, rendersize, IM_COL32(up.second.r, up.second.g, up.second.b, up.second.a));
 
 			//Draw up arrow point
-			worldTriangleFilled(draw, gizmo.objects["Up Point"], ImGuiDir::ImGuiDir_Up, rendersize, IM_COL32(0, 255, 0, 255));
+			auto const& up_point = gizmo.objects["Up Point"];
+			worldTriangleFilled(draw, up_point.first, ImGuiDir::ImGuiDir_Up, rendersize, IM_COL32(up_point.second.r, up_point.second.g, up_point.second.b, up_point.second.a));
 
 			//Draw right arrow
-			worldRectFilled(draw, gizmo.objects["Right"], rendersize, IM_COL32(255, 0, 0, 255));
+			auto const& right = gizmo.objects["Right"];
+			worldRectFilled(draw, right.first, rendersize, IM_COL32(right.second.r, right.second.g, right.second.b, right.second.a));
 
 			//Draw right arrow point
-			worldTriangleFilled(draw, gizmo.objects["Right Point"], ImGuiDir::ImGuiDir_Right, rendersize, IM_COL32(255, 0, 0, 255));
+			auto const& right_point = gizmo.objects["Right Point"];
+			worldTriangleFilled(draw, right_point.first, ImGuiDir::ImGuiDir_Right, rendersize, IM_COL32(right_point.second.r, right_point.second.g, right_point.second.b, right_point.second.a));
 			
 			//Draw center
-			worldCircleFilled(draw, gizmo.objects["Center"], rendersize, IM_COL32(255, 255, 255, 255));
+			auto const& center = gizmo.objects["Center"];
+			worldCircleFilled(draw, center.first, rendersize, IM_COL32(center.second.r, center.second.g, center.second.b, center.second.a));
 
 			break;
 			}
 		case GizmoMode::Scale: {
+			//Edit gizmo text buffer
+			std::snprintf(gizmo_text.data(), gizmo_text.capacity() + 1, "X: %.2f Y: %.2f", e_transform.scale.x, e_transform.scale.y);
+
 			//Draw up arrow
-			worldRectFilled(draw, gizmo.objects["Up"], rendersize, IM_COL32(0, 255, 0, 255));
+			auto const& up = gizmo.objects["Up"];
+			worldRectFilled(draw, up.first, rendersize, IM_COL32(up.second.r, up.second.g, up.second.b, up.second.a));
 
 			//Draw up arrow point
-			worldCircleFilled(draw, gizmo.objects["Up Point"], rendersize, IM_COL32(0, 255, 0, 255));
+			auto const& up_point = gizmo.objects["Up Point"];
+			worldCircleFilled(draw, up_point.first, rendersize, IM_COL32(up_point.second.r, up_point.second.g, up_point.second.b, up_point.second.a));
 
 			//Draw right arrow
-			worldRectFilled(draw, gizmo.objects["Right"], rendersize, IM_COL32(255, 0, 0, 255));
+			auto const& right = gizmo.objects["Right"];
+			worldRectFilled(draw, right.first, rendersize, IM_COL32(right.second.r, right.second.g, right.second.b, right.second.a));
 
 			//Draw up arrow point
-			worldCircleFilled(draw, gizmo.objects["Right Point"], rendersize, IM_COL32(255, 0, 0, 255));
+			auto const& right_point = gizmo.objects["Right Point"];
+			worldCircleFilled(draw, right_point.first, rendersize, IM_COL32(right_point.second.r, right_point.second.g, right_point.second.b, right_point.second.a));
 
 			//Draw center
-			worldCircleFilled(draw, gizmo.objects["Center"], rendersize, IM_COL32(255, 255, 255, 255));
+			auto const& center = gizmo.objects["Center"];
+			worldCircleFilled(draw, center.first, rendersize, IM_COL32(center.second.r, center.second.g, center.second.b, center.second.a));
 
 			break;
 			}
 		case GizmoMode::Rotate: {
+			//Edit gizmo text buffer
+			std::snprintf(gizmo_text.data(), gizmo_text.capacity() + 1, "%.2f Deg", e_transform.rotation);
+
+			//Get rotation point transform
+			auto const& rotation_point = gizmo.objects["Rot Point"];
+
+			//Draw line of rotation
+			worldLine(draw, e_transform.position, rotation_point.first.position, rendersize, IM_COL32(255, 255, 255, 255), (e_transform.scale.length() * 0.02f));
+
+			//Draw point of rotation
+			worldCircleFilled(draw, rotation_point.first, rendersize, IM_COL32(rotation_point.second.r, rotation_point.second.g, rotation_point.second.b, rotation_point.second.a));
 			break;
 			}
 		default: {
 			break;
 			}
+		}
+
+		//Render gizmo text
+		if (gizmo.mode == GizmoMode::Rotate) {
+			auto const& rotation_circle = gizmo.objects["Rot Circle"].first;
+			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), -rotation_circle.position.y + (rotation_circle.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+		}
+		else {
+			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 	}
 
