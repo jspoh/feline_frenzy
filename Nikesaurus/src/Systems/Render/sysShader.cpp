@@ -95,7 +95,7 @@ namespace NIKE {
 			glUniform1iv(location, static_cast<GLsizei>(vals.size()), reinterpret_cast<const int*>(vals.data()));
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			cerr << "Uniform location not found in shader " << shader_ref << " for: " << name << endl;
 			throw std::exception();
 		}
 

@@ -17,8 +17,8 @@
 #include "Math/Mtx33.h"
 
 
-// batched rendering
-constexpr bool BATCHED_RENDERING = false;
+ // batched rendering
+constexpr bool BATCHED_RENDERING = true;
 
 namespace NIKE {
 
@@ -140,8 +140,6 @@ namespace NIKE {
 	}
 
 	void Render::Manager::batchRenderObject() {
-		// !TODO: considering implementing instanced too with glDrawElementsInstanced
-
 		//GLenum err = glGetError();
 		//if (err != GL_NO_ERROR) {
 		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -202,7 +200,9 @@ namespace NIKE {
 		shader_system->useShader("batched_base");
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+		//glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+
+		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_quad.size()));
 
 		// cleanup
 		glBindVertexArray(0);
@@ -216,11 +216,12 @@ namespace NIKE {
 		//}
 	}
 
+	static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = true
+		;
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		// !TODO: batched rendering for texture incomplete
-		static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = false;
 
-		if constexpr(!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
+		if constexpr (!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -312,6 +313,18 @@ namespace NIKE {
 
 		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_texture");
 
+		// create vector of texture handles
+		// cant pass in unsigned int so.. using int
+		// map with texture handle as key and binding unit as value
+		// not using unordered_map as it uses hashingand i need the index
+		std::map<unsigned int, unsigned int> texture_binding_units;
+		for (int i{}; i < render_instances_texture.size(); i++) {
+			if (texture_binding_units.find(render_instances_texture[i].tex) == texture_binding_units.end()) {
+				glBindTextureUnit(i, render_instances_texture[i].tex);
+				texture_binding_units[render_instances_texture[i].tex] = i;
+			}
+		}
+
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
 		static constexpr int NUM_VERTICES_IN_MODEL = 4;
@@ -324,11 +337,19 @@ namespace NIKE {
 				v.transform = render_instances_texture[i].xform;
 				v.framesize = render_instances_texture[i].framesize;
 				v.uv_offset = render_instances_texture[i].uv_offset;
-				v.sampler_idx = static_cast<unsigned int>(i);
+
+				// get index of texture hdl in texture_binding_units vector
+				const int texture_idx = std::distance(texture_binding_units.begin(), texture_binding_units.find(render_instances_texture[i].tex));
+
+				v.sampler_idx = static_cast<unsigned int>(texture_idx);
 			}
 
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
 		}
+
+		// raw vector of binding units
+		std::vector<int> textures;
+		std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
 
 		// populate vbo
 		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
@@ -347,30 +368,19 @@ namespace NIKE {
 		// populate ebo
 		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
 
-		// create vector of texture handles
-		// cant pass in unsigned int so.. using int
-		std::vector<int> textures;
-		textures.reserve(vertices.size());
-		for (int i{}; i < vertices.size(); i++) {
-			const Assets::Vertex& v = vertices[i];
-
-			const int tex_binding_idx = i;
-
-			// bind textures
-			// using texture ids as texture units too..
-			glBindTextureUnit(tex_binding_idx, v.tex_hdl);
-
-			textures.push_back(tex_binding_idx);
-		}
-		shader_system->setUniform("batched_texture", "u_tex2d", textures);
-
 		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
 
 		// use shader
 		shader_system->useShader("batched_texture");
+
+		// set uniform
+		shader_system->setUniform("batched_texture", "u_tex2d", textures);
+
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+		//glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+
+		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
 
 		// cleanup
 		glBindVertexArray(0);
@@ -631,8 +641,10 @@ namespace NIKE {
 			}
 		}
 
+		if (BATCHED_RENDERING && TEXTURE_BATCHED_RENDERING_DONE) {
+			batchRenderTextures();	// at least 1 call to this is required every frame at the very end
+		}
 		batchRenderObject();		// at least 1 call to this is required every frame at the very end
-		//batchRenderTextures();	// at least 1 call to this is required every frame at the very end
 
 		// render text last
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
