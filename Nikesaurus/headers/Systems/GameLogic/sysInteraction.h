@@ -50,6 +50,9 @@ namespace NIKE {
 
             // Handles interaction logic between two entities
             void handleCollision(Entity::Type entity_a, Entity::Type entity_b);
+
+            // Apply damage
+            void applyDamage(Entity::Type attacker, Entity::Type target);
         };
 
     }

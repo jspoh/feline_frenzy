@@ -41,38 +41,28 @@ namespace NIKE {
             auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_b);
 
             // Apply damage if applicable
-            if (b_health_comp && a_damage_comp) {
-                auto& b_health = b_health_comp.value().get().health;
-                auto& a_damage = a_damage_comp.value().get().damage;
-                b_health -= a_damage;
-                NIKEE_CORE_INFO("Entity b health: " + std::to_string(b_health));
-                //NIKEE_CORE_INFO("Entity {} dealt {} damage to Entity {}. Remaining health: {}", entity_a, damage_a->damage, entity_b, health_b->health);
-            }
+            applyDamage(entity_a, entity_b);
+            applyDamage(entity_b, entity_a);
+        }
 
-            if (a_health_comp && b_damage_comp) {
-                auto& a_health = a_health_comp.value().get().health;
-                auto& b_damage = b_damage_comp.value().get().damage;
-                a_health -= b_damage;
-                NIKEE_CORE_INFO("Entity a health: " + std::to_string(a_health));
-                //NIKEE_CORE_INFO("Entity {} dealt {} damage to Entity {}. Remaining health: {}", entity_b, damage_b->damage, entity_a, health_a->health);
-            }
+        void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {
+            auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(attacker);
+            auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(target);
 
-            // Handle destruction if health drops to zero
-            if (a_health_comp) {
-                auto& a_health = a_health_comp.value().get().health;
-                if (a_health <= 0) {
-                    //NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
-                    //!TODO: DESTROY ENTITY 
-                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", entity_a);
-                }
-            }
+            if (attacker_damage_comp && target_health_comp) {
+                auto& target_health = target_health_comp.value().get().health;
+                auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
-            if (b_health_comp) {
-                auto& b_health = b_health_comp.value().get().health;
-                if (b_health <= 0) {
-                    //NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
-                    //!TODO: DESTROY ENTITY 
-                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", entity_b);
+                // Apply damage
+                target_health -= attacker_damage;
+                NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
+                    target, attacker_damage, attacker, target_health);
+
+                // Check if target health drops to zero or below
+                if (target_health <= 0) {
+                    //!TODO: DESTROY ENTITY
+                    // NIKE_ECS_MANAGER->markEntityForDeletion(target);
+                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
                 }
             }
         }
