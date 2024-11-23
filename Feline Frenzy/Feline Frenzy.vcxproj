@@ -105,10 +105,7 @@ xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.json" "$(OutDir)" /s /r /y /q
       <AdditionalLibraryDirectories>$(SolutionDir)Nikesaurus\dependencies\lib\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s /r /y /q
-xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s /r /y /q
-xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s /r /y /q
-xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*.pdb" "$(OutDir)" /s /r /y /q
+      <Command>xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*" "$(OutDir)" /s /r /y /q
 xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.json" "$(OutDir)" /s /r /y /q
 
 rem Delete all files in GAMEDIRECTORY
