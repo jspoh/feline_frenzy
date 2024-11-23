@@ -102,7 +102,9 @@ namespace NIKE {
 
 		// Add the map file path at the top of the scene JSON
 		std::string map_file_path = NIKE_ASSETS_SERVICE->getMapsPath() + Utility::extractFileName(file_path) + ".map";
-		data["Map_File"] = Utility::makeRelativePath(file_path, map_file_path);
+		nlohmann::json m_data;
+		m_data["Map Path"] = Utility::makeRelativePath(file_path, map_file_path);
+		data.push_back(m_data);
 
 		//Layers in scene
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
@@ -179,28 +181,28 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
-		// Load map grid if a map file path is specified
-		//if (data.contains("Map File")) {
-		//	std::string map_file_path = data.at("Map File").get<std::string>();
-		//	std::string full_map_path = std::filesystem::path(file_path).parent_path() / map_file_path;
-
-		//	if (std::filesystem::exists(full_map_path)) {
-		//		// Deserialize map grid
-		//		std::ifstream map_file(full_map_path, std::ios::in);
-		//		nlohmann::json map_data;
-		//		map_file >> map_data;
-		//		map_file.close();
-
-		//		NIKE_MAP_SERVICE->deserialize(map_data);
-		//	}
-		//	else {
-		//		// Log error or handle missing map file
-		//		NIKEE_CORE_ERROR("Map file not found: " + full_map_path);
-		//	}
-		//}
-
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
+
+			//Load map grid if a map file path is specified
+			if (l_data.contains("Map Path")) {
+				std::string map_file_path = l_data.at("Map Path").get<std::string>();
+				std::string full_map_path = (std::filesystem::path(file_path).parent_path() / map_file_path).string();
+
+				if (std::filesystem::exists(full_map_path)) {
+					// Deserialize map grid
+					std::ifstream map_file(full_map_path, std::ios::in);
+					nlohmann::json map_data;
+					map_file >> map_data;
+					map_file.close();
+
+					NIKE_MAP_SERVICE->deserialize(map_data);
+				}
+				else {
+					// Log error or handle missing map file
+					NIKEE_CORE_ERROR("Map file not found: " + full_map_path);
+				}
+			}
 
 			//If data contains layer
 			if (l_data.contains("Layer")) {
