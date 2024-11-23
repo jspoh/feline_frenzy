@@ -12,6 +12,8 @@
 #ifndef SYSTEM_UTILS_HPP
 #define SYSTEM_UTILS_HPP
 
+#include "Components/cTransform.h"
+
 namespace NIKE {
 	namespace Utility {
 
@@ -56,6 +58,10 @@ namespace NIKE {
 		T getMin(const T a, const T b) {
 			return (((a) < (b)) ? (a) : (b));
 		}
+
+		std::vector<Vector2f> convertTransformToVert(Transform::Transform const& e_transform);
+
+		bool isCursorInTransform(Vector2f const& mouse_pos, Transform::Transform const& transform);
 
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)

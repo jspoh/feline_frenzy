@@ -21,6 +21,7 @@ namespace NIKE {
 		//Forward declaration of panels
 		class GameWindowPanel;
 		class TileMapPanel;
+		class ComponentsPanel;
 
 		//Panel Interface
 		class IPanel {
@@ -77,6 +78,27 @@ namespace NIKE {
 			#ifdef NIKE_BUILD_DLL
 			//World to screen
 			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
+
+			//Render filled rectangle to draw list
+			void worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f);
+
+			//Render rectangle to draw list
+			void worldRect(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f, float thickness = 1.0f);
+
+			//Render filled quad to draw list ( Basically rectangle but with rotated )
+			void worldQuadFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color);
+
+			//Render quad to draw list ( Basically rectangle but with rotated )
+			void worldQuad(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
+
+			//Render filled circle to draw list
+			void worldCircleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color);
+
+			//Render circle to draw list
+			void worldCircle(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
+
+			//Render filled triangle to draw list
+			void worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color);
 			#endif // Only in nike build
 		};
 
@@ -174,6 +196,12 @@ namespace NIKE {
 			//Reference to game window panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
+			//Reference to component panel
+			std::weak_ptr<ComponentsPanel> comp_panel;
+
+			//Error msg
+			std::shared_ptr<std::string> error_msg;
+
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 
@@ -229,11 +257,41 @@ namespace NIKE {
 			//Check entity changed
 			bool isEntityChanged() const;
 
-			//Convert entity's transform to vertices
-			std::vector<Vector2f> convertTransformToVert(Transform::Transform const& e_transform) const;
-
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
+		};
+
+		//Gizmo modes
+		enum class GizmoMode {
+			Translate = 0,
+			Scale,
+			Rotate
+		};
+
+		//Gizmo object
+		struct Gizmo {
+			//Gizmo mode
+			GizmoMode mode;
+
+			//Gizmo sensitivity
+			float sensitivity;
+
+			//boolean for checking interaction with gizmo
+			bool b_interacting;
+
+			//Drag up
+			bool b_dragging_vert;
+
+			//Drag down
+			bool b_dragging_hori;
+
+			//Prev transform
+			Transform::Transform prev_transform;
+
+			//Gizmo objects
+			std::unordered_map<std::string, Transform::Transform> objects;
+
+			Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
 		};
 
 		//Components Management Panel
@@ -249,11 +307,17 @@ namespace NIKE {
 			//Reference to main panel
 			std::weak_ptr<MainPanel> main_panel;
 
+			//Reference to tilemap panel
+			std::weak_ptr<TileMapPanel> tilemap_panel;
+
 			//Boolean to signal dragging of entity
 			bool b_dragging_entity;
 
-			//Drag entity function
-			void dragEntity(bool snap_to_grid);
+			//Boolean to manage changing gizmos
+			Gizmo gizmo;
+
+			//Gizmo interaction
+			void interactGizmo();
 
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
@@ -277,7 +341,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>> comps_ui;
 
 		public:
-			ComponentsPanel() : b_dragging_entity{ false } {};
+			ComponentsPanel() : b_dragging_entity{ false }, gizmo() {};
 			~ComponentsPanel() = default;
 
 			//Panel Name
@@ -326,6 +390,12 @@ namespace NIKE {
 
 			//Check if entity is being dragged
 			bool checkEntityDragged() const;
+
+			//Check if there is interaction with gizmo
+			bool checkGizmoInteraction() const;
+
+			//Check if entity is snapping to grid
+			bool checkGridSnapping() const;
 		};
 
 		//Debug Management Panel
@@ -433,10 +503,16 @@ namespace NIKE {
 			Vector4f grid_color;
 
 			//Boolean for grid mode
-			bool b_grid_mode;
+			bool b_grid_edit;
+
+			//Booelean for snapping entities to grid
+			bool b_snap_to_grid;
+
+			//Reference to game window panel
+			std::weak_ptr<EntitiesPanel> entities_panel;
 
 		public:
-			TileMapPanel() : grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_mode{ false } {}
+			TileMapPanel() : grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_edit{ false }, b_snap_to_grid{ false } {}
 			~TileMapPanel() = default;
 
 			//Panel Name
@@ -462,7 +538,10 @@ namespace NIKE {
 			void renderGrid(void* draw_list, Vector2f const& render_size);
 
 			//Get grid editing mode
-			bool checkGridEditing();
+			bool checkGridEditing() const;
+
+			//Get grid snapping
+			bool checkGridSnapping() const;
 		};
 
 		//Game Window Panel
