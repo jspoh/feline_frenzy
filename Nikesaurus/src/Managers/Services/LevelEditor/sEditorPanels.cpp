@@ -114,6 +114,115 @@ namespace NIKE {
 					window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
 	}
 
+	void LevelEditor::IPanel::worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding) {
+
+		//Draw filled rect
+		draw_list->AddRectFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+			color, rounding);
+	}
+
+	void LevelEditor::IPanel::worldRect(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding, float thickness) {
+		//Draw filled rect
+		draw_list->AddRect(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+			color, rounding, 0, thickness);
+	}
+
+	void LevelEditor::IPanel::worldQuadFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color) {
+		//Convert transform to vertices
+		auto corners = Utility::convertTransformToVert(e_transform);
+
+		//Draw quad bounding box
+		draw_list->AddQuadFilled(worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size),
+			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size),
+			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size),
+			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size), color);
+	}
+
+	void LevelEditor::IPanel::worldQuad(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness) {
+		//Convert transform to vertices
+		auto corners = Utility::convertTransformToVert(e_transform);
+
+		//Full Screen scale
+		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
+
+		//Get zoom
+		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
+		//Draw quad bounding box
+		draw_list->AddQuad(worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size),
+			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size),
+			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size),
+			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size), color, thickness / zoom * fullscreen_scale.x);
+	}
+
+	void LevelEditor::IPanel::worldCircleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color) {
+		//World scale factor
+		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
+		
+		//Get zoom
+		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
+		//Render filled circle
+		draw_list->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), render_size),
+			(e_transform.scale.x * scale.x) / 2.0f / zoom, color);
+	}
+
+	void LevelEditor::IPanel::worldCircle(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness) {
+		//World scale factor
+		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
+
+		//Get zoom
+		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
+		//Render filled circle
+		draw_list->AddCircle(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), render_size),
+			(e_transform.scale.x * scale.x) / 2.0f / zoom, color, 0, thickness);
+	}
+
+	void LevelEditor::IPanel::worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color) {
+		
+		//Render filled triangle based on direction
+		switch (dir) {
+		case ImGuiDir::ImGuiDir_Up: {
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				color);
+			break;
+			}
+		case ImGuiDir::ImGuiDir_Down: {
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				color);
+			break;
+		}
+		case ImGuiDir::ImGuiDir_Right: {
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				color);
+			break;
+		}
+		case ImGuiDir::ImGuiDir_Left: {
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				color);
+			break;
+		}
+		default: {
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				color);
+			break;
+		}
+		}
+	}
+
 	/*****************************************************************//**
 	* Main Panel
 	*********************************************************************/
@@ -826,50 +935,6 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
-	void LevelEditor::ComponentsPanel::dragEntity(bool snap_to_grid) {
-
-		//Logic for moving entities
-		if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && (b_dragging_entity || entities_panel.lock()->isCursorInEntity(entities_panel.lock()->getSelectedEntity())) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
-			
-			//Entity position follows mouse cursor
-			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
-			if (e_transform_comp.has_value()) {
-				auto& e_transform = e_transform_comp.value().get();
-				e_transform.position = { game_panel.lock()->getWorldMousePos().x, -game_panel.lock()->getWorldMousePos().y };
-			}
-
-			//Dragging entity flag is true
-			b_dragging_entity = true;
-		}
-
-		//When entity is released
-		if (b_dragging_entity && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
-
-			//Reset dragging entity flag
-			b_dragging_entity = false;
-
-			//If snap to grid is not active return
-			if (snap_to_grid) {
-
-				//Get cursor position to snap to cell
-				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
-				if (e_transform_comp.has_value()) {
-					auto& e_transform = e_transform_comp.value().get();
-
-					//Get cursor pos
-					Vector2f new_position;
-					auto cursor_cell = NIKE_MAP_SERVICE->getCursorCell();
-					if (cursor_cell.has_value()) {
-						new_position = cursor_cell.value().get().position;
-					}
-
-					//Snap to cell
-					e_transform.position = { new_position.x, -new_position.y };
-				}
-			}
-		}
-	}
-
 	void LevelEditor::ComponentsPanel::interactGizmo() {
 		//Check if entity is locked
 		if (!entities_panel.lock()->getSelectedEntityEditor().has_value() || entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked) {
@@ -918,14 +983,21 @@ namespace NIKE {
 				gizmo.b_dragging_vert = true;
 				gizmo.b_dragging_hori = false;
 
-				//Calculate offset
-				static float yoffset = 0.0f;
-				if (ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-					yoffset = world_mouse.y + e_transform.position.y;
+				//Static variables to store initial values
+				static float initial_mouse_y = 0.0f;
+				static float initial_position_y = 0.0f;
+
+				//Initialize on mouse click
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+					initial_mouse_y = world_mouse.y;
+					initial_position_y = e_transform.position.y;
 				}
 
-				//Apply y positional change with offset
-				e_transform.position.y = -(world_mouse.y - yoffset);
+				//Calculate the Y-axis delta
+				float delta_y = -(world_mouse.y - initial_mouse_y) * gizmo.sensitivity;
+
+				//Apply the delta to the position
+				e_transform.position.y = initial_position_y + delta_y;
 			}
 
 			//Add gizmo right
@@ -943,14 +1015,21 @@ namespace NIKE {
 				gizmo.b_dragging_vert = false;
 				gizmo.b_dragging_hori = true;
 				
-				//Calculate offset
-				static float xoffset = 0.0f;
-				if (ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-					xoffset = world_mouse.x - e_transform.position.x;
+				//Static variables to store initial values
+				static float initial_mouse_x = 0.0f;
+				static float initial_position_x = 0.0f;
+
+				//Initialize on mouse click
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+					initial_mouse_x = world_mouse.x;
+					initial_position_x = e_transform.position.x;
 				}
 
-				//Apply x positional change with offset
-				e_transform.position.x = world_mouse.x - xoffset;
+				//Calculate the X-axis delta
+				float delta_x = (world_mouse.x - initial_mouse_x) * gizmo.sensitivity;
+
+				//Apply the delta to the position
+				e_transform.position.x = initial_position_x + delta_x;
 			}
 
 			//Add gizmo center
@@ -991,22 +1070,30 @@ namespace NIKE {
 				gizmo.b_dragging_vert = true;
 				gizmo.b_dragging_hori = false;
 
-				//Get initial ysize
-				static float ysize = 0.0f;
+				//Static variables to store initial values
+				static float initial_mouse_y = 0.0f;
+				static float initial_scale_y = 0.0f;
+
+				//Initialize on mouse click
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-					ysize = e_transform.scale.y;
+					initial_mouse_y = world_mouse.y;
+					initial_scale_y = e_transform.scale.y;
 				}
 
-				//Calculate the scale factor based on mouse position
-				float distance_to_handle = -world_mouse.y - e_transform.position.y;
-				float handle_initial_offset = gizmo.objects["Up Point"].position.y - e_transform.position.y;
-				float scale_factor = distance_to_handle / handle_initial_offset;
+				//Calculate scale sensitivity
+				float scale_sensitivity = gizmo.sensitivity / (initial_scale_y + EPSILON);
 
-				//Apply the scale factor to the initial size
-				e_transform.scale.y = ysize + ysize * scale_factor;
+				//Calculate the Y-axis movement relative to the initial position
+				float delta_y = -(world_mouse.y - initial_mouse_y);
+				
+				//Calculate scale factor
+				float scale_factor = (1.0f + delta_y * scale_sensitivity) < EPSILON ? EPSILON : (1.0f + delta_y * scale_sensitivity);
+
+				//Adjust the scale proportionally
+				e_transform.scale.y = initial_scale_y * scale_factor;
 
 				//Clamp the scale
-				e_transform.scale.y = std::clamp(e_transform.scale.y, 1.0f, (float)UINT16_MAX);
+				e_transform.scale.y = std::clamp(e_transform.scale.y, EPSILON, (float)UINT16_MAX);
 			}
 
 			//Add gizmo right
@@ -1024,22 +1111,30 @@ namespace NIKE {
 				gizmo.b_dragging_vert = false;
 				gizmo.b_dragging_hori = true;
 
-				//Get initial xsize
-				static float xsize = 0.0f;
+				//Static variables to store initial values
+				static float initial_mouse_x = 0.0f;
+				static float initial_scale_x = 0.0f;
+
+				//Initialize on mouse click
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-					xsize = e_transform.scale.x;
+					initial_mouse_x = world_mouse.x;
+					initial_scale_x = e_transform.scale.x;
 				}
 
-				//Calculate the scale factor based on mouse position
-				float distance_to_handle = world_mouse.x - e_transform.position.x;
-				float handle_initial_offset = gizmo.objects["Right Point"].position.x - e_transform.position.x;
-				float scale_factor = distance_to_handle / handle_initial_offset;
+				//Calculate scale sensitivity
+				float scale_sensitivity = gizmo.sensitivity / (initial_scale_x + EPSILON);
 
-				//Apply the scale factor to the initial size
-				e_transform.scale.x = xsize + xsize * scale_factor;
+				//Calculate the X-axis movement relative to the initial position
+				float delta_x = (world_mouse.x - initial_mouse_x);
+
+				//Calculate scale factor
+				float scale_factor = (1.0f + delta_x * scale_sensitivity) < EPSILON ? EPSILON : (1.0f + delta_x * scale_sensitivity);
+
+				//Adjust the scale proportionally
+				e_transform.scale.x = initial_scale_x * scale_factor;
 
 				//Clamp the scale
-				e_transform.scale.x = std::clamp(e_transform.scale.x, 1.0f, (float)UINT16_MAX);
+				e_transform.scale.x = std::clamp(e_transform.scale.x, EPSILON, (float)UINT16_MAX);
 			}
 
 			//Add gizmo center
@@ -1048,7 +1143,6 @@ namespace NIKE {
 
 			//Dragging stopped
 			if ((gizmo.b_dragging_hori || gizmo.b_dragging_vert) && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
-
 				//Reset dragging flags
 				gizmo.b_dragging_hori = false;
 				gizmo.b_dragging_vert = false;
@@ -1381,8 +1475,41 @@ namespace NIKE {
 					}
 				}
 
+				//Set Gizmo Sensitivity
+				{
+					ImGui::Text("Set Gizmo Sensitivity: ");
+					ImGui::DragFloat("##GizmoSensitivity", &gizmo.sensitivity, 0.01f, 0.0f, 5.0f);
+
+					//Before editing
+					static float sensitivity_before_change = gizmo.sensitivity;
+					if (ImGui::IsItemActivated()) {
+						sensitivity_before_change = gizmo.sensitivity;
+					}
+
+					//Upon editing finish
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						//Set gizmo sensi
+						Action set_gizmo_sensi;
+
+						//Do gizmo sensi
+						set_gizmo_sensi.do_action = [&, sensi = gizmo.sensitivity]() {
+							gizmo.sensitivity = sensi;
+							};
+
+						//Undo gizmo sensi
+						set_gizmo_sensi.undo_action = [&, sensi = sensitivity_before_change]() {
+							gizmo.sensitivity = sensi;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_sensi));
+					}
+				}
+
 				//Interact with gizmo
-				interactGizmo();
+				if (main_panel.lock()->getGizmoState()) {
+					interactGizmo();
+				}
 			}
 
 			//Add Spacing
@@ -1415,9 +1542,6 @@ namespace NIKE {
 
 			//Add Spacing
 			ImGui::Spacing();
-
-			//Logic for dragging entity
-			//dragEntity(false);
 
 			//Retrieve and display all registered component types
 			for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity())) {
@@ -1495,23 +1619,8 @@ namespace NIKE {
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
 
-		//Convert color
-		ImU32 color = IM_COL32(255, 255, 255, 255);
-
-		//Camera zoom
-		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
-
-		//Full Screen scale
-		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
-
-		//Convert transform to vertices
-		auto corners = Utility::convertTransformToVert(e_transform);
-
-		//Draw quad bounding box
-		draw->AddQuad(	worldToScreen(ImVec2(corners[0].x, corners[0].y), rendersize), 
-						worldToScreen(ImVec2(corners[1].x, corners[1].y), rendersize),
-						worldToScreen(ImVec2(corners[2].x, corners[2].y), rendersize),
-						worldToScreen(ImVec2(corners[3].x, corners[3].y), rendersize), color, (e_transform.scale.length() * 0.02f) / zoom * fullscreen_scale.x);
+		//Render rotated rectangle
+		worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (e_transform.scale.length() * 0.02f));
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
@@ -1526,12 +1635,6 @@ namespace NIKE {
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
 
-		//World scale factor
-		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
-
-		//Camera zoom
-		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
-
 		//Full Screen scale
 		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
 
@@ -1539,59 +1642,41 @@ namespace NIKE {
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
 			//Draw move box
-			draw->AddRectFilled(worldToScreen(ImVec2(gizmo.objects["Move Box"].position.x - (gizmo.objects["Move Box"].scale.x / 2.0f), -gizmo.objects["Move Box"].position.y - (gizmo.objects["Move Box"].scale.y / 2.0f)), rendersize),
-				worldToScreen(ImVec2(gizmo.objects["Move Box"].position.x + (gizmo.objects["Move Box"].scale.x / 2.0f), -gizmo.objects["Move Box"].position.y + (gizmo.objects["Move Box"].scale.y / 2.0f)), rendersize),
-				IM_COL32(100, 100, 100, 100));
+			worldRectFilled(draw, gizmo.objects["Move Box"], rendersize, IM_COL32(100, 100, 100, 100));
 
 			//Draw up arrow
-			draw->AddRectFilled(worldToScreen(ImVec2(gizmo.objects["Up"].position.x - (gizmo.objects["Up"].scale.x / 2.0f), -gizmo.objects["Up"].position.y - (gizmo.objects["Up"].scale.y / 2.0f)), rendersize),
-								worldToScreen(ImVec2(gizmo.objects["Up"].position.x + (gizmo.objects["Up"].scale.x / 2.0f), -gizmo.objects["Up"].position.y + (gizmo.objects["Up"].scale.y / 2.0f)), rendersize),
-								IM_COL32(0, 255, 0, 255));
+			worldRectFilled(draw, gizmo.objects["Up"], rendersize, IM_COL32(0, 255, 0, 255));
 
 			//Draw up arrow point
-			draw->AddTriangleFilled(worldToScreen(ImVec2(gizmo.objects["Up Point"].position.x, -gizmo.objects["Up Point"].position.y - (gizmo.objects["Up Point"].scale.y / 2.0f)), rendersize),
-									worldToScreen(ImVec2(gizmo.objects["Up Point"].position.x + (gizmo.objects["Up Point"].scale.x / 2.0f), -gizmo.objects["Up Point"].position.y + (gizmo.objects["Up Point"].scale.y / 2.0f)), rendersize),
-									worldToScreen(ImVec2(gizmo.objects["Up Point"].position.x - (gizmo.objects["Up Point"].scale.x / 2.0f), -gizmo.objects["Up Point"].position.y + (gizmo.objects["Up Point"].scale.y / 2.0f)), rendersize),
-									IM_COL32(0, 255, 0, 255));
+			worldTriangleFilled(draw, gizmo.objects["Up Point"], ImGuiDir::ImGuiDir_Up, rendersize, IM_COL32(0, 255, 0, 255));
 
 			//Draw right arrow
-			draw->AddRectFilled(worldToScreen(ImVec2(gizmo.objects["Right"].position.x - (gizmo.objects["Right"].scale.x / 2.0f), -gizmo.objects["Right"].position.y - (gizmo.objects["Right"].scale.y / 2.0f)), rendersize),
-				worldToScreen(ImVec2(gizmo.objects["Right"].position.x + (gizmo.objects["Right"].scale.x / 2.0f), -gizmo.objects["Right"].position.y + (gizmo.objects["Right"].scale.y / 2.0f)), rendersize),
-				IM_COL32(255, 0, 0, 255));
+			worldRectFilled(draw, gizmo.objects["Right"], rendersize, IM_COL32(255, 0, 0, 255));
 
 			//Draw right arrow point
-			draw->AddTriangleFilled(worldToScreen(ImVec2(gizmo.objects["Right Point"].position.x + (gizmo.objects["Right Point"].scale.x / 2.0f), -gizmo.objects["Right Point"].position.y), rendersize),
-				worldToScreen(ImVec2(gizmo.objects["Right Point"].position.x - (gizmo.objects["Right Point"].scale.x / 2.0f), -gizmo.objects["Right Point"].position.y + (gizmo.objects["Right Point"].scale.y / 2.0f)), rendersize),
-				worldToScreen(ImVec2(gizmo.objects["Right Point"].position.x - (gizmo.objects["Right Point"].scale.x / 2.0f), -gizmo.objects["Right Point"].position.y - (gizmo.objects["Right Point"].scale.y / 2.0f)), rendersize),
-				IM_COL32(255, 0, 0, 255));
+			worldTriangleFilled(draw, gizmo.objects["Right Point"], ImGuiDir::ImGuiDir_Right, rendersize, IM_COL32(255, 0, 0, 255));
 			
 			//Draw center
-			draw->AddCircleFilled(worldToScreen(ImVec2(gizmo.objects["Center"].position.x, -gizmo.objects["Center"].position.y), rendersize),
-				(gizmo.objects["Center"].scale.x * scale.x ) / 2.0f / zoom, IM_COL32(255, 255, 255, 255));
+			worldCircleFilled(draw, gizmo.objects["Center"], rendersize, IM_COL32(255, 255, 255, 255));
+
 			break;
 			}
 		case GizmoMode::Scale: {
 			//Draw up arrow
-			draw->AddRectFilled(worldToScreen(ImVec2(gizmo.objects["Up"].position.x - (gizmo.objects["Up"].scale.x / 2.0f), -gizmo.objects["Up"].position.y - (gizmo.objects["Up"].scale.y / 2.0f)), rendersize),
-				worldToScreen(ImVec2(gizmo.objects["Up"].position.x + (gizmo.objects["Up"].scale.x / 2.0f), -gizmo.objects["Up"].position.y + (gizmo.objects["Up"].scale.y / 2.0f)), rendersize),
-				IM_COL32(0, 255, 0, 255));
+			worldRectFilled(draw, gizmo.objects["Up"], rendersize, IM_COL32(0, 255, 0, 255));
 
 			//Draw up arrow point
-			draw->AddCircleFilled(worldToScreen(ImVec2(gizmo.objects["Up Point"].position.x, -gizmo.objects["Up Point"].position.y), rendersize),
-				(gizmo.objects["Up Point"].scale.x * scale.x) / 2.0f / zoom, IM_COL32(0, 255, 0, 255));
+			worldCircleFilled(draw, gizmo.objects["Up Point"], rendersize, IM_COL32(0, 255, 0, 255));
 
 			//Draw right arrow
-			draw->AddRectFilled(worldToScreen(ImVec2(gizmo.objects["Right"].position.x - (gizmo.objects["Right"].scale.x / 2.0f), -gizmo.objects["Right"].position.y - (gizmo.objects["Right"].scale.y / 2.0f)), rendersize),
-				worldToScreen(ImVec2(gizmo.objects["Right"].position.x + (gizmo.objects["Right"].scale.x / 2.0f), -gizmo.objects["Right"].position.y + (gizmo.objects["Right"].scale.y / 2.0f)), rendersize),
-				IM_COL32(255, 0, 0, 255));
+			worldRectFilled(draw, gizmo.objects["Right"], rendersize, IM_COL32(255, 0, 0, 255));
 
 			//Draw up arrow point
-			draw->AddCircleFilled(worldToScreen(ImVec2(gizmo.objects["Right Point"].position.x, -gizmo.objects["Right Point"].position.y), rendersize),
-				(gizmo.objects["Right Point"].scale.x * scale.x) / 2.0f / zoom, IM_COL32(255, 0, 0, 255));
+			worldCircleFilled(draw, gizmo.objects["Right Point"], rendersize, IM_COL32(255, 0, 0, 255));
 
 			//Draw center
-			draw->AddCircleFilled(worldToScreen(ImVec2(gizmo.objects["Center"].position.x, -gizmo.objects["Center"].position.y), rendersize),
-				(gizmo.objects["Center"].scale.x * scale.x) / 2.0f / zoom, IM_COL32(255, 255, 255, 255));
+			worldCircleFilled(draw, gizmo.objects["Center"], rendersize, IM_COL32(255, 255, 255, 255));
+
 			break;
 			}
 		case GizmoMode::Rotate: {
@@ -1601,24 +1686,6 @@ namespace NIKE {
 			break;
 			}
 		}
-
-		////Draw line up
-		//draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
-		//	worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-		//	IM_COL32(0, 255, 0, 255), 5.0f / zoom * fullscreen_scale.x);
-
-		////Add gizmo point
-		//draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - e_transform.scale.y * 0.75f), rendersize),
-		//	Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom * fullscreen_scale.x, IM_COL32(0, 255, 0, 255));
-
-		////Draw line right
-		//draw->AddLine(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), rendersize),
-		//	worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-		//	IM_COL32(255, 0, 0, 255), 5.0f / zoom * fullscreen_scale.x);
-
-		////Add gizmo point
-		//draw->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x + e_transform.scale.x * 0.75f, -e_transform.position.y), rendersize),
-		//	Utility::getMin(e_transform.scale.x / 2.0f, e_transform.scale.y / 2.0f) * 0.15f / zoom * fullscreen_scale.x, IM_COL32(255, 0, 0, 255));
 	}
 
 	bool LevelEditor::ComponentsPanel::checkEntityDragged() const {

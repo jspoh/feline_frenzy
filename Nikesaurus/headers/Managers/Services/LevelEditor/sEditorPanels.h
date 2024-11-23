@@ -78,6 +78,27 @@ namespace NIKE {
 			#ifdef NIKE_BUILD_DLL
 			//World to screen
 			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
+
+			//Render filled rectangle to draw list
+			void worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f);
+
+			//Render rectangle to draw list
+			void worldRect(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f, float thickness = 1.0f);
+
+			//Render filled quad to draw list ( Basically rectangle but with rotated )
+			void worldQuadFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color);
+
+			//Render quad to draw list ( Basically rectangle but with rotated )
+			void worldQuad(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
+
+			//Render filled circle to draw list
+			void worldCircleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color);
+
+			//Render circle to draw list
+			void worldCircle(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
+
+			//Render filled triangle to draw list
+			void worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color);
 			#endif // Only in nike build
 		};
 
@@ -244,13 +265,13 @@ namespace NIKE {
 			Rotate
 		};
 
-		//Gizmode object
+		//Gizmo object
 		struct Gizmo {
 			//Gizmo mode
 			GizmoMode mode;
 
-			//Gizmo start 
-			Vector2f world_start;
+			//Gizmo sensitivity
+			float sensitivity;
 
 			//boolean for checking interaction with gizmo
 			bool b_interacting;
@@ -261,10 +282,13 @@ namespace NIKE {
 			//Drag down
 			bool b_dragging_hori;
 
+			//Prev transform
+			Transform::Transform prev_transform;
+
 			//Gizmo objects
 			std::unordered_map<std::string, Transform::Transform> objects;
 
-			Gizmo() : mode{ GizmoMode::Translate }, world_start(), b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false } {}
+			Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
 		};
 
 		//Components Management Panel
@@ -285,9 +309,6 @@ namespace NIKE {
 
 			//Boolean to manage changing gizmos
 			Gizmo gizmo;
-
-			//Drag entity function
-			void dragEntity(bool snap_to_grid);
 
 			//Gizmo interaction
 			void interactGizmo();
