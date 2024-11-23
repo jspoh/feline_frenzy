@@ -289,6 +289,7 @@ namespace NIKE {
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+		ImGui::LoadIniSettingsFromDisk(io.IniFilename);
 
 		//Init editor action manager
 		action_manager = std::make_unique<ActionManager>();
@@ -359,6 +360,9 @@ namespace NIKE {
 		for (auto& panel : panels) {
 			panel->update();
 		}
+
+		//Save imgui layouts
+		ImGui::SaveIniSettingsToDisk(io.IniFilename);
 	}
 
 	void LevelEditor::Service::render() {

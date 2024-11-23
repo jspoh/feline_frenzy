@@ -1311,6 +1311,10 @@ namespace NIKE {
 				//Convert angle from radians to degrees
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
+				// Handle angle wrapping (crossing 0° or 360°)
+				if (angle_deg < 180.0f) angle_deg -= 360.0f;
+				if (angle_deg > -180.0f) angle_deg += 360.0f;
+
 				//Update the entity's rotation angle
 				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
 			}
