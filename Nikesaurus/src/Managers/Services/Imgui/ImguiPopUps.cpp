@@ -472,7 +472,7 @@ namespace NIKE
                 }
                 else if (asset_type == "Audio") {
                     // Retrieve the audio file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedAudios().at(key)->getFilePath();
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedSfx().at(key)->getFilePath();
 
                 }
                 else if (asset_type == "All_Prefabs") {

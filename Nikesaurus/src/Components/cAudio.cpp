@@ -65,7 +65,7 @@ namespace NIKE {
 
 					//Save audio ID Button
 					if (ImGui::Button("Save##AudioID")) {
-						if (NIKE_ASSETS_SERVICE->checkAudioExist(audio_id)) {
+						if (NIKE_ASSETS_SERVICE->checkSfxExist(audio_id)) {
 							LevelEditor::Action save_audio;
 
 							//Save audio action

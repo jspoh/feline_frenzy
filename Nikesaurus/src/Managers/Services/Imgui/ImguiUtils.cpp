@@ -150,7 +150,7 @@ namespace NIKE
 		}
 		else if (asset_type == "Audio")
 		{
-			for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedAudios())
+			for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedSfx())
 			{
 				std::string buttonLabel = "X##" + audio.first;
 

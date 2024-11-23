@@ -384,48 +384,30 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Audio
 	*********************************************************************/
-	void Assets::Service::loadSound(std::string const& audio_id, std::string const& file_path)
+	void Assets::Service::loadSfx(std::string const& audio_id, std::string const& file_path)
 	{
 		// Check if the audio already exists in the map
-		if (audio_list.find(audio_id) != audio_list.end())
+		if (sfx_list.find(audio_id) != sfx_list.end())
 		{
-			NIKEE_CORE_WARN("Audio(Sound) {} is already loaded. Skipping load", audio_id);
+			NIKEE_CORE_WARN("Sound effect {} is already loaded. Skipping load", audio_id);
 			return;
 		}
 
-		NIKEE_CORE_INFO("Loading sound '" + audio_id + "'");
+		NIKEE_CORE_INFO("Loading SFX '" + audio_id + "'");
 		//Emplace in audio list
-		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createSound(file_path))));
+		sfx_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createSound(file_path))));
 	}
 
-	void Assets::Service::reloadSound(std::string const& audio_id, std::string const& file_path) {
-		*audio_list.at(audio_id) = *audio_system->createSound(file_path);
+	void Assets::Service::reloadSfx(std::string const& audio_id, std::string const& file_path) {
+		*sfx_list.at(audio_id) = *audio_system->createSound(file_path);
 	}
 
-	void Assets::Service::loadMusic(std::string const& audio_id, std::string const& file_path)
-	{
-		// Check if the audio already exists in the map
-		if (audio_list.find(audio_id) != audio_list.end())
-		{
-			NIKEE_CORE_WARN("Audio(Music) {} is already loaded. Skipping load", audio_id);
-			return;
-		}
-
-		NIKEE_CORE_INFO("Loading music '" + audio_id + "'");
-		//Emplace in audio list
-		audio_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createStream(file_path))));
-	}
-
-	void Assets::Service::reloadMusic(std::string const& audio_id, std::string const& file_path) {
-		*audio_list.at(audio_id) = *audio_system->createStream(file_path);
-	}
-
-	void Assets::Service::unloadAudio(std::string const& audio_id) {
+	void Assets::Service::unloadSfx(std::string const& audio_id) {
 		//Find audio
-		auto it = audio_list.find(audio_id);
+		auto it = sfx_list.find(audio_id);
 
 		// Check if the audio already exists in the map
-		if (it == audio_list.end())
+		if (it == sfx_list.end())
 		{
 			NIKEE_CORE_WARN("Audio {} could not be found. Skipping unload", audio_id);
 			return;
@@ -433,29 +415,74 @@ namespace NIKE {
 
 		//Unload audio here
 		//! STOP AUDIO HERE
-		
+
 		//Unload audio
 		it->second->release();
-		audio_list.erase(it);
+		sfx_list.erase(it);
 	}
+
+	void Assets::Service::loadMusic(std::string const& audio_id, std::string const& file_path)
+	{
+		// Check if the audio already exists in the map
+		if (music_list.find(audio_id) != music_list.end())
+		{
+			NIKEE_CORE_WARN("Music {} is already loaded. Skipping load", audio_id);
+			return;
+		}
+
+		NIKEE_CORE_INFO("Loading music '" + audio_id + "'");
+		//Emplace in audio list
+		music_list.emplace(std::piecewise_construct, std::forward_as_tuple(audio_id), std::forward_as_tuple(std::move(audio_system->createStream(file_path))));
+	}
+
+	void Assets::Service::reloadMusic(std::string const& audio_id, std::string const& file_path) {
+		*music_list.at(audio_id) = *audio_system->createStream(file_path);
+	}
+
+	void Assets::Service::unloadMusic(std::string const& audio_id) {
+		//Find audio
+		auto it = music_list.find(audio_id);
+
+		// Check if the audio already exists in the map
+		if (it == music_list.end())
+		{
+			NIKEE_CORE_WARN("Audio {} could not be found. Skipping unload", audio_id);
+			return;
+		}
+
+		//Unload audio here
+		//! STOP AUDIO HERE
+
+		//Unload audio
+		it->second->release();
+		music_list.erase(it);
+	}
+
 
 	void Assets::Service::unloadAllAudios()
 	{
-		for (const auto& audio : audio_list)
+		for (const auto& sfx : sfx_list)
 		{
-			unloadAudio(audio.first);
+			unloadSfx(sfx.first);
 		}
 
-		audio_list.clear();
+		sfx_list.clear();
+
+		for (const auto& music : music_list)
+		{
+			unloadSfx(music.first);
+		}
+
+		sfx_list.clear();
 	}
 
-	std::shared_ptr<Audio::IAudio> Assets::Service::getAudio(std::string const& audio_tag)
+	std::shared_ptr<Audio::IAudio> Assets::Service::getSfx(std::string const& audio_tag)
 	{
 		//Find audio
-		auto it = audio_list.find(audio_tag);
+		auto it = sfx_list.find(audio_tag);
 
 		// Check if the audio already exists in the map
-		if (it == audio_list.end())
+		if (it == sfx_list.end())
 		{
 			LOG_CRASH("Audio could not be found.");
 		}
@@ -463,14 +490,43 @@ namespace NIKE {
 		return it->second;
 	}
 
-	const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& Assets::Service::getLoadedAudios()
+
+	std::shared_ptr<Audio::IAudio> Assets::Service::getMusic(std::string const& audio_tag)
 	{
-		return audio_list;
+		//Find audio
+		auto it = music_list.find(audio_tag);
+
+		// Check if the audio already exists in the map
+		if (it == music_list.end())
+		{
+			LOG_CRASH("Audio could not be found.");
+		}
+
+		return it->second;
 	}
 
-	bool Assets::Service::checkAudioExist(std::string const& audio_tag)
+	const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& Assets::Service::getLoadedSfx()
 	{
-		if (audio_list.find(audio_tag) == audio_list.end())
+		return sfx_list;
+	}
+
+	const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& Assets::Service::getLoadedMusic()
+	{
+		return music_list;
+	}
+
+	bool Assets::Service::checkSfxExist(std::string const& audio_tag)
+	{
+		if (sfx_list.find(audio_tag) == sfx_list.end())
+		{
+			return false;
+		}
+		return true;
+	}
+
+	bool Assets::Service::checkMusicExist(std::string const& audio_tag)
+	{
+		if (sfx_list.find(audio_tag) == sfx_list.end())
 		{
 			return false;
 		}
@@ -491,7 +547,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("File {} successfully copied into assets/Audios", src_file_path.string());
 
 		// Check if audio exists
-		if (checkAudioExist(src_file_path.filename().string())) {
+		if (checkSfxExist(src_file_path.filename().string())) {
 
 		}
 		else {
@@ -716,11 +772,11 @@ namespace NIKE {
 					size_t size = file_name.find_first_of('.', start) - start;
 
 					// Check if the audio already exists before loading
-					if (!checkAudioExist(file_name.substr(start, size))) {
-						loadMusic(file_name.substr(start, size), audio_paths.path().string());
+					if (!checkSfxExist(file_name.substr(start, size))) {
+						loadSfx(file_name.substr(start, size), audio_paths.path().string());
 					}
 					else {
-						reloadMusic(file_name.substr(start, size), audio_paths.path().string());
+						reloadSfx(file_name.substr(start, size), audio_paths.path().string());
 					}
 				}
 			}
@@ -870,11 +926,11 @@ namespace NIKE {
 	{
 		if (asset_type == "Audio") {
 			// FMOD free before deleting the sound
-			for (auto it = audio_list.begin(); it != audio_list.end(); it++) {
+			for (auto it = sfx_list.begin(); it != sfx_list.end(); it++) {
 				const auto& audio = *it;
 				if (audio.second && audio.second->getFilePath() == file_path) {
 					audio.second->release();   // Release the sound
-					audio_list.erase(it);   // Remove from the audio list
+					sfx_list.erase(it);   // Remove from the audio list
 					break;
 				}
 			}
