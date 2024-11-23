@@ -1253,6 +1253,37 @@ namespace NIKE {
 			gizmo.objects["Rot Circle"].first.scale = { Utility::getMax(e_transform.scale.x * 1.5f, e_transform.scale.y * 1.5f), Utility::getMax(e_transform.scale.x * 1.5f, e_transform.scale.y * 1.5f) };
 			gizmo.objects["Rot Circle"].second = { 255, 255, 255, 255 };
 
+			//Click on circle and change rotation point
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && Utility::isCursorInTransform(world_mouse, gizmo.objects["Rot Circle"].first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+				//Prev angle for undo and redo
+				float prev_angle = e_transform.rotation;
+
+				//Calculate mouse angle relative to the circle's center
+				float angle = atan2(-(world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+
+				//Convert angle from radians to degrees
+				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
+
+				//Update the entity's rotation angle
+				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
+
+				//Apply action
+				LevelEditor::Action change_rotation;
+
+				//Change rotation do action
+				change_rotation.do_action = [&, rotation = e_transform.rotation]() {
+					e_transform.rotation = rotation;
+					};
+
+				//Change rotation undo action
+				change_rotation.undo_action = [&, rotation = prev_angle]() {
+					e_transform.rotation = rotation;
+					};
+
+				//Execute action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
+			}
+
 			//Add rotation point
 			gizmo.objects["Rot Point"].first.position = {
 				gizmo.objects["Rot Circle"].first.position.x + (gizmo.objects["Rot Circle"].first.scale.x * 0.5f) * cos(e_transform.rotation * static_cast<float>(M_PI) / 180.0f),
@@ -1262,7 +1293,7 @@ namespace NIKE {
 			gizmo.objects["Rot Point"].second = { 100, 100, 100, 255 };
 
 			//Check for interactiom with rotation point
-			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Rot Circle"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
+			if (game_panel.lock()->isMouseInWindow() && !checkPopUpShowing() && ((gizmo.b_dragging_hori && gizmo.b_dragging_vert) || Utility::isCursorInTransform(world_mouse, gizmo.objects["Rot Point"].first)) && ImGui::GetIO().MouseDown[ImGuiMouseButton_Left]) {
 
 				//Set dragging flags
 				gizmo.b_dragging_vert = true;
@@ -1274,38 +1305,18 @@ namespace NIKE {
 					gizmo.prev_transform = e_transform;
 				}
 
-				static float current_angle_deg = 0.0f; // Current angle in degrees
-				static float previous_angle = 0.0f;    // Previous frame's angle in radians
-
 				//Calculate mouse angle relative to the circle's center
 				float angle = atan2(-(world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
 
 				//Convert angle from radians to degrees
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
-				//Normalize angle to range [0, 360]
-				if (angle_deg < 0.0f) {
-					angle_deg += 360.0f;
-				}
-
-				//Calculate the angular difference
-				float angle_diff = angle - previous_angle;
-
-				//Wrap angle
-				if (angle_diff > M_PI) angle_diff -= 2.0f * static_cast<float>(M_PI); // From +π to -π
-				if (angle_diff < -M_PI) angle_diff += 2.0f * static_cast<float>(M_PI); // From -π to +π
-
-				//Add the angular difference to the current angle, scaled by sensitivity
-				current_angle_deg += angle_diff * (180.0f / static_cast<float>(M_PI)) * gizmo.sensitivity;
-
-				//Clamp the angle
-				current_angle_deg = std::clamp(current_angle_deg, -360.0f, 360.0f);
+				// Handle angle wrapping (crossing 0° or 360°)
+				if (angle_deg < 180.0f) angle_deg -= 360.0f;
+				if (angle_deg > -180.0f) angle_deg += 360.0f;
 
 				//Update the entity's rotation angle
-				e_transform.rotation = current_angle_deg;
-
-				//Update the previous angle for the next frame
-				previous_angle = angle;
+				e_transform.rotation = std::clamp(angle_deg, -360.0f, 360.0f);
 			}
 
 			//Dragging stopped
