@@ -104,6 +104,7 @@ extern "C" {
 #include <thread>
 #include <optional>
 #include <stack>
+#include <regex>
 
  /*****************************************************************//**
  * Data (json)

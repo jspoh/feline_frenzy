@@ -1894,11 +1894,11 @@ namespace NIKE {
 			}
 
 			// Models tab
-			//if (ImGui::BeginTabItem("Models"))
-			//{
-			//	displayAssetList("Models");
-			//	ImGui::EndTabItem();
-			//}
+			if (ImGui::BeginTabItem("Models"))
+			{
+				displayAssetList("Models");
+				ImGui::EndTabItem();
+			}
 
 			// Font tab
 			if (ImGui::BeginTabItem("Fonts"))
@@ -1908,7 +1908,7 @@ namespace NIKE {
 			}
 
 			// Scripts tab
-			if (ImGui::BeginTabItem("Script"))
+			if (ImGui::BeginTabItem("Scripts"))
 			{
 				displayAssetList("Scripts");
 				ImGui::EndTabItem();

@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   sysLua.h
+ * \file   sLua.h
  * \brief  Lua manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
@@ -12,8 +12,9 @@
 #define SYS_LUA_HPP
 
 namespace NIKE {
+	//Temporary Disable DLL Export Warning
+	#pragma warning(disable: 4251)
 	namespace Lua {
-
 		//Bindable lua interface
 		class ILuaBind {
 		private:
@@ -21,22 +22,22 @@ namespace NIKE {
 			virtual void registerLuaBindings(sol::state& lua_state) = 0;
 			virtual ~ILuaBind() = default;
 		};
-		
-		//Lua system
-		class System {
+
+		//Lua Service
+		class NIKE_API Service {
 		private:
 
 			//Lua State
 			std::unique_ptr<sol::state> lua_state;
 
 			//Loaded lua scripts
-			std::unordered_map<std::string, std::pair<std::string, sol::table>> scripts;
+			std::unordered_map<std::string, std::pair<std::filesystem::path, sol::table>> scripts;
 
 			//Lua bindable systems
 			std::vector<std::shared_ptr<ILuaBind>> systems;
 		public:
-			System();
-			~System() = default;
+			Service();
+			~Service() = default;
 
 			//Initialize Lua
 			void init();
@@ -48,7 +49,7 @@ namespace NIKE {
 			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 			//Load lua script
-			std::string loadScript(std::string const& file_path);
+			std::string loadScript(std::string const& file_path_str);
 
 			//reload lua script
 			void reloadScript(std::string const& script_id);
@@ -56,10 +57,26 @@ namespace NIKE {
 			//Reload all lua scripts
 			void reloadAllScripts();
 
+			//Reload all lua scripts
+			void loadAllScripts();
+
+			// Check if lua script exist
+			bool checkScriptFileExist(const std::string& entry);
+
+			// Gettor for container
+			std::unordered_map<std::string, std::pair<std::filesystem::path, sol::table>>& getAllScripts();
+
 			//Execute lua scripts
 			sol::protected_function executeScript(std::string const& script_id, std::string const& function);
+
+			// For UI runtime loading
+			std::string extractFunctionFromScript(const std::string& script_id);
+
+			std::filesystem::path getScriptPath(const std::string& script_id) const;
 		};
 	}
+	//Re-enable DLL Export warning
+	#pragma warning(default: 4251)
 }
 
 #endif //!SYS_LUA_HPP

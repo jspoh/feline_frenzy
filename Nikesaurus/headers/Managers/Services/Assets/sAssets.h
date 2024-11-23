@@ -102,7 +102,7 @@ namespace NIKE {
 			/*****************************************************************//**
 			* Scripts private members
 			*********************************************************************/
-			std::unordered_map<std::string, std::filesystem::path> scripts_list;
+			//std::unordered_map<std::string, std::filesystem::path> scripts_list;
 
 		public:
 
@@ -260,11 +260,11 @@ namespace NIKE {
 			/*****************************************************************//**
 			* Script File path
 			*********************************************************************/
-			void loadScript(const std::filesystem::directory_entry& entry);
-			void loadScriptFiles();
-			bool checkScriptFileExist(const std::string& entry);
-			void reloadScript(std::string const&, std::filesystem::path const&);
-			std::unordered_map<std::string, std::filesystem::path>& getLoadedScripts();
+			//void loadScript(const std::filesystem::directory_entry& entry);
+			//void loadScriptFiles();
+			//bool checkScriptFileExist(const std::string& entry);
+			//void reloadScript(std::string const&, std::filesystem::path const&);
+			//std::unordered_map<std::string, std::filesystem::path>& getLoadedScripts();
 
 			/*****************************************************************//**
 			* File path gettors

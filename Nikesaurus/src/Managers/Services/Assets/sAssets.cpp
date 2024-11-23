@@ -653,50 +653,6 @@ namespace NIKE {
 		return prefabs_list;
 	}
 
-	void Assets::Service::loadScript(const std::filesystem::directory_entry& entry)
-	{
-		if (entry.is_regular_file() && hasValidScriptExtension(entry.path())) {
-			std::string file_name = entry.path().filename().string();
-
-			// Only add the file if it doesn't already exist in the script list
-			if (scripts_list.find(file_name) == scripts_list.end()) {
-				scripts_list[file_name] = entry.path();
-			}
-		}
-	}
-
-	void Assets::Service::loadScriptFiles()
-	{
-		// Ensure the list is fresh each time
-		scripts_list.clear();
-
-		// Iterate through the directory and load valid files
-		for (const auto& entry : std::filesystem::directory_iterator(getScriptsPath())) {
-			loadScript(entry);
-		}
-	}
-
-	bool Assets::Service::checkScriptFileExist(const std::string& entry)
-	{
-		// Check if the file path is already in the scripts_list
-		return scripts_list.find(entry) != scripts_list.end();
-	}
-
-	void Assets::Service::reloadScript(std::string const& script_key, std::filesystem::path const& script_file_path)
-	{
-		auto it = scripts_list.find(script_key);
-		if (it != scripts_list.end()) {
-			it->second = script_file_path;
-			std::filesystem::directory_entry entry(script_file_path);
-			loadScript(entry);
-		}
-	}
-
-	std::unordered_map<std::string, std::filesystem::path>& Assets::Service::getLoadedScripts()
-	{
-		return scripts_list;
-	}
-
 	std::string const& Assets::Service::getTexturePath() 
 	{ 
 		return texture_path; 
@@ -900,26 +856,36 @@ namespace NIKE {
 		}
 		// Others goes here
 		else if (asset_type == "Scripts") {
-
-			// Load new fonts
-			for (const auto& script_paths : std::filesystem::directory_iterator(getScriptsPath())) {
-				if (hasValidScriptExtension(script_paths)) {
+			// Iterate through the directory and process script files
+			for (const auto& script_paths : std::filesystem::directory_iterator(NIKE_ASSETS_SERVICE->getScriptsPath())) {
+				// Check if the file has a valid Lua script extension
+				if (script_paths.is_regular_file() && script_paths.path().extension() == ".lua") {
 					std::string file_name = script_paths.path().filename().string();
 
-					//string variables
+					// Extract script ID from the filename (or path)
 					size_t start = file_name.find_first_not_of('\\');
 					size_t size = file_name.find_first_of('.', start) - start;
+					std::string script_id = file_name.substr(start, size);
 
-					// Check if the font already exists before loading
-					if (!checkPrefabFileExist(file_name.substr(start, size))) {
-						loadScript(script_paths);
-					}	
-					else {
-						reloadScript(file_name.substr(start, size), script_paths.path());
+					try {
+						// Check if the script already exists in the system
+						if (!NIKE_LUA_SERVICE->checkScriptFileExist(script_id)) {
+							// If the script does not exist, load it
+							NIKE_LUA_SERVICE->loadScript(script_paths.path().string());
+						}
+						else {
+							// If the script exists, reload it
+							NIKE_LUA_SERVICE->reloadScript(script_id);
+						}
+					}
+					catch (const std::exception& e) {
+						// Handle errors during script loading or reloading
+						NIKEE_CORE_WARN("Error while reloading script ID: " + script_id + ". Details: " + std::string(e.what()));
 					}
 				}
 			}
 			}
+
 	}
 
 	bool Assets::Service::deleteFile(std::string const& file_path, const std::string& asset_type)

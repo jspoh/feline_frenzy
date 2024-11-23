@@ -18,11 +18,12 @@ void Splash::Scene::load() {
 	NIKE_ASSETS_SERVICE->reloadAssets("Audio");
 	NIKE_ASSETS_SERVICE->reloadAssets("Models");
 	NIKE_ASSETS_SERVICE->reloadAssets("Fonts");
+	NIKE_ASSETS_SERVICE->reloadAssets("Scripts");
 }
 
 void Splash::Scene::init() {
 
-	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/animation_scene.scn");
+	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/collision_scene.scn");
 
 	//NIKE_UI_SERVICE->createButton("Test",
 	//	NIKE::Transform::Transform({ 0.0f,0.0f }, { 200.0f, 100.0f }, 0.0f),

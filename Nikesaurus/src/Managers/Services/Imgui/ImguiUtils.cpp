@@ -229,8 +229,8 @@ namespace NIKE
 			for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
 
 
-				std::string buttonLabel = "X##" + level.first; // Small button has to have unqiue id in order to delete
-				if (ImGui::SmallButton(buttonLabel.c_str())) {
+				std::string button_label = "X##" + level.first; // Small button has to have unqiue id in order to delete
+				if (ImGui::SmallButton(button_label.c_str())) {
 					selected_file_path = level.first;
 					delete_file_popup = true;
 					ImGui::OpenPopup("Confirm Delete");
@@ -266,12 +266,41 @@ namespace NIKE
 		}
 		else if (asset_type == "Scripts")
 		{
-			for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedScripts())
-			{
-				ImGui::Text("%s", shader.first.c_str());
+			if (NIKE_LUA_SERVICE->getAllScripts().empty()) {
+				NIKE_LUA_SERVICE->loadAllScripts();
 			}
-		}
 
+	
+
+			for (const auto& script : NIKE_LUA_SERVICE->getAllScripts())
+			{
+				std::string button_label = "X##" + script.first; // Small button has to have unqiue id in order to delete
+				if (ImGui::SmallButton(button_label.c_str())) {
+					selected_file_path = script.first;
+					delete_file_popup = true;
+					ImGui::OpenPopup("Confirm Delete");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Selectable(script.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+					selected_file_path = script.first;
+
+					std::string script_file_path = script.first;
+				}
+
+				ImGui::Separator();
+			}
+			ImGui::Spacing();
+			if (ImGui::Button("Clear all Script files", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+			{
+				delete_all_files_popup = true;
+				ImGui::OpenPopup("Confirm Deleting All Files");
+
+			}
+			delete_file_popup = showDeleteFilePopup(selected_file_path, "Scripts");
+			delete_all_files_popup = showDeleteAllFilesPopup("Scripts");
+		}
 		ImGui::EndChild();
 	}
 

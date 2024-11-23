@@ -95,6 +95,7 @@ namespace NIKE {
 		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
 		provideService(std::make_shared<LevelEditor::Service>());
+		provideService(std::make_shared<Lua::Service>());
 
 		//Create console
 #ifndef NDEBUG
