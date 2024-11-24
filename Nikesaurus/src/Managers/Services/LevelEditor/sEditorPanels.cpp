@@ -417,7 +417,7 @@ namespace NIKE {
 				if (ImGui::Button("Reset")) {
 
 					//Get scn file path tagged to active scene
-					std::string curr_scn_file = NIKE_SCENES_SERVICE->getCurrScene()->getScnPath();
+					std::string curr_scn_file = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
 
 					//Resetting Curr Scn File
 					if (!curr_scn_file.empty() && std::filesystem::exists(curr_scn_file)) {
@@ -827,20 +827,49 @@ namespace NIKE {
 						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
 							continue;
 
-						//Check for entity clicking
+						// Check for entity clicking
 						if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+							// Only act if the entity changes
+							if (selected_entity != entity.first) { 
+
+								LevelEditor::Action select_entity_action;
+
+								// Capture current and previous selected entities
+								auto prev_entity = selected_entity;
+								auto new_entity = entity.first;
+
+								// Define the do action for selecting the new entity
+								select_entity_action.do_action = [&, prev_entity, new_entity]() {
+									selected_entity = new_entity;
+									b_entity_changed = true;
+									entity_clicked = true;
+									};
+
+								// Define the undo action for reverting to the previous entity
+								select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+									selected_entity = prev_entity;
+									b_entity_changed = true;
+									entity_clicked = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+							}
+
+							// Set the selected entity
 							selected_entity = entity.first;
 
-							//Get selected entity data
+							// Get selected entity data
 							auto it = entity_to_name.find(selected_entity);
 
-							//Signal entity changed
+							// Signal entity changed
 							b_entity_changed = true;
 
-							//Signal that an entity has been clicked
+							// Signal that an entity has been clicked
 							entity_clicked = true;
 							break;
 						}
+
 					}
 				}
 			}
@@ -1022,6 +1051,8 @@ namespace NIKE {
 				//Static variables to store initial values
 				static float initial_mouse_y = 0.0f;
 				static float initial_position_y = 0.0f;
+
+
 
 				//Initialize on mouse click
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
