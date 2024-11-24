@@ -2128,7 +2128,8 @@ namespace NIKE {
 	* Resource Management Panel
 	*********************************************************************/
 	void LevelEditor::ResourcePanel::init() {
-
+		std::shared_ptr<std::string> msg = std::make_shared<std::string>("File added successfully!");
+		registerPopUp("Dropped Files", defPopUp("Dropped Files", msg));
 	}
 
 	void LevelEditor::ResourcePanel::update() {
@@ -2185,8 +2186,19 @@ namespace NIKE {
 
 			ImGui::EndTabBar();
 		}
+		if (show_drop_popup) {
+			openPopUp("Dropped Files");
+			show_drop_popup = false;
+		}
 
+		// Render pop-ups
+		renderPopUps();
 		ImGui::End();
+	}
+
+	void LevelEditor::ResourcePanel::setDropPopUp(bool show) {
+		show_drop_popup = show;
+		
 	}
 
 	/*****************************************************************//**

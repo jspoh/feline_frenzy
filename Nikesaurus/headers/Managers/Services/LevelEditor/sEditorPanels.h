@@ -431,6 +431,8 @@ namespace NIKE {
 		//Assets Management Panel
 		class ResourcePanel : public IPanel {
 		private:
+			bool show_drop_popup = false;
+
 		public:
 			ResourcePanel() = default;
 			~ResourcePanel() = default;
@@ -453,6 +455,8 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			void setDropPopUp(bool show);
 		};
 
 		//Camera Management Panel

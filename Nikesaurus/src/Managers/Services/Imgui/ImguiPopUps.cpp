@@ -493,6 +493,12 @@ namespace NIKE
                     else if (asset_type == "Textures") {
                         NIKE_ASSETS_SERVICE->unloadTexture(key);
                     }
+                    else if (asset_type == "SFX") {
+                        NIKE_ASSETS_SERVICE->unloadSfx(key);
+                    }
+                    else if (asset_type == "Music") {
+                        NIKE_ASSETS_SERVICE->unloadMusic(key);
+                    }
                     
                     deleted = true;
                 }

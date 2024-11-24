@@ -147,8 +147,8 @@ namespace NIKE {
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for drop files event
-		NIKE_EVENTS_SERVICE->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
-
+		NIKE_EVENTS_SERVICE->addEventListeners<Assets::FileDropEvent>(NIKE_LVLEDITOR_SERVICE);
+		
 		//Init paths
 		NIKE_PATH_SERVICE->init(json_config);
 

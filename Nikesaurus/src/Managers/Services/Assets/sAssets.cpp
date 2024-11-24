@@ -47,42 +47,42 @@ namespace NIKE {
 
 	// Drop file event listener
 	void Assets::Service::onEvent(std::shared_ptr<Assets::FileDropEvent> event) {
-		int file_count = event->count;
-		const char** file_paths = event->paths;
+		//int file_count = event->count;
+		//const char** file_paths = event->paths;
 
-		const std::set<std::string> valid_tex_ext = { ".png", ".jpg", ".jpeg", ".tex"};
-		const std::set<std::string> valid_audio_ext = { ".wav" };
+		//const std::set<std::string> valid_tex_ext = { ".png", ".jpg", ".jpeg", ".tex"};
+		//const std::set<std::string> valid_audio_ext = { ".wav" };
 
-		// If filepath does not exist create one
-		if (!std::filesystem::exists("assets")) {
-			std::filesystem::create_directories("assets");
-			NIKEE_CORE_INFO("Created filepath assets");
-		}
+		//// If filepath does not exist create one
+		//if (!std::filesystem::exists("assets")) {
+		//	std::filesystem::create_directories("assets");
+		//	NIKEE_CORE_INFO("Created filepath assets");
+		//}
 
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		//if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 
-			for (int i = 0; i < file_count; ++i) {
-				std::filesystem::path src_file_path{ file_paths[i] };
+		//	for (int i = 0; i < file_count; ++i) {
+		//		std::filesystem::path src_file_path{ file_paths[i] };
 
-				// Makes sure extension isnt caps sensitive
-				std::string ext = src_file_path.extension().string();
-				// Transform each character in string ext to lowercase
-				for (char& c : ext) {
-					c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-				}
+		//		// Makes sure extension isnt caps sensitive
+		//		std::string ext = src_file_path.extension().string();
+		//		// Transform each character in string ext to lowercase
+		//		for (char& c : ext) {
+		//			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		//		}
 
-				if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
-					handleTextureDrop(src_file_path);
+		//		if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
+		//			handleTextureDrop(src_file_path);
 
-				}
-				else if (valid_audio_ext.find(ext) != valid_audio_ext.end()) {
-					handleAudioDrop(src_file_path);
-				}
-				else {
-					NIKEE_CORE_ERROR("ERROR: Unsupported File Type for file: {}", file_paths[i]);
-				}
-			}
-		}
+		//		}
+		//		else if (valid_audio_ext.find(ext) != valid_audio_ext.end()) {
+		//			handleAudioDrop(src_file_path);
+		//		}
+		//		else {
+		//			NIKEE_CORE_ERROR("ERROR: Unsupported File Type for file: {}", file_paths[i]);
+		//		}
+		//	}
+		//}
 	}
 
 	void Assets::Service::configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
@@ -542,10 +542,10 @@ namespace NIKE {
 	}
 
 	void Assets::Service::handleAudioDrop(const std::filesystem::path& src_file_path) {
-		std::filesystem::path tgt_file_path = "assets\\Audios" / src_file_path.filename();
+		std::filesystem::path tgt_file_path = "assets\\Audios\\SFX" / src_file_path.filename();
 
 		try {
-			// std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
+			 std::filesystem::copy(src_file_path, tgt_file_path, std::filesystem::copy_options::overwrite_existing);
 			NIKEE_CORE_INFO("File {} successfully copied into assets\\Audios", src_file_path.string());
 		}
 		catch (const std::filesystem::filesystem_error& e) {
@@ -556,10 +556,10 @@ namespace NIKE {
 
 		// Check if audio exists
 		if (checkSfxExist(src_file_path.filename().string())) {
-
+			reloadSfx(src_file_path.filename().string(), tgt_file_path.string());
 		}
 		else {
-
+			loadSfx(src_file_path.filename().string(), tgt_file_path.string());
 		}
 	}
 

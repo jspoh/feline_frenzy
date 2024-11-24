@@ -16,6 +16,7 @@
 #include "../sEvents.h"
 #include "../sInput.h"
 #include "../sWindows.h"
+#include "../Assets/sAssets.h"
 
 //Level Editor Helpers
 #include "sEditorActions.h"
@@ -30,7 +31,8 @@ namespace NIKE {
 			public Events::IEventListener<Input::MouseBtnEvent>,
 			public Events::IEventListener<Input::MouseMovedEvent>,
 			public Events::IEventListener<Input::MouseScrollEvent>,
-			public Events::IEventListener<Windows::WindowResized>
+			public Events::IEventListener<Windows::WindowResized>,
+			public Events::IEventListener<Assets::FileDropEvent>
 		{
 		private:
 
@@ -51,6 +53,9 @@ namespace NIKE {
 
 			//On windows resized event
 			void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
+
+			//On drop file event
+			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
 
 			//Begin frame for Editor
 			void beginFrame();
