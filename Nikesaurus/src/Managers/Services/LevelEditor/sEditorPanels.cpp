@@ -388,7 +388,7 @@ namespace NIKE {
 			//Gizmo usage showing
 			{
 				ImGui::Text("Transfomation Gizmo: ");
-				ImGui::Button(b_gizmo_state ? "Enable##Gizmo" : "Disable##Gizmo");
+				ImGui::Button(b_gizmo_state ? "Disable##Gizmo" : "Enable##Gizmo");
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
