@@ -103,7 +103,6 @@ namespace NIKE {
 		// Add the map file path at the top of the scene JSON
 		std::string grid_file_path = NIKE_ASSETS_SERVICE->getGridsPath() + Utility::extractFileName(file_path) + ".grid";
 		nlohmann::json m_data;
-		cout << Utility::makeRelativePath(file_path, grid_file_path) << endl;
 		m_data["Grid Path"] = grid_file_path;
 		data.push_back(m_data);
 

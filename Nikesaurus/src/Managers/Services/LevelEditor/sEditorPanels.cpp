@@ -2377,8 +2377,6 @@ namespace NIKE {
 
 			std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + grid_file_name;
 
-			cout << grid_full_path << endl;
-
 			// Serialize the grid data using the grid service
 			nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
 
