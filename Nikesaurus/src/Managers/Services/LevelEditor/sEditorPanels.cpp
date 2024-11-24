@@ -880,29 +880,63 @@ namespace NIKE {
 				//Check if entity is selected
 				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity.first).c_str() == entity_to_name.at(selected_entity).c_str();
 
-				//Show selectable
+				// Show selectable
 				if (ImGui::Selectable(entity_to_name.at(entity.first).c_str(), selected)) {
-
-					//Select entity
-					if (selected_entity != entity.first) {
-						selected_entity = entity.first;
-
-						//Get selected entity data
-						auto it = entity_to_name.find(selected_entity);
-						b_entity_changed = true;
-					}
-					else {
-						unselectEntity();
-						b_entity_changed = true;
-					}
-
-					//Check here if tilemap is editing grid
+					// Check if currently editing grid
 					if (tilemap_panel.lock()->checkGridEditing()) {
 						error_msg->assign("Editing grid now, unable to select entity.");
 						openPopUp("Error");
 						unselectEntity();
+						return;
+					}
+
+					// Prepare for redo/undo if the entity selection changes
+					if (selected_entity != entity.first) {
+						LevelEditor::Action select_entity_action;
+
+						// Capture current and previous selected entities
+						auto prev_entity = selected_entity;
+						auto new_entity = entity.first;
+
+						// Define the do action for selecting the new entity
+						select_entity_action.do_action = [&, prev_entity, new_entity]() {
+							selected_entity = new_entity;
+							b_entity_changed = true;
+							};
+
+						// Define the undo action for reverting to the previous entity
+						select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+							selected_entity = prev_entity;
+							b_entity_changed = true;
+							};
+
+						// Execute the action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+					}
+					// Unselect the entity
+					else {
+						LevelEditor::Action unselect_entity_action;
+
+						// Capture the current selected entity
+						auto prev_entity = selected_entity;
+
+						// Define the do action for unselecting
+						unselect_entity_action.do_action = [&, prev_entity]() {
+							unselectEntity();
+							b_entity_changed = true;
+							};
+
+						// Define the undo action for reselecting the previous entity
+						unselect_entity_action.undo_action = [&, prev_entity]() {
+							selected_entity = prev_entity;
+							b_entity_changed = true;
+							};
+
+						// Execute the action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
 					}
 				}
+
 			}
 		}
 
