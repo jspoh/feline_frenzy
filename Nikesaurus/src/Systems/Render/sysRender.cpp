@@ -320,8 +320,11 @@ namespace NIKE {
 		std::map<unsigned int, unsigned int> texture_binding_units;
 		for (int i{}; i < render_instances_texture.size(); i++) {
 			if (texture_binding_units.find(render_instances_texture[i].tex) == texture_binding_units.end()) {
-				glBindTextureUnit(i, render_instances_texture[i].tex);
-				texture_binding_units[render_instances_texture[i].tex] = i;
+				const unsigned int binding_unit = static_cast<unsigned int>(texture_binding_units.size());
+				glBindTextureUnit(binding_unit, render_instances_texture[i].tex);
+				texture_binding_units[render_instances_texture[i].tex] = binding_unit;
+				// glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				// glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			}
 		}
 
@@ -374,7 +377,11 @@ namespace NIKE {
 		shader_system->useShader("batched_texture");
 
 		// set uniform
-		shader_system->setUniform("batched_texture", "u_tex2d", textures);
+		//shader_system->setUniform("batched_texture", "u_tex2d", textures);
+		
+		// !TODO: debugging only
+		glBindTextureUnit(0, 23);
+		shader_system->setUniform("batched_texture", "u_tex2d", 0);
 
 		// bind vao
 		glBindVertexArray(model.vaoid);
@@ -388,6 +395,10 @@ namespace NIKE {
 
 		render_instances_texture.clear();
 
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderTextures: {0}", err);
+		}
 
 	}
 

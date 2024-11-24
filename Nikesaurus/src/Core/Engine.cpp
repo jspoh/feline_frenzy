@@ -171,6 +171,10 @@ namespace NIKE {
 
 		//Register Def Managers
 		registerDefSystems();
+
+		int max_texture_units;
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
 	}
 
 	void Core::Engine::run() {
