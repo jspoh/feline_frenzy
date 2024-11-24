@@ -26,6 +26,7 @@
 #include "Managers/Services/sUserInterface.h"
 #include "Managers/Services/sLua.h"
 #include "Managers/Services/LevelEditor/sLevelEditor.h"
+#include "Managers/Services/sPath.h"
 
 //Include all components here
 #include "Components/cAudio.h"
@@ -142,6 +143,7 @@ namespace NIKE {
 #define NIKE_UI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::UI::Service>()
 #define NIKE_LVLEDITOR_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::LevelEditor::Service>()
 #define NIKE_LUA_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Lua::Service>()
+#define NIKE_PATH_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Path::Service>()
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

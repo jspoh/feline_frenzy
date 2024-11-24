@@ -96,6 +96,7 @@ namespace NIKE {
 		provideService(std::make_shared<UI::Service>());
 		provideService(std::make_shared<LevelEditor::Service>());
 		provideService(std::make_shared<Lua::Service>());
+		provideService(std::make_shared<Path::Service>());
 
 		//Create console
 #ifndef NDEBUG
@@ -121,41 +122,41 @@ namespace NIKE {
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
 		//Add event listeners for window resized
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
-		getService<Events::Service>()->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for key event
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse event
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse move event
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse scroll event
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for drop files event
-		getService<Events::Service>()->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
+
+		//Init paths
+		NIKE_PATH_SERVICE->init(json_config);
 
 		//Setup Audio
-		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
+		NIKE_AUDIO_SERVICE->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
 
 		//Setup assets loading with systems for loading
-		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
-
-		//Init imgui
-		//NIKE_IMGUI_SERVICE->init();
+		NIKE_ASSETS_SERVICE->configAssets(getService<Audio::Service>()->getAudioSystem());
 
 		//Init camera
 		NIKE_CAMERA_SERVICE->init(json_config);

@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   mAssets.h
+ * \file   sAssets.h
  * \brief  Assets manager function declarations
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)

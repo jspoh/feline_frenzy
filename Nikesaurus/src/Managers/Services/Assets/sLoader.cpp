@@ -1,6 +1,6 @@
 /*****************************************************************//**
- * \file   sysFont.cpp
- * \brief	Font render manager
+ * \file	sLoader.cpp
+ * \brief	Loader manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu

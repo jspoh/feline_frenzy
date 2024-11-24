@@ -27,7 +27,7 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
-	void Camera::Service::init(nlohmann::json config) {
+	void Camera::Service::init(nlohmann::json const& config) {
 		// !TODO set height as a constant from the config
 		float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
 

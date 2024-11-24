@@ -63,6 +63,7 @@
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
+    <ClCompile Include="src\Managers\Services\sPath.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
+    <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />

@@ -1,6 +1,6 @@
 ﻿/*****************************************************************//**
- * \file   sysFont.h
- * \brief	Font render manager
+ * \file	sLoader.h
+ * \brief	Loading manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
