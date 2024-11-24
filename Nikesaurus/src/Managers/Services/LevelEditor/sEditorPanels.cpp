@@ -362,7 +362,7 @@ namespace NIKE {
 			//Grid Mode Switching
 			{
 				ImGui::Text("Show Grid: ");
-				ImGui::Button(b_grid_state ? "Show##GridState" : "Hide##GridState");
+				ImGui::Button(b_grid_state ? "Hide##GridState" : "Show##GridState");
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
