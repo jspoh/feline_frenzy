@@ -2338,6 +2338,10 @@ namespace NIKE {
 	void LevelEditor::TileMapPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 		registerPopUp("Save Grid", saveGridPopUp("Save Grid"));
+		error_msg = std::make_shared<std::string>("Saving Error");
+		success_msg = std::make_shared<std::string>("Saving Success");
+		registerPopUp("Error", defPopUp("Error", error_msg));
+		registerPopUp("Success", defPopUp("Success", success_msg));
 	}
 
 	void LevelEditor::TileMapPanel::update() {
@@ -2358,7 +2362,33 @@ namespace NIKE {
 
 		if (ImGui::Button("Save Grid"))
 		{
-			openPopUp("Save Grid");
+			// For saving of the prefab file with the extension
+			std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+
+			std::string grid_file_name = Utility::extractFileName(curr_scene) + ".grid";
+
+			std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + grid_file_name;
+
+			cout << grid_full_path << endl;
+
+			// Serialize the grid data using the grid service
+			nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+			// Open the file for writing
+			std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
+
+			// Check if the file opened successfully
+			if (!file.is_open()) {
+				openPopUp("Error");
+			}
+			else
+			{
+				openPopUp("Success");
+			}
+
+			// Write the serialized grid data to the file
+			file << grid_data.dump(4);
+			file.close();
 		}
 
 

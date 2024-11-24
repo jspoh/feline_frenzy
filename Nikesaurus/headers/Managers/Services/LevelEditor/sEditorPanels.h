@@ -511,6 +511,12 @@ namespace NIKE {
 			//Booelean for snapping entities to grid
 			bool b_snap_to_grid;
 
+			// Setting error message ( Usage: Editing error popup message )
+			std::shared_ptr<std::string> error_msg;
+
+			// Setting success message ( Usage: Editing success popup message )
+			std::shared_ptr<std::string> success_msg;
+
 			//Reference to game window panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 

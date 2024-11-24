@@ -103,7 +103,8 @@ namespace NIKE {
 		// Add the map file path at the top of the scene JSON
 		std::string grid_file_path = NIKE_ASSETS_SERVICE->getGridsPath() + Utility::extractFileName(file_path) + ".grid";
 		nlohmann::json m_data;
-		m_data["Grid Path"] = Utility::makeRelativePath(file_path, grid_file_path);
+		cout << Utility::makeRelativePath(file_path, grid_file_path) << endl;
+		m_data["Grid Path"] = grid_file_path;
 		data.push_back(m_data);
 
 		//Layers in scene
@@ -185,22 +186,17 @@ namespace NIKE {
 		for (const auto& l_data : data) {
 
 			//Load map grid if a map file path is specified
-			if (l_data.contains("Map Path")) {
-				std::string map_file_path = l_data.at("Map Path").get<std::string>();
-				std::string full_map_path = (std::filesystem::path(file_path).parent_path() / map_file_path).string();
+			if (l_data.contains("Grid Path")) {
+				std::string grid_file_path = l_data.at("Grid Path").get<std::string>();
+				std::string full_grid_path = (std::filesystem::path(file_path).parent_path() / grid_file_path).string();
 
-				if (std::filesystem::exists(full_map_path)) {
+				if (std::filesystem::exists(grid_file_path)) {
 					// Deserialize map grid
-					std::ifstream map_file(full_map_path, std::ios::in);
-					nlohmann::json map_data;
-					map_file >> map_data;
-					map_file.close();
-
-					NIKE_MAP_SERVICE->deserialize(map_data);
+					NIKE_SERIALIZE_SERVICE->loadGridFromFile(grid_file_path);
 				}
 				else {
 					// Log error or handle missing map file
-					NIKEE_CORE_ERROR("Map file not found: " + full_map_path);
+					NIKEE_CORE_ERROR("Map file not found: " + grid_file_path);
 				}
 			}
 
@@ -266,7 +262,7 @@ namespace NIKE {
 		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
 
 		// Get file path to seri
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::out);
 
 		if (!std::filesystem::exists(file_path))
 			NIKEE_CORE_ERROR("File does not exist!");
@@ -280,7 +276,7 @@ namespace NIKE {
 	void Serialization::Service::loadGridFromFile(const std::string& file_path)
 	{
 		// Get file path to seri
-		std::fstream file(file_path, std::ios::out);
+		std::fstream file(file_path, std::ios::in);
 
 		if (!file.is_open()) {
 			NIKEE_CORE_ERROR("Failed to open .map file for loading: " + file_path);
