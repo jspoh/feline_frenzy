@@ -47,7 +47,7 @@ void Splash::Scene::init() {
 }
 
 void Splash::Scene::exit() {
-	NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/collision_scene.scn");
+	//NIKE_SERIALIZE_SERVICE->saveSceneToFile("assets/Scenes/collision_scene.scn");
 }
 
 void Splash::Scene::unload() {

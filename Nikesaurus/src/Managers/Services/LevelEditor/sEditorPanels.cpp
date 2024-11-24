@@ -310,7 +310,7 @@ namespace NIKE {
 			//Game State Switching
 			{
 				ImGui::Text("Play/Pause Game: ");
-				ImGui::Button(b_game_state ? "Play" : "Pause");
+				ImGui::Button(b_game_state ? "Pause" : "Play");
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
@@ -336,7 +336,7 @@ namespace NIKE {
 			//Debug Mode Switching
 			{
 				ImGui::Text("Show Debug: ");
-				ImGui::Button(b_debug_mode ? "Show##DebugMode" : "Hide##DebugMode");
+				ImGui::Button(b_debug_mode ? "Hide##DebugMode" : "Show##DebugMode");
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
@@ -2432,7 +2432,7 @@ namespace NIKE {
 			//Adjust cell size
 			ImGui::Text("Snap entity to grid: ");
 			ImGui::SameLine();
-			ImGui::SmallButton(b_snap_to_grid ? "Enable##Snapping" : "Disable##Snapping");
+			ImGui::SmallButton(b_snap_to_grid ? "Disable##Snapping" : "Enable##Snapping");
 
 			//Check if button has been activated
 			if (ImGui::IsItemActivated()) {
