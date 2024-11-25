@@ -322,6 +322,8 @@ namespace NIKE {
 			//Gizmo interaction
 			void interactGizmo();
 
+			std::string comp_string_ref;
+
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
@@ -330,6 +332,9 @@ namespace NIKE {
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
+
+			//Remove Component confirmation popup
+			std::function<void()> removeComponentPopUp(std::string const& popup_id);
 
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
@@ -399,6 +404,8 @@ namespace NIKE {
 
 			//Check if entity is snapping to grid
 			bool checkGridSnapping() const;
+
+			std::string& getCompStringRef();
 		};
 
 		//Debug Management Panel
