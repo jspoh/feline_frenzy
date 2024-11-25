@@ -429,9 +429,52 @@ namespace NIKE {
 		};
 
 		//Assets Management Panel
+		class AssetsPanel : public IPanel {
+		private:
+			bool show_drop_popup;
+		public:
+			AssetsPanel() = default;
+			~AssetsPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Assets Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Assets Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+
+			void setDropPopUp(bool show);
+		};
+
+		//Resource Management panel
 		class ResourcePanel : public IPanel {
 		private:
-			bool show_drop_popup = false;
+			//Root Path
+			std::string root_path;
+
+			//Current Path
+			std::string current_path;
+
+			//Search filter
+			std::string search_filter;
+
+			//Icon size
+			Vector2f icon_size;
+
+			//Internal rendering of an asset browser
+			void renderAssetsBrowser(std::string const& virtual_path);
 
 		public:
 			ResourcePanel() = default;
@@ -455,8 +498,6 @@ namespace NIKE {
 
 			//Render
 			void render() override;
-
-			void setDropPopUp(bool show);
 		};
 
 		//Camera Management Panel

@@ -2125,18 +2125,18 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
-	* Resource Management Panel
+	* Assets Management Panel
 	*********************************************************************/
-	void LevelEditor::ResourcePanel::init() {
+	void LevelEditor::AssetsPanel::init() {
 		std::shared_ptr<std::string> msg = std::make_shared<std::string>("File added successfully!");
 		registerPopUp("Dropped Files", defPopUp("Dropped Files", msg));
 	}
 
-	void LevelEditor::ResourcePanel::update() {
+	void LevelEditor::AssetsPanel::update() {
 
 	}
 
-	void LevelEditor::ResourcePanel::render() {
+	void LevelEditor::AssetsPanel::render() {
 		ImGui::Begin(getName().c_str());
 
 		// Tabs for different asset types
@@ -2196,9 +2196,182 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void LevelEditor::ResourcePanel::setDropPopUp(bool show) {
+	void LevelEditor::AssetsPanel::setDropPopUp(bool show) {
 		show_drop_popup = show;
-		
+	}
+
+	/*****************************************************************//**
+	* Resource Management Panel
+	*********************************************************************/
+	void LevelEditor::ResourcePanel::renderAssetsBrowser(std::string const& virtual_path) {
+		//Get all directories & files
+		auto directories = NIKE_PATH_SERVICE->listDirectories(virtual_path, search_filter);
+		auto files = NIKE_PATH_SERVICE->listFiles(virtual_path, search_filter);
+
+		//Check if both files and directories are empty
+		if (directories.empty() && files.empty()) {
+			ImGui::Text("No results.");
+			return;
+		}
+
+		//Calculate the number of icons per row based on window size & icon size
+		int icons_per_row = static_cast<int>((ImGui::GetContentRegionAvail().x + (ImGui::GetStyle().ItemSpacing.x * 2)) / (icon_size.x + (ImGui::GetStyle().ItemSpacing.x * 2)));
+		icons_per_row = std::clamp(icons_per_row, 1, (int)UINT16_MAX);
+
+		//Track item index
+		int itemIndex = 0;
+
+		//Display all directories
+		for (const auto& dir : directories) {
+
+			//Item to exist in the same row
+			if (itemIndex % icons_per_row != 0) {
+				ImGui::SameLine();
+			}
+
+			ImGui::BeginGroup();
+
+			//Folder icon
+			ImTextureID icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture("folder")->gl_data);;
+
+			//Display directory icon
+			ImVec2 uv0(0.0f, 1.0f); // Bottom-left
+			ImVec2 uv1(1.0f, 0.0f); // Top-right
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			if (ImGui::ImageButton(std::string("##" + dir.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
+				//Change current path to folder path clicked
+				current_path = virtual_path + '/' + dir.filename().string();
+			}
+			ImGui::PopStyleColor();
+
+			//Display directory name
+			ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + icon_size.x);
+			ImGui::TextWrapped(dir.filename().string().c_str());
+			ImGui::PopTextWrapPos();
+
+			ImGui::EndGroup();
+
+			itemIndex++;
+		}
+
+		//Display all files
+		for (const auto& file : files) {
+
+			//Item to exist in the same row
+			if (itemIndex % icons_per_row != 0) {
+				ImGui::SameLine();
+			}
+
+			//Begin file group
+			ImGui::BeginGroup();
+
+			//Extension cases
+			ImTextureID icon = 0;
+
+			//Get extension loaded icon
+			if (NIKE_ASSETS_SERVICE->checkTextureExist(file.extension().string())) {
+				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture(file.extension().string())->gl_data);
+			}
+			else {
+				//Load default file icon
+				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture(".def")->gl_data);
+			}
+
+			//Display file icon
+			ImVec2 uv0(0.0f, 1.0f); // Bottom-left
+			ImVec2 uv1(1.0f, 0.0f); // Top-right
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			if (ImGui::ImageButton(std::string("##" + file.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
+
+			}
+			ImGui::PopStyleColor();
+
+			//Display file name
+			ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + icon_size.x);
+			ImGui::TextWrapped(file.filename().string().c_str());
+			ImGui::PopTextWrapPos();
+
+			ImGui::EndGroup();
+
+			itemIndex++;
+		}
+	}
+
+	void LevelEditor::ResourcePanel::init() {
+		root_path = "Game_Assets:/";
+		current_path = root_path;
+
+		//Search up till 32 characters
+		search_filter.resize(32);
+		search_filter = "";
+
+		//Default icon size
+		icon_size = { 128.0f, 128.0f };
+
+		//Load icons
+		NIKE_ASSETS_SERVICE->loadTexture("folder", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/folder_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".png", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/png_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".jpg", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/jpg_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".json", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/json_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".tff", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/tff_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".txt", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/txt_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".wav", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/wav_icon.png").string());
+		NIKE_ASSETS_SERVICE->loadTexture(".def", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/def_icon.png").string());
+
+	}
+
+	void LevelEditor::ResourcePanel::update() {
+
+	}
+
+	void LevelEditor::ResourcePanel::render() {
+		ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar);
+
+		ImGui::BeginMenuBar();
+
+		//Parent path navigation
+		{
+			//Back button
+			if (!current_path.empty() && ImGui::Button("< Back")) {
+
+				//Stop searching for parent at root directory
+				if (current_path != root_path) {
+					current_path = NIKE_PATH_SERVICE->getVirtualParentPath(current_path);
+				}
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Customize icon size
+		{
+			ImGui::Text("Icon Size: ");
+			ImGui::PushItemWidth(50.0f);
+			ImGui::DragFloat("##IconSizing", &icon_size.x, 1.0f, 32.0f, 256.0f, "%.f");
+			ImGui::PopItemWidth();
+			icon_size.y = icon_size.x;
+		}
+
+		ImGui::Spacing();
+
+		//Search filter
+		{
+			//Input filter
+			ImGui::Text("Filter: ");
+			ImGui::SameLine();
+			ImGui::PushItemWidth(100.0f);
+			if (ImGui::InputTextWithHint("##SearchFilter", "Search...", search_filter.data(), search_filter.capacity() + 1)) {
+				search_filter.resize(strlen(search_filter.c_str()));
+			}
+			ImGui::PopItemWidth();
+		}
+
+		ImGui::EndMenuBar();
+
+		//Render all assets & folders
+		renderAssetsBrowser(current_path);
+
+		ImGui::End();
 	}
 
 	/*****************************************************************//**
@@ -2898,7 +3071,7 @@ namespace NIKE {
 		float v_min = gaps.y / 2.0f / win_size.y;
 		float v_max = 1.0f - v_min;
 
-		//Configure UV Offsets3fc
+		//Configure UV Offsets
 		ImVec2 uv0(u_min, -v_min); // Bottom-left
 		ImVec2 uv1(u_max, -v_max); // Top-right
 
