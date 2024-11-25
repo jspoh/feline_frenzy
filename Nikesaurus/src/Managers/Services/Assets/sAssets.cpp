@@ -891,6 +891,29 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Assets Service
 	*********************************************************************/
+	Assets::Types Assets::Services::getAssetType(std::filesystem::path const& path) const {
+		auto ext = path.extension().string();
+		constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
+		if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tex") {
+			return Assets::Types::Texture;
+		}
+		else if (ext == ".model") {
+			return Assets::Types::Model;
+		}
+		else if (ext == ".tff") {
+			return Assets::Types::Font;
+		}
+		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) >= music_threshold) {
+			return Assets::Types::Music;
+		}
+		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) < music_threshold) {
+			return Assets::Types::Sound;
+		}
+		else {
+			return Assets::Types::None;
+		}
+	}
+
 	void Assets::Services::init(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
 		font_loader = std::make_unique<Assets::FontLoader>();
 		render_loader = std::make_unique<Assets::RenderLoader>();
@@ -922,8 +945,8 @@ namespace NIKE {
 			});
 	}
 
-	void Assets::Services::registerAsset(std::string const& asset_id, Types asset_type, std::string const& primary_path) {
-		asset_registry[asset_id] = MetaData(asset_type, NIKE_PATH_SERVICE->resolvePath(primary_path));
+	void Assets::Services::registerAsset(std::string const& asset_id, Types asset_type, std::string const& virtual_path) {
+		asset_registry[asset_id] = MetaData(asset_type, NIKE_PATH_SERVICE->resolvePath(virtual_path));
 	}
 
 	void Assets::Services::registerLoader(Types asset_type, LoaderFunc loader) {
@@ -945,6 +968,29 @@ namespace NIKE {
 		//		++it;
 		//	}
 		//}
+	}
+
+	void Assets::Services::scanAssetDirectory(std::filesystem::path const& root_path) {
+		for (const auto& file : std::filesystem::recursive_directory_iterator(root_path)) {
+			if (!file.is_regular_file()) continue;
+
+			//string variables
+			size_t start = file.path().string().find_last_of('\\') + 1;
+			size_t size = file.path().string().find_first_of('.', start) - start;
+			std::string asset_id = file.path().string().substr(start, size);
+
+			//Configure asset type
+			Types asset_type = getAssetType(file.path());
+
+			//Add into registry
+			asset_registry[asset_id] = MetaData(asset_type, file.path());
+		}
+	}
+
+	void Assets::Services::logAssetsRegistry() const {
+		for (auto const& asset : asset_registry) {
+			cout << "ID: " << asset.first << " Path: " << asset.second.primary_path << endl;
+		}
 	}
 
 	nlohmann::json Assets::Services::serialize() const {

@@ -134,6 +134,26 @@ namespace NIKE {
 
 	}
 
+	std::string Path::Service::convertToVirtualPath(std::string const& path_alias, std::string const& path) const {
+
+		//Get alias full path
+		auto alias_path = normalizePath(virtual_paths.at(path_alias));
+
+		//Normalized actual path
+		auto actual_path = normalizePath(path).string();
+
+		//Check if iteration of parent path exceeds alias
+		if (actual_path.find(alias_path.string()) == std::string::npos) {
+			throw std::runtime_error("Alias not found within actual path.");
+		}
+
+		//Get relative path from actual path
+		std::string relative_path = actual_path.substr(alias_path.string().size() + 1);
+
+		//Convert actual path to virtual path
+		return path_alias + relative_path;
+	}
+
 	void Path::Service::logVirtualPaths() const {
 		for (auto const& [alias, path] : virtual_paths) {
 			NIKEE_CORE_INFO(alias + " -> " + path.string());
@@ -221,12 +241,36 @@ namespace NIKE {
 			throw std::runtime_error("Path does not exist or is not a directory: " + actual_path.string());
 		}
 
-		// Add watcher for the directory
+		//Add watcher for the directory
 		dir_watchers.emplace(actual_path,
 			std::make_unique<filewatch::FileWatch<std::string>>(actual_path.string(),
-			[callback](const std::string& file, filewatch::Event event) {
+			[callback](std::string const& file, filewatch::Event event) {
 				callback(file, event);
 			}));
+	}
+
+	void Path::Service::watchDirectoryTree(std::string const& virtual_path, FileWatchEventCallback callback) {
+
+		//Get alias
+		auto alias = getAlias(virtual_path);
+
+		//Get actual path
+		auto actual_path = resolvePath(virtual_path);
+
+		//Check if path exists
+		if (!std::filesystem::exists(actual_path) || !std::filesystem::is_directory(actual_path)) {
+			throw std::runtime_error("Path does not exist or is not a directory: " + actual_path.string());
+		}
+		
+		//Add watcher for child directories
+		for (const auto& dir : std::filesystem::recursive_directory_iterator(actual_path)) {
+			if (dir.is_directory()) {
+				watchDirectory(convertToVirtualPath(alias, dir.path().string()), callback);
+			}
+		}
+
+		//Add watcher for the actual path
+		watchDirectory(virtual_path, callback);
 	}
 
 	void Path::Service::stopWatchingDirectory(std::string const& virtual_path) {

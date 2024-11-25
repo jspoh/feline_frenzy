@@ -56,6 +56,9 @@ namespace NIKE {
 			//Get virtual parent path
 			std::string getVirtualParentPath(std::string const& virtual_path) const;
 
+			//Convert to virtual path
+			std::string convertToVirtualPath(std::string const& path_alias, std::string const& path) const;
+
 			//Log all registered virtual paths
 			void logVirtualPaths() const;
 
@@ -70,6 +73,9 @@ namespace NIKE {
 
 			//Watch directory
 			void watchDirectory(std::string const& virtual_path, FileWatchEventCallback callback);
+
+			//Watch directory & child directories
+			void watchDirectoryTree(std::string const& virtual_path, FileWatchEventCallback callback);
 
 			//Stop watching directory
 			void stopWatchingDirectory(std::string const& virtual_path);

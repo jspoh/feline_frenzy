@@ -272,9 +272,9 @@ namespace NIKE {
 		};
 
 		enum class Types {
-			Texture = 0,
+			None = 0,
+			Texture,
 			Model,
-			Shader,
 			Font,
 			Music,
 			Sound,
@@ -314,6 +314,9 @@ namespace NIKE {
 
 			//Audio loader
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
+
+			//Extension to asset type
+			Types getAssetType(std::filesystem::path const& path) const;
 		public:
 
 			//Default constructor and destructor
@@ -324,7 +327,7 @@ namespace NIKE {
 			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
 			//Register asset
-			void registerAsset(std::string const& asset_id, Types asset_type, std::string const& primary_path);
+			void registerAsset(std::string const& asset_id, Types asset_type, std::string const& virtual_path);
 
 			//Register loader
 			void registerLoader(Types asset_type, LoaderFunc loader);
@@ -364,6 +367,12 @@ namespace NIKE {
 
 			//Clear expired cache
 			void clearExpiredCache();
+
+			//Register all assets from directory tree
+			void scanAssetDirectory(std::filesystem::path const& root_path);
+
+			//Log assets reigstry
+			void logAssetsRegistry() const;
 
 			//Serialize asset registry
 			nlohmann::json serialize() const;

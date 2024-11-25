@@ -2357,6 +2357,7 @@ namespace NIKE {
 		NIKE_ASSETS_SERVICE->loadTexture(".wav", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/wav_icon.png").string());
 		NIKE_ASSETS_SERVICE->loadTexture(".def", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/def_icon.png").string());
 
+		NIKE_ASSETS_SERVICES->scanAssetDirectory(NIKE_PATH_SERVICE->resolvePath(root_path));
 	}
 
 	void LevelEditor::ResourcePanel::update() {
