@@ -65,13 +65,13 @@ namespace NIKE {
     }
 
     bool Collision::System::detectAABBRectRect(
-        Physics::Dynamics const& dynamics_a, Physics::Collider const& collider_a,
-        Physics::Dynamics const& dynamics_b, Physics::Collider const& collider_b,
+        Transform::Transform const& transform_a, Physics::Dynamics const& dynamics_a,
+        Transform::Transform const& transform_b, Physics::Dynamics const& dynamics_b,
         CollisionInfo& info) {
         
         // References to components
-        AABB aabb_a({ collider_a.position.x - (collider_a.size.x * 0.5f), collider_a.position.y - (collider_a.size.y * 0.5f) }, { collider_a.position.x + (collider_a.size.x * 0.5f), collider_a.position.y + (collider_a.size.y * 0.5f) });
-        AABB aabb_b({ collider_b.position.x - (collider_b.size.x * 0.5f), collider_b.position.y - (collider_b.size.y * 0.5f) }, { collider_b.position.x + (collider_b.size.x * 0.5f), collider_b.position.y + (collider_b.size.y * 0.5f) });
+        AABB aabb_a({ transform_a.position.x - (transform_a.scale.x * 0.5f), transform_a.position.y - (transform_a.scale.y * 0.5f) }, { transform_a.position.x + (transform_a.scale.x * 0.5f), transform_a.position.y + (transform_a.scale.y * 0.5f) });
+        AABB aabb_b({ transform_b.position.x - (transform_b.scale.x * 0.5f), transform_b.position.y - (transform_b.scale.y * 0.5f) }, { transform_b.position.x + (transform_b.scale.x * 0.5f), transform_b.position.y + (transform_b.scale.y * 0.5f) });
 
         // Get delta time
         const float deltaTime = NIKE_ENGINE.getService<Windows::Service>()->getDeltaTime();
@@ -183,7 +183,7 @@ namespace NIKE {
 
     // Helper to retrieve and apply transformations to vertices based on model_id
     std::vector<Vector2f> Collision::System::getRotatedVertices(
-        const Transform::Transform& transform, const Physics::Collider& collider, const std::string& model_id)
+        const Transform::Transform& transform, const std::string& model_id)
     {
         std::vector<Vector2f> vertices;
 
@@ -204,13 +204,12 @@ namespace NIKE {
         }
 
         // Apply scaling and rotation
-        float angleRad = collider.rotation * static_cast<float>(M_PI / 180.0f); // Independent rotation
+        float angleRad = transform.rotation * ((float)M_PI / 180.0f);  // Ensure degrees to radians
 
         float cosAngle = cos(angleRad);
         float sinAngle = sin(angleRad);
-
-        Vector2f position = transform.position + collider.offset; // Use offset
-        Vector2f scale = collider.size;
+        Vector2f position = transform.position;
+        Vector2f scale = transform.scale;
 
         for (Vector2f& vertex : vertices) {
             vertex.x *= scale.x;
@@ -267,13 +266,12 @@ namespace NIKE {
 
     // Main detect SAT function
     bool Collision::System::detectSATCollision(
-        const Transform::Transform& transformA, const Transform::Transform& transformB, 
-        const Physics::Collider& colliderA, const Physics::Collider& colliderB,
+        const Transform::Transform& transformA, const Transform::Transform& transformB,
         const std::string& model_idA, const std::string& model_idB, CollisionInfo& info)
     {
         // Step 1: Get vertices and separating axes
-        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, colliderA, model_idA);
-        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, colliderB, model_idB);
+        std::vector<Vector2f> verticesA = getRotatedVertices(transformA, model_idA);
+        std::vector<Vector2f> verticesB = getRotatedVertices(transformB, model_idB);
         std::vector<Vector2f> axes = getSeparatingAxes(verticesA, verticesB);
 
         Vector2f smallestAxis;
@@ -323,12 +321,7 @@ namespace NIKE {
     void Collision::System::collisionResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
-        CollisionInfo const& info) 
-    {
-        // Skip resolution for triggers
-        if (collider_a.is_trigger || collider_b.is_trigger) {
-            return; // No physical resolution for triggers
-        }
+        CollisionInfo const& info) {
 
         // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
