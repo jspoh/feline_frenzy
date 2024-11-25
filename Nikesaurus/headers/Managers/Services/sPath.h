@@ -50,6 +50,12 @@ namespace NIKE {
 			//Normalise path
 			std::filesystem::path normalizePath(std::filesystem::path const& path) const;
 
+			//Get virtual path alias
+			std::string getAlias(std::string const& virtual_path) const;
+
+			//Get virtual parent path
+			std::string getVirtualParentPath(std::string const& virtual_path) const;
+
 			//Log all registered virtual paths
 			void logVirtualPaths() const;
 
@@ -57,10 +63,10 @@ namespace NIKE {
 			std::filesystem::path findRootDirectory();
 
 			//List directories
-			std::vector<std::filesystem::path> listDirectories(std::string const& virtual_path) const;
+			std::vector<std::filesystem::path> listDirectories(std::string const& virtual_path, std::string const& char_filter = "") const;
 
 			//List files
-			std::vector<std::filesystem::path> listFiles(std::string const& virtual_path, std::string const& ext_filter = "") const;
+			std::vector<std::filesystem::path> listFiles(std::string const& virtual_path, std::string const& char_filter = "", std::string const& ext_filter = "") const;
 
 			//Watch directory
 			void watchDirectory(std::string const& virtual_path, FileWatchEventCallback callback);

@@ -241,9 +241,9 @@ namespace NIKE {
 			}
 
 			// Try to get the ResourcePanel from the service using its static name
-			auto resource_panel = std::dynamic_pointer_cast<ResourcePanel>(panels_map.at(ResourcePanel::getStaticName()));
+			auto assets_panel = std::dynamic_pointer_cast<AssetsPanel>(panels_map.at(AssetsPanel::getStaticName()));
 
-			if (!resource_panel) {
+			if (!assets_panel) {
 				NIKEE_CORE_ERROR("Failed to get ResourcePanel or invalid panel type.");
 				return;
 			}
@@ -275,8 +275,8 @@ namespace NIKE {
 			}
 			// Construct the message
 			std::shared_ptr<std::string> msg = std::make_shared<std::string>(message);
-			resource_panel->editPopUp("Dropped Files", resource_panel->defPopUp("Dropped Files", msg));
-			resource_panel->setDropPopUp(true);
+			assets_panel->editPopUp("Dropped Files", assets_panel->defPopUp("Dropped Files", msg));
+			assets_panel->setDropPopUp(true);
 		}
 		event->setEventProcessed(true);
 	}
@@ -368,6 +368,11 @@ namespace NIKE {
 		auto debug_panel = std::make_shared<DebugPanel>();
 		panels.push_back(debug_panel);
 		panels_map.emplace(debug_panel->getName(), debug_panel);
+
+		//Add assets management panel
+		auto assets_panel = std::make_shared<AssetsPanel>();
+		panels.push_back(assets_panel);
+		panels_map.emplace(assets_panel->getName(), assets_panel);
 
 		//Add resource management panel
 		auto resource_panel = std::make_shared<ResourcePanel>();
