@@ -351,11 +351,7 @@ bool Collision::System::detectAABBRectRect(
         collider_a.position += info.mtv * 0.5f;
         collider_b.position -= info.mtv * 0.5f;
 
-        // Update Transform to reflect Collider's new state
-        transform.position = position - offset;
-        transform.scale = size;
-        transform.rotation = rotation;
-
+        // Update Transform to reflect Collider's new status
         collider_a.syncTransform(transform_a);
         collider_b.syncTransform(transform_b);
 
