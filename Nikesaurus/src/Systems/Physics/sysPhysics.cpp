@@ -147,9 +147,16 @@ namespace NIKE {
                     auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
                     if (e_collider_comp.has_value()) {
 
+
                         //Get collider & e_dynamics comp references
                         auto& e_collider = e_collider_comp.value().get();
                         auto& e_dynamics = e_dynamics_comp.has_value() ? e_dynamics_comp.value().get() : def_dynamics;
+
+                        // TEMPORARY JUST SYNC COLLIDER WITH TRANSFORM EVERYTIME
+                        // Sync with Transform
+                        e_collider.position = e_transform.position;
+                        e_collider.rotation = e_transform.rotation;
+                        e_collider.size = e_transform.scale;
 
                         //Check for collision with other entities
                         for (auto& colliding_entity : entities) {
@@ -192,7 +199,7 @@ namespace NIKE {
                             }
 
                             Collision::CollisionInfo info;
-                            if (!(static_cast<int>(e_transform.rotation) % 180) && !(static_cast<int>(other_transform.rotation) % 180) && collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
+                            if (!(static_cast<int>(e_collider.rotation) % 180) && !(static_cast<int>(other_collider.rotation) % 180) && collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
                                 //Set the flag of colliders
                                 e_collider.b_collided = true;
                                 other_collider.b_collided = true;
@@ -200,7 +207,7 @@ namespace NIKE {
                                 //Collision resolution
                                 collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
                             }
-                            else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_id, other_model_id, info)) {
+                            else if (collision_system->detectSATCollision(e_transform, other_transform, e_collider, other_collider, e_model_id, other_model_id, info)) {
                                 //Set the flag of colliders
                                 e_collider.b_collided = true;
                                 other_collider.b_collided = true;

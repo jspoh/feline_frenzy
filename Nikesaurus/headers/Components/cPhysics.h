@@ -46,12 +46,38 @@ namespace NIKE {
         };
 
         struct Collider {
-            bool b_collided;
-            Resolution resolution;
-            
-            Collider() : b_collided{ false }, resolution{ Resolution::NONE }{}
-            Collider(Resolution resolution) : b_collided{ false }, resolution{ resolution } {}
+            enum class ShapeType {
+                AABB,        // Axis-Aligned Bounding Box
+                Circle,      // Circle collider
+                Polygon      // Convex Polygon collider
+            };
+
+            ShapeType shape_type;                // Type of collider shape
+            Vector2f size;                       // Dimensions: width and height for AABB, or radius for Circle
+            std::vector<Vector2f> vertices;      // Vertices for polygon shapes
+            Vector2f offset{ 0.0f, 0.0f };       // Relative to entity's Transform
+            Vector2f position{ 0.0f, 0.0f };     // World position (calculated using offset and Transform position)
+            float rotation{ 0.0f };              // Independent rotation
+            bool is_static = false;              // If true, collider does not move (no need update from Transform component)
+            bool is_trigger = false;             // Trigger for non-physical collision zones
+
+            bool b_collided = false;             // Collision flag
+            Resolution resolution = Resolution::NONE; // Collision resolution type (NONE, SLIDE, BOUNCE)
+
+            // Default constructor
+            Collider()
+                : shape_type{ ShapeType::AABB }, size{ 20.0f, 20.0f }, offset{ 0.0f, 0.0f }, position{ 0.0f, 0.0f },
+                rotation{ 0.0f }, is_static{ false }, is_trigger{ true }, b_collided{ false },
+                resolution{ Resolution::NONE } {}
+
+            // Constructor taking all members
+            Collider(ShapeType type, Vector2f size, Vector2f offset, Vector2f position, float rotation, bool is_static,
+                bool is_trigger, Resolution resolution, bool b_collided = false)
+                : shape_type{ type }, size{ size }, offset{ offset }, position{ position }, rotation{ rotation },
+                is_static{ is_static }, is_trigger{ is_trigger }, b_collided{ b_collided },
+                resolution{ resolution } {}
         };
+
 
         //Change physics world variables
         struct ChangePhysicsEvent : public Events::IEvent {
