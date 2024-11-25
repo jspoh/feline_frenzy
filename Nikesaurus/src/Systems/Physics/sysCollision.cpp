@@ -340,8 +340,6 @@ bool Collision::System::detectAABBRectRect(
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        cout << "collision detected" << endl;
-
         if (collider_a.is_trigger || collider_b.is_trigger) return;
 
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
@@ -354,6 +352,10 @@ bool Collision::System::detectAABBRectRect(
         collider_b.position -= info.mtv * 0.5f;
 
         // Update Transform to reflect Collider's new state
+        transform.position = position - offset;
+        transform.scale = size;
+        transform.rotation = rotation;
+
         collider_a.syncTransform(transform_a);
         collider_b.syncTransform(transform_b);
 
