@@ -1,3 +1,13 @@
+﻿/*****************************************************************//**
+ * \file   ImguiUtils.cpp
+ * \brief  Utility for imgui
+ *
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
+ * \date   September 2024
+ * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #include "Core/stdafx.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
@@ -73,8 +83,7 @@ namespace NIKE
 
 	void displayAssetList(const std::string& asset_type)
 	{
-		// Variable to store the selected texture and file path
-		static std::string selected_texture;
+		// Variable to store file path
 		static std::string selected_file_path;
 
 		// To track if we need to show the popup
@@ -95,6 +104,9 @@ namespace NIKE
 
 		if (asset_type == "Textures")
 		{
+			// Variable to store the selected texture
+			static std::string selected_texture;
+
 			for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
 			{
 				ImVec2 uv0(0.0f, 1.0f);
@@ -150,22 +162,44 @@ namespace NIKE
 		}
 		else if (asset_type == "Audio")
 		{
+			// Variable to store the selected audio
+			static std::string selected_audio;
+			static bool is_playing = false;
+			static bool is_paused = false;
+			static float playback_position = 0.0f; // Simulated playback progress (0.0 to 1.0)
+			static float volume = 1.0f; 
+			static bool is_music = false;
+
+			// lambda function to stop audio
+			auto stopAudio = [&]() {
+				NIKE_AUDIO_SERVICE->getChannelGroup("Music")->stop();
+				NIKE_AUDIO_SERVICE->getChannelGroup("SFX")->stop();
+				is_playing = false;
+				is_paused = false;
+				playback_position = 0.0f; // Reset playback position
+				};
+
 			if (ImGui::BeginTabBar("AudioTabs"))
 			{
 				if (ImGui::BeginTabItem("SFX"))
 				{
-					for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedSfx())
+					for (const auto& sfx : NIKE_ASSETS_SERVICE->getLoadedSfx())
 					{
-						std::string buttonLabel = "X##SFX_" + audio.first;
+						std::string buttonLabel = "X##SFX_" + sfx.first;
 
 						if (ImGui::SmallButton(buttonLabel.c_str())) {
-							selected_file_path = audio.first;
+							selected_file_path = sfx.first;
 							delete_file_popup = true;
 							ImGui::OpenPopup("Confirm Delete");
 						}
 
 						ImGui::SameLine();
-						ImGui::Text("%s", audio.first.c_str());
+						if (ImGui::Selectable(sfx.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+							selected_audio = sfx.first;
+							stopAudio();
+							is_music = false;
+						}
+
 						ImGui::Separator();
 
 
@@ -176,18 +210,22 @@ namespace NIKE
 
 				if (ImGui::BeginTabItem("Music"))
 				{
-					for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedMusic())
+					for (const auto& music : NIKE_ASSETS_SERVICE->getLoadedMusic())
 					{
-						std::string buttonLabel = "X##MUSIC_" + audio.first;
+						std::string buttonLabel = "X##MUSIC_" + music.first;
 
 						if (ImGui::SmallButton(buttonLabel.c_str())) {
-							selected_file_path = audio.first;
+							selected_file_path = music.first;
 							delete_file_popup = true;
 							ImGui::OpenPopup("Confirm Delete");
 						}
 
 						ImGui::SameLine();
-						ImGui::Text("%s", audio.first.c_str());
+						if (ImGui::Selectable(music.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+							selected_audio = music.first;
+							stopAudio();
+							is_music = true;
+						}
 						ImGui::Separator();
 
 
@@ -196,6 +234,87 @@ namespace NIKE
 					ImGui::EndTabItem();
 				}
 				ImGui::EndTabBar();
+			}
+			if (!selected_audio.empty()) {
+				ImGui::SetNextWindowSize(ImVec2(400, 200));
+				ImGui::Begin("Selected Audio", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize);
+				ImGui::Text("Audio: %s", selected_audio.c_str());
+				ImGui::Text("Type: %s", is_music ? "Music" : "SFX");
+
+				ImGui::Separator();
+
+				if (ImGui::ArrowButton("PlayAudio", ImGuiDir_Right)) {
+					NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setPaused(false);
+					NIKE_AUDIO_SERVICE->playAudio(selected_audio, selected_audio, is_music ? "Music" : "SFX", volume, 1.0f, false, is_music);
+					is_playing = true;
+				}
+
+				ImGui::SameLine();
+
+				// Playback controls
+				if (ImGui::Button(is_playing && !is_paused ? "Pause" : "UnPause")) {
+					if (is_playing) {
+						is_playing = false;
+						NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setPaused(true);
+					}
+
+					else {
+						NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setPaused(false);
+						is_playing = true;
+					}
+				}
+				
+				ImGui::SameLine();
+				if (ImGui::Button("Stop")) {
+					stopAudio();
+				}
+				
+				// Scuffed progress bar
+				//static float total_length = 0.0f;
+				//if (is_music) {
+				//	total_length = static_cast<float>(NIKE_ASSETS_SERVICE->getMusic(selected_audio)->getLength());
+
+				//}
+				//else {
+				//	total_length = static_cast<float>(NIKE_ASSETS_SERVICE->getSfx(selected_audio)->getLength());
+				//}
+
+
+				//static std::chrono::steady_clock::time_point start_time;
+
+				//if (is_playing && !is_paused) {
+				//	if (start_time.time_since_epoch().count() == 0) { // Check if this is the first frame
+				//		start_time = std::chrono::steady_clock::now(); // Record start time
+				//	}
+
+				//	// Calculate elapsed time (in milliseconds)
+				//	auto elapsed_time = std::chrono::steady_clock::now() - start_time;
+				//	playback_position = std::chrono::duration<float, std::milli>(elapsed_time).count();
+
+				//	if (playback_position > total_length) {
+				//		playback_position = total_length; // Clamp at the end
+				//	}
+				//}
+
+				//// Simulated playback progress bar
+				//ImGui::Text("Progress:");
+				//ImGui::SameLine();
+				//ImGui::SliderFloat("##PlaybackProgress", &playback_position, 0.0f, total_length);
+
+				// Volume control
+				ImGui::Text("Volume:");
+				ImGui::SameLine();
+				ImGui::SliderFloat("##VolumeControl", &volume, 0.0f, 1.0f);
+				NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setVolume(volume);
+
+				// Close button to deselect audio
+				if (ImGui::Button("Close")) {
+					stopAudio();
+					selected_audio.clear();
+					
+				}
+
+				ImGui::End();
 			}
 		}
 		else if (asset_type == "Fonts")

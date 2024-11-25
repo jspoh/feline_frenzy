@@ -431,7 +431,7 @@ namespace NIKE {
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
 			//Channel ID will override each other if the same id is specified more than once
-			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused = false);
+			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
 
 			//Update Loop
 			void update();

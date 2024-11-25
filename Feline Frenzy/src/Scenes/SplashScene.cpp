@@ -23,7 +23,7 @@ void Splash::Scene::load() {
 
 void Splash::Scene::init() {
 
-	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/collision_scene.scn");
+	NIKE_SERIALIZE_SERVICE->loadSceneFromFile("assets/Scenes/audio_scene.scn");
 
 	//NIKE_UI_SERVICE->createButton("Test",
 	//	NIKE::Transform::Transform({ 0.0f,0.0f }, { 200.0f, 100.0f }, 0.0f),
@@ -37,7 +37,8 @@ void Splash::Scene::init() {
 
 	//Creat Channel Group
 	NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
-
+	NIKE_AUDIO_SERVICE->createChannelGroup("Music");
+	NIKE_AUDIO_SERVICE->createChannelGroup("SFX");
 	////Play Music
 	//NIKE_AUDIO_SERVICE->playAudio("test_music", "MUSIC_CHANNEL", "MASTER", 1.0f, 1.0f, true);
 

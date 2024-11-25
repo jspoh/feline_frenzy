@@ -37,7 +37,7 @@ namespace NIKE {
 
 					//Play SFX
 					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->checkSfxExist(e_sfx.audio_id) && NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
-						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false);
+						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false, false);
 						e_sfx.b_play_sfx = false;
 					}
 					else {

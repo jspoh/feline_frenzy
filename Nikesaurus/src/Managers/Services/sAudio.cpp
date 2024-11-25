@@ -348,7 +348,7 @@ namespace NIKE {
 		{
 			throw std::runtime_error("AUDIO GROUP NOT INITIALIZED");
 		}
-
+		
 		return std::make_shared<Audio::NIKEChannelGroup>(temp);
 	}
 
@@ -505,13 +505,13 @@ namespace NIKE {
 		return true;
 	}
 
-	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused) {
+	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
 		
 		//Get assets services
 		auto assets_service = NIKE_ASSETS_SERVICE;
 
 		//Play sound & get channel that sound is playing under
-		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(assets_service->getSfx(audio_id), getChannelGroup(channel_group_id), start_paused);
+		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(is_music ? assets_service->getMusic(audio_id) : assets_service->getSfx(audio_id), getChannelGroup(channel_group_id), start_paused);
 
 		//Add channel to the channel map
 		if (new_channel) {
@@ -527,7 +527,7 @@ namespace NIKE {
 			channels[channel_id] = std::move(new_channel);
 		}
 		else {
-			cout << "Error playing audio in channel!" << endl;
+			NIKEE_CORE_ERROR("Error playing audio in channel!");
 		}
 
 	}

@@ -1380,7 +1380,7 @@ namespace NIKE {
 			{
 				std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
 
-				NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0);
+				NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0, true);
 			}
 			else
 			{

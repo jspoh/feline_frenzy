@@ -367,7 +367,7 @@ namespace NIKE {
 				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
 				if (play)
 				{
-					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f,0);
+					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f, 0, false);
 					play = false;
 				}
 				

@@ -549,7 +549,7 @@ namespace NIKE
                 else if (asset_type == "Music") {
                     if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getMusicPath()))
                     {
-
+                        NIKE_ASSETS_SERVICE->reloadAssets("Audio");
                     }
                 }
 
