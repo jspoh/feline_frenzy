@@ -677,6 +677,9 @@ namespace NIKE {
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();
 
+		//Init shader system
+		shader_system->init();
+
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

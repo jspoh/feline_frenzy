@@ -144,25 +144,6 @@ namespace NIKE {
 			/*****************************************************************//**
 			* Render ( Texture, Model, Shaders )
 			*********************************************************************/
-
-			//Load shader
-			void loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
-
-			//Reload shader
-			void reloadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
-
-			//Unload shader
-			void unloadShader(std::string const& shader_id);
-
-			//Unload all shaders
-			void unloadAllShaders();
-
-			//Get shader
-			unsigned int getShader(std::string const& shader_id);
-
-			//Get shaders
-			const std::unordered_map<std::string, unsigned int>& getLoadedShaders();
-
 			//Load model
 			void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
 
@@ -288,6 +269,108 @@ namespace NIKE {
 			void reloadAssets(const std::string& asset_type);
 			bool deleteFile(std::string const& file_path, const std::string& asset_type);
 			bool deleteAllFiles(std::string const& file_path);
+		};
+
+		enum class Types {
+			Texture = 0,
+			Model,
+			Shader,
+			Font,
+			Music,
+			Sound,
+		};
+
+		class Services {
+		private:
+
+			//Assset meta data
+			struct MetaData {
+				Types type;
+				std::filesystem::path primary_path;
+				std::weak_ptr<void> cached;
+				
+				MetaData() : type{ 0 } {};
+				MetaData(Types type, std::filesystem::path const& primary_path)
+					: type{ type }, primary_path{ primary_path } {}
+			};
+
+			//Loader function
+			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&, std::filesystem::path const&)>;
+
+			//Asset registry of meta data
+			std::unordered_map<std::string, MetaData> asset_registry;
+
+			//Asset loader
+			std::unordered_map<Types, LoaderFunc> asset_loader;
+
+			//Assets cache for storing assets ( To be changed to weak ptr next time once systems are event driven )
+			std::unordered_map<std::string, std::shared_ptr<void>> asset_cache;
+
+			//Font loader
+			std::unique_ptr<Assets::FontLoader> font_loader;
+
+			//Render loader
+			std::unique_ptr<Assets::RenderLoader> render_loader;
+
+			//Audio loader
+			std::shared_ptr<Audio::IAudioSystem> audio_system;
+		public:
+
+			//Default constructor and destructor
+			Services() = default;
+			~Services() = default;
+
+			//Initialization
+			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+
+			//Register asset
+			void registerAsset(std::string const& asset_id, Types asset_type, std::string const& primary_path);
+
+			//Register loader
+			void registerLoader(Types asset_type, LoaderFunc loader);
+
+			//Get asset
+			template <typename T>
+			std::shared_ptr<T> getAsset(std::string const& asset_id) {
+				//Check asset cache
+				auto cache_it = asset_cache.find(asset_id);
+				if (cache_it != asset_cache.end()) {
+					if (cache_it->second) {
+ 						return std::static_pointer_cast<T>(cache_it->second);
+					}
+				}
+
+				//Get asset meta data
+				auto meta_it = asset_registry.find(asset_id);
+				if (meta_it == asset_registry.end()) {
+					throw std::runtime_error("Asset not registered yet.");
+				}
+
+				//Load assset through registered loaded
+				auto loader_it = asset_loader.find(meta_it->second.type);
+				if (loader_it == asset_loader.end()) {
+					throw std::runtime_error("Loader not registered for type.");
+				}
+
+				//Get loaded asset
+				auto asset = loader_it->second(meta_it->second.primary_path);
+
+				//Insert loaded asset into asset cache
+				asset_cache.emplace(asset_id, asset);
+
+				//Return asset
+				return std::static_pointer_cast<T>(asset);
+			}
+
+			//Clear expired cache
+			void clearExpiredCache();
+
+			//Serialize asset registry
+			nlohmann::json serialize() const;
+
+			//Deserialize asset registry
+			void deserialize(nlohmann::json const& data);
+
 		};
 
 		//Re-enable DLL Export warning

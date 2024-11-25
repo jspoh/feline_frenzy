@@ -168,67 +168,6 @@ namespace NIKE {
 	*********************************************************************/
 
 	/*****************************************************************//**
-	* Shaders
-	*********************************************************************/
-	void Assets::Service::loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
-		if (shaders_list.find(shader_id) != shaders_list.end())
-		{
-			NIKEE_CORE_WARN("Shader {} is already loaded. Skipping load", shader_id);
-			return;
-		}
-
-		NIKEE_CORE_INFO("Loading shader to '" + shader_id + "'");
-		shaders_list.emplace(std::piecewise_construct, std::forward_as_tuple(shader_id), std::forward_as_tuple(render_loader->compileShader(shader_id, vtx_path, frag_path)));
-	}
-
-	void Assets::Service::reloadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path) {
-		shaders_list.at(shader_id) = render_loader->compileShader(shader_id, vtx_path, frag_path);
-	}
-
-	void Assets::Service::unloadShader(std::string const& shader_id) {
-		//Find shader
-		auto it = shaders_list.find(shader_id);
-
-		// Check if the shader exists in map
-		if (it == shaders_list.end())
-		{
-			NIKEE_CORE_WARN("Shader {} could not be found. Skipping unload", shader_id);
-			return;
-		}
-
-		//Unload shader
-		glDeleteProgram(it->second);
-		shaders_list.erase(it);
-	}
-
-	void Assets::Service::unloadAllShaders()
-	{
-		for (const auto& shader : shaders_list)
-		{
-			unloadShader(shader.first);
-		}
-
-		shaders_list.clear();
-	}
-
-	unsigned int Assets::Service::getShader(std::string const& shader_id) {
-		//Find shader
-		auto it = shaders_list.find(shader_id);
-
-		//Check if shader exists
-		if (it == shaders_list.end())
-		{
-			LOG_CRASH("Shader could not be found.");
-		}
-
-		return it->second;
-	}
-
-	const std::unordered_map<std::string, unsigned int>& Assets::Service::getLoadedShaders()
-	{
-		return shaders_list;
-	}
-	/*****************************************************************//**
 	* Models
 	*********************************************************************/
 	void Assets::Service::loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering) {
@@ -291,7 +230,6 @@ namespace NIKE {
 	{
 		return models_list;
 	}
-
 
 	bool Assets::Service::checkModelExist(std::string const& model_id)
 	{
@@ -616,7 +554,6 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Prefab
 	*********************************************************************/
-
 	void Assets::Service::loadPrefab(const std::filesystem::directory_entry& entry)
 	{
 		if (entry.is_regular_file() && hasValidPrefabExtension(entry.path())) {
@@ -856,39 +793,6 @@ namespace NIKE {
 				}
 			}
 			}
-		else if (asset_type == "Shaders") {
-
-			// Load new fonts
-			int temp_count = 0;
-			for (const auto& shader_paths : std::filesystem::directory_iterator(getShadersPath())) {
-				temp_count++;
-				//Skip loading shader twice
-				if (temp_count % 2)
-					continue;
-
-				if (hasValidVertExtension(shader_paths)) {
-					//Get file name
-					std::string file_name = shader_paths.path().filename().string();
-
-					//string variables
-					size_t start = file_name.find_first_not_of('\\');
-					size_t size = file_name.find_first_of('.', start) - start;
-
-					//Get file path
-					std::string path = shader_paths.path().string();
-					std::string vtx = path.substr(0, path.find_first_of('.')) + ".vert";
-					std::string frag = path.substr(0, path.find_first_of('.')) + ".frag";
-
-					//Check if the file already exists before loading
-					if (shaders_list.find(file_name.substr(start, size)) == shaders_list.end()) {
-						loadShader(file_name.substr(start, size), vtx, frag);
-					}
-					else {
-						reloadShader(file_name.substr(start, size), vtx, frag);
-					}
-				}
-			}
-		}
 		// Others goes here
 		else if (asset_type == "Scripts") {
 			// Iterate through the directory and process script files
@@ -983,4 +887,85 @@ namespace NIKE {
 		return all_deleted;
 	}
 
+
+	/*****************************************************************//**
+	* Assets Service
+	*********************************************************************/
+	void Assets::Services::init(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
+		font_loader = std::make_unique<Assets::FontLoader>();
+		render_loader = std::make_unique<Assets::RenderLoader>();
+		audio_system = audio_sys;
+
+		//Register texture loader
+		registerLoader(Assets::Types::Texture, [this](std::filesystem::path const& primary_path, [[maybe_unused]]std::filesystem::path const& secondary_path) {
+			return std::make_shared<Texture>(render_loader->compileTexture(primary_path.string()));
+			});
+
+		//Register model loader
+		registerLoader(Assets::Types::Model, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+			return std::make_shared<Model>(render_loader->compileModel(primary_path.string()));
+			});
+
+		//Register font loader
+		registerLoader(Assets::Types::Font, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+			return std::make_shared<Font>(std::static_pointer_cast<Assets::NIKEFontLib>(font_loader->getFontLib())->generateFont(primary_path.string()));
+			});
+
+		//Register music loader
+		registerLoader(Assets::Types::Music, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+			return audio_system->createStream(primary_path.string());
+			});
+
+		//Register Sound loader
+		registerLoader(Assets::Types::Sound, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+			return audio_system->createSound(primary_path.string());
+			});
+	}
+
+	void Assets::Services::registerAsset(std::string const& asset_id, Types asset_type, std::string const& primary_path) {
+		asset_registry[asset_id] = MetaData(asset_type, NIKE_PATH_SERVICE->resolvePath(primary_path));
+	}
+
+	void Assets::Services::registerLoader(Types asset_type, LoaderFunc loader) {
+		if (asset_loader.find(asset_type) != asset_loader.end()) {
+			throw std::runtime_error("Loader already registered.");
+		}
+
+		asset_loader.emplace(asset_type, loader);
+	}
+
+	void Assets::Services::clearExpiredCache() {
+
+		////Iterate through assets cache to see if weak ptr is expired
+		//for (auto it = asset_cache.begin(); it != asset_cache.end();) {
+		//	if (it->second.expired()) {
+		//		it = asset_cache.erase(it);
+		//	}
+		//	else {
+		//		++it;
+		//	}
+		//}
+	}
+
+	nlohmann::json Assets::Services::serialize() const {
+		nlohmann::json data;
+
+		//Serialize registry meta data
+		for (const auto& [id, metadata] : asset_registry) {
+			data[id] =	{
+						{"Type", static_cast<int>(metadata.type)},
+						{"Primary_Path", metadata.primary_path.string()},
+						};
+		}
+
+		return data;
+	}
+
+	void Assets::Services::deserialize(nlohmann::json const& data) {
+
+		//Deserialize registry meta data
+		for (const auto& [id, meta_data] : data.items()) {
+			asset_registry[id] = MetaData(static_cast<Types>(meta_data["Type"].get<int>()), meta_data["Primary_Path"].get<std::string>());
+		}
+	}
 }

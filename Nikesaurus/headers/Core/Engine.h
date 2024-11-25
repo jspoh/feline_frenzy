@@ -144,6 +144,7 @@ namespace NIKE {
 #define NIKE_LVLEDITOR_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::LevelEditor::Service>()
 #define NIKE_LUA_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Lua::Service>()
 #define NIKE_PATH_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Path::Service>()
+#define NIKE_ASSETS_SERVICES NIKE::Core::Engine::getInstance().getService<NIKE::Assets::Services>()
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

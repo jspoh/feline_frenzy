@@ -18,9 +18,28 @@ namespace NIKE {
 		class Manager {
 		private:
 
+			std::unordered_map<std::string, unsigned int> shaders;
+
+			/**
+			 * compiles shader and adds to shader_programs.
+			 *
+			 * \param shader_ref	shader program's reference string
+			 * \param vtx_path		path to vertex shader
+			 * \param frag_path		path to fragment shader
+			 */
+
+			void compileShader(std::string const& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 		public:
 			Manager() = default;
-			~Manager() = default;
+			~Manager() {
+				//Clear shaders
+				for (auto& shader : shaders) {
+					glDeleteProgram(shader.second);
+				}
+			}
+
+			//Initialize shaders
+			void init();
 
 			//Use shader program
 			void useShader(const std::string& shader_ref);

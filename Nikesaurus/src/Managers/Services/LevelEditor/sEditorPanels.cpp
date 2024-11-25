@@ -2274,8 +2274,8 @@ namespace NIKE {
 			ImTextureID icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture("folder")->gl_data);;
 
 			//Display directory icon
-			ImVec2 uv0(0.0f, 1.0f); // Bottom-left
-			ImVec2 uv1(1.0f, 0.0f); // Top-right
+			ImVec2 uv0(0.0f, 1.0f);
+			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			if (ImGui::ImageButton(std::string("##" + dir.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
 				//Change current path to folder path clicked
@@ -2317,8 +2317,8 @@ namespace NIKE {
 			}
 
 			//Display file icon
-			ImVec2 uv0(0.0f, 1.0f); // Bottom-left
-			ImVec2 uv1(1.0f, 0.0f); // Top-right
+			ImVec2 uv0(0.0f, 1.0f);
+			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			if (ImGui::ImageButton(std::string("##" + file.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
 

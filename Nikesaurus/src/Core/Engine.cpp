@@ -97,6 +97,7 @@ namespace NIKE {
 		provideService(std::make_shared<LevelEditor::Service>());
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
+		provideService(std::make_shared<Assets::Services>());
 
 		//Create console
 #ifndef NDEBUG
@@ -157,6 +158,9 @@ namespace NIKE {
 
 		//Setup assets loading with systems for loading
 		NIKE_ASSETS_SERVICE->configAssets(getService<Audio::Service>()->getAudioSystem());
+
+		//Initialize assets service
+		NIKE_ASSETS_SERVICES->init(NIKE_AUDIO_SERVICE->getAudioSystem());
 
 		//Init camera
 		NIKE_CAMERA_SERVICE->init(json_config);
