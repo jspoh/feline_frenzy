@@ -887,33 +887,9 @@ namespace NIKE {
 		return all_deleted;
 	}
 
-
 	/*****************************************************************//**
 	* Assets Service
 	*********************************************************************/
-	Assets::Types Assets::Services::getAssetType(std::filesystem::path const& path) const {
-		auto ext = path.extension().string();
-		constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
-		if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tex") {
-			return Assets::Types::Texture;
-		}
-		else if (ext == ".model") {
-			return Assets::Types::Model;
-		}
-		else if (ext == ".ttf") {
-			return Assets::Types::Font;
-		}
-		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) >= music_threshold) {
-			return Assets::Types::Music;
-		}
-		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) < music_threshold) {
-			return Assets::Types::Sound;
-		}
-		else {
-			return Assets::Types::None;
-		}
-	}
-
 	std::string Assets::Services::typeToString(Types type) const {
 		switch (type) {
 		case Types::Texture:
@@ -932,7 +908,7 @@ namespace NIKE {
 			return "Sound";
 			break;
 		default:
-			return "";
+			return "Unknown";
 			break;
 		}
 	}
@@ -989,11 +965,115 @@ namespace NIKE {
 		asset_loader.emplace(asset_type, loader);
 	}
 
+	void Assets::Services::cacheAsset(std::string const& asset_id) {
+
+		//Check asset cache
+		auto cache_it = asset_cache.find(asset_id);
+		if (cache_it != asset_cache.end()) {
+			return;
+		}
+
+		//Get asset meta data
+		auto meta_it = asset_registry.find(asset_id);
+		if (meta_it == asset_registry.end()) {
+			return;
+		}
+
+		//Load assset through registered loaded
+		auto loader_it = asset_loader.find(meta_it->second.type);
+		if (loader_it == asset_loader.end()) {
+			return;
+		}
+
+		//Get loaded asset
+		auto asset = loader_it->second(meta_it->second.primary_path);
+
+		//Insert loaded asset into asset cache
+		asset_cache.emplace(asset_id, asset);
+	}
+
+	void Assets::Services::uncacheAsset(std::string const& asset_id) {
+		//Check asset cache
+		auto cache_it = asset_cache.find(asset_id);
+		if (cache_it != asset_cache.end()) {
+			cache_it = asset_cache.erase(cache_it);
+		}
+	}
+
+	Assets::Types Assets::Services::getAssetType(std::string const& asset_id) const {
+		if (asset_registry.find(asset_id) == asset_registry.end()) {
+			throw std::runtime_error("Asset not yet registered.");
+		}
+
+		return asset_registry.at(asset_id).type;
+	}
+
+	std::string Assets::Services::getAssetTypeString(std::string const& asset_id) const {
+		if (asset_registry.find(asset_id) == asset_registry.end()) {
+			throw std::runtime_error("Asset not yet registered.");
+		}
+
+		return typeToString(asset_registry.at(asset_id).type);
+	}
+
+	Assets::Types Assets::Services::getAssetType(std::filesystem::path const& path) const {
+		auto ext = path.extension().string();
+		constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
+		if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tex") {
+			return Assets::Types::Texture;
+		}
+		else if (ext == ".model") {
+			return Assets::Types::Model;
+		}
+		else if (ext == ".ttf") {
+			return Assets::Types::Font;
+		}
+		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) >= music_threshold) {
+			return Assets::Types::Music;
+		}
+		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) < music_threshold) {
+			return Assets::Types::Sound;
+		}
+		else {
+			return Assets::Types::None;
+		}
+	}
+
+	std::filesystem::path Assets::Services::getAssetPath(std::string const& asset_id) const {
+		if (asset_registry.find(asset_id) == asset_registry.end()) {
+			throw std::runtime_error("Asset not yet registered.");
+		}
+
+		return asset_registry.at(asset_id).primary_path;
+	}
+
+	bool Assets::Services::isAssetCached(std::string const& asset_id) const {
+		//Check asset cache
+		auto cache_it = asset_cache.find(asset_id);
+		if (cache_it != asset_cache.end()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	bool Assets::Services::isAssetCached(std::filesystem::path const& path) const {
+		auto id = getIDFromPath(path.string(), false);
+
+		//Check asset cache
+		auto cache_it = asset_cache.find(id);
+		if (cache_it != asset_cache.end()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	void Assets::Services::addInvalidExtensions(std::string const& ext) {
 		invalid_extensions.insert(ext);
 	}
 
-	bool Assets::Services::isPathValid(std::string const& path, bool b_virtual) {
+	bool Assets::Services::isPathValid(std::string const& path, bool b_virtual) const {
 		if (b_virtual) {
 			auto ext = NIKE_PATH_SERVICE->resolvePath(path).extension().string();
 			if (invalid_extensions.find(ext) != invalid_extensions.end()) {
@@ -1016,7 +1096,7 @@ namespace NIKE {
 		}
 	}
 
-	std::string Assets::Services::getIDFromPath(std::string const& path, bool b_virtual) {
+	std::string Assets::Services::getIDFromPath(std::string const& path, bool b_virtual) const {
 
 		if (b_virtual) {
 			auto actual_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(path)).string();
@@ -1090,6 +1170,90 @@ namespace NIKE {
 
 			//Log registration
 			NIKEE_CORE_INFO("Succesfully registered " + getIDFromPath(file.path().string(), false) + " Asset Type: " + typeToString(asset_type));
+		}
+	}
+
+	void Assets::Services::cacheAssetDirectory(std::string const& virtual_path, bool b_diretory_tree) {
+
+		//Resolve path
+		auto root_path = NIKE_PATH_SERVICE->resolvePath(virtual_path);
+
+		//Load just root path
+		if (!b_diretory_tree) {
+			for (const auto& file : std::filesystem::directory_iterator(root_path)) {
+				if (!file.is_regular_file()) continue;
+
+				//Check for valid path before caching
+				if (invalid_extensions.find(file.path().extension().string()) != invalid_extensions.end()) {
+					continue;
+				}
+
+				//Get asset id
+				auto asset_id = getIDFromPath(file.path().string(), false);
+
+				//Cache asset
+				cacheAsset(asset_id);
+			}
+
+			return;
+		}
+
+		//Load root & directory tree
+		for (const auto& file : std::filesystem::recursive_directory_iterator(root_path)) {
+			if (!file.is_regular_file()) continue;
+
+			//Check for valid path before caching
+			if (invalid_extensions.find(file.path().extension().string()) != invalid_extensions.end()) {
+				continue;
+			}
+
+			//Get asset id
+			auto asset_id = getIDFromPath(file.path().string(), false);
+
+			//Cache asset
+			cacheAsset(asset_id);
+		}
+	}
+
+	void Assets::Services::uncacheAssetDirectory(std::string const& virtual_path, bool b_diretory_tree) {
+
+		//Resolve path
+		auto root_path = NIKE_PATH_SERVICE->resolvePath(virtual_path);
+
+		//Load just root path
+		if (!b_diretory_tree) {
+			for (const auto& file : std::filesystem::directory_iterator(root_path)) {
+				if (!file.is_regular_file()) continue;
+
+				//Check for valid path before uncaching
+				if (invalid_extensions.find(file.path().extension().string()) != invalid_extensions.end()) {
+					continue;
+				}
+
+				//Get asset id
+				auto asset_id = getIDFromPath(file.path().string(), false);
+
+				//Uncache asset
+				uncacheAsset(asset_id);
+			}
+
+			return;
+		}
+
+		//Load root & directory tree
+		for (const auto& file : std::filesystem::recursive_directory_iterator(root_path)) {
+			if (!file.is_regular_file()) continue;
+
+			//Check for valid path before uncaching
+			if (invalid_extensions.find(file.path().extension().string()) != invalid_extensions.end()) {
+				continue;
+			}
+
+			//Get asset id
+			auto asset_id = getIDFromPath(file.path().string(), false);
+
+			//Uncache asset
+			uncacheAsset(asset_id);
 		}
 	}
 

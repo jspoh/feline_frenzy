@@ -2087,7 +2087,11 @@ namespace NIKE {
 	}
 
 	void LevelEditor::DebugPanel::render() {
-		ImGui::Begin(getName().c_str());
+		if (!ImGui::Begin(getName().c_str())) {
+			//Return if window is not being shown
+			ImGui::End();
+			return;
+		}
 
 		//Begin tab bar
 		if (ImGui::BeginTabBar("TabBar")) {
@@ -2242,10 +2246,27 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Resource Management Panel
 	*********************************************************************/
+	unsigned int LevelEditor::ResourcePanel::fileIcon(std::filesystem::path const& path) {
+		//Get assets icons
+		if (NIKE_ASSETS_SERVICES->getAssetType(path) == Assets::Types::Texture && NIKE_ASSETS_SERVICES->isAssetCached(path)) {
+
+			//Check if asset has been loaded
+			std::string icon_ref = NIKE_ASSETS_SERVICES->getIDFromPath(path.string(), false);
+			return NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)->gl_data;
+		}
+		else {
+			std::string icon_ref = path.extension().string().substr(1) + "_icon.png";
+			if (auto texture = NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)) {
+				return texture->gl_data;
+			}
+			else {
+				//Load default file icon
+				return NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>("def_icon.png")->gl_data;
+			}
+		}
+	}
+
 	void LevelEditor::ResourcePanel::renderAssetsBrowser(std::string const& virtual_path) {
-		//Get all directories & files
-		auto directories = NIKE_PATH_SERVICE->listDirectories(virtual_path, search_filter);
-		auto files = NIKE_PATH_SERVICE->listFiles(virtual_path, search_filter);
 
 		//Check if both files and directories are empty
 		if (directories.empty() && files.empty()) {
@@ -2262,6 +2283,11 @@ namespace NIKE {
 
 		//Display all directories
 		for (const auto& dir : directories) {
+
+			//Skip dir not matching searching filter
+			if (dir.string().find(search_filter) == dir.string().npos) {
+				continue;
+			}
 
 			//Item to exist in the same row
 			if (itemIndex % icons_per_row != 0) {
@@ -2280,6 +2306,15 @@ namespace NIKE {
 			if (ImGui::ImageButton(std::string("##" + dir.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
 				//Change current path to folder path clicked
 				current_path = virtual_path + '/' + dir.filename().string();
+
+				//Update directories & files
+				directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+				files = NIKE_PATH_SERVICE->listFiles(current_path);
+
+				//Break from files
+				ImGui::PopStyleColor();
+				ImGui::EndGroup();
+				break;
 			}
 			ImGui::PopStyleColor();
 
@@ -2296,6 +2331,11 @@ namespace NIKE {
 		//Display all files
 		for (const auto& file : files) {
 
+			//Skip file not matching searching filter
+			if (file.string().find(search_filter) == file.string().npos) {
+				continue;
+			}
+
 			//Item to exist in the same row
 			if (itemIndex % icons_per_row != 0) {
 				ImGui::SameLine();
@@ -2305,24 +2345,14 @@ namespace NIKE {
 			ImGui::BeginGroup();
 
 			//Extension cases
-			ImTextureID icon = 0;
-
-			//Get extension loaded icon
-			std::string icon_ref = file.extension().string().substr(1) + "_icon.png";
-			if (auto texture = NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)) {
-				icon = static_cast<ImTextureID>(texture->gl_data);
-			}
-			else {
-				//Load default file icon
-				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>("def_icon.png")->gl_data);
-			}
+			ImTextureID icon = static_cast<ImTextureID>(fileIcon(file));
 
 			//Display file icon
 			ImVec2 uv0(0.0f, 1.0f);
 			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			if (ImGui::ImageButton(std::string("##" + file.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
-
+				selected_asset_id = file.filename().string();
 			}
 			ImGui::PopStyleColor();
 
@@ -2337,7 +2367,55 @@ namespace NIKE {
 		}
 	}
 
+	std::function<void()> LevelEditor::ResourcePanel::deleteAssetPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Warning message
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
+
+			//Select a component to add
+			ImGui::Text("Are you sure you want to delete this asset?");
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Confirm")) {
+
+				//Get selected asset path
+				auto path = NIKE_ASSETS_SERVICES->getAssetPath(selected_asset_id);
+
+				//Remove path and clear selected asset text buffer
+				std::filesystem::remove(path);
+				selected_asset_id.clear();
+				files = NIKE_PATH_SERVICE->listFiles(current_path);
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::ResourcePanel::init() {
+
+		//Register popups
+		error_msg = std::make_shared<std::string>("Error");
+		success_msg = std::make_shared<std::string>("Success");
+		registerPopUp("Error", defPopUp("Error", error_msg));
+		registerPopUp("Success", defPopUp("Success", success_msg));
+		registerPopUp("Delete Asset", deleteAssetPopup("Delete Asset"));
+
+		//Initialize root
 		root_path = "Game_Assets:/";
 		current_path = root_path;
 
@@ -2350,6 +2428,10 @@ namespace NIKE {
 
 		//Register all engine icons
 		NIKE_ASSETS_SERVICES->scanAssetDirectory("Engine_Assets:/Icons");
+
+		//Init all directories & files
+		directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+		files = NIKE_PATH_SERVICE->listFiles(current_path);
 	}
 
 	void LevelEditor::ResourcePanel::update() {
@@ -2357,7 +2439,12 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ResourcePanel::render() {
-		ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar);
+		if (!ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
+
+			//Return if window is not being shown
+			ImGui::End();
+			return;
+		}
 
 		ImGui::BeginMenuBar();
 
@@ -2369,6 +2456,82 @@ namespace NIKE {
 				//Stop searching for parent at root directory
 				if (current_path != root_path) {
 					current_path = NIKE_PATH_SERVICE->getVirtualParentPath(current_path);
+
+					//Update directories & files
+					directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+					files = NIKE_PATH_SERVICE->listFiles(current_path);
+				}
+			}
+		}
+
+		ImGui::Spacing();
+
+		//Load button
+		{
+			//Array of load directories
+			const char*  load_directory[] = { "Current", "Current *", "Root *" };
+			static int directory_mode = 0;
+
+			//Render the dropdown
+			ImGui::PushItemWidth(100.0f);
+			ImGui::Combo("##Directory", &directory_mode, load_directory, IM_ARRAYSIZE(load_directory));
+			ImGui::PopItemWidth();
+
+			//Load all from directory mode
+			if (ImGui::Button("Load All")) {
+
+				//Check for directory mode
+				switch (directory_mode) {
+				case 0: {
+					NIKE_ASSETS_SERVICES->cacheAssetDirectory(current_path);
+					success_msg->assign("All assets in: \"" + current_path + "\" loaded.");
+					openPopUp("Success");
+					break;
+				}
+				case 1: {
+					NIKE_ASSETS_SERVICES->cacheAssetDirectory(current_path, true);
+					success_msg->assign("All assets in: \"" + current_path + "*\" loaded.");
+					openPopUp("Success");
+					break;
+				}
+				case 2: {
+					NIKE_ASSETS_SERVICES->cacheAssetDirectory(root_path, true);
+					success_msg->assign("All assets in: \"" + current_path + "*\" loaded.");
+					openPopUp("Success");
+					break;
+				}
+				default: {
+					break;
+				}
+				}
+			}
+
+			//Unload all from directory mode
+			if (ImGui::Button("Unload All")) {
+
+				//Check for directory mode
+				switch (directory_mode) {
+				case 0: {
+					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(current_path);
+					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
+					openPopUp("Success");
+					break;
+				}
+				case 1: {
+					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(current_path, true);
+					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
+					openPopUp("Success");
+					break;
+				}
+				case 2: {
+					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(root_path, true);
+					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
+					openPopUp("Success");
+					break;
+				}
+				default: {
+					break;
+				}
 				}
 			}
 		}
@@ -2398,10 +2561,93 @@ namespace NIKE {
 			ImGui::PopItemWidth();
 		}
 
+		ImGui::Spacing();
+
+		//Refresh directory
+		{
+			if (ImGui::Button("Refresh")) {
+				//Update directories & files
+				directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+				files = NIKE_PATH_SERVICE->listFiles(current_path);
+			}
+		}
+
+		//Render popups
+		renderPopUps();
+
 		ImGui::EndMenuBar();
 
 		//Render all assets & folders
 		renderAssetsBrowser(current_path);
+
+		//Render selected asset options
+		if(!selected_asset_id.empty()){
+
+			// Center the panel
+			ImGui::Begin("Selected Asset", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings);
+
+			//Get selected asset path
+			auto path = NIKE_ASSETS_SERVICES->getAssetPath(selected_asset_id);
+
+			//Asset metadata
+			ImGui::Text("Asset: %s", selected_asset_id.c_str());
+			ImGui::Text("Type: %s", NIKE_ASSETS_SERVICES->getAssetTypeString(selected_asset_id).c_str());
+
+			//Get selected asset texture display
+			ImTextureID display = static_cast<ImTextureID>(fileIcon(path));
+
+			//Display image
+			ImVec2 uv0(0.0f, 1.0f);
+			ImVec2 uv1(1.0f, 0.0f);
+			ImGui::Image(display, { 256, 256 }, uv0, uv1);
+
+			//Load action
+			if (ImGui::Button("Load")) {
+
+				//Load asset
+				NIKE_ASSETS_SERVICES->cacheAsset(selected_asset_id);
+				success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
+				openPopUp("Success");
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Unload action
+			if (ImGui::Button("Unload")) {
+
+				//Unload asset
+				NIKE_ASSETS_SERVICES->uncacheAsset(selected_asset_id);
+				success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
+				openPopUp("Success");
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Delete asset
+			if (ImGui::Button("Delete")) {
+				openPopUp("Delete Asset");
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Unload action
+			if (ImGui::Button("Close")) {
+
+				//Reset selected asset id
+				selected_asset_id.clear();
+			}
+
+			//Render popups
+			renderPopUps();
+
+			ImGui::End();
+		}
+
+		//Render popups
+		renderPopUps();
 
 		ImGui::End();
 	}
@@ -2646,9 +2892,7 @@ namespace NIKE {
 	void LevelEditor::TileMapPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-
 		ImGui::Spacing();
-
 
 		if (ImGui::Button("Save Grid"))
 		{

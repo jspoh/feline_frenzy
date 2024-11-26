@@ -468,6 +468,12 @@ namespace NIKE {
 		//Resource Management panel
 		class ResourcePanel : public IPanel {
 		private:
+			//Directories
+			std::vector<std::filesystem::path> directories;
+
+			//Files
+			std::vector<std::filesystem::path> files;
+
 			//Root Path
 			std::string root_path;
 
@@ -480,9 +486,23 @@ namespace NIKE {
 			//Icon size
 			Vector2f icon_size;
 
+			//Selected file
+			std::string selected_asset_id;
+
+			//Setting error message ( Usage: Editing error popup message )
+			std::shared_ptr<std::string> error_msg;
+
+			//Setting success message ( Usage: Editing success popup message )
+			std::shared_ptr<std::string> success_msg;
+
+			//Internal asset icon picking
+			unsigned int fileIcon(std::filesystem::path const& path);
+
 			//Internal rendering of an asset browser
 			void renderAssetsBrowser(std::string const& virtual_path);
 
+			//Delete asset popup
+			std::function<void()> deleteAssetPopup(std::string const& popup_id);
 		public:
 			ResourcePanel() = default;
 			~ResourcePanel() = default;
