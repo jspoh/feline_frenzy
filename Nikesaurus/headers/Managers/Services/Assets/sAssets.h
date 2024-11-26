@@ -318,9 +318,6 @@ namespace NIKE {
 			//Audio loader
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
 
-			//Extension to asset type
-			Types getAssetType(std::filesystem::path const& path) const;
-
 			//Conversion from type to string
 			std::string typeToString(Types type) const;
 		public:
@@ -337,6 +334,12 @@ namespace NIKE {
 
 			//Register loader
 			void registerLoader(Types asset_type, LoaderFunc loader);
+
+			//Cache asset
+			void cacheAsset(std::string const& asset_id);
+
+			//Uncache asset
+			void uncacheAsset(std::string const& asset_id);
 
 			//Get asset
 			template <typename T>
@@ -374,21 +377,45 @@ namespace NIKE {
 				//Return asset
 				return std::static_pointer_cast<T>(asset);
 			}
-			
+
+			//Get asset type from registered asset id
+			Types getAssetType(std::string const& asset_id) const;
+
+			//Get asset type string from registered asset id
+			std::string getAssetTypeString(std::string const& asset_id) const;
+
+			//Get asset type from path
+			Types getAssetType(std::filesystem::path const& path) const;
+
+			//Get asset path from registered asset id
+			std::filesystem::path getAssetPath(std::string const& asset_id) const;
+
+			//Check if asset is loaded from asset id
+			bool isAssetCached(std::string const& asset_id) const;
+
+			//Check if asset is loaded from file path
+			bool isAssetCached(std::filesystem::path const& path) const;
+	
 			//Add invalid extension
 			void addInvalidExtensions(std::string const& ext);
 
 			//Check for valid path
-			bool isPathValid(std::string const& path, bool b_virtual = true);
+			bool isPathValid(std::string const& path, bool b_virtual = true) const;
 
 			//Get ref from path
-			std::string getIDFromPath(std::string const& path, bool b_virtual = true);
+			std::string getIDFromPath(std::string const& path, bool b_virtual = true) const;
 
 			//Clear expired cache
 			void clearCache();
 
 			//Register all assets from directory tree
 			void scanAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
+
+			//Cache all assets from directory tree
+			void cacheAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
+
+			//Remove cache for all assets from directory tree
+			void uncacheAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
 
 			//Log assets reigstry
 			void logAssetsRegistry() const;

@@ -58,7 +58,7 @@ namespace NIKE {
 	}
 
 	std::filesystem::path Path::Service::resolvePath(std::string const& virtual_path) const {
-		
+
 		//Check for valid virtual path
 		auto separator_pos = virtual_path.find(":/");
 		if (separator_pos == std::string::npos) {
