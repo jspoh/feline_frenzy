@@ -216,8 +216,8 @@ namespace NIKE {
 		//}
 	}
 
-	static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = true
-		;
+	static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = true;
+
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		// !TODO: batched rendering for texture incomplete
 
@@ -227,6 +227,8 @@ namespace NIKE {
 
 		//Translate UV offset to bottom left
 		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+
+		const unsigned int tex_hdl = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
 
 		if constexpr (!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
 			//Set polygon mode
@@ -241,11 +243,11 @@ namespace NIKE {
 			// set texture
 			glBindTextureUnit(
 				texture_unit, // texture unit (binding index)
-				NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
+				tex_hdl
 			);
 
-			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 			//Set uniforms for texture rendering
 			shader_system->setUniform("texture", "u_tex2d", texture_unit);
@@ -264,11 +266,11 @@ namespace NIKE {
 			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
 			//Get model
-			auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+			auto& model = *NIKE_ASSETS_SERVICE->getModel("square-texture");
 
 			//Draw
-			glBindVertexArray(model->vaoid);
-			glDrawElements(model->primitive_type, model->draw_count, GL_UNSIGNED_INT, nullptr);
+			glBindVertexArray(model.vaoid);
+			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
 
 			//Unuse texture
 			glBindVertexArray(0);
@@ -278,7 +280,7 @@ namespace NIKE {
 			// prepare for batched rendering
 			RenderInstance instance;
 			instance.xform = x_form;
-			instance.tex = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
+			instance.tex = tex_hdl;
 			instance.framesize = framesize;
 			instance.uv_offset = uv_offset;
 
@@ -321,6 +323,10 @@ namespace NIKE {
 			}
 		}
 
+		// raw vector of binding units
+		std::vector<int> textures;
+		std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
+
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
 		static constexpr int NUM_VERTICES_IN_MODEL = 4;
@@ -342,10 +348,6 @@ namespace NIKE {
 
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
 		}
-
-		// raw vector of binding units
-		std::vector<int> textures;
-		std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
 
 		// populate vbo
 		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
@@ -376,7 +378,7 @@ namespace NIKE {
 		//glBindTextureUnit(0, render_instances_texture[0].tex);
 		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		shader_system->setUniform("batched_texture", "u_tex2d", 0);
+		//shader_system->setUniform("batched_texture", "u_tex2d", 0);
 		
 
 		// bind vao
