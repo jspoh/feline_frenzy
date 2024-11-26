@@ -435,26 +435,36 @@ namespace NIKE {
 		// VBO (Vertex Buffer Object)
 		glCreateBuffers(1, &model.vboid);
 		glNamedBufferStorage(model.vboid,
-			sizeof(Vector2f) * vertices.size() + sizeof(Vector2f) * tex_coords.size(),
+			sizeof(Vertex) * vertices.size(),
 			nullptr, // nullptr means no data is transferred
 			GL_DYNAMIC_STORAGE_BIT);
-		glNamedBufferSubData(model.vboid, 0, sizeof(Vector2f) * vertices.size(), vertices.data());
-		glNamedBufferSubData(model.vboid, sizeof(Vector2f) * vertices.size(), sizeof(Vector2f) * tex_coords.size(), tex_coords.data());
+
+		std::vector<Vertex> rendering_vertices;
+		rendering_vertices.reserve(vertices.size());
+		for (size_t i = 0; i < vertices.size(); ++i) {
+			Vertex v;
+			v.pos = vertices[i];
+			v.tex_coords = tex_coords[i];
+			rendering_vertices.push_back(v);
+		}
+
+		glNamedBufferSubData(model.vboid, 0, sizeof(Vertex) * vertices.size(), rendering_vertices.data());
 
 		// VAO (Vertex Array Object)
 		glCreateVertexArrays(1, &model.vaoid);
 
+		static constexpr int BINDING_INDEX = 0;
+		glVertexArrayVertexBuffer(model.vaoid, BINDING_INDEX, model.vboid, 0, sizeof(Vertex));
+
 		// Vertex Position Array
 		glEnableVertexArrayAttrib(model.vaoid, 0); // vertex attribute index 0
-		glVertexArrayVertexBuffer(model.vaoid, 0, model.vboid, 0, sizeof(Vector2f)); // buffer binding point 0
-		glVertexArrayAttribFormat(model.vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribBinding(model.vaoid, 0, 0);
+		glVertexArrayAttribFormat(model.vaoid, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
+		glVertexArrayAttribBinding(model.vaoid, 0, BINDING_INDEX);
 
 		// Vertex texture coordinates
 		glEnableVertexArrayAttrib(model.vaoid, 2);
-		glVertexArrayVertexBuffer(model.vaoid, 1, model.vboid, sizeof(Vector2f) * vertices.size(), sizeof(Vector2f));
-		glVertexArrayAttribFormat(model.vaoid, 2, 2, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribBinding(model.vaoid, 2, 1);
+		glVertexArrayAttribFormat(model.vaoid, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex_coords));
+		glVertexArrayAttribBinding(model.vaoid, 2, BINDING_INDEX);
 
 		// Create EBO
 		glCreateBuffers(1, &model.eboid);

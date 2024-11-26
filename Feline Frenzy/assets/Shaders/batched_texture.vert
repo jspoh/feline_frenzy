@@ -24,7 +24,8 @@ void main() {
 
 	//	gl_Position = vec4(a_position, 0.0, 1.0); no uniform
 	gl_Position = vec4( vec2(a_model_to_ndc * vec3(a_position, 1.f)), 0.0, 1.0);
-	f_texcoord = a_texcoord * framesize + uv_offset;
+	f_texcoord = a_texcoord * framesize + uv_offset;		// this is causing texcoord to be fixed???
+	f_texcoord = a_texcoord;
 	f_sampler_idx = a_sampler_idx;
 }
 
