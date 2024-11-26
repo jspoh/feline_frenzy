@@ -333,6 +333,7 @@ namespace NIKE {
             //NIKEE_CORE_INFO("entity a marked for deletion");
             NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_a);
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
+
             return;
         }
 
@@ -340,6 +341,7 @@ namespace NIKE {
             //NIKEE_CORE_INFO("entity b marked for deletion");
             NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_b);
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
+
             return;
         }
 

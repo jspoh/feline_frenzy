@@ -127,6 +127,7 @@ namespace NIKE {
 				}
 			}
 		}
+
 		// Destroy all entities that are marked for deletion
 		//NIKEE_CORE_INFO("GG TO DESTROY MARKED ENTITIES");
 		NIKE_ECS_MANAGER->destroyMarkedEntities();

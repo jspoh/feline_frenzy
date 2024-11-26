@@ -204,9 +204,6 @@ namespace NIKE {
 			//Update all audio pending actions
 			NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
-			//Update Level Editor
-			NIKE_LVLEDITOR_SERVICE->update();
-
 			//update UI First
 			NIKE_UI_SERVICE->update();
 
@@ -228,6 +225,9 @@ namespace NIKE {
 
 			////ImGui Render & Update
 			//NIKE_IMGUI_SERVICE->update();
+
+			//Update Level Editor
+			NIKE_LVLEDITOR_SERVICE->update();
 
 			//Render Level Editor
 			NIKE_LVLEDITOR_SERVICE->render();
