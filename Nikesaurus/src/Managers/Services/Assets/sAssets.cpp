@@ -997,8 +997,6 @@ namespace NIKE {
 			auto asset_id = getIDFromPath(path, false);
 			asset_registry[asset_id] = MetaData(asset_type, path);
 
-			cout << path << endl;
-
 			return asset_id;
 		}
 	}

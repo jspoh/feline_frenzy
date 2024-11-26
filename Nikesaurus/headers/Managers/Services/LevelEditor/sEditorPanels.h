@@ -488,6 +488,9 @@ namespace NIKE {
 			//Selected file
 			std::string selected_asset_id;
 
+			//File payload type string
+			std::string payload_typestring;
+
 			//Selected directory mode
 			int directory_mode;
 
@@ -508,6 +511,9 @@ namespace NIKE {
 
 			//Delete directory content popup
 			std::function<void()> deleteDirectoryPopup(std::string const& popup_id);
+
+			//Moving file accept payload
+			void moveFileAcceptPayload(std::string const& virtual_path);
 
 			//On drop file event
 			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
@@ -659,6 +665,9 @@ namespace NIKE {
 
 			//Game window render event
 			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
+
+			//Render accept payload
+			void renderAcceptPayload();
 
 		public:
 			GameWindowPanel() : texture_id{ 0 } {}

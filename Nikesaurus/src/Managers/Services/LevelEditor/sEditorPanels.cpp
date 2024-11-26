@@ -2246,6 +2246,31 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Resource Management Panel
 	*********************************************************************/
+	void LevelEditor::ResourcePanel::moveFileAcceptPayload(std::string const& virtual_path) {
+		//Drop target
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string(payload_typestring + "_FILE").c_str())) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Copy file
+				std::filesystem::copy(NIKE_ASSETS_SERVICE->getAssetPath(asset_id), NIKE_PATH_SERVICE->resolvePath(virtual_path), std::filesystem::copy_options::overwrite_existing);
+
+				//Delete assets old registration
+				std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
+
+				//Create new virtual path
+				std::filesystem::path new_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(virtual_path) / asset_id);
+
+				//Register new asset
+				NIKE_ASSETS_SERVICE->registerAsset(NIKE_ASSETS_SERVICE->getAssetType(asset_id), new_path.string(), false);
+
+				//Update files
+				files = NIKE_PATH_SERVICE->listFiles(current_path);
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
 
 	void LevelEditor::ResourcePanel::onEvent(std::shared_ptr<Assets::FileDropEvent> event) {
 
@@ -2270,7 +2295,7 @@ namespace NIKE {
 
 					//Check if asset has already been registered
 					if (NIKE_ASSETS_SERVICE->isAssetRegistered(asset_id)) {
-						//Delete asset for old registration
+						//Delete assets old registration
 						std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
 					}
 
@@ -2290,9 +2315,13 @@ namespace NIKE {
 				}
 			}
 
-			//Show success popup
-			success_msg->assign(message);
-			openPopUp("Success");
+			//Update directories & files
+			directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+			files = NIKE_PATH_SERVICE->listFiles(current_path);
+
+			////Show success popup
+			//success_msg->assign(message);
+			//openPopUp("Success");
 		}
 
 		event->setEventProcessed(true);
@@ -2355,6 +2384,7 @@ namespace NIKE {
 			ImVec2 uv0(0.0f, 1.0f);
 			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
 			if (ImGui::ImageButton(std::string("##" + dir.filename().string()).c_str(), icon, ImVec2(icon_size.x, icon_size.y), uv0, uv1)) {
 				//Change current path to folder path clicked
 				current_path = virtual_path + '/' + dir.filename().string();
@@ -2369,6 +2399,7 @@ namespace NIKE {
 				break;
 			}
 			ImGui::PopStyleColor();
+			moveFileAcceptPayload(virtual_path + '/' + dir.filename().string());
 
 			//Display directory name
 			ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + icon_size.x);
@@ -2407,6 +2438,19 @@ namespace NIKE {
 				selected_asset_id = file.filename().string();
 			}
 			ImGui::PopStyleColor();
+
+			//Start drag-and-drop source
+			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+				auto filetype_string = NIKE_ASSETS_SERVICE->getAssetTypeString(file.filename().string());
+				//Set drag payload with asset name
+				ImGui::SetDragDropPayload(std::string(filetype_string + "_FILE").c_str(), file.filename().string().c_str(), file.filename().string().size() + 1);
+				payload_typestring = filetype_string;
+
+				//Render the icon or name at the cursor during dragging
+				ImGui::Image(icon, { 64, 64 }, uv0, uv1);
+				ImGui::TextWrapped(file.filename().string().c_str());
+				ImGui::EndDragDropSource();
+			}
 
 			//Display file name
 			ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + icon_size.x);
@@ -2588,6 +2632,7 @@ namespace NIKE {
 					files = NIKE_PATH_SERVICE->listFiles(current_path);
 				}
 			}
+			moveFileAcceptPayload(NIKE_PATH_SERVICE->getVirtualParentPath(current_path));
 		}
 
 		ImGui::Spacing();
@@ -3384,6 +3429,78 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Game Window Panel
 	*********************************************************************/
+	void LevelEditor::GameWindowPanel::renderAcceptPayload() {
+		if (ImGui::BeginDragDropTarget()) {
+
+			//Texture file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Get texture asset
+				auto texture = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(asset_id);
+
+				//Create entity
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+
+				//Add transform
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), Vector2f((float)texture->size.x, (float)texture->size.y), 0.0f));
+
+				//Add texture
+				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture(asset_id, { 0.0f, 0.0f, 0.0f, 1.0f }));
+			}
+
+			//Model file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Model_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Get model asset
+				auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(asset_id);
+
+				//Default model size
+				Vector2f size = { 100.0f, 100.0f };
+
+				//Default model color
+				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				//Create entity
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+
+				//Add transform
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), size, 0.0f));
+
+				//Add model
+				NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape(asset_id, color));
+			}
+
+			//Texture font payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Font_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Get font asset
+				auto font = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(asset_id);
+
+				//Default font color
+				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				//Default place holder text
+				std::string place_holder{ "Hello World! Ah Pan Tat!" };
+
+				//Create entity
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+
+				//Add transform
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
+
+				//Add texture
+				NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(entity, Render::Text(asset_id, place_holder, color, 1.0f));
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+
 	void LevelEditor::GameWindowPanel::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
 		texture_id = event->tex_id;
 		event->setEventProcessed(true);
@@ -3484,6 +3601,9 @@ namespace NIKE {
 
 		//Render game to viewport
 		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
+
+		//Accept render assets payload
+		renderAcceptPayload();
 
 		//If grid is showing
 		if (main_panel.lock()->getGridState()) {
