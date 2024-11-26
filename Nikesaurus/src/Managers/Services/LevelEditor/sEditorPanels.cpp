@@ -2406,6 +2406,75 @@ namespace NIKE {
 			};
 	}
 
+	std::function<void()> LevelEditor::ResourcePanel::deleteDirectoryPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Warning message
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
+
+			//Select a component to add
+			ImGui::Text("Are you sure you want to delete everything in selected directory?");
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Confirm")) {
+
+				//Check for directory mode
+				switch (directory_mode) {
+				case 0: {
+
+					//Remove all files in current directory
+					for (auto const& file : files) {
+						std::filesystem::remove(file);
+					}
+					break;
+				}
+				case 1: {
+
+					//Remove all files & folders in current directory
+					for (auto const& file : files) {
+						std::filesystem::remove(file);
+					}
+					for (auto const& dir : directories) {
+						std::filesystem::remove_all(dir);
+					}
+					break;
+				}
+				case 2: {
+
+					//Remove all files & folders in root directory
+					for (auto const& file : NIKE_PATH_SERVICE->listFiles(root_path)) {
+						std::filesystem::remove(file);
+					}
+					for (auto const& dir : NIKE_PATH_SERVICE->listDirectories(root_path)) {
+						std::filesystem::remove_all(dir);
+					}
+					current_path = root_path;
+					break;
+				}
+				default: {
+					break;
+				}
+				}
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::ResourcePanel::init() {
 
 		//Register popups
@@ -2414,6 +2483,7 @@ namespace NIKE {
 		registerPopUp("Error", defPopUp("Error", error_msg));
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Asset", deleteAssetPopup("Delete Asset"));
+		registerPopUp("Clear Directory", deleteDirectoryPopup("Clear Directory"));
 
 		//Initialize root
 		root_path = "Game_Assets:/";
@@ -2466,18 +2536,17 @@ namespace NIKE {
 
 		ImGui::Spacing();
 
-		//Load button
+		//Directory level actions
 		{
 			//Array of load directories
 			const char*  load_directory[] = { "Current", "Current *", "Root *" };
-			static int directory_mode = 0;
 
 			//Render the dropdown
 			ImGui::PushItemWidth(100.0f);
 			ImGui::Combo("##Directory", &directory_mode, load_directory, IM_ARRAYSIZE(load_directory));
 			ImGui::PopItemWidth();
 
-			//Load all from directory mode
+			//Load all from directory
 			if (ImGui::Button("Load All")) {
 
 				//Check for directory mode
@@ -2496,7 +2565,7 @@ namespace NIKE {
 				}
 				case 2: {
 					NIKE_ASSETS_SERVICES->cacheAssetDirectory(root_path, true);
-					success_msg->assign("All assets in: \"" + current_path + "*\" loaded.");
+					success_msg->assign("All assets in: \"" + root_path + "*\" loaded.");
 					openPopUp("Success");
 					break;
 				}
@@ -2506,7 +2575,7 @@ namespace NIKE {
 				}
 			}
 
-			//Unload all from directory mode
+			//Unload all from directory
 			if (ImGui::Button("Unload All")) {
 
 				//Check for directory mode
@@ -2525,7 +2594,7 @@ namespace NIKE {
 				}
 				case 2: {
 					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(root_path, true);
-					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
+					success_msg->assign("All assets in: \"" + root_path + "*\" unloaded.");
 					openPopUp("Success");
 					break;
 				}
@@ -2533,6 +2602,11 @@ namespace NIKE {
 					break;
 				}
 				}
+			}
+
+			//Delete all from directory
+			if (ImGui::Button("Delete All")) {
+				openPopUp("Clear Directory");
 			}
 		}
 

@@ -404,8 +404,6 @@ namespace NIKE {
 
 			//Check if entity is snapping to grid
 			bool checkGridSnapping() const;
-
-			std::string& getCompStringRef();
 		};
 
 		//Debug Management Panel
@@ -489,6 +487,9 @@ namespace NIKE {
 			//Selected file
 			std::string selected_asset_id;
 
+			//Selected directory mode
+			int directory_mode;
+
 			//Setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
 
@@ -503,8 +504,11 @@ namespace NIKE {
 
 			//Delete asset popup
 			std::function<void()> deleteAssetPopup(std::string const& popup_id);
+
+			//Delete directory content popup
+			std::function<void()> deleteDirectoryPopup(std::string const& popup_id);
 		public:
-			ResourcePanel() = default;
+			ResourcePanel() : directory_mode{ 0 } { }
 			~ResourcePanel() = default;
 
 			//Panel Name
