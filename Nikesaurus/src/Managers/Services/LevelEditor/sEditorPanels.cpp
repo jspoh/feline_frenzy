@@ -2308,9 +2308,9 @@ namespace NIKE {
 			ImTextureID icon = 0;
 
 			//Get extension loaded icon
-			if (NIKE_ASSETS_SERVICE->checkTextureExist(file.extension().string())) {
-				std::string icon_ref = file.extension().string().substr(1) + "_icon.png";
-				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)->gl_data);
+			std::string icon_ref = file.extension().string().substr(1) + "_icon.png";
+			if (auto texture = NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)) {
+				icon = static_cast<ImTextureID>(texture->gl_data);
 			}
 			else {
 				//Load default file icon
@@ -2350,9 +2350,6 @@ namespace NIKE {
 
 		//Register all engine icons
 		NIKE_ASSETS_SERVICES->scanAssetDirectory("Engine_Assets:/Icons");
-
-		//Register all assets
-		NIKE_ASSETS_SERVICES->scanAssetDirectory(root_path, true);
 	}
 
 	void LevelEditor::ResourcePanel::update() {

@@ -28,14 +28,16 @@ int WINAPI WinMain(
 	//Init Engine
 	NIKE_ENGINE.init("Config.json", 60, "Welcome To Nikesaurus.");
 
+	//Register all assets in the game folder
+	NIKE_ASSETS_SERVICES->scanAssetDirectory("Game_Assets:/", true);
+
 	//Register Scenes
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
 	NIKE_SCENES_SERVICE->registerScene<Menu::Scene>("MENU");
 
 	// register built in model for batched quad rendering (!TODO: can be implemented in a different way if required)
-	NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
-	NIKE_ASSETS_SERVICE->loadModel("batched_texture", "assets/Models/square-texture.txt", true);
-
+	//NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);
+	//NIKE_ASSETS_SERVICE->loadModel("batched_texture", "assets/Models/square-texture.txt", true);
 
 	//Change Scene To Main Menu
 	//NIKE_SCENES_SERVICE->queueSceneEvent(NIKE::Scenes::SceneEvent(NIKE::Scenes::Actions::CHANGE, "MENU"));

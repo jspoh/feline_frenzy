@@ -72,7 +72,7 @@ namespace NIKE
 	bool hasValidModelExtension(const std::filesystem::path& filePath)
 	{
 		std::string extension = filePath.extension().string();
-		return (extension == ".txt");
+		return (extension == ".model");
 	}
 
 	bool hasValidPrefabExtension(const std::filesystem::path& filePath)

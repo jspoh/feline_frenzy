@@ -900,7 +900,7 @@ namespace NIKE {
 		else if (ext == ".model") {
 			return Assets::Types::Model;
 		}
-		else if (ext == ".tff") {
+		else if (ext == ".ttf") {
 			return Assets::Types::Font;
 		}
 		else if ((ext == ".WAV" || ext == ".wav") && std::filesystem::file_size(path) >= music_threshold) {
@@ -911,6 +911,29 @@ namespace NIKE {
 		}
 		else {
 			return Assets::Types::None;
+		}
+	}
+
+	std::string Assets::Services::typeToString(Types type) const {
+		switch (type) {
+		case Types::Texture:
+			return "Texture";
+			break;
+		case Types::Model:
+			return "Model";
+			break;
+		case Types::Font:
+			return "Font";
+			break;
+		case Types::Music:
+			return "Music";
+			break;
+		case Types::Sound:
+			return "Sound";
+			break;
+		default:
+			return "";
+			break;
 		}
 	}
 
@@ -1041,6 +1064,9 @@ namespace NIKE {
 
 				//Add into registry
 				asset_registry[getIDFromPath(file.path().string(), false)] = MetaData(asset_type, NIKE_PATH_SERVICE->normalizePath(file.path()));
+
+				//Log registration
+				NIKEE_CORE_INFO("Succesfully registered " + getIDFromPath(file.path().string(), false) + " Asset Type: " + typeToString(asset_type));
 			}
 
 			return;
@@ -1061,6 +1087,9 @@ namespace NIKE {
 
 			//Add into registry
 			asset_registry[getIDFromPath(file.path().string(), false)] = MetaData(asset_type, NIKE_PATH_SERVICE->normalizePath(file.path()));
+
+			//Log registration
+			NIKEE_CORE_INFO("Succesfully registered " + getIDFromPath(file.path().string(), false) + " Asset Type: " + typeToString(asset_type));
 		}
 	}
 

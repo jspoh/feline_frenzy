@@ -280,7 +280,7 @@ namespace NIKE {
 			Sound,
 		};
 
-		class Services {
+		class NIKE_API Services {
 		private:
 
 			//Assset meta data
@@ -320,6 +320,9 @@ namespace NIKE {
 
 			//Extension to asset type
 			Types getAssetType(std::filesystem::path const& path) const;
+
+			//Conversion from type to string
+			std::string typeToString(Types type) const;
 		public:
 
 			//Default constructor and destructor
@@ -351,7 +354,6 @@ namespace NIKE {
 				if (meta_it == asset_registry.end()) {
 
 					//Return nullptr
-					NIKEE_CORE_ERROR("Asset not registered yet for: " + asset_id);
 					return nullptr;
 				}
 
@@ -360,8 +362,7 @@ namespace NIKE {
 				if (loader_it == asset_loader.end()) {
 
 					//Return nullptr
-					NIKEE_CORE_ERROR("Loader not registered for asset type");
-					return nullptr;
+					throw std::runtime_error("Loader not registered for asset type");
 				}
 
 				//Get loaded asset

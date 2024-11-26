@@ -13,12 +13,12 @@
 #include "Core/Engine.h"
 
 void Splash::Scene::load() {
-	NIKE_ASSETS_SERVICE->reloadAssets("Textures");
-	NIKE_ASSETS_SERVICE->reloadAssets("Shaders");
-	NIKE_ASSETS_SERVICE->reloadAssets("Audio");
-	NIKE_ASSETS_SERVICE->reloadAssets("Models");
-	NIKE_ASSETS_SERVICE->reloadAssets("Fonts");
-	NIKE_ASSETS_SERVICE->reloadAssets("Scripts");
+	//NIKE_ASSETS_SERVICE->reloadAssets("Textures");
+	//NIKE_ASSETS_SERVICE->reloadAssets("Shaders");
+	//NIKE_ASSETS_SERVICE->reloadAssets("Audio");
+	//NIKE_ASSETS_SERVICE->reloadAssets("Models");
+	//NIKE_ASSETS_SERVICE->reloadAssets("Fonts");
+	//NIKE_ASSETS_SERVICE->reloadAssets("Scripts");
 }
 
 void Splash::Scene::init() {
