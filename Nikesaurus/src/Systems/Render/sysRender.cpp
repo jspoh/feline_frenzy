@@ -377,7 +377,7 @@ namespace NIKE {
 		
 		// !TODO: debugging only
 		static constexpr unsigned int debug_tex_unit = 0;
-		static const unsigned int debug_tex_hdl = NIKE_ASSETS_SERVICE->getTexture("player")->gl_data;
+		static const unsigned int debug_tex_hdl = NIKE_ASSETS_SERVICE->getTexture("Main_Menu")->gl_data;
 		glBindTextureUnit(debug_tex_unit, debug_tex_hdl);
 		glTextureParameteri(debug_tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(debug_tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -386,9 +386,9 @@ namespace NIKE {
 
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+		//glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
-		//glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
+		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
 
 		// cleanup
 		glBindVertexArray(0);
@@ -627,6 +627,7 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderViewport() {
+		glClearColor(1, 1, 0, 1);		// set background to yellow for easier debugging
 
 		//Render to frame buffer if imgui is active
 		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {

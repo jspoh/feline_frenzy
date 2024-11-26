@@ -21,5 +21,6 @@ void main() {
 	out_color = tex_color;
 	//out_color = vec4(1.0, 0.0, 1.0, 1.0);
 	//out_color = vec4(f_sampler_idx, f_sampler_idx, f_sampler_idx, 1.0);
+	//out_color = vec4(f_texcoord, 0.0, 1.0);		// used to check if texcoord is valid
 }
 
