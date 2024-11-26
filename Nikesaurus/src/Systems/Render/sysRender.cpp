@@ -316,8 +316,8 @@ namespace NIKE {
 				const unsigned int binding_unit = static_cast<unsigned int>(texture_binding_units.size());
 				glBindTextureUnit(binding_unit, render_instances_texture[i].tex);
 				texture_binding_units[render_instances_texture[i].tex] = binding_unit;
-				// glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				// glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			}
 		}
 
@@ -370,13 +370,13 @@ namespace NIKE {
 		shader_system->useShader("batched_texture");
 
 		// set uniform
-		//shader_system->setUniform("batched_texture", "u_tex2d", textures);
+		shader_system->setUniform("batched_texture", "u_tex2d", textures);
 		
 		// !TODO: debugging only
-		glBindTextureUnit(0, render_instances_texture[0].tex);
-		glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		shader_system->setUniform("batched_texture", "u_tex2d", 0);
+		//glBindTextureUnit(0, render_instances_texture[0].tex);
+		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		//shader_system->setUniform("batched_texture", "u_tex2d", 0);
 		
 
 		// bind vao
