@@ -76,9 +76,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
 	}
 
-	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
-
-		//Provide ecs coordinator service for internal engine usage
+	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
 		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Provide Services

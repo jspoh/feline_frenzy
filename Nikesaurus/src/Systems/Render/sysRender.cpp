@@ -370,20 +370,20 @@ namespace NIKE {
 		shader_system->useShader("batched_texture");
 
 		// set uniform
-		shader_system->setUniform("batched_texture", "u_tex2d", textures);
+		//shader_system->setUniform("batched_texture", "u_tex2d", textures);
 		
 		// !TODO: debugging only
 		//glBindTextureUnit(0, render_instances_texture[0].tex);
 		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//shader_system->setUniform("batched_texture", "u_tex2d", 0);
+		shader_system->setUniform("batched_texture", "u_tex2d", 0);
 		
 
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		//glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
-		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
+		//glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
 
 		// cleanup
 		glBindVertexArray(0);
