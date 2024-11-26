@@ -312,20 +312,20 @@ namespace NIKE {
 		// cant pass in unsigned int so.. using int
 		// map with texture handle as key and binding unit as value
 		// not using unordered_map as it uses hashingand i need the index
-		std::map<unsigned int, unsigned int> texture_binding_units;
-		for (int i{}; i < render_instances_texture.size(); i++) {
-			if (texture_binding_units.find(render_instances_texture[i].tex) == texture_binding_units.end()) {
-				const unsigned int binding_unit = static_cast<unsigned int>(texture_binding_units.size());
-				glBindTextureUnit(binding_unit, render_instances_texture[i].tex);
-				texture_binding_units[render_instances_texture[i].tex] = binding_unit;
-				 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			}
-		}
+		//std::map<unsigned int, unsigned int> texture_binding_units;
+		//for (int i{}; i < render_instances_texture.size(); i++) {
+		//	if (texture_binding_units.find(render_instances_texture[i].tex) == texture_binding_units.end()) {
+		//		const unsigned int binding_unit = static_cast<unsigned int>(texture_binding_units.size());
+		//		glBindTextureUnit(binding_unit, render_instances_texture[i].tex);
+		//		texture_binding_units[render_instances_texture[i].tex] = binding_unit;
+		//		 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		//		 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		//	}
+		//}
 
-		// raw vector of binding units
-		std::vector<int> textures;
-		std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
+		//// raw vector of binding units
+		//std::vector<int> textures;
+		//std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -341,9 +341,10 @@ namespace NIKE {
 				v.uv_offset = render_instances_texture[i].uv_offset;
 
 				// get index of texture hdl in texture_binding_units vector
-				const int texture_idx = std::distance(texture_binding_units.begin(), texture_binding_units.find(render_instances_texture[i].tex));
+				//const int texture_idx = std::distance(texture_binding_units.begin(), texture_binding_units.find(render_instances_texture[i].tex));
 
-				v.sampler_idx = static_cast<unsigned int>(texture_idx);
+				//v.sampler_idx = static_cast<unsigned int>(texture_idx);
+				v.sampler_idx = 1;
 			}
 
 			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
@@ -375,10 +376,12 @@ namespace NIKE {
 		//shader_system->setUniform("batched_texture", "u_tex2d", textures);
 		
 		// !TODO: debugging only
-		//glBindTextureUnit(0, render_instances_texture[0].tex);
-		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//shader_system->setUniform("batched_texture", "u_tex2d", 0);
+		static constexpr unsigned int debug_tex_unit = 0;
+		static const unsigned int debug_tex_hdl = NIKE_ASSETS_SERVICE->getTexture("player")->gl_data;
+		glBindTextureUnit(debug_tex_unit, debug_tex_hdl);
+		glTextureParameteri(debug_tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(debug_tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		shader_system->setUniform("batched_texture", "u_tex2d", static_cast<int>(debug_tex_unit));
 		
 
 		// bind vao

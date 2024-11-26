@@ -16,6 +16,7 @@ uniform sampler2D u_tex2d;
 void main() {
 	//vec4 tex_color = texture(u_tex2d[f_sampler_idx], f_texcoord);		// layer is specified with f_sampler_idx for sampler2DArray u_tex2d
 	vec4 tex_color = texture(u_tex2d, f_texcoord);
+	//tex_color = texture(u_tex2d, vec2(0.5,0.5));
 
 	out_color = tex_color;
 	//out_color = vec4(1.0, 0.0, 1.0, 1.0);

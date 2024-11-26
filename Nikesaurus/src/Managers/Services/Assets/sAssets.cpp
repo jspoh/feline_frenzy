@@ -340,6 +340,7 @@ namespace NIKE {
 	std::shared_ptr<Assets::Texture> Assets::Service::getTexture(std::string const& texture_id) {
 		if (textures_list.find(texture_id) == textures_list.end())
 		{
+			NIKEE_CORE_ERROR("Texture with id {} not found", texture_id);
 			LOG_CRASH("Texture could not be found.");
 		}
 
