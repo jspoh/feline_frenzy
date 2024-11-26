@@ -329,7 +329,7 @@ namespace NIKE {
 			// create temp model to populate with current instance's data
 			Assets::Model m{ model };
 			for (Assets::Vertex& v : m.vertices) {
-				v.tex_hdl = render_instances_texture[i].tex;
+				//v.tex_hdl = render_instances_texture[i].tex;
 				v.transform = render_instances_texture[i].xform;
 				v.framesize = render_instances_texture[i].framesize;
 				v.uv_offset = render_instances_texture[i].uv_offset;
