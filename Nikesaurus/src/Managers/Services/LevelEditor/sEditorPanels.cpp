@@ -2271,7 +2271,7 @@ namespace NIKE {
 			ImGui::BeginGroup();
 
 			//Folder icon
-			ImTextureID icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture("folder")->gl_data);;
+			ImTextureID icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>("folder_icon.png")->gl_data);
 
 			//Display directory icon
 			ImVec2 uv0(0.0f, 1.0f);
@@ -2309,11 +2309,12 @@ namespace NIKE {
 
 			//Get extension loaded icon
 			if (NIKE_ASSETS_SERVICE->checkTextureExist(file.extension().string())) {
-				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture(file.extension().string())->gl_data);
+				std::string icon_ref = file.extension().string().substr(1) + "_icon.png";
+				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)->gl_data);
 			}
 			else {
 				//Load default file icon
-				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getTexture(".def")->gl_data);
+				icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>("def_icon.png")->gl_data);
 			}
 
 			//Display file icon
@@ -2347,17 +2348,11 @@ namespace NIKE {
 		//Default icon size
 		icon_size = { 128.0f, 128.0f };
 
-		//Load icons
-		NIKE_ASSETS_SERVICE->loadTexture("folder", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/folder_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".png", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/png_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".jpg", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/jpg_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".json", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/json_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".tff", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/tff_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".txt", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/txt_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".wav", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/wav_icon.png").string());
-		NIKE_ASSETS_SERVICE->loadTexture(".def", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Icons/def_icon.png").string());
+		//Register all engine icons
+		NIKE_ASSETS_SERVICES->scanAssetDirectory("Engine_Assets:/Icons");
 
-		NIKE_ASSETS_SERVICES->scanAssetDirectory(NIKE_PATH_SERVICE->resolvePath(root_path));
+		//Register all assets
+		NIKE_ASSETS_SERVICES->scanAssetDirectory(root_path, true);
 	}
 
 	void LevelEditor::ResourcePanel::update() {

@@ -919,34 +919,43 @@ namespace NIKE {
 		render_loader = std::make_unique<Assets::RenderLoader>();
 		audio_system = audio_sys;
 
+		//Register invalid file extensions
+		addInvalidExtensions(".ogg");
+
 		//Register texture loader
-		registerLoader(Assets::Types::Texture, [this](std::filesystem::path const& primary_path, [[maybe_unused]]std::filesystem::path const& secondary_path) {
+		registerLoader(Assets::Types::Texture, [this](std::filesystem::path const& primary_path) {
 			return std::make_shared<Texture>(render_loader->compileTexture(primary_path.string()));
 			});
 
 		//Register model loader
-		registerLoader(Assets::Types::Model, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+		registerLoader(Assets::Types::Model, [this](std::filesystem::path const& primary_path) {
 			return std::make_shared<Model>(render_loader->compileModel(primary_path.string()));
 			});
 
 		//Register font loader
-		registerLoader(Assets::Types::Font, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+		registerLoader(Assets::Types::Font, [this](std::filesystem::path const& primary_path) {
 			return std::make_shared<Font>(std::static_pointer_cast<Assets::NIKEFontLib>(font_loader->getFontLib())->generateFont(primary_path.string()));
 			});
 
 		//Register music loader
-		registerLoader(Assets::Types::Music, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+		registerLoader(Assets::Types::Music, [this](std::filesystem::path const& primary_path) {
 			return audio_system->createStream(primary_path.string());
 			});
 
 		//Register Sound loader
-		registerLoader(Assets::Types::Sound, [this](std::filesystem::path const& primary_path, [[maybe_unused]] std::filesystem::path const& secondary_path) {
+		registerLoader(Assets::Types::Sound, [this](std::filesystem::path const& primary_path) {
 			return audio_system->createSound(primary_path.string());
 			});
 	}
 
-	void Assets::Services::registerAsset(std::string const& asset_id, Types asset_type, std::string const& virtual_path) {
+	std::string Assets::Services::registerAsset(Types asset_type, std::string const& virtual_path) {
+		if (isPathValid(virtual_path)) {
+			NIKEE_CORE_ERROR("Invalid path detected. Asset will not be registered.");
+		}
+		auto asset_id = getIDFromPath(virtual_path);
 		asset_registry[asset_id] = MetaData(asset_type, NIKE_PATH_SERVICE->resolvePath(virtual_path));
+
+		return asset_id;
 	}
 
 	void Assets::Services::registerLoader(Types asset_type, LoaderFunc loader) {
@@ -957,33 +966,101 @@ namespace NIKE {
 		asset_loader.emplace(asset_type, loader);
 	}
 
-	void Assets::Services::clearExpiredCache() {
-
-		////Iterate through assets cache to see if weak ptr is expired
-		//for (auto it = asset_cache.begin(); it != asset_cache.end();) {
-		//	if (it->second.expired()) {
-		//		it = asset_cache.erase(it);
-		//	}
-		//	else {
-		//		++it;
-		//	}
-		//}
+	void Assets::Services::addInvalidExtensions(std::string const& ext) {
+		invalid_extensions.insert(ext);
 	}
 
-	void Assets::Services::scanAssetDirectory(std::filesystem::path const& root_path) {
+	bool Assets::Services::isPathValid(std::string const& path, bool b_virtual) {
+		if (b_virtual) {
+			auto ext = NIKE_PATH_SERVICE->resolvePath(path).extension().string();
+			if (invalid_extensions.find(ext) != invalid_extensions.end()) {
+				NIKEE_CORE_ERROR("Invalid extension found: " + ext + " In path: " + path);
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+		else {
+			auto ext = std::filesystem::path(path).extension().string();
+			if (invalid_extensions.find(ext) != invalid_extensions.end()) {
+				NIKEE_CORE_ERROR("Invalid extension found: " + ext + " In path: " + path);
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+	}
+
+	std::string Assets::Services::getIDFromPath(std::string const& path, bool b_virtual) {
+
+		if (b_virtual) {
+			auto actual_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(path)).string();
+			//string variables
+			size_t start = actual_path.find_last_of('\\') + 1;
+			//size_t size = actual_path.find_first_of('.', start) - start;
+			std::string asset_id = actual_path.substr(start);
+
+			return asset_id;
+		}
+		else {
+			auto actual_path = NIKE_PATH_SERVICE->normalizePath(path).string();
+			//string variables
+			size_t start = actual_path.find_last_of('\\') + 1;
+			//size_t size = actual_path.find_first_of('.', start) - start;
+			std::string asset_id = actual_path.substr(start);
+
+			return asset_id;
+		}
+	}
+
+	void Assets::Services::clearCache() {
+		//Clear asset cache when needed
+		asset_cache.clear();
+	}
+
+	void Assets::Services::scanAssetDirectory(std::string const& virtual_path, bool b_diretory_tree) {
+
+		//Resolve path
+		auto root_path = NIKE_PATH_SERVICE->resolvePath(virtual_path);
+
+		//Scan just root path
+		if (!b_diretory_tree) {
+			for (const auto& file : std::filesystem::directory_iterator(root_path)) {
+				if (!file.is_regular_file()) continue;
+
+				//Check for valid path before registering
+				if (invalid_extensions.find(file.path().extension().string()) != invalid_extensions.end()) {
+					NIKEE_CORE_ERROR("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
+					continue;
+				}
+
+				//Configure asset type
+				Types asset_type = getAssetType(file.path());
+
+				//Add into registry
+				asset_registry[getIDFromPath(file.path().string(), false)] = MetaData(asset_type, NIKE_PATH_SERVICE->normalizePath(file.path()));
+			}
+
+			return;
+		}
+
+		//Scan root & directory tree
 		for (const auto& file : std::filesystem::recursive_directory_iterator(root_path)) {
 			if (!file.is_regular_file()) continue;
 
-			//string variables
-			size_t start = file.path().string().find_last_of('\\') + 1;
-			size_t size = file.path().string().find_first_of('.', start) - start;
-			std::string asset_id = file.path().string().substr(start, size);
+			//Check for valid path before registering
+			if (invalid_extensions.find(file.path().extension().string()) != invalid_extensions.end()) {
+				NIKEE_CORE_ERROR("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
+				continue;
+			}
 
 			//Configure asset type
 			Types asset_type = getAssetType(file.path());
 
 			//Add into registry
-			asset_registry[asset_id] = MetaData(asset_type, file.path());
+			asset_registry[getIDFromPath(file.path().string(), false)] = MetaData(asset_type, NIKE_PATH_SERVICE->normalizePath(file.path()));
 		}
 	}
 

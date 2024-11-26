@@ -295,7 +295,10 @@ namespace NIKE {
 			};
 
 			//Loader function
-			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&, std::filesystem::path const&)>;
+			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
+
+			//List of invalid extension
+			std::set<std::string> invalid_extensions;
 
 			//Asset registry of meta data
 			std::unordered_map<std::string, MetaData> asset_registry;
@@ -303,7 +306,7 @@ namespace NIKE {
 			//Asset loader
 			std::unordered_map<Types, LoaderFunc> asset_loader;
 
-			//Assets cache for storing assets ( To be changed to weak ptr next time once systems are event driven )
+			//Assets cache for storing assets ( Optionally change to weakptr for a more event driven approach )
 			std::unordered_map<std::string, std::shared_ptr<void>> asset_cache;
 
 			//Font loader
@@ -327,7 +330,7 @@ namespace NIKE {
 			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
 			//Register asset
-			void registerAsset(std::string const& asset_id, Types asset_type, std::string const& virtual_path);
+			std::string registerAsset(Types asset_type, std::string const& virtual_path);
 
 			//Register loader
 			void registerLoader(Types asset_type, LoaderFunc loader);
@@ -346,13 +349,19 @@ namespace NIKE {
 				//Get asset meta data
 				auto meta_it = asset_registry.find(asset_id);
 				if (meta_it == asset_registry.end()) {
-					throw std::runtime_error("Asset not registered yet.");
+
+					//Return nullptr
+					NIKEE_CORE_ERROR("Asset not registered yet for: " + asset_id);
+					return nullptr;
 				}
 
 				//Load assset through registered loaded
 				auto loader_it = asset_loader.find(meta_it->second.type);
 				if (loader_it == asset_loader.end()) {
-					throw std::runtime_error("Loader not registered for type.");
+
+					//Return nullptr
+					NIKEE_CORE_ERROR("Loader not registered for asset type");
+					return nullptr;
 				}
 
 				//Get loaded asset
@@ -364,12 +373,21 @@ namespace NIKE {
 				//Return asset
 				return std::static_pointer_cast<T>(asset);
 			}
+			
+			//Add invalid extension
+			void addInvalidExtensions(std::string const& ext);
+
+			//Check for valid path
+			bool isPathValid(std::string const& path, bool b_virtual = true);
+
+			//Get ref from path
+			std::string getIDFromPath(std::string const& path, bool b_virtual = true);
 
 			//Clear expired cache
-			void clearExpiredCache();
+			void clearCache();
 
 			//Register all assets from directory tree
-			void scanAssetDirectory(std::filesystem::path const& root_path);
+			void scanAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
 
 			//Log assets reigstry
 			void logAssetsRegistry() const;
