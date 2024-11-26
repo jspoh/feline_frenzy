@@ -221,6 +221,13 @@ namespace NIKE {
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		// !TODO: batched rendering for texture incomplete
 
+		//Caculate UV Offset
+		const Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+		Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
+
+		//Translate UV offset to bottom left
+		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+
 		if constexpr (!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
@@ -229,7 +236,7 @@ namespace NIKE {
 			shader_system->useShader("texture");
 
 			//Texture unit
-			constexpr int texture_unit = 6;
+			static constexpr int texture_unit = 6;
 
 			// set texture
 			glBindTextureUnit(
@@ -239,13 +246,6 @@ namespace NIKE {
 
 			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-			//Caculate UV Offset
-			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
-			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
-
-			//Translate UV offset to bottom left
-			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
 
 			//Set uniforms for texture rendering
 			shader_system->setUniform("texture", "u_tex2d", texture_unit);
@@ -275,13 +275,6 @@ namespace NIKE {
 			shader_system->unuseShader();
 		}
 		else {
-			//Caculate UV Offset
-			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
-			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
-
-			//Translate UV offset to bottom left
-			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
-
 			// prepare for batched rendering
 			RenderInstance instance;
 			instance.xform = x_form;
@@ -380,8 +373,11 @@ namespace NIKE {
 		//shader_system->setUniform("batched_texture", "u_tex2d", textures);
 		
 		// !TODO: debugging only
-		glBindTextureUnit(0, 23);
+		glBindTextureUnit(0, render_instances_texture[0].tex);
+		glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(render_instances_texture[0].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		shader_system->setUniform("batched_texture", "u_tex2d", 0);
+		
 
 		// bind vao
 		glBindVertexArray(model.vaoid);
