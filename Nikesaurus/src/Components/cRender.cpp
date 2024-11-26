@@ -205,7 +205,7 @@ namespace NIKE {
 
 					//Save font ID Button
 					if (ImGui::Button("Save##FontID")) {
-						if (NIKE_ASSETS_SERVICE->checkFontExist(font_id))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(font_id))
 						{
 							LevelEditor::Action save_font_id;
 
@@ -353,7 +353,7 @@ namespace NIKE {
 
 					//Save Shape model ID Button
 					if (ImGui::Button("Save##ShapeModelID")) {
-						if (NIKE_ASSETS_SERVICE->checkModelExist(shape_model_input))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(shape_model_input))
 						{
 							LevelEditor::Action save_shape_model;
 
@@ -479,7 +479,7 @@ namespace NIKE {
 
 					//Save Shape model ID Button
 					if (ImGui::Button("Save##TextureID")) {
-						if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id_input))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(texture_id_input))
 						{
 							LevelEditor::Action save_texture_id;
 

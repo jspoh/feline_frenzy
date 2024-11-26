@@ -14,6 +14,7 @@
 
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
+#include "Managers/Services/Assets/sAssets.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -464,7 +465,7 @@ namespace NIKE {
 		};
 
 		//Resource Management panel
-		class ResourcePanel : public IPanel {
+		class ResourcePanel : public IPanel, public Events::IEventListener<Assets::FileDropEvent> {
 		private:
 			//Directories
 			std::vector<std::filesystem::path> directories;
@@ -507,6 +508,9 @@ namespace NIKE {
 
 			//Delete directory content popup
 			std::function<void()> deleteDirectoryPopup(std::string const& popup_id);
+
+			//On drop file event
+			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
 		public:
 			ResourcePanel() : directory_mode{ 0 } { }
 			~ResourcePanel() = default;

@@ -226,61 +226,6 @@ namespace NIKE {
 		io.DisplaySize.y = static_cast<float>(event->frame_buffer.y);
 	}
 
-	void LevelEditor::Service::onEvent(std::shared_ptr<Assets::FileDropEvent> event) {
-		if (b_editor_active) {
-			int file_count = event->count;
-			const char** file_paths = event->paths;
-
-			const std::set<std::string> valid_tex_ext = { ".png", ".jpg", ".jpeg", ".tex" };
-			const std::set<std::string> valid_audio_ext = { ".wav" };
-
-			// If filepath does not exist create one
-			if (!std::filesystem::exists("assets")) {
-				std::filesystem::create_directories("assets");
-				NIKEE_CORE_INFO("Created filepath assets");
-			}
-
-			// Try to get the ResourcePanel from the service using its static name
-			auto assets_panel = std::dynamic_pointer_cast<AssetsPanel>(panels_map.at(AssetsPanel::getStaticName()));
-
-			if (!assets_panel) {
-				NIKEE_CORE_ERROR("Failed to get ResourcePanel or invalid panel type.");
-				return;
-			}
-
-			std::string message = "Files Added: " + std::to_string(file_count) + " \n";
-
-			for (int i = 0; i < file_count; ++i) {
-				std::filesystem::path src_file_path{ file_paths[i] };
-
-				// Makes sure extension isnt caps sensitive
-				std::string ext = src_file_path.extension().string();
-				// Transform each character in string ext to lowercase
-				for (char& c : ext) {
-					c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-				}
-
-				if (valid_tex_ext.find(ext) != valid_tex_ext.end()) {
-					NIKE_ASSETS_SERVICE->handleTextureDrop(src_file_path);
-					message += std::string(file_paths[i]) + "\n";
-				}
-				else if (valid_audio_ext.find(ext) != valid_audio_ext.end()) {
-					NIKE_ASSETS_SERVICE->handleAudioDrop(src_file_path);
-					message += std::string(file_paths[i]) + "\n";
-				}
-				else {
-					NIKEE_CORE_ERROR("Error Unsupported File Type: {}", file_paths[i]);
-					message = "Error Unsupported File Type: " + ext;
-				}
-			}
-			// Construct the message
-			std::shared_ptr<std::string> msg = std::make_shared<std::string>(message);
-			assets_panel->editPopUp("Dropped Files", assets_panel->defPopUp("Dropped Files", msg));
-			assets_panel->setDropPopUp(true);
-		}
-		event->setEventProcessed(true);
-	}
-
 	void LevelEditor::Service::beginFrame() {
 		//Start a new ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();

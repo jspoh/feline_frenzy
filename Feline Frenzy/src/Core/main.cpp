@@ -29,7 +29,7 @@ int WINAPI WinMain(
 	NIKE_ENGINE.init("Config.json", 60, "Welcome To Nikesaurus.");
 
 	//Register all assets in the game folder
-	NIKE_ASSETS_SERVICES->scanAssetDirectory("Game_Assets:/", true);
+	NIKE_ASSETS_SERVICE->scanAssetDirectory("Game_Assets:/", true);
 
 	//Register Scenes
 	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");

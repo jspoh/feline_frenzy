@@ -158,14 +158,14 @@ namespace NIKE {
         // Ensure the scripts is fresh each time
         scripts.clear();
 
-        // Iterate through the directory and load valid files
-        for (const auto& entry : std::filesystem::directory_iterator(NIKE_ASSETS_SERVICE->getScriptsPath())) {
-            if (entry.is_regular_file() && hasValidScriptExtension(entry))
-            {
-                loadScript(entry.path().string());
-            }
+        //// Iterate through the directory and load valid files
+        //for (const auto& entry : std::filesystem::directory_iterator(NIKE_ASSETS_SERVICE->getScriptsPath())) {
+        //    if (entry.is_regular_file() && hasValidScriptExtension(entry))
+        //    {
+        //        loadScript(entry.path().string());
+        //    }
 
-        }
+        //}
     }
 
     sol::protected_function Lua::Service::executeScript(std::string const& script_id, std::string const& function) {

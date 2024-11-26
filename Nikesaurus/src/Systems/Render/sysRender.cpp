@@ -110,7 +110,7 @@ namespace NIKE {
 			shader_system->setUniform("base", "model_to_ndc", x_form);
 
 			//Get model
-			auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
+			auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(e_shape.model_id);
 
 			//Draw
 			glBindVertexArray(model->vaoid);
@@ -156,7 +156,7 @@ namespace NIKE {
 			return;
 		}
 
-		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_square.model");
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -233,11 +233,11 @@ namespace NIKE {
 			// set texture
 			glBindTextureUnit(
 				texture_unit, // texture unit (binding index)
-				NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
+				NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data
 			);
 
-			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 			//Caculate UV Offset
 			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
@@ -263,7 +263,7 @@ namespace NIKE {
 			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
 			//Get model
-			auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+			auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
 
 			//Draw
 			glBindVertexArray(model->vaoid);
@@ -284,7 +284,7 @@ namespace NIKE {
 			// prepare for batched rendering
 			RenderInstance instance;
 			instance.xform = x_form;
-			instance.tex = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
+			instance.tex = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data;
 			instance.framesize = framesize;
 			instance.uv_offset = uv_offset;
 
@@ -310,7 +310,7 @@ namespace NIKE {
 			return;
 		}
 
-		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_texture");
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_texture.model");
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -400,7 +400,7 @@ namespace NIKE {
 
 		//Calculate size of text
 		for (char c : e_text.text) {
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(e_text.font_id)->char_map[c];
 
 			//Calculate width
 			text_size.x += (ch.advance >> 6) * e_text.scale;
@@ -439,7 +439,7 @@ namespace NIKE {
 		//Iterate through all characters
 		for (char c : e_text.text)
 		{
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(e_text.font_id)->char_map[c];
 
 			float xpos = pos.x + ch.bearing.x * e_text.scale;
 			float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
@@ -487,7 +487,7 @@ namespace NIKE {
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel("square");
+		auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square.model");
 
 		//Draw model
 		glBindVertexArray(model->vaoid);
@@ -517,11 +517,11 @@ namespace NIKE {
 			auto& e_texture = e_texture_comp.value().get();
 
 			//Check if texture is loaded
-			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
 				//Allow stretching of texture
 				if (!e_texture.b_stretch) {
 					//Copy transform for texture mapping ( Locks the transformation of a texture )
-					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
+					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
 					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 				}
 
@@ -536,7 +536,7 @@ namespace NIKE {
 			auto& e_shape = e_shape_comp.value().get();
 
 			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
 				// Transform matrix here
 				transformMatrix(e_transform, matrix, cam_ndcx);
 
@@ -607,7 +607,7 @@ namespace NIKE {
 	void Render::Manager::renderViewport() {
 
 		//Render to frame buffer if imgui is active
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
@@ -645,7 +645,7 @@ namespace NIKE {
 			}
 		}
 
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}

@@ -1506,49 +1506,49 @@ namespace NIKE {
 			}
 
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
-				//Temporary create action
-				Action save_prefab;
+				////Temporary create action
+				//Action save_prefab;
 
-				// For saving of the prefab file with the extension
-				std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + prefab_file_path + ".prefab";
+				//// For saving of the prefab file with the extension
+				//std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + prefab_file_path + ".prefab";
 
-				//Create a shared id for do & undo functions
-				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(prefab_full_path);
+				////Create a shared id for do & undo functions
+				//std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(prefab_full_path);
 
-				//Do Action
-				save_prefab.do_action = [&, shared_id]() {
-					// Serialize the prefab to the file path
-					NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel.lock()->getSelectedEntity(), *shared_id);
-					setPopUpSuccessMsg("Prefab file saved!");
-					openPopUp("Success");
+				////Do Action
+				//save_prefab.do_action = [&, shared_id]() {
+				//	// Serialize the prefab to the file path
+				//	NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel.lock()->getSelectedEntity(), *shared_id);
+				//	setPopUpSuccessMsg("Prefab file saved!");
+				//	openPopUp("Success");
 
-					};
+				//	};
 
-				//Undo Action
-				save_prefab.undo_action = [&, shared_id]() {
+				////Undo Action
+				//save_prefab.undo_action = [&, shared_id]() {
 
-					const std::string& file_to_delete = *shared_id;
+				//	const std::string& file_to_delete = *shared_id;
 
-					// Check if file exists before deleting
-					if (std::filesystem::exists(file_to_delete)) {
-						try {
-							std::filesystem::remove(file_to_delete);
-						}
-						catch (const std::filesystem::filesystem_error& e) {
-							// Log error if file deletion fails
-							NIKEE_CORE_WARN("Failed to delete prefab file during undo: " + std::string(e.what()));
-						}
-					}
-					else {
-						NIKEE_CORE_WARN("File does not exist for undo: " + file_to_delete);
-					}
-					};
+				//	// Check if file exists before deleting
+				//	if (std::filesystem::exists(file_to_delete)) {
+				//		try {
+				//			std::filesystem::remove(file_to_delete);
+				//		}
+				//		catch (const std::filesystem::filesystem_error& e) {
+				//			// Log error if file deletion fails
+				//			NIKEE_CORE_WARN("Failed to delete prefab file during undo: " + std::string(e.what()));
+				//		}
+				//	}
+				//	else {
+				//		NIKEE_CORE_WARN("File does not exist for undo: " + file_to_delete);
+				//	}
+				//	};
 
-				//Execute create entity action
-				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_prefab));
+				////Execute create entity action
+				//NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_prefab));
 
-				//Reset entity name
-				prefab_file_path.clear();
+				////Reset entity name
+				//prefab_file_path.clear();
 
 				//Close popup
 				closePopUp(popup_id);
@@ -2182,57 +2182,57 @@ namespace NIKE {
 	void LevelEditor::AssetsPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-		// Tabs for different asset types
-		if (ImGui::BeginTabBar("Asset Types"))
-		{
-			// Levels tab for .prefabs files
-			if (ImGui::BeginTabItem("Prefabs"))
-			{
-				displayAssetList("Prefabs");
-				ImGui::EndTabItem();
-			}
+		//// Tabs for different asset types
+		//if (ImGui::BeginTabBar("Asset Types"))
+		//{
+		//	// Levels tab for .prefabs files
+		//	if (ImGui::BeginTabItem("Prefabs"))
+		//	{
+		//		displayAssetList("Prefabs");
+		//		ImGui::EndTabItem();
+		//	}
 
-			// Textures tab
-			if (ImGui::BeginTabItem("Textures"))
-			{
-				displayAssetList("Textures");
-				ImGui::EndTabItem();
-			}
+		//	// Textures tab
+		//	if (ImGui::BeginTabItem("Textures"))
+		//	{
+		//		displayAssetList("Textures");
+		//		ImGui::EndTabItem();
+		//	}
 
-			// Models tab
-			if (ImGui::BeginTabItem("Models"))
-			{
-				displayAssetList("Models");
-				ImGui::EndTabItem();
-			}
+		//	// Models tab
+		//	if (ImGui::BeginTabItem("Models"))
+		//	{
+		//		displayAssetList("Models");
+		//		ImGui::EndTabItem();
+		//	}
 
-			// Font tab
-			if (ImGui::BeginTabItem("Fonts"))
-			{
-				displayAssetList("Fonts");
-				ImGui::EndTabItem();
-			}
+		//	// Font tab
+		//	if (ImGui::BeginTabItem("Fonts"))
+		//	{
+		//		displayAssetList("Fonts");
+		//		ImGui::EndTabItem();
+		//	}
 
-			// Scripts tab
-			if (ImGui::BeginTabItem("Scripts"))
-			{
-				displayAssetList("Scripts");
-				ImGui::EndTabItem();
-			}
+		//	// Scripts tab
+		//	if (ImGui::BeginTabItem("Scripts"))
+		//	{
+		//		displayAssetList("Scripts");
+		//		ImGui::EndTabItem();
+		//	}
 
-			// Audio tab
-			if (ImGui::BeginTabItem("Audio"))
-			{
-				displayAssetList("Audio");
-				ImGui::EndTabItem();
-			}
+		//	// Audio tab
+		//	if (ImGui::BeginTabItem("Audio"))
+		//	{
+		//		displayAssetList("Audio");
+		//		ImGui::EndTabItem();
+		//	}
 
-			ImGui::EndTabBar();
-		}
-		if (show_drop_popup) {
-			openPopUp("Dropped Files");
-			show_drop_popup = false;
-		}
+		//	ImGui::EndTabBar();
+		//}
+		//if (show_drop_popup) {
+		//	openPopUp("Dropped Files");
+		//	show_drop_popup = false;
+		//}
 
 		// Render pop-ups
 		renderPopUps();
@@ -2246,22 +2246,74 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Resource Management Panel
 	*********************************************************************/
+
+	void LevelEditor::ResourcePanel::onEvent(std::shared_ptr<Assets::FileDropEvent> event) {
+
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState() && !checkPopUpShowing()) {
+			int file_count = event->count;
+			const char** file_paths = event->paths;
+
+			//Initialize message
+			std::string message = "Files Added: " + std::to_string(file_count) + " \n";
+
+			for (int i = 0; i < file_count; ++i) {
+				std::filesystem::path src_file_path{ file_paths[i] };
+
+				//Check if path is valid
+				if (NIKE_ASSETS_SERVICE->isPathValid(src_file_path.string(), false)) {
+
+					//Copy file
+					std::filesystem::copy(src_file_path, NIKE_PATH_SERVICE->resolvePath(current_path), std::filesystem::copy_options::overwrite_existing);
+
+					//Get asset id
+					auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(src_file_path.string(), false);
+
+					//Check if asset has already been registered
+					if (NIKE_ASSETS_SERVICE->isAssetRegistered(asset_id)) {
+						//Delete asset for old registration
+						std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
+					}
+
+					//Create new virtual path
+					std::filesystem::path new_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(current_path) / asset_id);
+
+					//Register new asset
+					NIKE_ASSETS_SERVICE->registerAsset(NIKE_ASSETS_SERVICE->getAssetType(asset_id), new_path.string(), false);
+
+					//Log success
+					NIKEE_CORE_INFO("File " + src_file_path.string() + " successfully copied into" + NIKE_PATH_SERVICE->resolvePath(current_path).string());
+					message += std::string(file_paths[i]) + "\n";
+				}
+				else {
+					NIKEE_CORE_ERROR("Error Unsupported File Type: {}", file_paths[i]);
+					message = "Error Unsupported File Type: " + src_file_path.filename().extension().string();
+				}
+			}
+
+			//Show success popup
+			success_msg->assign(message);
+			openPopUp("Success");
+		}
+
+		event->setEventProcessed(true);
+	}
+
 	unsigned int LevelEditor::ResourcePanel::fileIcon(std::filesystem::path const& path) {
 		//Get assets icons
-		if (NIKE_ASSETS_SERVICES->getAssetType(path) == Assets::Types::Texture && NIKE_ASSETS_SERVICES->isAssetCached(path)) {
+		if (NIKE_ASSETS_SERVICE->getAssetType(path) == Assets::Types::Texture && NIKE_ASSETS_SERVICE->isAssetCached(path)) {
 
 			//Check if asset has been loaded
-			std::string icon_ref = NIKE_ASSETS_SERVICES->getIDFromPath(path.string(), false);
-			return NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)->gl_data;
+			std::string icon_ref = NIKE_ASSETS_SERVICE->getIDFromPath(path.string(), false);
+			return NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(icon_ref)->gl_data;
 		}
 		else {
 			std::string icon_ref = path.extension().string().substr(1) + "_icon.png";
-			if (auto texture = NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>(icon_ref)) {
+			if (auto texture = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(icon_ref)) {
 				return texture->gl_data;
 			}
 			else {
 				//Load default file icon
-				return NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>("def_icon.png")->gl_data;
+				return NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>("def_icon.png")->gl_data;
 			}
 		}
 	}
@@ -2297,7 +2349,7 @@ namespace NIKE {
 			ImGui::BeginGroup();
 
 			//Folder icon
-			ImTextureID icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICES->getAsset<Assets::Texture>("folder_icon.png")->gl_data);
+			ImTextureID icon = static_cast<ImTextureID>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>("folder_icon.png")->gl_data);
 
 			//Display directory icon
 			ImVec2 uv0(0.0f, 1.0f);
@@ -2383,7 +2435,7 @@ namespace NIKE {
 			if (ImGui::Button("Confirm")) {
 
 				//Get selected asset path
-				auto path = NIKE_ASSETS_SERVICES->getAssetPath(selected_asset_id);
+				auto path = NIKE_ASSETS_SERVICE->getAssetPath(selected_asset_id);
 
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
@@ -2477,6 +2529,10 @@ namespace NIKE {
 
 	void LevelEditor::ResourcePanel::init() {
 
+		//Setup events listening
+		std::shared_ptr<LevelEditor::ResourcePanel> resourcepanel_wrapped (this, [](LevelEditor::ResourcePanel*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Assets::FileDropEvent>(resourcepanel_wrapped);
+
 		//Register popups
 		error_msg = std::make_shared<std::string>("Error");
 		success_msg = std::make_shared<std::string>("Success");
@@ -2497,7 +2553,7 @@ namespace NIKE {
 		icon_size = { 128.0f, 128.0f };
 
 		//Register all engine icons
-		NIKE_ASSETS_SERVICES->scanAssetDirectory("Engine_Assets:/Icons");
+		NIKE_ASSETS_SERVICE->scanAssetDirectory("Engine_Assets:/Icons");
 
 		//Init all directories & files
 		directories = NIKE_PATH_SERVICE->listDirectories(current_path);
@@ -2552,19 +2608,19 @@ namespace NIKE {
 				//Check for directory mode
 				switch (directory_mode) {
 				case 0: {
-					NIKE_ASSETS_SERVICES->cacheAssetDirectory(current_path);
+					NIKE_ASSETS_SERVICE->cacheAssetDirectory(current_path);
 					success_msg->assign("All assets in: \"" + current_path + "\" loaded.");
 					openPopUp("Success");
 					break;
 				}
 				case 1: {
-					NIKE_ASSETS_SERVICES->cacheAssetDirectory(current_path, true);
+					NIKE_ASSETS_SERVICE->cacheAssetDirectory(current_path, true);
 					success_msg->assign("All assets in: \"" + current_path + "*\" loaded.");
 					openPopUp("Success");
 					break;
 				}
 				case 2: {
-					NIKE_ASSETS_SERVICES->cacheAssetDirectory(root_path, true);
+					NIKE_ASSETS_SERVICE->cacheAssetDirectory(root_path, true);
 					success_msg->assign("All assets in: \"" + root_path + "*\" loaded.");
 					openPopUp("Success");
 					break;
@@ -2581,19 +2637,19 @@ namespace NIKE {
 				//Check for directory mode
 				switch (directory_mode) {
 				case 0: {
-					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(current_path);
+					NIKE_ASSETS_SERVICE->uncacheAssetDirectory(current_path);
 					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
 					openPopUp("Success");
 					break;
 				}
 				case 1: {
-					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(current_path, true);
+					NIKE_ASSETS_SERVICE->uncacheAssetDirectory(current_path, true);
 					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
 					openPopUp("Success");
 					break;
 				}
 				case 2: {
-					NIKE_ASSETS_SERVICES->uncacheAssetDirectory(root_path, true);
+					NIKE_ASSETS_SERVICE->uncacheAssetDirectory(root_path, true);
 					success_msg->assign("All assets in: \"" + root_path + "*\" unloaded.");
 					openPopUp("Success");
 					break;
@@ -2661,11 +2717,11 @@ namespace NIKE {
 			ImGui::Begin("Selected Asset", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings);
 
 			//Get selected asset path
-			auto path = NIKE_ASSETS_SERVICES->getAssetPath(selected_asset_id);
+			auto path = NIKE_ASSETS_SERVICE->getAssetPath(selected_asset_id);
 
 			//Asset metadata
 			ImGui::Text("Asset: %s", selected_asset_id.c_str());
-			ImGui::Text("Type: %s", NIKE_ASSETS_SERVICES->getAssetTypeString(selected_asset_id).c_str());
+			ImGui::Text("Type: %s", NIKE_ASSETS_SERVICE->getAssetTypeString(selected_asset_id).c_str());
 
 			//Get selected asset texture display
 			ImTextureID display = static_cast<ImTextureID>(fileIcon(path));
@@ -2675,25 +2731,26 @@ namespace NIKE {
 			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::Image(display, { 256, 256 }, uv0, uv1);
 
-			//Load action
-			if (ImGui::Button("Load")) {
+			//Asset loading or unloading
+			if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
+				//Unload action
+				if (ImGui::Button("Unload")) {
 
-				//Load asset
-				NIKE_ASSETS_SERVICES->cacheAsset(selected_asset_id);
-				success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
-				openPopUp("Success");
+					//Unload asset
+					NIKE_ASSETS_SERVICE->uncacheAsset(selected_asset_id);
+					success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
+					openPopUp("Success");
+				}
 			}
+			else {
+				//Load action
+				if (ImGui::Button("Load")) {
 
-			//Same line
-			ImGui::SameLine();
-
-			//Unload action
-			if (ImGui::Button("Unload")) {
-
-				//Unload asset
-				NIKE_ASSETS_SERVICES->uncacheAsset(selected_asset_id);
-				success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
-				openPopUp("Success");
+					//Load asset
+					NIKE_ASSETS_SERVICE->cacheAsset(selected_asset_id);
+					success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
+					openPopUp("Success");
+				}
 			}
 
 			//Same line
@@ -2970,31 +3027,31 @@ namespace NIKE {
 
 		if (ImGui::Button("Save Grid"))
 		{
-			// For saving of the prefab file with the extension
-			std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+			//// For saving of the prefab file with the extension
+			//std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
 
-			std::string grid_file_name = Utility::extractFileName(curr_scene) + ".grid";
+			//std::string grid_file_name = Utility::extractFileName(curr_scene) + ".grid";
 
-			std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + grid_file_name;
+			//std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + grid_file_name;
 
-			// Serialize the grid data using the grid service
-			nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+			//// Serialize the grid data using the grid service
+			//nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
 
-			// Open the file for writing
-			std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
+			//// Open the file for writing
+			//std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
 
-			// Check if the file opened successfully
-			if (!file.is_open()) {
-				openPopUp("Error");
-			}
-			else
-			{
-				openPopUp("Success");
-			}
+			//// Check if the file opened successfully
+			//if (!file.is_open()) {
+			//	openPopUp("Error");
+			//}
+			//else
+			//{
+			//	openPopUp("Success");
+			//}
 
-			// Write the serialized grid data to the file
-			file << grid_data.dump(4);
-			file.close();
+			//// Write the serialized grid data to the file
+			//file << grid_data.dump(4);
+			//file.close();
 		}
 
 
@@ -3226,23 +3283,23 @@ namespace NIKE {
 			// If the user clicks "OK" or presses Enter, serialize the grid
 			if ((ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) && !file_name.empty()) {
 
-				// For saving of the prefab file with the extension
-				std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + file_name + ".grid";
+				//// For saving of the prefab file with the extension
+				//std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + file_name + ".grid";
 
-				// Serialize the grid data using the grid service
-				nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+				//// Serialize the grid data using the grid service
+				//nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
 
-				// Open the file for writing
-				std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
+				//// Open the file for writing
+				//std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
 
-				// Check if the file opened successfully
-				if (!file.is_open()) {
-					NIKEE_CORE_ERROR("FILE CANNOT BE OPEN");
-				}
+				//// Check if the file opened successfully
+				//if (!file.is_open()) {
+				//	NIKEE_CORE_ERROR("FILE CANNOT BE OPEN");
+				//}
 
-				// Write the serialized grid data to the file
-				file << grid_data.dump(4);
-				file.close();
+				//// Write the serialized grid data to the file
+				//file << grid_data.dump(4);
+				//file.close();
 
 				// Close the popup after saving
 				closePopUp(popup_id);

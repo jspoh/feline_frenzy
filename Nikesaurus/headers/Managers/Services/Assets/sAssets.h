@@ -31,245 +31,245 @@ namespace NIKE {
 				: count{ count }, paths{ paths } {}
 		};
 
-		class NIKE_API Service 
-			: public Events::IEventListener<FileDropEvent> 
-		{
-		private:
-			//Delete Copy Constructor & Copy Assignment
-			Service(Service const& copy) = delete;
-			void operator=(Service const& copy) = delete;
+		//class NIKE_API Service 
+		//	: public Events::IEventListener<FileDropEvent> 
+		//{
+		//private:
+		//	//Delete Copy Constructor & Copy Assignment
+		//	Service(Service const& copy) = delete;
+		//	void operator=(Service const& copy) = delete;
 
-			// On drop event
-			void onEvent(std::shared_ptr<FileDropEvent> event) override;
+		//	// On drop event
+		//	void onEvent(std::shared_ptr<FileDropEvent> event) override;
 
-			/*****************************************************************//**
-			* Font Private Members
-			*********************************************************************/
+		//	/*****************************************************************//**
+		//	* Font Private Members
+		//	*********************************************************************/
 
-			//Free type lib
-			std::unique_ptr<Assets::FontLoader> font_loader;
+		//	//Free type lib
+		//	std::unique_ptr<Assets::FontLoader> font_loader;
 
-			//Maps to fonts
-			std::unordered_map<std::string, std::shared_ptr<Assets::Font>> fonts_list;
+		//	//Maps to fonts
+		//	std::unordered_map<std::string, std::shared_ptr<Assets::Font>> fonts_list;
 
-			/*****************************************************************//**
-			* Render Private Members
-			*********************************************************************/
-			std::unique_ptr<Assets::RenderLoader> render_loader;
+		//	/*****************************************************************//**
+		//	* Render Private Members
+		//	*********************************************************************/
+		//	std::unique_ptr<Assets::RenderLoader> render_loader;
 
-			//Map to shaders for render
-			std::unordered_map<std::string, unsigned int> shaders_list;
+		//	//Map to shaders for render
+		//	std::unordered_map<std::string, unsigned int> shaders_list;
 
-			//Map to models for render
-			std::unordered_map<std::string, std::shared_ptr<Assets::Model>> models_list;
+		//	//Map to models for render
+		//	std::unordered_map<std::string, std::shared_ptr<Assets::Model>> models_list;
 
-			// Map to textures for render
-			std::unordered_map<std::string, std::shared_ptr<Assets::Texture>> textures_list;
+		//	// Map to textures for render
+		//	std::unordered_map<std::string, std::shared_ptr<Assets::Texture>> textures_list;
 
-			/*****************************************************************//**
-			* Audio Private Members
-			*********************************************************************/
+		//	/*****************************************************************//**
+		//	* Audio Private Members
+		//	*********************************************************************/
 
-			//Fmod System
-			std::shared_ptr<Audio::IAudioSystem> audio_system;
+		//	//Fmod System
+		//	std::shared_ptr<Audio::IAudioSystem> audio_system;
 
-			//Map of audios split into sfx and music
-			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> sfx_list;
-			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> music_list;
+		//	//Map of audios split into sfx and music
+		//	std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> sfx_list;
+		//	std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> music_list;
 
-			/*****************************************************************//**
-			* File Paths for specific asset types
-			*********************************************************************/
-			std::string texture_path = "assets\\Textures\\";
-			std::string sfx_path = "assets\\Audios\\SFX";
-			std::string music_path = "assets\\Audios\\Music";
-			std::string font_path = "assets\\Fonts\\";
-			std::string models_path = "assets\\Models\\";
-			std::string scenes_path = "assets\\Scenes\\";
-			std::string shaders_path = "assets\\Shaders\\";
-			std::string prefabs_path = "assets\\Prefabs\\";
-			std::string scripts_path = "assets\\Scripts\\";
-			std::string grid_path = "assets\\Grids\\";
+		//	/*****************************************************************//**
+		//	* File Paths for specific asset types
+		//	*********************************************************************/
+		//	std::string texture_path = "assets\\Textures\\";
+		//	std::string sfx_path = "assets\\Audios\\SFX";
+		//	std::string music_path = "assets\\Audios\\Music";
+		//	std::string font_path = "assets\\Fonts\\";
+		//	std::string models_path = "assets\\Models\\";
+		//	std::string scenes_path = "assets\\Scenes\\";
+		//	std::string shaders_path = "assets\\Shaders\\";
+		//	std::string prefabs_path = "assets\\Prefabs\\";
+		//	std::string scripts_path = "assets\\Scripts\\";
+		//	std::string grid_path = "assets\\Grids\\";
 
-			/*****************************************************************//**
-			* Scn (Levels) private members
-			*********************************************************************/
-			std::unordered_map<std::string, std::filesystem::path> levels_list;
+		//	/*****************************************************************//**
+		//	* Scn (Levels) private members
+		//	*********************************************************************/
+		//	std::unordered_map<std::string, std::filesystem::path> levels_list;
 
-			/*****************************************************************//**
-			* Prefabs private members
-			*********************************************************************/
-			std::unordered_map<std::string, std::filesystem::path> prefabs_list;
+		//	/*****************************************************************//**
+		//	* Prefabs private members
+		//	*********************************************************************/
+		//	std::unordered_map<std::string, std::filesystem::path> prefabs_list;
 
-			/*****************************************************************//**
-			* Scripts private members
-			*********************************************************************/
-			//std::unordered_map<std::string, std::filesystem::path> scripts_list;
+		//	/*****************************************************************//**
+		//	* Scripts private members
+		//	*********************************************************************/
+		//	//std::unordered_map<std::string, std::filesystem::path> scripts_list;
 
-		public:
+		//public:
 
-			//Default constructor
-			Service() = default;
+		//	//Default constructor
+		//	Service() = default;
 
-			// Dtor
-			~Service();
+		//	// Dtor
+		//	~Service();
 
-			//Configure Assets Manager
-			void configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+		//	//Configure Assets Manager
+		//	void configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
-			/*****************************************************************//**
-			* Font
-			*********************************************************************/
-			//Register font
-			void loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+		//	/*****************************************************************//**
+		//	* Font
+		//	*********************************************************************/
+		//	//Register font
+		//	void loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
-			//Reload font
-			void reloadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+		//	//Reload font
+		//	void reloadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
 
-			//Unload font
-			void unloadFont(std::string const& fond_id);
+		//	//Unload font
+		//	void unloadFont(std::string const& fond_id);
 
-			//Unload all fonts
-			void unloadAllFonts();
+		//	//Unload all fonts
+		//	void unloadAllFonts();
 
-			//Get font
-			std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
+		//	//Get font
+		//	std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
 
-			//Get loaded fonts
-			const std::unordered_map<std::string, std::shared_ptr<Assets::Font>>& getLoadedFonts() const;
+		//	//Get loaded fonts
+		//	const std::unordered_map<std::string, std::shared_ptr<Assets::Font>>& getLoadedFonts() const;
 
-			// Checker
-			bool checkFontExist(std::string const& font_id);
+		//	// Checker
+		//	bool checkFontExist(std::string const& font_id);
 
-			/*****************************************************************//**
-			* Render ( Texture, Model, Shaders )
-			*********************************************************************/
-			//Load model
-			void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
+		//	/*****************************************************************//**
+		//	* Render ( Texture, Model, Shaders )
+		//	*********************************************************************/
+		//	//Load model
+		//	void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
 
-			//Reload model
-			void reloadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
+		//	//Reload model
+		//	void reloadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
 
-			//Unload model
-			void unloadModel(std::string const& model_id);
+		//	//Unload model
+		//	void unloadModel(std::string const& model_id);
 
-			//Unload all models
-			void unloadAllModels();
+		//	//Unload all models
+		//	void unloadAllModels();
 
-			//Get model
-			std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
+		//	//Get model
+		//	std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
 
-			//Get models
-			const std::unordered_map<std::string, std::shared_ptr<Assets::Model>>& getLoadedModels();
+		//	//Get models
+		//	const std::unordered_map<std::string, std::shared_ptr<Assets::Model>>& getLoadedModels();
 
-			// Check model
-			bool checkModelExist(std::string const& model_id);
+		//	// Check model
+		//	bool checkModelExist(std::string const& model_id);
 
-			//Load texture
-			void loadTexture(std::string const& texture_id, std::string const& file_path);
+		//	//Load texture
+		//	void loadTexture(std::string const& texture_id, std::string const& file_path);
 
-			//Reload texture
-			void reloadTexture(std::string const& texture_id, std::string const& file_path);
+		//	//Reload texture
+		//	void reloadTexture(std::string const& texture_id, std::string const& file_path);
 
-			// Unload texture
-			void unloadTexture(std::string const& texture_id);
+		//	// Unload texture
+		//	void unloadTexture(std::string const& texture_id);
 
-			// Unload all textures
-			void unloadAllTextures();
+		//	// Unload all textures
+		//	void unloadAllTextures();
 
-			//Get texture
-			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
+		//	//Get texture
+		//	std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
 
-			//Check if texture exist
-			bool checkTextureExist(std::string const& texture_id);
+		//	//Check if texture exist
+		//	bool checkTextureExist(std::string const& texture_id);
 
-			//Check if texture loaded
-			const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
+		//	//Check if texture loaded
+		//	const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
 
-			//Handle drop for textures
-			void handleTextureDrop(const std::filesystem::path& src_file_path);
+		//	//Handle drop for textures
+		//	void handleTextureDrop(const std::filesystem::path& src_file_path);
 
-			/*****************************************************************//**
-			* Audio
-			*********************************************************************/
-			// Load audio
-			void loadSfx(std::string const& audio_id, std::string const& file_path);
-			void loadMusic(std::string const& audio_id, std::string const& file_path);
+		//	/*****************************************************************//**
+		//	* Audio
+		//	*********************************************************************/
+		//	// Load audio
+		//	void loadSfx(std::string const& audio_id, std::string const& file_path);
+		//	void loadMusic(std::string const& audio_id, std::string const& file_path);
 
-			// Reload audio
-			void reloadSfx(std::string const& audio_id, std::string const& file_path);
-			void reloadMusic(std::string const& audio_id, std::string const& file_path);
+		//	// Reload audio
+		//	void reloadSfx(std::string const& audio_id, std::string const& file_path);
+		//	void reloadMusic(std::string const& audio_id, std::string const& file_path);
 
-			//Unload specific audio
-			void unloadSfx(const std::string& audio_id);
-			void unloadMusic(const std::string& audio_id);
+		//	//Unload specific audio
+		//	void unloadSfx(const std::string& audio_id);
+		//	void unloadMusic(const std::string& audio_id);
 
-			//Unload all audios
-			void unloadAllAudios();
+		//	//Unload all audios
+		//	void unloadAllAudios();
 
-			//Get audio
-			std::shared_ptr<Audio::IAudio> getSfx(std::string const& audio_tag);
-			std::shared_ptr<Audio::IAudio> getMusic(std::string const& audio_tag);
+		//	//Get audio
+		//	std::shared_ptr<Audio::IAudio> getSfx(std::string const& audio_tag);
+		//	std::shared_ptr<Audio::IAudio> getMusic(std::string const& audio_tag);
 
-			//Get audios
-			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedSfx();
-			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedMusic();
+		//	//Get audios
+		//	const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedSfx();
+		//	const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedMusic();
 
-			//Check if audio exits
-			bool checkSfxExist(std::string const& audio_tag);
-			bool checkMusicExist(std::string const& audio_tag);
+		//	//Check if audio exits
+		//	bool checkSfxExist(std::string const& audio_tag);
+		//	bool checkMusicExist(std::string const& audio_tag);
 
-			//Handle drop for textures
-			void handleAudioDrop(const std::filesystem::path& src_file_path);
+		//	//Handle drop for textures
+		//	void handleAudioDrop(const std::filesystem::path& src_file_path);
 
-			/*****************************************************************//**
-			* Scn File path
-			*********************************************************************/
-			void loadScn(const std::filesystem::directory_entry& entry);
-			void loadScnFiles();
-			bool checkScnFileExist(const std::string& entry);
-			void reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path);
-			std::unordered_map<std::string, std::filesystem::path>& getLevelsList();
+		//	/*****************************************************************//**
+		//	* Scn File path
+		//	*********************************************************************/
+		//	void loadScn(const std::filesystem::directory_entry& entry);
+		//	void loadScnFiles();
+		//	bool checkScnFileExist(const std::string& entry);
+		//	void reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path);
+		//	std::unordered_map<std::string, std::filesystem::path>& getLevelsList();
 
-			/*****************************************************************//**
-			* Prefab File path
-			*********************************************************************/
-			void loadPrefab(const std::filesystem::directory_entry& entry);
-			void loadPrefabFiles();
-			bool checkPrefabFileExist(const std::string& entry);
-			void reloadPrefab(std::string const&, std::filesystem::path const&);
-			std::unordered_map<std::string, std::filesystem::path>& getLoadedPrefabs();
+		//	/*****************************************************************//**
+		//	* Prefab File path
+		//	*********************************************************************/
+		//	void loadPrefab(const std::filesystem::directory_entry& entry);
+		//	void loadPrefabFiles();
+		//	bool checkPrefabFileExist(const std::string& entry);
+		//	void reloadPrefab(std::string const&, std::filesystem::path const&);
+		//	std::unordered_map<std::string, std::filesystem::path>& getLoadedPrefabs();
 
-			/*****************************************************************//**
-			* Script File path
-			*********************************************************************/
-			//void loadScript(const std::filesystem::directory_entry& entry);
-			//void loadScriptFiles();
-			//bool checkScriptFileExist(const std::string& entry);
-			//void reloadScript(std::string const&, std::filesystem::path const&);
-			//std::unordered_map<std::string, std::filesystem::path>& getLoadedScripts();
+		//	/*****************************************************************//**
+		//	* Script File path
+		//	*********************************************************************/
+		//	//void loadScript(const std::filesystem::directory_entry& entry);
+		//	//void loadScriptFiles();
+		//	//bool checkScriptFileExist(const std::string& entry);
+		//	//void reloadScript(std::string const&, std::filesystem::path const&);
+		//	//std::unordered_map<std::string, std::filesystem::path>& getLoadedScripts();
 
-			/*****************************************************************//**
-			* File path gettors
-			*********************************************************************/
-			std::string const& getTexturePath(); 
-			std::string const& getSfxPath(); 
-			std::string const& getMusicPath();
-			std::string const& getFontPath(); 
-			std::string const& getModelsPath(); 
-			std::string const& getScenesPath(); 
-			std::string const& getShadersPath(); 
-			std::string const& getPrefabsPath();
-			std::string const& getScriptsPath();
-			std::string const& getGridsPath();
+		//	/*****************************************************************//**
+		//	* File path gettors
+		//	*********************************************************************/
+		//	std::string const& getTexturePath(); 
+		//	std::string const& getSfxPath(); 
+		//	std::string const& getMusicPath();
+		//	std::string const& getFontPath(); 
+		//	std::string const& getModelsPath(); 
+		//	std::string const& getScenesPath(); 
+		//	std::string const& getShadersPath(); 
+		//	std::string const& getPrefabsPath();
+		//	std::string const& getScriptsPath();
+		//	std::string const& getGridsPath();
 
-			/*****************************************************************//**
-			* Reload of specific asset types
-			*********************************************************************/
-			void reloadAssets(const std::string& asset_type);
-			bool deleteFile(std::string const& file_path, const std::string& asset_type);
-			bool deleteAllFiles(std::string const& file_path);
-		};
+		//	/*****************************************************************//**
+		//	* Reload of specific asset types
+		//	*********************************************************************/
+		//	void reloadAssets(const std::string& asset_type);
+		//	bool deleteFile(std::string const& file_path, const std::string& asset_type);
+		//	bool deleteAllFiles(std::string const& file_path);
+		//};
 
 		enum class Types {
 			None = 0,
@@ -278,9 +278,13 @@ namespace NIKE {
 			Font,
 			Music,
 			Sound,
+			Scene,
+			Prefab,
+			Grid,
+			Script
 		};
 
-		class NIKE_API Services {
+		class NIKE_API Service {
 		private:
 
 			//Assset meta data
@@ -298,7 +302,7 @@ namespace NIKE {
 			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
 
 			//List of invalid extension
-			std::set<std::string> invalid_extensions;
+			std::set<std::string> valid_extensions;
 
 			//Asset registry of meta data
 			std::unordered_map<std::string, MetaData> asset_registry;
@@ -323,14 +327,14 @@ namespace NIKE {
 		public:
 
 			//Default constructor and destructor
-			Services() = default;
-			~Services() = default;
+			Service() = default;
+			~Service() = default;
 
 			//Initialization
 			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
 			//Register asset
-			std::string registerAsset(Types asset_type, std::string const& virtual_path);
+			std::string registerAsset(Types asset_type, std::string const& path, bool b_virtual = true);
 
 			//Register loader
 			void registerLoader(Types asset_type, LoaderFunc loader);
@@ -397,10 +401,13 @@ namespace NIKE {
 			bool isAssetCached(std::filesystem::path const& path) const;
 	
 			//Add invalid extension
-			void addInvalidExtensions(std::string const& ext);
+			void addValidExtensions(std::string const& ext);
 
 			//Check for valid path
 			bool isPathValid(std::string const& path, bool b_virtual = true) const;
+
+			//Check for registration
+			bool isAssetRegistered(std::string const& asset_id) const;
 
 			//Get ref from path
 			std::string getIDFromPath(std::string const& path, bool b_virtual = true) const;

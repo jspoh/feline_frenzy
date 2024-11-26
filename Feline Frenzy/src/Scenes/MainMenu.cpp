@@ -10,11 +10,7 @@
 #include "Scenes/MainMenu.h"
 
 void Menu::Scene::load() {
-	NIKE_ASSETS_SERVICE->reloadAssets("Textures");
-	NIKE_ASSETS_SERVICE->reloadAssets("Shaders");
-	NIKE_ASSETS_SERVICE->reloadAssets("Audio");
-	NIKE_ASSETS_SERVICE->reloadAssets("Models");
-	NIKE_ASSETS_SERVICE->reloadAssets("Fonts");
+
 }
 
 void Menu::Scene::init() {

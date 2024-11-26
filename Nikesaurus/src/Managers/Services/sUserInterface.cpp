@@ -120,7 +120,7 @@ namespace NIKE {
 			auto const& e_shape = e_shape_comp.value().get();
 
 			auto getVertices = [e_shape]() {
-				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
+				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(e_shape.model_id)->vertices;
 
 				std::vector<Vector2f> vert;
 				for (const Assets::Vertex& v : vertices) {
@@ -143,7 +143,7 @@ namespace NIKE {
 		}
 		else {
 			auto getVertices = []() {
-				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
+				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model")->vertices;
 
 				std::vector<Vector2f> vert;
 				for (const Assets::Vertex& v : vertices) {

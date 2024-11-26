@@ -81,7 +81,7 @@ namespace NIKE {
 		//Provide ecs coordinator service for internal engine usage
 		provideService(std::make_shared<Coordinator::Manager>());
 
-		//Provide Services
+		//Provide Service
 		provideService(std::make_shared<Windows::Service>());
 		provideService(std::make_shared<Scenes::Service>());
 		provideService(std::make_shared<Events::Service>());
@@ -90,14 +90,12 @@ namespace NIKE {
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
-		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
 		provideService(std::make_shared<LevelEditor::Service>());
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
-		provideService(std::make_shared<Assets::Services>());
 
 		//Create console
 #ifndef NDEBUG
@@ -146,9 +144,6 @@ namespace NIKE {
 		//Add event listeners for mouse scroll event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
-
-		//Add event listeners for drop files event
-		NIKE_EVENTS_SERVICE->addEventListeners<Assets::FileDropEvent>(NIKE_LVLEDITOR_SERVICE);
 		
 		//Init paths
 		NIKE_PATH_SERVICE->init(json_config);
@@ -156,11 +151,8 @@ namespace NIKE {
 		//Setup Audio
 		NIKE_AUDIO_SERVICE->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
 
-		//Setup assets loading with systems for loading
-		NIKE_ASSETS_SERVICE->configAssets(getService<Audio::Service>()->getAudioSystem());
-
 		//Initialize assets service
-		NIKE_ASSETS_SERVICES->init(NIKE_AUDIO_SERVICE->getAudioSystem());
+		NIKE_ASSETS_SERVICE->init(NIKE_AUDIO_SERVICE->getAudioSystem());
 
 		//Init camera
 		NIKE_CAMERA_SERVICE->init(json_config);
@@ -228,9 +220,6 @@ namespace NIKE {
 
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
-
-			////ImGui Render & Update
-			//NIKE_IMGUI_SERVICE->update();
 
 			//Update Level Editor
 			NIKE_LVLEDITOR_SERVICE->update();
