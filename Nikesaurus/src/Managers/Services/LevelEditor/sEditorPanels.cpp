@@ -3432,6 +3432,24 @@ namespace NIKE {
 	void LevelEditor::GameWindowPanel::renderAcceptPayload() {
 		if (ImGui::BeginDragDropTarget()) {
 
+			//Calculate render position
+			Vector2f render_pos;
+			if (tile_map_panel.lock()->checkGridSnapping()) {
+				//Get snapped to cell position
+				auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(Vector2f(world_mouse_pos.x, -world_mouse_pos.y));
+				if (cursor_cell.has_value()) {
+
+					//Snap to cell
+					render_pos = cursor_cell.value().get().position;
+				}
+				else {
+					render_pos = { world_mouse_pos.x, -world_mouse_pos.y };
+				}
+			}
+			else {
+				render_pos = { world_mouse_pos.x, -world_mouse_pos.y };
+			}
+
 			//Texture file payload
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
 				//Get asset ID
@@ -3444,7 +3462,7 @@ namespace NIKE {
 				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
 
 				//Add transform
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), Vector2f((float)texture->size.x, (float)texture->size.y), 0.0f));
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, Vector2f((float)texture->size.x, (float)texture->size.y), 0.0f));
 
 				//Add texture
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture(asset_id, { 0.0f, 0.0f, 0.0f, 1.0f }));
@@ -3468,7 +3486,7 @@ namespace NIKE {
 				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
 
 				//Add transform
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), size, 0.0f));
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, size, 0.0f));
 
 				//Add model
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape(asset_id, color));
