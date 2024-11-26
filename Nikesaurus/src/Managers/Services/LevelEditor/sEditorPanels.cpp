@@ -3128,4 +3128,159 @@ namespace NIKE {
 
 		ImGui::End();
 	}
+
+	/*****************************************************************//**
+	* Layer Management Window Panel
+	*********************************************************************/
+
+	void LevelEditor::LayerManagementPanel::setPopUpErrorMsg(std::string const& msg)
+	{
+		err_msg->assign(msg);
+	}
+
+	void LevelEditor::LayerManagementPanel::updateLayerNames() {
+		layer_names.clear();
+		for (const auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			layer_names.push_back("Layer " + std::to_string(layer->getLayerID()));
+		}
+	}
+
+	std::function<void()> LevelEditor::LayerManagementPanel::errLayerPopup(std::string const& popup_id, std::shared_ptr<std::string> msg)
+	{
+		return [this, popup_id, msg]() {
+			//Show error message
+			ImGui::Text("%s", msg->c_str());
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//OK button to close the popup
+			if (ImGui::Button("OK")) {
+				closePopUp(popup_id);
+			}
+		};
+	}
+
+	void LevelEditor::LayerManagementPanel::init()
+	{
+		err_msg = std::make_shared<std::string>("Layer Fault");
+		registerPopUp("Error", errLayerPopup("Error", err_msg));
+	}
+
+	void LevelEditor::LayerManagementPanel::update()
+	{
+		// Empty for now, nothing to update
+	}
+
+	void LevelEditor::LayerManagementPanel::render()
+	{
+		ImGui::Begin(getName().c_str());
+
+		// Get total layer count
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
+
+		// Get layers
+		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+
+		// Update the layer names when layers change
+		if (layer_count != layer_names.size()) {
+			updateLayerNames();
+		}
+
+		// Display layer count
+		ImGui::Text("Total Layers: %u", layer_count);
+
+		// Layer selection dropdown
+		if (!layers.empty()) {
+			if (ImGui::BeginCombo("Select Layer",
+				(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
+				for (unsigned int i = 0; i < layers.size(); ++i) {
+					const bool is_selected = (selected_layer_index == i);
+					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
+						selected_layer_index = i;
+						bit_position = 0;
+						edit_mask_id = static_cast<unsigned int>(layers[selected_layer_index]->getLayerMask().to_ulong());
+					}
+					if (is_selected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+		}
+		else {
+			ImGui::Text("No layers available.");
+		}
+
+		// Show layer editing options
+		if (selected_layer_index < layers.size()) {
+			ImGui::Text("Edit Selected Layer");
+
+			// Create layer button
+			if (ImGui::Button("Create Layer")) {
+				if (layer_count < 64) {
+					NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
+					selected_layer_index = layer_count;
+					updateLayerNames();
+				}
+				else {
+					setPopUpErrorMsg("Unable to create layer");
+					openPopUp("Error");
+				}
+			}
+
+			ImGui::SameLine();
+
+			// Remove layer button
+			if (ImGui::Button("Remove Layer")) {
+				if (layer_count > 1) {
+					unsigned int layer_id = layers[selected_layer_index]->getLayerID();
+					NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(layer_id);
+					selected_layer_index = 0;
+					bit_position = 0;
+					updateLayerNames();
+				}
+				else {
+					setPopUpErrorMsg("Unable to remove layer");
+					openPopUp("Error");
+				}
+			}
+
+			ImGui::Separator();
+
+			// Layer mask editing
+			if (layers.size() > 1) {
+				if (ImGui::BeginCombo("Select Mask Layer", layer_names[bit_position].c_str())) {
+					for (unsigned int i = 0; i < layers.size(); ++i) {
+						if (i == selected_layer_index) continue;
+
+						const bool mask_selected = (bit_position == i);
+						if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
+							bit_position = i;
+						}
+						if (mask_selected) ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				// Set bit state checkbox
+				bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
+				if (ImGui::Checkbox("Set Bit State", &bit_state)) {
+					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
+				}
+			}
+			else {
+				ImGui::Text("No layers available.");
+			}
+		}
+		else {
+			ImGui::Text("Select a layer to edit or remove.");
+		}
+		
+
+		//Render popups
+		renderPopUps();
+
+		ImGui::End();
+	}
 }
+
+

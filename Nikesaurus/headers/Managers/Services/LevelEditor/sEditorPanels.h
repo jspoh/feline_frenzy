@@ -664,6 +664,58 @@ namespace NIKE {
 			//Render
 			void render() override;
 		};
+
+		//Layer Management panel
+		class LayerManagementPanel : public IPanel {
+		private:
+			
+			// For storing editing layer mask id
+			unsigned int edit_mask_id;
+
+			bool bit_state = false;
+
+			// For storing selected layer index
+			unsigned int selected_layer_index;
+
+			// For storing bit_position
+			unsigned int bit_position;
+
+			// For error layering management
+			std::shared_ptr<std::string> err_msg;
+
+			// To store layer names
+			std::vector<std::string> layer_names;
+
+		public:
+			LayerManagementPanel() = default;
+			~LayerManagementPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Layer Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Layer Management";
+			}
+
+			//Set error message for popup
+			void setPopUpErrorMsg(std::string const& msg);
+
+			void updateLayerNames();
+
+			std::function<void()> errLayerPopup(std::string const& popup_id, std::shared_ptr<std::string> msg);
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
 	}
 }
 
