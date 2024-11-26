@@ -238,71 +238,75 @@ namespace NIKE {
 				ImGui::Spacing();
 
 				//Set Text input
+				if (!comp.font_id.empty())
 				{
-					//Set Text input
-					ImGui::Text("Enter Text:");
-					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
-						text_input.resize(strlen(text_input.c_str()));
-					}
+					{
+						//Set Text input
+						ImGui::Text("Enter Text:");
+						if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
+							text_input.resize(strlen(text_input.c_str()));
+						}
 
-					ImGui::SameLine();
+						ImGui::SameLine();
 
-					//Save text input Button
-					if (ImGui::Button("Save##TextInput")) {
-						LevelEditor::Action save_text;
-
-						//Save texrt action
-						save_text.do_action = [&, text = text_input]() {
-							comp.text = text;
-							text_input = comp.text;
-							};
-
-						//Undo save text action
-						save_text.undo_action = [&, text = comp.text]() {
-							comp.text = text;
-							text_input = comp.text;
-							};
-
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
-						comp_panel.setPopUpSuccessMsg("Text Saved successfully");
-						comp_panel.openPopUp("Success");
-					}
-				}
-
-				ImGui::Spacing();
-
-				// For Text Origin
-				{
-					ImGui::Text("Adjust text origin:");
-					static const char* origin_names[] = { "CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT" };
-					// Hold the current selection and the previous value
-					static NIKE::Render::TextOrigin before_select_origin;
-					static int previous_origin = static_cast<int>(comp.origin);
-					int current_origin = static_cast<int>(comp.origin);
-					// Combo returns one bool check
-					if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
-						NIKE::Render::TextOrigin new_origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
-						if (new_origin != comp.origin) {
-							// Save action
+						//Save text input Button
+						if (ImGui::Button("Save##TextInput")) {
 							LevelEditor::Action save_text;
-							save_text.do_action = [&, origin = new_origin]() {
-								comp.origin = origin;
+
+							//Save texrt action
+							save_text.do_action = [&, text = text_input]() {
+								comp.text = text;
+								text_input = comp.text;
 								};
 
-							// Undo action
-							save_text.undo_action = [&, origin = before_select_origin]() {
-								comp.origin = origin;
+							//Undo save text action
+							save_text.undo_action = [&, text = comp.text]() {
+								comp.text = text;
+								text_input = comp.text;
 								};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+							comp_panel.setPopUpSuccessMsg("Text Saved successfully");
+							comp_panel.openPopUp("Success");
+						}
+					}
 
-							// Update the previous value
-							before_select_origin = comp.origin;
-							// Apply the new origin
-							comp.origin = new_origin;
+					ImGui::Spacing();
+
+					// For Text Origin
+					{
+						ImGui::Text("Adjust text origin:");
+						static const char* origin_names[] = { "CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT" };
+						// Hold the current selection and the previous value
+						static NIKE::Render::TextOrigin before_select_origin;
+						static int previous_origin = static_cast<int>(comp.origin);
+						int current_origin = static_cast<int>(comp.origin);
+						// Combo returns one bool check
+						if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
+							NIKE::Render::TextOrigin new_origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
+							if (new_origin != comp.origin) {
+								// Save action
+								LevelEditor::Action save_text;
+								save_text.do_action = [&, origin = new_origin]() {
+									comp.origin = origin;
+									};
+
+								// Undo action
+								save_text.undo_action = [&, origin = before_select_origin]() {
+									comp.origin = origin;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+
+								// Update the previous value
+								before_select_origin = comp.origin;
+								// Apply the new origin
+								comp.origin = new_origin;
+							}
 						}
 					}
 				}
+				
 			}
 		);
 

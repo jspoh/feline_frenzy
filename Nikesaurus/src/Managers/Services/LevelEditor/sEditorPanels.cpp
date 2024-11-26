@@ -1472,7 +1472,7 @@ namespace NIKE {
 					//add_comp.do_action = [=]() {
 
 						//Add default comp to entity
-						NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
+					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
 					//	};
 
 					//Execute add component action
@@ -1649,7 +1649,7 @@ namespace NIKE {
 
 				//Do Action
 				//remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
-					NIKE_ECS_MANAGER->removeEntityComponent(entity_copy, comp_type_copy);
+				NIKE_ECS_MANAGER->removeEntityComponent(entity_copy, comp_type_copy);
 				//	};
 
 				//Undo Action
@@ -1673,7 +1673,7 @@ namespace NIKE {
 				//Close popup
 				closePopUp(popup_id);
 			}
-		};
+			};
 	}
 
 	void LevelEditor::ComponentsPanel::init() {
@@ -3158,7 +3158,7 @@ namespace NIKE {
 			if (ImGui::Button("OK")) {
 				closePopUp(popup_id);
 			}
-		};
+			};
 	}
 
 	void LevelEditor::LayerManagementPanel::init()
@@ -3197,9 +3197,33 @@ namespace NIKE {
 				for (unsigned int i = 0; i < layers.size(); ++i) {
 					const bool is_selected = (selected_layer_index == i);
 					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
-						selected_layer_index = i;
-						bit_position = 0;
-						edit_mask_id = static_cast<unsigned int>(layers[selected_layer_index]->getLayerMask().to_ulong());
+
+						Action select_layer_action;
+
+						// Capture the previous and new layer indices
+						unsigned int prev_layer_index = selected_layer_index;
+						unsigned int new_layer_index = i;
+
+						// Do action
+						select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
+							selected_layer_index = new_layer_index;
+							// Reset bit position
+							bit_position = 0;
+							edit_mask_id = static_cast<unsigned int>(
+								layers[selected_layer_index]->getLayerMask().to_ulong());
+							};
+
+						// Undo action
+						select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
+							selected_layer_index = prev_layer_index;
+							// Reset bit position
+							bit_position = 0;
+							edit_mask_id = static_cast<unsigned int>(
+								layers[selected_layer_index]->getLayerMask().to_ulong());
+							};
+
+						// Execute the action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
 					}
 					if (is_selected) ImGui::SetItemDefaultFocus();
 				}
@@ -3210,6 +3234,7 @@ namespace NIKE {
 			ImGui::Text("No layers available.");
 		}
 
+
 		// Show layer editing options
 		if (selected_layer_index < layers.size()) {
 			ImGui::Text("Edit Selected Layer");
@@ -3217,9 +3242,27 @@ namespace NIKE {
 			// Create layer button
 			if (ImGui::Button("Create Layer")) {
 				if (layer_count < 64) {
-					NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
-					selected_layer_index = layer_count;
-					updateLayerNames();
+					Action create_layer_action;
+
+					// Capture the state before adding the new layer
+					unsigned int previous_layer_count = static_cast<unsigned int>(layers.size());
+
+					// Do action
+					create_layer_action.do_action = [&, previous_layer_count]() {
+						NIKE_SCENES_SERVICE->getCurrScene()->createLayer(previous_layer_count);
+						updateLayerNames();
+						};
+
+					// Undo action
+					create_layer_action.undo_action = [&, previous_layer_count]() {
+						if (!layers.empty()) {
+							NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(previous_layer_count);
+							updateLayerNames();
+						}
+						};
+
+					// Execute the action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create_layer_action));
 				}
 				else {
 					setPopUpErrorMsg("Unable to create layer");
@@ -3232,11 +3275,28 @@ namespace NIKE {
 			// Remove layer button
 			if (ImGui::Button("Remove Layer")) {
 				if (layer_count > 1) {
-					unsigned int layer_id = layers[selected_layer_index]->getLayerID();
-					NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(layer_id);
-					selected_layer_index = 0;
-					bit_position = 0;
-					updateLayerNames();
+					Action remove_layer_action;
+
+					// Capture state before removing layer
+					auto& removed_layer = layers[selected_layer_index];
+					unsigned int removed_layer_id = removed_layer->getLayerID();
+
+					// Do action
+					remove_layer_action.do_action = [&, removed_layer_id]() {
+						NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(removed_layer_id);
+						// Adjusts selected_layer_index to the last valid index
+						selected_layer_index = min(selected_layer_index, static_cast<unsigned int>(layers.size() - 1));
+						updateLayerNames();
+						};
+
+					// Undo action
+					remove_layer_action.undo_action = [&, removed_layer_id]() {
+						NIKE_SCENES_SERVICE->getCurrScene()->createLayer(removed_layer_id);
+						updateLayerNames();
+					};
+
+					// Execute the action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_layer_action));
 				}
 				else {
 					setPopUpErrorMsg("Unable to remove layer");
@@ -3245,6 +3305,9 @@ namespace NIKE {
 			}
 
 			ImGui::Separator();
+
+			// Warning msg
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Select Mask Layer action cannot be undone!");
 
 			// Layer mask editing
 			if (layers.size() > 1) {
@@ -3261,8 +3324,8 @@ namespace NIKE {
 					ImGui::EndCombo();
 				}
 
-				// Set bit state checkbox
 				bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Select Bit State action cannot be undone!");
 				if (ImGui::Checkbox("Set Bit State", &bit_state)) {
 					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
 				}
@@ -3274,7 +3337,7 @@ namespace NIKE {
 		else {
 			ImGui::Text("Select a layer to edit or remove.");
 		}
-		
+
 
 		//Render popups
 		renderPopUps();
@@ -3282,5 +3345,6 @@ namespace NIKE {
 		ImGui::End();
 	}
 }
+
 
 
