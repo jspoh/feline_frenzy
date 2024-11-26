@@ -71,6 +71,12 @@ namespace NIKE {
 	}
 
 	void Coordinator::Manager::markEntityForDeletion(Entity::Type entity) {
+		// Checking if entity is valid
+		if (!checkEntity(entity)) {
+			NIKEE_CORE_WARN("Attempted to mark invalid entity {} for deletion.", entity);
+			return;
+		}
+
 		if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) == entities_to_destroy.end()) {
 			entities_to_destroy.push_back(entity);
 		}

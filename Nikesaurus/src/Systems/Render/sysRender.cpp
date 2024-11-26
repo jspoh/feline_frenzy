@@ -519,8 +519,8 @@ namespace NIKE {
 			for (auto& entity : entities) {
 
 				// Skip entities marked for deletion
-				if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
-					continue;
+				//if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
+				//	continue;
 
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;

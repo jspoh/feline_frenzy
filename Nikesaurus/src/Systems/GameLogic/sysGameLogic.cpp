@@ -58,8 +58,8 @@ namespace NIKE {
 			for (auto& entity : entities) {
 				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 					// Skip entities marked for deletion
-					if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
-						continue;
+					//if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
+					//	continue;
 
 					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 						continue;
@@ -91,7 +91,7 @@ namespace NIKE {
 							// TODO: Add cooldown check HERE
 							std::string script_path = "assets/Scripts/createBullet.lua";
 							std::string function_name = "createBullet";
-							std::string prefab_path = "damageBullet.prefab";
+							std::string prefab_path = "destroyBullet.prefab";
 							int layer_id = 0; // Placeholder
 
 							// Load Lua Script

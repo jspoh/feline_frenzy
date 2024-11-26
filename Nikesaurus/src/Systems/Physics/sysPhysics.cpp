@@ -47,10 +47,10 @@ namespace NIKE {
                 for (auto& entity : entities) {
 
                     // Skip entities marked for deletion
-                    if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end()) {
-                        NIKEE_CORE_INFO("Skipping entity {} marked for deletion", entity);
-                        continue;
-                    }
+                    //if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end()) {
+                    //    NIKEE_CORE_INFO("Skipping entity {} marked for deletion", entity);
+                    //    continue;
+                    //}
 
                     try {
                         if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
@@ -174,63 +174,69 @@ namespace NIKE {
                         for (auto& colliding_entity : entities) {
 
                             //Skip entities colliding entites that are not in the layer mask
-                            if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
-                                entity == colliding_entity)
-                                continue;
+                            try {
+                                if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
+                                    entity == colliding_entity)
+                                    continue;
 
-                            //Get colliding entity's transform
-                            auto other_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
-                            if (!other_transform_comp.has_value()) continue;
-                            auto& other_transform = other_transform_comp.value().get();
+                                //Get colliding entity's transform
+                                auto other_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
+                                if (!other_transform_comp.has_value()) continue;
+                                auto& other_transform = other_transform_comp.value().get();
 
-                            //Get colliding entity's collider
-                            auto other_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
-                            if (!other_collider_comp.has_value()) continue;
-                            auto& other_collider = other_collider_comp.value().get();
+                                //Get colliding entity's collider
+                                auto other_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
+                                if (!other_collider_comp.has_value()) continue;
+                                auto& other_collider = other_collider_comp.value().get();
 
-                            //Get colliding entity's dynamics
-                            auto other_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
-                            auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
+                                //Get colliding entity's dynamics
+                                auto other_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
+                                auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
 
-                            // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
-                            std::string e_model_id;
-                            std::string other_model_id;
-                            auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-                            if (e_shape_comp.has_value()) {
-                                e_model_id = e_shape_comp.value().get().model_id;
+                                // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
+                                std::string e_model_id;
+                                std::string other_model_id;
+                                auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+                                if (e_shape_comp.has_value()) {
+                                    e_model_id = e_shape_comp.value().get().model_id;
+                                }
+                                else {
+                                    e_model_id = "square"; // Default to square for SAT
+                                }
+                                auto other_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity);
+                                if (other_shape_comp.has_value()) {
+                                    other_model_id = other_shape_comp.value().get().model_id;
+                                }
+                                else {
+                                    other_model_id = "square"; // Default to square for SAT
+                                }
+
+                                Collision::CollisionInfo info;
+                                if (!(static_cast<int>(e_transform.rotation) % 180) && !(static_cast<int>(other_transform.rotation) % 180) && collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
+                                    //Set the flag of colliders
+                                    e_collider.b_collided = true;
+                                    other_collider.b_collided = true;
+
+                                    //Collision resolution
+                                    collision_system->collisionResolution(entity, e_transform, e_dynamics, e_collider, colliding_entity, other_transform, other_dynamics, other_collider, info);
+                                }
+                                else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_id, other_model_id, info)) {
+                                    //Set the flag of colliders
+                                    e_collider.b_collided = true;
+                                    other_collider.b_collided = true;
+
+                                    //Collision resolution
+                                    collision_system->collisionResolution(entity, e_transform, e_dynamics, e_collider, colliding_entity, other_transform, other_dynamics, other_collider, info);
+                                }
+                                else {
+                                    //Set the flag of colliders
+                                    e_collider.b_collided = false;
+                                    other_collider.b_collided = false;
+                                }
                             }
-                            else {
-                                e_model_id = "square"; // Default to square for SAT
-                            }
-                            auto other_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity);
-                            if (other_shape_comp.has_value()) {
-                                other_model_id = other_shape_comp.value().get().model_id;
-                            }
-                            else {
-                                other_model_id = "square"; // Default to square for SAT
-                            }
-
-                            Collision::CollisionInfo info;
-                            if (!(static_cast<int>(e_transform.rotation) % 180) && !(static_cast<int>(other_transform.rotation) % 180) && collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
-                                //Set the flag of colliders
-                                e_collider.b_collided = true;
-                                other_collider.b_collided = true;
-
-                                //Collision resolution
-                                collision_system->collisionResolution(entity, e_transform, e_dynamics, e_collider, colliding_entity, other_transform, other_dynamics, other_collider, info);
-                            }
-                            else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_id, other_model_id, info)) {
-                                //Set the flag of colliders
-                                e_collider.b_collided = true;
-                                other_collider.b_collided = true;
-
-                                //Collision resolution
-                                collision_system->collisionResolution(entity, e_transform, e_dynamics, e_collider, colliding_entity, other_transform, other_dynamics, other_collider, info);
-                            }
-                            else {
-                                //Set the flag of colliders
-                                e_collider.b_collided = false;
-                                other_collider.b_collided = false;
+                            catch(const std::runtime_error& e) {
+                                // Handle the exception (log it, report it, or recover gracefully)
+                                NIKEE_CORE_ERROR("Entity error: {}", e.what());
                             }
                         }
                     }
