@@ -81,56 +81,72 @@ namespace NIKE {
 					// Check for shooting comp
 					auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
 					if (e_shoot_comp.has_value()) {
-						// Get entity's position
-						auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-						Vector2f shooter_pos = e_transform_comp.value().get().position;
-						//auto& shoot_values = e_shoot_comp.value().get();
+
+						// Get shooting comp
+						auto& shoot_comp = e_shoot_comp.value().get();
+
+						// Accumulate time since last shot
+						shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
 						// Create bullet
 						if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
-							// TODO: Add cooldown check HERE
-							std::string script_path = "assets/Scripts/createBullet.lua";
-							std::string function_name = "createBullet";
-							std::string prefab_path = "destroyBullet.prefab";
-							int layer_id = 0; // Placeholder
+							// Cooldown
+							if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
+								// Get entity's position
+								auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+								Vector2f shooter_pos = e_transform_comp.value().get().position;
 
-							// Load Lua Script
-							std::string script_id = lua_system->loadScript(script_path);
+								std::string script_path = "assets/Scripts/createBullet.lua";
+								std::string function_name = "createBullet";
+								std::string prefab_path = "destroyBullet.prefab";
+								int layer_id = 0; // Placeholder
 
-							// Check if the script is loaded successfully
-							if (script_id.empty()) {
-								NIKEE_CORE_ERROR("Failed to load script: " + script_path);
-							}
+								// Load Lua Script
+								std::string script_id = lua_system->loadScript(script_path);
 
-							// Execute Lua Script
-							sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
+								// Check if the script is loaded successfully
+								if (script_id.empty()) {
+									NIKEE_CORE_ERROR("Failed to load script: " + script_path);
+								}
+
+								// Execute Lua Script
+								sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
 
 
-							// Checking if something went wrong w cpp func
-							if (!create_bullet_func.valid()) {
-								NIKEE_CORE_ERROR("Failed to execute Lua script: " + script_path);
+								// Checking if something went wrong w cpp func
+								if (!create_bullet_func.valid()) {
+									NIKEE_CORE_ERROR("Failed to execute Lua script: " + script_path);
+								}
+								else {
+									// Function was valid 
+									sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y);
+
+									// Checking if something went wrong with lua func
+									if (!result.valid()) {
+										sol::error err = result;
+										NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
+									}
+								}
+
+								// Reset the last shot time after shooting
+								shoot_comp.last_shot_time = 0.f;
+
+								//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+								//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
 							}
 							else {
-								// Function was valid 
-								sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y);
-
-								// Checking if something went wrong with lua func
-								if (!result.valid()) {
-									sol::error err = result;
-									NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
-								}
+								// Cooldown not up
+								NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
 							}
-							//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
-							//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
 						}
 					}
 				}
+
+				// Destroy all entities that are marked for deletion
+				//NIKEE_CORE_INFO("GG TO DESTROY MARKED ENTITIES");
+				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}
-
-		// Destroy all entities that are marked for deletion
-		//NIKEE_CORE_INFO("GG TO DESTROY MARKED ENTITIES");
-		NIKE_ECS_MANAGER->destroyMarkedEntities();
 	}
 }
 	//void GameLogic::Manager::init() {

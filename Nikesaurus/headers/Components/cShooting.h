@@ -19,7 +19,8 @@ namespace NIKE {
 			float cooldown;			//Time between shot
 			float last_shot_time;	// Tracking elapsed time since last shot
 
-			Shooting() : cooldown(10.f), last_shot_time(0.f) {};
+			// Set last_shot_time to cooldown to allow player to shoot immediately
+			Shooting() : cooldown(.5f), last_shot_time(cooldown) {};
 			Shooting(float const& cooldown, float const& last_shot_time)
 				: cooldown{ cooldown }, last_shot_time{ last_shot_time } {}
 		};
