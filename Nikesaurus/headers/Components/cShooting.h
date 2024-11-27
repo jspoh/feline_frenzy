@@ -31,12 +31,13 @@ namespace NIKE {
 			float cooldown;			// Time between shot
 			float last_shot_time;	// Tracking elapsed time since last shot
 			float offset;			// Offset for bullet spawn position
+			int layer;				// Bullet spawn layer
 
 			// Set last_shot_time equal to cooldown to allow player to shoot immediately
 			// !TODO: Make offset automatic based on spawning entity's scale?
-			Shooting() :script(), cooldown(.5f), last_shot_time(cooldown), offset(.0f) {};
-			Shooting(std::string const& script, float const& cooldown, float const& last_shot_time, float const& offset)
-				: script{ script }, cooldown{ cooldown }, last_shot_time{ last_shot_time }, offset{ offset } {}
+			Shooting() :script(), cooldown(.5f), last_shot_time(cooldown), offset(150.f), layer(0) {};
+			Shooting(std::string const& script, float const& cooldown, float const& last_shot_time, float const& offset, int const& layer)
+				: script{ script }, cooldown{ cooldown }, last_shot_time{ last_shot_time }, offset{ offset }, layer{ layer } {}
 		};
 
 		void registerComponents();

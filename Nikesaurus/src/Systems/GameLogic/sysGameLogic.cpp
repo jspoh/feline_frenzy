@@ -96,11 +96,10 @@ namespace NIKE {
 								auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 								Vector2f shooter_pos = e_transform_comp.value().get().position;
 
+								// !TODO: Set these in cShooting
 								std::string script_path = "assets/Scripts/createBullet.lua";
 								std::string function_name = "createBullet";
 								std::string prefab_path = "damageBullet.prefab";
-								float offset = 150.0f;
-								int layer_id = 1; // Placeholder
 
 								// Load Lua Script
 								std::string script_id = lua_system->loadScript(script_path);
@@ -120,7 +119,7 @@ namespace NIKE {
 								}
 								else {
 									// Function was valid 
-									sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y, offset);
+									sol::protected_function_result result = create_bullet_func(shoot_comp.layer, prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
 
 									// Checking if something went wrong with lua func
 									if (!result.valid()) {
