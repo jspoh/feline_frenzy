@@ -15,6 +15,7 @@
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
 #include "Managers/Services/Assets/sAssets.h"
+#include "Managers/ECS/mCoordinator.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -172,7 +173,7 @@ namespace NIKE {
 		};
 
 		//Entities Management Panel
-		class EntitiesPanel : public IPanel {
+		class EntitiesPanel : public IPanel, public Events::IEventListener<Coordinator::EntitiesChanged> {
 		private:
 			//Sort entities
 			struct EntitySorter{
@@ -214,6 +215,9 @@ namespace NIKE {
 
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
+
+			//On entities changed event
+			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -260,6 +264,9 @@ namespace NIKE {
 
 			//Check entity changed
 			bool isEntityChanged() const;
+
+			//Update entities list
+			void updateEntities(std::set<Entity::Type> ecs_entities);
 
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;

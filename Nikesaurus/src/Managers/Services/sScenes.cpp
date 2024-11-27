@@ -97,6 +97,11 @@ namespace NIKE {
 	}
 
 	void Scenes::Service::restartScene() {
+		//Check if scene exists
+		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
+			return;
+		}
+
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
 
@@ -105,11 +110,6 @@ namespace NIKE {
 
 		//Create the first layer
 		createLayer();
-
-		//Check if scene exists
-		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
-			throw std::runtime_error("Error scene file does not exist");
-		}
 
 		//ReRun scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);

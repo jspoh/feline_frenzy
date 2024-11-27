@@ -690,7 +690,15 @@ namespace NIKE {
 			};
 	}
 
+	void LevelEditor::EntitiesPanel::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
+		updateEntities(event->entities);
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
+
+		//Setup events listening
+		std::shared_ptr<LevelEditor::EntitiesPanel> entitiespanel_wrapped (this, [](LevelEditor::EntitiesPanel*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(entitiespanel_wrapped);
 
 		//Register popups
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
@@ -710,40 +718,6 @@ namespace NIKE {
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
-
-		//Update entities list when there is size mismatch
-		if (entities.size() != NIKE_ECS_MANAGER->getEntitiesCount()) {
-			//Get all entities currently active in the ECS
-			auto ecs_entities = NIKE_ECS_MANAGER->getAllEntities();
-
-			//Remove entities that are no longer in the ECS
-			for (auto it = entities.begin(); it != entities.end();) {
-				if (ecs_entities.find(it->first) == ecs_entities.end()) {
-					//Remove the entity from all associated maps
-					name_to_entity.erase(entity_to_name.at(it->first));
-					entity_to_name.erase(it->first);
-					it = entities.erase(it);
-				}
-				else {
-					++it;
-				}
-			}
-
-			//Add new entities from the ECS that are not yet in the editor
-			for (auto& entity : ecs_entities) {
-				if (entities.find(entity) == entities.end()) {
-
-					//Create identifier for entity
-					char entity_name[32];
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
-
-					//Add entity to editor structures
-					entities.emplace(entity, EditorEntity());
-					entity_to_name.emplace(entity, entity_name);
-					name_to_entity.emplace(entity_name, entity);
-				}
-			}
-		}
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
@@ -982,6 +956,37 @@ namespace NIKE {
 
 	bool LevelEditor::EntitiesPanel::isEntityChanged() const {
 		return b_entity_changed;
+	}
+
+	void LevelEditor::EntitiesPanel::updateEntities(std::set<Entity::Type> ecs_entities) {
+
+		//Remove entities that are no longer in the ECS
+		for (auto it = entities.begin(); it != entities.end();) {
+			if (ecs_entities.find(it->first) == ecs_entities.end()) {
+				//Remove the entity from all associated maps
+				name_to_entity.erase(entity_to_name.at(it->first));
+				entity_to_name.erase(it->first);
+				it = entities.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+
+		//Add new entities from the ECS that are not yet in the editor
+		for (auto& entity : ecs_entities) {
+			if (entities.find(entity) == entities.end()) {
+
+				//Create identifier for entity
+				char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
+
+				//Add entity to editor structures
+				entities.emplace(entity, EditorEntity());
+				entity_to_name.emplace(entity, entity_name);
+				name_to_entity.emplace(entity_name, entity);
+			}
+		}
 	}
 
 	bool LevelEditor::EntitiesPanel::isCursorInEntity(Entity::Type entity) const {
@@ -3253,7 +3258,6 @@ namespace NIKE {
 			//file.close();
 		}
 
-
 		//Adjust grid mode
 		{
 			//Adjust grid mode
@@ -3331,7 +3335,7 @@ namespace NIKE {
 
 			//Check if grid has begun editing
 			if (ImGui::IsItemActivated()) {
-				grid_size_before_change = NIKE_MAP_SERVICE->getGridSize();
+				grid_size = NIKE_MAP_SERVICE->getGridSize();
 			}
 
 			//Check if grid has finished editing
@@ -3352,6 +3356,11 @@ namespace NIKE {
 
 				//Execute action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_grid_size));
+			}
+
+			//Update grid size
+			if (!ImGui::IsItemActive()) {
+				grid_size = NIKE_MAP_SERVICE->getGridSize();
 			}
 		}
 
@@ -3390,6 +3399,11 @@ namespace NIKE {
 
 				//Execute action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cell_size));
+			}
+
+			//Update cell size
+			if (!ImGui::IsItemActive()) {
+				cell_size = NIKE_MAP_SERVICE->getCellSize();
 			}
 		}
 
