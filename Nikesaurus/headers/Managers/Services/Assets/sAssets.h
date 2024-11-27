@@ -182,7 +182,7 @@ namespace NIKE {
 			std::filesystem::path getAssetPath(std::string const& asset_id) const;
 
 			//Get all asset ref of type
-			std::vector<std::string> getAssetRefs(Types type) const;
+			std::vector<const char*> getAssetRefs(Types type) const;
 
 			//Check if asset is loaded from asset id
 			bool isAssetCached(std::string const& asset_id) const;

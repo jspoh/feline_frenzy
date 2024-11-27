@@ -100,11 +100,11 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
-		//// Add the map file path at the top of the scene JSON
-		//std::string grid_file_path = NIKE_ASSETS_SERVICE->getGridsPath() + Utility::extractFileName(file_path) + ".grid";
-		//nlohmann::json m_data;
-		//m_data["Grid Path"] = grid_file_path;
-		//data.push_back(m_data);
+		// Add the map file path at the top of the scene JSON
+		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
+		nlohmann::json m_data;
+		m_data["Grid ID"] = grid_id;
+		data.push_back(m_data);
 
 		//Layers in scene
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
@@ -184,20 +184,20 @@ namespace NIKE {
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
-			////Load map grid if a map file path is specified
-			//if (l_data.contains("Grid Path")) {
-			//	std::string grid_file_path = l_data.at("Grid Path").get<std::string>();
-			//	std::string full_grid_path = (std::filesystem::path(file_path).parent_path() / grid_file_path).string();
+			//Load map grid if a map file path is specified
+			if (l_data.contains("Grid ID")) {
+				std::string grid_id = l_data.at("Grid ID").get<std::string>();
+				std::string full_grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
 
-			//	if (std::filesystem::exists(grid_file_path)) {
-			//		// Deserialize map grid
-			//		NIKE_SERIALIZE_SERVICE->loadGridFromFile(grid_file_path);
-			//	}
-			//	else {
-			//		// Log error or handle missing map file
-			//		NIKEE_CORE_ERROR("Map file not found: " + grid_file_path);
-			//	}
-			//}
+				if (std::filesystem::exists(full_grid_path)) {
+					// Deserialize map grid
+					NIKE_SERIALIZE_SERVICE->loadGridFromFile(full_grid_path);
+				}
+				else {
+					// Log error or handle missing map file
+					NIKEE_CORE_ERROR("Map file not found: " + grid_id);
+				}
+			}
 
 			//If data contains layer
 			if (l_data.contains("Layer")) {

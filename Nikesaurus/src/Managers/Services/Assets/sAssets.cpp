@@ -161,6 +161,11 @@ namespace NIKE {
 
 	void Assets::Service::cacheAsset(std::string const& asset_id) {
 
+		//Check if asset is an executable
+		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+			return;
+		}
+
 		//Check asset cache
 		auto cache_it = asset_cache.find(asset_id);
 		if (cache_it != asset_cache.end()) {
@@ -187,6 +192,11 @@ namespace NIKE {
 	}
 
 	void Assets::Service::uncacheAsset(std::string const& asset_id) {
+		//Check if asset is an executable
+		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+			return;
+		}
+
 		//Check asset cache
 		auto cache_it = asset_cache.find(asset_id);
 		if (cache_it != asset_cache.end()) {
@@ -195,6 +205,11 @@ namespace NIKE {
 	}
 
 	void Assets::Service::recacheAsset(std::string const& asset_id) {
+
+		//Check if asset is an executable
+		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+			return;
+		}
 		
 		//Uncache asset
 		uncacheAsset(asset_id);
@@ -296,11 +311,11 @@ namespace NIKE {
 		return asset_registry.at(asset_id).primary_path;
 	}
 
-	std::vector<std::string> Assets::Service::getAssetRefs(Assets::Types type) const {
-		std::vector<std::string> asset_refs;
+	std::vector<const char*> Assets::Service::getAssetRefs(Assets::Types type) const {
+		std::vector<const char*> asset_refs;
 		for (auto it = asset_registry.begin(); it != asset_registry.end(); ++it) {
 			if (it->second.type == type) {
-				asset_refs.push_back(it->first);
+				asset_refs.push_back(it->first.c_str());
 			}
 		}
 
@@ -308,6 +323,7 @@ namespace NIKE {
 	}
 
 	bool Assets::Service::isAssetCached(std::string const& asset_id) const {
+
 		//Check asset cache
 		auto cache_it = asset_cache.find(asset_id);
 		if (cache_it != asset_cache.end()) {

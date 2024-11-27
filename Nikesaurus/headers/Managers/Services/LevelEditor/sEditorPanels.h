@@ -15,6 +15,7 @@
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
 #include "Managers/Services/Assets/sAssets.h"
+#include "Managers/ECS/mCoordinator.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -172,7 +173,7 @@ namespace NIKE {
 		};
 
 		//Entities Management Panel
-		class EntitiesPanel : public IPanel {
+		class EntitiesPanel : public IPanel, public Events::IEventListener<Coordinator::EntitiesChanged> {
 		private:
 			//Sort entities
 			struct EntitySorter{
@@ -214,6 +215,9 @@ namespace NIKE {
 
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
+
+			//On entities changed event
+			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -260,6 +264,9 @@ namespace NIKE {
 
 			//Check entity changed
 			bool isEntityChanged() const;
+
+			//Update entities list
+			void updateEntities(std::set<Entity::Type> ecs_entities);
 
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
@@ -683,6 +690,66 @@ namespace NIKE {
 			bool checkGridSnapping() const;
 		};
 
+		//Scenes Management panel
+		class ScenesPanel : public IPanel {
+		private:
+
+			// For storing editing layer mask id
+			unsigned int edit_mask_id;
+
+			bool bit_state = false;
+
+			// For storing selected layer index
+			unsigned int selected_layer_index;
+
+			// For storing bit_position
+			unsigned int bit_position;
+
+			//Error msg
+			std::shared_ptr<std::string> err_msg;
+
+			//Success msg
+			std::shared_ptr<std::string> success_msg;
+
+			// To store layer names
+			std::vector<std::string> layer_names;
+
+			//Create scene popup
+			std::function<void()> createScenePopup(std::string const& popup_id);
+
+			//Delete scene popup
+			std::function<void()> deleteScenePopup(std::string const& popup_id);
+
+		public:
+			ScenesPanel() = default;
+			~ScenesPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Scenes Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Scenes Management";
+			}
+
+			//Set error message for popup
+			void setPopUpErrorMsg(std::string const& msg);
+
+			//Update layer names
+			void updateLayerNames();
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
 		//Game Window Panel
 		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
 		private:
@@ -732,58 +799,6 @@ namespace NIKE {
 
 			//Check if mouse is in game window
 			bool isMouseInWindow() const;
-
-			//Init
-			void init() override;
-
-			//Update
-			void update() override;
-
-			//Render
-			void render() override;
-		};
-
-		//Layer Management panel
-		class LayerManagementPanel : public IPanel {
-		private:
-			
-			// For storing editing layer mask id
-			unsigned int edit_mask_id;
-
-			bool bit_state = false;
-
-			// For storing selected layer index
-			unsigned int selected_layer_index;
-
-			// For storing bit_position
-			unsigned int bit_position;
-
-			// For error layering management
-			std::shared_ptr<std::string> err_msg;
-
-			// To store layer names
-			std::vector<std::string> layer_names;
-
-		public:
-			LayerManagementPanel() = default;
-			~LayerManagementPanel() = default;
-
-			//Panel Name
-			std::string getName() const override {
-				return "Layer Management";
-			}
-
-			//Static panel name
-			static std::string getStaticName() {
-				return "Layer Management";
-			}
-
-			//Set error message for popup
-			void setPopUpErrorMsg(std::string const& msg);
-
-			void updateLayerNames();
-
-			std::function<void()> errLayerPopup(std::string const& popup_id, std::shared_ptr<std::string> msg);
 
 			//Init
 			void init() override;

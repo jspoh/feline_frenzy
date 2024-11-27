@@ -169,6 +169,9 @@ namespace NIKE {
 		//Init UI
 		NIKE_UI_SERVICE->init();
 
+		// For testing imgui combo - lim
+		NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
+
 		//Register Def Components
 		registerDefComponents();
 
@@ -236,6 +239,9 @@ namespace NIKE {
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 		}
+
+		//Stop watching all directories
+		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();

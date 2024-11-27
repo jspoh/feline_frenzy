@@ -1,6 +1,6 @@
 [
     {
-        "Grid Path": "assets\\Grids\\collision_scene.grid"
+        "Grid ID": "collision_scene.grid"
     },
     {
         "Layer": {

@@ -416,21 +416,8 @@ namespace NIKE {
 				ImGui::Text("Reset Scene:");
 				if (ImGui::Button("Reset")) {
 
-					//Get scn file path tagged to active scene
-					std::string curr_scn_file = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
-
-					//Resetting Curr Scn File
-					if (!curr_scn_file.empty() && std::filesystem::exists(curr_scn_file)) {
-
-						// Clear previous scene entities before loading the new one
-						NIKE_ECS_MANAGER->destroyAllEntities();
-
-						// Load the scene from the selected file path
-						NIKE_SERIALIZE_SERVICE->loadSceneFromFile(curr_scn_file);
-					}
-					else {
-						NIKEE_CORE_ERROR("Error: Scene file path is invalid or file does not exist.");
-					}
+					//Restart scene
+					NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
 				}
 			}
 
@@ -703,7 +690,15 @@ namespace NIKE {
 			};
 	}
 
+	void LevelEditor::EntitiesPanel::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
+		updateEntities(event->entities);
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
+
+		//Setup events listening
+		std::shared_ptr<LevelEditor::EntitiesPanel> entitiespanel_wrapped (this, [](LevelEditor::EntitiesPanel*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(entitiespanel_wrapped);
 
 		//Register popups
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
@@ -723,40 +718,6 @@ namespace NIKE {
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
-
-		//Update entities list when there is size mismatch
-		if (entities.size() != NIKE_ECS_MANAGER->getEntitiesCount()) {
-			//Get all entities currently active in the ECS
-			auto ecs_entities = NIKE_ECS_MANAGER->getAllEntities();
-
-			//Remove entities that are no longer in the ECS
-			for (auto it = entities.begin(); it != entities.end();) {
-				if (ecs_entities.find(it->first) == ecs_entities.end()) {
-					//Remove the entity from all associated maps
-					name_to_entity.erase(entity_to_name.at(it->first));
-					entity_to_name.erase(it->first);
-					it = entities.erase(it);
-				}
-				else {
-					++it;
-				}
-			}
-
-			//Add new entities from the ECS that are not yet in the editor
-			for (auto& entity : ecs_entities) {
-				if (entities.find(entity) == entities.end()) {
-
-					//Create identifier for entity
-					char entity_name[32];
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
-
-					//Add entity to editor structures
-					entities.emplace(entity, EditorEntity());
-					entity_to_name.emplace(entity, entity_name);
-					name_to_entity.emplace(entity_name, entity);
-				}
-			}
-		}
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
@@ -995,6 +956,37 @@ namespace NIKE {
 
 	bool LevelEditor::EntitiesPanel::isEntityChanged() const {
 		return b_entity_changed;
+	}
+
+	void LevelEditor::EntitiesPanel::updateEntities(std::set<Entity::Type> ecs_entities) {
+
+		//Remove entities that are no longer in the ECS
+		for (auto it = entities.begin(); it != entities.end();) {
+			if (ecs_entities.find(it->first) == ecs_entities.end()) {
+				//Remove the entity from all associated maps
+				name_to_entity.erase(entity_to_name.at(it->first));
+				entity_to_name.erase(it->first);
+				it = entities.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+
+		//Add new entities from the ECS that are not yet in the editor
+		for (auto& entity : ecs_entities) {
+			if (entities.find(entity) == entities.end()) {
+
+				//Create identifier for entity
+				char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
+
+				//Add entity to editor structures
+				entities.emplace(entity, EditorEntity());
+				entity_to_name.emplace(entity, entity_name);
+				name_to_entity.emplace(entity_name, entity);
+			}
+		}
 	}
 
 	bool LevelEditor::EntitiesPanel::isCursorInEntity(Entity::Type entity) const {
@@ -2367,14 +2359,11 @@ namespace NIKE {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
 
-				//Remember old path
-				std::filesystem::path old_path = NIKE_ASSETS_SERVICE->getAssetPath(asset_id);
+				//Craft the destination path
+				std::filesystem::path dest_path = NIKE_PATH_SERVICE->resolvePath(virtual_path) / asset_id;
 
 				//Copy file
-				std::filesystem::copy(old_path, NIKE_PATH_SERVICE->resolvePath(virtual_path), std::filesystem::copy_options::overwrite_existing);
-
-				//Delete assets old registration
-				std::filesystem::remove(old_path);
+				std::filesystem::rename(NIKE_ASSETS_SERVICE->getAssetPath(asset_id), dest_path);
 
 				//Update files
 				files = NIKE_PATH_SERVICE->listFiles(current_path);
@@ -2762,8 +2751,8 @@ namespace NIKE {
 		//Setup directory watching for 
 		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
 
-			//Watch only for files
-			if (!std::filesystem::is_regular_file(file)) {
+			//Skip directories
+			if (std::filesystem::is_directory(file)) {
 				return;
 			}
 
@@ -2776,7 +2765,6 @@ namespace NIKE {
 				break;
 			}
 			case filewatch::Event::removed: {
-
 				//Unregister assets
 				NIKE_ASSETS_SERVICE->unregisterAsset(NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false));
 				break;
@@ -3374,7 +3362,6 @@ namespace NIKE {
 			//file.close();
 		}
 
-
 		//Adjust grid mode
 		{
 			//Adjust grid mode
@@ -3452,7 +3439,7 @@ namespace NIKE {
 
 			//Check if grid has begun editing
 			if (ImGui::IsItemActivated()) {
-				grid_size_before_change = NIKE_MAP_SERVICE->getGridSize();
+				grid_size = NIKE_MAP_SERVICE->getGridSize();
 			}
 
 			//Check if grid has finished editing
@@ -3473,6 +3460,11 @@ namespace NIKE {
 
 				//Execute action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_grid_size));
+			}
+
+			//Update grid size
+			if (!ImGui::IsItemActive()) {
+				grid_size = NIKE_MAP_SERVICE->getGridSize();
 			}
 		}
 
@@ -3511,6 +3503,11 @@ namespace NIKE {
 
 				//Execute action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cell_size));
+			}
+
+			//Update cell size
+			if (!ImGui::IsItemActive()) {
+				cell_size = NIKE_MAP_SERVICE->getCellSize();
 			}
 		}
 
@@ -3699,6 +3696,363 @@ namespace NIKE {
 
 	bool LevelEditor::TileMapPanel::checkGridSnapping() const {
 		return b_snap_to_grid;
+	}
+
+	/*****************************************************************//**
+	* Scene Management Panel
+	*********************************************************************/
+	std::function<void()> LevelEditor::ScenesPanel::createScenePopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string scn_id;
+
+			//Get Scene text
+			ImGui::Text("Enter a name for the scene without .scn:");
+			if (ImGui::InputText("##Scene Name", scn_id.data(), scn_id.capacity() + 1)) {
+				scn_id.resize(strlen(scn_id.c_str()));
+			}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Ok") && !scn_id.empty() && (scn_id.find(".scn") == scn_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(scn_id)) {
+
+				//Craft file path from name
+				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
+				if (std::filesystem::exists(path)) {
+					path /= std::string(scn_id + ".scn");
+				}
+				else {
+					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
+					path /= std::string(scn_id + ".scn");
+				}
+
+				//Save current state of the scene to file
+				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
+
+				//Set new scn id
+				NIKE_SCENES_SERVICE->setCurrSceneID(std::string(scn_id + ".scn"));
+
+				//Reset scene id buffer
+				scn_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Reset scene id buffer
+				scn_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
+	std::function<void()> LevelEditor::ScenesPanel::deleteScenePopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Warning message
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
+
+			//Select a component to add
+			ImGui::Text("Are you sure you want to delete this scene?");
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Confirm")) {
+
+				//Get selected asset path
+				auto path = NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID());
+
+				//Remove path and clear selected asset text buffer
+				std::filesystem::remove(path);
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
+	void LevelEditor::ScenesPanel::setPopUpErrorMsg(std::string const& msg)
+	{
+		err_msg->assign(msg);
+	}
+
+	void LevelEditor::ScenesPanel::updateLayerNames() {
+		layer_names.clear();
+		for (const auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+			layer_names.push_back("Layer " + std::to_string(layer->getLayerID()));
+		}
+	}
+
+	void LevelEditor::ScenesPanel::init()
+	{
+		err_msg = std::make_shared<std::string>("Layer Fault");
+		success_msg = std::make_shared<std::string>("Success");
+		registerPopUp("Error", defPopUp("Error", err_msg));
+		registerPopUp("Success", defPopUp("Success", success_msg));
+		registerPopUp("Delete Scene", deleteScenePopup("Delete Scene"));
+		registerPopUp("Create Scene", createScenePopup("Create Scene"));
+	}
+
+	void LevelEditor::ScenesPanel::update()
+	{
+		// Empty for now, nothing to update
+	}
+
+	void LevelEditor::ScenesPanel::render()
+	{
+		ImGui::Begin(getName().c_str());
+
+		//Scene ref
+		ImGui::Text("Scene ID: %s", NIKE_SCENES_SERVICE->getCurrSceneID().c_str());
+
+		//Scene ref payload
+		if (ImGui::BeginDragDropTarget()) {
+			//Scene file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Change scene payload
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, asset_id));
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		//Create new scene
+		{
+			if (ImGui::Button("Create Scene")) {
+				openPopUp("Create Scene");
+			}
+		}
+
+		ImGui::SameLine();
+
+		//Delete curr scene
+		{
+			if (ImGui::Button("Delete Scene")) {
+				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+					openPopUp("Delete Scene");
+				}
+				else {
+					err_msg->assign("No scene attached, unable to delete anything.");
+					openPopUp("Error");
+				}
+			}
+		}
+
+		ImGui::SameLine();
+
+		//Save curr scene
+		{
+			if (ImGui::Button("Save Scene")) {
+				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+
+					//Save scene
+					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+
+					success_msg->assign("Scene successfully saved.");
+					openPopUp("Success");
+				}
+				else {
+					err_msg->assign("No scene attached, create a scene before saving.");
+					openPopUp("Error");
+				}
+			}
+		}
+
+
+		//Add Separator
+		ImGui::Separator();
+
+		// Get total layer count
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
+
+		// Get layers
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
+
+		// Update the layer names when layers change
+		if (layer_count != layer_names.size()) {
+			updateLayerNames();
+		}
+
+		// Display layer count
+		ImGui::Text("Total Layers: %u", layer_count);
+
+		// Layer selection dropdown
+		if (!layers.empty()) {
+			ImGui::Text("Select Layer");
+			if (ImGui::BeginCombo("##Select Layer",
+				(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
+				for (unsigned int i = 0; i < layers.size(); ++i) {
+					const bool is_selected = (selected_layer_index == i);
+					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
+
+						Action select_layer_action;
+
+						// Capture the previous and new layer indices
+						unsigned int prev_layer_index = selected_layer_index;
+						unsigned int new_layer_index = i;
+
+						// Do action
+						select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
+							selected_layer_index = new_layer_index;
+							// Reset bit position
+							bit_position = 0;
+							edit_mask_id = static_cast<unsigned int>(
+								layers[selected_layer_index]->getLayerMask().to_ulong());
+							};
+
+						// Undo action
+						select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
+							selected_layer_index = prev_layer_index;
+							// Reset bit position
+							bit_position = 0;
+							edit_mask_id = static_cast<unsigned int>(
+								layers[selected_layer_index]->getLayerMask().to_ulong());
+							};
+
+						// Execute the action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
+					}
+					if (is_selected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+		}
+		else {
+			ImGui::Text("No layers available.");
+		}
+
+		// Create layer button
+		if (ImGui::Button("Create Layer")) {
+			if (layer_count < 64) {
+				Action create_layer_action;
+
+				// Capture the state before adding the new layer
+				unsigned int previous_layer_count = static_cast<unsigned int>(layers.size());
+
+				// Do action
+				create_layer_action.do_action = [&, previous_layer_count]() {
+					NIKE_SCENES_SERVICE->createLayer(previous_layer_count);
+					updateLayerNames();
+					};
+
+				// Undo action
+				create_layer_action.undo_action = [&, previous_layer_count]() {
+					if (!layers.empty()) {
+						NIKE_SCENES_SERVICE->removeLayer(previous_layer_count);
+						updateLayerNames();
+					}
+					};
+
+				// Execute the action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create_layer_action));
+			}
+			else {
+				setPopUpErrorMsg("Unable to create layer");
+				openPopUp("Error");
+			}
+		}
+
+		ImGui::SameLine();
+
+		// Remove layer button
+		if (ImGui::Button("Remove Layer")) {
+			if (layer_count > 1) {
+				Action remove_layer_action;
+
+				// Capture state before removing layer
+				auto& removed_layer = layers[selected_layer_index];
+				unsigned int removed_layer_id = removed_layer->getLayerID();
+
+				// Do action
+				remove_layer_action.do_action = [&, removed_layer_id]() {
+					NIKE_SCENES_SERVICE->removeLayer(removed_layer_id);
+					// Adjusts selected_layer_index to the last valid index
+					selected_layer_index = min(selected_layer_index, static_cast<unsigned int>(layers.size() - 1));
+					updateLayerNames();
+					};
+
+				// Undo action
+				remove_layer_action.undo_action = [&, removed_layer_id]() {
+					NIKE_SCENES_SERVICE->createLayer(removed_layer_id);
+					updateLayerNames();
+					};
+
+				// Execute the action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_layer_action));
+			}
+			else {
+				setPopUpErrorMsg("Unable to remove layer");
+				openPopUp("Error");
+			}
+		}
+
+		ImGui::Separator();
+
+		// Show layer editing options
+		if (selected_layer_index < layers.size()) {
+			ImGui::Text("Edit Layer Mask");
+
+			// Layer mask editing
+			if (layers.size() > 1) {
+
+				// For ensuring bit_position does not default to the newly created layer
+				if (bit_position >= layers.size() || bit_position == selected_layer_index) {
+					bit_position = (selected_layer_index == 0) ? 1 : 0;
+				}
+
+				if (ImGui::BeginCombo("##Select Mask Layer", layer_names[bit_position].c_str())) {
+					for (unsigned int i = 0; i < layers.size(); ++i) {
+						if (i == selected_layer_index) continue;
+
+						const bool mask_selected = (bit_position == i);
+						if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
+							bit_position = i;
+						}
+						if (mask_selected) ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
+				if (ImGui::Checkbox("Set Bit State", &bit_state)) {
+					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
+				}
+			}
+			else {
+				ImGui::Text("No mask layers available.");
+			}
+		}
+
+
+		//Render popups
+		renderPopUps();
+
+		ImGui::End();
 	}
 
 	/*****************************************************************//**
@@ -3926,221 +4280,4 @@ namespace NIKE {
 
 		ImGui::End();
 	}
-
-	/*****************************************************************//**
-	* Layer Management Window Panel
-	*********************************************************************/
-	void LevelEditor::LayerManagementPanel::setPopUpErrorMsg(std::string const& msg)
-	{
-		err_msg->assign(msg);
-	}
-
-	void LevelEditor::LayerManagementPanel::updateLayerNames() {
-		layer_names.clear();
-		for (const auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
-			layer_names.push_back("Layer " + std::to_string(layer->getLayerID()));
-		}
-	}
-
-	std::function<void()> LevelEditor::LayerManagementPanel::errLayerPopup(std::string const& popup_id, std::shared_ptr<std::string> msg)
-	{
-		return [this, popup_id, msg]() {
-			//Show error message
-			ImGui::Text("%s", msg->c_str());
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			//OK button to close the popup
-			if (ImGui::Button("OK")) {
-				closePopUp(popup_id);
-			}
-			};
-	}
-
-	void LevelEditor::LayerManagementPanel::init()
-	{
-		err_msg = std::make_shared<std::string>("Layer Fault");
-		registerPopUp("Error", errLayerPopup("Error", err_msg));
-	}
-
-	void LevelEditor::LayerManagementPanel::update()
-	{
-		// Empty for now, nothing to update
-	}
-
-	void LevelEditor::LayerManagementPanel::render()
-	{
-		ImGui::Begin(getName().c_str());
-
-		// Get total layer count
-		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
-
-		// Get layers
-		auto& layers = NIKE_SCENES_SERVICE->getLayers();
-
-		// Update the layer names when layers change
-		if (layer_count != layer_names.size()) {
-			updateLayerNames();
-		}
-
-		// Display layer count
-		ImGui::Text("Total Layers: %u", layer_count);
-
-		// Layer selection dropdown
-		if (!layers.empty()) {
-			if (ImGui::BeginCombo("Select Layer",
-				(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
-				for (unsigned int i = 0; i < layers.size(); ++i) {
-					const bool is_selected = (selected_layer_index == i);
-					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
-
-						Action select_layer_action;
-
-						// Capture the previous and new layer indices
-						unsigned int prev_layer_index = selected_layer_index;
-						unsigned int new_layer_index = i;
-
-						// Do action
-						select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
-							selected_layer_index = new_layer_index;
-							// Reset bit position
-							bit_position = 0;
-							edit_mask_id = static_cast<unsigned int>(
-								layers[selected_layer_index]->getLayerMask().to_ulong());
-							};
-
-						// Undo action
-						select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
-							selected_layer_index = prev_layer_index;
-							// Reset bit position
-							bit_position = 0;
-							edit_mask_id = static_cast<unsigned int>(
-								layers[selected_layer_index]->getLayerMask().to_ulong());
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
-					}
-					if (is_selected) ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-		}
-		else {
-			ImGui::Text("No layers available.");
-		}
-
-
-		// Show layer editing options
-		if (selected_layer_index < layers.size()) {
-			ImGui::Text("Edit Selected Layer");
-
-			// Create layer button
-			if (ImGui::Button("Create Layer")) {
-				if (layer_count < 64) {
-					Action create_layer_action;
-
-					// Capture the state before adding the new layer
-					unsigned int previous_layer_count = static_cast<unsigned int>(layers.size());
-
-					// Do action
-					create_layer_action.do_action = [&, previous_layer_count]() {
-						NIKE_SCENES_SERVICE->createLayer(previous_layer_count);
-						updateLayerNames();
-						};
-
-					// Undo action
-					create_layer_action.undo_action = [&, previous_layer_count]() {
-						if (!layers.empty()) {
-							NIKE_SCENES_SERVICE->removeLayer(previous_layer_count);
-							updateLayerNames();
-						}
-						};
-
-					// Execute the action
-					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create_layer_action));
-				}
-				else {
-					setPopUpErrorMsg("Unable to create layer");
-					openPopUp("Error");
-				}
-			}
-
-			ImGui::SameLine();
-
-			// Remove layer button
-			if (ImGui::Button("Remove Layer")) {
-				if (layer_count > 1) {
-					Action remove_layer_action;
-
-					// Capture state before removing layer
-					auto& removed_layer = layers[selected_layer_index];
-					unsigned int removed_layer_id = removed_layer->getLayerID();
-
-					// Do action
-					remove_layer_action.do_action = [&, removed_layer_id]() {
-						NIKE_SCENES_SERVICE->removeLayer(removed_layer_id);
-						// Adjusts selected_layer_index to the last valid index
-						selected_layer_index = min(selected_layer_index, static_cast<unsigned int>(layers.size() - 1));
-						updateLayerNames();
-						};
-
-					// Undo action
-					remove_layer_action.undo_action = [&, removed_layer_id]() {
-						NIKE_SCENES_SERVICE->createLayer(removed_layer_id);
-						updateLayerNames();
-					};
-
-					// Execute the action
-					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_layer_action));
-				}
-				else {
-					setPopUpErrorMsg("Unable to remove layer");
-					openPopUp("Error");
-				}
-			}
-
-			ImGui::Separator();
-
-			// Warning msg
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Select Mask Layer action cannot be undone!");
-
-			// Layer mask editing
-			if (layers.size() > 1) {
-				if (ImGui::BeginCombo("Select Mask Layer", layer_names[bit_position].c_str())) {
-					for (unsigned int i = 0; i < layers.size(); ++i) {
-						if (i == selected_layer_index) continue;
-
-						const bool mask_selected = (bit_position == i);
-						if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
-							bit_position = i;
-						}
-						if (mask_selected) ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-				}
-
-				bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Select Bit State action cannot be undone!");
-				if (ImGui::Checkbox("Set Bit State", &bit_state)) {
-					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
-				}
-			}
-			else {
-				ImGui::Text("No layers available.");
-			}
-		}
-		else {
-			ImGui::Text("Select a layer to edit or remove.");
-		}
-
-
-		//Render popups
-		renderPopUps();
-
-		ImGui::End();
-	}
-
-
 }

@@ -58,6 +58,11 @@ namespace NIKE {
 		curr_scene = scene_id;
 		prev_scene = curr_scene;
 
+		//Check if scene exists
+		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
+			throw std::runtime_error("Error scene file does not exist");
+		}
+
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 	}
@@ -82,11 +87,21 @@ namespace NIKE {
 		//Create the first layer
 		createLayer();
 
+		//Check if scene exists
+		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
+			throw std::runtime_error("Error scene file does not exist");
+		}
+
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 	}
 
 	void Scenes::Service::restartScene() {
+		//Check if scene exists
+		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
+			return;
+		}
+
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
 
@@ -102,7 +117,7 @@ namespace NIKE {
 
 	void Scenes::Service::previousScene() {
 		//If prev scene is same as curr scene, restart curr scene
-		if (prev_scene == curr_scene) {
+		if (prev_scene == curr_scene || !NIKE_ASSETS_SERVICE->isAssetRegistered(prev_scene)) {
 			restartScene();
 			return;
 		}
@@ -118,6 +133,11 @@ namespace NIKE {
 
 		//Create the first layer
 		createLayer();
+
+		//Check if scene exists
+		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
+			throw std::runtime_error("Error scene file does not exist");
+		}
 
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
@@ -201,6 +221,18 @@ namespace NIKE {
 		}
 	}
 
+	void Scenes::Service::setCurrSceneID(std::string const& new_scene_id) {
+		curr_scene = new_scene_id;
+	}
+
+	std::string Scenes::Service::getCurrSceneID() const {
+		return curr_scene;
+	}
+
+	std::string Scenes::Service::getPrevSceneID() const {
+		return prev_scene;
+	}
+
 	void Scenes::Service::init() {
 		//Create the first layer
 		createLayer();
@@ -210,6 +242,12 @@ namespace NIKE {
 		if (!NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 		}
 
+		//Check if curr scene path is still active
+		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
+			curr_scene.clear();
+		}
+
+		//Execute new scene queue
 		if (event_queue) {
 			switch (event_queue->scene_action) {
 			case Scenes::Actions::CHANGE:

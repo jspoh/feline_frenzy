@@ -32,7 +32,7 @@ namespace NIKE {
 		for (size_t i = 0; i < grid_size.y; ++i) {
 			float left = -(grid_scale.x / 2.0f);
 			for (size_t j = 0; j < grid_size.x; ++j) {
-				grid.at(i).at(j).position = { left + (cell_size.y / 2.0f), top + (cell_size.x / 2.0f) };
+				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top + (cell_size.y / 2.0f) };
 				left += cell_size.x;
 			}
 			top += cell_size.y;

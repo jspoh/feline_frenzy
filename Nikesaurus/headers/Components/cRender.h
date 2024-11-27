@@ -87,7 +87,7 @@ namespace NIKE {
 			Vector4f color;
 			bool use_override_color;
 
-			Shape() :model_id{ "square" }, color(1.f, 1.f, 1.f, 1.f), pos{}, use_override_color { false } {}
+			Shape() :model_id{}, color(1.f, 1.f, 1.f, 1.f), pos{}, use_override_color { false } {}
 			Shape(std::string const& model_id, Vector2f const& pos) : model_id{ model_id }, pos{ pos }, color(), use_override_color{ false } {};
 			Shape(const std::string& model_id, const Vector4f& color, const Vector2f& pos)
 				: model_id{ model_id }, pos{ pos }, color{ color }, use_override_color{ true } {}
