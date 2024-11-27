@@ -9,10 +9,6 @@
 #include "Core/pch.h"
 class NullStream nullstream;
 
-//Splash Scene
-#include "Scenes/SplashScene.h"
-#include "Scenes/MainMenu.h"
-
 int WINAPI WinMain(
 	[[maybe_unused]] _In_ HINSTANCE hInstance,
 	[[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,
@@ -27,10 +23,6 @@ int WINAPI WinMain(
 
 	//Init Engine
 	NIKE_ENGINE.init("Config.json", 60, "Welcome To Nikesaurus.");
-
-	//Register Scenes
-	NIKE_SCENES_SERVICE->registerScene<Splash::Scene>("SPLASH");
-	NIKE_SCENES_SERVICE->registerScene<Menu::Scene>("MENU");
 
 	// register built in model for batched quad rendering (!TODO: can be implemented in a different way if required)
 	//NIKE_ASSETS_SERVICE->loadModel("batched_square", "assets/Models/square.txt", true);

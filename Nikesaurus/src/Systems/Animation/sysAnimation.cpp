@@ -23,7 +23,7 @@ namespace NIKE {
 		for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
 
 			//Iterate through layers
-			for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+			for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 				//SKip inactive layer
 				if (!layer->getLayerState())
 					continue;

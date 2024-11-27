@@ -469,7 +469,7 @@ namespace NIKE {
 			ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
@@ -724,43 +724,36 @@ namespace NIKE {
 
 	void LevelEditor::EntitiesPanel::update() {
 
-		//Get all active entities
+		//Update entities list when there is size mismatch
 		if (entities.size() != NIKE_ECS_MANAGER->getEntitiesCount()) {
-			auto entities_set = NIKE_ECS_MANAGER->getAllEntities();
-			//Iterate through all active entities
-			unsigned int count = 0;
-			for (auto entity : entities_set) {
+			//Get all entities currently active in the ECS
+			auto ecs_entities = NIKE_ECS_MANAGER->getAllEntities();
+
+			//Remove entities that are no longer in the ECS
+			for (auto it = entities.begin(); it != entities.end();) {
+				if (ecs_entities.find(it->first) == ecs_entities.end()) {
+					//Remove the entity from all associated maps
+					name_to_entity.erase(entity_to_name.at(it->first));
+					entity_to_name.erase(it->first);
+					it = entities.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+
+			//Add new entities from the ECS that are not yet in the editor
+			for (auto& entity : ecs_entities) {
 				if (entities.find(entity) == entities.end()) {
-					//Emplace entity
-					entities.emplace(entity, EditorEntity());
 
 					//Create identifier for entity
 					char entity_name[32];
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", count);
+					snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
 
-					//Add entity to BiMap
+					//Add entity to editor structures
+					entities.emplace(entity, EditorEntity());
 					entity_to_name.emplace(entity, entity_name);
 					name_to_entity.emplace(entity_name, entity);
-				}
-
-				count++;
-			}
-
-			if (entities.size() != entities_set.size()) {
-				//Iterate through entities ref to check which entity has been removed
-				auto enit = entity_to_name.begin();
-				auto neit = name_to_entity.begin();
-				for (decltype(entities)::iterator it = entities.begin(); it != entities.end();) {
-					if (entities_set.find(it->first) == entities_set.end()) {
-						it = entities.erase(it);
-						enit = entity_to_name.erase(enit);
-						neit = name_to_entity.erase(neit);
-					}
-					else {
-						++it;
-						++enit;
-						++neit;
-					}
 				}
 			}
 		}
@@ -812,8 +805,8 @@ namespace NIKE {
 				entity_clicked = false;
 
 				//Iterate through entities from top layer down
-				for (auto layer = NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rbegin();
-					!entity_clicked && layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
+				for (auto layer = NIKE_SCENES_SERVICE->getLayers().rbegin();
+					!entity_clicked && layer != NIKE_SCENES_SERVICE->getLayers().rend();
 					layer++) {
 
 					//SKip inactive layer
@@ -1587,7 +1580,7 @@ namespace NIKE {
 			ImGui::InputInt("##NewLayerID", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
 
 			//Click set to set layer
 			if (ImGui::Button("Set")) {
@@ -3637,7 +3630,7 @@ namespace NIKE {
 				auto texture = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(asset_id);
 
 				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 				//Add transform
 				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, Vector2f((float)texture->size.x, (float)texture->size.y), 0.0f));
@@ -3661,7 +3654,7 @@ namespace NIKE {
 				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 				//Add transform
 				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, size, 0.0f));
@@ -3685,7 +3678,7 @@ namespace NIKE {
 				std::string place_holder{ "Hello World! Ah Pan Tat!" };
 
 				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 				//Add transform
 				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
@@ -3693,6 +3686,16 @@ namespace NIKE {
 				//Add texture
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(entity, Render::Text(asset_id, place_holder, color, 1.0f));
 			}
+
+			//Scene file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Change scene payload
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, asset_id));
+			}
+
 			ImGui::EndDragDropTarget();
 		}
 	}
@@ -3823,7 +3826,6 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Layer Management Window Panel
 	*********************************************************************/
-
 	void LevelEditor::LayerManagementPanel::setPopUpErrorMsg(std::string const& msg)
 	{
 		err_msg->assign(msg);
@@ -3831,7 +3833,7 @@ namespace NIKE {
 
 	void LevelEditor::LayerManagementPanel::updateLayerNames() {
 		layer_names.clear();
-		for (const auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (const auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			layer_names.push_back("Layer " + std::to_string(layer->getLayerID()));
 		}
 	}
@@ -3868,10 +3870,10 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		// Get total layer count
-		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
 
 		// Get layers
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		// Update the layer names when layers change
 		if (layer_count != layer_names.size()) {
@@ -3940,14 +3942,14 @@ namespace NIKE {
 
 					// Do action
 					create_layer_action.do_action = [&, previous_layer_count]() {
-						NIKE_SCENES_SERVICE->getCurrScene()->createLayer(previous_layer_count);
+						NIKE_SCENES_SERVICE->createLayer(previous_layer_count);
 						updateLayerNames();
 						};
 
 					// Undo action
 					create_layer_action.undo_action = [&, previous_layer_count]() {
 						if (!layers.empty()) {
-							NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(previous_layer_count);
+							NIKE_SCENES_SERVICE->removeLayer(previous_layer_count);
 							updateLayerNames();
 						}
 						};
@@ -3974,7 +3976,7 @@ namespace NIKE {
 
 					// Do action
 					remove_layer_action.do_action = [&, removed_layer_id]() {
-						NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(removed_layer_id);
+						NIKE_SCENES_SERVICE->removeLayer(removed_layer_id);
 						// Adjusts selected_layer_index to the last valid index
 						selected_layer_index = min(selected_layer_index, static_cast<unsigned int>(layers.size() - 1));
 						updateLayerNames();
@@ -3982,7 +3984,7 @@ namespace NIKE {
 
 					// Undo action
 					remove_layer_action.undo_action = [&, removed_layer_id]() {
-						NIKE_SCENES_SERVICE->getCurrScene()->createLayer(removed_layer_id);
+						NIKE_SCENES_SERVICE->createLayer(removed_layer_id);
 						updateLayerNames();
 					};
 

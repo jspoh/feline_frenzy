@@ -935,12 +935,12 @@ namespace NIKE {
 		static unsigned int selected_layer_index = 0;
 		static unsigned int bit_position = 0;
 
-		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
-		const auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
+		const auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		std::vector<std::string> layer_names;
 		for (int i = 0; i < layers.size(); ++i) {
-			layer_names.push_back("Layer " + std::to_string(NIKE_SCENES_SERVICE->getCurrScene()->getLayer(i)->getLayerID()));
+			layer_names.push_back("Layer " + std::to_string(NIKE_SCENES_SERVICE->getLayer(i)->getLayerID()));
 		}
 
 		// Display layer count
@@ -973,7 +973,7 @@ namespace NIKE {
 
 			// Button to create a new layer with the next available index
 			if (ImGui::Button("Create Layer")) {
-				NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
+				NIKE_SCENES_SERVICE->createLayer(layer_count);
 				selected_layer_index = layer_count;
 			}
 
@@ -986,7 +986,7 @@ namespace NIKE {
 				if (layer_count > 1)
 				{
 					unsigned int layer_id = layers[selected_layer_index]->getLayerID();
-					NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(layer_id);
+					NIKE_SCENES_SERVICE->removeLayer(layer_id);
 
 					// Update the selected index and refetch the layers
 					selected_layer_index = 0;

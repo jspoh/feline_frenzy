@@ -160,6 +160,9 @@ namespace NIKE {
 		//Init camera
 		NIKE_CAMERA_SERVICE->init(json_config);
 
+		//Init scene
+		NIKE_SCENES_SERVICE->init();
+
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
 
