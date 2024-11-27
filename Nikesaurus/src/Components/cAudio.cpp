@@ -101,48 +101,63 @@ namespace NIKE {
 
 				//Set Channel Group ID
 				{
-					//Channel group id input
-					ImGui::Text("Enter Channel Group ID:");
-					if (ImGui::InputText("##ChannelGroupID", channel_group_id.data(), channel_group_id.capacity() + 1)) {
-						channel_group_id.resize(strlen(channel_group_id.c_str()));
+					// Display a combo box for selecting a audio
+					ImGui::Text("Select Channel Group:");
+
+					// Hold the current and previous audio selection
+					static std::string previous_channel_group_id = comp.channel_group_id;
+					std::string current_channel_group_id = comp.channel_group_id;
+
+					// Get all loaded audios
+					const auto& all_loaded_channel_groups = NIKE_AUDIO_SERVICE->getAllChannelGroups();
+
+					// Get the string from the map and change to const char* for imgui combo
+					std::vector<const char*> all_channel_group_names;
+					for (auto& elem : all_loaded_channel_groups)
+					{
+						all_channel_group_names.push_back(elem.first.c_str());
 					}
 
-					ImGui::SameLine();
-
-					//Save audio ID Button
-					if (ImGui::Button("Save##ChannelGroupID")) {
-						if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(channel_group_id)) {
-							LevelEditor::Action save_channel_group;
-
-							//Save audio action
-							save_channel_group.do_action = [&, id = channel_group_id]() {
-								comp.channel_group_id = id;
-								channel_group_id = comp.channel_group_id;
-								};
-
-							//Undo save audio action
-							save_channel_group.undo_action = [&, id = comp.channel_group_id]() {
-								comp.channel_group_id = id;
-								channel_group_id = comp.channel_group_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_channel_group));
-							comp_panel.setPopUpSuccessMsg("Audio Channel Group Saved!");
-							comp_panel.openPopUp("Success");
+					// Find the index of the currently selected audio in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_channel_group_names.size(); ++i) {
+						if (current_channel_group_id == all_channel_group_names[i]) {
+							current_index = static_cast<int>(i);
+							break;
 						}
-						else {
-							comp_panel.setPopUpErrorMsg("Channel Group Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							channel_group_id = comp.channel_group_id;
+					}
+
+					// Display combo box for audio selection
+					if (ImGui::Combo("##SelectChannelGroup", &current_index, all_channel_group_names.data(), static_cast<int>(all_channel_group_names.size()))) {
+						// Validate the selected index and get the new audio ID
+						if (current_index >= 0 && current_index < static_cast<int>(all_channel_group_names.size())) {
+							std::string new_channel_group_id = all_channel_group_names[current_index];
+							if (new_channel_group_id != comp.channel_group_id) {
+								// Save action
+								LevelEditor::Action change_channel_group_id_action;
+								change_channel_group_id_action.do_action = [&, channel_group_id = new_channel_group_id]() {
+									comp.channel_group_id = channel_group_id;
+									};
+
+								// Undo action
+								change_channel_group_id_action.undo_action = [&, channel_group_id = previous_channel_group_id]() {
+									comp.channel_group_id = channel_group_id;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_channel_group_id_action));
+
+								// Update the previous audio ID
+								previous_channel_group_id = new_channel_group_id;
+							}
 						}
 					}
 				}
 
-				ImGui::Text("Edit Audio Volume & Pitch:");
-
 				//Set volume
 				if (!comp.audio_id.empty() && !comp.channel_group_id.empty())
 				{
+					ImGui::Text("Edit Audio Volume & Pitch:");
 					{
 						//Volume before change
 						static float vol_before_change;

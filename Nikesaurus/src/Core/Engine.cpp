@@ -169,6 +169,9 @@ namespace NIKE {
 		//Init UI
 		NIKE_UI_SERVICE->init();
 
+		// For testing imgui combo - lim
+		NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
+
 		//Register Def Components
 		registerDefComponents();
 
