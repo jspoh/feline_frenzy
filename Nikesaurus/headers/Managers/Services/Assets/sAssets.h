@@ -271,6 +271,7 @@ namespace NIKE {
 		//	bool deleteAllFiles(std::string const& file_path);
 		//};
 
+		//Asset types
 		enum class Types {
 			None = 0,
 			Texture,
@@ -284,6 +285,7 @@ namespace NIKE {
 			Script
 		};
 
+		//Asset service
 		class NIKE_API Service {
 		private:
 
@@ -393,6 +395,9 @@ namespace NIKE {
 
 			//Get asset path from registered asset id
 			std::filesystem::path getAssetPath(std::string const& asset_id) const;
+
+			//Get all asset ref of type
+			std::vector<std::string> getAssetRefs(Types type) const;
 
 			//Check if asset is loaded from asset id
 			bool isAssetCached(std::string const& asset_id) const;

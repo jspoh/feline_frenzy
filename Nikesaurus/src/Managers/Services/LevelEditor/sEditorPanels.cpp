@@ -2605,7 +2605,6 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ResourcePanel::update() {
-
 	}
 
 	void LevelEditor::ResourcePanel::render() {

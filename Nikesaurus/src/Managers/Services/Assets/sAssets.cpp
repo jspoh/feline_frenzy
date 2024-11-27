@@ -1103,6 +1103,17 @@ namespace NIKE {
 		return asset_registry.at(asset_id).primary_path;
 	}
 
+	std::vector<std::string> Assets::Service::getAssetRefs(Assets::Types type) const {
+		std::vector<std::string> asset_refs;
+		for (auto it = asset_registry.begin(); it != asset_registry.end(); ++it) {
+			if (it->second.type == type) {
+				asset_refs.push_back(it->first);
+			}
+		}
+
+		return asset_refs;
+	}
+
 	bool Assets::Service::isAssetCached(std::string const& asset_id) const {
 		//Check asset cache
 		auto cache_it = asset_cache.find(asset_id);
