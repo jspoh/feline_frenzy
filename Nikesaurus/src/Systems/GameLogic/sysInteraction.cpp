@@ -60,7 +60,6 @@ namespace NIKE {
 
                 // Check if target health drops to zero or below
                 if (target_health <= 0) {
-                    //!TODO: DESTROY ENTITY
                     NIKE_ECS_MANAGER->markEntityForDeletion(target);
                     NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
                 }
