@@ -58,6 +58,12 @@ namespace NIKE {
 		render_loader = std::make_unique<Assets::RenderLoader>();
 		audio_system = audio_sys;
 
+		//Add executable types
+		executable_types.insert(Types::Scene);
+		executable_types.insert(Types::Prefab);
+		executable_types.insert(Types::Grid);
+		executable_types.insert(Types::Script);
+
 		//Texture extensions
 		addValidExtensions(".png");
 		addValidExtensions(".jpg");
@@ -103,6 +109,12 @@ namespace NIKE {
 		//Register Sound loader
 		registerLoader(Assets::Types::Sound, [this](std::filesystem::path const& primary_path) {
 			return audio_system->createSound(primary_path.string());
+			});
+
+		//Register Scene loader
+		registerLoader(Assets::Types::Scene, [this](std::filesystem::path const& primary_path) {
+			NIKE_SERIALIZE_SERVICE->loadSceneFromFile(primary_path.string());
+			return nullptr;
 			});
 	}
 
@@ -189,6 +201,40 @@ namespace NIKE {
 
 		//Cache asset
 		cacheAsset(asset_id);
+	}
+
+	void Assets::Service::getExecutable(std::string const& asset_id) {
+
+		//Check if asset is a executable asset type
+		if (executable_types.find(getAssetType(asset_id)) == executable_types.end()) {
+			NIKEE_CORE_WARN("Wrong usage! For fetching normal type assets use getAsset<T>().");
+			return;
+		}
+
+		//Get asset meta data
+		auto meta_it = asset_registry.find(asset_id);
+		if (meta_it == asset_registry.end()) {
+			return;
+		}
+
+		//Load assset through registered loaded
+		auto loader_it = asset_loader.find(meta_it->second.type);
+		if (loader_it == asset_loader.end()) {
+
+			//Return nullptr
+			throw std::runtime_error("Loader not registered for asset type");
+		}
+
+		//Run executable
+		loader_it->second(meta_it->second.primary_path);
+	}
+
+	void Assets::Service::addTypeAsExecutable(Types type) {
+		executable_types.insert(type);
+	}
+
+	bool Assets::Service::isAssetExecutableType(std::string const& asset_id) const {
+		return executable_types.find(getAssetType(asset_id)) != executable_types.end();
 	}
 
 	Assets::Types Assets::Service::getAssetType(std::string const& asset_id) const {

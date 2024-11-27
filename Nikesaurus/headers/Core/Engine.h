@@ -119,6 +119,8 @@ namespace NIKE {
 			}
 		};
 
+
+
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)
 	}

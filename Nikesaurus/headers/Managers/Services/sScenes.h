@@ -22,6 +22,7 @@ namespace NIKE {
 
 		//Forward declaration of IScene for friending layer
 		class IScene;
+		class Services;
 
 		//Layer class
 		class NIKE_API Layer {
@@ -30,6 +31,7 @@ namespace NIKE {
 		private:
 			//Friend of layer class
 			friend class IScene;
+			friend class Services;
 
 			//Layer mask
 			LayerMask mask;
@@ -127,6 +129,64 @@ namespace NIKE {
 			//Constructor
 			SceneEvent(Actions scene_action, std::string next_scene_id)
 				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {}
+		};
+
+		class NIKE_API Services {
+		private:
+			//Delete Copy Constructor & Copy Assignment
+			Services(Services const& copy) = delete;
+			void operator=(Services const& copy) = delete;
+
+			//Curr scene
+			std::string curr_scene;
+
+			//Prev scene
+			std::string prev_scene;
+
+			//Scene event queue
+			std::shared_ptr<Scenes::SceneEvent> event_queue;
+
+			//Layers within scene
+			std::vector<std::shared_ptr<Layer>> layers;
+
+			//Init starting scene
+			void initScene(std::string const& scene_id);
+
+			//Change scene
+			void changeScene(std::string const& scene_id);
+
+			//Restart scene
+			void restartScene();
+
+			//Go To Previous scene
+			void previousScene();
+		public:
+			Services() = default;
+			~Services() = default;
+
+			//Create layer
+			std::shared_ptr<Layer> createLayer(int index = -1);
+
+			//Get layer
+			std::shared_ptr<Layer> getLayer(unsigned int layer_id);
+
+			//Remove layer
+			void removeLayer(unsigned int layer_id);
+
+			//Check layer
+			bool checkLayer(unsigned int layer_id);
+
+			//Get layer count
+			unsigned int getLayerCount() const;
+
+			//Get all layers
+			std::vector<std::shared_ptr<Layer>>& getLayers();
+
+			//Queue scene event
+			void queueSceneEvent(Scenes::SceneEvent&& event);
+
+			//Update scene event
+			void update();
 		};
 
 		//Scenes manager

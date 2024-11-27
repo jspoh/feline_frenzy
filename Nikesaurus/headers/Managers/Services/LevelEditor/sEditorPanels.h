@@ -407,6 +407,33 @@ namespace NIKE {
 			bool checkGridSnapping() const;
 		};
 
+		//Prefabs Management panel
+		class PrefabsPanel : public IPanel {
+		private:
+		public:
+			PrefabsPanel() = default;
+			~PrefabsPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Prefab Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Prefab Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
 		//Debug Management Panel
 		class DebugPanel : public IPanel {
 		private:

@@ -66,6 +66,9 @@ namespace NIKE {
 			//List of invalid extension
 			std::set<std::string> valid_extensions;
 
+			//List of executable asset type
+			std::set<Types> executable_types;
+
 			//Asset registry of meta data
 			std::unordered_map<std::string, MetaData> asset_registry;
 
@@ -116,6 +119,13 @@ namespace NIKE {
 			//Get asset
 			template <typename T>
 			std::shared_ptr<T> getAsset(std::string const& asset_id) {
+
+				//Check if asset is a executable asset type
+				if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+					NIKEE_CORE_WARN("Wrong usage! For fetching executable type assets use getExecutable().");
+					return nullptr;
+				}
+
 				//Check asset cache
 				auto cache_it = asset_cache.find(asset_id);
 				if (cache_it != asset_cache.end()) {
@@ -149,6 +159,15 @@ namespace NIKE {
 				//Return asset
 				return std::static_pointer_cast<T>(asset);
 			}
+
+			//Get executable
+			void getExecutable(std::string const& asset_id);
+
+			//Add asset type as executable
+			void addTypeAsExecutable(Types type);
+
+			//check if asset is executable type
+			bool isAssetExecutableType(std::string const& asset_id) const;
 
 			//Get asset type from registered asset id
 			Types getAssetType(std::string const& asset_id) const;

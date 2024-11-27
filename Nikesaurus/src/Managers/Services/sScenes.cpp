@@ -132,6 +132,158 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Scene maanger
 	*********************************************************************/
+	void Scenes::Services::initScene(std::string const& scene_id) {
+
+		//Set curr & prev scene id references
+		curr_scene = scene_id;
+		prev_scene = curr_scene;
+
+		//Run scene
+		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+	}
+
+	void Scenes::Services::changeScene(std::string const& scene_id) {
+
+		//Change scene only if its not the same scene
+		if (scene_id == curr_scene) {
+			return;
+		}
+		
+		//Set curr & prev scene id references
+		prev_scene = curr_scene;
+		curr_scene = scene_id;
+
+		//Run scene
+		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+	}
+
+	void Scenes::Services::restartScene() {
+		//ReRun scene
+		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+	}
+
+	void Scenes::Services::previousScene() {
+		//If prev scene is same as curr scene, restart curr scene
+		if (prev_scene == curr_scene) {
+			restartScene();
+			return;
+		}
+
+		//Change New State
+		std::swap(prev_scene, curr_scene);
+
+		//Run scene
+		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+	}
+
+	std::shared_ptr<Scenes::Layer> Scenes::Services::createLayer(int index) {
+		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
+		//Insert layers at back
+		if (index >= 0) {
+			layers.emplace(layers.begin() + index, layer);
+		}
+		else {
+			layers.push_back(layer);
+			index = static_cast<int>(layers.size()) - 1;
+		}
+
+		layer->id = index;
+		layer->mask.set(layer->id, true);
+
+		return layer;
+	}
+
+	std::shared_ptr<Scenes::Layer> Scenes::Services::getLayer(unsigned int layer_id) {
+		//Check if layer has been added
+		if (layer_id >= static_cast<unsigned int>(layers.size())) {
+			throw std::runtime_error("Layer has not been registered.");
+		}
+
+		return layers.at(layer_id);
+	}
+
+	void Scenes::Services::removeLayer(unsigned int layer_id) {
+		//Check if layer has been added
+		if (layer_id >= static_cast<unsigned int>(layers.size())) {
+			throw std::runtime_error("Layer has not been registered.");
+		}
+
+		//Set all of removed layer bit to false
+		for (auto& layer : layers) {
+			//Set bit removed id bit to false
+			layer->mask.set(layer_id, false);
+		}
+
+		//Erase layer
+		layers.erase(layers.begin() + layer_id);
+
+		//Update layers index & mask
+		unsigned int index = 0;
+		for (auto& layer : layers) {
+			//Get new index
+			layer->id = index++;
+
+			//Shift all bits down
+			for (unsigned int i = layer_id + 1; i < layers.size(); i++) {
+				layer->mask[i - 1] = layer->mask[i];
+			}
+
+			//Clear the last bit, as it has shifted left by one position
+			layer->mask[layers.size() - 1] = false;
+		}
+	}
+
+	bool Scenes::Services::checkLayer(unsigned int layer_id) {
+		return layer_id < static_cast<unsigned int>(layers.size());
+	}
+
+	unsigned int Scenes::Services::getLayerCount() const {
+		return static_cast<unsigned int>(layers.size());
+	}
+
+	std::vector<std::shared_ptr<Scenes::Layer>>& Scenes::Services::getLayers() {
+		return layers;
+	}
+
+	void Scenes::Services::queueSceneEvent(Scenes::SceneEvent&& new_event) {
+		if (event_queue == nullptr) {
+			event_queue = std::make_shared<Scenes::SceneEvent>(std::move(new_event));
+		}
+		else {
+			NIKEE_CORE_INFO("Multiple new scene event. First scene event will be used");
+		}
+	}
+
+	void Scenes::Services::update() {
+		if (!NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+		}
+
+		if (event_queue) {
+			switch (event_queue->scene_action) {
+			case Scenes::Actions::CHANGE:
+				changeScene(event_queue->next_scene_id);
+				break;
+			case Scenes::Actions::PREVIOUS:
+				previousScene();
+				break;
+			case Scenes::Actions::RESTART:
+				restartScene();
+				break;
+			case Scenes::Actions::CLOSE:
+				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				break;
+			default:
+				break;
+			}
+
+			//Reset queue
+			event_queue.reset();
+		}
+	}
+
+	/*****************************************************************//**
+	* Scene maanger
+	*********************************************************************/
 	void Scenes::Service::initScene(std::string scene_id) {
 		curr_scene = scenes.at(scene_id);
 		prev_scene = curr_scene;
@@ -215,8 +367,12 @@ namespace NIKE {
 	}
 
 	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent&& new_event) {
-		if(event_queue == nullptr)
-		event_queue = std::make_shared<Scenes::SceneEvent>(std::move(new_event));
+		if (event_queue == nullptr) {
+			event_queue = std::make_shared<Scenes::SceneEvent>(std::move(new_event));
+		}
+		else {
+			NIKEE_CORE_INFO("Multiple new scene event. First scene event will be used");
+		}
 	}
 
 	void Scenes::Service::update() {

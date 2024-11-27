@@ -2244,6 +2244,23 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
+	* Prefab Management Panel
+	*********************************************************************/
+	void LevelEditor::PrefabsPanel::init() {
+
+	}
+
+	void LevelEditor::PrefabsPanel::update() {
+
+	}
+
+	void LevelEditor::PrefabsPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
 	* Resource Management Panel
 	*********************************************************************/
 	void LevelEditor::ResourcePanel::moveFileAcceptPayload(std::string const& virtual_path) {
@@ -2873,85 +2890,88 @@ namespace NIKE {
 			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::Image(display, { 256, 256 }, uv0, uv1);
 
-			//Asset loading or unloading
-			if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
-				//Unload action
-				if (ImGui::Button("Unload")) {
+			//Non executable type actions
+			if (!NIKE_ASSETS_SERVICE->isAssetExecutableType(selected_asset_id)) {
+				//Asset loading or unloading
+				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
+					//Unload action
+					if (ImGui::Button("Unload")) {
 
-					//Unload asset
-					NIKE_ASSETS_SERVICE->uncacheAsset(selected_asset_id);
-					success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
-					openPopUp("Success");
-				}
-
-				//Audio asset preview
-				if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
-					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music) {
-
-					//Same line
-					ImGui::SameLine();
-					
-					//Play button
-					if (ImGui::Button("Play")) {
-						//Check if channel group has been created
-						if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
-							NIKE_AUDIO_SERVICE->createChannelGroup("Audio Preview");
-						}
-
-						//Get audio group
-						auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
-
-						//Toggle audio state
-						if (group->getPaused()) {
-							group->setPaused(false);
-						}
-						else {
-							//Play music
-							bool is_music = NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music ? true : false;
-							NIKE_AUDIO_SERVICE->playAudio(selected_asset_id, "", "Audio Preview", 0.5f, 0.5f, false, is_music);
-						}
+						//Unload asset
+						NIKE_ASSETS_SERVICE->uncacheAsset(selected_asset_id);
+						success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
+						openPopUp("Success");
 					}
 
-					//Manage preview audio group
-					if (NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
-						auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
+					//Audio asset preview
+					if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
+						NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music) {
 
-						if (group->isPlaying()) {
-							//Same line
-							ImGui::SameLine();
+						//Same line
+						ImGui::SameLine();
 
-							//Pause audio preview
-							if (ImGui::Button("Pause")) {
-								group->setPaused(true);
+						//Play button
+						if (ImGui::Button("Play")) {
+							//Check if channel group has been created
+							if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
+								NIKE_AUDIO_SERVICE->createChannelGroup("Audio Preview");
 							}
 
-							//Same line
-							ImGui::SameLine();
+							//Get audio group
+							auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
 
-							//Pause audio preview
-							if (ImGui::Button("Stop")) {
-								group->stop();
+							//Toggle audio state
+							if (group->getPaused()) {
+								group->setPaused(false);
+							}
+							else {
+								//Play music
+								bool is_music = NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music ? true : false;
+								NIKE_AUDIO_SERVICE->playAudio(selected_asset_id, "", "Audio Preview", 0.5f, 0.5f, false, is_music);
 							}
 						}
-						else if (!group->isPlaying() && !group->getPaused()) {
-							NIKE_AUDIO_SERVICE->unloadChannelGroup("Audio Preview");
+
+						//Manage preview audio group
+						if (NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
+							auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
+
+							if (group->isPlaying()) {
+								//Same line
+								ImGui::SameLine();
+
+								//Pause audio preview
+								if (ImGui::Button("Pause")) {
+									group->setPaused(true);
+								}
+
+								//Same line
+								ImGui::SameLine();
+
+								//Pause audio preview
+								if (ImGui::Button("Stop")) {
+									group->stop();
+								}
+							}
+							else if (!group->isPlaying() && !group->getPaused()) {
+								NIKE_AUDIO_SERVICE->unloadChannelGroup("Audio Preview");
+							}
 						}
 					}
 				}
-			}
-			else {
-				//Load action
-				if (ImGui::Button("Load")) {
+				else {
+					//Load action
+					if (ImGui::Button("Load")) {
 
-					//Load asset
-					NIKE_ASSETS_SERVICE->cacheAsset(selected_asset_id);
-					success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
-					openPopUp("Success");
+						//Load asset
+						NIKE_ASSETS_SERVICE->cacheAsset(selected_asset_id);
+						success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
+						openPopUp("Success");
+					}
 				}
-			}
 
-			//Same line
-			ImGui::SameLine();
+				//Same line
+				ImGui::SameLine();
+			}
 
 			//Delete asset
 			if (ImGui::Button("Delete")) {

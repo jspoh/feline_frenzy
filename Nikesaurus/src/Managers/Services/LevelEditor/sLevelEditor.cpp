@@ -309,6 +309,11 @@ namespace NIKE {
 		panels.push_back(components_panel);
 		panels_map.emplace(components_panel->getName(), components_panel);
 
+		//Add prefab management panel
+		auto prefab_panel = std::make_shared<PrefabsPanel>();
+		panels.push_back(prefab_panel);
+		panels_map.emplace(prefab_panel->getName(), prefab_panel);
+
 		//Add debug management panel
 		auto debug_panel = std::make_shared<DebugPanel>();
 		panels.push_back(debug_panel);
