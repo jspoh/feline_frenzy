@@ -12,7 +12,7 @@
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
-    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "", const Vector2f& shooter_pos = { 0.f, 0.f }) {
+    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "", const Vector2f& shooter_pos = { 0.f, 0.f }, const float& offset = .0f) {
     //void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
         //NIKEE_CORE_INFO("SHOOT BULLET CALLED");
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
@@ -30,30 +30,29 @@ namespace NIKE {
             std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
-            Vector2f bullet_pos = shooter_pos;
-            // Transform
+            // Calculate offset position
+            Vector2f mouse_pos = {
+                NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2),
+                -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2))
+            };
+
+            // Calculate direction
+            Vector2f direction = mouse_pos - shooter_pos;
+            direction.normalize(); 
+
+            // Offset spawn position of bullet
+            Vector2f bullet_pos = shooter_pos + (direction * offset);
+
+            // Set bullet's position
             auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
             if (e_transform_comp.has_value()) {
-                //Set entity position to (0, 0) for now
-                // Will change this to the coord of whatever is spawning the boolet
                 e_transform_comp.value().get().position = bullet_pos;
             }
 
-            // Physics
+            // Apply physics
             auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(new_id);
             if (e_physics_comp.has_value()) {
-                // Get mouse position
-                Vector2f mouse_pos = {
-                    NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2),
-                    -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2))
-                };
-
-                // Calculate direction vector
-                Vector2f direction = mouse_pos - bullet_pos;
-
-                // Normalizing direction vector
-                direction.normalize();
-
+                // Set force
                 e_physics_comp.value().get().force = { direction.x * 1000.f, direction.y * 1000.f };
             }
         }
@@ -80,9 +79,9 @@ namespace NIKE {
         lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
 
         //Register lua binding for prefab loading
-        lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float shooter_x, float shooter_y) {
+        lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float shooter_x, float shooter_y, float offset) {
             Vector2f shooter_pos{ shooter_x, shooter_y };
-            this->shootBullet(layer_id, file_path, entity_name, shooter_pos);
+            this->shootBullet(layer_id, file_path, entity_name, shooter_pos, offset);
             });
 
 

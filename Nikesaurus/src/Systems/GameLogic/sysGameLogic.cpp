@@ -99,7 +99,8 @@ namespace NIKE {
 								std::string script_path = "assets/Scripts/createBullet.lua";
 								std::string function_name = "createBullet";
 								std::string prefab_path = "damageBullet.prefab";
-								int layer_id = 0; // Placeholder
+								float offset = 150.0f;
+								int layer_id = 1; // Placeholder
 
 								// Load Lua Script
 								std::string script_id = lua_system->loadScript(script_path);
@@ -119,7 +120,7 @@ namespace NIKE {
 								}
 								else {
 									// Function was valid 
-									sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y);
+									sol::protected_function_result result = create_bullet_func(layer_id, prefab_path, shooter_pos.x, shooter_pos.y, offset);
 
 									// Checking if something went wrong with lua func
 									if (!result.valid()) {

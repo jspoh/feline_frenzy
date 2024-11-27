@@ -58,7 +58,7 @@ namespace NIKE {
 
 			//Create entity from prefab
 			//void shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name);
-			void shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos);
+			void shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos, const float& offset);
 			
 			//Execute lua scripts
 			sol::protected_function executeScript(std::string const& script_id, std::string const& function);
