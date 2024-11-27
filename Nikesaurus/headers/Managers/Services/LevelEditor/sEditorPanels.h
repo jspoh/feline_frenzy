@@ -515,6 +515,9 @@ namespace NIKE {
 			//Delete directory content popup
 			std::function<void()> deleteDirectoryPopup(std::string const& popup_id);
 
+			//New folder popup
+			std::function<void()> newFolderPopup(std::string const& popup_id);
+
 			//Moving file accept payload
 			void moveFileAcceptPayload(std::string const& virtual_path);
 

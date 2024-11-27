@@ -22,7 +22,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::filesystem::path> virtual_paths;
 
 			//Event call back for file watchess
-			using FileWatchEventCallback = std::function<void(const std::filesystem::path&, filewatch::Event)>;
+			using FileWatchEventCallback = std::function<void(std::filesystem::path const&, filewatch::Event)>;
 
 			//Map of file watchers
 			std::unordered_map<std::filesystem::path, std::unique_ptr<filewatch::FileWatch<std::string>>> dir_watchers;
@@ -80,8 +80,14 @@ namespace NIKE {
 			//Stop watching directory
 			void stopWatchingDirectory(std::string const& virtual_path);
 
+			//Stop watching directory & child directories
+			void stopWatchingDirectoryTree(std::string const& virtual_path);
+
 			//Stop watching all directories
 			void stopWatchingAllDirectories();
+
+			//Log watched directories
+			void logWatchedDirectories() const;
 		};
 	}
 }

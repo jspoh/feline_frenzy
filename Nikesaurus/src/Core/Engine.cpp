@@ -154,6 +154,9 @@ namespace NIKE {
 		//Initialize assets service
 		NIKE_ASSETS_SERVICE->init(NIKE_AUDIO_SERVICE->getAudioSystem());
 
+		//Register all assets in the game and engine folder
+		NIKE_ASSETS_SERVICE->scanAssetDirectory("Game_Assets:/", true);
+
 		//Init camera
 		NIKE_CAMERA_SERVICE->init(json_config);
 

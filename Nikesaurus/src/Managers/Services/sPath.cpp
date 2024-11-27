@@ -244,8 +244,8 @@ namespace NIKE {
 		//Add watcher for the directory
 		dir_watchers.emplace(actual_path,
 			std::make_unique<filewatch::FileWatch<std::string>>(actual_path.string(),
-			[callback](std::string const& file, filewatch::Event event) {
-				callback(file, event);
+			[actual_path, callback](std::string const& file, filewatch::Event event) {
+				callback(actual_path / file, event);
 			}));
 	}
 
@@ -261,16 +261,30 @@ namespace NIKE {
 		if (!std::filesystem::exists(actual_path) || !std::filesystem::is_directory(actual_path)) {
 			throw std::runtime_error("Path does not exist or is not a directory: " + actual_path.string());
 		}
+
+		//Function to add watcher for a directory
+		auto addWatcher = [this, alias, callback](std::filesystem::path const& dir_path) {
+			watchDirectory(convertToVirtualPath(alias, dir_path.string()), callback);
+			};
 		
 		//Add watcher for child directories
 		for (const auto& dir : std::filesystem::recursive_directory_iterator(actual_path)) {
 			if (dir.is_directory()) {
-				watchDirectory(convertToVirtualPath(alias, dir.path().string()), callback);
+				addWatcher(dir.path());
 			}
 		}
 
-		//Add watcher for the actual path
-		watchDirectory(virtual_path, callback);
+		//Watch the root directory and dynamically add watchers for new directories
+		watchDirectory(virtual_path, [this, callback, addWatcher](std::filesystem::path const& path, filewatch::Event event) {
+
+			if (event == filewatch::Event::added && std::filesystem::is_directory(path)) {
+				//Add a watcher for the new directory
+				addWatcher(path);
+			}
+
+			//Pass the event to the callback
+			callback(path, event);
+			});
 	}
 
 	void Path::Service::stopWatchingDirectory(std::string const& virtual_path) {
@@ -289,7 +303,46 @@ namespace NIKE {
 		}
 	}
 
+	void Path::Service::stopWatchingDirectoryTree(std::string const& virtual_path) {
+		//Get alias
+		auto alias = getAlias(virtual_path);
+
+		//Get actual path
+		auto actual_path = resolvePath(virtual_path);
+
+		//Check if path exists
+		if (!std::filesystem::exists(actual_path) || !std::filesystem::is_directory(actual_path)) {
+			throw std::runtime_error("Path does not exist or is not a directory: " + actual_path.string());
+		}
+
+		//Add watcher for child directories
+		for (const auto& dir : std::filesystem::recursive_directory_iterator(actual_path)) {
+			if (dir.is_directory()) {
+				auto path = convertToVirtualPath(alias, dir.path().string());
+
+				//Erase directory from watchers
+				auto it = dir_watchers.find(path);
+				if (it != dir_watchers.end()) {
+					dir_watchers.erase(it);
+				}
+			}
+		}
+
+		//Erase directory from watchers
+		auto it = dir_watchers.find(virtual_path);
+		if (it != dir_watchers.end()) {
+			dir_watchers.erase(it);
+		}
+	}
+
 	void Path::Service::stopWatchingAllDirectories() {
 		dir_watchers.clear();
+	}
+
+	void Path::Service::logWatchedDirectories() const {
+		NIKEE_CORE_INFO("Currently watched directories:");
+		for (const auto& [path, watcher] : dir_watchers) {
+			NIKEE_CORE_INFO(" - " + path.string());
+		}
 	}
 }

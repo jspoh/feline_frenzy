@@ -2253,17 +2253,14 @@ namespace NIKE {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
 
+				//Remember old path
+				std::filesystem::path old_path = NIKE_ASSETS_SERVICE->getAssetPath(asset_id);
+
 				//Copy file
-				std::filesystem::copy(NIKE_ASSETS_SERVICE->getAssetPath(asset_id), NIKE_PATH_SERVICE->resolvePath(virtual_path), std::filesystem::copy_options::overwrite_existing);
+				std::filesystem::copy(old_path, NIKE_PATH_SERVICE->resolvePath(virtual_path), std::filesystem::copy_options::overwrite_existing);
 
 				//Delete assets old registration
-				std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
-
-				//Create new virtual path
-				std::filesystem::path new_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(virtual_path) / asset_id);
-
-				//Register new asset
-				NIKE_ASSETS_SERVICE->registerAsset(NIKE_ASSETS_SERVICE->getAssetType(asset_id), new_path.string(), false);
+				std::filesystem::remove(old_path);
 
 				//Update files
 				files = NIKE_PATH_SERVICE->listFiles(current_path);
@@ -2286,10 +2283,7 @@ namespace NIKE {
 
 				//Check if path is valid
 				if (NIKE_ASSETS_SERVICE->isPathValid(src_file_path.string(), false)) {
-
-					//Copy file
-					std::filesystem::copy(src_file_path, NIKE_PATH_SERVICE->resolvePath(current_path), std::filesystem::copy_options::overwrite_existing);
-
+					
 					//Get asset id
 					auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(src_file_path.string(), false);
 
@@ -2299,11 +2293,8 @@ namespace NIKE {
 						std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
 					}
 
-					//Create new virtual path
-					std::filesystem::path new_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(current_path) / asset_id);
-
-					//Register new asset
-					NIKE_ASSETS_SERVICE->registerAsset(NIKE_ASSETS_SERVICE->getAssetType(asset_id), new_path.string(), false);
+					//Copy file
+					std::filesystem::copy(src_file_path, NIKE_PATH_SERVICE->resolvePath(current_path), std::filesystem::copy_options::overwrite_existing);
 
 					//Log success
 					NIKEE_CORE_INFO("File " + src_file_path.string() + " successfully copied into" + NIKE_PATH_SERVICE->resolvePath(current_path).string());
@@ -2576,6 +2567,51 @@ namespace NIKE {
 			};
 	}
 
+	std::function<void()> LevelEditor::ResourcePanel::newFolderPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Select a component to add
+			ImGui::Text("New folder name: ");
+
+			//New folder name
+			static std::string folder_name = "";
+			folder_name.resize(32);
+			ImGui::InputText("##NewFolderName", folder_name.data(), folder_name.capacity() + 1);
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Create")) {
+
+				//Create a new directory
+				std::filesystem::create_directory(NIKE_PATH_SERVICE->resolvePath(current_path) / folder_name);
+
+				//Update directories & files
+				directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+
+				//Reset folder name buffer
+				folder_name.assign("");
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Reset folder name buffer
+				folder_name.assign("");
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::ResourcePanel::init() {
 
 		//Setup events listening
@@ -2589,6 +2625,7 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Asset", deleteAssetPopup("Delete Asset"));
 		registerPopUp("Clear Directory", deleteDirectoryPopup("Clear Directory"));
+		registerPopUp("New Folder", newFolderPopup("New Folder"));
 
 		//Initialize root
 		root_path = "Game_Assets:/";
@@ -2607,6 +2644,43 @@ namespace NIKE {
 		//Init all directories & files
 		directories = NIKE_PATH_SERVICE->listDirectories(current_path);
 		files = NIKE_PATH_SERVICE->listFiles(current_path);
+
+		//Setup directory watching for 
+		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
+
+			//Watch only for files
+			if (!std::filesystem::is_regular_file(file)) {
+				return;
+			}
+
+			//Watch for events
+			switch (event) {
+			case filewatch::Event::added: {
+
+				//Register assets
+				NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
+				break;
+			}
+			case filewatch::Event::removed: {
+
+				//Unregister assets
+				NIKE_ASSETS_SERVICE->unregisterAsset(NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false));
+				break;
+			}
+			case filewatch::Event::modified: {
+
+				//Only recache assets that are already cached
+				auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
+				if (NIKE_ASSETS_SERVICE->isAssetCached(asset_id)) {
+					NIKE_ASSETS_SERVICE->recacheAsset(asset_id);
+				}
+				break;
+			}
+			default: {
+				break;
+			}
+			}
+		});
 	}
 
 	void LevelEditor::ResourcePanel::update() {
@@ -2614,6 +2688,15 @@ namespace NIKE {
 
 	void LevelEditor::ResourcePanel::render() {
 		if (!ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
+
+			//File dropped popup
+			if (b_file_dropped) {
+				openPopUp("Success");
+				b_file_dropped = false;
+			}
+
+			//Render popups
+			renderPopUps();
 
 			//Return if window is not being shown
 			ImGui::End();
@@ -2637,6 +2720,16 @@ namespace NIKE {
 				}
 			}
 			moveFileAcceptPayload(NIKE_PATH_SERVICE->getVirtualParentPath(current_path));
+		}
+
+		ImGui::Spacing();
+
+		//New folder
+		{
+			//Create new folder popup
+			if (ImGui::Button("New Folder")) {
+				openPopUp("New Folder");
+			}
 		}
 
 		ImGui::Spacing();
@@ -3923,6 +4016,3 @@ namespace NIKE {
 		ImGui::End();
 	}
 }
-
-
-
