@@ -107,7 +107,7 @@ namespace NIKE {
 		//data.push_back(m_data);
 
 		//Layers in scene
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//UI Entities
 		std::unordered_map<Entity::Type, std::string> ui_entities;
@@ -202,12 +202,12 @@ namespace NIKE {
 			//If data contains layer
 			if (l_data.contains("Layer")) {
 				//Deserialize layer
-				if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
-					auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+				if (!NIKE_SCENES_SERVICE->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
+					auto layer = NIKE_SCENES_SERVICE->createLayer();
 					layer->deserialize(l_data.at("Layer"));
 				}
 				else {
-					NIKE_SCENES_SERVICE->getCurrScene()->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
+					NIKE_SCENES_SERVICE->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
 				}
 
 				//Iterate through all entities within layer

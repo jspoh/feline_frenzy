@@ -18,7 +18,7 @@ namespace NIKE {
 	}
 
 	void Audio::Manager::update() {
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 
 			//SKip inactive layer
 			if (!layer->getLayerState())

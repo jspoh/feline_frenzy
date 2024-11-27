@@ -41,7 +41,7 @@ namespace NIKE {
 	void GameLogic::Manager::update() {
 
 		//Get layers
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {

@@ -469,7 +469,7 @@ namespace NIKE {
 			ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
@@ -724,43 +724,36 @@ namespace NIKE {
 
 	void LevelEditor::EntitiesPanel::update() {
 
-		//Get all active entities
+		//Update entities list when there is size mismatch
 		if (entities.size() != NIKE_ECS_MANAGER->getEntitiesCount()) {
-			auto entities_set = NIKE_ECS_MANAGER->getAllEntities();
-			//Iterate through all active entities
-			unsigned int count = 0;
-			for (auto entity : entities_set) {
+			//Get all entities currently active in the ECS
+			auto ecs_entities = NIKE_ECS_MANAGER->getAllEntities();
+
+			//Remove entities that are no longer in the ECS
+			for (auto it = entities.begin(); it != entities.end();) {
+				if (ecs_entities.find(it->first) == ecs_entities.end()) {
+					//Remove the entity from all associated maps
+					name_to_entity.erase(entity_to_name.at(it->first));
+					entity_to_name.erase(it->first);
+					it = entities.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+
+			//Add new entities from the ECS that are not yet in the editor
+			for (auto& entity : ecs_entities) {
 				if (entities.find(entity) == entities.end()) {
-					//Emplace entity
-					entities.emplace(entity, EditorEntity());
 
 					//Create identifier for entity
 					char entity_name[32];
-					snprintf(entity_name, sizeof(entity_name), "entity_%04d", count);
+					snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
 
-					//Add entity to BiMap
+					//Add entity to editor structures
+					entities.emplace(entity, EditorEntity());
 					entity_to_name.emplace(entity, entity_name);
 					name_to_entity.emplace(entity_name, entity);
-				}
-
-				count++;
-			}
-
-			if (entities.size() != entities_set.size()) {
-				//Iterate through entities ref to check which entity has been removed
-				auto enit = entity_to_name.begin();
-				auto neit = name_to_entity.begin();
-				for (decltype(entities)::iterator it = entities.begin(); it != entities.end();) {
-					if (entities_set.find(it->first) == entities_set.end()) {
-						it = entities.erase(it);
-						enit = entity_to_name.erase(enit);
-						neit = name_to_entity.erase(neit);
-					}
-					else {
-						++it;
-						++enit;
-						++neit;
-					}
 				}
 			}
 		}
@@ -812,8 +805,8 @@ namespace NIKE {
 				entity_clicked = false;
 
 				//Iterate through entities from top layer down
-				for (auto layer = NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rbegin();
-					!entity_clicked && layer != NIKE_SCENES_SERVICE->getCurrScene()->getLayers().rend();
+				for (auto layer = NIKE_SCENES_SERVICE->getLayers().rbegin();
+					!entity_clicked && layer != NIKE_SCENES_SERVICE->getLayers().rend();
 					layer++) {
 
 					//SKip inactive layer
@@ -1587,7 +1580,7 @@ namespace NIKE {
 			ImGui::InputInt("##NewLayerID", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
 
 			//Click set to set layer
 			if (ImGui::Button("Set")) {
@@ -2348,6 +2341,23 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
+	* Prefab Management Panel
+	*********************************************************************/
+	void LevelEditor::PrefabsPanel::init() {
+
+	}
+
+	void LevelEditor::PrefabsPanel::update() {
+
+	}
+
+	void LevelEditor::PrefabsPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
 	* Resource Management Panel
 	*********************************************************************/
 	void LevelEditor::ResourcePanel::moveFileAcceptPayload(std::string const& virtual_path) {
@@ -2357,17 +2367,14 @@ namespace NIKE {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
 
+				//Remember old path
+				std::filesystem::path old_path = NIKE_ASSETS_SERVICE->getAssetPath(asset_id);
+
 				//Copy file
-				std::filesystem::copy(NIKE_ASSETS_SERVICE->getAssetPath(asset_id), NIKE_PATH_SERVICE->resolvePath(virtual_path), std::filesystem::copy_options::overwrite_existing);
+				std::filesystem::copy(old_path, NIKE_PATH_SERVICE->resolvePath(virtual_path), std::filesystem::copy_options::overwrite_existing);
 
 				//Delete assets old registration
-				std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
-
-				//Create new virtual path
-				std::filesystem::path new_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(virtual_path) / asset_id);
-
-				//Register new asset
-				NIKE_ASSETS_SERVICE->registerAsset(NIKE_ASSETS_SERVICE->getAssetType(asset_id), new_path.string(), false);
+				std::filesystem::remove(old_path);
 
 				//Update files
 				files = NIKE_PATH_SERVICE->listFiles(current_path);
@@ -2390,10 +2397,7 @@ namespace NIKE {
 
 				//Check if path is valid
 				if (NIKE_ASSETS_SERVICE->isPathValid(src_file_path.string(), false)) {
-
-					//Copy file
-					std::filesystem::copy(src_file_path, NIKE_PATH_SERVICE->resolvePath(current_path), std::filesystem::copy_options::overwrite_existing);
-
+					
 					//Get asset id
 					auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(src_file_path.string(), false);
 
@@ -2403,11 +2407,8 @@ namespace NIKE {
 						std::filesystem::remove(NIKE_ASSETS_SERVICE->getAssetPath(asset_id));
 					}
 
-					//Create new virtual path
-					std::filesystem::path new_path = NIKE_PATH_SERVICE->normalizePath(NIKE_PATH_SERVICE->resolvePath(current_path) / asset_id);
-
-					//Register new asset
-					NIKE_ASSETS_SERVICE->registerAsset(NIKE_ASSETS_SERVICE->getAssetType(asset_id), new_path.string(), false);
+					//Copy file
+					std::filesystem::copy(src_file_path, NIKE_PATH_SERVICE->resolvePath(current_path), std::filesystem::copy_options::overwrite_existing);
 
 					//Log success
 					NIKEE_CORE_INFO("File " + src_file_path.string() + " successfully copied into" + NIKE_PATH_SERVICE->resolvePath(current_path).string());
@@ -2680,6 +2681,51 @@ namespace NIKE {
 			};
 	}
 
+	std::function<void()> LevelEditor::ResourcePanel::newFolderPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Select a component to add
+			ImGui::Text("New folder name: ");
+
+			//New folder name
+			static std::string folder_name = "";
+			folder_name.resize(32);
+			ImGui::InputText("##NewFolderName", folder_name.data(), folder_name.capacity() + 1);
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Create")) {
+
+				//Create a new directory
+				std::filesystem::create_directory(NIKE_PATH_SERVICE->resolvePath(current_path) / folder_name);
+
+				//Update directories & files
+				directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+
+				//Reset folder name buffer
+				folder_name.assign("");
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Reset folder name buffer
+				folder_name.assign("");
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::ResourcePanel::init() {
 
 		//Setup events listening
@@ -2693,6 +2739,7 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Asset", deleteAssetPopup("Delete Asset"));
 		registerPopUp("Clear Directory", deleteDirectoryPopup("Clear Directory"));
+		registerPopUp("New Folder", newFolderPopup("New Folder"));
 
 		//Initialize root
 		root_path = "Game_Assets:/";
@@ -2711,6 +2758,43 @@ namespace NIKE {
 		//Init all directories & files
 		directories = NIKE_PATH_SERVICE->listDirectories(current_path);
 		files = NIKE_PATH_SERVICE->listFiles(current_path);
+
+		//Setup directory watching for 
+		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
+
+			//Watch only for files
+			if (!std::filesystem::is_regular_file(file)) {
+				return;
+			}
+
+			//Watch for events
+			switch (event) {
+			case filewatch::Event::added: {
+
+				//Register assets
+				NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
+				break;
+			}
+			case filewatch::Event::removed: {
+
+				//Unregister assets
+				NIKE_ASSETS_SERVICE->unregisterAsset(NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false));
+				break;
+			}
+			case filewatch::Event::modified: {
+
+				//Only recache assets that are already cached
+				auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
+				if (NIKE_ASSETS_SERVICE->isAssetCached(asset_id)) {
+					NIKE_ASSETS_SERVICE->recacheAsset(asset_id);
+				}
+				break;
+			}
+			default: {
+				break;
+			}
+			}
+		});
 	}
 
 	void LevelEditor::ResourcePanel::update() {
@@ -2718,6 +2802,15 @@ namespace NIKE {
 
 	void LevelEditor::ResourcePanel::render() {
 		if (!ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
+
+			//File dropped popup
+			if (b_file_dropped) {
+				openPopUp("Success");
+				b_file_dropped = false;
+			}
+
+			//Render popups
+			renderPopUps();
 
 			//Return if window is not being shown
 			ImGui::End();
@@ -2741,6 +2834,16 @@ namespace NIKE {
 				}
 			}
 			moveFileAcceptPayload(NIKE_PATH_SERVICE->getVirtualParentPath(current_path));
+		}
+
+		ImGui::Spacing();
+
+		//New folder
+		{
+			//Create new folder popup
+			if (ImGui::Button("New Folder")) {
+				openPopUp("New Folder");
+			}
 		}
 
 		ImGui::Spacing();
@@ -2884,85 +2987,88 @@ namespace NIKE {
 			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::Image(display, { 256, 256 }, uv0, uv1);
 
-			//Asset loading or unloading
-			if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
-				//Unload action
-				if (ImGui::Button("Unload")) {
+			//Non executable type actions
+			if (!NIKE_ASSETS_SERVICE->isAssetExecutableType(selected_asset_id)) {
+				//Asset loading or unloading
+				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
+					//Unload action
+					if (ImGui::Button("Unload")) {
 
-					//Unload asset
-					NIKE_ASSETS_SERVICE->uncacheAsset(selected_asset_id);
-					success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
-					openPopUp("Success");
-				}
-
-				//Audio asset preview
-				if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
-					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music) {
-
-					//Same line
-					ImGui::SameLine();
-					
-					//Play button
-					if (ImGui::Button("Play")) {
-						//Check if channel group has been created
-						if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
-							NIKE_AUDIO_SERVICE->createChannelGroup("Audio Preview");
-						}
-
-						//Get audio group
-						auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
-
-						//Toggle audio state
-						if (group->getPaused()) {
-							group->setPaused(false);
-						}
-						else {
-							//Play music
-							bool is_music = NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music ? true : false;
-							NIKE_AUDIO_SERVICE->playAudio(selected_asset_id, "", "Audio Preview", 0.5f, 0.5f, false, is_music);
-						}
+						//Unload asset
+						NIKE_ASSETS_SERVICE->uncacheAsset(selected_asset_id);
+						success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
+						openPopUp("Success");
 					}
 
-					//Manage preview audio group
-					if (NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
-						auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
+					//Audio asset preview
+					if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
+						NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music) {
 
-						if (group->isPlaying()) {
-							//Same line
-							ImGui::SameLine();
+						//Same line
+						ImGui::SameLine();
 
-							//Pause audio preview
-							if (ImGui::Button("Pause")) {
-								group->setPaused(true);
+						//Play button
+						if (ImGui::Button("Play")) {
+							//Check if channel group has been created
+							if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
+								NIKE_AUDIO_SERVICE->createChannelGroup("Audio Preview");
 							}
 
-							//Same line
-							ImGui::SameLine();
+							//Get audio group
+							auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
 
-							//Pause audio preview
-							if (ImGui::Button("Stop")) {
-								group->stop();
+							//Toggle audio state
+							if (group->getPaused()) {
+								group->setPaused(false);
+							}
+							else {
+								//Play music
+								bool is_music = NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music ? true : false;
+								NIKE_AUDIO_SERVICE->playAudio(selected_asset_id, "", "Audio Preview", 0.5f, 0.5f, false, is_music);
 							}
 						}
-						else if (!group->isPlaying() && !group->getPaused()) {
-							NIKE_AUDIO_SERVICE->unloadChannelGroup("Audio Preview");
+
+						//Manage preview audio group
+						if (NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
+							auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
+
+							if (group->isPlaying()) {
+								//Same line
+								ImGui::SameLine();
+
+								//Pause audio preview
+								if (ImGui::Button("Pause")) {
+									group->setPaused(true);
+								}
+
+								//Same line
+								ImGui::SameLine();
+
+								//Pause audio preview
+								if (ImGui::Button("Stop")) {
+									group->stop();
+								}
+							}
+							else if (!group->isPlaying() && !group->getPaused()) {
+								NIKE_AUDIO_SERVICE->unloadChannelGroup("Audio Preview");
+							}
 						}
 					}
 				}
-			}
-			else {
-				//Load action
-				if (ImGui::Button("Load")) {
+				else {
+					//Load action
+					if (ImGui::Button("Load")) {
 
-					//Load asset
-					NIKE_ASSETS_SERVICE->cacheAsset(selected_asset_id);
-					success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
-					openPopUp("Success");
+						//Load asset
+						NIKE_ASSETS_SERVICE->cacheAsset(selected_asset_id);
+						success_msg->assign("Asset: \"" + selected_asset_id + "\" loaded.");
+						openPopUp("Success");
+					}
 				}
-			}
 
-			//Same line
-			ImGui::SameLine();
+				//Same line
+				ImGui::SameLine();
+			}
 
 			//Delete asset
 			if (ImGui::Button("Delete")) {
@@ -3628,7 +3734,7 @@ namespace NIKE {
 				auto texture = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(asset_id);
 
 				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 				//Add transform
 				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, Vector2f((float)texture->size.x, (float)texture->size.y), 0.0f));
@@ -3652,7 +3758,7 @@ namespace NIKE {
 				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 				//Add transform
 				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, size, 0.0f));
@@ -3676,7 +3782,7 @@ namespace NIKE {
 				std::string place_holder{ "Hello World! Ah Pan Tat!" };
 
 				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 				//Add transform
 				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
@@ -3684,6 +3790,16 @@ namespace NIKE {
 				//Add texture
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(entity, Render::Text(asset_id, place_holder, color, 1.0f));
 			}
+
+			//Scene file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Scene_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Change scene payload
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, asset_id));
+			}
+
 			ImGui::EndDragDropTarget();
 		}
 	}
@@ -3814,7 +3930,6 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Layer Management Window Panel
 	*********************************************************************/
-
 	void LevelEditor::LayerManagementPanel::setPopUpErrorMsg(std::string const& msg)
 	{
 		err_msg->assign(msg);
@@ -3822,7 +3937,7 @@ namespace NIKE {
 
 	void LevelEditor::LayerManagementPanel::updateLayerNames() {
 		layer_names.clear();
-		for (const auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (const auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			layer_names.push_back("Layer " + std::to_string(layer->getLayerID()));
 		}
 	}
@@ -3859,10 +3974,10 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		// Get total layer count
-		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
 
 		// Get layers
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		// Update the layer names when layers change
 		if (layer_count != layer_names.size()) {
@@ -3931,14 +4046,14 @@ namespace NIKE {
 
 					// Do action
 					create_layer_action.do_action = [&, previous_layer_count]() {
-						NIKE_SCENES_SERVICE->getCurrScene()->createLayer(previous_layer_count);
+						NIKE_SCENES_SERVICE->createLayer(previous_layer_count);
 						updateLayerNames();
 						};
 
 					// Undo action
 					create_layer_action.undo_action = [&, previous_layer_count]() {
 						if (!layers.empty()) {
-							NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(previous_layer_count);
+							NIKE_SCENES_SERVICE->removeLayer(previous_layer_count);
 							updateLayerNames();
 						}
 						};
@@ -3965,7 +4080,7 @@ namespace NIKE {
 
 					// Do action
 					remove_layer_action.do_action = [&, removed_layer_id]() {
-						NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(removed_layer_id);
+						NIKE_SCENES_SERVICE->removeLayer(removed_layer_id);
 						// Adjusts selected_layer_index to the last valid index
 						selected_layer_index = min(selected_layer_index, static_cast<unsigned int>(layers.size() - 1));
 						updateLayerNames();
@@ -3973,7 +4088,7 @@ namespace NIKE {
 
 					// Undo action
 					remove_layer_action.undo_action = [&, removed_layer_id]() {
-						NIKE_SCENES_SERVICE->getCurrScene()->createLayer(removed_layer_id);
+						NIKE_SCENES_SERVICE->createLayer(removed_layer_id);
 						updateLayerNames();
 					};
 
@@ -4029,8 +4144,3 @@ namespace NIKE {
 
 
 }
-/*****************************************************************//**
-* Camera Management Panel
-*********************************************************************/
-
-

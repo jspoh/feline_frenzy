@@ -593,15 +593,18 @@ namespace NIKE {
 		if (!e_text_comp.has_value()) return;
 		auto& e_text = e_text_comp.value().get();
 
-		//Make copy of transform, scale to 1.0f for calculating matrix
-		Transform::Transform copy = e_transform;
-		copy.scale = { 1.0f, 1.0f };
+		//Check if font exists
+		if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
+			//Make copy of transform, scale to 1.0f for calculating matrix
+			Transform::Transform copy = e_transform;
+			copy.scale = { 1.0f, 1.0f };
 
-		//Transform text matrix
-		transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+			//Transform text matrix
+			transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
 
-		//Render text
-		renderText(matrix, e_text);
+			//Render text
+			renderText(matrix, e_text);
+		}
 	}
 
 	void Render::Manager::renderViewport() {
@@ -612,7 +615,7 @@ namespace NIKE {
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
@@ -635,7 +638,7 @@ namespace NIKE {
 		//batchRenderTextures();	// at least 1 call to this is required every frame at the very end
 
 		// render text last
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
