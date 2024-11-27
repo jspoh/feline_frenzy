@@ -238,9 +238,6 @@ namespace NIKE {
 							}
 						}
 					}
-
-
-
 				}
 
 				//Set Text input
@@ -336,97 +333,100 @@ namespace NIKE {
 		// UI for shape
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
-				//Static variables for string input management
-				static std::string shape_model_input;
-
-				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					shape_model_input = comp.model_id;
-				}
-
 				ImGui::Text("Edit Shape variables");
 
 				ImGui::Spacing();
 
 				// For shape model
 				{
-					ImGui::Text("Enter shape model:");
-					if (ImGui::InputText("##ShapeInput", shape_model_input.data(), shape_model_input.capacity() + 1)) {
-						shape_model_input.resize(strlen(shape_model_input.c_str()));
+					// Display a combo box for selecting a model
+					ImGui::Text("Select Shape:");
+
+					// Hold the current and previous model selection
+					static std::string previous_model_id = comp.model_id;
+					std::string current_model_id = comp.model_id;
+
+					// Get all loaded models
+					const auto& all_loaded_models = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Model);
+
+					// Find the index of the currently selected model in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_models.size(); ++i) {
+						if (current_model_id == all_loaded_models[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
 					}
 
-					ImGui::SameLine();
+					// Display combo box for model selection
+					if (ImGui::Combo("##SelectModel", &current_index, all_loaded_models.data(), static_cast<int>(all_loaded_models.size()))) {
+						// Validate the selected index and get the new model ID
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_models.size())) {
+							std::string new_model_id = all_loaded_models[current_index];
+							if (new_model_id != comp.model_id) {
+								// Save action
+								LevelEditor::Action change_model_action;
+								change_model_action.do_action = [&, model_id = new_model_id]() {
+									comp.model_id = model_id;
+									};
 
-					//Save Shape model ID Button
-					if (ImGui::Button("Save##ShapeModelID")) {
-						if (NIKE_ASSETS_SERVICE->isAssetRegistered(shape_model_input))
-						{
-							LevelEditor::Action save_shape_model;
+								// Undo action
+								change_model_action.undo_action = [&, model_id = previous_model_id]() {
+									comp.model_id = model_id;
+									};
 
-							//Save action
-							save_shape_model.do_action = [&, shape_model = shape_model_input]() {
-								comp.model_id = shape_model;
-								shape_model_input = comp.model_id;
-								};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_model_action));
 
-							//Undo action
-							save_shape_model.undo_action = [&, shape_model = comp.model_id]() {
-								comp.model_id = shape_model;
-								shape_model_input = comp.model_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_shape_model));
-							comp_panel.setPopUpSuccessMsg("Shape Model Saved!");
-							comp_panel.openPopUp("Success");
+								// Update the previous model ID
+								previous_model_id = new_model_id;
+							}
 						}
-						else
-						{
-							comp_panel.setPopUpErrorMsg("Shape Model Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							shape_model_input = comp.model_id;
-						}
-
 					}
 				}
 
 				ImGui::Spacing();
 
 				// For shape color
+				if (!comp.model_id.empty())
 				{
-					// Before change
-					static Vector4f before_change;
+					{
+						// Before change
+						static Vector4f before_change;
 
-					ImGui::Text("Adjust shape color:");
+						ImGui::Text("Adjust shape color:");
 
-					ImGui::ColorPicker4("Shape Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
+						ImGui::ColorPicker4("Shape Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
-					//Check if begin editing
-					if (ImGui::IsItemActivated()) {
-						before_change = comp.color;
+						//Check if begin editing
+						if (ImGui::IsItemActivated()) {
+							before_change = comp.color;
+						}
+
+						//Check if finished editing
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_shape_color;
+
+							//Change pos do action
+							change_shape_color.do_action = [&, color = comp.color]() {
+								comp.color = color;
+								};
+
+							//Change pos undo action
+							change_shape_color.undo_action = [&, color = before_change]() {
+								comp.color = color;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_shape_color));
+						}
+
+
 					}
 
-					//Check if finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_shape_color;
-
-						//Change pos do action
-						change_shape_color.do_action = [&, color = comp.color]() {
-							comp.color = color;
-							};
-
-						//Change pos undo action
-						change_shape_color.undo_action = [&, color = before_change]() {
-							comp.color = color;
-							};
-
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_shape_color));
-					}
-
-					
 				}
-
 			}
+				
 		);
 
 
