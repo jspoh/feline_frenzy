@@ -4004,9 +4004,16 @@ namespace NIKE {
 
 			// Layer mask editing
 			if (layers.size() > 1) {
+				// Ensure bit_position does not default to the newly created layer
+				if (bit_position >= layers.size() || bit_position == selected_layer_index) {
+					// Default to a valid layer
+					bit_position = (selected_layer_index == 0) ? 1 : 0; 
+				}
+
+				// Begin Combo for selecting mask layer
 				if (ImGui::BeginCombo("Select Mask Layer", layer_names[bit_position].c_str())) {
 					for (unsigned int i = 0; i < layers.size(); ++i) {
-						if (i == selected_layer_index) continue;
+						if (i == selected_layer_index) continue; 
 
 						const bool mask_selected = (bit_position == i);
 						if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
@@ -4017,6 +4024,7 @@ namespace NIKE {
 					ImGui::EndCombo();
 				}
 
+				// Update and display bit state
 				bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Select Bit State action cannot be undone!");
 				if (ImGui::Checkbox("Set Bit State", &bit_state)) {
@@ -4026,6 +4034,7 @@ namespace NIKE {
 			else {
 				ImGui::Text("No layers available.");
 			}
+
 		}
 		else {
 			ImGui::Text("Select a layer to edit or remove.");
