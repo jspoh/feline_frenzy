@@ -3726,9 +3726,6 @@ namespace NIKE {
 			ImGui::EndDragDropTarget();
 		}
 
-		// Warning message
-		ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "These action cannot be undone!");
-
 		//Create new scene
 		{
 			if (ImGui::Button("Create Scene")) {

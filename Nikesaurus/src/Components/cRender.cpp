@@ -214,7 +214,7 @@ namespace NIKE {
 					}
 
 					// Display combo box for font selection
-					if (ImGui::Combo("Select Font", &current_index, all_loaded_fonts.data(), static_cast<int>(all_loaded_fonts.size()))) {
+					if (ImGui::Combo("##SelectFont", &current_index, all_loaded_fonts.data(), static_cast<int>(all_loaded_fonts.size()))) {
 						// Validate the selected index and get the new font ID
 						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_fonts.size())) {
 							std::string new_font_id = all_loaded_fonts[current_index];
@@ -462,56 +462,53 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
 
-				//Static variables for string input management
-				static std::string texture_id_input;
-
-				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					texture_id_input = comp.texture_id;
-				}
-
 				ImGui::Text("Edit Texture variables");
 
 				ImGui::Spacing();
 
 				// For texture id
 				{
-					ImGui::Text("Enter Texture id:");
-					if (ImGui::InputText("##TextureIDInput", texture_id_input.data(), texture_id_input.capacity() + 10)) {
-						texture_id_input.resize(strlen(texture_id_input.c_str()));
+					// Hold the current and previous texture selection
+					static std::string previous_texture = comp.texture_id;
+					std::string current_texture = comp.texture_id;
+
+					ImGui::Text("Select Texture");
+					
+					auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
+
+					// Find the index of the currently selected texture in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_textures.size(); ++i) {
+						if (current_texture == all_loaded_textures[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
 					}
 
-					ImGui::SameLine();
+					// Display combo box for texture selection
+					if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+						// Validate the selected index and get the new texture
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
+							std::string new_texture = all_loaded_textures[current_index];
+							if (new_texture != comp.texture_id) {
+								// Save action
+								LevelEditor::Action change_font_action;
+								change_font_action.do_action = [&, texture_id = new_texture]() {
+									comp.texture_id = texture_id;
+									};
 
-					//Save Shape model ID Button
-					if (ImGui::Button("Save##TextureID")) {
-						if (NIKE_ASSETS_SERVICE->isAssetRegistered(texture_id_input))
-						{
-							LevelEditor::Action save_texture_id;
+								// Undo action
+								change_font_action.undo_action = [&, texture_id = previous_texture]() {
+									comp.texture_id = texture_id;
+									};
 
-							//Save action
-							save_texture_id.do_action = [&, texture_id = texture_id_input]() {
-								comp.texture_id = texture_id;
-								texture_id_input = comp.texture_id;
-								};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
 
-							//Undo action
-							save_texture_id.undo_action = [&, texture_id = comp.texture_id]() {
-								comp.texture_id = texture_id;
-								texture_id_input = comp.texture_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_texture_id));
-							comp_panel.setPopUpSuccessMsg("Texture ID Saved!");
-							comp_panel.openPopUp("Success");
+								// Update the previous texture
+								previous_texture = new_texture;
+							}
 						}
-						else
-						{
-							comp_panel.setPopUpErrorMsg("Texture ID Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							texture_id_input = comp.texture_id;
-						}
-
 					}
 				}
 
