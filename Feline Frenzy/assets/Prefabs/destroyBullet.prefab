@@ -1,5 +1,8 @@
 {
     "Components": {
+        "Damage::Damage": {
+            "Damage": 1.0
+        },
         "Physics::Collider": {
             "B_Collided": true,
             "Resolution": 3

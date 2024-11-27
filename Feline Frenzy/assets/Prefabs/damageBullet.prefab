@@ -5,7 +5,7 @@
         },
         "Physics::Collider": {
             "B_Collided": true,
-            "Resolution": 0
+            "Resolution": 3
         },
         "Physics::Dynamics": {
             "Drag": 0.0,
@@ -51,8 +51,8 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 149.99998474121094,
-                "y": 149.99998474121094
+                "x": 49.99999237060547,
+                "y": 49.99999237060547
             }
         }
     }

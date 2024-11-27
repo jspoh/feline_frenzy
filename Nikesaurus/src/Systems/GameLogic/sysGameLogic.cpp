@@ -98,7 +98,7 @@ namespace NIKE {
 
 								std::string script_path = "assets/Scripts/createBullet.lua";
 								std::string function_name = "createBullet";
-								std::string prefab_path = "destroyBullet.prefab";
+								std::string prefab_path = "damageBullet.prefab";
 								int layer_id = 0; // Placeholder
 
 								// Load Lua Script
