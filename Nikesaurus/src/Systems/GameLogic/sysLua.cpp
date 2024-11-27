@@ -54,7 +54,7 @@ namespace NIKE {
                 // Normalizing direction vector
                 direction.normalize();
 
-                e_physics_comp.value().get().velocity = { direction.x * 1000.f, direction.y * 1000.f };
+                e_physics_comp.value().get().force = { direction.x * 1000.f, direction.y * 1000.f };
             }
         }
     }
