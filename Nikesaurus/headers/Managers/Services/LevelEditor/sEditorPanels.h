@@ -434,22 +434,31 @@ namespace NIKE {
 			void render() override;
 		};
 
-		//Assets Management Panel
-		class AssetsPanel : public IPanel {
+		//Audio Management Panel
+		class AudioPanel : public IPanel {
 		private:
-			bool show_drop_popup;
+
+			// Selected channel
+			std::string selected_channel_name;
+			//Create entity popup
+			std::function<void()> createChannelPopUp(std::string const& popup_id);
+
+			//Delete Channel popup
+			std::function<void()> deleteChannelPopUp(std::string const& popup_id);
+
 		public:
-			AssetsPanel() = default;
-			~AssetsPanel() = default;
+			AudioPanel() = default;
+			~AudioPanel() = default;
+
 
 			//Panel Name
 			std::string getName() const override {
-				return "Assets Management";
+				return "Audio Management";
 			}
 
 			//Static panel name
 			static std::string getStaticName() {
-				return "Assets Management";
+				return "Audio Management";
 			}
 
 			//Init
@@ -461,7 +470,6 @@ namespace NIKE {
 			//Render
 			void render() override;
 
-			void setDropPopUp(bool show);
 		};
 
 		//Resource Management panel

@@ -219,7 +219,7 @@ namespace NIKE {
 
 	float Audio::NIKEChannelGroup::getPitch() const {
 		float pitch;
-		group->getVolume(&pitch);
+		group->getPitch(&pitch);
 		return pitch;
 	}
 

@@ -2168,79 +2168,183 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
-	* Assets Management Panel
+	* Audio Management Panel
 	*********************************************************************/
-	void LevelEditor::AssetsPanel::init() {
-		std::shared_ptr<std::string> msg = std::make_shared<std::string>("File added successfully!");
-		registerPopUp("Dropped Files", defPopUp("Dropped Files", msg));
+
+	std::function<void()> LevelEditor::AudioPanel::createChannelPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+			//Static channel name input buffer
+			static std::string channel_name;
+			static bool valid_name = true;
+
+			//Get entity text
+			ImGui::Text("Enter a name for the new channel:");
+			if (ImGui::InputText("##Entity Name", channel_name.data(), channel_name.capacity() + 1)) {
+				channel_name.resize(strlen(channel_name.c_str()));
+			}
+			if (!valid_name) {
+				//Warning message
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Please enter a valid name!");
+			}
+
+			//If enter or ok button is pressed
+			if (ImGui::Button("OK")) {
+				//Temporary create action
+				Action create;
+
+				//Create a shared id for do & undo functions
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(channel_name);
+
+				//If entity name is not provided (Create a default)
+				if (shared_id->empty() || NIKE_AUDIO_SERVICE->checkChannelGroupExist(channel_name))
+				{
+					valid_name = false;
+				}
+				else {
+					NIKE_AUDIO_SERVICE->createChannelGroup(channel_name);
+					////Do Action
+					//create.do_action = [&, shared_id]() {
+					//	//Creat new entity 
+					//	Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+
+					//	//Save entity name into entities ref
+					//	entities.emplace(new_id, EditorEntity());
+					//	entity_to_name.emplace(new_id, shared_id->c_str());
+					//	name_to_entity.emplace(shared_id->c_str(), new_id);
+					//	};
+
+					////Undo Action
+					//create.undo_action = [&, shared_id]() {
+
+					//	//Check if entity is still alive
+					//	if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+					//		//Destroy new entity
+					//		NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+
+					//		//Erase new entity ref
+					//		entities.erase(name_to_entity.at(shared_id->data()));
+					//		entity_to_name.erase(name_to_entity.at(shared_id->data()));
+					//		name_to_entity.erase(shared_id->data());
+					//	}
+					//	};
+
+					////Execute create entity action
+					//NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
+
+					//Reset channel name
+					channel_name.clear();
+
+					//Close popup
+					closePopUp(popup_id);
+				}
+			}
+
+			ImGui::SameLine();
+			//Cancel creating new entity
+			if (ImGui::Button("Cancel")) {
+
+				//Reset entity name
+				channel_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
 	}
 
-	void LevelEditor::AssetsPanel::update() {
+	std::function<void()> LevelEditor::AudioPanel::deleteChannelPopUp(std::string const& popup_id){
+
+		return [this, popup_id] {
+			//Warning message
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
+
+			//Select a component to add
+			ImGui::Text("Are you sure you want to delete channel: %s?", selected_channel_name.c_str());
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Confirm")) {
+				
+				if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(selected_channel_name)) {
+					NIKE_AUDIO_SERVICE->unloadChannelGroup(selected_channel_name);
+				}
+				else {
+					NIKEE_CORE_ERROR("Error: Unable to delete channel group!");
+				}
+
+				selected_channel_name.clear();
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+		};
+		
+	}
+
+	void LevelEditor::AudioPanel::init() {
+		registerPopUp("Add New Channel", createChannelPopUp("Add New Channel"));
+		registerPopUp("Delete Channel", deleteChannelPopUp("Delete Channel"));
+	}
+
+	void LevelEditor::AudioPanel::update() {
 
 	}
 
-	void LevelEditor::AssetsPanel::render() {
+	void LevelEditor::AudioPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-		//// Tabs for different asset types
-		//if (ImGui::BeginTabBar("Asset Types"))
-		//{
-		//	// Levels tab for .prefabs files
-		//	if (ImGui::BeginTabItem("Prefabs"))
-		//	{
-		//		displayAssetList("Prefabs");
-		//		ImGui::EndTabItem();
-		//	}
+		if (ImGui::Button("Add New Channel")){
+			openPopUp("Add New Channel");
+		}
 
-		//	// Textures tab
-		//	if (ImGui::BeginTabItem("Textures"))
-		//	{
-		//		displayAssetList("Textures");
-		//		ImGui::EndTabItem();
-		//	}
+		ImGui::Separator();
 
-		//	// Models tab
-		//	if (ImGui::BeginTabItem("Models"))
-		//	{
-		//		displayAssetList("Models");
-		//		ImGui::EndTabItem();
-		//	}
+		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
+			ImGui::Spacing();
+			ImGui::Text("Channel: %s", channel.first.c_str());
 
-		//	// Font tab
-		//	if (ImGui::BeginTabItem("Fonts"))
-		//	{
-		//		displayAssetList("Fonts");
-		//		ImGui::EndTabItem();
-		//	}
+			ImGui::Spacing();
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
-		//	// Scripts tab
-		//	if (ImGui::BeginTabItem("Scripts"))
-		//	{
-		//		displayAssetList("Scripts");
-		//		ImGui::EndTabItem();
-		//	}
+			float volume = channel.second->getVolume();
+			ImGui::Text("Volume");
+			if (ImGui::SliderFloat(std::string("##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f)) {
+				channel.second->setVolume(volume);
+			}
 
-		//	// Audio tab
-		//	if (ImGui::BeginTabItem("Audio"))
-		//	{
-		//		displayAssetList("Audio");
-		//		ImGui::EndTabItem();
-		//	}
+			ImGui::Spacing();
 
-		//	ImGui::EndTabBar();
-		//}
-		//if (show_drop_popup) {
-		//	openPopUp("Dropped Files");
-		//	show_drop_popup = false;
-		//}
+			float pitch = channel.second->getPitch();
+			ImGui::Text("Pitch");
+			if (ImGui::SliderFloat(std::string("##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f)) {
+				channel.second->setPitch(pitch);
+			}
 
+			ImGui::Spacing();
+
+			if (ImGui::Button((std::string("Delete Channel##" + channel.first).c_str()))) {
+				selected_channel_name = channel.first;
+				openPopUp("Delete Channel");
+			}
+			ImGui::Spacing();
+
+			ImGui::Separator();
+
+		}
 		// Render pop-ups
 		renderPopUps();
 		ImGui::End();
-	}
-
-	void LevelEditor::AssetsPanel::setDropPopUp(bool show) {
-		show_drop_popup = show;
 	}
 
 	/*****************************************************************//**
@@ -3922,7 +4026,11 @@ namespace NIKE {
 
 		ImGui::End();
 	}
-}
 
+
+}
+/*****************************************************************//**
+* Camera Management Panel
+*********************************************************************/
 
 

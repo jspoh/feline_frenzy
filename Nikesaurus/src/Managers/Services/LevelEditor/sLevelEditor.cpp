@@ -314,10 +314,10 @@ namespace NIKE {
 		panels.push_back(debug_panel);
 		panels_map.emplace(debug_panel->getName(), debug_panel);
 
-		//Add assets management panel
-		auto assets_panel = std::make_shared<AssetsPanel>();
-		panels.push_back(assets_panel);
-		panels_map.emplace(assets_panel->getName(), assets_panel);
+		//Add audio management panel
+		auto audio_panel = std::make_shared<AudioPanel>();
+		panels.push_back(audio_panel);
+		panels_map.emplace(audio_panel->getName(), audio_panel);
 
 		//Add resource management panel
 		auto resource_panel = std::make_shared<ResourcePanel>();
