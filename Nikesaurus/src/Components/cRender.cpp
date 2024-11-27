@@ -104,12 +104,10 @@ namespace NIKE {
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
 
 				//Static variables for string input management
-				static std::string font_id;
 				static std::string text_input;
 
 				//Initialization of string inputs upon collapsible shown
 				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					font_id = comp.font_id;
 					text_input = comp.text;
 				}
 
@@ -196,46 +194,54 @@ namespace NIKE {
 
 				// For Text font
 				{
-					ImGui::Text("Enter Font (wihtout the ttf):");
-					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 10)) {
-						font_id.resize(strlen(font_id.c_str()));
-					}
+					// Display a combo box for selecting a font
+					ImGui::Text("Select Font:");
 
-					ImGui::SameLine();
+					// Hold the current and previous font selection
+					static std::string previous_font_id = comp.font_id; 
+					std::string current_font_id = comp.font_id;        
 
-					//Save font ID Button
-					if (ImGui::Button("Save##FontID")) {
-						if (NIKE_ASSETS_SERVICE->isAssetRegistered(font_id))
-						{
-							LevelEditor::Action save_font_id;
+					// Get all loaded fonts
+					const auto& all_loaded_fonts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Font);
 
-							//Save font id action
-							save_font_id.do_action = [&, id = font_id]() {
-								comp.font_id = id;
-								font_id = comp.font_id;
-								};
-
-							//Undo save font id action
-							save_font_id.undo_action = [&, id = comp.font_id]() {
-								comp.font_id = id;
-								font_id = comp.font_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_font_id));
-							comp_panel.setPopUpSuccessMsg("Font Saved successfully");
-							comp_panel.openPopUp("Success");
-
-						}
-						else {
-							comp_panel.setPopUpErrorMsg("Font Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							font_id = comp.font_id;
+					// Find the index of the currently selected font in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_fonts.size(); ++i) {
+						if (current_font_id == all_loaded_fonts[i]) {
+							current_index = static_cast<int>(i);
+							break;
 						}
 					}
+
+					// Display combo box for font selection
+					if (ImGui::Combo("Select Font", &current_index, all_loaded_fonts.data(), static_cast<int>(all_loaded_fonts.size()))) {
+						// Validate the selected index and get the new font ID
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_fonts.size())) {
+							std::string new_font_id = all_loaded_fonts[current_index];
+							if (new_font_id != comp.font_id) {
+								// Save action
+								LevelEditor::Action change_font_action;
+								change_font_action.do_action = [&, font_id = new_font_id]() {
+									comp.font_id = font_id;
+									};
+
+								// Undo action
+								change_font_action.undo_action = [&, font_id = previous_font_id]() {
+									comp.font_id = font_id;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
+
+								// Update the previous font ID
+								previous_font_id = new_font_id;
+							}
+						}
+					}
+
+
 
 				}
-
-				ImGui::Spacing();
 
 				//Set Text input
 				if (!comp.font_id.empty())
