@@ -43,14 +43,6 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Audio::SFX>(
 			[](LevelEditor::ComponentsPanel& comp_panel, Audio::SFX& comp) {
 
-				//Static variables for audio string input management
-				static std::string channel_group_id;
-
-				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					channel_group_id = comp.channel_group_id;
-				}
-
 				//Set audio ID
 				{
 					// Display a combo box for selecting a audio

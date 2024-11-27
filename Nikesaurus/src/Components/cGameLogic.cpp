@@ -59,43 +59,52 @@ namespace NIKE {
 
 				// For script path input
 				{
-					ImGui::Text("Enter Your Script:");
-					if (ImGui::InputText("##ScriptInput", script_input.data(), script_input.capacity() + 1)) {
-						script_input.resize(strlen(script_input.c_str()));
+					// Display a combo box for selecting script
+					ImGui::Text("Select Script:");
+
+					// Hold the current and previous script path
+					static std::string previous_script_id = comp.script.script_id;
+					std::string current_script_id = comp.script.script_id;
+
+					// Get all loaded scripts
+					const auto& all_loaded_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
+
+					// Find the index of the currently selected script in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_scripts.size(); ++i) {
+						if (current_script_id == all_loaded_scripts[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
 					}
 
-					ImGui::SameLine();
+					// Display combo box for script selection
+					if (ImGui::Combo("##SelectScript", &current_index, all_loaded_scripts.data(), static_cast<int>(all_loaded_scripts.size()))) {
+						// Validate the selected index and get the new script
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_scripts.size())) {
+							std::string new_script = all_loaded_scripts[current_index];
+							if (new_script != comp.script.script_id) {
+								// Save action
+								LevelEditor::Action change_script_action;
+								change_script_action.do_action = [&, script = new_script]() {
+									comp.script.script_id = script;
+									comp.script.script_path = NIKE_LUA_SERVICE->getScriptPath(script).string();
+									comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script);
+									};
 
-					//Save Button
-					if (ImGui::Button("Save##Script")) {
-						std::filesystem::path script_path = NIKE_LUA_SERVICE->getScriptPath(script_input);
-						if (!script_path.empty() && NIKE_LUA_SERVICE->checkScriptFileExist(script_input))
-						{
-							comp.script.script_path = script_path.string();
-							comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script_input);
-							LevelEditor::Action save_script_id;
+								// Undo action
+								change_script_action.undo_action = [&, script = previous_script_id]() {
+									comp.script.script_id = script;
+									comp.script.script_path = NIKE_LUA_SERVICE->getScriptPath(script).string();
+									comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script);
+									};
 
-							//Save script id action
-							save_script_id.do_action = [&, script = script_input]() {
-								comp.script.script_id = script;
-								script_input = comp.script.script_id;
-								};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_script_action));
 
-							//Undo save script id action
-							save_script_id.undo_action = [&, script = comp.script.script_id]() {
-								comp.script.script_id = script;
-								script_input = comp.script.script_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_script_id));
-							comp_panel.setPopUpSuccessMsg("Script Saved successfully");
-							comp_panel.openPopUp("Success");
-
-						}
-						else {
-							comp_panel.setPopUpErrorMsg("Script Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							script_input = comp.script.script_id;
+								// Update the previous script id
+								previous_script_id = new_script;
+							}
 						}
 					}
 				}
