@@ -237,6 +237,9 @@ namespace NIKE {
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 		}
 
+		//Stop watching all directories
+		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
+
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();
 
