@@ -137,6 +137,15 @@ namespace NIKE {
 			//Queue scene event
 			void queueSceneEvent(Scenes::SceneEvent&& event);
 
+			//Set curr scene id
+			void setCurrSceneID(std::string const& new_scene_id);
+
+			//Get curr scene id
+			std::string getCurrSceneID() const;
+
+			//Get prev scene id
+			std::string getPrevSceneID() const;
+
 			//Init scene service
 			void init();
 

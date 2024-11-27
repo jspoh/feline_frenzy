@@ -345,7 +345,7 @@ namespace NIKE {
 		panels_map.emplace(game_panel->getName(), game_panel);
 
 		// Add layer management window panel
-		auto layer_panel = std::make_shared<LayerManagementPanel>();
+		auto layer_panel = std::make_shared<ScenesPanel>();
 		panels.push_back(layer_panel);
 		panels_map.emplace(layer_panel->getName(), layer_panel);
 
