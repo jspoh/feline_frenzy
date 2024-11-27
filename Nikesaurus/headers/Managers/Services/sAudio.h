@@ -116,6 +116,13 @@ namespace NIKE {
 
 			//Get parent channel group
 			virtual std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const = 0;
+
+			//System channels are channels crucial in the game
+			//Set system channel
+			virtual void setSystemChannel(bool value) = 0;
+
+			//Check system channel
+			virtual bool checkSystemChannel() const = 0;
 		};
 
 		//Abstract channel class
@@ -251,6 +258,7 @@ namespace NIKE {
 		class NIKEChannelGroup : public IChannelGroup {
 		private:
 			FMOD::ChannelGroup* group{ nullptr };
+			bool isSystemChannel = false;
 		public:
 			NIKEChannelGroup(FMOD::ChannelGroup* group);
 			~NIKEChannelGroup() = default;
@@ -290,6 +298,10 @@ namespace NIKE {
 			void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) override;
 
 			std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const override;
+
+			void setSystemChannel(bool value) override;
+
+			bool checkSystemChannel() const override;
 		};
 
 		//NIKE Audio Group
@@ -389,6 +401,11 @@ namespace NIKE {
 
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
+
+			//Queue for BGM
+			std::queue<std::string> bgm_playlist;
+
+			bool is_bgm_playing = false;
 		public:
 
 			//Default Constructor
@@ -433,9 +450,6 @@ namespace NIKE {
 			//Channel ID will override each other if the same id is specified more than once
 			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
 
-			//Update Loop
-			void update();
-
 			/**
 			 * pauses all audio.
 			 * 
@@ -447,6 +461,23 @@ namespace NIKE {
 			 * 
 			 */
 			void resumeAllChannels();
+
+			// Get BGM Queue
+			std::queue<std::string>& getBGMQueue();
+
+			// Get BGM isPlaying;
+			bool checkIsBGMPlaying();
+
+			void setIsBGMPlaying(bool value);
+
+			// Add BGM to queue
+			void addBGMToQueue(std::string const& audio_id);
+
+			// Play BGM in queue
+			void playBGM();
+			//Update Loop
+			void update();
+
 		};
 
 		//Re-enable DLL Export warning

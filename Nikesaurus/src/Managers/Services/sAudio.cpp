@@ -269,6 +269,14 @@ namespace NIKE {
 		return Audio::Service::convertChannelGroup(new Audio::NIKEChannelGroup(parent_group));
 	}
 
+	void Audio::NIKEChannelGroup::setSystemChannel(bool value) {
+		isSystemChannel = value;
+	}
+
+	bool Audio::NIKEChannelGroup::checkSystemChannel() const{
+		return isSystemChannel;
+	}
+
 	/*****************************************************************//**
 	* NIKE AUDIO SYSTEM
 	*********************************************************************/
@@ -532,6 +540,54 @@ namespace NIKE {
 
 	}
 
+
+	void Audio::Service::pauseAllChannels() {
+		for (auto& pair : getAllChannelGroups()) {
+			pair.second->setPaused(true);
+		}
+	}
+
+	void Audio::Service::resumeAllChannels() {
+		for (auto& pair : getAllChannelGroups()) {
+			pair.second->setPaused(false);
+		}
+	}
+
+	/*****************************************************************//**
+	* BGM
+	*********************************************************************/
+	std::queue<std::string>& Audio::Service::getBGMQueue() {
+		return bgm_playlist;
+	}
+
+	bool Audio::Service::checkIsBGMPlaying() {
+		return is_bgm_playing;
+	}
+
+	void Audio::Service::setIsBGMPlaying(bool value) {
+		is_bgm_playing = value;
+	}
+
+	void Audio::Service::addBGMToQueue(std::string const& audio_id) {
+		bgm_playlist.push(audio_id);
+
+		if (!is_bgm_playing) {
+			playBGM();  // If no BGM is playing, start playing immediately
+		}
+	}
+
+	void Audio::Service::playBGM() {
+		if (!bgm_playlist.empty()) {
+			std::string current_bgm = bgm_playlist.front();
+			bgm_playlist.pop();
+
+
+			playAudio(current_bgm, "", "BGM", 1.0f, 1.0f, false, true);
+
+			is_bgm_playing = true;
+		}
+	}
+
 	void Audio::Service::update() {
 		audio_system->update();
 
@@ -545,17 +601,6 @@ namespace NIKE {
 				++it;
 			}
 		}
-	}
-
-	void Audio::Service::pauseAllChannels() {
-		for (auto& pair : getAllChannelGroups()) {
-			pair.second->setPaused(true);
-		}
-	}
-
-	void Audio::Service::resumeAllChannels() {
-		for (auto& pair : getAllChannelGroups()) {
-			pair.second->setPaused(false);
-		}
+	
 	}
 }

@@ -2186,35 +2186,27 @@ namespace NIKE {
 					valid_name = false;
 				}
 				else {
-					NIKE_AUDIO_SERVICE->createChannelGroup(channel_name);
-					////Do Action
-					//create.do_action = [&, shared_id]() {
-					//	//Creat new entity 
-					//	Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
-					//	//Save entity name into entities ref
-					//	entities.emplace(new_id, EditorEntity());
-					//	entity_to_name.emplace(new_id, shared_id->c_str());
-					//	name_to_entity.emplace(shared_id->c_str(), new_id);
-					//	};
+					//Do Action
+					create.do_action = [&, shared_id]() {
+						//Create new channel 
+						if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
+							NIKE_AUDIO_SERVICE->createChannelGroup(shared_id->c_str());
+						}
+					};
 
-					////Undo Action
-					//create.undo_action = [&, shared_id]() {
+					//Undo Action
+					create.undo_action = [&, shared_id]() {
 
-					//	//Check if entity is still alive
-					//	if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
-					//		//Destroy new entity
-					//		NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+						//Check if channel exists
+						if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
+							//unload channel
+							NIKE_AUDIO_SERVICE->unloadChannelGroup(shared_id->c_str());
+						}
+					};
 
-					//		//Erase new entity ref
-					//		entities.erase(name_to_entity.at(shared_id->data()));
-					//		entity_to_name.erase(name_to_entity.at(shared_id->data()));
-					//		name_to_entity.erase(shared_id->data());
-					//	}
-					//	};
-
-					////Execute create entity action
-					//NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
+					//Execute create entity action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
 
 					//Reset channel name
 					channel_name.clear();
@@ -2240,8 +2232,6 @@ namespace NIKE {
 	std::function<void()> LevelEditor::AudioPanel::deleteChannelPopUp(std::string const& popup_id){
 
 		return [this, popup_id] {
-			//Warning message
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
 
 			//Select a component to add
 			ImGui::Text("Are you sure you want to delete channel: %s?", selected_channel_name.c_str());
@@ -2251,13 +2241,28 @@ namespace NIKE {
 
 			//Display each component as a button
 			if (ImGui::Button("Confirm")) {
-				
-				if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(selected_channel_name)) {
-					NIKE_AUDIO_SERVICE->unloadChannelGroup(selected_channel_name);
-				}
-				else {
-					NIKEE_CORE_ERROR("Error: Unable to delete channel group!");
-				}
+
+				Action remove;
+
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(selected_channel_name.c_str());
+				remove.undo_action = [&, shared_id]() {
+					//Create new channel 
+					if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
+						NIKE_AUDIO_SERVICE->createChannelGroup(shared_id->c_str());
+					}
+				};
+
+				remove.do_action = [&, shared_id]() {
+					if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
+						NIKE_AUDIO_SERVICE->unloadChannelGroup(shared_id->c_str());
+					}
+					else {
+						NIKEE_CORE_ERROR("Error: Unable to delete channel group!");
+					}
+				};
+
+				//Execute remove action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove));
 
 				selected_channel_name.clear();
 				//Close popup
@@ -2278,6 +2283,9 @@ namespace NIKE {
 	}
 
 	void LevelEditor::AudioPanel::init() {
+		NIKE_AUDIO_SERVICE->createChannelGroup("BGM");
+		NIKE_AUDIO_SERVICE->getChannelGroup("BGM")->setSystemChannel(true); // Core audio channel
+
 		registerPopUp("Add New Channel", createChannelPopUp("Add New Channel"));
 		registerPopUp("Delete Channel", deleteChannelPopUp("Delete Channel"));
 	}
@@ -2294,37 +2302,87 @@ namespace NIKE {
 		}
 
 		ImGui::Separator();
+		if (ImGui::CollapsingHeader(std::string("Channel: BGM").c_str(), ImGuiTreeNodeFlags_None) && NIKE_AUDIO_SERVICE->checkChannelGroupExist("BGM")) {
+			const auto &bgm_channel = NIKE_AUDIO_SERVICE->getChannelGroup("BGM");
+			static std::string audio_id_input;
 
-		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
+			ImGui::Text("Add Audio To BGM Queue:");
+			if (ImGui::InputText("##AudioIDInput", audio_id_input.data(), audio_id_input.capacity() + 10)) {
+				audio_id_input.resize(strlen(audio_id_input.c_str()));
+			}
+
+			ImGui::SameLine();
+
+			std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(audio_id_input);
+			//Save Shape model ID Button
+			if (ImGui::Button("Add##AudioIDAdd")) {
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(shared_id->c_str())) {
+					//LevelEditor::Action save;
+
+					//save.do_action = [&, shared_id]() {
+
+					//};
+
+
+					//save.undo_action = [&, shared_id]() {
+
+					//};
+					NIKE_AUDIO_SERVICE->addBGMToQueue(shared_id->c_str());
+				}
+			}
+
 			ImGui::Spacing();
-			ImGui::Text("Channel: %s", channel.first.c_str());
+			float volume = bgm_channel->getVolume();
+			float pitch = bgm_channel->getPitch();
 
-			ImGui::Spacing();
-			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-
-			float volume = channel.second->getVolume();
-			ImGui::Text("Volume");
-			if (ImGui::SliderFloat(std::string("##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f)) {
-				channel.second->setVolume(volume);
+			ImGui::Text("Adjust Volume & Pitch");
+			if (ImGui::SliderFloat("Volume##VOLUME_BGM", &volume, 0.0f, 1.0f)) {
+				bgm_channel->setVolume(volume);
+			}
+			if (ImGui::SliderFloat("Pitch##PITCH_BGM", &pitch, 0.5f, 2.0f)) {
+				bgm_channel->setPitch(pitch);
 			}
 
 			ImGui::Spacing();
 
-			float pitch = channel.second->getPitch();
-			ImGui::Text("Pitch");
-			if (ImGui::SliderFloat(std::string("##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f)) {
-				channel.second->setPitch(pitch);
-			}
+			std::queue<std::string> display_queue = NIKE_AUDIO_SERVICE->getBGMQueue();
 
-			ImGui::Spacing();
-
-			if (ImGui::Button((std::string("Delete Channel##" + channel.first).c_str()))) {
-				selected_channel_name = channel.first;
-				openPopUp("Delete Channel");
+			ImGui::Text("BGM Playlist:");
+			while (!display_queue.empty()) {
+				ImGui::BulletText("%s", display_queue.front().c_str()); // Display the current track
+				display_queue.pop(); // Remove it from the temporary queue
 			}
 			ImGui::Spacing();
-
 			ImGui::Separator();
+		}
+		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
+			if (channel.second->checkSystemChannel()) continue; // Handle BGM separately
+			ImGui::Spacing();
+			if (ImGui::CollapsingHeader(std::string("Channel: " + channel.first).c_str(), ImGuiTreeNodeFlags_None)) {
+				
+
+				ImGui::Spacing();
+
+				float volume = channel.second->getVolume();
+				float pitch = channel.second->getPitch();
+
+				ImGui::Text("Adjust Volume & Pitch");
+				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f)) {
+					channel.second->setVolume(volume);
+				}
+				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f)) {
+					channel.second->setPitch(pitch);
+				}
+
+				ImGui::Spacing();
+
+				if (ImGui::Button((std::string("Delete Channel##" + channel.first).c_str()))) {
+					selected_channel_name = channel.first;
+					openPopUp("Delete Channel");
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+			}
 
 		}
 		// Render pop-ups

@@ -46,5 +46,19 @@ namespace NIKE {
 				}
 			}
 		}
+
+		// Handle BGM
+		if (NIKE_AUDIO_SERVICE->checkIsBGMPlaying()) {
+
+			if (NIKE_AUDIO_SERVICE->getChannelGroup("BGM") && !NIKE_AUDIO_SERVICE->getChannelGroup("BGM")->isPlaying()) {
+				// If the BGM has finished playing, play the next track in the playlist
+				if (!NIKE_AUDIO_SERVICE->getBGMQueue().empty()) {
+					NIKE_AUDIO_SERVICE->playBGM();  // Play the next track
+				}
+				else {
+					NIKE_AUDIO_SERVICE->setIsBGMPlaying(false);  // No more tracks to play
+				}
+			}
+		}
 	}
 }
