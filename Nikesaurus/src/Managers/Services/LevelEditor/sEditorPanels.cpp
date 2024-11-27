@@ -2319,9 +2319,9 @@ namespace NIKE {
 			directories = NIKE_PATH_SERVICE->listDirectories(current_path);
 			files = NIKE_PATH_SERVICE->listFiles(current_path);
 
-			////Show success popup
-			//success_msg->assign(message);
-			//openPopUp("Success");
+			//Show success popup
+			success_msg->assign(message);
+			b_file_dropped = true;
 		}
 
 		event->setEventProcessed(true);
@@ -2555,6 +2555,11 @@ namespace NIKE {
 				}
 				}
 
+
+				//Update directories & files
+				directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+				files = NIKE_PATH_SERVICE->listFiles(current_path);
+
 				//Close popup
 				closePopUp(popup_id);
 			}
@@ -2785,6 +2790,61 @@ namespace NIKE {
 					success_msg->assign("Asset: \"" + selected_asset_id + "\" unloaded.");
 					openPopUp("Success");
 				}
+
+				//Audio asset preview
+				if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
+					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music) {
+
+					//Same line
+					ImGui::SameLine();
+					
+					//Play button
+					if (ImGui::Button("Play")) {
+						//Check if channel group has been created
+						if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
+							NIKE_AUDIO_SERVICE->createChannelGroup("Audio Preview");
+						}
+
+						//Get audio group
+						auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
+
+						//Toggle audio state
+						if (group->getPaused()) {
+							group->setPaused(false);
+						}
+						else {
+							//Play music
+							bool is_music = NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music ? true : false;
+							NIKE_AUDIO_SERVICE->playAudio(selected_asset_id, "", "Audio Preview", 0.5f, 0.5f, false, is_music);
+						}
+					}
+
+					//Manage preview audio group
+					if (NIKE_AUDIO_SERVICE->checkChannelGroupExist("Audio Preview")) {
+						auto group = NIKE_AUDIO_SERVICE->getChannelGroup("Audio Preview");
+
+						if (group->isPlaying()) {
+							//Same line
+							ImGui::SameLine();
+
+							//Pause audio preview
+							if (ImGui::Button("Pause")) {
+								group->setPaused(true);
+							}
+
+							//Same line
+							ImGui::SameLine();
+
+							//Pause audio preview
+							if (ImGui::Button("Stop")) {
+								group->stop();
+							}
+						}
+						else if (!group->isPlaying() && !group->getPaused()) {
+							NIKE_AUDIO_SERVICE->unloadChannelGroup("Audio Preview");
+						}
+					}
+				}
 			}
 			else {
 				//Load action
@@ -2819,6 +2879,12 @@ namespace NIKE {
 			renderPopUps();
 
 			ImGui::End();
+		}
+
+		//File dropped popup
+		if (b_file_dropped) {
+			openPopUp("Success");
+			b_file_dropped = false;
 		}
 
 		//Render popups

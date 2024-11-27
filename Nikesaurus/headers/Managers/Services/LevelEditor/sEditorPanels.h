@@ -494,6 +494,9 @@ namespace NIKE {
 			//Selected directory mode
 			int directory_mode;
 
+			//File dropped
+			bool b_file_dropped;
+
 			//Setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
 
@@ -518,7 +521,7 @@ namespace NIKE {
 			//On drop file event
 			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
 		public:
-			ResourcePanel() : directory_mode{ 0 } { }
+			ResourcePanel() : directory_mode{ 0 }, b_file_dropped{ false } { }
 			~ResourcePanel() = default;
 
 			//Panel Name
