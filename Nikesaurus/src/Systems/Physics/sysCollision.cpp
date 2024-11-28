@@ -347,16 +347,18 @@ bool Collision::System::detectAABBRectRect(
             return;
         }
 
-        // Apply MTV to Collider
+        // Apply MTV to Collider positions
         collider_a.position += info.mtv * 0.5f;
         collider_b.position -= info.mtv * 0.5f;
 
-        // Update Transform to reflect Collider's new status
-        collider_a.syncTransform(transform_a);
-        collider_b.syncTransform(transform_b);
+        // Apply the same adjustment to Transform positions
+        transform_a.position += info.mtv * 0.5f;
+        transform_b.position -= info.mtv * 0.5f;
 
+        // Reflect velocity changes
+        dynamics_a.velocity += info.collision_normal * (dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
+        dynamics_b.velocity -= info.collision_normal * (dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
     }
-
 
 
 

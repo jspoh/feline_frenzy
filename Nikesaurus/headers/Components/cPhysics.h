@@ -66,10 +66,6 @@ namespace NIKE {
             bool b_collided;               // Collision flag
             Resolution resolution;         // Collision resolution type (NONE, SLIDE, BOUNCE)
 
-            // Initialization flag
-            bool isInitialized;            // True if Collider has been initialized from Transform
-
-            // Default constructor
             Collider()
                 : shape_type{ ShapeType::AABB },
                 position{ 0.0f, 0.0f },
@@ -79,38 +75,7 @@ namespace NIKE {
                 is_static{ false },
                 is_trigger{ false },
                 b_collided{ false },
-                resolution{ Resolution::NONE },
-                isInitialized{ false } {}
-
-            // Constructor with parameters
-            Collider(ShapeType type, Vector2f size, Vector2f offset, float rotation,
-                bool is_static, bool is_trigger, Resolution resolution)
-                : shape_type{ type },
-                position{ 0.0f, 0.0f },
-                size{ size },
-                offset{ offset },
-                rotation{ rotation },
-                is_static{ is_static },
-                is_trigger{ is_trigger },
-                b_collided{ false },
-                resolution{ resolution },
-                isInitialized{ true } {}
-
-            // Initialize Collider from a Transform
-            void initializeFromTransform(const Transform::Transform& transform) {
-                position = transform.position + offset;
-                size = transform.scale;
-                rotation = transform.rotation;
-            }
-
-            // Sync Transform to Collider state
-            void syncTransform(Transform::Transform& transform) const {
-                if (!is_static) {
-                    transform.position = position - offset;
-                    transform.scale = size;
-                    transform.rotation = rotation;
-                }
-            }
+                resolution{ Resolution::NONE } {}
         };
 
         //Change physics world variables
