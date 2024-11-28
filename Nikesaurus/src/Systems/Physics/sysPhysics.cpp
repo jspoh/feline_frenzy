@@ -73,42 +73,6 @@ namespace NIKE {
                     if (e_dynamics_comp) {
                         auto& e_dynamics = e_dynamics_comp.value().get();
 
-                        //// Retrieve the logic state to determine behavior
-                        //if (NIKE_ECS_MANAGER->checkEntityComponent<Logic::State>(entity)) {
-                        //    auto& e_state = NIKE_ECS_MANAGER->getEntityComponent<Logic::State>(entity);
-
-                        //    switch (e_state.current_state) {
-                        //    case Logic::EntityStateType::IDLE:
-                        //        // In IDLE, entity is stationary
-                        //        e_dynamics.velocity = Vector2f(0.0f, 0.0f);
-                        //        break;
-
-                        //    case Logic::EntityStateType::PATROLLING:
-                        //        // In PATROLLING, entity moves to random points in patrol radius
-                        //        if (e_dynamics.velocity.length() < 0.01f) {
-                        //            // Check if entity has reached patrol target, if so wait 2 seconds
-                        //            e_dynamics.velocity = getRandomDirection() * e_dynamics.max_speed;
-                        //        }
-                        //        e_transform.position += e_dynamics.velocity * dt;
-                        //        break;
-
-                        //    case Logic::EntityStateType::CHASING: {
-                        //        // In CHASING, entity moves toward the player
-                        //        auto player_entity = GameLogic::Manager::getPlayerEntity();
-                        //        if (player_entity && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(player_entity)) {
-                        //            auto& player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
-                        //            Vector2f chase_direction = (player_transform.position - e_transform.position).normalize();
-                        //            e_dynamics.velocity = chase_direction * e_dynamics.max_speed;
-                        //            e_transform.position += e_dynamics.velocity * dt;
-                        //        }
-                        //        break;
-                        //    }
-
-                        //    default:
-                        //        break;
-                        //    }
-                        //}
-
                         //Ensure that mass is not negative
                         e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
 
@@ -171,7 +135,7 @@ namespace NIKE {
 
                     //}
 
-                     // Collision detection
+                    // Collision detection
                     Physics::Dynamics def_dynamics;
                     auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
                     if (e_collider_comp.has_value()) {
@@ -197,8 +161,8 @@ namespace NIKE {
                             auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
 
                             // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
-                            std::string e_model_id = "square"; // Default model
-                            std::string other_model_id = "square"; // Default model
+                            std::string e_model_id = "square.model"; // Default model
+                            std::string other_model_id = "square.model"; // Default model
                             auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
                             if (e_shape_comp.has_value()) {
                                 e_model_id = e_shape_comp.value().get().model_id;

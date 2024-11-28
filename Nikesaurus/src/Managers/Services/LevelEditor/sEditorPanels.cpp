@@ -478,9 +478,9 @@ namespace NIKE {
 					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Save entity name into entities ref
-					entities.emplace(new_id, EditorEntity());
-					entity_to_name.emplace(new_id, shared_id->c_str());
-					name_to_entity.emplace(shared_id->c_str(), new_id);
+					entities[new_id] = EditorEntity();
+					entity_to_name[new_id] = shared_id->c_str();
+					name_to_entity[shared_id->c_str()] = new_id;
 					};
 
 				//Undo Action
@@ -490,11 +490,6 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Erase new entity ref
-						entities.erase(name_to_entity.at(shared_id->data()));
-						entity_to_name.erase(name_to_entity.at(shared_id->data()));
-						name_to_entity.erase(shared_id->data());
 					}
 					};
 
@@ -560,12 +555,10 @@ namespace NIKE {
 						NIKE_ECS_MANAGER->setEntityComponent(new_id, comp_types.at(comp.first), comp.second);
 					}
 
-					//Update entities list
-					entities.emplace(new_id, EditorEntity());
-
 					//Save entity name into entities ref
-					entity_to_name.emplace(new_id, shared_id->c_str());
-					name_to_entity.emplace(shared_id->c_str(), new_id);
+					entities[new_id] = EditorEntity();
+					entity_to_name[new_id] = shared_id->c_str();
+					name_to_entity[shared_id->c_str()] = new_id;
 
 					//Set selected entity back to old entity
 					selected_entity = name_to_entity.at(shared_id->data());
@@ -576,15 +569,9 @@ namespace NIKE {
 
 					//Check if entity is still alive
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Update entities list
-						entities.erase(name_to_entity.at(shared_id->data()));
-
-						//Erase new entity ref
-						entity_to_name.erase(name_to_entity.at(shared_id->data()));
-						name_to_entity.erase(shared_id->data());
 
 						//Set selected entity back to first entity
 						selected_entity = entities.empty() ? 0 : entities.begin()->first;
@@ -645,9 +632,9 @@ namespace NIKE {
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
 
 						//Save entity name into entities ref
-						entities.emplace(new_id, EditorEntity());
-						entity_to_name.emplace(new_id, shared_id->c_str());
-						name_to_entity.emplace(shared_id->c_str(), new_id);
+						entities[new_id] = EditorEntity();
+						entity_to_name[new_id] = shared_id->c_str();
+						name_to_entity[shared_id->c_str()] = new_id;
 					}
 					};
 
@@ -658,11 +645,6 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Erase new entity ref
-						entities.erase(name_to_entity.at(shared_id->data()));
-						entity_to_name.erase(name_to_entity.at(shared_id->data()));
-						name_to_entity.erase(shared_id->data());
 					}
 					};
 
