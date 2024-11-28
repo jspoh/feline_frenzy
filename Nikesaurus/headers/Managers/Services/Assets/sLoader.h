@@ -20,7 +20,7 @@ namespace NIKE {
 			Vector2f pos;
 			Vector4f col;
 			Vector2f tex_coords;
-			unsigned int sampler_idx;	// index to use in sampler2DArray
+			float sampler_idx;	// index to use in sampler2DArray
 			Matrix_33 transform;		// column major
 			Vector2f framesize{};
 			Vector2f uv_offset{};
@@ -30,8 +30,8 @@ namespace NIKE {
 			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, sampler_idx{} {}
 			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, sampler_idx{} {}
 			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, sampler_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int sampler_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), sampler_idx{ sampler_idx } {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int sampler_idx, const Matrix_33& transform, const Vector2f& framesize, const Vector2f& uv_offset) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform{ transform }, sampler_idx{ sampler_idx }, framesize{ framesize }, uv_offset{ uv_offset } {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, float sampler_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), sampler_idx{ sampler_idx } {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, float sampler_idx, const Matrix_33& transform, const Vector2f& framesize, const Vector2f& uv_offset) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform{ transform }, sampler_idx{ sampler_idx }, framesize{ framesize }, uv_offset{ uv_offset } {}
 		};
 
 		//Font Type Data Structure

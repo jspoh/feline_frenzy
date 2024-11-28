@@ -6,7 +6,7 @@
 #version 450 core
 
 layout (location=0) in vec2 f_texcoord;
-layout (location=1) flat in uint f_sampler_idx;
+layout (location=1) flat in float f_sampler_idx;
 //layout (location=2) in vec2 dbg_framesize;
 
 layout (location=0) out	vec4 out_color;

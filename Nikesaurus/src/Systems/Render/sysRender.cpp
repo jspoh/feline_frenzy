@@ -356,7 +356,7 @@ namespace NIKE {
 
 				const int texture_idx = std::distance(texture_binding_unit_map.begin(), texture_binding_unit_map.find(render_instances_texture[i].tex));
 
-				v.sampler_idx = texture_idx;
+				v.sampler_idx = static_cast<float>(texture_idx);
 				//v.sampler_idx = 0;
 			}
 

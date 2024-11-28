@@ -336,7 +336,7 @@ namespace NIKE {
 		// batched_texture.vert location=2
 		static constexpr int SAMPLERIDX_ATTRIB_INDEX = 2;
 		static constexpr int SAMPLERIDX_ATTRIB_SIZE = 1;		// num elements (index)
-		static constexpr int SAMPLERIDX_DATA_TYPE = GL_UNSIGNED_INT;
+		static constexpr int SAMPLERIDX_DATA_TYPE = GL_FLOAT;
 		static constexpr int SAMPLERIDX_DATA_OFFSET = offsetof(Vertex, sampler_idx);
 		glEnableVertexArrayAttrib(model.vaoid, SAMPLERIDX_ATTRIB_INDEX);		// vertex attrib index 1
 		glVertexArrayAttribFormat(
