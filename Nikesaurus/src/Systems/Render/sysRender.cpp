@@ -323,9 +323,9 @@ namespace NIKE {
 			}
 		}
 
-		//// raw vector of binding units
-		//std::vector<int> textures;
-		//std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
+		// raw vector of binding units
+		std::vector<int> textures;
+		std::transform(texture_binding_units.begin(), texture_binding_units.end(), std::back_inserter(textures), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -373,7 +373,7 @@ namespace NIKE {
 		shader_system->useShader("batched_texture");
 
 		// set uniform
-		//shader_system->setUniform("batched_texture", "u_tex2d", textures);
+		shader_system->setUniform("batched_texture", "u_tex2d", textures);
 		
 		// !TODO: debugging only
 		//static constexpr unsigned int debug_tex_unit = 0;
