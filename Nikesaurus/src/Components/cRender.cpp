@@ -104,12 +104,10 @@ namespace NIKE {
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
 
 				//Static variables for string input management
-				static std::string font_id;
 				static std::string text_input;
 
 				//Initialization of string inputs upon collapsible shown
 				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					font_id = comp.font_id;
 					text_input = comp.text;
 				}
 
@@ -196,113 +194,122 @@ namespace NIKE {
 
 				// For Text font
 				{
-					ImGui::Text("Enter Font (wihtout the ttf):");
-					if (ImGui::InputText("##FontID", font_id.data(), font_id.capacity() + 10)) {
-						font_id.resize(strlen(font_id.c_str()));
-					}
+					// Display a combo box for selecting a font
+					ImGui::Text("Select Font:");
 
-					ImGui::SameLine();
+					// Hold the current and previous font selection
+					static std::string previous_font_id = comp.font_id; 
+					std::string current_font_id = comp.font_id;        
 
-					//Save font ID Button
-					if (ImGui::Button("Save##FontID")) {
-						if (NIKE_ASSETS_SERVICE->checkFontExist(font_id))
-						{
-							LevelEditor::Action save_font_id;
+					// Get all loaded fonts
+					const auto& all_loaded_fonts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Font);
 
-							//Save font id action
-							save_font_id.do_action = [&, id = font_id]() {
-								comp.font_id = id;
-								font_id = comp.font_id;
-								};
-
-							//Undo save font id action
-							save_font_id.undo_action = [&, id = comp.font_id]() {
-								comp.font_id = id;
-								font_id = comp.font_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_font_id));
-							comp_panel.setPopUpSuccessMsg("Font Saved successfully");
-							comp_panel.openPopUp("Success");
-
-						}
-						else {
-							comp_panel.setPopUpErrorMsg("Font Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							font_id = comp.font_id;
+					// Find the index of the currently selected font in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_fonts.size(); ++i) {
+						if (current_font_id == all_loaded_fonts[i]) {
+							current_index = static_cast<int>(i);
+							break;
 						}
 					}
 
+					// Display combo box for font selection
+					if (ImGui::Combo("##SelectFont", &current_index, all_loaded_fonts.data(), static_cast<int>(all_loaded_fonts.size()))) {
+						// Validate the selected index and get the new font ID
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_fonts.size())) {
+							std::string new_font_id = all_loaded_fonts[current_index];
+							if (new_font_id != comp.font_id) {
+								// Save action
+								LevelEditor::Action change_font_action;
+								change_font_action.do_action = [&, font_id = new_font_id]() {
+									comp.font_id = font_id;
+									};
+
+								// Undo action
+								change_font_action.undo_action = [&, font_id = previous_font_id]() {
+									comp.font_id = font_id;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
+
+								// Update the previous font ID
+								previous_font_id = new_font_id;
+							}
+						}
+					}
 				}
-
-				ImGui::Spacing();
 
 				//Set Text input
+				if (!comp.font_id.empty())
 				{
-					//Set Text input
-					ImGui::Text("Enter Text:");
-					if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
-						text_input.resize(strlen(text_input.c_str()));
-					}
+					{
+						//Set Text input
+						ImGui::Text("Enter Text:");
+						if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
+							text_input.resize(strlen(text_input.c_str()));
+						}
 
-					ImGui::SameLine();
+						ImGui::SameLine();
 
-					//Save text input Button
-					if (ImGui::Button("Save##TextInput")) {
-						LevelEditor::Action save_text;
-
-						//Save texrt action
-						save_text.do_action = [&, text = text_input]() {
-							comp.text = text;
-							text_input = comp.text;
-							};
-
-						//Undo save text action
-						save_text.undo_action = [&, text = comp.text]() {
-							comp.text = text;
-							text_input = comp.text;
-							};
-
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
-						comp_panel.setPopUpSuccessMsg("Text Saved successfully");
-						comp_panel.openPopUp("Success");
-					}
-				}
-
-				ImGui::Spacing();
-
-				// For Text Origin
-				{
-					ImGui::Text("Adjust text origin:");
-					static const char* origin_names[] = { "CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT" };
-					// Hold the current selection and the previous value
-					static NIKE::Render::TextOrigin before_select_origin;
-					static int previous_origin = static_cast<int>(comp.origin);
-					int current_origin = static_cast<int>(comp.origin);
-					// Combo returns one bool check
-					if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
-						NIKE::Render::TextOrigin new_origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
-						if (new_origin != comp.origin) {
-							// Save action
+						//Save text input Button
+						if (ImGui::Button("Save##TextInput")) {
 							LevelEditor::Action save_text;
-							save_text.do_action = [&, origin = new_origin]() {
-								comp.origin = origin;
+
+							//Save texrt action
+							save_text.do_action = [&, text = text_input]() {
+								comp.text = text;
+								text_input = comp.text;
 								};
 
-							// Undo action
-							save_text.undo_action = [&, origin = before_select_origin]() {
-								comp.origin = origin;
+							//Undo save text action
+							save_text.undo_action = [&, text = comp.text]() {
+								comp.text = text;
+								text_input = comp.text;
 								};
 
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+							comp_panel.setPopUpSuccessMsg("Text Saved successfully");
+							comp_panel.openPopUp("Success");
+						}
+					}
 
-							// Update the previous value
-							before_select_origin = comp.origin;
-							// Apply the new origin
-							comp.origin = new_origin;
+					ImGui::Spacing();
+
+					// For Text Origin
+					{
+						ImGui::Text("Adjust text origin:");
+						static const char* origin_names[] = { "CENTER", "TOP", "BOTTOM", "RIGHT", "LEFT" };
+						// Hold the current selection and the previous value
+						static NIKE::Render::TextOrigin before_select_origin;
+						static int previous_origin = static_cast<int>(comp.origin);
+						int current_origin = static_cast<int>(comp.origin);
+						// Combo returns one bool check
+						if (ImGui::Combo("##TextOrigin", &current_origin, origin_names, IM_ARRAYSIZE(origin_names))) {
+							NIKE::Render::TextOrigin new_origin = static_cast<NIKE::Render::TextOrigin>(current_origin);
+							if (new_origin != comp.origin) {
+								// Save action
+								LevelEditor::Action save_text;
+								save_text.do_action = [&, origin = new_origin]() {
+									comp.origin = origin;
+									};
+
+								// Undo action
+								save_text.undo_action = [&, origin = before_select_origin]() {
+									comp.origin = origin;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_text));
+
+								// Update the previous value
+								before_select_origin = comp.origin;
+								// Apply the new origin
+								comp.origin = new_origin;
+							}
 						}
 					}
 				}
+				
 			}
 		);
 
@@ -326,97 +333,100 @@ namespace NIKE {
 		// UI for shape
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
-				//Static variables for string input management
-				static std::string shape_model_input;
-
-				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					shape_model_input = comp.model_id;
-				}
-
 				ImGui::Text("Edit Shape variables");
 
 				ImGui::Spacing();
 
 				// For shape model
 				{
-					ImGui::Text("Enter shape model:");
-					if (ImGui::InputText("##ShapeInput", shape_model_input.data(), shape_model_input.capacity() + 1)) {
-						shape_model_input.resize(strlen(shape_model_input.c_str()));
+					// Display a combo box for selecting a model
+					ImGui::Text("Select Shape:");
+
+					// Hold the current and previous model selection
+					static std::string previous_model_id = comp.model_id;
+					std::string current_model_id = comp.model_id;
+
+					// Get all loaded models
+					const auto& all_loaded_models = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Model);
+
+					// Find the index of the currently selected model in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_models.size(); ++i) {
+						if (current_model_id == all_loaded_models[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
 					}
 
-					ImGui::SameLine();
+					// Display combo box for model selection
+					if (ImGui::Combo("##SelectModel", &current_index, all_loaded_models.data(), static_cast<int>(all_loaded_models.size()))) {
+						// Validate the selected index and get the new model ID
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_models.size())) {
+							std::string new_model_id = all_loaded_models[current_index];
+							if (new_model_id != comp.model_id) {
+								// Save action
+								LevelEditor::Action change_model_action;
+								change_model_action.do_action = [&, model_id = new_model_id]() {
+									comp.model_id = model_id;
+									};
 
-					//Save Shape model ID Button
-					if (ImGui::Button("Save##ShapeModelID")) {
-						if (NIKE_ASSETS_SERVICE->checkModelExist(shape_model_input))
-						{
-							LevelEditor::Action save_shape_model;
+								// Undo action
+								change_model_action.undo_action = [&, model_id = previous_model_id]() {
+									comp.model_id = model_id;
+									};
 
-							//Save action
-							save_shape_model.do_action = [&, shape_model = shape_model_input]() {
-								comp.model_id = shape_model;
-								shape_model_input = comp.model_id;
-								};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_model_action));
 
-							//Undo action
-							save_shape_model.undo_action = [&, shape_model = comp.model_id]() {
-								comp.model_id = shape_model;
-								shape_model_input = comp.model_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_shape_model));
-							comp_panel.setPopUpSuccessMsg("Shape Model Saved!");
-							comp_panel.openPopUp("Success");
+								// Update the previous model ID
+								previous_model_id = new_model_id;
+							}
 						}
-						else
-						{
-							comp_panel.setPopUpErrorMsg("Shape Model Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							shape_model_input = comp.model_id;
-						}
-
 					}
 				}
 
 				ImGui::Spacing();
 
 				// For shape color
+				if (!comp.model_id.empty())
 				{
-					// Before change
-					static Vector4f before_change;
+					{
+						// Before change
+						static Vector4f before_change;
 
-					ImGui::Text("Adjust shape color:");
+						ImGui::Text("Adjust shape color:");
 
-					ImGui::ColorPicker4("Shape Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
+						ImGui::ColorPicker4("Shape Color", &comp.color.x, ImGuiColorEditFlags_AlphaBar);
 
-					//Check if begin editing
-					if (ImGui::IsItemActivated()) {
-						before_change = comp.color;
+						//Check if begin editing
+						if (ImGui::IsItemActivated()) {
+							before_change = comp.color;
+						}
+
+						//Check if finished editing
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_shape_color;
+
+							//Change pos do action
+							change_shape_color.do_action = [&, color = comp.color]() {
+								comp.color = color;
+								};
+
+							//Change pos undo action
+							change_shape_color.undo_action = [&, color = before_change]() {
+								comp.color = color;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_shape_color));
+						}
+
+
 					}
 
-					//Check if finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_shape_color;
-
-						//Change pos do action
-						change_shape_color.do_action = [&, color = comp.color]() {
-							comp.color = color;
-							};
-
-						//Change pos undo action
-						change_shape_color.undo_action = [&, color = before_change]() {
-							comp.color = color;
-							};
-
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_shape_color));
-					}
-
-					
 				}
-
 			}
+				
 		);
 
 
@@ -452,56 +462,53 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
 
-				//Static variables for string input management
-				static std::string texture_id_input;
-
-				//Initialization of string inputs upon collapsible shown
-				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
-					texture_id_input = comp.texture_id;
-				}
-
 				ImGui::Text("Edit Texture variables");
 
 				ImGui::Spacing();
 
 				// For texture id
 				{
-					ImGui::Text("Enter Texture id:");
-					if (ImGui::InputText("##TextureIDInput", texture_id_input.data(), texture_id_input.capacity() + 10)) {
-						texture_id_input.resize(strlen(texture_id_input.c_str()));
+					// Hold the current and previous texture selection
+					static std::string previous_texture = comp.texture_id;
+					std::string current_texture = comp.texture_id;
+
+					ImGui::Text("Select Texture");
+					
+					auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
+
+					// Find the index of the currently selected texture in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_textures.size(); ++i) {
+						if (current_texture == all_loaded_textures[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
 					}
 
-					ImGui::SameLine();
+					// Display combo box for texture selection
+					if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+						// Validate the selected index and get the new texture
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
+							std::string new_texture = all_loaded_textures[current_index];
+							if (new_texture != comp.texture_id) {
+								// Save action
+								LevelEditor::Action change_font_action;
+								change_font_action.do_action = [&, texture_id = new_texture]() {
+									comp.texture_id = texture_id;
+									};
 
-					//Save Shape model ID Button
-					if (ImGui::Button("Save##TextureID")) {
-						if (NIKE_ASSETS_SERVICE->checkTextureExist(texture_id_input))
-						{
-							LevelEditor::Action save_texture_id;
+								// Undo action
+								change_font_action.undo_action = [&, texture_id = previous_texture]() {
+									comp.texture_id = texture_id;
+									};
 
-							//Save action
-							save_texture_id.do_action = [&, texture_id = texture_id_input]() {
-								comp.texture_id = texture_id;
-								texture_id_input = comp.texture_id;
-								};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
 
-							//Undo action
-							save_texture_id.undo_action = [&, texture_id = comp.texture_id]() {
-								comp.texture_id = texture_id;
-								texture_id_input = comp.texture_id;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_texture_id));
-							comp_panel.setPopUpSuccessMsg("Texture ID Saved!");
-							comp_panel.openPopUp("Success");
+								// Update the previous texture
+								previous_texture = new_texture;
+							}
 						}
-						else
-						{
-							comp_panel.setPopUpErrorMsg("Texture ID Does Not Exist!");
-							comp_panel.openPopUp("Error");
-							texture_id_input = comp.texture_id;
-						}
-
 					}
 				}
 

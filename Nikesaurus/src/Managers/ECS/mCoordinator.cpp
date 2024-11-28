@@ -1,5 +1,15 @@
+/*****************************************************************//**
+ * \file   mCoordinator.cpp
+ * \brief  ECS Coordinator
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
+ * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #include "Core/stdafx.h"
 #include "Managers/ECS/mCoordinator.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	//Default constructor
@@ -12,7 +22,12 @@ namespace NIKE {
 	* Entity Methods
 	*********************************************************************/
 	Entity::Type Coordinator::Manager::createEntity(unsigned int layer_id) {
-		return entity_manager->createEntity(layer_id);
+		auto entity = entity_manager->createEntity(layer_id);
+
+		//Dispatch event
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
+
+		return entity;
 	}
 
 	Entity::Type Coordinator::Manager::cloneEntity(Entity::Type copy) {
@@ -20,6 +35,8 @@ namespace NIKE {
 		component_manager->cloneEntity(new_entity, copy);
 		entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
 		system_manager->cloneEntity(new_entity, copy);
+
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
 
 		return new_entity;
 	}
@@ -30,6 +47,8 @@ namespace NIKE {
 		entity_manager->destroyEntity(entity);
 		component_manager->entityDestroyed(entity);
 		system_manager->entityDestroyed(entity); 
+
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
 	}
 
 	bool Coordinator::Manager::checkEntity(Entity::Type entity) const {

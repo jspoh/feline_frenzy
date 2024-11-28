@@ -12,7 +12,7 @@
 #define GAME_LOGIC_HPP
 
 #include "Managers/ECS/mSystem.h"
-#include "sysLua.h"
+#include "Managers/Services/sLua.h"
 
 namespace NIKE {
     namespace GameLogic {
@@ -22,9 +22,6 @@ namespace NIKE {
 		    //Delete Copy Constructor & Copy Assignment
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
-
-			//Internal lua system
-			std::unique_ptr<Lua::System> lua_system;
 
 			//Internal script management
 			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);

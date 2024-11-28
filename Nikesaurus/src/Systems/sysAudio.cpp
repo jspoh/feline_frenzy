@@ -18,7 +18,7 @@ namespace NIKE {
 	}
 
 	void Audio::Manager::update() {
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 
 			//SKip inactive layer
 			if (!layer->getLayerState())
@@ -36,13 +36,27 @@ namespace NIKE {
 					auto& e_sfx = e_sfx_comp.value().get();
 
 					//Play SFX
-					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->checkAudioExist(e_sfx.audio_id) && NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
-						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false);
+					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->isAssetRegistered(e_sfx.audio_id) && NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
+						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false, false);
 						e_sfx.b_play_sfx = false;
 					}
 					else {
 						e_sfx.b_play_sfx = false;
 					}
+				}
+			}
+		}
+
+		// Handle BGM
+		if (NIKE_AUDIO_SERVICE->checkIsBGMPlaying()) {
+
+			if (NIKE_AUDIO_SERVICE->getChannelGroup("BGM") && !NIKE_AUDIO_SERVICE->getChannelGroup("BGM")->isPlaying()) {
+				// If the BGM has finished playing, play the next track in the playlist
+				if (!NIKE_AUDIO_SERVICE->getBGMQueue().empty()) {
+					NIKE_AUDIO_SERVICE->playBGM();  // Play the next track
+				}
+				else {
+					NIKE_AUDIO_SERVICE->setIsBGMPlaying(false);  // No more tracks to play
 				}
 			}
 		}

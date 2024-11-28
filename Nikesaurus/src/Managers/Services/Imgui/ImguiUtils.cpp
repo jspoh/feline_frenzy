@@ -1,3 +1,13 @@
+﻿/*****************************************************************//**
+ * \file   ImguiUtils.cpp
+ * \brief  Utility for imgui
+ *
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
+ * \date   September 2024
+ * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #include "Core/stdafx.h"
 #include "Managers/Services/Imgui/sImgui.h"
 #include "Core/Engine.h"
@@ -53,10 +63,16 @@ namespace NIKE
 		return (extension == ".frag" || extension == ".vert");
 	}
 
+	bool hasValidScriptExtension(const std::filesystem::path& filePath)
+	{
+		std::string extension = filePath.extension().string();
+		return (extension == ".lua");
+	}
+
 	bool hasValidModelExtension(const std::filesystem::path& filePath)
 	{
 		std::string extension = filePath.extension().string();
-		return (extension == ".txt");
+		return (extension == ".model");
 	}
 
 	bool hasValidPrefabExtension(const std::filesystem::path& filePath)
@@ -67,8 +83,7 @@ namespace NIKE
 
 	void displayAssetList(const std::string& asset_type)
 	{
-		// Variable to store the selected texture and file path
-		static std::string selected_texture;
+		// Variable to store file path
 		static std::string selected_file_path;
 
 		// To track if we need to show the popup
@@ -89,12 +104,15 @@ namespace NIKE
 
 		if (asset_type == "Textures")
 		{
+			// Variable to store the selected texture
+			static std::string selected_texture;
+
 			for (const auto& texture : NIKE_ASSETS_SERVICE->getLoadedTextures())
 			{
 				ImVec2 uv0(0.0f, 1.0f);
 				ImVec2 uv1(1.0f, 0.0f);
 
-				std::string unique_id = "##" + texture.first;
+				std::string unique_id = "X##TEXTURE_" + texture.first;
 				if (ImGui::ImageButton(unique_id.c_str(), (intptr_t)texture.second->gl_data, ImVec2(64, 64), uv0, uv1)) {
 					selected_texture = texture.first;
 				}
@@ -111,7 +129,8 @@ namespace NIKE
 				ImGui::Text("%s", texture.first.c_str());
 			}
 			if (!selected_texture.empty()) {
-				ImGui::Begin("Selected Texture");
+
+				ImGui::Begin("Selected Texture", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize);
 				ImGui::Text("Texture: %s", selected_texture.c_str());
 
 				auto textureData = NIKE_ASSETS_SERVICE->getLoadedTextures().find(selected_texture);
@@ -121,17 +140,181 @@ namespace NIKE
 					ImGui::Image((intptr_t)textureData->second->gl_data, ImVec2(256, 256), uv0, uv1);
 				}
 
+				if (ImGui::Button("Delete")) {
+					delete_file_popup = true;
+					ImGui::OpenPopup("Confirm Delete");
+				}
+
+				ImGui::SameLine();
+
 				if (ImGui::Button("Close")) {
 					selected_texture.clear();
 				}
+
+				delete_file_popup = showDeleteFilePopup(selected_texture, "Textures");
+
+				if (delete_file_popup) {
+					selected_texture.clear();
+				}
+
 				ImGui::End();
 			}
 		}
 		else if (asset_type == "Audio")
 		{
-			for (const auto& audio : NIKE_ASSETS_SERVICE->getLoadedAudios())
+			// Variable to store the selected audio
+			static std::string selected_audio;
+			static bool is_playing = false;
+			static bool is_paused = false;
+			static float playback_position = 0.0f; // Simulated playback progress (0.0 to 1.0)
+			static float volume = 1.0f; 
+			static bool is_music = false;
+
+			// lambda function to stop audio
+			auto stopAudio = [&]() {
+				NIKE_AUDIO_SERVICE->getChannelGroup("Music")->stop();
+				NIKE_AUDIO_SERVICE->getChannelGroup("SFX")->stop();
+				is_playing = false;
+				is_paused = false;
+				playback_position = 0.0f; // Reset playback position
+				};
+
+			if (ImGui::BeginTabBar("AudioTabs"))
 			{
-				ImGui::Text("%s", audio.first.c_str());
+				if (ImGui::BeginTabItem("SFX"))
+				{
+					for (const auto& sfx : NIKE_ASSETS_SERVICE->getLoadedSfx())
+					{
+						std::string buttonLabel = "X##SFX_" + sfx.first;
+
+						if (ImGui::SmallButton(buttonLabel.c_str())) {
+							selected_file_path = sfx.first;
+							delete_file_popup = true;
+							ImGui::OpenPopup("Confirm Delete");
+						}
+
+						ImGui::SameLine();
+						if (ImGui::Selectable(sfx.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+							selected_audio = sfx.first;
+							stopAudio();
+							is_music = false;
+						}
+
+						ImGui::Separator();
+
+
+					}
+					delete_file_popup = showDeleteFilePopup(selected_file_path, "SFX");
+					ImGui::EndTabItem();
+				}
+
+				if (ImGui::BeginTabItem("Music"))
+				{
+					for (const auto& music : NIKE_ASSETS_SERVICE->getLoadedMusic())
+					{
+						std::string buttonLabel = "X##MUSIC_" + music.first;
+
+						if (ImGui::SmallButton(buttonLabel.c_str())) {
+							selected_file_path = music.first;
+							delete_file_popup = true;
+							ImGui::OpenPopup("Confirm Delete");
+						}
+
+						ImGui::SameLine();
+						if (ImGui::Selectable(music.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+							selected_audio = music.first;
+							stopAudio();
+							is_music = true;
+						}
+						ImGui::Separator();
+
+
+					}
+					delete_file_popup = showDeleteFilePopup(selected_file_path, "Music");
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
+			}
+			if (!selected_audio.empty()) {
+				ImGui::SetNextWindowSize(ImVec2(400, 200));
+				ImGui::Begin("Selected Audio", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize);
+				ImGui::Text("Audio: %s", selected_audio.c_str());
+				ImGui::Text("Type: %s", is_music ? "Music" : "SFX");
+
+				ImGui::Separator();
+
+				if (ImGui::ArrowButton("PlayAudio", ImGuiDir_Right)) {
+					NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setPaused(false);
+					NIKE_AUDIO_SERVICE->playAudio(selected_audio, selected_audio, is_music ? "Music" : "SFX", volume, 1.0f, false, is_music);
+					is_playing = true;
+				}
+
+				ImGui::SameLine();
+
+				// Playback controls
+				if (ImGui::Button(is_playing && !is_paused ? "Pause" : "UnPause")) {
+					if (is_playing) {
+						is_playing = false;
+						NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setPaused(true);
+					}
+
+					else {
+						NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setPaused(false);
+						is_playing = true;
+					}
+				}
+				
+				ImGui::SameLine();
+				if (ImGui::Button("Stop")) {
+					stopAudio();
+				}
+				
+				// Scuffed progress bar
+				//static float total_length = 0.0f;
+				//if (is_music) {
+				//	total_length = static_cast<float>(NIKE_ASSETS_SERVICE->getMusic(selected_audio)->getLength());
+
+				//}
+				//else {
+				//	total_length = static_cast<float>(NIKE_ASSETS_SERVICE->getSfx(selected_audio)->getLength());
+				//}
+
+
+				//static std::chrono::steady_clock::time_point start_time;
+
+				//if (is_playing && !is_paused) {
+				//	if (start_time.time_since_epoch().count() == 0) { // Check if this is the first frame
+				//		start_time = std::chrono::steady_clock::now(); // Record start time
+				//	}
+
+				//	// Calculate elapsed time (in milliseconds)
+				//	auto elapsed_time = std::chrono::steady_clock::now() - start_time;
+				//	playback_position = std::chrono::duration<float, std::milli>(elapsed_time).count();
+
+				//	if (playback_position > total_length) {
+				//		playback_position = total_length; // Clamp at the end
+				//	}
+				//}
+
+				//// Simulated playback progress bar
+				//ImGui::Text("Progress:");
+				//ImGui::SameLine();
+				//ImGui::SliderFloat("##PlaybackProgress", &playback_position, 0.0f, total_length);
+
+				// Volume control
+				ImGui::Text("Volume:");
+				ImGui::SameLine();
+				ImGui::SliderFloat("##VolumeControl", &volume, 0.0f, 1.0f);
+				NIKE_AUDIO_SERVICE->getChannelGroup(is_music ? "Music" : "SFX")->setVolume(volume);
+
+				// Close button to deselect audio
+				if (ImGui::Button("Close")) {
+					stopAudio();
+					selected_audio.clear();
+					
+				}
+
+				ImGui::End();
 			}
 		}
 		else if (asset_type == "Fonts")
@@ -157,7 +340,7 @@ namespace NIKE
 			for (const auto& prefab : NIKE_ASSETS_SERVICE->getLoadedPrefabs())
 			{
 
-				std::string buttonLabel = "X##" + prefab.first;
+				std::string buttonLabel = "X##PREFAB_" + prefab.first;
 
 				if (ImGui::SmallButton(buttonLabel.c_str())) {
 					selected_file_path = prefab.first;
@@ -195,8 +378,8 @@ namespace NIKE
 			for (const auto& level : NIKE_ASSETS_SERVICE->getLevelsList()) {
 
 
-				std::string buttonLabel = "X##" + level.first; // Small button has to have unqiue id in order to delete
-				if (ImGui::SmallButton(buttonLabel.c_str())) {
+				std::string button_label = "X##LEVEL_" + level.first; // Small button has to have unqiue id in order to delete
+				if (ImGui::SmallButton(button_label.c_str())) {
 					selected_file_path = level.first;
 					delete_file_popup = true;
 					ImGui::OpenPopup("Confirm Delete");
@@ -230,197 +413,45 @@ namespace NIKE
 			delete_file_popup = showDeleteFilePopup(selected_file_path, "Levels");
 			delete_all_files_popup = showDeleteAllFilesPopup("Levels");
 		}
-		else if (asset_type == "Shaders")
+		else if (asset_type == "Scripts")
 		{
-			for (const auto& shader : NIKE_ASSETS_SERVICE->getLoadedShaders())
-			{
-				ImGui::Text("%s", shader.first.c_str());
+			if (NIKE_LUA_SERVICE->getAllScripts().empty()) {
+				NIKE_LUA_SERVICE->loadAllScripts();
 			}
-		}
 
+	
+
+			for (const auto& script : NIKE_LUA_SERVICE->getAllScripts())
+			{
+				std::string button_label = "X##SCRIPT_" + script.first; // Small button has to have unqiue id in order to delete
+				if (ImGui::SmallButton(button_label.c_str())) {
+					selected_file_path = script.first;
+					delete_file_popup = true;
+					ImGui::OpenPopup("Confirm Delete");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Selectable(script.first.c_str(), false, ImGuiSelectableFlags_AllowOverlap)) {
+					selected_file_path = script.first;
+
+					std::string script_file_path = script.first;
+				}
+
+				ImGui::Separator();
+			}
+			ImGui::Spacing();
+			if (ImGui::Button("Clear all Script files", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+			{
+				delete_all_files_popup = true;
+				ImGui::OpenPopup("Confirm Deleting All Files");
+
+			}
+			delete_file_popup = showDeleteFilePopup(selected_file_path, "Scripts");
+			delete_all_files_popup = showDeleteAllFilesPopup("Scripts");
+		}
 		ImGui::EndChild();
 	}
-
-	void renderGrid(Vector2i grid_dimen, Vector2f viewport_size)
-	{
-		// Get the position and size of the viewport window
-		ImVec2 start_pos = ImGui::GetWindowPos();
-
-		// Debug: Log viewport and grid dimensions
-		//cout << "Viewport Size (x, y): " << viewport_size.x << ", " << viewport_size.y
-		//    << " Grid Dimensions (x, y): " << grid_dimen.x << ", " << grid_dimen.y
-		//    << endl;
-
-		// Calculate the tile size to ensure the grid fits inside the viewport
-		float tile_size_x = viewport_size.x / grid_dimen.x;
-		float tile_size_y = viewport_size.y / grid_dimen.y;
-		float tile_size = min(tile_size_x, tile_size_y);
-
-		cout << "Tile Size: " << tile_size << endl;
-
-		// Loop through grid rows and columns to draw the squares
-		for (int row = 0; row < grid_dimen.y; ++row) {
-			for (int col = 0; col < grid_dimen.x; ++col) {
-				// Calculate the top-left and bottom-right coordinates for each grid square
-				ImVec2 top_left(start_pos.x + col * tile_size, start_pos.y + row * tile_size);
-				ImVec2 bottom_right(start_pos.x + (col + 1) * tile_size, start_pos.y + (row + 1) * tile_size);
-
-				// Draw each grid square 
-				ImGui::GetWindowDrawList()->AddRect(top_left, bottom_right, IM_COL32(255, 255, 255, 255));
-			}
-		}
-	}
-
-	bool isMouseOverEntity([[maybe_unused]] const Entity::Type& entity) {
-
-		////Get bounding box
-		//auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-		//if (!e_transform_comp.has_value()) return false;
-		//auto const& e_transform = e_transform_comp.value().get();
-
-		////Vertices
-		//std::vector<Vector2f> vert;
-
-		////If Shape
-		//auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-		//if (e_shape_comp.has_value()) {
-		//	auto const& e_shape = e_shape_comp.value().get();
-
-		//	auto getVertices = [e_shape]() {
-		//		std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
-
-		//		std::vector<Vector2f> vert;
-		//		for (const Assets::Vertex& v : vertices) {
-		//			vert.push_back(v.pos);
-		//		}
-		//		return vert;
-		//		};
-
-		//	vert = getVertices();
-		//	for (auto& point : vert) {
-		//		point.x *= e_transform.scale.x;
-		//		point.y *= e_transform.scale.y;
-		//		point.x += e_transform.position.x;
-		//		point.y -= e_transform.position.y;
-
-		//		//Translate model to world coordinates
-		//		point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-		//		point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
-		//	}
-		//}
-		//else {
-		//	auto getVertices = []() {
-		//		std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
-
-		//		std::vector<Vector2f> vert;
-		//		for (const Assets::Vertex& v : vertices) {
-		//			vert.push_back(v.pos);
-		//		}
-		//		return vert;
-		//		};
-
-		//	for (auto& point : vert) {
-		//		point.x *= e_transform.scale.x;
-		//		point.y *= e_transform.scale.y;
-		//		point.x += e_transform.position.x;
-		//		point.y -= e_transform.position.y;
-
-		//		//Translate model to world coordinates
-		//		point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-		//		point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
-		//	}
-		//}
-
-		////Calculate vertices intersection with mouse
-		//int intersectCount = 0;
-
-		//for (size_t i = 0; i < vert.size(); i++) {
-		//	Vector2f v1 = vert[i];
-		//	Vector2f v2 = vert[(i + 1) % vert.size()];  // Wrap to the start for the last edge
-
-		//	// Check if the ray intersects the edge
-		//	bool isEdgeCrossing = ((v1.y > mouse.y) != (v2.y > mouse.y));
-		//	if (isEdgeCrossing) {
-		//		float intersectionX = v1.x + (mouse.y - v1.y) * (v2.x - v1.x) / (v2.y - v1.y);
-		//		if (mouse.x < intersectionX) {
-		//			intersectCount++;
-		//		}
-		//	}
-		//}
-
-		//// If intersect count is odd, the point is inside
-		//return (intersectCount % 2) == 1;
-		return false;
-	}
-
-	void handleEntitySelectionAndDrag(const Vector2f& main_mouse) {
-
-		if (ImGui::IsMouseClicked(0)) {
-			bool entity_found = false;
-			for (auto& entity : NIKE_IMGUI_SERVICE->getEntityRef()) {
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity.second))
-				{
-					if (isMouseOverEntity(entity.second)) {
-						NIKE_IMGUI_SERVICE->setSelectedEntityName(entity.first);
-						cout << "in" << endl;
-						entity_select = entity.second;
-						entity_found = true;
-						break;
-					}
-				}
-
-			}
-			if (!entity_found) {
-				NIKE_IMGUI_SERVICE->setSelectedEntityName("");  
-				entity_select = 0;  
-			}
-		}
-
-		// Update entity's position when mouse is moving and the mouse is held down
-		if (ImGui::IsMouseDown(0) && entity_select != 0) {
-			std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
-			if (!selected_entity_name.empty()) {
-				Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity_name);
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-					auto& transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get();
-					transform_comp.position = main_mouse;  
-				}
-			}
-		}
-
-		// Release the selected entity when the mouse button is released
-		if (ImGui::IsMouseReleased(0)) {
-			//entity_select = 0;
-		}
-
-		// For deleting entity when delete key triggered
-		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_DELETE)) {
-			std::string selected_entity_name = NIKE_IMGUI_SERVICE->getSelectedEntityName();
-
-			if (!selected_entity_name.empty() && NIKE_IMGUI_SERVICE->checkEntityExist(selected_entity_name)) {
-				// Retrieve the selected entity from the name
-				Entity::Type entity = NIKE_IMGUI_SERVICE->getEntityByName(selected_entity_name);
-
-				// Remove the entity from the reference map
-				NIKE_IMGUI_SERVICE->getEntityRef().erase(selected_entity_name);
-
-				// Destroy the entity from the ECS manager
-				NIKE_ECS_MANAGER->destroyEntity(entity);
-
-				// Reset selected entity name and select state
-				NIKE_IMGUI_SERVICE->setSelectedEntityName("");
-				entity_select = 0;  
-			}
-		}
-
-	}
-
-
-
-
-
-
-
 
 }
 

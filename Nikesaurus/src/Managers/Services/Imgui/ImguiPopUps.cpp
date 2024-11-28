@@ -445,7 +445,7 @@ namespace NIKE
         return is_popup_open;
     }
 
-    bool showDeleteFilePopup(const std::string& file_path, const std::string& asset_type) {
+    bool showDeleteFilePopup(const std::string& key, const std::string& asset_type) {
         bool deleted = false;
 
         // Confirmation popup for deleting a file
@@ -459,18 +459,30 @@ namespace NIKE
                 // Determine which asset type to delete
                 if (asset_type == "Levels") {
                     // Retrieve the scene file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(file_path).string();
+                    full_file_path = NIKE_ASSETS_SERVICE->getLevelsList().at(key).string();
                 }
                 else if (asset_type == "Prefabs") {
                     // Retrieve the prefab file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(file_path).string();
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedPrefabs().at(key).string();
                 }
-                else if (asset_type == "All_Prefabs") {
+                else if (asset_type == "Textures") {
+                    // Retrieve the texture file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedTextures().at(key)->file_path;
+
+                }
+                else if (asset_type == "SFX") {
+                    // Retrieve the audio file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedSfx().at(key)->getFilePath();
+
+                }
+                else if (asset_type == "Music") {
+                    // Retrieve the audio file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedMusic().at(key)->getFilePath();
 
                 }
 
                 // Attempt to delete the selected file
-                if (NIKE_ASSETS_SERVICE->deleteFile(full_file_path)) {
+                if (NIKE_ASSETS_SERVICE->deleteFile(full_file_path, asset_type)) {
                     // Refresh the respective list after deletion
                     if (asset_type == "Levels") {
                         NIKE_ASSETS_SERVICE->loadScnFiles();
@@ -478,6 +490,16 @@ namespace NIKE
                     else if (asset_type == "Prefabs") {
                         NIKE_ASSETS_SERVICE->loadPrefabFiles();
                     }
+                    else if (asset_type == "Textures") {
+                        NIKE_ASSETS_SERVICE->unloadTexture(key);
+                    }
+                    else if (asset_type == "SFX") {
+                        NIKE_ASSETS_SERVICE->unloadSfx(key);
+                    }
+                    else if (asset_type == "Music") {
+                        NIKE_ASSETS_SERVICE->unloadMusic(key);
+                    }
+                    
                     deleted = true;
                 }
                 ImGui::CloseCurrentPopup();
@@ -516,6 +538,18 @@ namespace NIKE
                     if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getPrefabsPath()))
                     {
                         NIKE_ASSETS_SERVICE->loadPrefabFiles();
+                    }
+                }
+                else if (asset_type == "SFX") {
+                    if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getSfxPath()))
+                    {
+                        NIKE_ASSETS_SERVICE->reloadAssets("Audio");
+                    }
+                }
+                else if (asset_type == "Music") {
+                    if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getMusicPath()))
+                    {
+                        NIKE_ASSETS_SERVICE->reloadAssets("Audio");
                     }
                 }
 

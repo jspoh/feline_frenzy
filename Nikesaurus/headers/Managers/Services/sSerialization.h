@@ -91,6 +91,11 @@ namespace NIKE {
 
 			//Get current scene file path
 			std::string const& getCurrSceneFile() const;
+
+			// Save grid to .map file
+			void saveGridToFile(const std::string& file_path);
+
+			void loadGridFromFile(const std::string& file_path);
 		};
 
 		//Re-enable DLL Export warning

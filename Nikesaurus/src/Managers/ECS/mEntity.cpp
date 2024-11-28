@@ -33,7 +33,7 @@ namespace NIKE {
 		avail_entities.pop();
 
 		//Add layer id
-		if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(layer_id)) {
+		if (!NIKE_SCENES_SERVICE->checkLayer(layer_id)) {
 			throw std::runtime_error("Layer does not exist.");
 		}
 

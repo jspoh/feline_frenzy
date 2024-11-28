@@ -16,7 +16,7 @@
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
 #include "Components/cPathfinding.h"
-#include "Systems/GameLogic/sysLua.h"
+#include "Managers/Services/sLua.h"
 
 namespace NIKE {
 	namespace Physics {

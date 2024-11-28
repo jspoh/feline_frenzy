@@ -5,29 +5,34 @@
 * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
 * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
 * \date   September 2024
-* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+* All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 *********************************************************************/
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sWindows.h"
 #include "Managers/Services/sEvents.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	/*****************************************************************//**
 	* NIKE Window
 	*********************************************************************/
 	Windows::NIKEWindow::NIKEWindow(Vector2i window_size, std::string window_title)
-		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }, aspect_ratio{ 0.0f }
 	{
 	}
 
 	Windows::NIKEWindow::NIKEWindow(nlohmann::json const& config)
-		: ptr_window{ nullptr }, b_full_screen{ false }
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }, aspect_ratio{ 0.0f }
 	{
 		try {
 			auto const& data = config.at("WindowsConfig");
 			window_title = data.at("Title").get<std::string>();
 			window_size.fromJson(data.at("Window_Size"));
+			size_before_fullscreen = window_size;
+			world_size.fromJson(data.at("World_Size"));
+			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+			calculateViewport();
 		}
 		catch(const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -35,6 +40,10 @@ namespace NIKE {
 
 			window_title = "Window";
 			window_size = { 1600, 900 };
+			size_before_fullscreen = window_size;
+			world_size = { 1600.0f, 900.0f };
+			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+			calculateViewport();
 		}
 
 		//Configure Window Setup
@@ -94,8 +103,14 @@ namespace NIKE {
 #endif
 	}
 
-	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
-		return ptr_window;
+	void Windows::NIKEWindow::calculateViewport() {
+		//Manage aspect ratio
+		viewport_size.x = static_cast<float>(window_size.x);
+		viewport_size.y = viewport_size.x / aspect_ratio;
+		if (viewport_size.y > static_cast<float>(window_size.y)) {
+			viewport_size.y = static_cast<float>(window_size.y);
+			viewport_size.x = viewport_size.y * aspect_ratio;
+		}
 	}
 
 	void Windows::NIKEWindow::setWindowMode(int mode, int value) {
@@ -112,14 +127,13 @@ namespace NIKE {
 		GLFWmonitor* monitor;
 		const GLFWvidmode* mode;
 
-
 		if (value == GLFW_TRUE && !b_full_screen) {
 			//Get FullScreen Attributes
 			monitor = glfwGetPrimaryMonitor();
 			mode = glfwGetVideoMode(monitor);
 
 			// Get the window position and size
-			glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
+			glfwGetWindowPos(ptr_window, &pos_before_fullscreen.x, &pos_before_fullscreen.y);
 			glfwGetWindowSize(ptr_window, &size_before_fullscreen.x, &size_before_fullscreen.y);
 
 			// Recreate the window in fullscreen mode
@@ -134,7 +148,7 @@ namespace NIKE {
 			monitor = nullptr;
 
 			// Recreate the window in windowed mode at the stored position and size
-			glfwSetWindowMonitor(ptr_window, nullptr, window_pos.x, window_pos.y, size_before_fullscreen.x, size_before_fullscreen.y, 0);
+			glfwSetWindowMonitor(ptr_window, nullptr, pos_before_fullscreen.x, pos_before_fullscreen.y, size_before_fullscreen.x, size_before_fullscreen.y, 0);
 
 			//Set Full Screen Mode False
 			b_full_screen = false;
@@ -145,12 +159,18 @@ namespace NIKE {
 		return b_full_screen;
 	}
 
+	Vector2f Windows::NIKEWindow::getFullScreenScale() const {
+		return { std::clamp(static_cast<float>(viewport_size.x) / static_cast<float>(size_before_fullscreen.x), 0.0f, (float)UINT16_MAX),
+					std::clamp(static_cast<float>(viewport_size.y) / static_cast<float>(size_before_fullscreen.y), 0.0f, (float)UINT16_MAX) };
+	}
+
 	void Windows::NIKEWindow::setupEventCallbacks() {
 		glfwSetFramebufferSizeCallback(ptr_window, Events::Service::fbsize_cb);
 		glfwSetKeyCallback(ptr_window, Events::Service::key_cb);
 		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
+		glfwSetWindowFocusCallback(ptr_window, Events::Service::windowfocus_cb);
 	    glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
 	}
 
@@ -179,6 +199,10 @@ namespace NIKE {
 		return window_title;
 	}
 
+	Vector2f Windows::NIKEWindow::getWorldSize() const {
+		return world_size;
+	}
+
 	void Windows::NIKEWindow::setWindowSize(int width, int height) {
 		window_size.x = width;
 		window_size.y = height;
@@ -187,12 +211,27 @@ namespace NIKE {
 	}
 
 	Vector2i Windows::NIKEWindow::getWindowSize() const {
-		if (b_full_screen) {
-			return size_before_fullscreen;
-		}
-		else {
-			return window_size;
-		}
+		return window_size;
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportSize() const {
+		return viewport_size;
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportRatio() const {
+		return { std::clamp(viewport_size.x / window_size.x, 0.0f, 1.0f), std::clamp(viewport_size.y / window_size.y, 0.0f, 1.0f) };
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportWindowGap() const {
+		return { std::clamp(window_size.x - viewport_size.x, 0.0f, (float)UINT16_MAX), std::clamp(window_size.y - viewport_size.y, 0.0f, (float)UINT16_MAX) };
+	}
+
+	void Windows::NIKEWindow::setAspectRatio(float ratio) {
+		aspect_ratio = ratio;
+	}
+
+	float Windows::NIKEWindow::getAspectRatio() const {
+		return aspect_ratio;
 	}
 
 	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const {
@@ -226,8 +265,58 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowResized> event) {
-		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
+
+		//Window size
 		window_size = event->frame_buffer;
+
+		//Calculate viewport
+		calculateViewport();
+
+		//Center the viewport within the window
+		int x_offset = (window_size.x - static_cast<int>(viewport_size.x)) / 2;
+		int y_offset = (window_size.y - static_cast<int>(viewport_size.y)) / 2;
+
+		//Set viewport
+		glViewport(x_offset, y_offset, static_cast<GLsizei>(viewport_size.x), static_cast<GLsizei>(viewport_size.y));
+	}
+
+	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		static bool is_fullscreen;
+
+		if (event->focused) {
+			glfwRestoreWindow(ptr_window);
+
+			if (is_fullscreen) {
+				setFullScreen(true);
+			}
+
+			// in case of resizes
+			int width, height;
+			glfwGetFramebufferSize(ptr_window, &width, &height);
+			glViewport(0, 0, width, height);
+
+			// just in case
+			glfwMakeContextCurrent(ptr_window);
+
+			NIKE_AUDIO_SERVICE->resumeAllChannels();
+		}
+		else {
+			GLFWmonitor* monitor = glfwGetWindowMonitor(ptr_window);
+			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
+
+			NIKE_AUDIO_SERVICE->pauseAllChannels();
+			//glfwIconifyWindow(ptr_window); // minimize the window if unfocused
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	/*****************************************************************//**
@@ -237,6 +326,10 @@ namespace NIKE {
 		:	ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, 
 			actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 },
 			accumulated_time{ 0.0 } {}
+
+	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
+		return ptr_window;
+	}
 
 	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {
 		ptr_window = window;

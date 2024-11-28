@@ -1,6 +1,6 @@
 ﻿/*****************************************************************//**
- * \file   sysFont.h
- * \brief	Font render manager
+ * \file	sLoader.h
+ * \brief	Loading manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
@@ -21,15 +21,18 @@ namespace NIKE {
 			Vector4f col;
 			Vector2f tex_coords;
 			unsigned int tex_hdl;
-			unsigned int tex_binding_idx;
+			unsigned int sampler_idx;	// index to use in sampler2DArray
 			Matrix_33 transform;		// column major
+			Vector2f framesize{};
+			Vector2f uv_offset{};
 
-			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int tex_binding_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, tex_binding_idx{ tex_binding_idx } {}
+			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, sampler_idx{} {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int sampler_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, sampler_idx{ sampler_idx } {}
+			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int sampler_idx, const Matrix_33& transform, const Vector2f& framesize, const Vector2f& uv_offset) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform{ transform }, tex_hdl{ tex_hdl }, sampler_idx{ sampler_idx }, framesize{ framesize }, uv_offset{ uv_offset } {}
 		};
 
 		//Font Type Data Structure
@@ -110,9 +113,11 @@ namespace NIKE {
 		struct Texture {
 			unsigned int gl_data;
 			Vector2i size;
+			std::string file_path;
 
-			Texture() : gl_data{ 0 }, size() {}
-			Texture(unsigned int gl_data, Vector2i&& size) : gl_data{ gl_data }, size{ size } {}
+			Texture() : gl_data{ 0 }, size{}, file_path{ "" } {}
+			Texture(unsigned int gl_data, Vector2i size, std::string file_path)
+				: gl_data{ gl_data }, size{ std::move(size) }, file_path{ std::move(file_path) } {}
 		};
 
 		//Shader/Model/Texture Loader
@@ -139,6 +144,8 @@ namespace NIKE {
 			 */
 			void createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Model& model);
 
+			void createBatchedTextureBuffers(Model& model);
+
 			/**
 			 * all .tex files should be 256x256 in RGBA8 format.
 			 *
@@ -156,16 +163,6 @@ namespace NIKE {
 		public:
 			RenderLoader() = default;
 			~RenderLoader() = default;
-
-			/**
-			 * compiles shader and adds to shader_programs.
-			 *
-			 * \param shader_ref	shader program's reference string
-			 * \param vtx_path		path to vertex shader
-			 * \param frag_path		path to fragment shader
-			 */
-			unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
-
 			/**
 			 * creates vertex array object. from mesh data and registers it to meshes.
 			 *

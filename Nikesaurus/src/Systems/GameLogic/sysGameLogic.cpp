@@ -14,35 +14,34 @@
 namespace NIKE {
 
 	void GameLogic::Manager::init() {
-		lua_system = std::make_unique<Lua::System>();
-		lua_system->init();
+		NIKE_LUA_SERVICE->init();
 	}
 
 	void GameLogic::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
 		//Add system to lua
-		lua_system->registerLuaSystem(system);
+		NIKE_LUA_SERVICE->registerLuaSystem(system);
 	}
 
 	sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
 		//Run script
 		if (script_id == "") {
-			script_id = lua_system->loadScript(file_path);
+			script_id = NIKE_LUA_SERVICE->loadScript(file_path);
 			b_loaded = true;
-			return lua_system->executeScript(script_id, function);
+			return NIKE_LUA_SERVICE->executeScript(script_id, function);
 		}
 		else if (b_loaded) {
-			return lua_system->executeScript(script_id, function);
+			return NIKE_LUA_SERVICE->executeScript(script_id, function);
 		}
 		else {
-			lua_system->reloadScript(script_id);
+			NIKE_LUA_SERVICE->reloadScript(script_id);
 			b_loaded = true;
-			return lua_system->executeScript(script_id, function);
+			return NIKE_LUA_SERVICE->executeScript(script_id, function);
 		}
 	}
 
 	void GameLogic::Manager::update() {
 		//Get layers
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		// Get entities marked for deletion
 		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();

@@ -19,14 +19,13 @@ namespace NIKE {
 	namespace Camera {
 
 		class Service
-			: public Events::IEventListener<Windows::WindowResized>,
-			public Events::IEventListener<Render::ChangeCamEvent>
+			: public Events::IEventListener<Render::ChangeCamEvent>
 		{
 		public:
 			Service();
 
 			//Init camera
-			void init();
+			void init(nlohmann::json const& config);
 
 			// Return active Cam id
 			Entity::Type getCamId() const;
@@ -42,6 +41,12 @@ namespace NIKE {
 
 			//Get active camera
 			Render::Cam getActiveCamera() const;
+
+			//Set camera height
+			void setCameraHeight(float height);
+
+			//Get camera height
+			float getCameraHeight() const;
 		private:
 			//Targets
 			Vector2f target;
@@ -53,11 +58,8 @@ namespace NIKE {
 			//Default Camera
 			std::shared_ptr<Render::Cam> def_cam;
 
-			//Camera aspect ratio
-			float aspect_ratio;
-
-			//On window resized event
-			void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
+			//Camera height
+			float cam_height;
 
 			//On change camera event
 			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;

@@ -20,11 +20,12 @@
 #include "Managers/Services/sSerialization.h"
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/Assets/sAssets.h"
-#include "Managers/Services/Imgui/sImgui.h"
 #include "Managers/Services/sMap.h"
 #include "Managers/Services/sCamera.h"
 #include "Managers/Services/sUserInterface.h"
+#include "Managers/Services/sLua.h"
 #include "Managers/Services/LevelEditor/sLevelEditor.h"
+#include "Managers/Services/sPath.h"
 
 //Include all components here
 #include "Components/cAudio.h"
@@ -121,6 +122,8 @@ namespace NIKE {
 			}
 		};
 
+
+
 		//Re-enable DLL Export warning
 		#pragma warning(default: 4251)
 	}
@@ -138,11 +141,12 @@ namespace NIKE {
 #define NIKE_ASSETS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Assets::Service>()
 #define NIKE_SERIALIZE_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Serialization::Service>()
 #define NIKE_DEBUG_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Debug::Service>()
-#define NIKE_IMGUI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::IMGUI::Service>()
 #define NIKE_MAP_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Map::Service>()
 #define NIKE_CAMERA_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Camera::Service>()
 #define NIKE_UI_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::UI::Service>()
 #define NIKE_LVLEDITOR_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::LevelEditor::Service>()
+#define NIKE_LUA_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Lua::Service>()
+#define NIKE_PATH_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Path::Service>()
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

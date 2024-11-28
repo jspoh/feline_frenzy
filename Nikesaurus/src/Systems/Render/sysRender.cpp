@@ -47,7 +47,7 @@ namespace NIKE {
 
 		// Check if framebuffer is complete
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -110,7 +110,7 @@ namespace NIKE {
 			shader_system->setUniform("base", "model_to_ndc", x_form);
 
 			//Get model
-			auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
+			auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(e_shape.model_id);
 
 			//Draw
 			glBindVertexArray(model->vaoid);
@@ -156,7 +156,7 @@ namespace NIKE {
 			return;
 		}
 
-		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_square.model");
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -217,7 +217,10 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
-		if (!BATCHED_RENDERING) {
+		// !TODO: batched rendering for texture incomplete
+		static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = false;
+
+		if constexpr(!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -230,11 +233,11 @@ namespace NIKE {
 			// set texture
 			glBindTextureUnit(
 				texture_unit, // texture unit (binding index)
-				NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data
+				NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data
 			);
 
-			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 			//Caculate UV Offset
 			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
@@ -260,7 +263,7 @@ namespace NIKE {
 			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
 			//Get model
-			auto model = NIKE_ASSETS_SERVICE->getModel("square-texture");
+			auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
 
 			//Draw
 			glBindVertexArray(model->vaoid);
@@ -271,11 +274,112 @@ namespace NIKE {
 			shader_system->unuseShader();
 		}
 		else {
+			//Caculate UV Offset
+			Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
+			Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
 
+			//Translate UV offset to bottom left
+			uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
+
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.tex = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data;
+			instance.framesize = framesize;
+			instance.uv_offset = uv_offset;
+
+			render_instances_texture.push_back(instance);
+
+			if (render_instances_texture.size() >= MAX_INSTANCES) {
+				batchRenderTextures();
+			}
 		}
 	}
 
-	void batchRenderTextures() {}
+	void Render::Manager::batchRenderTextures() {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		if (!BATCHED_RENDERING) {
+			return;
+		}
+
+		if (render_instances_texture.empty()) {
+			return;
+		}
+
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_texture.model");
+
+		// create buffer of vertices
+		std::vector<Assets::Vertex> vertices;
+		static constexpr int NUM_VERTICES_IN_MODEL = 4;
+		vertices.reserve(render_instances_texture.size() * NUM_VERTICES_IN_MODEL);
+		for (size_t i{}; i < render_instances_texture.size(); i++) {
+			// create temp model to populate with current instance's data
+			Assets::Model m{ model };
+			for (Assets::Vertex& v : m.vertices) {
+				v.tex_hdl = render_instances_texture[i].tex;
+				v.transform = render_instances_texture[i].xform;
+				v.framesize = render_instances_texture[i].framesize;
+				v.uv_offset = render_instances_texture[i].uv_offset;
+				v.sampler_idx = static_cast<unsigned int>(i);
+			}
+
+			vertices.insert(vertices.end(), m.vertices.begin(), m.vertices.end());
+		}
+
+		// populate vbo
+		glNamedBufferSubData(model.vboid, 0, vertices.size() * sizeof(Assets::Vertex), vertices.data());
+
+		// create buffer of indices for indexed rendering
+		std::vector<unsigned int> indices;
+		static constexpr int NUM_INDICES_FOR_QUAD = 6;
+		indices.reserve(render_instances_texture.size() * NUM_INDICES_FOR_QUAD);
+		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
+		for (size_t i{}; i < render_instances_texture.size(); i++) {
+			for (size_t j{}; j < model.indices.size(); j++) {
+				indices.push_back(model.indices[j] + static_cast<unsigned int>((i * NUM_VERTICES_IN_MODEL)));
+			}
+		}
+
+		// populate ebo
+		glNamedBufferSubData(model.eboid, 0, indices.size() * sizeof(unsigned int), indices.data());
+
+		// create vector of texture handles
+		// cant pass in unsigned int so.. using int
+		std::vector<int> textures;
+		textures.reserve(vertices.size());
+		for (int i{}; i < vertices.size(); i++) {
+			const Assets::Vertex& v = vertices[i];
+
+			const int tex_binding_idx = i;
+
+			// bind textures
+			// using texture ids as texture units too..
+			glBindTextureUnit(tex_binding_idx, v.tex_hdl);
+
+			textures.push_back(tex_binding_idx);
+		}
+		shader_system->setUniform("batched_texture", "u_tex2d", textures);
+
+		static constexpr int INDICES_TYPE = GL_UNSIGNED_INT;
+
+		// use shader
+		shader_system->useShader("batched_texture");
+		// bind vao
+		glBindVertexArray(model.vaoid);
+		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+
+		// cleanup
+		glBindVertexArray(0);
+		shader_system->unuseShader();
+
+		render_instances_texture.clear();
+
+
+	}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
 
@@ -296,7 +400,7 @@ namespace NIKE {
 
 		//Calculate size of text
 		for (char c : e_text.text) {
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(e_text.font_id)->char_map[c];
 
 			//Calculate width
 			text_size.x += (ch.advance >> 6) * e_text.scale;
@@ -335,7 +439,7 @@ namespace NIKE {
 		//Iterate through all characters
 		for (char c : e_text.text)
 		{
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(e_text.font_id)->char_map[c];
 
 			float xpos = pos.x + ch.bearing.x * e_text.scale;
 			float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
@@ -383,7 +487,7 @@ namespace NIKE {
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel("square");
+		auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square.model");
 
 		//Draw model
 		glBindVertexArray(model->vaoid);
@@ -413,11 +517,11 @@ namespace NIKE {
 			auto& e_texture = e_texture_comp.value().get();
 
 			//Check if texture is loaded
-			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
 				//Allow stretching of texture
 				if (!e_texture.b_stretch) {
 					//Copy transform for texture mapping ( Locks the transformation of a texture )
-					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
+					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
 					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 				}
 
@@ -432,7 +536,7 @@ namespace NIKE {
 			auto& e_shape = e_shape_comp.value().get();
 
 			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
 				// Transform matrix here
 				transformMatrix(e_transform, matrix, cam_ndcx);
 
@@ -489,29 +593,29 @@ namespace NIKE {
 		if (!e_text_comp.has_value()) return;
 		auto& e_text = e_text_comp.value().get();
 
-		//Make copy of transform, scale to 1.0f for calculating matrix
-		Transform::Transform copy = e_transform;
-		copy.scale = { 1.0f, 1.0f };
+		//Check if font exists
+		if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
+			//Make copy of transform, scale to 1.0f for calculating matrix
+			Transform::Transform copy = e_transform;
+			copy.scale = { 1.0f, 1.0f };
 
-		//Transform text matrix
-		transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+			//Transform text matrix
+			transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
 
-		//Render text
-		renderText(matrix, e_text);
+			//Render text
+			renderText(matrix, e_text);
+		}
 	}
 
 	void Render::Manager::renderViewport() {
 
 		//Render to frame buffer if imgui is active
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
-		// Get entities marked for deletion
-		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
-
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
@@ -536,9 +640,10 @@ namespace NIKE {
 		}
 
 		batchRenderObject();		// at least 1 call to this is required every frame at the very end
+		//batchRenderTextures();	// at least 1 call to this is required every frame at the very end
 
 		// render text last
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
@@ -548,7 +653,7 @@ namespace NIKE {
 			}
 		}
 
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}
@@ -579,6 +684,9 @@ namespace NIKE {
 
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();
+
+		//Init shader system
+		shader_system->init();
 
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);

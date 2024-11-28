@@ -17,8 +17,8 @@ namespace NIKE {
 	/*****************************************************************//**
 	* NIKE AUDIO
 	*********************************************************************/
-	Audio::NIKEAudio::NIKEAudio(FMOD::Sound* sound)
-		:sound{ sound } {}
+	Audio::NIKEAudio::NIKEAudio(FMOD::Sound* sound, const std::string& path)
+		:sound{ sound }, file_path{path} {}
 
 	FMOD::Sound* Audio::NIKEAudio::getAudio() {
 		return sound;
@@ -26,6 +26,10 @@ namespace NIKE {
 
 	void Audio::NIKEAudio::release() {
 		sound->release();
+	}
+
+	std::string Audio::NIKEAudio::getFilePath() const{
+		return file_path;
 	}
 
 	unsigned int Audio::NIKEAudio::getLength() const {
@@ -215,7 +219,7 @@ namespace NIKE {
 
 	float Audio::NIKEChannelGroup::getPitch() const {
 		float pitch;
-		group->getVolume(&pitch);
+		group->getPitch(&pitch);
 		return pitch;
 	}
 
@@ -265,6 +269,14 @@ namespace NIKE {
 		return Audio::Service::convertChannelGroup(new Audio::NIKEChannelGroup(parent_group));
 	}
 
+	void Audio::NIKEChannelGroup::setSystemChannel(bool value) {
+		isSystemChannel = value;
+	}
+
+	bool Audio::NIKEChannelGroup::checkSystemChannel() const{
+		return isSystemChannel;
+	}
+
 	/*****************************************************************//**
 	* NIKE AUDIO SYSTEM
 	*********************************************************************/
@@ -312,7 +324,7 @@ namespace NIKE {
 
 		NIKEE_CORE_INFO("Sucessfully loaded sound from " + file_path);
 
-		return std::make_shared<Audio::NIKEAudio>(temp_audio);
+		return std::make_shared<Audio::NIKEAudio>(temp_audio, file_path);
 	}
 
 	std::shared_ptr<Audio::IAudio> Audio::NIKEAudioSystem::createStream(std::string const& file_path) {
@@ -332,7 +344,7 @@ namespace NIKE {
 
 		NIKEE_CORE_INFO("Sucessfully loaded music from " + file_path);
 
-		return std::make_shared<Audio::NIKEAudio>(temp_audio);
+		return std::make_shared<Audio::NIKEAudio>(temp_audio, file_path);
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::NIKEAudioSystem::createChannelGroup(std::string const& identifier) {
@@ -344,7 +356,7 @@ namespace NIKE {
 		{
 			throw std::runtime_error("AUDIO GROUP NOT INITIALIZED");
 		}
-
+		
 		return std::make_shared<Audio::NIKEChannelGroup>(temp);
 	}
 
@@ -501,13 +513,13 @@ namespace NIKE {
 		return true;
 	}
 
-	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused) {
+	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
 		
 		//Get assets services
 		auto assets_service = NIKE_ASSETS_SERVICE;
 
 		//Play sound & get channel that sound is playing under
-		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(assets_service->getAudio(audio_id), getChannelGroup(channel_group_id), start_paused);
+		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(is_music ? assets_service->getAsset<Audio::IAudio>(audio_id) : assets_service->getAsset<Audio::IAudio>(audio_id), getChannelGroup(channel_group_id), start_paused);
 
 		//Add channel to the channel map
 		if (new_channel) {
@@ -523,9 +535,57 @@ namespace NIKE {
 			channels[channel_id] = std::move(new_channel);
 		}
 		else {
-			cout << "Error playing audio in channel!" << endl;
+			NIKEE_CORE_ERROR("Error playing audio in channel!");
 		}
 
+	}
+
+
+	void Audio::Service::pauseAllChannels() {
+		for (auto& pair : getAllChannelGroups()) {
+			pair.second->setPaused(true);
+		}
+	}
+
+	void Audio::Service::resumeAllChannels() {
+		for (auto& pair : getAllChannelGroups()) {
+			pair.second->setPaused(false);
+		}
+	}
+
+	/*****************************************************************//**
+	* BGM
+	*********************************************************************/
+	std::queue<std::string>& Audio::Service::getBGMQueue() {
+		return bgm_playlist;
+	}
+
+	bool Audio::Service::checkIsBGMPlaying() {
+		return is_bgm_playing;
+	}
+
+	void Audio::Service::setIsBGMPlaying(bool value) {
+		is_bgm_playing = value;
+	}
+
+	void Audio::Service::addBGMToQueue(std::string const& audio_id) {
+		bgm_playlist.push(audio_id);
+
+		if (!is_bgm_playing) {
+			playBGM();  // If no BGM is playing, start playing immediately
+		}
+	}
+
+	void Audio::Service::playBGM() {
+		if (!bgm_playlist.empty()) {
+			std::string current_bgm = bgm_playlist.front();
+			bgm_playlist.pop();
+
+
+			playAudio(current_bgm, "", "BGM", 1.0f, 1.0f, false, true);
+
+			is_bgm_playing = true;
+		}
 	}
 
 	void Audio::Service::update() {
@@ -541,5 +601,6 @@ namespace NIKE {
 				++it;
 			}
 		}
+	
 	}
 }

@@ -712,7 +712,7 @@ namespace NIKE {
 								}
 							}
 							if (ImGui::Button("Save Audio ID")) {
-								if (NIKE_ASSETS_SERVICE->checkAudioExist(input_audio_id))
+								if (NIKE_ASSETS_SERVICE->checkSfxExist(input_audio_id))
 								{
 									// Update audio ID in component
 									sfx_comp.audio_id = input_audio_id;
@@ -935,12 +935,12 @@ namespace NIKE {
 		static unsigned int selected_layer_index = 0;
 		static unsigned int bit_position = 0;
 
-		unsigned int layer_count = NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount();
-		const auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
+		const auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		std::vector<std::string> layer_names;
 		for (int i = 0; i < layers.size(); ++i) {
-			layer_names.push_back("Layer " + std::to_string(NIKE_SCENES_SERVICE->getCurrScene()->getLayer(i)->getLayerID()));
+			layer_names.push_back("Layer " + std::to_string(NIKE_SCENES_SERVICE->getLayer(i)->getLayerID()));
 		}
 
 		// Display layer count
@@ -973,7 +973,7 @@ namespace NIKE {
 
 			// Button to create a new layer with the next available index
 			if (ImGui::Button("Create Layer")) {
-				NIKE_SCENES_SERVICE->getCurrScene()->createLayer(layer_count);
+				NIKE_SCENES_SERVICE->createLayer(layer_count);
 				selected_layer_index = layer_count;
 			}
 
@@ -986,7 +986,7 @@ namespace NIKE {
 				if (layer_count > 1)
 				{
 					unsigned int layer_id = layers[selected_layer_index]->getLayerID();
-					NIKE_SCENES_SERVICE->getCurrScene()->removeLayer(layer_id);
+					NIKE_SCENES_SERVICE->removeLayer(layer_id);
 
 					// Update the selected index and refetch the layers
 					selected_layer_index = 0;
@@ -1151,12 +1151,6 @@ namespace NIKE {
 				NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(new_entity, Render::Texture(new_texture_id, { 1.0f, 1.0f, 1.0f, 1.0f }));
 			}
 			ImGui::EndDragDropTarget();
-		}
-
-		if (NIKE_IMGUI_SERVICE->getGridActive())
-		{
-			renderGrid(NIKE_IMGUI_SERVICE->getGridDimen(), viewport_size);
-
 		}
 
 		ImGui::End();
@@ -1355,7 +1349,7 @@ namespace NIKE {
 
 		// Saving input
 		if (ImGui::Button("Save Audio Input")) {
-			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file)))
+			if (NIKE_ASSETS_SERVICE->checkSfxExist(std::string(current_audio_file)))
 			{
 				ImGui::OpenPopup("VALID INPUT");
 				show_save_popup = true;
@@ -1381,12 +1375,12 @@ namespace NIKE {
 
 		if (ImGui::Button("Play BGM"))
 		{
-			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+			if (NIKE_ASSETS_SERVICE->checkSfxExist(std::string(current_audio_file))
 				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
 			{
 				std::string channel_id = "CHANNEL_" + std::to_string(channel_counter);
 
-				NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0);
+				NIKE_AUDIO_SERVICE->playAudio(current_audio_file, channel_id, current_channel_input, 1.0f, 1.0f, 0, true);
 			}
 			else
 			{
@@ -1398,7 +1392,7 @@ namespace NIKE {
 
 		if (ImGui::Button("Stop BGM"))
 		{
-			if (NIKE_ASSETS_SERVICE->checkAudioExist(std::string(current_audio_file))
+			if (NIKE_ASSETS_SERVICE->checkSfxExist(std::string(current_audio_file))
 				&& NIKE_AUDIO_SERVICE->checkChannelGroupExist(std::string(current_channel_input)))
 			{
 

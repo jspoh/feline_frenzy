@@ -32,7 +32,7 @@ namespace NIKE {
 		for (size_t i = 0; i < grid_size.y; ++i) {
 			float left = -(grid_scale.x / 2.0f);
 			for (size_t j = 0; j < grid_size.x; ++j) {
-				grid.at(i).at(j).position = { left + (cell_size.y / 2.0f), top + (cell_size.x / 2.0f) };
+				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top + (cell_size.y / 2.0f) };
 				left += cell_size.x;
 			}
 			top += cell_size.y;
@@ -106,6 +106,23 @@ namespace NIKE {
 
 		//Get index for cell
 		Vector2i index{ static_cast<int>(translated_cursor.x / cell_size.x), static_cast<int>(translated_cursor.y / cell_size.y) };
+
+		//Check if index is valid
+		if (index.x < 0 || index.x >= grid_size.x || index.y < 0 || index.y >= grid_size.y) {
+			return std::nullopt;
+		}
+		else {
+			return grid.at(index.y).at(index.x);
+		}
+	}
+
+	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCellAtPosition(Vector2f const& position) {
+
+		//Translate position
+		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), position.y + (grid_scale.y / 2.0f) };
+
+		//Get index for cell
+		Vector2i index{ static_cast<int>(translated_pos.x / cell_size.x), static_cast<int>(translated_pos.y / cell_size.y) };
 
 		//Check if index is valid
 		if (index.x < 0 || index.x >= grid_size.x || index.y < 0 || index.y >= grid_size.y) {

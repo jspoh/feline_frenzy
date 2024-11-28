@@ -54,9 +54,6 @@
     <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
     <ClCompile Include="src\Managers\ECS\mComponent.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sAssets.cpp" />
-    <ClCompile Include="src\Managers\Services\Imgui\ImguiPopUps.cpp" />
-    <ClCompile Include="src\Managers\Services\Imgui\ImguiUtils.cpp" />
-    <ClCompile Include="src\Managers\Services\Imgui\ImguiWindows.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
@@ -66,13 +63,14 @@
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
+    <ClCompile Include="src\Managers\Services\sPath.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
-    <ClCompile Include="src\Systems\GameLogic\sysLua.cpp" />
+    <ClCompile Include="src\Managers\Services\sLua.cpp" />
     <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\Services\sCamera.cpp" />
@@ -89,7 +87,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Systems\sysAudio.cpp" />
-    <ClCompile Include="src\Managers\Services\Imgui\sImgui.cpp" />
     <ClCompile Include="src\Utility\uSystems.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -111,10 +108,7 @@
     <ClInclude Include="headers\Components\cShooting.h" />
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
-    <ClInclude Include="headers\Managers\Services\Imgui\ImguiPopUps.h" />
-    <ClInclude Include="headers\Managers\Services\Imgui\ImguiUtils.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />
-    <ClInclude Include="headers\Managers\Services\Imgui\ImguiWindows.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
@@ -123,13 +117,14 @@
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
+    <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
-    <ClInclude Include="headers\Systems\GameLogic\sysLua.h" />
+    <ClInclude Include="headers\Managers\Services\sLua.h" />
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Managers\Services\sCamera.h" />
@@ -158,7 +153,6 @@
     <ClInclude Include="headers\Math\Vector2\Vector2.h" />
     <ClInclude Include="headers\Math\Vector4\Vector4.h" />
     <ClInclude Include="headers\Systems\sysAudio.h" />
-    <ClInclude Include="headers\Managers\Services\Imgui\sImgui.h" />
     <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>
@@ -240,9 +234,8 @@
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
-if not exist "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" mkdir "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy"
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+REM copy all files (including pdb) to main startup project outdir
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -275,9 +268,8 @@ xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Pla
 
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
-if not exist "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" mkdir "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy"
-
-xcopy "$(OutDir)Nikesaurus.dll" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy" /s  /r  /y  /q</Command>
+REM copy all files (including pdb) to main startup project outdir
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

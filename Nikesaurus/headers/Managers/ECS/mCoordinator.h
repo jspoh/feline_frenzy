@@ -15,8 +15,16 @@
 #include "Managers/ECS/mComponent.h"
 #include "Managers/ECS/mSystem.h"
 
+#include "Managers/Services/sEvents.h"
+
 namespace NIKE {
 	namespace Coordinator {
+
+		struct EntitiesChanged : Events::IEvent {
+			std::set<Entity::Type> entities;
+			EntitiesChanged() = default;
+			EntitiesChanged(std::set<Entity::Type> entities) : entities{ entities }{}
+		};
 
 		class Manager {
 		private:
