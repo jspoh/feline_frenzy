@@ -35,17 +35,6 @@ namespace NIKE {
 					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 						continue;
 
-					// If player entity is not saved
-					//if (!player_entity) {
-					//	// Check for player logic comp
-					//	auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
-					//	if (e_player_comp.has_value()) {
-					//		// Save ref to player entity
-					//		player_entity = entity; // Assign by value
-					//		player_entity_cached = true;
-					//	}
-					}
-
 					// Check for attack comp
 					auto e_enemy_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(entity);
 					if (e_enemy_comp.has_value()) {
@@ -53,13 +42,13 @@ namespace NIKE {
 						for (auto& other_entity : entities) {
 							auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(other_entity);
 							if (e_player_comp.has_value()) {
-								// Get player's position
-								auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
-								Vector2f player_pos = e_transform_comp.value().get().position;
-
-								NIKEE_CORE_INFO("Player Position: x = {}, y = {}", player_pos.x, player_pos.y);
-								// Calculate distance between player and enemy
-								// Shoot if distance < range
+								
+								if (withinRange(entity, other_entity)) {
+									NIKEE_CORE_INFO("Player within range");
+								}
+								else {
+									NIKEE_CORE_INFO("Not in range");
+								}
 							}
 						}
 					}
@@ -67,3 +56,34 @@ namespace NIKE {
 			}
 		}
 	}
+
+	 bool Enemy::Manager::withinRange(const Entity::Type enemy, const Entity::Type player) {
+		// Get player transform
+		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		Vector2f player_pos = player_transform_comp.value().get().position;
+		Vector2f player_scale = player_transform_comp.value().get().scale;
+
+		// Get enemy transform
+		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		Vector2f enemy_pos = enemy_transform_comp.value().get().position;
+		Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
+
+		// Get enemy range
+		auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		float enemy_range = enemy_attack_comp.value().get().range;
+
+		// Calculations
+		float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
+		float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
+
+		float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
+		float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
+
+		float distance = (dist_x * dist_x) + (dist_y * dist_y);
+
+		//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
+		
+		// It is recommended to use enemy_range^2, but it's probably easier this way
+		return distance < enemy_range;
+	}
+}

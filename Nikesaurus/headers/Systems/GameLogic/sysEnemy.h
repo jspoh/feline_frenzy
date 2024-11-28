@@ -24,9 +24,8 @@ namespace NIKE {
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
-			// Player entity
-			//Entity::Type player_entity;
-			//bool player_entity_cached = false;
+			// Check if player is within range
+			bool withinRange(const Entity::Type enemy, const Entity::Type player);
 
 		public:
 			//Default Constructor
