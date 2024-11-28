@@ -353,7 +353,7 @@ namespace NIKE {
 				// get index of texture hdl in texture_binding_units vector
 				const int texture_idx = std::distance(texture_binding_units.begin(), texture_binding_units.find(render_instances_texture[i].tex));
 
-				v.sampler_idx = static_cast<unsigned int>(texture_idx);
+				v.sampler_idx = texture_idx;
 				//v.sampler_idx = 1;
 			}
 
