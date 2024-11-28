@@ -410,7 +410,6 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderTextures: {0}", err);
 		}
-
 	}
 
 	void Render::Manager::renderText(Matrix_33 const& x_form, Render::Text& e_text) {
