@@ -7,7 +7,7 @@
 
 layout (location=0) in vec2 f_texcoord;
 layout (location=1) flat in int f_sampler_idx;
-layout (location=2) in vec2 dbg_framesize;
+//layout (location=2) in vec2 dbg_framesize;
 
 layout (location=0) out	vec4 out_color;
 
@@ -23,6 +23,6 @@ void main() {
 	//out_color = vec4(1.0, 0.0, 1.0, 1.0);
 	//out_color = vec4(f_sampler_idx, f_sampler_idx, f_sampler_idx, 1.0);
 	//out_color = vec4(f_texcoord, 0.0, 1.0);		// used to check if texcoord is valid
-	out_color = vec4(dbg_framesize, 1.0, 1.0);		// used to check if framesize is valid
+	//out_color = vec4(dbg_framesize, 1.0, 1.0);		// used to check if framesize is valid
 }
 

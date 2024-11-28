@@ -407,8 +407,8 @@ namespace NIKE {
 		);
 		glVertexArrayAttribBinding(model.vaoid, FRAMESIZE_ATTRIB_INDEX, VBO_BINDING_INDEX);
 
-		// batched_texture.vert location=8
-		static constexpr int UVOFFSET_ATTRIB_INDEX = 8;
+		// batched_texture.vert location=9
+		static constexpr int UVOFFSET_ATTRIB_INDEX = 9;
 		static constexpr int UVOFFSET_ATTRIB_SIZE = 2;		// num elements (x, y)
 		static constexpr int UVOFFSET_DATA_TYPE = GL_FLOAT;
 		static constexpr int UVOFFSET_DATA_OFFSET = offsetof(Vertex, uv_offset);
