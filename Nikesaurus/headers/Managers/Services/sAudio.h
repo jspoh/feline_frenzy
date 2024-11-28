@@ -4,6 +4,7 @@
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -117,12 +118,6 @@ namespace NIKE {
 			//Get parent channel group
 			virtual std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const = 0;
 
-			//System channels are channels crucial in the game
-			//Set system channel
-			virtual void setSystemChannel(bool value) = 0;
-
-			//Check system channel
-			virtual bool checkSystemChannel() const = 0;
 		};
 
 		//Abstract channel class
@@ -258,7 +253,6 @@ namespace NIKE {
 		class NIKEChannelGroup : public IChannelGroup {
 		private:
 			FMOD::ChannelGroup* group{ nullptr };
-			bool isSystemChannel = false;
 		public:
 			NIKEChannelGroup(FMOD::ChannelGroup* group);
 			~NIKEChannelGroup() = default;
@@ -299,9 +293,6 @@ namespace NIKE {
 
 			std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const override;
 
-			void setSystemChannel(bool value) override;
-
-			bool checkSystemChannel() const override;
 		};
 
 		//NIKE Audio Group
@@ -402,10 +393,9 @@ namespace NIKE {
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 
-			//Queue for BGM
-			std::queue<std::string> bgm_playlist;
+			//Queue for each channel's playlist
+			std::unordered_map<std::string , std::queue<std::string> > channel_playlists;
 
-			bool is_bgm_playing = false;
 		public:
 
 			//Default Constructor
@@ -462,19 +452,18 @@ namespace NIKE {
 			 */
 			void resumeAllChannels();
 
-			// Get BGM Queue
-			std::queue<std::string>& getBGMQueue();
+			/*****************************************************************//**
+			* Playlist Management
+			*********************************************************************/
+			// Create channel playlist and add to map
+			void createChannelPlaylist(std::string audio_id);
 
-			// Get BGM isPlaying;
-			bool checkIsBGMPlaying();
+			// Get individual channel's playlist
+			std::queue<std::string>& getChannelPlaylist(std::string audio_id);
 
-			void setIsBGMPlaying(bool value);
+			// Queue audio to playlist
+			void queueAudioToPlaylist(std::string channel_id, std::string audio_id);
 
-			// Add BGM to queue
-			void addBGMToQueue(std::string const& audio_id);
-
-			// Play BGM in queue
-			void playBGM();
 			//Update Loop
 			void update();
 

@@ -2283,9 +2283,6 @@ namespace NIKE {
 	}
 
 	void LevelEditor::AudioPanel::init() {
-		NIKE_AUDIO_SERVICE->createChannelGroup("BGM");
-		NIKE_AUDIO_SERVICE->getChannelGroup("BGM")->setSystemChannel(true); // Core audio channel
-
 		registerPopUp("Add New Channel", createChannelPopUp("Add New Channel"));
 		registerPopUp("Delete Channel", deleteChannelPopUp("Delete Channel"));
 	}
@@ -2302,64 +2299,17 @@ namespace NIKE {
 		}
 
 		ImGui::Separator();
-		if (ImGui::CollapsingHeader(std::string("Channel: BGM").c_str(), ImGuiTreeNodeFlags_None) && NIKE_AUDIO_SERVICE->checkChannelGroupExist("BGM")) {
-			const auto &bgm_channel = NIKE_AUDIO_SERVICE->getChannelGroup("BGM");
-			static std::string audio_id_input;
 
-			ImGui::Text("Add Audio To BGM Queue:");
-			if (ImGui::InputText("##AudioIDInput", audio_id_input.data(), audio_id_input.capacity() + 10)) {
-				audio_id_input.resize(strlen(audio_id_input.c_str()));
-			}
+		static std::unordered_map<std::string, std::string> channel_audio_ids;
+		static std::unordered_map<std::string, int> channel_indices;
+		static std::unordered_map<std::string, bool> open_playlists;
+		
+		const auto& all_loaded_sounds = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Sound);
 
-			ImGui::SameLine();
-
-			std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(audio_id_input);
-			//Save Shape model ID Button
-			if (ImGui::Button("Add##AudioIDAdd")) {
-				if (NIKE_ASSETS_SERVICE->isAssetRegistered(shared_id->c_str())) {
-					//LevelEditor::Action save;
-
-					//save.do_action = [&, shared_id]() {
-
-					//};
-
-
-					//save.undo_action = [&, shared_id]() {
-
-					//};
-					NIKE_AUDIO_SERVICE->addBGMToQueue(shared_id->c_str());
-				}
-			}
-
-			ImGui::Spacing();
-			float volume = bgm_channel->getVolume();
-			float pitch = bgm_channel->getPitch();
-
-			ImGui::Text("Adjust Volume & Pitch");
-			if (ImGui::SliderFloat("Volume##VOLUME_BGM", &volume, 0.0f, 1.0f)) {
-				bgm_channel->setVolume(volume);
-			}
-			if (ImGui::SliderFloat("Pitch##PITCH_BGM", &pitch, 0.5f, 2.0f)) {
-				bgm_channel->setPitch(pitch);
-			}
-
-			ImGui::Spacing();
-
-			std::queue<std::string> display_queue = NIKE_AUDIO_SERVICE->getBGMQueue();
-
-			ImGui::Text("BGM Playlist:");
-			while (!display_queue.empty()) {
-				ImGui::BulletText("%s", display_queue.front().c_str()); // Display the current track
-				display_queue.pop(); // Remove it from the temporary queue
-			}
-			ImGui::Spacing();
-			ImGui::Separator();
-		}
 		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
-			if (channel.second->checkSystemChannel()) continue; // Handle BGM separately
 			ImGui::Spacing();
+
 			if (ImGui::CollapsingHeader(std::string("Channel: " + channel.first).c_str(), ImGuiTreeNodeFlags_None)) {
-				
 
 				ImGui::Spacing();
 
@@ -2376,9 +2326,93 @@ namespace NIKE {
 
 				ImGui::Spacing();
 
+
+				if (ImGui::Button(channel.second->getPaused() ? std::string("Unpause Channel##" + channel.first).c_str() : std::string("Pause Channel##" + channel.first).c_str() )) {
+					channel.second->setPaused(!channel.second->getPaused());
+				}
+
+				ImGui::Spacing();
+				
+				if (open_playlists.find(channel.first) == open_playlists.end()) {
+					open_playlists[channel.first] = false;
+				}
+				bool& open_playlist = open_playlists[channel.first];
+
+				ImGui::Spacing();
+
 				if (ImGui::Button((std::string("Delete Channel##" + channel.first).c_str()))) {
 					selected_channel_name = channel.first;
 					openPopUp("Delete Channel");
+				}
+
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+
+				ImGui::Text("Playlist Management");
+				ImGui::Spacing();
+
+				ImGui::Checkbox(std::string("Open Playlist##CHECKBOXPLAYLIST_" + channel.first).c_str(), &open_playlists[channel.first]);
+				ImGui::Spacing();
+
+				if (open_playlist) {
+
+					// Get channel audio id and index from map
+					if (channel_audio_ids.find(channel.first) == channel_audio_ids.end()) {
+						channel_audio_ids[channel.first] = "";
+					}
+					if (channel_indices.find(channel.first) == channel_indices.end()) {
+						channel_indices[channel.first] = -1;
+					}
+
+					std::string& current_audio_id = channel_audio_ids[channel.first];
+					int& current_index = channel_indices[channel.first];
+
+					if (current_index == -1) {
+						auto it = std::find(all_loaded_sounds.begin(), all_loaded_sounds.end(), current_audio_id);
+						current_index = (it != all_loaded_sounds.end() ? std::distance(all_loaded_sounds.begin(), it) : -1);
+					}
+
+					ImGui::Text("Select audio to add to queue:");
+					if (ImGui::Combo(std::string("##SELECTAUDIO_" + channel.first).c_str(), &current_index, all_loaded_sounds.data(), static_cast<int>(all_loaded_sounds.size()))) {
+						if (current_index >= 0 && current_index < all_loaded_sounds.size()) {
+							current_audio_id = all_loaded_sounds[current_index];
+						}
+					}
+
+					ImGui::SameLine();
+
+					//Save Shape model ID Button
+					if (ImGui::Button(std::string("Add##ADDAUDIOBTN_" + channel.first).c_str())) {
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(current_audio_id)) {
+							//LevelEditor::Action save;
+
+							//save.do_action = [&, shared_id]() {
+
+							//};
+
+
+							//save.undo_action = [&, shared_id]() {
+
+							//};
+							NIKE_AUDIO_SERVICE->queueAudioToPlaylist(channel.first, current_audio_id);
+						}
+					}
+
+					ImGui::Spacing();
+
+					std::queue<std::string> display_queue = NIKE_AUDIO_SERVICE->getChannelPlaylist(channel.first);
+
+					ImGui::Text(std::string(channel.first + " Playlist:").c_str());
+					if (display_queue.empty()) {
+						ImGui::BulletText("No audio queued");
+					}
+					while (!display_queue.empty()) {
+						ImGui::BulletText("%s", display_queue.front().c_str()); // Display the current track
+						display_queue.pop(); // Remove it from the temporary queue
+					}
+
+					ImGui::Spacing();
 				}
 				ImGui::Spacing();
 				ImGui::Separator();
