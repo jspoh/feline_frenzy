@@ -336,7 +336,7 @@ namespace NIKE {
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
 			//Save Prefab popup
-			std::function<void()> savePrefabPopUp(std::string const& popup_id);
+			std::function<void()> createPrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
@@ -459,6 +459,7 @@ namespace NIKE {
 			// Accept payload from file management
 			void prefabAcceptPayload();
 
+			// For component stuff
 			void renderPrefabComponents();
 
 			// Utility functions for managing prefab entity
