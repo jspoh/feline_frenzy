@@ -2473,8 +2473,12 @@ namespace NIKE {
 
 	void LevelEditor::PrefabsPanel::clearTempPrefabEntity()
 	{
-		NIKE_ECS_MANAGER->destroyEntity(prefab_temp_entity.entity);
-		prefab_temp_entity = { "", 0 };
+		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
+		{
+			NIKE_ECS_MANAGER->destroyEntity(prefab_temp_entity.entity);
+			prefab_temp_entity = { "", 0 };
+		}
+
 	}
 
 	/*****************************************************************//**
