@@ -44,9 +44,6 @@ namespace NIKE {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
 
-		// Get entities marked for deletion
-		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
-
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
 
@@ -57,9 +54,6 @@ namespace NIKE {
 			//Iterate through all entities
 			for (auto& entity : entities) {
 				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-					// Skip entities marked for deletion
-					//if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
-					//	continue;
 
 					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 						continue;

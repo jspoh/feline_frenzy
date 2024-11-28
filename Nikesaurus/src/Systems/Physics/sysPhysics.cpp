@@ -7,7 +7,7 @@
  *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
  * 
  * \date   September 2024
- * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"

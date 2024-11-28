@@ -17,6 +17,7 @@
 #include "Systems/sysAudio.h"
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Systems/GameLogic/sysEnemy.h"
 
 namespace NIKE {
 
@@ -53,6 +54,9 @@ namespace NIKE {
 
 		//Register Damage components
 		Damage::registerComponents();
+
+		//Register Enemy components
+		Enemy::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -61,6 +65,7 @@ namespace NIKE {
 		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Shooting::Shooting>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
 
 		//Register physics manager
 		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
@@ -91,6 +96,10 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Health::Health>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Damage::Damage>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
+
+		//Register enemy manager
+		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 
 	}
 

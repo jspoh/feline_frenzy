@@ -36,6 +36,7 @@
 #include "Components/cShooting.h"
 #include "Components/cHealth.h"
 #include "Components/cDamage.h"
+#include "Components/cEnemy.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL
