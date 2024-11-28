@@ -11,7 +11,7 @@ layout (location=1) flat in int f_sampler_idx;
 
 layout (location=0) out	vec4 out_color;
 
-uniform sampler2D u_tex2d[10];	// 1000 because that is the MAX_INSTANCES for rendering textures
+uniform sampler2D u_tex2d[32];	// 32 because that is the MAX_INSTANCES for rendering textures
 //uniform sampler2D u_tex2d;
 
 void main() {
@@ -19,23 +19,9 @@ void main() {
 	//vec4 tex_color = texture(u_tex2d, f_texcoord);
 	//tex_color = texture(u_tex2d, vec2(0.5,0.5));
 
-	if (f_sampler_idx == 0) {
-		tex_color = texture(u_tex2d[0], f_texcoord);
-	}
-	else if (f_sampler_idx == 1) {
-		tex_color = texture(u_tex2d[1], f_texcoord);
-		out_color = vec4(1.0, 0.0, 0.0, 1.0);
-		return;
-
-	}
-	else {
-		out_color = vec4(0.0, 0.0, 1.0, 1.0);
-		return;
-	}
-
 	out_color = tex_color;
 	//out_color = vec4(1.0, 0.0, 1.0, 1.0);
-	//out_color = vec4(f_sampler_idx, f_sampler_idx, f_sampler_idx, 1.0);
+	//out_color = vec4(f_sampler_idx/2555555555.0, 0, 0, 1.0);
 	//out_color = vec4(f_texcoord, 0.0, 1.0);		// used to check if texcoord is valid
 	//out_color = vec4(dbg_framesize, 1.0, 1.0);		// used to check if framesize is valid
 }
