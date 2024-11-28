@@ -48,10 +48,6 @@ namespace NIKE {
 
             // Apply impluse to velocity
             dynamics_a.velocity += impulse;
-
-            //Update bounding box
-            collider_a.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
-            collider_a.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
         else {
             // Transform back outside of collision
@@ -61,12 +57,6 @@ namespace NIKE {
             // Apply impulse to velocity based on mass
             dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
             dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
-
-            //Update bounding box
-            collider_a.transform.position.x = transform_a.position.x + collider_a.pos_offset.x;
-            collider_a.transform.position.y = transform_a.position.y + collider_a.pos_offset.y;
-            collider_b.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
-            collider_b.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
     }
 
@@ -194,14 +184,23 @@ namespace NIKE {
         // Initialize vertex list based on model type
         std::vector<Vector2f> vertices;
 
-        if (model_id == "triangle") {
+        if (model_id == "triangle.model") {
             vertices = {
                 Vector2f(-0.5f, -0.5f),
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.0f, 0.5f)
             };
         }
-        else if (model_id == "square" || model_id == "square-texture") {
+        else if (model_id == "square.model" || model_id == "square-texture.model") {
+            vertices = {
+                Vector2f(0.5f, -0.5f),
+                Vector2f(0.5f, 0.5f),
+                Vector2f(-0.5f, 0.5f),
+                Vector2f(-0.5f, -0.5f)
+            };
+        }
+        //Fallback default to square
+        else {
             vertices = {
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.5f, 0.5f),
@@ -346,88 +345,38 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
+        // Bounce Resolution
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
             return;
         }
 
-        // Apply MTV to Collider positions
-        collider_a.transform.position += info.mtv * 0.5f;
-        collider_b.transform.position -= info.mtv * 0.5f;
-
-        // Apply the same adjustment to Transform positions
-        transform_a.position += info.mtv * 0.5f;
-        transform_b.position -= info.mtv * 0.5f;
-
-        // Reflect velocity changes
-        dynamics_a.velocity += info.collision_normal * (dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
-        dynamics_b.velocity -= info.collision_normal * (dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
-    }
-
-
-
-    /* Temporary storage for mouse click detection functions
-        // Detect if the mouse is inside a rectangular area
-        bool Collision::Manager::detectMClickRect(const Vector2& center, float width, float height) {
-        // Get the mouse position from Input::Manager
-        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
-        float mouseX = mouse.button_pos.x;
-        float mouseY = mouse.button_pos.y;
-
-        // Calculate the boundaries of the rectangle
-        float left = center.x - (width * 0.5f);
-        float right = center.x + (width * 0.5f);
-        float top = center.y - (height * 0.5f);
-        float bottom = center.y + (height * 0.5f);
-
-        // Check if the mouse is inside the rectangle
-        if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
-
-            // Check if the mouse is exactly at the center
-            if (mouseX == center.x && mouseY == center.y) {
-                cout << "Mouse is exactly at the center of the rectangle." << endl;
-            }
-            else {
-                // Print where the mouse is relative to the center of the rectangle
-                if (mouseX < center.x)
-                    cout << "Mouse is on the left side of the center." << endl;
-                else
-                    cout << "Mouse is on the right side of the center." << endl;
-
-                if (mouseY < center.y)
-                    cout << "Mouse is above the center." << endl;
-                else
-                    cout << "Mouse is below the center." << endl;
-            }
-
-            return true;
+        // Slide To Slide Resolution
+        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
+            return;
         }
 
-        return false;
-    }
-
-
-    // Detect if the mouse is inside a circular area
-    bool Collision::Manager::detectMClickCircle(const Vector2& center, float radius) {
-
-        // Get the mouse position from Input::Manager
-        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
-        float mouseX = mouse.button_pos.x;
-        float mouseY = mouse.button_pos.y;
-
-        // Calculate the distance from the mouse to the center of the circle
-        float distX = mouseX - center.x;
-        float distY = mouseY - center.y;
-        float distance = std::sqrt(distX * distX + distY * distY);
-
-        // Check if the mouse is inside the circle
-        if (distance <= radius) {
-            cout << "Mouse is inside the circle." << endl;
-            return true;
+        // Resolution::NONE currently makes movement object "bounce"
+        switch (collider_a.resolution) {
+        case Physics::Resolution::NONE:
+            break;
+        case Physics::Resolution::SLIDE:
+            transform_a.position += info.mtv;
+            break;
+        default:
+            break;
         }
 
-        return false;
+        switch (collider_b.resolution) {
+        case Physics::Resolution::NONE:
+            break;
+        case Physics::Resolution::SLIDE:
+            transform_b.position -= info.mtv;
+            break;
+        default:
+            break;
+        }
     }
-    */
-
 }

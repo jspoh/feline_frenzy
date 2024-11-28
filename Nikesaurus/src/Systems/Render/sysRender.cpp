@@ -551,7 +551,7 @@ namespace NIKE {
 
 			//Check for collider component
 			if (auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);  e_collider_comp.has_value()) {
-				auto& e_collider = e_collider_comp.value().get();
+				auto const& e_collider = e_collider_comp.value().get();
 
 				if (e_collider.b_collided) {
 					wire_frame_color = { 0.0f, 1.0f, 0.0f, 1.0f };

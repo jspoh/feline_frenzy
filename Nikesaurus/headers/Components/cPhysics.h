@@ -69,6 +69,7 @@ namespace NIKE {
 
             Collider()
                 : shape_type{ ShapeType::AABB },
+                transform(),
                 pos_offset{ 0.0f, 0.0f },
                 b_bind_to_entity{ true },
                 b_collided{ false },

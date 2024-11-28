@@ -231,7 +231,8 @@ namespace NIKE {
 					{
 						//Edit link to entity
 						ImGui::Text("Bind To Entity Transform: ");
-						ImGui::Button(comp.b_bind_to_entity ? "Unbind##BindTranform" : "Bind##BindTranform");
+						ImGui::SameLine();
+						ImGui::SmallButton(comp.b_bind_to_entity ? "Unbind##BindTranform" : "Bind##BindTranform");
 
 						//Check if button has been activated
 						if (ImGui::IsItemActivated()) {
@@ -254,13 +255,13 @@ namespace NIKE {
 						//Check for bind to entity state
 						if (comp.b_bind_to_entity) {
 							ImGui::Text("Collider Transform:");
-							ImGui::Text("Position: X %.2f, Y &.2f", comp.transform.position.x, comp.transform.position.y);
-							ImGui::Text("Scale: X %.2f, Y &.2f", comp.transform.scale.x, comp.transform.scale.y);
+							ImGui::Text("Position: X %.2f, Y %.2f", comp.transform.position.x, comp.transform.position.y);
+							ImGui::Text("Scale: X %.2f, Y %.2f", comp.transform.scale.x, comp.transform.scale.y);
 							ImGui::Text("Rotation: %.2f", comp.transform.rotation);
 						}
 						else {
 							//Transform text
-							ImGui::Text("Edit Collider Offset:");
+							ImGui::Text("Edit Collider:");
 
 							//Edit Offset
 							{
@@ -268,7 +269,7 @@ namespace NIKE {
 								static Vector2f offset_before_change;
 
 								//Drag offset
-								ImGui::DragFloat2("Offset", &comp.pos_offset.x, 0.1f);
+								ImGui::DragFloat2("Offset##Collider", &comp.pos_offset.x, 0.1f);
 
 								//Check if offset has begun editing
 								if (ImGui::IsItemActivated()) {
@@ -302,7 +303,7 @@ namespace NIKE {
 								static Vector2f scale_before_change;
 
 								//Change scale
-								ImGui::DragFloat2("Scale", &comp.transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+								ImGui::DragFloat2("Scale##Collider", &comp.transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
 
 								//Check if scale has beguin editing
 								if (ImGui::IsItemActivated()) {
@@ -334,7 +335,7 @@ namespace NIKE {
 								static float rotation_before_change;
 
 								//Change rotation
-								ImGui::DragFloat("Rotation", &comp.transform.rotation, 0.1f, -360.f, 360.f);
+								ImGui::DragFloat("Rotation##Collider", &comp.transform.rotation, 0.1f, -360.f, 360.f);
 
 								//Check if rotation has begun editing
 								if (ImGui::IsItemActivated()) {
@@ -361,6 +362,8 @@ namespace NIKE {
 							}
 						}
 					}
+
+					ImGui::Separator();
 
 					//Collision State
 					ImGui::Text("Colliding: %s", comp.b_collided ? "True" : "False");

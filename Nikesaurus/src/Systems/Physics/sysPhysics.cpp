@@ -90,7 +90,7 @@ namespace NIKE {
                         }
 
                         //Set velocity to zero if net velo < 0.01
-                        if (e_dynamics.velocity.length() < 0.0001f) {
+                        if (e_dynamics.velocity.length() < EPSILON) {
                             e_dynamics.velocity = { 0.0f, 0.0f };
                         }
 
@@ -111,8 +111,7 @@ namespace NIKE {
                             e_collider.transform = e_transform;
                         }
                         else {
-                            e_collider.transform.position.x = e_transform.position.x + e_collider.pos_offset.x;
-                            e_collider.transform.position.y = e_transform.position.y + e_collider.pos_offset.y;
+                            e_collider.transform.position = e_transform.position + e_collider.pos_offset;
                         }
 
                         // Check for collisions with other entities
@@ -133,6 +132,14 @@ namespace NIKE {
                             auto& other_collider = other_collider_comp.value().get();
                             auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
 
+                            //Update collision transform
+                            if (other_collider.b_bind_to_entity) {
+                                other_collider.transform = other_transform;
+                            }
+                            else {
+                                other_collider.transform.position = other_transform.position + other_collider.pos_offset;
+                            }
+
                             // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
                             std::string e_model_id = "square.model"; // Default model
                             std::string other_model_id = "square.model"; // Default model
@@ -149,22 +156,25 @@ namespace NIKE {
 
                             // Perform AABB collision detection first
                             if (!(static_cast<int>(e_collider.transform.rotation) % 180) &&
-                                !(static_cast<int>(other_collider.transform.rotation) % 180) &&
-                                collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
+                                !(static_cast<int>(other_collider.transform.rotation) % 180)) {
 
-                                // Set the collision flags
-                                e_collider.b_collided = true;
-                                other_collider.b_collided = true;
+                                //If AABB collision
+                                if (collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
+                                    // Set the collision flags
+                                    e_collider.b_collided = true;
+                                    other_collider.b_collided = true;
 
-                                // Perform collision resolution
-                                collision_system->collisionResolution(
-                                    e_transform, e_dynamics, e_collider,
-                                    other_transform, other_dynamics, other_collider,
-                                    info
-                                );
+                                    // Perform collision resolution
+                                    collision_system->collisionResolution(
+                                        e_transform, e_dynamics, e_collider,
+                                        other_transform, other_dynamics, other_collider,
+                                        info
+                                    );
 
-                                // Perform SAT collision detection if AABB fails
+                                    return;
+                                }
                             }
+                            // Perform SAT collision detection if AABB fails
                             else if (collision_system->detectSATCollision(e_collider, other_collider, e_model_id, other_model_id, info)) {
 
                                 // Set the collision flags
@@ -178,12 +188,12 @@ namespace NIKE {
                                     info
                                 );
 
+                                return;
                             }
-                            else {
-                                // Reset collision flags if no collision
-                                e_collider.b_collided = false;
-                                other_collider.b_collided = false;
-                            }
+
+                            // Reset collision flags if no collision
+                            e_collider.b_collided = false;
+                            other_collider.b_collided = false;
                         }
                     }
                 }

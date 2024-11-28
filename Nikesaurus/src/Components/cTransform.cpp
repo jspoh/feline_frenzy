@@ -48,7 +48,7 @@ namespace NIKE {
 					static Vector2f pos_before_change;
 
 					//Drag position
-					ImGui::DragFloat2("Position", &comp.position.x, 0.1f);
+					ImGui::DragFloat2("Position##Transform", &comp.position.x, 0.1f);
 
 					//Check if position has begun editing
 					if (ImGui::IsItemActivated()) {
@@ -93,7 +93,7 @@ namespace NIKE {
 					static Vector2f scale_before_change;
 
 					//Change scale
-					ImGui::DragFloat2("Scale", &comp.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+					ImGui::DragFloat2("Scale##Transform", &comp.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
 
 					//Check if scale has beguin editing
 					if (ImGui::IsItemActivated()) {
@@ -125,7 +125,7 @@ namespace NIKE {
 					static float rotation_before_change;
 
 					//Change rotation
-					ImGui::DragFloat("Rotation", &comp.rotation, 0.1f, -360.f, 360.f);
+					ImGui::DragFloat("Rotation##Transform", &comp.rotation, 0.1f, -360.f, 360.f);
 
 					//Check if rotation has begun editing
 					if (ImGui::IsItemActivated()) {
