@@ -116,6 +116,15 @@ namespace NIKE {
 			NIKE_SERIALIZE_SERVICE->loadSceneFromFile(primary_path.string());
 			return nullptr;
 			});
+
+		//Register Prefab loader
+		registerLoader(Assets::Types::Prefab, [this](std::filesystem::path const& primary_path) {
+			// Temp entity for the prefab loading
+			int temp = -1;
+			Entity::Type temp_entity = NIKE_ECS_MANAGER->createEntity(static_cast<unsigned int>(temp));
+			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, primary_path.string());
+			return nullptr;
+		});
 	}
 
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {

@@ -388,6 +388,9 @@ namespace NIKE {
 			//Set error message for popup
 			void setPopUpSuccessMsg(std::string const& msg);
 
+			//Gettor for comps_ui
+			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>>& getCompsUI();
+
 			//Add component UI function
 			template<typename T>
 			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
@@ -417,6 +420,19 @@ namespace NIKE {
 		//Prefabs Management panel
 		class PrefabsPanel : public IPanel {
 		private:
+
+			struct TemporaryEntity {
+				// Stores file path to prefab
+				std::string file_path;
+				// The prefab temp entity
+				Entity::Type entity;
+			};
+
+			// For prefab temp entity
+			TemporaryEntity prefab_temp_entity;
+
+			// Reference to component panel
+			std::weak_ptr<ComponentsPanel> comps_panel;
 		public:
 			PrefabsPanel() = default;
 			~PrefabsPanel() = default;
@@ -439,6 +455,15 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			// Accept payload from file management
+			void prefabAcceptPayload();
+
+			void renderPrefabComponents();
+
+			// Utility functions for managing prefab entity
+			void createTempPrefabEntity(const std::string& file_path);
+			void clearTempPrefabEntity();
 		};
 
 		//Debug Management Panel
@@ -562,6 +587,9 @@ namespace NIKE {
 
 			//Moving file accept payload
 			void moveFileAcceptPayload(std::string const& virtual_path);
+
+			//Entities panel for string reference
+			std::weak_ptr<EntitiesPanel> entities_panel;
 
 			//On drop file event
 			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
@@ -809,6 +837,8 @@ namespace NIKE {
 			//Render
 			void render() override;
 		};
+
+
 	}
 }
 
