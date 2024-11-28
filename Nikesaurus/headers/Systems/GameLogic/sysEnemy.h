@@ -15,6 +15,7 @@
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
 #include "Components/cEnemy.h"
+#include "sysLua.h"
 
 namespace NIKE {
 	namespace Enemy {
@@ -24,8 +25,17 @@ namespace NIKE {
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
+			//Internal lua system
+			std::unique_ptr<Lua::System> lua_system;
+
+			//Internal script management
+			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+
 			// Check if player is within range
 			bool withinRange(const Entity::Type enemy, const Entity::Type player);
+
+			// Shoot bullet
+			void shootBullet(const Entity::Type enemy, const Entity::Type player);
 
 		public:
 			//Default Constructor
@@ -42,6 +52,9 @@ namespace NIKE {
 			{
 				return "Enemy System";
 			}
+
+			//Register systems for lua
+			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 			//Update
 			void update() override;

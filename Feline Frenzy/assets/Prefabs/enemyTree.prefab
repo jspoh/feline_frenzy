@@ -1,15 +1,16 @@
 {
     "Components": {
         "Enemy::Attack": {
-            "Cooldown": 0.5,
-            "Function": "",
-            "LastShotTime": 0.5,
-            "Layer": 0,
+            "Cooldown": 10.0,
+            "Function": "enemyBullet",
+            "LastShotTime": 2.1666653156280518,
+            "Layer": 1,
             "Offset": 150.0,
-            "Range": 2.0,
+            "PrefabPath": "damageBullet.prefab",
+            "Range": 10.0,
             "ScriptID": "",
             "ScriptLoaded": false,
-            "ScriptPath": ""
+            "ScriptPath": "assets/Scripts/enemyBullet.lua"
         },
         "Health::Health": {
             "Health": 100.0,

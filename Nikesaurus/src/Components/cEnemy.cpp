@@ -26,10 +26,11 @@ namespace NIKE {
 					{ "LastShotTime", comp.last_shot_time },
 					{ "Offset", comp.offset },
 					{ "Layer", comp.layer },
+					{ "PrefabPath", comp.prefab_path},
 					{ "ScriptID", comp.script.script_id },
 					{ "ScriptPath", comp.script.script_path },
 					{ "Function", comp.script.function },
-					{ "ScriptLoaded", comp.script.b_loaded }
+					{ "ScriptLoaded", comp.script.b_loaded },
 				};
 			},
 
@@ -40,6 +41,7 @@ namespace NIKE {
 				comp.last_shot_time = data.at("LastShotTime").get<float>();
 				comp.offset = data.at("Offset").get<float>();
 				comp.layer = data.at("Layer").get<int>();
+				comp.prefab_path = data.at("PrefabPath").get<std::string>();
 				comp.script.script_id = data.at("ScriptID").get<std::string>();
 				comp.script.script_path = data.at("ScriptPath").get<std::string>();
 				comp.script.function = data.at("Function").get<std::string>();
@@ -145,7 +147,7 @@ namespace NIKE {
 
 				// Show and allow editing of the layer
 				{
-					static float before_change_layer;
+					static int before_change_layer;
 
 					ImGui::DragInt("Layer", &comp.layer, 1);
 
@@ -174,6 +176,7 @@ namespace NIKE {
 				}
 
 				// !TODO: Change this to input
+				ImGui::Text("Prefab Path: %s", comp.prefab_path.c_str());
 				ImGui::Text("Script Path: %s", comp.script.script_path.c_str());
 				ImGui::Text("Function: %s", comp.script.function.c_str());
 				ImGui::Text("Script Loaded: %s", comp.script.b_loaded ? "Yes" : "No");

@@ -79,8 +79,11 @@ namespace NIKE {
 						// Get shooting comp
 						auto& shoot_comp = e_shoot_comp.value().get();
 
-						// Accumulate time since last shot
-						shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						// If shooting is on cooldown
+						if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
+							// Accumulate time since last shot
+							shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						}
 
 						// Create bullet
 						if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
@@ -91,9 +94,9 @@ namespace NIKE {
 								Vector2f shooter_pos = e_transform_comp.value().get().position;
 
 								// !TODO: Set these in cShooting
-								std::string script_path = "assets/Scripts/createBullet.lua";
-								std::string function_name = "createBullet";
-								std::string prefab_path = "damageBullet.prefab";
+								std::string script_path = shoot_comp.script.script_path;
+								std::string function_name = shoot_comp.script.function;
+								std::string prefab_path = shoot_comp.prefab_path;
 
 								// Load Lua Script
 								std::string script_id = lua_system->loadScript(script_path);
@@ -105,7 +108,6 @@ namespace NIKE {
 
 								// Execute Lua Script
 								sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
-
 
 								// Checking if something went wrong w cpp func
 								if (!create_bullet_func.valid()) {

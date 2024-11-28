@@ -134,6 +134,7 @@ xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
     <None Include="assets\Scripts\createBullet.lua" />
+    <None Include="assets\Scripts\enemyBullet.lua" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\player.lua" />
     <None Include="assets\Shaders\base.frag" />

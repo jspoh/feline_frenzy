@@ -113,7 +113,7 @@ namespace NIKE {
 
 				// Show and allow editing of the layer
 				{
-					static float before_change_layer;
+					static int before_change_layer;
 
 					ImGui::DragInt("Layer", &comp.layer, 1);
 

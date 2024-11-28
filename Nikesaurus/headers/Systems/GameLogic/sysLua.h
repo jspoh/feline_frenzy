@@ -56,10 +56,12 @@ namespace NIKE {
 			//Reload all lua scripts
 			void reloadAllScripts();
 
-			//Create entity from prefab
-			//void shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name);
+			//For shooting component
 			void shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos, const float& offset);
 			
+			//For enemy component
+			void enemyBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& enemy_pos, const Vector2f& player_pos, const float& offset);
+
 			//Execute lua scripts
 			sol::protected_function executeScript(std::string const& script_id, std::string const& function);
 		};

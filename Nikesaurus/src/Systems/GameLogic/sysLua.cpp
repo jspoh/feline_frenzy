@@ -12,8 +12,7 @@
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
-    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "", const Vector2f& shooter_pos = { 0.f, 0.f }, const float& offset = .0f) {
-    //void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name = "") {
+    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos, const float& offset) {
         //NIKEE_CORE_INFO("SHOOT BULLET CALLED");
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
             // Create entity function call ( Defaulted to the base layer for now )
@@ -30,7 +29,7 @@ namespace NIKE {
             std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
-            // Calculate offset position
+            // Get mouse position
             Vector2f mouse_pos = {
                 NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2),
                 -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2))
@@ -58,6 +57,43 @@ namespace NIKE {
         }
     }
 
+    void Lua::System::enemyBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& enemy_pos, const Vector2f& player_pos, const float& offset) {
+        if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+            // Create entity function call
+            Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+
+            // If empty string, assign default string
+            std::string name = entity_name.empty() ? "entity_" + std::to_string(new_id) : entity_name;
+
+            // Save entity_name string
+            NIKE_IMGUI_SERVICE->addEntityRef(name, new_id);
+
+            // Load entity with prefab
+            std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
+            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
+
+            // Calculate direction
+            Vector2f direction = player_pos - enemy_pos;
+            direction.normalize();
+
+            // Offset spawn position of bullet
+            Vector2f bullet_pos = enemy_pos + (direction * offset);
+
+            // Set bullet's position
+            auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(new_id);
+            if (e_transform_comp.has_value()) {
+                e_transform_comp.value().get().position = bullet_pos;
+            }
+
+            // Apply physics
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(new_id);
+            if (e_physics_comp.has_value()) {
+                // Set force
+                e_physics_comp.value().get().force = { direction.x * 1.f, direction.y * 1.f };
+            }
+        }
+    }
+
     void Lua::System::registerBindings() {
 
         //Reigster all lua system bindings
@@ -78,10 +114,16 @@ namespace NIKE {
         lua_state->set_function("isKeyTriggered", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyTriggered(key); });
         lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
 
-        //Register lua binding for prefab loading
+        //Register lua binding for player bullet
         lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float shooter_x, float shooter_y, float offset) {
             Vector2f shooter_pos{ shooter_x, shooter_y };
             this->shootBullet(layer_id, file_path, entity_name, shooter_pos, offset);
+            });
+
+        //Register lua binding for enemy bullet
+        lua_state->set_function("enemyBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float enemy_x, float enemy_y, float player_x, float player_y, float offset) {
+            Vector2f enemy_pos{ enemy_x, enemy_y }, player_pos{ player_x, player_y };
+            this->enemyBullet(layer_id, file_path, entity_name, enemy_pos, player_pos, offset);
             });
 
 
