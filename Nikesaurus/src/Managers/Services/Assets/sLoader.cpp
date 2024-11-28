@@ -348,7 +348,7 @@ namespace NIKE {
 			SAMPLERIDX_DATA_OFFSET		// offset
 		);
 		glVertexArrayAttribBinding(model.vaoid, SAMPLERIDX_ATTRIB_INDEX, VBO_BINDING_INDEX);
-		glVertexAttribDivisor(SAMPLERIDX_ATTRIB_INDEX, 1);		// per instance only. do not interpolate
+		// glVertexAttribDivisor(SAMPLERIDX_ATTRIB_INDEX, 1);		// per instance only. do not interpolate(nvm useless)
 
 		// batched_texture.vert location=4
 		static constexpr int XFORM_ATTRIB_INDEX_0 = 4;
