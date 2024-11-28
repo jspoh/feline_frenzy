@@ -24,22 +24,6 @@ namespace NIKE {
 
         std::shared_ptr<Physics::Manager> physics_sys_wrapped(this, [](Physics::Manager*) {});
         NIKE_EVENTS_SERVICE->addEventListeners<Physics::ChangePhysicsEvent>(physics_sys_wrapped);
-
-        // Initialize Collider using Transform (temporary)
-        for (auto& entity : entities) {
-            auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-            auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-
-            if (e_collider_comp.has_value() && e_transform_comp) {
-                auto& e_collider = e_collider_comp.value().get();
-                auto& e_transform = e_transform_comp.value().get();
-
-                // Initialize Collider with Transform data
-                e_collider.position = e_transform.position + e_collider.offset;
-                e_collider.size = e_transform.scale;
-                e_collider.rotation = e_transform.rotation;
-            }
-        }
     }
 
     void Physics::Manager::update() {
@@ -113,27 +97,7 @@ namespace NIKE {
                         //Update Transform position based on velocity
                         e_transform.position.x += e_dynamics.velocity.x * dt;
                         e_transform.position.y += e_dynamics.velocity.y * dt;
-
-                        // Check Physics::Collider present
-                        auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-                        if (e_collider_comp.has_value()) {
-                            auto& e_collider = e_collider_comp.value().get();
-                            // Update Collider position
-                            if (!e_collider.is_static) {
-                                auto& e_collider = e_collider_comp.value().get();
-                                e_collider.position.x += e_dynamics.velocity.x * dt;
-                                e_collider.position.y += e_dynamics.velocity.y * dt;
-                            }
-                        }
-
                     }
-
-                    //Pathfinding
-                    //if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity) &&
-                    //    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-                    //    auto& e_pathfinding = NIKE_ECS_SERVICE->getEntityComponent<Pathfinding::Path>(entity);
-
-                    //}
 
                     // Collision detection
                     Physics::Dynamics def_dynamics;
@@ -141,6 +105,15 @@ namespace NIKE {
                     if (e_collider_comp.has_value()) {
                         auto& e_collider = e_collider_comp.value().get();
                         auto& e_dynamics = e_dynamics_comp.has_value() ? e_dynamics_comp.value().get() : def_dynamics;
+
+                        //Update collision transform
+                        if (e_collider.b_bind_to_entity) {
+                            e_collider.transform = e_transform;
+                        }
+                        else {
+                            e_collider.transform.position.x = e_transform.position.x + e_collider.pos_offset.x;
+                            e_collider.transform.position.y = e_transform.position.y + e_collider.pos_offset.y;
+                        }
 
                         // Check for collisions with other entities
                         for (auto& colliding_entity : entities) {
@@ -175,8 +148,8 @@ namespace NIKE {
                             Collision::CollisionInfo info;
 
                             // Perform AABB collision detection first
-                            if (!(static_cast<int>(e_collider.rotation) % 180) &&
-                                !(static_cast<int>(other_collider.rotation) % 180) &&
+                            if (!(static_cast<int>(e_collider.transform.rotation) % 180) &&
+                                !(static_cast<int>(other_collider.transform.rotation) % 180) &&
                                 collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
 
                                 // Set the collision flags

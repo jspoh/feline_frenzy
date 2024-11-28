@@ -227,6 +227,145 @@ namespace NIKE {
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Collider& comp) {
 				// For collider response
 				{
+					//Collide transform
+					{
+						//Edit link to entity
+						ImGui::Text("Bind To Entity Transform: ");
+						ImGui::Button(comp.b_bind_to_entity ? "Unbind##BindTranform" : "Bind##BindTranform");
+
+						//Check if button has been activated
+						if (ImGui::IsItemActivated()) {
+							LevelEditor::Action set_edit_bind;
+
+							//Do bind transform
+							set_edit_bind.do_action = [&, bind = !comp.b_bind_to_entity]() {
+								comp.b_bind_to_entity = bind;
+								};
+
+							//Undo bind transform
+							set_edit_bind.undo_action = [&, bind = comp.b_bind_to_entity]() {
+								comp.b_bind_to_entity = bind;
+								};
+
+							//Execute action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_edit_bind));
+						}
+
+						//Check for bind to entity state
+						if (comp.b_bind_to_entity) {
+							ImGui::Text("Collider Transform:");
+							ImGui::Text("Position: X %.2f, Y &.2f", comp.transform.position.x, comp.transform.position.y);
+							ImGui::Text("Scale: X %.2f, Y &.2f", comp.transform.scale.x, comp.transform.scale.y);
+							ImGui::Text("Rotation: %.2f", comp.transform.rotation);
+						}
+						else {
+							//Transform text
+							ImGui::Text("Edit Collider Offset:");
+
+							//Edit Offset
+							{
+								//Offset before change
+								static Vector2f offset_before_change;
+
+								//Drag offset
+								ImGui::DragFloat2("Offset", &comp.pos_offset.x, 0.1f);
+
+								//Check if offset has begun editing
+								if (ImGui::IsItemActivated()) {
+									offset_before_change = comp.pos_offset;
+								}
+
+								//Check if offset has finished editing
+								if (ImGui::IsItemDeactivatedAfterEdit()) {
+
+									//Apply action
+									LevelEditor::Action change_offset;
+
+									//Change offset do action
+									change_offset.do_action = [&, offset = comp.pos_offset]() {
+										comp.pos_offset = offset;
+										};
+
+									//Change offset undo action
+									change_offset.undo_action = [&, offset = offset_before_change]() {
+										comp.transform.position = offset;
+										};
+
+									//Execute action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
+								}
+							}
+
+							//Edit Scale
+							{
+								//Scale before change
+								static Vector2f scale_before_change;
+
+								//Change scale
+								ImGui::DragFloat2("Scale", &comp.transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+
+								//Check if scale has beguin editing
+								if (ImGui::IsItemActivated()) {
+									scale_before_change = comp.transform.scale;
+								}
+
+								//Check if scale has finished editing
+								if (ImGui::IsItemDeactivatedAfterEdit()) {
+									LevelEditor::Action change_scale;
+
+									//Change scale do action
+									change_scale.do_action = [&, scale = comp.transform.scale]() {
+										comp.transform.scale = scale;
+										};
+
+									//Change scale undo action
+									change_scale.undo_action = [&, scale = scale_before_change]() {
+										comp.transform.scale = scale;
+										};
+
+									//Execute action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_scale));
+								}
+							}
+
+							//Edit Rotation
+							{
+								//Rotation before change
+								static float rotation_before_change;
+
+								//Change rotation
+								ImGui::DragFloat("Rotation", &comp.transform.rotation, 0.1f, -360.f, 360.f);
+
+								//Check if rotation has begun editing
+								if (ImGui::IsItemActivated()) {
+									rotation_before_change = comp.transform.rotation;
+								}
+
+								//Check if rotation has finished editing
+								if (ImGui::IsItemDeactivatedAfterEdit()) {
+									LevelEditor::Action change_rotation;
+
+									//Change rotation do action
+									change_rotation.do_action = [&, rotation = comp.transform.rotation]() {
+										comp.transform.rotation = rotation;
+										};
+
+									//Change rotation undo action
+									change_rotation.undo_action = [&, rotation = rotation_before_change]() {
+										comp.transform.rotation = rotation;
+										};
+
+									//Execute action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
+								}
+							}
+						}
+					}
+
+					//Collision State
+					ImGui::Text("Colliding: %s", comp.b_collided ? "True" : "False");
+
+					//Collider resolution
 					ImGui::Text("Choose Collider Resolution:");
 					static const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
 					// Hold the current selection and the previous value
@@ -257,7 +396,6 @@ namespace NIKE {
 						}
 					}
 				}
-			}
-				);
+			});
 	}
 }

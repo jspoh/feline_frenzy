@@ -40,7 +40,7 @@ namespace NIKE {
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Transform& comp) {
 
 				//Transform text
-				ImGui::Text("Edit Transform Variables:");
+				ImGui::Text("Edit Transform:");
 
 				//Edit Position
 				{

@@ -3433,7 +3433,7 @@ namespace NIKE {
 
 		//Adjust snap to grid mode
 		{
-			//Adjust cell size
+			//Adjust snap to grid state
 			ImGui::Text("Snap entity to grid: ");
 			ImGui::SameLine();
 			ImGui::SmallButton(b_snap_to_grid ? "Disable##Snapping" : "Enable##Snapping");

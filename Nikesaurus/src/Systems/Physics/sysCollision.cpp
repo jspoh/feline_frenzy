@@ -27,40 +27,46 @@ namespace NIKE {
 
         // Calculate impulse magnitude based on collision response
         float impulse_magnitude = -(1 + restitution) * normal_vel;
-        Vector2f impulse = info.collision_normal * impulse_magnitude;
+
+        // Calculate the reflection vector for angular bounce
+        Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
-            // Move collider B back
-            collider_b.position += info.mtv;
+            // Transform back outside of collision
+            transform_b.position += info.mtv;
 
-            // Apply impulse
+            // Apply impluse to velocity
             dynamics_b.velocity -= impulse;
 
-            // Update Transform B
-            transform_b.position = collider_b.position - collider_b.offset;
+            //Update bounding box
+            collider_b.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
+            collider_b.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
         else if (collider_b.resolution == Physics::Resolution::NONE) {
-            // Move collider A back
-            collider_a.position += info.mtv;
+            // Transform back outside of collision
+            transform_a.position += info.mtv;
 
-            // Apply impulse
+            // Apply impluse to velocity
             dynamics_a.velocity += impulse;
 
-            // Update Transform A
-            transform_a.position = collider_a.position - collider_a.offset;
+            //Update bounding box
+            collider_a.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
+            collider_a.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
         else {
-            // Split MTV between A and B
-            collider_a.position += info.mtv * 0.5f;
-            collider_b.position -= info.mtv * 0.5f;
+            // Transform back outside of collision
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
 
-            // Apply impulse based on mass
-            dynamics_a.velocity += impulse * (dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
-            dynamics_b.velocity -= impulse * (dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
+            // Apply impulse to velocity based on mass
+            dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
+            dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
 
-            // Update Transform positions
-            transform_a.position = collider_a.position - collider_a.offset;
-            transform_b.position = collider_b.position - collider_b.offset;
+            //Update bounding box
+            collider_a.transform.position.x = transform_a.position.x + collider_a.pos_offset.x;
+            collider_a.transform.position.y = transform_a.position.y + collider_a.pos_offset.y;
+            collider_b.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
+            collider_b.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
     }
 
@@ -73,26 +79,26 @@ namespace NIKE {
         return restitution;
     }
 
-bool Collision::System::detectAABBRectRect(
+    bool Collision::System::detectAABBRectRect(
         Physics::Dynamics const& dynamics_a, Physics::Collider const& collider_a,
         Physics::Dynamics const& dynamics_b, Physics::Collider const& collider_b,
         CollisionInfo& info) {
         
         // References to components
         AABB aabb_a({
-            collider_a.position.x - (collider_a.size.x * 0.5f),
-            collider_a.position.y - (collider_a.size.y * 0.5f)
+            collider_a.transform.position.x - (collider_a.transform.scale.x * 0.5f),
+            collider_a.transform.position.y - (collider_a.transform.scale.y * 0.5f)
         }, {
-            collider_a.position.x + (collider_a.size.x * 0.5f),
-            collider_a.position.y + (collider_a.size.y * 0.5f)
+            collider_a.transform.position.x + (collider_a.transform.scale.x * 0.5f),
+            collider_a.transform.position.y + (collider_a.transform.scale.y * 0.5f)
         });
 
         AABB aabb_b({
-            collider_b.position.x - (collider_b.size.x * 0.5f),
-            collider_b.position.y - (collider_b.size.y * 0.5f)
+            collider_b.transform.position.x - (collider_b.transform.scale.x * 0.5f),
+            collider_b.transform.position.y - (collider_b.transform.scale.y * 0.5f)
         }, {
-            collider_b.position.x + (collider_b.size.x * 0.5f),
-            collider_b.position.y + (collider_b.size.y * 0.5f)
+            collider_b.transform.position.x + (collider_b.transform.scale.x * 0.5f),
+            collider_b.transform.position.y + (collider_b.transform.scale.y * 0.5f)
         });
 
         // Get delta time
@@ -205,12 +211,12 @@ bool Collision::System::detectAABBRectRect(
         }
 
         // Apply scaling and rotation based on Collider properties
-        float angleRad = collider.rotation * static_cast<float>(M_PI) / 180.0f; // Convert degrees to radians
+        float angleRad = collider.transform.rotation * static_cast<float>(M_PI) / 180.0f; // Convert degrees to radians
         float cosAngle = cos(angleRad);
         float sinAngle = sin(angleRad);
 
-        Vector2f position = collider.position; // Collider's position is independent of Transform
-        Vector2f scale = collider.size;
+        Vector2f position = collider.transform.position; // Collider's position is independent of Transform
+        Vector2f scale = collider.transform.scale;
 
         for (Vector2f& vertex : vertices) {
             // Scale the vertex
@@ -318,7 +324,7 @@ bool Collision::System::detectAABBRectRect(
         // Step 3: If collision is detected, assign the MTV and collision normal
         if (collisionDetected) {
             // Calculate consistent MTV direction based on relative position
-            Vector2f relativePosition = colliderA.position - colliderB.position;
+            Vector2f relativePosition = colliderA.transform.position - colliderB.transform.position;
             float biasFactor = 0.001f;
 
             if (relativePosition.dot(smallestAxis) < 0) {
@@ -340,16 +346,14 @@ bool Collision::System::detectAABBRectRect(
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        if (collider_a.is_trigger || collider_b.is_trigger) return;
-
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
             return;
         }
 
         // Apply MTV to Collider positions
-        collider_a.position += info.mtv * 0.5f;
-        collider_b.position -= info.mtv * 0.5f;
+        collider_a.transform.position += info.mtv * 0.5f;
+        collider_b.transform.position -= info.mtv * 0.5f;
 
         // Apply the same adjustment to Transform positions
         transform_a.position += info.mtv * 0.5f;

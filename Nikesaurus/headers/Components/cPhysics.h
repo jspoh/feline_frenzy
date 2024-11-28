@@ -46,6 +46,8 @@ namespace NIKE {
         };
 
         struct Collider {
+
+            //Shape type
             enum class ShapeType {
                 AABB,
                 Circle,
@@ -54,26 +56,21 @@ namespace NIKE {
 
             // Collider properties
             ShapeType shape_type;          // Type of collider shape
-            Vector2f position;             // Collider's position in world space
-            Vector2f size;                 // Dimensions: width and height for AABB, or radius for Circle
             std::vector<Vector2f> vertices; // Vertices for polygon shapes
-            Vector2f offset;               // Offset relative to the Transform
-            float rotation;                // Collider's independent rotation (in degrees)
+
+            // Collider transform
+            bool b_bind_to_entity;
+            Transform::Transform transform;
+            Vector2f pos_offset;
 
             // Collision flags
-            bool is_static;                // Whether the Collider is static (non-moving)
-            bool is_trigger;               // Whether the Collider acts as a trigger (no physical resolution)
             bool b_collided;               // Collision flag
             Resolution resolution;         // Collision resolution type (NONE, SLIDE, BOUNCE)
 
             Collider()
                 : shape_type{ ShapeType::AABB },
-                position{ 0.0f, 0.0f },
-                size{ 0.0f, 0.0f },
-                offset{ 0.0f, 0.0f },
-                rotation{ 0.0f },
-                is_static{ false },
-                is_trigger{ false },
+                pos_offset{ 0.0f, 0.0f },
+                b_bind_to_entity{ true },
                 b_collided{ false },
                 resolution{ Resolution::NONE } {}
         };
