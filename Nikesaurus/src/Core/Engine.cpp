@@ -48,16 +48,16 @@ namespace NIKE {
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
-		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 
 		//Register physics manager
-		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
-		game_logic_sys->registerLuaSystem(physics_sys);
+		//game_logic_sys->registerLuaSystem(physics_sys);
 
 		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);

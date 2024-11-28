@@ -16,27 +16,27 @@ namespace NIKE {
 		NIKE_LUA_SERVICE->init();
 	}
 
-	void GameLogic::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
-		//Add system to lua
-		NIKE_LUA_SERVICE->registerLuaSystem(system);
-	}
+	//void GameLogic::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
+	//	//Add system to lua
+	//	NIKE_LUA_SERVICE->registerLuaSystem(system);
+	//}
 
-	sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
-		//Run script
-		if (script_id == "") {
-			script_id = NIKE_LUA_SERVICE->loadScript(file_path);
-			b_loaded = true;
-			return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		}
-		else if (b_loaded) {
-			return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		}
-		else {
-			NIKE_LUA_SERVICE->reloadScript(script_id);
-			b_loaded = true;
-			return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		}
-	}
+	//sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
+	//	//Run script
+	//	if (script_id == "") {
+	//		script_id = NIKE_LUA_SERVICE->loadScript(file_path);
+	//		b_loaded = true;
+	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
+	//	}
+	//	else if (b_loaded) {
+	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
+	//	}
+	//	else {
+	//		NIKE_LUA_SERVICE->reloadScript(script_id);
+	//		b_loaded = true;
+	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
+	//	}
+	//}
 
 	void GameLogic::Manager::update() {
 
@@ -60,12 +60,12 @@ namespace NIKE {
 				if (e_player_comp.has_value()) {
 					auto& e_player = e_player_comp.value().get();
 
-					//Skip if script  has not been set
-					if (e_player.script.script_path == "")
-						continue;
+					////Skip if script  has not been set
+					//if (e_player.script.script_path == "")
+					//	continue;
 
-					int move = static_cast<int>(Utility::randFloat() * 3);
-					executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
+					//int move = static_cast<int>(Utility::randFloat() * 3);
+					//executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
 				}
 			}
 		}

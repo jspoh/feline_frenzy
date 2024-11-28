@@ -23,7 +23,7 @@
 #include "Managers/Services/sMap.h"
 #include "Managers/Services/sCamera.h"
 #include "Managers/Services/sUserInterface.h"
-#include "Managers/Services/sLua.h"
+#include "Managers/Services/Lua/sLua.h"
 #include "Managers/Services/LevelEditor/sLevelEditor.h"
 #include "Managers/Services/sPath.h"
 

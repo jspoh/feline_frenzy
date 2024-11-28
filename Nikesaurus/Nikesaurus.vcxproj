@@ -54,6 +54,7 @@
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
@@ -66,7 +67,7 @@
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
-    <ClCompile Include="src\Managers\Services\sLua.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLua.cpp" />
     <ClCompile Include="src\Systems\Physics\sysCollision.cpp" />
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\Services\sCamera.cpp" />
@@ -105,6 +106,7 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
@@ -116,7 +118,7 @@
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
-    <ClInclude Include="headers\Managers\Services\sLua.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLua.h" />
     <ClInclude Include="headers\Systems\Physics\sysCollision.h" />
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Managers\Services\sCamera.h" />

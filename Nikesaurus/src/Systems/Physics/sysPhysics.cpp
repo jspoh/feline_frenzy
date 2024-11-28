@@ -206,32 +206,32 @@ namespace NIKE {
         event->setEventProcessed(true);
     }
 
-    void Physics::Manager::applyXForce(Entity::Type entity, float force) {
-        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
-            return;
+    //void Physics::Manager::applyXForce(Entity::Type entity, float force) {
+    //    if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
+    //        return;
 
-        //Get dynamics
-        auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        if (!e_dynamics_comp.has_value()) return;
-        e_dynamics_comp.value().get().force.x = force;
-    }
+    //    //Get dynamics
+    //    auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+    //    if (!e_dynamics_comp.has_value()) return;
+    //    e_dynamics_comp.value().get().force.x = force;
+    //}
 
-    void Physics::Manager::applyYForce(Entity::Type entity, float force) {
-        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
-            return;
+    //void Physics::Manager::applyYForce(Entity::Type entity, float force) {
+    //    if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
+    //        return;
 
-        //Get dynamics
-        auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        if (!e_dynamics_comp.has_value()) return;
-        e_dynamics_comp.value().get().force.y = force;
-    }
+    //    //Get dynamics
+    //    auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+    //    if (!e_dynamics_comp.has_value()) return;
+    //    e_dynamics_comp.value().get().force.y = force;
+    //}
 
-    void Physics::Manager::registerLuaBindings(sol::state& lua_state) {
-        lua_state.set_function("applyXForce", [this](unsigned int entity, float x_force) {
-            applyXForce(static_cast<Entity::Type>(entity), x_force);
-            });
-        lua_state.set_function("applyYForce", [this](unsigned int entity, float y_force) {
-            applyYForce(static_cast<Entity::Type>(entity), y_force);
-            });
-    }
+    //void Physics::Manager::registerLuaBindings(sol::state& lua_state) {
+    //    lua_state.set_function("applyXForce", [this](unsigned int entity, float x_force) {
+    //        applyXForce(static_cast<Entity::Type>(entity), x_force);
+    //        });
+    //    lua_state.set_function("applyYForce", [this](unsigned int entity, float y_force) {
+    //        applyYForce(static_cast<Entity::Type>(entity), y_force);
+    //        });
+    //}
 }
