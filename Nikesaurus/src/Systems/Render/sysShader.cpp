@@ -90,10 +90,18 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at start of {0}: {1}", __FUNCTION__, err);
 		}
 
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		const int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
 		if (location >= 0) {
-			glUniform1iv(location, static_cast<GLsizei>(vals.size()), reinterpret_cast<const int*>(vals.data()));
-			//glUniform1i(location, vals[0]);
+			for (size_t i{}; i < vals.size(); i++) {
+				const int idx_loc = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), (name + "[" + std::to_string(i) + "]").c_str());
+				if (idx_loc >= 0) {
+					glUniform1i(idx_loc, vals[i]);
+				}
+				else {
+					cerr << "Uniform location not found in shader " << shader_ref << " for: " << name << "[" << i << "]" << endl;
+					throw std::exception();
+				}
+			}
 		}
 		else {
 			cerr << "Uniform location not found in shader " << shader_ref << " for: " << name << endl;

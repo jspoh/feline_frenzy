@@ -309,17 +309,27 @@ namespace NIKE {
 		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_texture");
 
 		// create vector of texture handles
-		// cant pass in unsigned int so.. using int
 		// map with texture handle as key and binding unit as value
 		// not using unordered_map as it uses hashingand i need the index
 		std::map<unsigned int, unsigned int> texture_binding_units;
 		for (int i{}; i < render_instances_texture.size(); i++) {
 			if (texture_binding_units.find(render_instances_texture[i].tex) == texture_binding_units.end()) {
+				// binding unit for this texture does not exist yet
+
+				// get binding unit. size of texture_binding_units is the next available binding unit(size changes during this loop)
+				// cant use `i` as the max texture unit (at least on my system) is 32
 				const unsigned int binding_unit = static_cast<unsigned int>(texture_binding_units.size());
-				glBindTextureUnit(binding_unit, render_instances_texture[i].tex);
-				texture_binding_units[render_instances_texture[i].tex] = binding_unit;
-				 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				 glTextureParameteri(render_instances_texture[i].tex, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				const unsigned int tex_hdl = render_instances_texture[i].tex;
+
+				// bind texture to binding unit
+				glBindTextureUnit(binding_unit, tex_hdl);
+
+				// store binding unit in map
+				texture_binding_units[tex_hdl] = binding_unit;
+
+				// set texture parameters
+				 glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				 glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			}
 		}
 
