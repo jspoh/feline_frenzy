@@ -11,7 +11,7 @@
         },
         "Animation::Sprite": {
             "Curr_Index": {
-                "x": 4,
+                "x": 7,
                 "y": 0
             },
             "End_Index": {
@@ -44,8 +44,8 @@
             "Mass": 2.0,
             "Max_Speed": 150.0,
             "Velocity": {
-                "x": -1.1303002834320068,
-                "y": -1.4643006324768066
+                "x": -0.688118577003479,
+                "y": -1.2976702451705933
             }
         },
         "Render::Cam": {
@@ -69,7 +69,7 @@
                 "z": 0.0
             },
             "Frame_Index": {
-                "x": 4,
+                "x": 7,
                 "y": 0
             },
             "Frame_Size": {
@@ -80,13 +80,19 @@
             "Texture_ID": "Player_Walk_Front_Spritesheet"
         },
         "Shooting::Shooting": {
-            "Cooldown": 10.0,
-            "LastShotTime": 0.0
+            "Cooldown": 0.5,
+            "Function": "",
+            "LastShotTime": 0.699999988079071,
+            "Layer": 0,
+            "Offset": 150.0,
+            "ScriptID": "",
+            "ScriptLoaded": false,
+            "ScriptPath": ""
         },
         "Transform::Transform": {
             "Position": {
-                "x": -34.80446243286133,
-                "y": -20.29800796508789
+                "x": -33.29427719116211,
+                "y": -20.503517150878906
             },
             "Rotation": 0.0,
             "Scale": {
