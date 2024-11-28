@@ -216,8 +216,6 @@ namespace NIKE {
 		//}
 	}
 
-	static constexpr bool TEXTURE_BATCHED_RENDERING_DONE = true;
-
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
 		// !TODO: batched rendering for texture incomplete
 
@@ -230,7 +228,7 @@ namespace NIKE {
 
 		const unsigned int tex_hdl = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
 
-		if constexpr (!TEXTURE_BATCHED_RENDERING_DONE || !BATCHED_RENDERING) {
+		if constexpr (!BATCHED_RENDERING) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -663,7 +661,7 @@ namespace NIKE {
 			}
 		}
 
-		if (BATCHED_RENDERING && TEXTURE_BATCHED_RENDERING_DONE) {
+		if (BATCHED_RENDERING) {
 			batchRenderTextures();	// at least 1 call to this is required every frame at the very end
 		}
 		batchRenderObject();		// at least 1 call to this is required every frame at the very end
