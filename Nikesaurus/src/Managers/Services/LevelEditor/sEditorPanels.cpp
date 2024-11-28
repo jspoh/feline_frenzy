@@ -2342,7 +2342,7 @@ namespace NIKE {
 
 					if (current_index == -1) {
 						auto it = std::find(all_loaded_sounds.begin(), all_loaded_sounds.end(), current_audio_id);
-						current_index = (it != all_loaded_sounds.end() ? std::distance(all_loaded_sounds.begin(), it) : -1);
+						current_index = (it != all_loaded_sounds.end() ? (int)std::distance(all_loaded_sounds.begin(), it) : -1);
 					}
 
 					ImGui::Text("Select audio to add to queue:");
@@ -2905,7 +2905,7 @@ namespace NIKE {
 		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
 
 			//Skip directories
-			if (std::filesystem::is_directory(file)) {
+			if (std::filesystem::is_directory(file) || !NIKE_ASSETS_SERVICE->isPathValid(file.string(), false)) {
 				return;
 			}
 

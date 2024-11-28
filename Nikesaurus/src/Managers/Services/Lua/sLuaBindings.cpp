@@ -172,7 +172,9 @@ namespace NIKE {
     void Lua::registerVector2(sol::state& lua_state, const std::string& type_name) {
         using Vector2Type = Vector2<T>;
 
-        lua_state.new_usertype<Vector2Type>(type_name,
+        auto math = lua_state["Math"].get_or_create<sol::table>();
+
+        math.new_usertype<Vector2Type>(type_name.c_str(),
             sol::constructors<Vector2Type(), Vector2Type(T, T)>(),
             "x", &Vector2Type::x,
             "y", &Vector2Type::y,
@@ -182,7 +184,7 @@ namespace NIKE {
             sol::meta_function::addition, &Vector2Type::operator+,
             sol::meta_function::subtraction, &Vector2Type::operator-,
             sol::meta_function::multiplication, [](Vector2Type& lhs, T scalar) { return lhs * scalar; },
-            sol::meta_function::division, &Vector2Type::operator/
+            sol::meta_function::division, & Vector2Type::operator/
         );
     }
 
@@ -190,7 +192,9 @@ namespace NIKE {
     void Lua::registerVector4(sol::state& lua_state, const std::string& type_name) {
         using Vector4Type = Vector4<T>;
 
-        lua_state.new_usertype<Vector4Type>(type_name,
+        auto math = lua_state["Math"].get_or_create<sol::table>();
+
+        math.new_usertype<Vector4Type>(type_name.c_str(),
             sol::constructors<Vector4Type(), Vector4Type(T, T, T, T)>(),
             "x", &Vector4Type::x,
             "y", &Vector4Type::y,
@@ -211,12 +215,11 @@ namespace NIKE {
     }
 
     void Lua::luaMathBinds(sol::state& lua_state) {
+
         registerVector2<float>(lua_state, "Vector2f");
         registerVector2<int>(lua_state, "Vector2i");
 
         registerVector4<float>(lua_state, "Vector4f");
         registerVector4<int>(lua_state, "Vector4i");
     }
-
-
 }

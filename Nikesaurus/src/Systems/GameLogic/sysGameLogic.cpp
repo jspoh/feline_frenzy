@@ -60,12 +60,12 @@ namespace NIKE {
 				if (e_player_comp.has_value()) {
 					auto& e_player = e_player_comp.value().get();
 
-					////Skip if script  has not been set
-					//if (e_player.script.script_path == "")
-					//	continue;
+					//Skip if script  has not been set
+					if (e_player.script.script_path == "")
+						continue;
 
-					//int move = static_cast<int>(Utility::randFloat() * 3);
-					//executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
+					//Execute script
+					NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
 				}
 			}
 		}

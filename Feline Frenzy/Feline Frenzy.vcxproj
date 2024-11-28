@@ -148,6 +148,7 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\player.lua" />
+    <None Include="assets\Scripts\test.lua" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
     <None Include="assets\Shaders\batched_base.frag" />

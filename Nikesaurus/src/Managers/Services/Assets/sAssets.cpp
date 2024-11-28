@@ -62,7 +62,6 @@ namespace NIKE {
 		executable_types.insert(Types::Scene);
 		executable_types.insert(Types::Prefab);
 		executable_types.insert(Types::Grid);
-		executable_types.insert(Types::Script);
 
 		//Texture extensions
 		addValidExtensions(".png");
@@ -124,7 +123,12 @@ namespace NIKE {
 			Entity::Type temp_entity = NIKE_ECS_MANAGER->createEntity(static_cast<unsigned int>(temp));
 			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, primary_path.string());
 			return nullptr;
-		});
+			});
+
+		//Register Scripts loader
+		registerLoader(Assets::Types::Script, [this](std::filesystem::path const& primary_path) {
+			return std::make_shared<sol::load_result>(NIKE_LUA_SERVICE->loadScript(primary_path));
+			});
 	}
 
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {
@@ -361,22 +365,20 @@ namespace NIKE {
 	bool Assets::Service::isPathValid(std::string const& path, bool b_virtual) const {
 		if (b_virtual) {
 			auto ext = NIKE_PATH_SERVICE->resolvePath(path).extension().string();
-			if (valid_extensions.find(ext) == valid_extensions.end()) {
-				NIKEE_CORE_ERROR("Invalid extension found: " + ext + " In path: " + path);
-				return false;
+			if (valid_extensions.find(ext) != valid_extensions.end()) {
+				return true;
 			}
 			else {
-				return true;
+				return false;
 			}
 		}
 		else {
 			auto ext = std::filesystem::path(path).extension().string();
-			if (valid_extensions.find(ext) == valid_extensions.end()) {
-				NIKEE_CORE_ERROR("Invalid extension found: " + ext + " In path: " + path);
-				return false;
+			if (valid_extensions.find(ext) != valid_extensions.end()) {
+				return true;
 			}
 			else {
-				return true;
+				return false;
 			}
 		}
 	}

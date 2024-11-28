@@ -23,8 +23,11 @@ namespace NIKE {
 
 			//Lua State
 			std::unique_ptr<sol::state> lua_state;
+
+			//Internal get sol table asset
+			std::shared_ptr<sol::load_result> getLuaAssset(std::string const& script_id) const;
 		public:
-			Service();
+			Service() = default;
 			~Service() = default;
 
 			//Initialize Lua
@@ -50,16 +53,122 @@ namespace NIKE {
 			}
 
 			//Load lua script
-			sol::table loadScript(std::string const& virtual_path);
+			sol::load_result loadScript(std::string const& virtual_path);
+
+			//Load lua script
+			sol::load_result loadScript(std::filesystem::path const& path);
 
 			//Get functions from lua script
 			std::vector<std::string> getScriptFunctions(std::string const& virtual_path);
 
+			//Get functions from lua script
+			std::vector<std::string> getScriptFunctions(std::filesystem::path const& path);
+
 			//Execute script based on sol::table object
-			sol::object executeScript(sol::table script_table, std::string const& function, int argc, sol::variadic_args const& args);
+			template<typename ...Args>
+			sol::object executeScript(sol::load_result& script, std::string const& function, int argc, Args&&... args) {
+
+				try {
+
+					//Check if script is loaded correctly
+					if (!script.valid()) {
+						throw std::runtime_error("Invalid Lua script: script is not loaded correctly.");
+					}
+
+					//Execute script
+					sol::protected_function_result result = script();
+
+					//No function to be called
+					if (function.empty()) {
+						//Execute script table
+						if (result.get_type() == sol::type::table) {
+							return sol::make_object(script->lua_state(), result);
+						}
+
+						//Execute script function
+						else {
+							sol::object returned_value = result[0];
+							sol::function lua_function = returned_value.as<sol::function>();
+							return lua_function();
+						}
+					}
+
+					//Check if result here is not a table
+					if (result.get_type() != sol::type::table) {
+						throw std::runtime_error("Error! Cant call a function from a function script!");
+					}
+
+					//Convert result into a table
+					sol::table script_table = result;
+
+					//Function to be called
+					sol::function script_function = script_table[function];
+					if (!script_function.valid()) {
+						throw std::runtime_error("Function not found in script table: " + function);
+					}
+
+					//Execute the Lua function with provided arguments
+					return script_function(argc, std::forward<Args>(args)...);
+				}
+				catch (std::runtime_error const& e) {
+					NIKEE_CORE_WARN(e.what());
+					return sol::nil;
+				}
+			}
 
 			//Execute lua script based on asset service id
-			sol::object executeScript(std::string const& script_id, std::string const& function, int argc, sol::variadic_args args);
+			template<typename ...Args>
+			sol::object executeScript(std::string const& script_id, std::string const& function, int argc, Args&&... args) {
+				try {
+					//Get script table from asset service
+					auto script = getLuaAssset(script_id);
+
+					//Check if script is loaded correctly
+					if (!script->valid()) {
+						throw std::runtime_error("Invalid Lua script: script is not loaded correctly.");
+					}
+
+					//Execute script
+					sol::protected_function_result result = (*script)();
+
+					//No function to be called
+					if (function.empty()) {
+
+						//Execute script table
+						if (result.get_type() == sol::type::table) {
+							return sol::make_object(script->lua_state(), result);
+						}
+
+						//Execute script function
+						else {
+							sol::object returned_value = result[0];
+							sol::function lua_function = returned_value.as<sol::function>();
+							return lua_function();
+						}
+					}
+
+					//Check if result here is not a table
+					if (result.get_type() != sol::type::table) {
+						throw std::runtime_error("Error! Cant call a function from a function script!");
+					}
+
+					//Convert result into a table
+					sol::table script_table = result;
+
+					//Function to be called
+					sol::function script_function = script_table[function];
+					if (!script_function.valid()) {
+						throw std::runtime_error("Function not found in script table: " + function);
+					}
+
+					//Execute the Lua function with provided arguments
+					return script_function(argc, std::forward<Args>(args)...);
+				}
+				catch (std::runtime_error const& e) {
+					NIKEE_CORE_WARN(e.what());
+					return sol::nil;
+				}
+			}
 		};
 
 		//Re-enable DLL Export warning
