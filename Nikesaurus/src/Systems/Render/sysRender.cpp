@@ -309,14 +309,14 @@ namespace NIKE {
 		// create vector of texture handles
 		// map with texture handle as key and binding unit as value
 		// not using unordered_map as it uses hashingand i need the index
-		std::map<unsigned int, int> texture_binding_unit_map;
+		std::map<unsigned int, unsigned int> texture_binding_unit_map;
 		for (int i{}; i < render_instances_texture.size(); i++) {
 			if (texture_binding_unit_map.find(render_instances_texture[i].tex) == texture_binding_unit_map.end()) {
 				// binding unit for this texture does not exist yet
 
 				// get binding unit. size of texture_binding_unit_map is the next available binding unit(size changes during this loop)
 				// cant use `i` as the max texture unit (at least on my system) is 32
-				const int binding_unit = static_cast<int>(texture_binding_unit_map.size());
+				const unsigned int binding_unit = static_cast<unsigned int>(texture_binding_unit_map.size());
 				const unsigned int tex_hdl = render_instances_texture[i].tex;
 
 				// bind texture to binding unit
@@ -332,12 +332,8 @@ namespace NIKE {
 		}
 
 		// raw vector of binding units
-		std::vector<int> texture_binding_units;
-		std::transform(texture_binding_unit_map.begin(), texture_binding_unit_map.end(), std::back_inserter(texture_binding_units), [](const std::pair<unsigned int, int>& pair) { return pair.second; });
-
-		// raw vector of tex hdls
-		//std::vector<int> texture_hdls;
-		//std::transform(texture_binding_unit_map.begin(), texture_binding_unit_map.end(), std::back_inserter(texture_hdls), [](const std::pair<unsigned int, int>& pair) { return pair.first; });
+		std::vector<unsigned int> texture_binding_units;
+		std::transform(texture_binding_unit_map.begin(), texture_binding_unit_map.end(), std::back_inserter(texture_binding_units), [](const std::pair<unsigned int, unsigned int>& pair) { return pair.second; });
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;

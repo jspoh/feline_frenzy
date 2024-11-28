@@ -6,7 +6,7 @@
 #version 450 core
 
 layout (location=0) in vec2 f_texcoord;
-layout (location=1) flat in int f_sampler_idx;
+layout (location=1) flat in uint f_sampler_idx;
 //layout (location=2) in vec2 dbg_framesize;
 
 layout (location=0) out	vec4 out_color;
@@ -15,7 +15,9 @@ uniform sampler2D u_tex2d[32];	// 32 because that is the MAX_INSTANCES for rende
 //uniform sampler2D u_tex2d;
 
 void main() {
-	vec4 tex_color = texture(u_tex2d[f_sampler_idx], f_texcoord);		// layer is specified with f_sampler_idx for sampler2DArray u_tex2d
+	int idx = int(f_sampler_idx);
+
+	vec4 tex_color = texture(u_tex2d[idx], f_texcoord);		// layer is specified with f_sampler_idx for sampler2DArray u_tex2d
 	//vec4 tex_color = texture(u_tex2d, f_texcoord);
 	//tex_color = texture(u_tex2d, vec2(0.5,0.5));
 

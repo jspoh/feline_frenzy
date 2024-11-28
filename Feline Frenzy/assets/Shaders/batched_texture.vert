@@ -7,7 +7,7 @@
 
 layout (location = 0) in vec2 a_position;
 layout (location = 1) in vec2 a_texcoord;
-layout (location = 2) in int a_sampler_idx;
+layout (location = 2) in uint a_sampler_idx;
 
 layout (location = 4) in vec3 a_model_to_ndc_0;
 layout (location = 5) in vec3 a_model_to_ndc_1;
@@ -17,7 +17,7 @@ layout (location=8) in vec2 framesize;
 layout (location=9) in vec2 uv_offset;
 
 layout (location=0) out vec2 f_texcoord;
-layout (location=1) flat out int f_sampler_idx;
+layout (location=1) flat out uint f_sampler_idx;
 //layout (location=2) out vec2 dbg_framesize;
 
 void main() {

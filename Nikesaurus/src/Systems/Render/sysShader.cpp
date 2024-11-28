@@ -84,7 +84,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<int>& vals) {
+	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at start of {0}: {1}", __FUNCTION__, err);
