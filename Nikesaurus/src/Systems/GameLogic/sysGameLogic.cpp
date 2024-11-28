@@ -101,7 +101,7 @@ namespace NIKE {
 								std::string prefab_path = "damageBullet.prefab";
 
 								// Load Lua Script
-								std::string script_id = lua_system->loadScript(script_path);
+								std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
 
 								// Check if the script is loaded successfully
 								if (script_id.empty()) {
@@ -109,7 +109,7 @@ namespace NIKE {
 								}
 
 								// Execute Lua Script
-								sol::protected_function create_bullet_func = lua_system->executeScript(script_id, function_name);
+								sol::protected_function create_bullet_func = NIKE_LUA_SERVICE->executeScript(script_id, function_name);
 
 
 								// Checking if something went wrong w cpp func

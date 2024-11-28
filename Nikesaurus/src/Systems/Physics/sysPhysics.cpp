@@ -259,8 +259,8 @@ namespace NIKE {
 
                                 // Collision resolution with Transform updates
                                 collision_system->collisionResolution(
-                                    e_transform, e_dynamics, e_collider,
-                                    other_transform, other_dynamics, other_collider,
+                                    entity, e_transform, e_dynamics, e_collider,
+                                    colliding_entity, other_transform, other_dynamics, other_collider,
                                     info
                                 );
                             }
@@ -271,8 +271,8 @@ namespace NIKE {
 
                                 // Collision resolution with Transform updates
                                 collision_system->collisionResolution(
-                                    e_transform, e_dynamics, e_collider,
-                                    other_transform, other_dynamics, other_collider,
+                                    entity, e_transform, e_dynamics, e_collider,
+                                    colliding_entity, other_transform, other_dynamics, other_collider,
                                     info
                                 );
                             }
