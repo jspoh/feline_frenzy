@@ -238,6 +238,11 @@ namespace NIKE {
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+			}
 		}
 
 		//Clean up level editor

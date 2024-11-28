@@ -201,7 +201,24 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::swapBuffers() {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			NIKEE_CORE_ERROR("Incomplete framebuffer in {0} with status: {1}", __FUNCTION__, status);
+		}
+
 		glfwSwapBuffers(ptr_window);
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Windows::NIKEWindow::clearBuffer() {

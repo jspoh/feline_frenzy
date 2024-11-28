@@ -35,6 +35,11 @@ namespace NIKE {
 	}
 
 	void Render::Manager::onEvent(std::shared_ptr<Windows::WindowResized> event) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
 		glGenFramebuffers(1, &frame_buffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
@@ -51,6 +56,11 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
@@ -91,10 +101,10 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
-		//GLenum err = glGetError();
-		//if (err != GL_NO_ERROR) {
-		//	NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
-		//}
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
 
 		if (!BATCHED_RENDERING) {
 			//Set polygon mode
@@ -134,10 +144,10 @@ namespace NIKE {
 			}
 		}
 
-		//err = glGetError();
-		//if (err != GL_NO_ERROR) {
-		//	NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
-		//}
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Render::Manager::batchRenderObject() {
@@ -218,6 +228,10 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
 		// !TODO: batched rendering for texture incomplete
 
 		//Caculate UV Offset
@@ -292,6 +306,10 @@ namespace NIKE {
 			if (render_instances_texture.size() >= MAX_INSTANCES || curr_instance_unique_tex_hdls.size() >= MAX_UNIQUE_TEX_HDLS) {
 				batchRenderTextures();
 			}
+		}
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
@@ -644,6 +662,11 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderViewport() {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
 		glClearColor(1, 1, 0, 1);		// set background to yellow for easier debugging
 
 		//Render to frame buffer if imgui is active
@@ -673,8 +696,8 @@ namespace NIKE {
 
 		if (BATCHED_RENDERING) {
 			batchRenderTextures();	// at least 1 call to this is required every frame at the very end
+			batchRenderObject();		// at least 1 call to this is required every frame at the very end
 		}
-		batchRenderObject();		// at least 1 call to this is required every frame at the very end
 
 		// render text last
 		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
@@ -690,6 +713,11 @@ namespace NIKE {
 		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
