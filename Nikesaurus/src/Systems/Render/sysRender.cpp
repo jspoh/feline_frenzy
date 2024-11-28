@@ -19,6 +19,7 @@
 
  // batched rendering
 constexpr bool BATCHED_RENDERING = true;
+std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
 
@@ -284,7 +285,11 @@ namespace NIKE {
 
 			render_instances_texture.push_back(instance);
 
-			if (render_instances_texture.size() >= MAX_INSTANCES) {
+			// used to track number of unique texture handles
+			// system can only handle max 32 unique texture binding units, hence have to clear texture render instances or not all textures will render properly.
+			curr_instance_unique_tex_hdls.insert(tex_hdl);
+
+			if (render_instances_texture.size() >= MAX_INSTANCES || curr_instance_unique_tex_hdls.size() >= MAX_UNIQUE_TEX_HDLS) {
 				batchRenderTextures();
 			}
 		}

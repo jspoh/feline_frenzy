@@ -93,6 +93,10 @@ namespace NIKE {
 		public:
 			constexpr static unsigned int MAX_INSTANCES = 1000;
 
+			// hashset used to store unique texture handles in
+			static std::unordered_set<unsigned int> curr_instance_unique_tex_hdls;
+			static constexpr int MAX_UNIQUE_TEX_HDLS = 32;
+
 			//Constructor
 			Manager();
 
