@@ -79,34 +79,34 @@ namespace NIKE {
 					}
 
 					// Display combo box for script selection
-					if (ImGui::Combo("##SelectScript", &current_index, all_loaded_scripts.data(), static_cast<int>(all_loaded_scripts.size()))) {
-						// Validate the selected index and get the new script
-						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_scripts.size())) {
-							std::string new_script = all_loaded_scripts[current_index];
-							if (new_script != comp.script.script_id) {
-								// Save action
-								LevelEditor::Action change_script_action;
-								change_script_action.do_action = [&, script = new_script]() {
-									comp.script.script_id = script;
-									comp.script.script_path = NIKE_LUA_SERVICE->getScriptPath(script).string();
-									comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script);
-									};
+					//if (ImGui::Combo("##SelectScript", &current_index, all_loaded_scripts.data(), static_cast<int>(all_loaded_scripts.size()))) {
+					//	// Validate the selected index and get the new script
+					//	if (current_index >= 0 && current_index < static_cast<int>(all_loaded_scripts.size())) {
+					//		std::string new_script = all_loaded_scripts[current_index];
+					//		if (new_script != comp.script.script_id) {
+					//			// Save action
+					//			LevelEditor::Action change_script_action;
+					//			change_script_action.do_action = [&, script = new_script]() {
+					//				comp.script.script_id = script;
+					//				comp.script.script_path = NIKE_LUA_SERVICE->getScriptPath(script).string();
+					//				comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script);
+					//				};
 
-								// Undo action
-								change_script_action.undo_action = [&, script = previous_script_id]() {
-									comp.script.script_id = script;
-									comp.script.script_path = NIKE_LUA_SERVICE->getScriptPath(script).string();
-									comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script);
-									};
+					//			// Undo action
+					//			change_script_action.undo_action = [&, script = previous_script_id]() {
+					//				comp.script.script_id = script;
+					//				comp.script.script_path = NIKE_LUA_SERVICE->getScriptPath(script).string();
+					//				comp.script.function = NIKE_LUA_SERVICE->extractFunctionFromScript(script);
+					//				};
 
-								// Execute the action
-								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_script_action));
+					//			// Execute the action
+					//			NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_script_action));
 
-								// Update the previous script id
-								previous_script_id = new_script;
-							}
-						}
-					}
+					//			// Update the previous script id
+					//			previous_script_id = new_script;
+					//		}
+					//	}
+					//}
 				}
 
 				// Show the extracted function input

@@ -478,9 +478,9 @@ namespace NIKE {
 					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Save entity name into entities ref
-					entities.emplace(new_id, EditorEntity());
-					entity_to_name.emplace(new_id, shared_id->c_str());
-					name_to_entity.emplace(shared_id->c_str(), new_id);
+					entities[new_id] = EditorEntity();
+					entity_to_name[new_id] = shared_id->c_str();
+					name_to_entity[shared_id->c_str()] = new_id;
 					};
 
 				//Undo Action
@@ -490,11 +490,6 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Erase new entity ref
-						entities.erase(name_to_entity.at(shared_id->data()));
-						entity_to_name.erase(name_to_entity.at(shared_id->data()));
-						name_to_entity.erase(shared_id->data());
 					}
 					};
 
@@ -560,12 +555,10 @@ namespace NIKE {
 						NIKE_ECS_MANAGER->setEntityComponent(new_id, comp_types.at(comp.first), comp.second);
 					}
 
-					//Update entities list
-					entities.emplace(new_id, EditorEntity());
-
 					//Save entity name into entities ref
-					entity_to_name.emplace(new_id, shared_id->c_str());
-					name_to_entity.emplace(shared_id->c_str(), new_id);
+					entities[new_id] = EditorEntity();
+					entity_to_name[new_id] = shared_id->c_str();
+					name_to_entity[shared_id->c_str()] = new_id;
 
 					//Set selected entity back to old entity
 					selected_entity = name_to_entity.at(shared_id->data());
@@ -576,15 +569,9 @@ namespace NIKE {
 
 					//Check if entity is still alive
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Update entities list
-						entities.erase(name_to_entity.at(shared_id->data()));
-
-						//Erase new entity ref
-						entity_to_name.erase(name_to_entity.at(shared_id->data()));
-						name_to_entity.erase(shared_id->data());
 
 						//Set selected entity back to first entity
 						selected_entity = entities.empty() ? 0 : entities.begin()->first;
@@ -645,9 +632,9 @@ namespace NIKE {
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
 
 						//Save entity name into entities ref
-						entities.emplace(new_id, EditorEntity());
-						entity_to_name.emplace(new_id, shared_id->c_str());
-						name_to_entity.emplace(shared_id->c_str(), new_id);
+						entities[new_id] = EditorEntity();
+						entity_to_name[new_id] = shared_id->c_str();
+						name_to_entity[shared_id->c_str()] = new_id;
 					}
 					};
 
@@ -658,11 +645,6 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Erase new entity ref
-						entities.erase(name_to_entity.at(shared_id->data()));
-						entity_to_name.erase(name_to_entity.at(shared_id->data()));
-						name_to_entity.erase(shared_id->data());
 					}
 					};
 
@@ -697,7 +679,7 @@ namespace NIKE {
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Setup events listening
-		std::shared_ptr<LevelEditor::EntitiesPanel> entitiespanel_wrapped (this, [](LevelEditor::EntitiesPanel*) {});
+		std::shared_ptr<LevelEditor::EntitiesPanel> entitiespanel_wrapped(this, [](LevelEditor::EntitiesPanel*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(entitiespanel_wrapped);
 
 		//Register popups
@@ -1906,6 +1888,11 @@ namespace NIKE {
 		success_msg->assign(msg);
 	}
 
+	std::unordered_map<std::string, std::function<void(LevelEditor::ComponentsPanel&, void*)>>& LevelEditor::ComponentsPanel::getCompsUI()
+	{
+		return comps_ui;
+	}
+
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
 		//Check if entity is locked
 		if (!entities_panel.lock()->getSelectedEntityEditor().has_value() || entities_panel.lock()->getSelectedEntityEditor().value().get().b_locked) {
@@ -2193,7 +2180,7 @@ namespace NIKE {
 						if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
 							NIKE_AUDIO_SERVICE->createChannelGroup(shared_id->c_str());
 						}
-					};
+						};
 
 					//Undo Action
 					create.undo_action = [&, shared_id]() {
@@ -2203,7 +2190,7 @@ namespace NIKE {
 							//unload channel
 							NIKE_AUDIO_SERVICE->unloadChannelGroup(shared_id->c_str());
 						}
-					};
+						};
 
 					//Execute create entity action
 					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
@@ -2226,10 +2213,10 @@ namespace NIKE {
 				//Close popup
 				closePopUp(popup_id);
 			}
-		};
+			};
 	}
 
-	std::function<void()> LevelEditor::AudioPanel::deleteChannelPopUp(std::string const& popup_id){
+	std::function<void()> LevelEditor::AudioPanel::deleteChannelPopUp(std::string const& popup_id) {
 
 		return [this, popup_id] {
 
@@ -2250,7 +2237,7 @@ namespace NIKE {
 					if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
 						NIKE_AUDIO_SERVICE->createChannelGroup(shared_id->c_str());
 					}
-				};
+					};
 
 				remove.do_action = [&, shared_id]() {
 					if (NIKE_AUDIO_SERVICE->checkChannelGroupExist(shared_id->c_str())) {
@@ -2259,7 +2246,7 @@ namespace NIKE {
 					else {
 						NIKEE_CORE_ERROR("Error: Unable to delete channel group!");
 					}
-				};
+					};
 
 				//Execute remove action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove));
@@ -2278,8 +2265,8 @@ namespace NIKE {
 				//Close popup
 				closePopUp(popup_id);
 			}
-		};
-		
+			};
+
 	}
 
 	void LevelEditor::AudioPanel::init() {
@@ -2294,7 +2281,7 @@ namespace NIKE {
 	void LevelEditor::AudioPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-		if (ImGui::Button("Add New Channel")){
+		if (ImGui::Button("Add New Channel")) {
 			openPopUp("Add New Channel");
 		}
 
@@ -2428,7 +2415,8 @@ namespace NIKE {
 	* Prefab Management Panel
 	*********************************************************************/
 	void LevelEditor::PrefabsPanel::init() {
-
+		//Components panel reference
+		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
 	}
 
 	void LevelEditor::PrefabsPanel::update() {
@@ -2438,7 +2426,93 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		// Accept payload here
+		prefabAcceptPayload();
+
+		// Display prefab details
+		ImGui::Text("Loaded Prefab: %s", prefab_temp_entity.file_path.c_str());
+
+		// Show components attached to the prefab entity
+		renderPrefabComponents();
+
+		// Add a button to save changes to the prefab file
+		if (ImGui::Button("Save Prefab")) {
+			NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_temp_entity.file_path);
+		}
+
+		// Add a button to clear the current prefab
+		ImGui::SameLine();
+		if (ImGui::Button("Clear Prefab")) {
+			clearTempPrefabEntity();
+		}
+
+
+
+		renderPopUps();
+
 		ImGui::End();
+	}
+
+	void LevelEditor::PrefabsPanel::prefabAcceptPayload()
+	{
+		if (ImGui::BeginDragDropTarget()) {
+			//Scene file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Prefab_FILE")) {
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				createTempPrefabEntity(asset_id);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+	}
+
+	void LevelEditor::PrefabsPanel::renderPrefabComponents()
+	{
+		auto& entity = prefab_temp_entity.entity;
+
+		// Iterate through components of the entity
+		for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+			// Display a collapsible header for each component
+			if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
+				// Use the component's UI rendering logic
+				comps_panel.lock()->getCompsUI().at(comp.first)(*comps_panel.lock(), comp.second.get());
+
+				// Add a button to remove the component
+				if (ImGui::Button(std::string("RemovePrefabComponent##" + comp.first).c_str())) {
+					comps_panel.lock()->openPopUp("Remove Component");
+				}
+			}
+		}
+	}
+
+	void LevelEditor::PrefabsPanel::createTempPrefabEntity(const std::string& file_path)
+	{
+		// Clear any existing prefab
+		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
+		{
+			// clearTempPrefabEntity();
+		}
+
+		// Create a temporary entity (excluded from systems)
+		Entity::Type temp_entity = NIKE_ECS_MANAGER->createEntity();
+
+		std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(file_path);
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, prefab_full_path.string());
+
+		// Store the prefab information
+		prefab_temp_entity = { file_path, temp_entity };
+	}
+
+	void LevelEditor::PrefabsPanel::clearTempPrefabEntity()
+	{
+		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
+		{
+			NIKE_ECS_MANAGER->destroyEntity(prefab_temp_entity.entity);
+			prefab_temp_entity = { "", 0 };
+		}
+
 	}
 
 	/*****************************************************************//**
@@ -2478,7 +2552,7 @@ namespace NIKE {
 
 				//Check if path is valid
 				if (NIKE_ASSETS_SERVICE->isPathValid(src_file_path.string(), false)) {
-					
+
 					//Get asset id
 					auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(src_file_path.string(), false);
 
@@ -2810,8 +2884,10 @@ namespace NIKE {
 	void LevelEditor::ResourcePanel::init() {
 
 		//Setup events listening
-		std::shared_ptr<LevelEditor::ResourcePanel> resourcepanel_wrapped (this, [](LevelEditor::ResourcePanel*) {});
+		std::shared_ptr<LevelEditor::ResourcePanel> resourcepanel_wrapped(this, [](LevelEditor::ResourcePanel*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Assets::FileDropEvent>(resourcepanel_wrapped);
+
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
 		//Register popups
 		error_msg = std::make_shared<std::string>("Error");
@@ -2874,7 +2950,7 @@ namespace NIKE {
 				break;
 			}
 			}
-		});
+			});
 	}
 
 	void LevelEditor::ResourcePanel::update() {
@@ -2931,7 +3007,7 @@ namespace NIKE {
 		//Directory level actions
 		{
 			//Array of load directories
-			const char*  load_directory[] = { "Current", "Current *", "Root *" };
+			const char* load_directory[] = { "Current", "Current *", "Root *" };
 
 			//Render the dropdown
 			ImGui::PushItemWidth(100.0f);
@@ -3047,7 +3123,7 @@ namespace NIKE {
 		renderAssetsBrowser(current_path);
 
 		//Render selected asset options
-		if(!selected_asset_id.empty()){
+		if (!selected_asset_id.empty()) {
 
 			// Center the panel
 			ImGui::Begin("Selected Asset", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings);
@@ -3134,6 +3210,8 @@ namespace NIKE {
 							}
 						}
 					}
+
+
 				}
 				else {
 					//Load action
@@ -3148,6 +3226,19 @@ namespace NIKE {
 
 				//Same line
 				ImGui::SameLine();
+			}
+
+			//Prefab asset loading
+			if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Prefab) {
+				if (ImGui::Button("Create Entity with Prefab"))
+				{
+					// Load the prefab
+					Entity::Type temp = NIKE_ECS_MANAGER->createEntity();
+					std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(selected_asset_id);
+					NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp, prefab_full_path.string());
+					success_msg->assign("Entity with prefab created!");
+					openPopUp("Success");
+				}
 			}
 
 			//Delete asset
@@ -3485,7 +3576,7 @@ namespace NIKE {
 
 		//Adjust snap to grid mode
 		{
-			//Adjust cell size
+			//Adjust snap to grid state
 			ImGui::Text("Snap entity to grid: ");
 			ImGui::SameLine();
 			ImGui::SmallButton(b_snap_to_grid ? "Disable##Snapping" : "Enable##Snapping");
