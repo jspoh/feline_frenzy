@@ -2289,10 +2289,10 @@ namespace NIKE {
 				float pitch = channel.second->getPitch();
 
 				ImGui::Text("Adjust Volume & Pitch");
-				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f)) {
+				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
 					channel.second->setVolume(volume);
 				}
-				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f)) {
+				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
 					channel.second->setPitch(pitch);
 				}
 
@@ -2617,7 +2617,7 @@ namespace NIKE {
 		for (const auto& dir : directories) {
 
 			//Skip dir not matching searching filter
-			if (dir.string().find(search_filter) == dir.string().npos) {
+			if (dir == NIKE_PATH_SERVICE->resolvePath("Game_Assets:/") || dir.string().find(search_filter) == dir.string().npos) {
 				continue;
 			}
 
@@ -2911,7 +2911,9 @@ namespace NIKE {
 		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
 
 			//Skip directories
-			if (std::filesystem::is_directory(file) || !NIKE_ASSETS_SERVICE->isPathValid(file.string(), false)) {
+			if (std::filesystem::is_directory(file) ||
+				!NIKE_ASSETS_SERVICE->isPathValid(file.string(), false) ||
+				file == NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/")) {
 				return;
 			}
 
