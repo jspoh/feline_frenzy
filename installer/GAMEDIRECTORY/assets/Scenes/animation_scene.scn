@@ -28,7 +28,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Tileset_Guide"
+                                "Texture_ID": "Tileset_Guide.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -69,7 +69,7 @@
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 5,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -78,7 +78,7 @@
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
-                                    "y": 1
+                                    "y": 16
                                 },
                                 "Start_Index": {
                                     "x": 0,
@@ -113,30 +113,30 @@
                                     "y": 200.0
                                 }
                             },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 5,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 10,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Player_Walk_Front_Spritesheet"
+                          "Render::Texture": {
+                            "B_Blend": false,
+                            "B_Flip": {
+                              "x": false,
+                              "y": false
                             },
+                            "B_Stretch": false,
+                            "Color": {
+                              "w": 1.0,
+                              "x": 0.0,
+                              "y": 0.0,
+                              "z": 0.0
+                            },
+                            "Frame_Index": {
+                              "x": 5,
+                              "y": 0
+                            },
+                            "Frame_Size": {
+                              "x": 10,
+                              "y": 16
+                            },
+                            "Intensity": 0.0,
+                            "Texture_ID": "Player_animation_sprite.png"
+                          },
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -24.892953872680664,

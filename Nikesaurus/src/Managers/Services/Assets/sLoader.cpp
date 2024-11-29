@@ -425,6 +425,54 @@ namespace NIKE {
 		);
 		glVertexArrayAttribBinding(model.vaoid, UVOFFSET_ATTRIB_INDEX, VBO_BINDING_INDEX);
 
+		// batched_texture.vert location=11
+		static constexpr int BLEND_ATTRIB_INDEX = 11;
+		static constexpr int BLEND_ATTRIB_SIZE = 1;		// num elements (x, y)
+		static constexpr int BLEND_DATA_TYPE = GL_FLOAT;
+		static constexpr int BLEND_DATA_OFFSET = offsetof(Vertex, to_blend_color);
+		glEnableVertexArrayAttrib(model.vaoid, BLEND_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			BLEND_ATTRIB_INDEX,
+			BLEND_ATTRIB_SIZE,
+			BLEND_DATA_TYPE,
+			false,		//normalized
+			BLEND_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, BLEND_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_texture.vert location=12
+		static constexpr int BLENDCOLOR_ATTRIB_INDEX = 12;
+		static constexpr int BLENDCOLOR_ATTRIB_SIZE = 4;		// num elements (x, y)
+		static constexpr int BLENDCOLOR_DATA_TYPE = GL_FLOAT;
+		static constexpr int BLENDCOLOR_DATA_OFFSET = offsetof(Vertex, col);
+		glEnableVertexArrayAttrib(model.vaoid, BLENDCOLOR_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			BLENDCOLOR_ATTRIB_INDEX,
+			BLENDCOLOR_ATTRIB_SIZE,
+			BLENDCOLOR_DATA_TYPE,
+			false,		//normalized
+			BLENDCOLOR_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, BLENDCOLOR_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
+		// batched_texture.vert location=13
+		static constexpr int BLENDINTENSITY_ATTRIB_INDEX = 13;
+		static constexpr int BLENDINTENSITY_ATTRIB_SIZE = 1;		// num elements (x, y)
+		static constexpr int BLENDINTENSITY_DATA_TYPE = GL_FLOAT;
+		static constexpr int BLENDINTENSITY_DATA_OFFSET = offsetof(Vertex, blend_intensity);
+		glEnableVertexArrayAttrib(model.vaoid, BLENDINTENSITY_ATTRIB_INDEX);		// vertex attrib index 1
+		glVertexArrayAttribFormat(
+			model.vaoid,
+			BLENDINTENSITY_ATTRIB_INDEX,
+			BLENDINTENSITY_ATTRIB_SIZE,
+			BLENDINTENSITY_DATA_TYPE,
+			false,		//normalized
+			BLENDINTENSITY_DATA_OFFSET		// offset
+		);
+		glVertexArrayAttribBinding(model.vaoid, BLENDINTENSITY_ATTRIB_INDEX, VBO_BINDING_INDEX);
+
 		// vbo and ebo data population will be done in update
 
 		err = glGetError();

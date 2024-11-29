@@ -113,6 +113,9 @@ namespace NIKE {
 			//Create texture button
 			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture);
 
+			//Destroy button
+			void destroyButton(std::string const& btn_id);
+
 			//Check button hovered
 			bool isButtonHovered(std::string const& btn_id) const;
 
@@ -120,10 +123,13 @@ namespace NIKE {
 			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code);
 
 			//Get all buttons
-			std::unordered_map<std::string, UI::UIBtn> getAllButtons() const;
+			std::unordered_map<std::string, UI::UIBtn>& getAllButtons();
 
 			//Check if entity is UI
 			bool checkEntity(Entity::Type entity) const;
+
+			//Check if UI ID has been registered
+			bool checkUIEntity(std::string const& btn_id);
 
 			//Set button script
 			void setButtonScript(std::string const& btn_id, Lua::Script const& script);

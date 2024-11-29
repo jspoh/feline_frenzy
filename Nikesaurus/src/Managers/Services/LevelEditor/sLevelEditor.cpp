@@ -161,8 +161,13 @@ namespace NIKE {
 			}
 			}
 
-			//Mark event as processed
-			event->setEventProcessed(true);
+			//Game game panel functions
+			auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
+
+			//Check if current mouse pos is within game window
+			if (!game_panel->isMouseInWindow() || game_panel->checkPopUpShowing()) {
+				event->setEventProcessed(true);
+			}
 		}
 	}
 
@@ -333,6 +338,11 @@ namespace NIKE {
 		auto camera_panel = std::make_shared<CameraPanel>();
 		panels.push_back(camera_panel);
 		panels_map.emplace(camera_panel->getName(), camera_panel);
+
+		//Add UI management panel
+		auto ui_panel = std::make_shared<UIPanel>();
+		panels.push_back(ui_panel);
+		panels_map.emplace(ui_panel->getName(), ui_panel);
 
 		//Add Tile Map management panel
 		auto tile_map_panel = std::make_shared<TileMapPanel>();

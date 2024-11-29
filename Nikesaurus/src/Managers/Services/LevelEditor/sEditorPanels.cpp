@@ -3482,6 +3482,323 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
+	* User Interface Management Panel
+	*********************************************************************/
+	std::function<void()> LevelEditor::UIPanel::createButtonPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Button ID
+			static std::string btn_id = "";
+			{
+				//Enter new button ID
+				ImGui::Text("New button id: ");
+
+				//New Btn ID
+				if (ImGui::InputText("##BtnID", btn_id.data(), btn_id.capacity() + 1)) {
+					btn_id.resize(strlen(btn_id.c_str()));
+				}
+			}
+
+			//Button Text
+			static Render::Text btn_text;
+			static int font_index = -1;
+			{
+				// Get all loaded fonts
+				const auto& all_loaded_fonts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Font);
+
+				// Display combo box for font selection
+				ImGui::Text("Button Font: ");
+				if (ImGui::Combo("##SelectBtnFont", &font_index, all_loaded_fonts.data(), static_cast<int>(all_loaded_fonts.size()))) {
+					// Validate the selected index and get the new font ID
+					if (font_index >= 0 && font_index < static_cast<int>(all_loaded_fonts.size())) {
+						btn_text.font_id = all_loaded_fonts[font_index];
+					}
+				}
+
+				//Enter new button text
+				ImGui::Text("Button Text: ");
+				if (ImGui::InputText("##btn_text", btn_text.text.data(), btn_text.text.capacity() + 1)) {
+					btn_text.text.resize(strlen(btn_text.text.c_str()));
+				}
+
+				//Adjust btn color
+				ImGui::Text("Button Text Color: ");
+				ImGui::ColorPicker4("##BtnTextColor", &btn_text.color.x, ImGuiColorEditFlags_AlphaBar);
+			}
+
+			//Static btn transform
+			static Transform::Transform btn_transform;
+			{
+				//Edit Position
+				{
+					//Drag position
+					ImGui::Text("Position");
+					ImGui::DragFloat2("##BtnTransform", &btn_transform.position.x, 0.1f);
+				}
+
+				//Edit Scale
+				{
+					//Change scale
+					ImGui::Text("Scale");
+					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+				}
+
+				//Edit Rotation
+				{
+					//Change rotation
+					ImGui::Text("Rotation");
+					ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
+				}
+			}
+
+			static int texture_index = -1;
+			static int model_index = -1;
+			static std::string render_ref = "";
+			static bool b_model = true;
+			static Vector4f btn_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			//Select texture or model
+			{
+				//Select render mode
+				ImGui::Text("Button Render: ");
+				ImGui::SameLine();
+				if(ImGui::SmallButton(b_model ? "Model" : "Texture")) {
+					b_model = !b_model;
+				}
+
+				//Select ref based on mode
+				if (!b_model) {
+					// Get all loaded fonts
+					const auto& all_loaded_texture = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
+
+					// Display combo box for font selection
+					ImGui::Text("Button Texture: ");
+					if (ImGui::Combo("##SelectBtnTexture", &texture_index, all_loaded_texture.data(), static_cast<int>(all_loaded_texture.size()))) {
+						// Validate the selected index and get the new font ID
+						if (texture_index >= 0 && texture_index < static_cast<int>(all_loaded_texture.size())) {
+							render_ref = all_loaded_texture[texture_index];
+						}
+					}
+				} 
+				else{
+					// Get all loaded fonts
+					const auto & all_loaded_models = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Model);
+
+					// Display combo box for font selection
+					ImGui::Text("Button Shape: ");
+					if (ImGui::Combo("##SelectBtnShape", &model_index, all_loaded_models.data(), static_cast<int>(all_loaded_models.size()))) {
+						// Validate the selected index and get the new font ID
+						if (model_index >= 0 && model_index < static_cast<int>(all_loaded_models.size())) {
+							render_ref = all_loaded_models[model_index];
+						}
+					}
+
+					//Adjust btn color
+					ImGui::Text("Button Color: ");
+					ImGui::ColorPicker4("##BtnColor", &btn_color.x, ImGuiColorEditFlags_AlphaBar);
+				}
+			}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Create") && !btn_id.empty() && !NIKE_UI_SERVICE->checkUIEntity(btn_id)) {
+
+				//Make copies
+				Transform::Transform trans_copy = btn_transform;
+				Render::Text txt_copy = btn_text;
+
+				//Create button based on mode
+				if (b_model) {
+					//Create button
+					NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Shape(render_ref, btn_color));
+				}
+				else {
+					//Create button
+					NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Texture(render_ref, btn_color, false, 0.5f, true));
+				}
+
+				//Reset btn id
+				btn_id.assign("");
+
+				//Reset btn transform
+				btn_transform = Transform::Transform();
+
+				//Reset btn text
+				btn_text = Render::Text();
+
+				//Reset font current index
+				font_index = -1;
+
+				//Reset render modes
+				texture_index = -1;
+				model_index = -1;
+				render_ref = "";
+				b_model = true;
+				btn_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel createing new btn
+			if (ImGui::Button("Cancel")) {
+
+				//Reset btn id
+				btn_id.assign("");
+
+				//Reset btn transform
+				btn_transform = Transform::Transform();
+
+				//Reset btn text
+				btn_text = Render::Text();
+
+				//Reset font current index
+				font_index = -1;
+
+				//Reset render modes
+				texture_index = -1;
+				model_index = -1;
+				render_ref = "";
+				b_model = true;
+				btn_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
+	std::function<void()> LevelEditor::UIPanel::deleteButtonPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Delete")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel createing new btn
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
+	void LevelEditor::UIPanel::init() {
+		registerPopUp("Create Button", createButtonPopup("Create Button"));
+		registerPopUp("Delete Button", deleteButtonPopup("Delete Button"));
+	}
+
+	void LevelEditor::UIPanel::update() {
+
+	}
+
+	void LevelEditor::UIPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Create button
+		{
+			if (ImGui::Button("Create Button")) {
+				openPopUp("Create Button");
+			}
+		}
+
+		ImGui::Separator();
+
+		//List of active buttons
+		ImGui::Text("Active Buttons: ");
+		for (auto& button : NIKE_UI_SERVICE->getAllButtons()) {
+			ImGui::Spacing();
+
+			//Collapsing button
+			if (ImGui::CollapsingHeader(std::string("Button: " + button.first).c_str(), ImGuiTreeNodeFlags_None)) {
+
+				//Select script
+				{
+					// Get all loaded scripts
+					const auto& get_load_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
+
+					// Find the index of the currently selected script id in the list
+					int script_index = -1;
+					for (size_t i = 0; i < get_load_scripts.size(); ++i) {
+						if (button.second.script.script_id == get_load_scripts[i]) {
+							script_index = static_cast<int>(i);
+							break;
+						}
+					}
+
+					//Display combo box for script selection
+					ImGui::Text("Button Script: ");
+					if (ImGui::Combo("##BtnScript", &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+						// Validate the selected index and get the new font ID
+						if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
+							button.second.script.script_id = get_load_scripts[script_index];
+						}
+					}
+				}
+
+				//Select script function
+				{
+					if (!button.second.script.script_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(button.second.script.script_id)) {
+						// Get all loaded script functions
+						const auto& get_script_functions = NIKE_LUA_SERVICE->getScriptFunctions(NIKE_ASSETS_SERVICE->getAssetPath(button.second.script.script_id));
+						std::vector<const char*> funcs;
+						//Convert to const char*
+						std::for_each(get_script_functions.begin(), get_script_functions.end(), [&funcs](std::string const& ref) {
+							funcs.push_back(ref.c_str());
+							});
+
+						// Find the index of the currently selected script id in the list
+						int script_func_index = -1;
+						for (size_t i = 0; i < funcs.size(); ++i) {
+							if (button.second.script.function == funcs[i]) {
+								script_func_index = static_cast<int>(i);
+								break;
+							}
+						}
+
+						//Display combo box for script function selection
+						ImGui::Text("Button Script Function: ");
+						if (ImGui::Combo("##BtnScriptFunc", &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+							// Validate the selected index and get the new font ID
+							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
+								button.second.script.function = funcs[script_func_index];
+							}
+						}
+					}
+				}
+
+				//Add spacing
+				ImGui::Spacing();
+
+				//Delete Button
+				if (ImGui::Button("Delete Button")) {
+					NIKE_UI_SERVICE->destroyButton(button.first);
+					break;
+				}
+			}
+
+		}
+
+		renderPopUps();
+
+		ImGui::End();
+	}
+
+	/*****************************************************************//**
 	* Tile Map Management Panel
 	*********************************************************************/
 	void LevelEditor::TileMapPanel::init() {
