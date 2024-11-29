@@ -202,8 +202,10 @@ namespace NIKE {
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
 
+#ifdef NDEBUG
 		// default startup to fullscreen (M3 1931)
 		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+#endif
 	}
 
 	void Core::Engine::run() {
