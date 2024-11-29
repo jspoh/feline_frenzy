@@ -201,13 +201,11 @@ namespace NIKE {
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
-
-
-		// !TODO: remove this, hardcoded for testing only
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 	}
 
 	void Core::Engine::run() {
+		// !TODO: remove this, hardcoded for testing only
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
