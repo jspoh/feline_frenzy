@@ -15,7 +15,7 @@
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
 #include "Components/cEnemy.h"
-#include "sysLua.h"
+#include "Managers/Services/sLua.h"
 
 namespace NIKE {
 	namespace Enemy {
@@ -26,7 +26,7 @@ namespace NIKE {
 			void operator=(Manager const& copy) = delete;
 
 			//Internal lua system
-			std::unique_ptr<Lua::System> lua_system;
+			//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
 
 			//Internal script management
 			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);

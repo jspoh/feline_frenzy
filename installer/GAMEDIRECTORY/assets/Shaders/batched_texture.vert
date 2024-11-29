@@ -13,9 +13,6 @@ layout (location = 4) in vec3 a_model_to_ndc_0;
 layout (location = 5) in vec3 a_model_to_ndc_1;
 layout (location = 6) in vec3 a_model_to_ndc_2;
 
-layout (location=8) in vec2 framesize;
-layout (location=9) in vec2 uv_offset;
-
 layout (location=0) out vec2 f_texcoord;
 layout (location=1) flat out int f_sampler_idx;
 
@@ -24,7 +21,7 @@ void main() {
 
 	//	gl_Position = vec4(a_position, 0.0, 1.0); no uniform
 	gl_Position = vec4( vec2(a_model_to_ndc * vec3(a_position, 1.f)), 0.0, 1.0);
-	f_texcoord = a_texcoord * framesize + uv_offset;
+	f_texcoord = a_texcoord;
 	f_sampler_idx = a_sampler_idx;
 }
 

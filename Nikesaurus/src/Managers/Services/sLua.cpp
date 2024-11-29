@@ -15,7 +15,7 @@ namespace NIKE {
 
     // Bullet functions
 
-    void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos, const float& offset) {
+    void Lua::Service::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos, const float& offset) {
         //NIKEE_CORE_INFO("SHOOT BULLET CALLED");
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount())) {
             // Create entity function call ( Defaulted to the base layer for now )
@@ -61,8 +61,8 @@ namespace NIKE {
         }
     }
 
-    void Lua::System::enemyBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& enemy_pos, const Vector2f& player_pos, const float& offset) {
-        if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
+    void Lua::Service::enemyBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& enemy_pos, const Vector2f& player_pos, const float& offset) {
+        if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount())) {
             // Create entity function call
             Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
@@ -70,10 +70,11 @@ namespace NIKE {
             std::string name = entity_name.empty() ? "entity_" + std::to_string(new_id) : entity_name;
 
             // Save entity_name string
-            NIKE_IMGUI_SERVICE->addEntityRef(name, new_id);
+            //NIKE_IMGUI_SERVICE->addEntityRef(name, new_id);
 
             // Load entity with prefab
-            std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
+            //std::string prefab_full_path = NIKE_ASSETS_SERVICE->getPrefabsPath() + file_path;
+            std::string prefab_full_path = "assets/Prefabs/" + file_path;
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_full_path);
 
             // Calculate direction
@@ -98,7 +99,7 @@ namespace NIKE {
         }
     }
 
-    void Lua::System::registerBindings() {
+    void Lua::Service::registerBindings() {
 
         //Reigster all lua Service bindings
         for (auto& system : systems) {

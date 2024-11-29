@@ -10,8 +10,50 @@
 --Player object
 Player = {}
 
+--Cheat mode state
+local cheatModeEnabled = false
+local godModeEnabled = false
+local highDamageEnabled = false
+
 --Player update function
 function Player:update(entity)
+    
+    -- Cheat mode enable
+    if isKeyTriggered(Key["0"]) and isKeyTriggered(Key["9"]) then
+        cheatModeEnabled = not cheatModeEnabled
+        if cheatModeEnabled then
+            cout("Cheat mode enabled")
+        end
+        if not cheatModeEnabled then
+            cout("Cheat mode disabled")
+        end
+    end
+
+    if cheatModeEnabled then
+        -- Teleport to cursor cheat
+        if isKeyTriggered(Key["1"]) then
+            -- Get mouse position
+            local mousePos = getMousePos()
+
+            -- Set player position to the mouse position
+            setPosition(entity, mousePos.x, mousePos.y)
+
+            -- Log the new position
+            cout("Teleported player to: X = " .. mousePos.x .. ", Y = " .. mousePos.y)
+        end
+
+        -- God Mode toggle
+        if isKeyTriggered(Key["2"]) then
+            godModeEnabled = not godModeEnabled
+            setGodMode(entity, godModeEnabled)
+        end
+
+        -- High Damage toggle
+        if isKeyTriggered(Key["3"]) then
+            highDamageEnabled = not highDamageEnabled
+            setHighDamage(entity, highDamageEnabled)
+        end
+    end
 
     --Reset force
     applyXForce(entity, 0.0)
@@ -36,6 +78,7 @@ function Player:update(entity)
     if isKeyPressed(Key.D) then
         applyXForce(entity, 100.0)
     end
+
 end
 
 --Return player object
