@@ -12,6 +12,9 @@
 #include "Systems/Physics/sysPhysics.h"
 
 namespace NIKE {
+
+    // Bullet functions
+
     void Lua::System::shootBullet(int layer_id, const std::string& file_path, const std::string& entity_name, const Vector2f& shooter_pos, const float& offset) {
         //NIKEE_CORE_INFO("SHOOT BULLET CALLED");
         if (layer_id < static_cast<int>(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount())) {
@@ -103,16 +106,25 @@ namespace NIKE {
 
         //Register lua table for key codes
         lua_state->create_named_table("Key",
+            // Movement
             "W", NIKE_KEY_W,
             "A", NIKE_KEY_A,
             "S", NIKE_KEY_S,
-            "D", NIKE_KEY_D
+            "D", NIKE_KEY_D,
+            // Numbers (For cheat code currently)
+            "0", NIKE_KEY_0,
+            "1", NIKE_KEY_1,
+            "2", NIKE_KEY_2,
+            "3", NIKE_KEY_3,
+            "4", NIKE_KEY_4,
+            "8", NIKE_KEY_8, 
+            "9", NIKE_KEY_9  
         );
 
         //Register lua bindings for key inputs
         lua_state->set_function("isKeyPressed", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyPressed(key); });
         lua_state->set_function("isKeyTriggered", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyTriggered(key); });
-        lua_state->set_function("iskeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
+        lua_state->set_function("isKeyReleased", [](int key)->bool { return NIKE_INPUT_SERVICE->isKeyReleased(key); });
 
         //Register lua binding for player bullet
         lua_state->set_function("shootBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float shooter_x, float shooter_y, float offset) {
@@ -124,6 +136,54 @@ namespace NIKE {
         lua_state->set_function("enemyBullet", [this](int layer_id, const std::string& file_path, const std::string& entity_name, float enemy_x, float enemy_y, float player_x, float player_y, float offset) {
             Vector2f enemy_pos{ enemy_x, enemy_y }, player_pos{ player_x, player_y };
             this->enemyBullet(layer_id, file_path, entity_name, enemy_pos, player_pos, offset);
+            });
+
+        // Register lua binding for cheat mode functions
+        
+        // Mouse position getter
+        lua_state->set_function("getMousePos", [this]() -> sol::table {
+            Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMousePos();
+            sol::table pos_table = lua_state->create_table();
+            pos_table["x"] = mouse_pos.x;
+            pos_table["y"] = mouse_pos.y;
+            return pos_table;
+            });
+
+        // Entity position setter
+        lua_state->set_function("setPosition", [](int entity_id, float x, float y) {
+            auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity_id);
+            if (transform.has_value()) {
+                transform.value().get().position = { x, y };
+            }
+            });
+
+        // God mode toggle
+        lua_state->set_function("setGodMode", [](int entity_id, bool enable) {
+            auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity_id);
+            if (health_comp) {
+                health_comp.value().get().invulnerableFlag = enable;
+                if (health_comp.value().get().invulnerableFlag) {
+                    cout << "Player god mode enabled" << endl;
+                }
+                else {
+                    cout << "Player god mode disabled" << endl;
+                }
+            }
+            });
+
+        // High Damage toggle
+        lua_state->set_function("setHighDamage", [](int entity_id, bool enable) {
+            auto damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_id);
+            if (damage_comp) {
+                if (enable) {
+                    damage_comp.value().get().damage = 9999.0f; // High damage
+                    cout << "Damage set max" << endl;
+                }
+                else {
+                    damage_comp.value().get().damage = 1.0f; // Default damage
+                    cout << "Damage set default 1" << endl;
+                }
+            }
             });
 
 
