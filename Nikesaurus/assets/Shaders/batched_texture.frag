@@ -25,7 +25,10 @@ void main() {
 	//vec4 tex_color = texture(u_tex2d, f_texcoord);
 	//tex_color = texture(u_tex2d, vec2(0.5,0.5));
 
-	if (f_blend == 1) {
+	//out_color = vec4(f_blend, f_blend, f_blend, 1.0);
+	//out_color = f_color;
+
+	if (f_blend > 0) {
 		out_color = vec4(mix(tex_color, f_color, f_blend_intensity).rgb, tex_color.a * f_color.a);
 		return;
 	}

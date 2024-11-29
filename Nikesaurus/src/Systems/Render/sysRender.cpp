@@ -380,7 +380,6 @@ namespace NIKE {
 				v.to_blend_color = render_instances_texture[i].to_blend_color;
 
 				if (v.to_blend_color) {
-					v.to_blend_color = !!v.to_blend_color;
 					v.col = render_instances_texture[i].color;
 					v.blend_intensity = render_instances_texture[i].blend_intensity;
 				}
