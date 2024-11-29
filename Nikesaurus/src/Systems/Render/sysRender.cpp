@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = true;
+constexpr bool BATCHED_RENDERING = false;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
@@ -110,7 +110,9 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		if (!BATCHED_RENDERING) {
+		constexpr std::array<const char*, 1> QUAD_SHAPE_MODELS = { "square.model" };
+
+		if (!BATCHED_RENDERING || std::find(QUAD_SHAPE_MODELS.begin(), QUAD_SHAPE_MODELS.end(), e_shape.model_id) == QUAD_SHAPE_MODELS.end()) {
 			//Set polygon mode
 			glPolygonMode(GL_FRONT, GL_FILL);
 			glEnable(GL_BLEND);
