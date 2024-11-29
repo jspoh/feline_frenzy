@@ -126,6 +126,12 @@ xcopy "$(OutDir)*" "$(SolutionDir)installer\GAMEDIRECTORY\" /s /r /y /q
 
 rem Remove all .pdb files from GAMEDIRECTORY
 del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
+
+rem Remove all .exp files from GAMEDIRECTORY
+del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.exp" &gt;nul 2&gt;&amp;1
+
+rem Remove all .lib files from GAMEDIRECTORY
+del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

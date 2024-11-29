@@ -10,6 +10,7 @@
 #include "Core/stdafx.h"
 
 #include "Utility/uLogger.h"
+#include <ShlObj.h>
 
 namespace NIKE {
 
@@ -19,6 +20,13 @@ namespace NIKE {
 
 	void Log::Init()
 	{
+		static char documents_path[MAX_PATH] = "";
+
+		// Get the path to the Desktop folder
+		if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+			cerr << "Failed to get desktop path!" << endl;
+		}
+
 		spdlog::set_pattern("%^[%X] %n: %v%$");
 
 		// Core Logger (Logging related to engine)
@@ -30,7 +38,7 @@ namespace NIKE {
 		s_ClientLogger->set_level(spdlog::level::trace);
 
 		// Create a file sink (append crash log into file)
-		auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/crash-log.txt", false);
+		auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::string{ documents_path } + R"(\feline-frenzy-logs\crash-log.txt)", false);
 
 		// Crash Logger to file sink
 		s_CrashFileLogger = std::make_shared<spdlog::logger>("Crash Log", file_sink);
