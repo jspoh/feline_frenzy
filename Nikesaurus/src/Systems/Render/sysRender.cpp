@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = false;
+constexpr bool BATCHED_RENDERING = true;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
@@ -61,17 +61,21 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
-	}
+	}	
 
-	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
+	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip) {
 		//Transform matrix here
 		Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
-		Matrix_33RotDeg(rot_mat, obj.rotation);
+		const Matrix_33 FLIP_X_MAT = { -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+		const Matrix_33 FLIP_Y_MAT = { 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
+		Matrix_33RotDeg(rot_mat, obj.rotation);
 		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat
+			* (flip.x ? FLIP_X_MAT : Matrix_33::Identity())
+			* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity());
 
 		// OpenGL requires matrix in col maj so transpose
 		Matrix_33Transpose(x_form, result);
@@ -275,8 +279,8 @@ namespace NIKE {
 			shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
 			//Flip texture options
-			shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+			//shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			//shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
 			//Get model
 			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
@@ -296,6 +300,9 @@ namespace NIKE {
 			instance.tex = tex_hdl;
 			instance.framesize = framesize;
 			instance.uv_offset = uv_offset;
+			instance.to_blend_color = e_texture.b_blend;
+			instance.color = e_texture.color;
+			instance.blend_intensity = e_texture.intensity;
 
 			render_instances_texture.push_back(instance);
 
@@ -370,6 +377,12 @@ namespace NIKE {
 				v.transform = render_instances_texture[i].xform;
 				v.framesize = render_instances_texture[i].framesize;
 				v.uv_offset = render_instances_texture[i].uv_offset;
+				v.to_blend_color = render_instances_texture[i].to_blend_color ? 1.f : 0.f;
+
+				if (v.to_blend_color) {
+					v.col = render_instances_texture[i].color;
+					v.blend_intensity = render_instances_texture[i].blend_intensity;
+				}
 
 				// get index of texture hdl in texture_binding_unit_map vector
 				if (texture_binding_unit_map.find(render_instances_texture[i].tex) == texture_binding_unit_map.end()) {
@@ -583,7 +596,7 @@ namespace NIKE {
 				}
 
 				// Transform matrix here
-				transformMatrix(e_transform, matrix, cam_ndcx);
+				transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
 
 				// Render Texture
 				renderObject(matrix, e_texture);
