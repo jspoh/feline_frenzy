@@ -26,6 +26,7 @@ namespace NIKE {
 		class GameWindowPanel;
 		class TileMapPanel;
 		class ComponentsPanel;
+		class PrefabsPanel;
 
 		//Panel Interface
 		class IPanel {
@@ -328,6 +329,9 @@ namespace NIKE {
 			//Reference to main panel
 			std::weak_ptr<MainPanel> main_panel;
 
+			//Reference to p[refab panel
+			std::weak_ptr<PrefabsPanel> prefab_panel;
+
 			//Reference to tilemap panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
@@ -342,17 +346,11 @@ namespace NIKE {
 
 			std::string comp_string_ref;
 
-			//Add Components popup
-			std::function<void()> addComponentPopUp(std::string const& popup_id);
-
 			//Save Prefab popup
 			std::function<void()> createPrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
-
-			//Remove Component confirmation popup
-			std::function<void()> removeComponentPopUp(std::string const& popup_id);
 
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
@@ -380,11 +378,19 @@ namespace NIKE {
 				return "Components Management";
 			}
 
+			//Add Components popup
+			std::function<void()> addComponentPopUp(std::string const& popup_id);
+
+			//Remove Component confirmation popup
+			std::function<void()> removeComponentPopUp(std::string const& popup_id);
+
 			//Init
 			void init() override;
 
 			//Update
 			void update() override;
+
+			void setCompStringRef(std::string const& to_set);
 
 			//Render
 			void render() override;
@@ -447,8 +453,14 @@ namespace NIKE {
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
-			// Boolean to tell editor entity is created for prefab purposes
+			// Boolean for checking if entity is created from prefab
 			bool b_is_prefab_entity;
+
+
+			// Msg for pop up
+			std::shared_ptr<std::string> msg;
+			std::shared_ptr<std::string> clear_msg;
+
 		public:
 			PrefabsPanel() = default;
 			~PrefabsPanel() = default;
@@ -475,14 +487,10 @@ namespace NIKE {
 			// Accept payload from file management
 			void prefabAcceptPayload();
 
-			// Settor for boolean
-			void setBoolPrefabEntity(bool to_set);
-
-			// Gettor for boolean
-			bool& getBoolPrefabEntity();
-
 			// For component stuff
 			void renderPrefabComponents();
+
+			std::optional<Entity::Type> getTempPrefabEntity() const;
 
 			// Utility functions for managing prefab entity
 			void createTempPrefabEntity(const std::string& file_path);
