@@ -2289,10 +2289,10 @@ namespace NIKE {
 				float pitch = channel.second->getPitch();
 
 				ImGui::Text("Adjust Volume & Pitch");
-				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
+				if (ImGui::SliderFloat(std::string("Volume##" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
 					channel.second->setVolume(volume);
 				}
-				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
+				if (ImGui::SliderFloat(std::string("Pitch##" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
 					channel.second->setPitch(pitch);
 				}
 
@@ -2302,6 +2302,13 @@ namespace NIKE {
 				if (ImGui::Button(channel.second->getPaused() ? std::string("Unpause Channel##" + channel.first).c_str() : std::string("Pause Channel##" + channel.first).c_str() )) {
 					channel.second->setPaused(!channel.second->getPaused());
 				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(std::string("Stop Audio In Channel##" + channel.first).c_str())) {
+					channel.second->stop();
+				}
+
 
 				ImGui::Spacing();
 
@@ -2322,12 +2329,12 @@ namespace NIKE {
 				}
 				bool& open_playlist = open_playlists[channel.first];
 
+				ImGui::Checkbox(std::string("Open Playlist##" + channel.first).c_str(), &open_playlists[channel.first]);
 
-				ImGui::Checkbox(std::string("Open Playlist##CHECKBOXPLAYLIST_" + channel.first).c_str(), &open_playlists[channel.first]);
 				ImGui::Spacing();
 
 				if (open_playlist) {
-					auto & loop_playlists = NIKE_AUDIO_SERVICE->channel_playlists_loop;
+					bool loop_playlist = NIKE_AUDIO_SERVICE->isPlaylistLooping(channel.first);
 					// Get channel audio id and index from map
 					if (channel_audio_ids.find(channel.first) == channel_audio_ids.end()) {
 						channel_audio_ids[channel.first] = "";
@@ -2335,15 +2342,10 @@ namespace NIKE {
 					if (channel_indices.find(channel.first) == channel_indices.end()) {
 						channel_indices[channel.first] = -1;
 					}
-					if (loop_playlists.find(channel.first) == loop_playlists.end()) {
-						loop_playlists[channel.first] = false;
-					}
 
 					std::string& current_audio_id = channel_audio_ids[channel.first];
 					int& current_index = channel_indices[channel.first];
 
-
-					ImGui::Checkbox(std::string("Loop Playlist##CHECKBOXLOOPPLAYLIST_" + channel.first).c_str(), &loop_playlists[channel.first]);
 					ImGui::Spacing();
 
 					if (current_index == -1) {
@@ -2379,15 +2381,30 @@ namespace NIKE {
 
 					ImGui::Spacing();
 
-					std::queue<std::string> display_queue = NIKE_AUDIO_SERVICE->getChannelPlaylist(channel.first);
+
+					if (ImGui::Button((std::string("Clear Playlist##" + channel.first).c_str()))) {
+						NIKE_AUDIO_SERVICE->clearPlaylist(channel.first);
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Checkbox(std::string("Loop Playlist##" + channel.first).c_str(), &loop_playlist)) {
+						NIKE_AUDIO_SERVICE->setPlaylistLoop(channel.first, loop_playlist);
+					}
+
+					const auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channel.first);
+
+
+					ImGui::Spacing();
 
 					ImGui::Text(std::string(channel.first + " Playlist:").c_str());
-					if (display_queue.empty()) {
+					if (playlist.tracks.empty()) {
 						ImGui::BulletText("No audio queued");
 					}
-					while (!display_queue.empty()) {
-						ImGui::BulletText("%s", display_queue.front().c_str()); // Display the current track
-						display_queue.pop(); // Remove it from the temporary queue
+					else {
+						for (const auto& track : playlist.tracks) {
+							ImGui::BulletText("%s", track.c_str());
+						}
 					}
 
 					ImGui::Spacing();
