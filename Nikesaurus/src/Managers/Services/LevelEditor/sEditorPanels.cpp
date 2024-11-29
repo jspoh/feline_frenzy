@@ -3718,9 +3718,17 @@ namespace NIKE {
 
 		ImGui::Separator();
 
-		//List of active buttons
-		ImGui::Text("Active Buttons: ");
-		for (auto& button : NIKE_UI_SERVICE->getAllButtons()) {
+		//List of buttons
+		auto& buttons = NIKE_UI_SERVICE->getAllButtons();
+		if (buttons.empty()) {
+			ImGui::Text("No active buttons.");
+		}
+		else {
+			ImGui::Text("Active Buttons: ");
+		}
+
+		//Show all active buttons
+		for (auto& button : buttons) {
 			ImGui::Spacing();
 
 			//Collapsing button
