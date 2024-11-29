@@ -201,6 +201,9 @@ namespace NIKE {
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
+
+		// default startup to fullscreen (M3 1931)
+		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 	}
 
 	void Core::Engine::run() {
@@ -233,22 +236,22 @@ namespace NIKE {
 				//Update scenes manager
 				NIKE_SCENES_SERVICE->update();
 
-				//static constexpr bool JS_TEXTURE_TEST = false;
-				////Render entity to mouse click
-				//if 
-				//	(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+				static constexpr bool JS_TEXTURE_TEST = true;
+				//Render entity to mouse click
+				if 
+					(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
-				//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+					static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
-				//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-				//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-				//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-				//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-				//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-				//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-				//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
-				//	}
-				//}
+					for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
+						Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+						Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
+						Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+						NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
+						NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
+						NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+					}
+				}
 
 				//Escape Key
 				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
