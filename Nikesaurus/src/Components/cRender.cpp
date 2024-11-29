@@ -37,6 +37,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Cam& comp) {
 				ImGui::Text("Edit Camera variables");
@@ -74,6 +75,7 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 
 		//Register text for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Text>(
@@ -100,6 +102,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
 
@@ -312,6 +315,7 @@ namespace NIKE {
 				
 			}
 		);
+#endif
 
 		//Register shape for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Shape>(
@@ -330,6 +334,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		// UI for shape
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
@@ -428,6 +433,7 @@ namespace NIKE {
 			}
 				
 		);
+#endif
 
 
 		//Register shape for serialization
@@ -459,6 +465,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
 
@@ -780,5 +787,6 @@ namespace NIKE {
 
 			}
 		);
+#endif
 	}
 }

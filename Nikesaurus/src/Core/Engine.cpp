@@ -91,7 +91,9 @@ namespace NIKE {
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
+#ifndef NDEBUG
 		provideService(std::make_shared<LevelEditor::Service>());
+#endif
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
 
@@ -121,28 +123,43 @@ namespace NIKE {
 		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
-		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for key event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse move event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse scroll event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+
+#ifndef NDEBUG
+		//imgui event listeners
 		
+		//Add event listeners for window resized
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for key event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse move event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse scroll event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+#endif
+
+
 		//Init paths
 		NIKE_PATH_SERVICE->init(json_config);
 
@@ -161,8 +178,10 @@ namespace NIKE {
 		//Init scene
 		NIKE_SCENES_SERVICE->init();
 
+#ifndef NDEBUG
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
+#endif
 
 		//Init UI
 		NIKE_UI_SERVICE->init();
@@ -185,6 +204,8 @@ namespace NIKE {
 	}
 
 	void Core::Engine::run() {
+		// !TODO: remove this, hardcoded for testing only
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
@@ -236,11 +257,13 @@ namespace NIKE {
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
+#ifndef NDEBUG
 			//Update Level Editor
 			NIKE_LVLEDITOR_SERVICE->update();
 
 			//Render Level Editor
 			NIKE_LVLEDITOR_SERVICE->render();
+#endif
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
@@ -254,8 +277,10 @@ namespace NIKE {
 		//Stop watching all directories
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
+#ifndef NDEBUG
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();
+#endif
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();

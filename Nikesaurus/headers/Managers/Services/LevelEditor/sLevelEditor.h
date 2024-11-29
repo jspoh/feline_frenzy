@@ -9,6 +9,8 @@
 
 #pragma once
 
+#ifndef NDEBUG
+
 #ifndef LEVEL_EDITOR_HPP
 #define LEVEL_EDITOR_HPP
 
@@ -123,3 +125,6 @@ namespace NIKE {
 }
 
 #endif //!LEVEL_EDITOR_HPP
+
+
+#endif

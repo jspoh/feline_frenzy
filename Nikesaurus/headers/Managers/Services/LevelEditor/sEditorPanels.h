@@ -9,6 +9,8 @@
 
 #pragma once
 
+#ifndef NDEBUG
+
 #ifndef EDITOR_PANELS_HPP
 #define EDITOR_PANELS_HPP
 
@@ -876,3 +878,6 @@ namespace NIKE {
 }
 
 #endif //!EDITOR_PANELS_HPP
+
+
+#endif

@@ -35,6 +35,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		//Register transform for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Transform>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Transform& comp) {
@@ -152,5 +153,6 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 	}
 }
