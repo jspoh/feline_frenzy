@@ -492,6 +492,8 @@ namespace NIKE {
 
 			std::optional<Entity::Type> getTempPrefabEntity() const;
 
+			void applyPrefabToEntity(Entity::Type prefab, Entity::Type new_entity);
+
 			// Utility functions for managing prefab entity
 			void createTempPrefabEntity(const std::string& file_path);
 			void clearTempPrefabEntity();

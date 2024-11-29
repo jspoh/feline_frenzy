@@ -2477,7 +2477,8 @@ namespace NIKE {
 		{
 			// Add a button to save changes to the prefab file
 			if (ImGui::Button("Save Prefab")) {
-				NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_temp_entity.file_path);
+				std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_temp_entity.file_path);
+				NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_full_path.string());
 				openPopUp("Success");
 			}
 
@@ -2506,7 +2507,6 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::prefabAcceptPayload()
 	{
 		if (ImGui::BeginDragDropTarget()) {
-			//Scene file payload
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Prefab_FILE")) {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
@@ -2560,6 +2560,8 @@ namespace NIKE {
 		std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(file_path);
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, prefab_full_path.string());
 
+		cout << "Loading prefab from: " << prefab_full_path << endl;
+
 		// Store the prefab information
 		prefab_temp_entity = { file_path, temp_entity };
 
@@ -2568,6 +2570,23 @@ namespace NIKE {
 
 		b_is_prefab_entity = true;
 	}
+
+	void LevelEditor::PrefabsPanel::applyPrefabToEntity(Entity::Type prefab, Entity::Type new_entity) {
+		// Get all components from the prefab entity
+		auto components = NIKE_ECS_MANAGER->getAllEntityComponents(prefab);
+
+		// Add each component to the new entity
+		for (const auto& [comp_name, comp_data] : components) {
+			auto comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+			// Add the component to the new entity
+			NIKE_ECS_MANAGER->addDefEntityComponent(new_entity, comp_type);
+
+			// Set the component data
+			NIKE_ECS_MANAGER->setEntityComponent(new_entity, comp_type, comp_data);
+		}
+	}
+
 
 	void LevelEditor::PrefabsPanel::clearTempPrefabEntity()
 	{
