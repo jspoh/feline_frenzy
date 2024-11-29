@@ -365,7 +365,7 @@ namespace NIKE {
 			glfwRestoreWindow(ptr_window);
 
 			if (is_fullscreen) {
-				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 			}
 #endif
 
