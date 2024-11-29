@@ -204,8 +204,6 @@ namespace NIKE {
 	}
 
 	void Core::Engine::run() {
-		// !TODO: remove this, hardcoded for testing only
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
