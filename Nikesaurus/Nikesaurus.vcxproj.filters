@@ -59,6 +59,7 @@
     <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysEnemy.cpp" />
+    <ClCompile Include="src\Components\cDespawn.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -130,6 +131,7 @@
     <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysEnemy.h" />
+    <ClInclude Include="headers\Components\cDespawn.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

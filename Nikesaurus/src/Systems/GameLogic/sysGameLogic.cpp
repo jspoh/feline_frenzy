@@ -9,7 +9,6 @@
 #include "Core/stdafx.h"
 #include "Systems/GameLogic/sysGameLogic.h"
 #include "Core/Engine.h"
-//#include "Systems/GameLogic/sysLua.h"
 
 namespace NIKE {
 
@@ -136,10 +135,31 @@ namespace NIKE {
 							}
 						}
 					}
+
+					//Check for despawn comp
+					// Currently bugged, please do not use until it is fixed
+					/*
+					auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
+					if (e_despawn_comp.has_value()) {
+						auto& e_despawn = e_despawn_comp.value().get();
+
+						// update current lifetime
+						e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+						NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
+						NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
+
+						// if current lifetime > max lifetime, mark for deletion
+						if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
+							if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+								NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+							}
+						}
+					}
+					*/
 				}
 
 				// Destroy all entities that are marked for deletion
-				//NIKEE_CORE_INFO("GG TO DESTROY MARKED ENTITIES");
 				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}

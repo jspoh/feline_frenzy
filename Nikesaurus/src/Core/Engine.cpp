@@ -57,6 +57,9 @@ namespace NIKE {
 
 		//Register Enemy components
 		Enemy::registerComponents();
+
+		//Register Despawn components
+		Despawn::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -66,6 +69,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Shooting::Shooting>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
 
 		//Register physics manager
 		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);

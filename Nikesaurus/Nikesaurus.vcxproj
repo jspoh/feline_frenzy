@@ -42,6 +42,7 @@
     <ClCompile Include="src\Components\cAnimation.cpp" />
     <ClCompile Include="src\Components\cAudio.cpp" />
     <ClCompile Include="src\Components\cDamage.cpp" />
+    <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
     <ClCompile Include="src\Components\cHealth.cpp" />
     <ClCompile Include="src\Components\cPathfinding.cpp" />
@@ -105,6 +106,7 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
     <ClInclude Include="headers\Components\cDamage.h" />
+    <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
     <ClInclude Include="headers\Components\cHealth.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />

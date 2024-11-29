@@ -13,10 +13,10 @@
 
 namespace NIKE {
 	void Enemy::registerComponents() {
-		// Register transform components
+		// Register attack components
 		NIKE_ECS_MANAGER->registerComponent<Attack>();
 
-		// Register transform for serialization
+		// Register attack for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Attack>(
 			// Serialize
 			[](Attack const& comp) -> nlohmann::json {

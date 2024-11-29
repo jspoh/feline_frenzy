@@ -142,6 +142,7 @@ namespace NIKE {
 				}
 
 				// !TODO: Change this to input
+				ImGui::Text("Prefab: %s", comp.prefab_path.c_str());
 				ImGui::Text("Script Path: %s", comp.script.script_path.c_str());
 				ImGui::Text("Function: %s", comp.script.function.c_str());
 				ImGui::Text("Script Loaded: %s", comp.script.b_loaded ? "Yes" : "No");
