@@ -6,7 +6,7 @@
         "Layer": {
             "B_State": true,
             "Entities": [
-                {
+                 {
                     "Entity": {
                         "Components": {
                             "Render::Texture": {
