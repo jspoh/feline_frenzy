@@ -34,7 +34,7 @@ namespace NIKE {
 			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
 			calculateViewport();
 		}
-		catch (const nlohmann::json::exception& e) {
+		catch(const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
 			NIKEE_CORE_WARN("Window config invalid! Reverting to default window config");
 
@@ -51,8 +51,6 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::configWindow() {
-		GLenum err;
-
 		if (!glfwInit()) {
 			cerr << "Failed to initialize GLFW\n";
 			throw std::exception();
@@ -83,22 +81,11 @@ namespace NIKE {
 		}
 
 		glfwMakeContextCurrent(ptr_window);
-		if (!glfwGetCurrentContext()) {
-			NIKEE_CORE_ERROR("No valid OpenGL context available");
-		}
 
-		// clear glErrors
-		while (glGetError() != GL_NO_ERROR) { }
-
-		err = glewInit();
+		GLenum err = glewInit();
 		if (err != GLEW_OK) {
 			cerr << "GLEW init failed: " << glewGetErrorString(err) << endl;
 			throw std::exception();
-		}
-
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at after GL init in {0}: {1}", __FUNCTION__, err);
 		}
 
 		//Engine Init Successful
@@ -111,13 +98,9 @@ namespace NIKE {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
-			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
+			//NIKEE_CORE_ERROR("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
 #endif
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
-		}
 	}
 
 	void Windows::NIKEWindow::calculateViewport() {
@@ -188,7 +171,7 @@ namespace NIKE {
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
 		glfwSetWindowFocusCallback(ptr_window, Events::Service::windowfocus_cb);
-		glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
+	    glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value) {
@@ -201,24 +184,7 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::swapBuffers() {
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			NIKEE_CORE_ERROR("Incomplete framebuffer in {0} with status: {1}", __FUNCTION__, status);
-		}
-
 		glfwSwapBuffers(ptr_window);
-
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
-		}
 	}
 
 	void Windows::NIKEWindow::clearBuffer() {
@@ -357,9 +323,9 @@ namespace NIKE {
 	* Window Service
 	*********************************************************************/
 	Windows::Service::Service(std::shared_ptr<IWindow> window)
-		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 },
-		actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 },
-		accumulated_time{ 0.0 } {}
+		:	ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, 
+			actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 },
+			accumulated_time{ 0.0 } {}
 
 	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
 		return ptr_window;

@@ -117,11 +117,6 @@ namespace NIKE {
 
 	void System::Manager::updateSystems()
 	{
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
-		}
-
 		// Vector to hold each of the system duration
 		std::vector<double> system_times;
 
@@ -160,11 +155,6 @@ namespace NIKE {
 
 			// Update the last debug call time to the current time
 			last_call_time = current_time;
-		}
-
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 

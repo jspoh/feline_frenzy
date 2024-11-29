@@ -5,7 +5,7 @@
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
  * \date   October 2024
- * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -337,7 +337,7 @@ namespace NIKE {
 		// batched_texture.vert location=2
 		static constexpr int SAMPLERIDX_ATTRIB_INDEX = 2;
 		static constexpr int SAMPLERIDX_ATTRIB_SIZE = 1;		// num elements (index)
-		static constexpr int SAMPLERIDX_DATA_TYPE = GL_FLOAT;
+		static constexpr int SAMPLERIDX_DATA_TYPE = GL_INT;
 		static constexpr int SAMPLERIDX_DATA_OFFSET = offsetof(Vertex, sampler_idx);
 		glEnableVertexArrayAttrib(model.vaoid, SAMPLERIDX_ATTRIB_INDEX);		// vertex attrib index 1
 		glVertexArrayAttribFormat(
@@ -349,7 +349,6 @@ namespace NIKE {
 			SAMPLERIDX_DATA_OFFSET		// offset
 		);
 		glVertexArrayAttribBinding(model.vaoid, SAMPLERIDX_ATTRIB_INDEX, VBO_BINDING_INDEX);
-		// glVertexAttribDivisor(SAMPLERIDX_ATTRIB_INDEX, 1);		// per instance only. do not interpolate(nvm useless)
 
 		// batched_texture.vert location=4
 		static constexpr int XFORM_ATTRIB_INDEX_0 = 4;
@@ -409,8 +408,8 @@ namespace NIKE {
 		);
 		glVertexArrayAttribBinding(model.vaoid, FRAMESIZE_ATTRIB_INDEX, VBO_BINDING_INDEX);
 
-		// batched_texture.vert location=9
-		static constexpr int UVOFFSET_ATTRIB_INDEX = 9;
+		// batched_texture.vert location=8
+		static constexpr int UVOFFSET_ATTRIB_INDEX = 8;
 		static constexpr int UVOFFSET_ATTRIB_SIZE = 2;		// num elements (x, y)
 		static constexpr int UVOFFSET_DATA_TYPE = GL_FLOAT;
 		static constexpr int UVOFFSET_DATA_OFFSET = offsetof(Vertex, uv_offset);
@@ -437,36 +436,26 @@ namespace NIKE {
 		// VBO (Vertex Buffer Object)
 		glCreateBuffers(1, &model.vboid);
 		glNamedBufferStorage(model.vboid,
-			sizeof(Vertex) * vertices.size(),
+			sizeof(Vector2f) * vertices.size() + sizeof(Vector2f) * tex_coords.size(),
 			nullptr, // nullptr means no data is transferred
 			GL_DYNAMIC_STORAGE_BIT);
-
-		std::vector<Vertex> rendering_vertices;
-		rendering_vertices.reserve(vertices.size());
-		for (size_t i = 0; i < vertices.size(); ++i) {
-			Vertex v;
-			v.pos = vertices[i];
-			v.tex_coords = tex_coords[i];
-			rendering_vertices.push_back(v);
-		}
-
-		glNamedBufferSubData(model.vboid, 0, sizeof(Vertex) * vertices.size(), rendering_vertices.data());
+		glNamedBufferSubData(model.vboid, 0, sizeof(Vector2f) * vertices.size(), vertices.data());
+		glNamedBufferSubData(model.vboid, sizeof(Vector2f) * vertices.size(), sizeof(Vector2f) * tex_coords.size(), tex_coords.data());
 
 		// VAO (Vertex Array Object)
 		glCreateVertexArrays(1, &model.vaoid);
 
-		static constexpr int BINDING_INDEX = 0;
-		glVertexArrayVertexBuffer(model.vaoid, BINDING_INDEX, model.vboid, 0, sizeof(Vertex));
-
 		// Vertex Position Array
 		glEnableVertexArrayAttrib(model.vaoid, 0); // vertex attribute index 0
-		glVertexArrayAttribFormat(model.vaoid, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
-		glVertexArrayAttribBinding(model.vaoid, 0, BINDING_INDEX);
+		glVertexArrayVertexBuffer(model.vaoid, 0, model.vboid, 0, sizeof(Vector2f)); // buffer binding point 0
+		glVertexArrayAttribFormat(model.vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(model.vaoid, 0, 0);
 
 		// Vertex texture coordinates
 		glEnableVertexArrayAttrib(model.vaoid, 2);
-		glVertexArrayAttribFormat(model.vaoid, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex_coords));
-		glVertexArrayAttribBinding(model.vaoid, 2, BINDING_INDEX);
+		glVertexArrayVertexBuffer(model.vaoid, 1, model.vboid, sizeof(Vector2f) * vertices.size(), sizeof(Vector2f));
+		glVertexArrayAttribFormat(model.vaoid, 2, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(model.vaoid, 2, 1);
 
 		// Create EBO
 		glCreateBuffers(1, &model.eboid);
@@ -550,7 +539,7 @@ namespace NIKE {
 		return nullptr;
 	}
 
-	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
+	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh, bool for_batched_rendering) {
 		Assets::Model model;
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
@@ -634,9 +623,6 @@ namespace NIKE {
 		for (int i{}; i < tex_coords.size(); i++) {
 			model.vertices[i].tex_coords = tex_coords[i];
 		}
-
-		static constexpr const char* BATCHED_PREFIX = "batched_";
-		const bool for_batched_rendering = path_to_mesh.find(BATCHED_PREFIX) != std::string::npos;
 
 		if (tex_coords.size() == 0) {
 			if (for_batched_rendering) {

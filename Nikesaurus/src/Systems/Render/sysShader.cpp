@@ -5,7 +5,7 @@
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu(70%)
  * \coauthor Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (30%)
  * \date   September 2024
- * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -188,32 +188,22 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals) {
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at start of {0}: {1}", __FUNCTION__, err);
-		}
-
+	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<int>& vals) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 
-		const int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
-			for (size_t i{}; i < vals.size(); i++) {
-				const int idx_loc = glGetUniformLocation(shaders.at(shader_ref), (name + "[" + std::to_string(i) + "]").c_str());
-				if (idx_loc >= 0) {
-					glUniform1i(idx_loc, vals[i]);
-				}
-				else {
-					cerr << "Uniform location not found in shader " << shader_ref << " for: " << name << "[" << i << "]" << endl;
-					throw std::exception();
-				}
-			}
+			glUniform1iv(location, static_cast<GLsizei>(vals.size()), reinterpret_cast<const int*>(vals.data()));
 		}
 		else {
-			cerr << "Uniform location not found in shader " << shader_ref << " for: " << name << endl;
-			//throw std::exception();
+			cerr << "Uniform location not found for: " << name << endl;
+			throw std::exception();
 		}
 
 		err = glGetError();
