@@ -2094,15 +2094,15 @@ namespace NIKE {
 			if (ImGui::BeginTabItem("Crash Logger")) {
 				ImGui::Text("Crash logs:");
 
-				static char desktopPath[MAX_PATH] = "";
+				static char documents_path[MAX_PATH] = "";
 
 				// Get the path to the Desktop folder
-				if (SHGetFolderPathA(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, desktopPath) != S_OK) {
+				if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
 					cerr << "Failed to get desktop path!" << endl;
 				}
 
 				// Open crash log file
-				std::ifstream crashLogFile(std::string{ desktopPath } + R"(\feline-frenzy-logs\crash-log.txt)");
+				std::ifstream crashLogFile(std::string{ documents_path } + R"(\feline-frenzy-logs\crash-log.txt)");
 
 				if (crashLogFile.is_open()) {
 					std::string line;

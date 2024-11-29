@@ -43,7 +43,7 @@ Database& Database::getInstance() {
 
 
 bool Database::forceUpdate() {
-	// !TODO: this function should not be called until impl has been shifted to a public dir.
+	// !TODO: this function should not be called until impl has been shifted to a documents dir.
 	return false;
 
 	//try {
