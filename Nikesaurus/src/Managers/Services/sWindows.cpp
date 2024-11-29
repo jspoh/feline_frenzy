@@ -361,11 +361,13 @@ namespace NIKE {
 		if (event->focused) {
 			NIKE_WINDOWS_SERVICE->setWindowFocus(true);
 
-			//glfwRestoreWindow(ptr_window);
+#ifdef NDEBUG
+			glfwRestoreWindow(ptr_window);
 
 			if (is_fullscreen) {
-				setFullScreen(true);
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 			}
+#endif
 
 			// in case of resizes
 			int width, height;
@@ -385,8 +387,9 @@ namespace NIKE {
 			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
 
 			NIKE_AUDIO_SERVICE->pauseAllChannels();
-
-			//glfwIconifyWindow(ptr_window);
+#ifdef NDEBUG
+			glfwIconifyWindow(ptr_window);
+#endif
 		}
 
 		err = glGetError();
