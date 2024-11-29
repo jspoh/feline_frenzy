@@ -92,7 +92,8 @@ namespace NIKE {
 
 			//Mouse data structure
 			struct Mouse {
-				Vector2f pos;
+				Vector2f window_pos;
+				Vector2f world_pos;
 				Vector2f offset;
 			};
 
@@ -121,8 +122,11 @@ namespace NIKE {
 			//Mouse Button Released
 			bool isMouseReleased(int key);
 
-			//Get Mouse Position
-			Vector2f getMousePos() const;
+			//Get Mouse window Position
+			Vector2f getMouseWindowPos() const;
+
+			//Get Mouse world Position
+			Vector2f getMouseWorldPos() const;
 
 			//Get Mouse Scroll Offset
 			Vector2f getMouseScroll() const;

@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
@@ -29,10 +29,10 @@ namespace NIKE {
         luaKeyBinds(*lua_state);
         luaMathBinds(*lua_state);
 
-        //Log out all 
-        for (auto& pair : lua_state->globals()) {
-            cout << pair.first.as<std::string>() << "\n";
-        }
+        ////Log out all 
+        //for (auto& pair : lua_state->globals()) {
+        //    cout << pair.first.as<std::string>() << "\n";
+        //}
     }
 
     sol::load_result Lua::Service::loadScript(std::string const& virtual_path) {
