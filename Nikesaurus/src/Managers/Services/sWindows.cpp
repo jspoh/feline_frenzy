@@ -105,7 +105,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("GL init success");
 
 		// enable debug logging
-		#ifndef NDEBUG
+#ifndef NDEBUG
 		// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -113,7 +113,43 @@ namespace NIKE {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
 			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-		#endif
+#endif
+
+		// set window icon
+		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
+
+		GLFWimage icon;
+
+		int width, height, size;
+		bool is_tex_or_png_ext;
+		const unsigned char* icon_data = NIKE::Assets::RenderLoader
+			::prepareImageData(ICON_PATH, width, height, size, is_tex_or_png_ext);
+
+		if (icon_data) {
+			icon.width = width;
+			icon.height = height;
+			icon.pixels = const_cast<unsigned char*>(icon_data);
+
+			// flip stbi image around for opengl
+			static constexpr int channels = 4;
+			const int row_size = width * channels;
+			for (int i = 0; i < height / 2; ++i) {
+				unsigned char* topRow = icon.pixels + i * row_size;
+				unsigned char* bottomRow = icon.pixels + (height - 1 - i) * row_size;
+				for (int j = 0; j < row_size; ++j) {
+					std::swap(topRow[j], bottomRow[j]);
+				}
+			}
+
+			glfwSetWindowIcon(ptr_window, 1, &icon);
+			//stbi_image_free(const_cast<char*>(icon_data));
+		}
+		else {
+			NIKEE_CORE_ERROR("Failed to load window icon in {0}", __FUNCTION__);
+		}
+
+
+
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);

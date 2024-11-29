@@ -147,6 +147,12 @@ namespace NIKE {
 
 			void createBatchedTextureBuffers(Model& model);
 
+
+		public:
+			RenderLoader() = default;
+			~RenderLoader() = default;
+
+
 			/**
 			 * all .tex files should be 256x256 in RGBA8 format.
 			 *
@@ -158,12 +164,9 @@ namespace NIKE {
 			 *
 			 * @returns dynamically allocated char*
 			 */
-			char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
+			static unsigned char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
 
 
-		public:
-			RenderLoader() = default;
-			~RenderLoader() = default;
 			/**
 			 * creates vertex array object. from mesh data and registers it to meshes.
 			 *
