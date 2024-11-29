@@ -14,30 +14,30 @@
 
 namespace NIKE {
 	void Enemy::Manager::init() {
-		NIKE_LUA_SERVICE->init();
+		//NIKE_LUA_SERVICE->init();
 	}
 
-	void Enemy::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
-		//Add system to lua
-		NIKE_LUA_SERVICE->registerLuaSystem(system);
-	}
+	//void Enemy::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
+	//	//Add system to lua
+	//	NIKE_LUA_SERVICE->registerLuaSystem(system);
+	//}
 
-	sol::protected_function Enemy::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
-		//Run script
-		if (script_id == "") {
-			script_id = NIKE_LUA_SERVICE->loadScript(file_path);
-			b_loaded = true;
-			return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		}
-		else if (b_loaded) {
-			return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		}
-		else {
-			NIKE_LUA_SERVICE->reloadScript(script_id);
-			b_loaded = true;
-			return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		}
-	}
+	//sol::protected_function Enemy::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
+	//	//Run script
+	//	if (script_id == "") {
+	//		script_id = NIKE_LUA_SERVICE->loadScript(file_path);
+	//		b_loaded = true;
+	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
+	//	}
+	//	else if (b_loaded) {
+	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
+	//	}
+	//	else {
+	//		NIKE_LUA_SERVICE->reloadScript(script_id);
+	//		b_loaded = true;
+	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
+	//	}
+	//}
 
 	void Enemy::Manager::update() {
 		//Get layers
@@ -130,30 +130,30 @@ namespace NIKE {
 		 auto& enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy).value().get();
 
 		 // Load Lua Script
-		 std::string script_id = NIKE_LUA_SERVICE->loadScript(enemy_attack_comp.script.script_path);
+		 //std::string script_id = NIKE_LUA_SERVICE->loadScript(enemy_attack_comp.script.script_path);
 
 		 // Check if the script is loaded successfully
-		 if (script_id.empty()) {
-			 NIKEE_CORE_ERROR("Failed to load script.");
-		 }
+		 //if (script_id.empty()) {
+			// NIKEE_CORE_ERROR("Failed to load script.");
+		 //}
 
 		 // Execute Lua Script
-		 sol::protected_function enemy_bullet_func = NIKE_LUA_SERVICE->executeScript(script_id, enemy_attack_comp.script.function);
+		 //sol::protected_function enemy_bullet_func = executeScript(enemy_attack_comp.script.script_path, enemy_attack_comp.script.script_id, enemy_attack_comp.script.b_loaded, enemy_attack_comp.script.function);
 
 		 // Checking if something went wrong w cpp func
-		 if (!enemy_bullet_func.valid()) {
-			 NIKEE_CORE_ERROR("Failed to execute Lua script: " + enemy_attack_comp.script.function);
-		 }
-		 else {
-			 // Function was valid 
-			 sol::protected_function_result result = enemy_bullet_func(enemy_attack_comp.layer, enemy_attack_comp.prefab_path, enemy_pos.x, enemy_pos.y, player_pos.x, player_pos.y, enemy_attack_comp.offset);
+		 //if (!enemy_bullet_func.valid()) {
+			// NIKEE_CORE_ERROR("Failed to execute Lua script: " + enemy_attack_comp.script.function);
+		 //}
+		 //else {
+			// // Function was valid 
+			// sol::protected_function_result result = enemy_bullet_func(enemy_attack_comp.layer, enemy_attack_comp.prefab_path, enemy_pos.x, enemy_pos.y, player_pos.x, player_pos.y, enemy_attack_comp.offset);
 
-			 // Checking if something went wrong with lua func
-			 if (!result.valid()) {
-				 sol::error err = result;
-				 NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
-			 }
-		 }
+			// // Checking if something went wrong with lua func
+			// if (!result.valid()) {
+			//	 sol::error err = result;
+			//	 NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
+			// }
+		 //}
 
 		 // Reset the last shot time after shooting
 		 enemy_attack_comp.last_shot_time = 0.f;

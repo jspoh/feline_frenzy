@@ -21,22 +21,22 @@ namespace NIKE {
 	//	NIKE_LUA_SERVICE->registerLuaSystem(system);
 	//}
 
-	//sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
-	//	//Run script
-	//	if (script_id == "") {
-	//		script_id = NIKE_LUA_SERVICE->loadScript(file_path);
-	//		b_loaded = true;
-	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
-	//	}
-	//	else if (b_loaded) {
-	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
-	//	}
-	//	else {
-	//		NIKE_LUA_SERVICE->reloadScript(script_id);
-	//		b_loaded = true;
-	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
-	//	}
-	//}
+	sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
+		//Run script
+		//if (script_id == "") {
+		//	script_id = NIKE_LUA_SERVICE->loadScript(file_path);
+		//	b_loaded = true;
+		//	return NIKE_LUA_SERVICE->executeScript(script_id, function);
+		//}
+		//else if (b_loaded) {
+		//	return NIKE_LUA_SERVICE->executeScript(script_id, function);
+		//}
+		//else {
+		//	NIKE_LUA_SERVICE->reloadScript(script_id);
+		//	b_loaded = true;
+		//}
+		return 0;
+	}
 
 	void GameLogic::Manager::update() {
 		//Get layers
@@ -67,7 +67,12 @@ namespace NIKE {
 							continue;
 
 						int move = static_cast<int>(Utility::randFloat() * 3);
-						executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);
+
+						std::filesystem::path path = NIKE_ASSETS_SERVICE->getAssetPath("assets/Scripts/player.lua");
+
+						sol::load_result result = NIKE_LUA_SERVICE->loadScript(path);
+						/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
+						NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
 					}
 
 					// Check for shooting comp
@@ -92,28 +97,28 @@ namespace NIKE {
 								Vector2f shooter_pos = e_transform_comp.value().get().position;
 
 								// !TODO: Set these in cShooting
-								std::string script_path = shoot_comp.script.script_path;
-								std::string function_name = shoot_comp.script.function;
-								std::string prefab_path = shoot_comp.prefab_path;
+								//std::string script_path = shoot_comp.script.script_path;
+								//std::string function_name = shoot_comp.script.function;
+								//std::string prefab_path = shoot_comp.prefab_path;
 
 								// Load Lua Script
-								std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
+								//std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
 
-								// Check if the script is loaded successfully
-								if (script_id.empty()) {
-									NIKEE_CORE_ERROR("Failed to load script: " + script_path);
-								}
+								//// Check if the script is loaded successfully
+								//if (script_id.empty()) {
+								//	NIKEE_CORE_ERROR("Failed to load script: " + script_path);
+								//}
 
 								// Execute Lua Script
-								sol::protected_function create_bullet_func = NIKE_LUA_SERVICE->executeScript(script_id, function_name);
+								sol::protected_function create_bullet_func = executeScript(shoot_comp.script.script_path, shoot_comp.script.script_id, shoot_comp.script.b_loaded, shoot_comp.script.function);
 
 								// Checking if something went wrong w cpp func
 								if (!create_bullet_func.valid()) {
-									NIKEE_CORE_ERROR("Failed to execute Lua script: " + script_path);
+									NIKEE_CORE_ERROR("Failed to execute Lua script");
 								}
 								else {
 									// Function was valid 
-									sol::protected_function_result result = create_bullet_func(shoot_comp.layer, prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
+									sol::protected_function_result result = create_bullet_func(shoot_comp.layer, shoot_comp.prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
 
 									// Checking if something went wrong with lua func
 									if (!result.valid()) {

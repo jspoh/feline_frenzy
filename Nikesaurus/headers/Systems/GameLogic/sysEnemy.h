@@ -29,7 +29,7 @@ namespace NIKE {
 			//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
 
 			//Internal script management
-			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
 			// Check if player is within range
 			bool withinRange(const Entity::Type enemy, const Entity::Type player);
@@ -54,7 +54,7 @@ namespace NIKE {
 			}
 
 			//Register systems for lua
-			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 			//Update
 			void update() override;
