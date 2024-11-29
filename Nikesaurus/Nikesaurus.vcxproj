@@ -150,6 +150,16 @@
     <ClInclude Include="headers\Utility\uSystems.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\Shaders\base.frag" />
+    <None Include="assets\Shaders\base.vert" />
+    <None Include="assets\Shaders\batched_base.frag" />
+    <None Include="assets\Shaders\batched_base.vert" />
+    <None Include="assets\Shaders\batched_texture.frag" />
+    <None Include="assets\Shaders\batched_texture.vert" />
+    <None Include="assets\Shaders\text.frag" />
+    <None Include="assets\Shaders\text.vert" />
+    <None Include="assets\Shaders\texture.frag" />
+    <None Include="assets\Shaders\texture.vert" />
     <None Include="db\data.json" />
     <None Include="headers\Math\Vector2\Vector2.inl" />
     <None Include="headers\Math\Vector3\Vector3.inl" />
@@ -229,7 +239,9 @@
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
 REM copy all files (including pdb) to main startup project outdir
-xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q
+
+xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -263,7 +275,9 @@ xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline
 xcopy "$(SolutionDir)$(ProjectName)\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 
 REM copy all files (including pdb) to main startup project outdir
-xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q</Command>
+xcopy "$(OutDir)*" "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Feline Frenzy\" /s /r /y /q
+
+xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

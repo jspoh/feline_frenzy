@@ -27,10 +27,12 @@ namespace NIKE {
 
 		struct RenderInstance {
 			Matrix_33 xform{};
+			bool to_blend_color = false;
 			Vector4f color{};
 			unsigned int tex{};
 			Vector2f framesize{};
 			Vector2f uv_offset{};
+			float blend_intensity{};
 		};
 
 		//Render Manager
@@ -54,7 +56,7 @@ namespace NIKE {
 			unsigned int VAO, VBO;
 
 			//Transform matrix
-			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
+			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip = {false, false});
 
 			//Transform matrix debug
 			void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
