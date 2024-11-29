@@ -105,7 +105,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("GL init success");
 
 		// enable debug logging
-#ifndef NDEBUG
+		#ifndef NDEBUG
 		// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -113,7 +113,7 @@ namespace NIKE {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
 			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-#endif
+		#endif
 
 		// set window icon
 		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";

@@ -688,7 +688,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		glClearColor(1, 1, 0, 1);		// set background to yellow for easier debugging
+		glClearColor(0, 0, 0, 1);	
 
 #ifndef NDEBUG
 		//Render to frame buffer if imgui is active
