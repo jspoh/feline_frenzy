@@ -3666,8 +3666,34 @@ namespace NIKE {
 			};
 	}
 
+	std::function<void()> LevelEditor::UIPanel::deleteButtonPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Delete")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel createing new btn
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::UIPanel::init() {
 		registerPopUp("Create Button", createButtonPopup("Create Button"));
+		registerPopUp("Delete Button", deleteButtonPopup("Delete Button"));
 	}
 
 	void LevelEditor::UIPanel::update() {
@@ -3686,8 +3712,88 @@ namespace NIKE {
 
 		ImGui::Separator();
 
-		//List of active buttons
-		ImGui::Text("Active Buttons: ");
+		//List of buttons
+		auto& buttons = NIKE_UI_SERVICE->getAllButtons();
+		if (buttons.empty()) {
+			ImGui::Text("No active buttons.");
+		}
+		else {
+			ImGui::Text("Active Buttons: ");
+		}
+
+		//Show all active buttons
+		for (auto& button : buttons) {
+			ImGui::Spacing();
+
+			//Collapsing button
+			if (ImGui::CollapsingHeader(std::string("Button: " + button.first).c_str(), ImGuiTreeNodeFlags_None)) {
+
+				//Select script
+				{
+					// Get all loaded scripts
+					const auto& get_load_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
+
+					// Find the index of the currently selected script id in the list
+					int script_index = -1;
+					for (size_t i = 0; i < get_load_scripts.size(); ++i) {
+						if (button.second.script.script_id == get_load_scripts[i]) {
+							script_index = static_cast<int>(i);
+							break;
+						}
+					}
+
+					//Display combo box for script selection
+					ImGui::Text("Button Script: ");
+					if (ImGui::Combo("##BtnScript", &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+						// Validate the selected index and get the new font ID
+						if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
+							button.second.script.script_id = get_load_scripts[script_index];
+						}
+					}
+				}
+
+				//Select script function
+				{
+					if (!button.second.script.script_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(button.second.script.script_id)) {
+						// Get all loaded script functions
+						const auto& get_script_functions = NIKE_LUA_SERVICE->getScriptFunctions(NIKE_ASSETS_SERVICE->getAssetPath(button.second.script.script_id));
+						std::vector<const char*> funcs;
+						//Convert to const char*
+						std::for_each(get_script_functions.begin(), get_script_functions.end(), [&funcs](std::string const& ref) {
+							funcs.push_back(ref.c_str());
+							});
+
+						// Find the index of the currently selected script id in the list
+						int script_func_index = -1;
+						for (size_t i = 0; i < funcs.size(); ++i) {
+							if (button.second.script.function == funcs[i]) {
+								script_func_index = static_cast<int>(i);
+								break;
+							}
+						}
+
+						//Display combo box for script function selection
+						ImGui::Text("Button Script Function: ");
+						if (ImGui::Combo("##BtnScriptFunc", &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+							// Validate the selected index and get the new font ID
+							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
+								button.second.script.function = funcs[script_func_index];
+							}
+						}
+					}
+				}
+
+				//Add spacing
+				ImGui::Spacing();
+
+				//Delete Button
+				if (ImGui::Button("Delete Button")) {
+					NIKE_UI_SERVICE->destroyButton(button.first);
+					break;
+				}
+			}
+
+		}
 
 		renderPopUps();
 
