@@ -213,14 +213,22 @@ namespace NIKE {
 			//Serialize
 			[](Physics::Collider const& comp) -> nlohmann::json {
 				return	{
-						{ "B_Collided", comp.b_collided },
+						{ "B_Bind_To_Entity", comp.b_bind_to_entity },
+						{ "Position", comp.transform.position.toJson()},
+						{ "Scale", comp.transform.scale.toJson()},
+						{ "Rotation", comp.transform.rotation},
+						{ "Pos_Offset", comp.pos_offset.toJson()},
 						{ "Resolution", static_cast<int>(comp.resolution) }
 						};
 			},
 
 			//Deserialize
 			[](Physics::Collider& comp, nlohmann::json const& data) {
-				comp.b_collided = data.at("B_Collided").get<bool>();
+				comp.b_bind_to_entity = data.at("B_Bind_To_Entity").get<bool>();
+				comp.transform.position.fromJson(data.at("Position"));
+				comp.transform.scale.fromJson(data.at("Scale"));
+				comp.transform.rotation = data.at("Rotation").get<float>();
+				comp.pos_offset.fromJson(data.at("Pos_Offset"));
 				comp.resolution = static_cast<Resolution>(data.at("Resolution").get<int>());
 			}
 		);

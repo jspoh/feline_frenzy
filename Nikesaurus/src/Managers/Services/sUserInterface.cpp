@@ -13,6 +13,18 @@
 
 namespace NIKE {
 
+	nlohmann::json UI::UIBtn::serialize() const {
+		return	{
+		{"Input_State", static_cast<int>(input_state)},
+		{"Script", script.serialize()}
+		};
+	}
+
+	void UI::UIBtn::deserialize(nlohmann::json const& data) {
+		input_state = static_cast<UI::InputStates>(data["Input_State"].get<int>());
+		script.deserialize(data["Script"]);
+	}
+
 	void UI::Service::onEvent(std::shared_ptr<Input::KeyEvent> event) {
 
 		//Check if UI is polling for this event

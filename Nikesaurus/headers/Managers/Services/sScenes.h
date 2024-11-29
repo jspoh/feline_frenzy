@@ -85,9 +85,6 @@ namespace NIKE {
 
 		class NIKE_API Service {
 		private:
-			//Delete Copy Constructor & Copy Assignment
-			Service(Service const& copy) = delete;
-			void operator=(Service const& copy) = delete;
 
 			//Curr scene
 			std::string curr_scene;
@@ -135,7 +132,7 @@ namespace NIKE {
 			std::vector<std::shared_ptr<Layer>>& getLayers();
 
 			//Queue scene event
-			void queueSceneEvent(Scenes::SceneEvent&& event);
+			void queueSceneEvent(Scenes::SceneEvent const& event);
 
 			//Set curr scene id
 			void setCurrSceneID(std::string const& new_scene_id);

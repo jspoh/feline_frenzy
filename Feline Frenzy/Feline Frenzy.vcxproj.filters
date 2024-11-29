@@ -49,6 +49,6 @@
     <None Include="assets\Scripts\move.lua" />
     <None Include="src\Core\Config.json" />
     <None Include="assets\Scenes\main_menu.scn" />
-    <None Include="assets\Scripts\test.lua" />
+    <None Include="assets\Scripts\ChangeScene.lua" />
   </ItemGroup>
 </Project>

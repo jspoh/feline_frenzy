@@ -43,6 +43,10 @@ namespace NIKE {
 			Lua::Script script;
 
 			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, script() {};
+
+			nlohmann::json serialize() const;
+
+			void deserialize(nlohmann::json const& data);
 		};
 
 		//Change btn ratio event

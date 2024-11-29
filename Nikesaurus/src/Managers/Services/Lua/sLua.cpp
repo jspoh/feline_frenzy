@@ -37,6 +37,10 @@ namespace NIKE {
        return NIKE_ASSETS_SERVICE->getAsset<sol::load_result>(script_id);
     }
 
+    void Lua::Service::uncacheLuaAsset(std::string const& script_id) const {
+        NIKE_ASSETS_SERVICE->uncacheAsset(script_id);
+    }
+
     sol::table Lua::Service::convertScriptArgs(Script const& script) const {
         //Convert arguments to a Lua table
         sol::table lua_args = lua_state->create_table();
@@ -62,11 +66,12 @@ namespace NIKE {
         luaBasicBinds(*lua_state);
         luaKeyBinds(*lua_state);
         //luaMathBinds(*lua_state);
+        luaSceneBinds(*lua_state);
 
-        ////Log out all 
-        //for (auto& pair : lua_state->globals()) {
-        //    cout << pair.first.as<std::string>() << "\n";
-        //}
+        //Log out all 
+        for (auto& pair : lua_state->globals()) {
+            cout << pair.first.as<std::string>() << "\n";
+        }
     }
 
     sol::load_result Lua::Service::loadScript(std::string const& virtual_path) {
@@ -117,7 +122,7 @@ namespace NIKE {
         //Open script file
         std::ifstream script_file(path);
         if (!script_file.is_open()) {
-            NIKEE_CORE_ERROR("Unable to open Lua script file: {}", path.string());
+            NIKEE_CORE_WARN("Unable to open Lua script file: {}", path.string());
             return {};
         }
 
@@ -138,10 +143,10 @@ namespace NIKE {
         auto end = script_content.cend();
         while (std::regex_search(start, end, match, function_pattern)) {
             std::string function_name = match[1].str();
-            if (!match[2].str().empty()) {
-                function_name += ":" + match[2].str();
-            }
-            functions.push_back(function_name);
+            //if (!match[2].str().empty()) {
+            //    function_name += ":" + match[2].str();
+            //}
+            functions.push_back(match[2].str());
             start = match.suffix().first;
         }
 
@@ -153,7 +158,7 @@ namespace NIKE {
         //Open script file
         std::ifstream script_file(path);
         if (!script_file.is_open()) {
-            NIKEE_CORE_ERROR("Unable to open Lua script file: {}", path.string());
+            NIKEE_CORE_WARN("Unable to open Lua script file: {}", path.string());
             return {};
         }
 
@@ -174,10 +179,10 @@ namespace NIKE {
         auto end = script_content.cend();
         while (std::regex_search(start, end, match, function_pattern)) {
             std::string function_name = match[1].str();
-            if (!match[2].str().empty()) {
-                function_name += ":" + match[2].str();
-            }
-            functions.push_back(function_name);
+            //if (!match[2].str().empty()) {
+            //    function_name += ":" + match[2].str();
+            //}
+            functions.push_back(match[2].str());
             start = match.suffix().first;
         }
 
