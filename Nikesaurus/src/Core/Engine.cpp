@@ -138,6 +138,7 @@ namespace NIKE {
 		//Add event listeners for mouse scroll event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
 
+#ifndef NDEBUG
 		//imgui event listeners
 		
 		//Add event listeners for window resized
@@ -154,6 +155,7 @@ namespace NIKE {
 
 		//Add event listeners for mouse scroll event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+#endif
 
 
 		//Init paths
@@ -174,8 +176,10 @@ namespace NIKE {
 		//Init scene
 		NIKE_SCENES_SERVICE->init();
 
+#ifndef NDEBUG
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
+#endif
 
 		//Init UI
 		NIKE_UI_SERVICE->init();
@@ -249,11 +253,13 @@ namespace NIKE {
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
+#ifndef NDEBUG
 			//Update Level Editor
 			NIKE_LVLEDITOR_SERVICE->update();
 
 			//Render Level Editor
 			NIKE_LVLEDITOR_SERVICE->render();
+#endif
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
@@ -267,8 +273,10 @@ namespace NIKE {
 		//Stop watching all directories
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
+#ifndef NDEBUG
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();
+#endif
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();
