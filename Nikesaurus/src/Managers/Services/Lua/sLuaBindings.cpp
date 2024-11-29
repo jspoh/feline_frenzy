@@ -222,4 +222,23 @@ namespace NIKE {
         registerVector4<float>(lua_state, "Vector4f");
         registerVector4<int>(lua_state, "Vector4i");
     }
+
+    void Lua::luaSceneBinds(sol::state& lua_state) {
+
+        lua_state.set_function("ChangeScene", [&](std::string const& scene) {
+            NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene));
+            });
+
+        lua_state.set_function("RestartScene", [&]() {
+            NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+            });
+
+        lua_state.set_function("PreviousScene", [&]() {
+            NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PREVIOUS, ""));
+            });
+
+        lua_state.set_function("CloseScene", [&]() {
+            NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CLOSE, ""));
+            });
+    }
 }
