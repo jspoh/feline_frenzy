@@ -150,7 +150,7 @@ namespace NIKE {
             });
 
         // Entity position setter
-        lua_state->set_function("setPosition", [](int entity_id, float x, float y) {
+        lua_state->set_function("setPosition", [](Entity::Type entity_id, float x, float y) {
             auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity_id);
             if (transform.has_value()) {
                 transform.value().get().position = { x, y };
@@ -158,7 +158,7 @@ namespace NIKE {
             });
 
         // God mode toggle
-        lua_state->set_function("setGodMode", [](int entity_id, bool enable) {
+        lua_state->set_function("setGodMode", [](Entity::Type entity_id, bool enable) {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity_id);
             if (health_comp) {
                 health_comp.value().get().invulnerableFlag = enable;
@@ -172,7 +172,7 @@ namespace NIKE {
             });
 
         // High Damage toggle
-        lua_state->set_function("setHighDamage", [](int entity_id, bool enable) {
+        lua_state->set_function("setHighDamage", [](Entity::Type entity_id, bool enable) {
             auto damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_id);
             if (damage_comp) {
                 if (enable) {
