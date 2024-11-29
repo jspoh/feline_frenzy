@@ -1,3 +1,11 @@
+/*****************************************************************//**
+ * \file   uLogger.h
+ * \brief  logging function declarations
+ *
+ * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
+ * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
 #pragma once
 
 namespace NIKE {
@@ -17,7 +25,7 @@ namespace NIKE {
 		
 		inline static std::shared_ptr<spdlog::logger>& GetCrashFileLogger() { return s_CrashFileLogger; }
 
-		// Debugging
+		static void InitCrashLogger();
 
 	private:
 
@@ -27,6 +35,7 @@ namespace NIKE {
 		static std::shared_ptr<spdlog::logger> s_CrashFileLogger;
 
 		// Debugging
+		static char documents_path[MAX_PATH];
 	};
 
 	//Re-enable DLL Export warning
@@ -50,7 +59,15 @@ namespace NIKE {
 // CRASH LOGGER (USED FOR EXCEPTION ERRORS)
 #define LOG_CRASH(message) \
     do { \
+        if (!NIKE::Log::GetCrashFileLogger()) { \
+            NIKE::Log::InitCrashLogger(); \
+        } \
         NIKE::Log::GetCrashFileLogger()->error("{} (crash occurred in file: {} line: {} in function {}())", message, __FILE__, __LINE__, __func__); \
-		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp(); \
-		assert(false && message); \
+        if (IsDebuggerPresent()) { \
+            __debugbreak(); \
+        } \
+        if (NIKE_WINDOWS_SERVICE && NIKE_WINDOWS_SERVICE->getWindow()) { \
+            NIKE_WINDOWS_SERVICE->getWindow()->cleanUp(); \
+        } \
+        assert(false && message); \
     } while (0)
