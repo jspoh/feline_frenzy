@@ -4,7 +4,7 @@
 *
 * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
 * \date   September 2024
-* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+* All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -184,6 +184,14 @@ namespace NIKE {
         // Initialize vertex list based on model type
         std::vector<Vector2f> vertices;
 
+        // quad models
+        constexpr std::array<const char*, 4> QUAD_MODELS {
+            "square.model",
+            "square-texture.model",
+            "batched_square.model",
+            "batched_texture.model"
+        };
+
         if (model_id == "triangle.model") {
             vertices = {
                 Vector2f(-0.5f, -0.5f),
@@ -191,7 +199,7 @@ namespace NIKE {
                 Vector2f(0.0f, 0.5f)
             };
         }
-        else if (model_id == "square.model" || model_id == "square-texture.model") {
+        else if (std::find(QUAD_MODELS.begin(), QUAD_MODELS.end(), model_id) != QUAD_MODELS.end()) {
             vertices = {
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.5f, 0.5f),
