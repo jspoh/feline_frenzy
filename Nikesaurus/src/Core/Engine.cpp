@@ -286,7 +286,9 @@ namespace NIKE {
 		}
 		catch (const std::exception& e) {
 			NIKEE_CORE_ERROR("Exception caught: {}", e.what());
-			
+		}
+		catch (...) {
+			NIKEE_CORE_ERROR("Unknown exception caught.");
 		}
 
 

@@ -482,9 +482,14 @@ namespace NIKE {
 			// Clear playlist
 			void clearPlaylist(const std::string& channel_id);
 
-
 			//Update Loop
 			void update();
+
+			// Serialize
+			nlohmann::json serializeAudioChannels() const;
+
+			// Deserialize
+			void deserializeAudioChannels(nlohmann::json const& data);
 
 		};
 

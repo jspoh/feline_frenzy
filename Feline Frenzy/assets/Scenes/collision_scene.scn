@@ -13,14 +13,14 @@
                             "Physics::Dynamics": {
                                 "Drag": 0.0,
                                 "Force": {
-                                    "x": 32.5,
-                                    "y": -42.29999923706055
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "Mass": 9.999999747378752e-05,
-                                "Max_Speed": 100.0,
+                                "Mass": 100.0,
+                                "Max_Speed": 500.0,
                                 "Velocity": {
-                                    "x": -75.57986450195313,
-                                    "y": 65.48043060302734
+                                    "x": -123.86152648925781,
+                                    "y": 123.0870361328125
                                 }
                             },
                             "Render::Texture": {
@@ -49,8 +49,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -524.8242797851563,
-                                    "y": -327.38775634765625
+                                    "x": -374.1875305175781,
+                                    "y": -48.0372314453125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -66,7 +66,7 @@
                     "Entity": {
                         "Components": {
                             "Physics::Collider": {
-                                "B_Collided": false,
+                                "B_Collided": true,
                                 "Resolution": 0
                             },
                             "Physics::Dynamics": {
@@ -110,7 +110,7 @@
                     "Entity": {
                         "Components": {
                             "Physics::Collider": {
-                                "B_Collided": false,
+                                "B_Collided": true,
                                 "Resolution": 0
                             },
                             "Physics::Dynamics": {
@@ -198,7 +198,7 @@
                     "Entity": {
                         "Components": {
                             "Physics::Collider": {
-                                "B_Collided": false,
+                                "B_Collided": true,
                                 "Resolution": 0
                             },
                             "Physics::Dynamics": {
@@ -286,7 +286,7 @@
                     "Entity": {
                         "Components": {
                             "Physics::Collider": {
-                                "B_Collided": true,
+                                "B_Collided": false,
                                 "Resolution": 0
                             },
                             "Physics::Dynamics": {

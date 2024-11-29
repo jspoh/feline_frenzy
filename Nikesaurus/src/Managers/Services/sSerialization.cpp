@@ -24,6 +24,57 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Serialization Services
 	*********************************************************************/
+
+	/*****************************************************************//**
+	* Audio Channels
+	*********************************************************************/
+
+	
+
+	/*****************************************************************//**
+	* Grid
+	*********************************************************************/
+
+	void Serialization::Service::saveGridToFile(const std::string& file_path)
+	{
+		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::out);
+
+		if (!std::filesystem::exists(file_path))
+		{
+			NIKEE_CORE_ERROR("File does not exist!");
+			return;
+		}
+
+
+		// Save data into file
+		file << grid_data.dump(4);
+
+		file.close();
+	}
+
+	void Serialization::Service::loadGridFromFile(const std::string& file_path)
+	{
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::in);
+
+		if (!file.is_open()) {
+			NIKEE_CORE_ERROR("Failed to open .map file for loading: " + file_path);
+			return;
+		}
+
+		nlohmann::json grid_data;
+		file >> grid_data;
+		file.close();
+
+		NIKE_MAP_SERVICE->deserialize(grid_data);
+	}
+
+	/*****************************************************************//**
+	* Entity
+	*********************************************************************/
 	nlohmann::json Serialization::Service::serializeEntity(Entity::Type entity) {
 
 		//Create new data
@@ -96,6 +147,14 @@ namespace NIKE {
 		file.close();
 	}
 
+	/*****************************************************************//**
+	* Scenes
+	*********************************************************************/
+
+	std::string const& Serialization::Service::getCurrSceneFile() const {
+		return curr_scene_file;
+	}
+
 	void Serialization::Service::saveSceneToFile(std::string const& file_path) {
 		//Json Data
 		nlohmann::json data;
@@ -114,14 +173,16 @@ namespace NIKE {
 			data.push_back(m_data);
 		}
 
-		//Layers in scene
-		auto& layers = NIKE_SCENES_SERVICE->getLayers();
+
 
 		//UI Entities
 		std::unordered_map<Entity::Type, std::string> ui_entities;
 		for (auto const& entity : NIKE_UI_SERVICE->getAllButtons()) {
 			ui_entities.emplace(entity.second.entity_id, entity.first);
 		}
+
+		//Layers in scene
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//Iterate through all layers in current scene
 		for (auto const& layer : layers) {
@@ -263,41 +324,6 @@ namespace NIKE {
 		return data;
 	}
 
-	std::string const& Serialization::Service::getCurrSceneFile() const {
-		return curr_scene_file;
-	}
-
-	void Serialization::Service::saveGridToFile(const std::string& file_path)
-	{
-		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
-
-		// Get file path to seri
-		std::fstream file(file_path, std::ios::out);
-
-		if (!std::filesystem::exists(file_path))
-			NIKEE_CORE_ERROR("File does not exist!");
-		
-		// Save data into file
-		file << grid_data.dump(4);
-
-		file.close();
-	}
-
-	void Serialization::Service::loadGridFromFile(const std::string& file_path)
-	{
-		// Get file path to seri
-		std::fstream file(file_path, std::ios::in);
-
-		if (!file.is_open()) {
-			NIKEE_CORE_ERROR("Failed to open .map file for loading: " + file_path);
-		}
-
-		nlohmann::json grid_data;
-		file >> grid_data;
-		file.close();
-
-		NIKE_MAP_SERVICE->deserialize(grid_data);
-	}
 
 	//void Serialization::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
 	//	// Open Scene file
