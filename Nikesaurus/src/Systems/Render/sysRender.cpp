@@ -688,7 +688,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		glClearColor(0, 0, 0, 1);		// set background to yellow for easier debugging
+		glClearColor(1, 1, 0, 1);		// set background to yellow for easier debugging
 
 #ifndef NDEBUG
 		//Render to frame buffer if imgui is active
@@ -711,11 +711,13 @@ namespace NIKE {
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
 					continue;
 
-#ifndef NDEBUG
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+#ifndef NDEBUG
 					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
-				}
+#else
+					transformAndRenderEntity(entity, false);
 #endif
+				}
 			}
 		}
 
