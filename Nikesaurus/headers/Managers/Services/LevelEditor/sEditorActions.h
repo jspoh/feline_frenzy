@@ -9,6 +9,8 @@
 
 #pragma once
 
+#ifndef NDEBUG
+
 #ifndef UNDO_REDO_EDITOR_HPP
 #define UNDO_REDO_EDITOR_HPP
 
@@ -51,3 +53,5 @@ namespace NIKE {
 }
 
 #endif //!UNDO_REDO_EDITOR_HPP
+
+#endif

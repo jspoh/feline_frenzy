@@ -45,6 +45,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		// Animation base comp UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Animation::Base>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Animation::Base& comp) {
@@ -183,6 +184,7 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 
 		//Register Sprite For Serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Animation::Sprite>(
@@ -205,6 +207,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		// Animation base comp UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Animation::Sprite>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Animation::Sprite& comp) {
@@ -278,5 +281,6 @@ namespace NIKE {
 				ImGui::BulletText("Y = %d", comp.curr_index.y);
 			}
 		);
+#endif
 	}
 }
