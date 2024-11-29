@@ -19,7 +19,7 @@
     "Zoom" : 1.0
   },
   "PathsConfig": {
-    "Game_Assets:/": "Feline Frenzy/assets",
-    "Engine_Assets:/": "Nikesaurus/assets"
+    "Game_Assets:/": "assets",
+    "Engine_Assets:/": "assets/Engine"
   }
 }
