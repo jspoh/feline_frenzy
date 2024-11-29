@@ -24,13 +24,6 @@ int WINAPI WinMain(
 	//Init Engine
 	NIKE_ENGINE.init("Config.json", 60, "Welcome To Nikesaurus.");
 
-	// register built in model for batched quad rendering (!TODO: can be implemented in a different way if required)
-	//NIKE::Core::Engine::getInstance().getService<NIKE::Assets::RenderLoader>()->compileModel("square.model", true);
-	//NIKE::Core::Engine::getInstance().getService<NIKE::Assets::RenderLoader>()->compileModel("square-texture.model", true);
-
-	//Change Scene To Main Menu
-	//NIKE_SCENES_SERVICE->queueSceneEvent(NIKE::Scenes::SceneEvent(NIKE::Scenes::Actions::CHANGE, "MENU"));
-
 	//Run Engine
 	NIKE_ENGINE.run();
 

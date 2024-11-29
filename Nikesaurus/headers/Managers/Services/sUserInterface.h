@@ -13,6 +13,7 @@
 #include "sInput.h"
 #include "sEvents.h"
 #include "sSerialization.h"
+#include "Lua/sLua.h"
 
 //Forward declaration of friend class
 namespace NIKE {
@@ -32,6 +33,16 @@ namespace NIKE {
 			PRESSED = 0,
 			TRIGGERED,
 			RELEASED
+		};
+
+		//UI Data Structure
+		struct UIBtn {
+			Entity::Type entity_id;
+			bool b_hovered;
+			InputStates input_state;
+			Lua::Script script;
+
+			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, script() {};
 		};
 
 		//Change btn ratio event
@@ -72,7 +83,7 @@ namespace NIKE {
 			std::unordered_map<std::string, std::pair<Transform::Transform, bool>> hover_container;
 
 			//Unordered map of UI Entities
-			std::unordered_map<std::string, std::pair<Entity::Type, bool>> ui_entities;
+			std::unordered_map<std::string, UIBtn> ui_entities;
 
 			//Data structure of state
 			struct EventStates {
@@ -106,13 +117,25 @@ namespace NIKE {
 			bool isButtonHovered(std::string const& btn_id) const;
 
 			//Check Button Clicked
-			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state);
+			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code);
 
 			//Get all buttons
-			std::unordered_map<std::string, std::pair<Entity::Type, bool>> getAllButtons() const;
+			std::unordered_map<std::string, UI::UIBtn> getAllButtons() const;
 
 			//Check if entity is UI
 			bool checkEntity(Entity::Type entity) const;
+
+			//Set button script
+			void setButtonScript(std::string const& btn_id, Lua::Script const& script);
+
+			//Get button script
+			Lua::Script getButtonScript(std::string const& btn_id) const;
+
+			//Set button input state
+			void setButtonInputState(std::string const& btn_id, InputStates state);
+
+			//Get button input state
+			InputStates getButtonInputState(std::string const& btn_id) const;
 
 			//UI init function
 			void init();

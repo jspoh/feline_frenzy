@@ -13,9 +13,43 @@
 
 namespace NIKE {
 
+    nlohmann::json Lua::Script::serialize() const {
+        return	{
+        {"Script_ID", script_id},
+        {"Function", function},
+        {"Named_Args", named_args}
+        };
+    }
+
+    void Lua::Script::deserialize(nlohmann::json const& data) {
+        script_id = data["Script_ID"].get<std::string>();
+        function = data["Function"].get<std::string>();
+
+        if (data.contains("Named_Args")) {
+            for (const auto& [key, value] : data.at("Named_Args").items()) {
+                named_args[key] = value.get<LuaValue>();
+            }
+        }
+    }
+
     std::shared_ptr<sol::load_result> Lua::Service::getLuaAssset(std::string const& script_id) const {
         //Get script table from asset service
        return NIKE_ASSETS_SERVICE->getAsset<sol::load_result>(script_id);
+    }
+
+    sol::table Lua::Service::convertScriptArgs(Script const& script) const {
+        //Convert arguments to a Lua table
+        sol::table lua_args = lua_state->create_table();
+        for (const auto& pair : script.named_args) {
+            const auto& key = pair.first;
+            const auto& value = pair.second;
+
+            std::visit([&lua_args, &key](auto&& arg) {
+                lua_args[key] = arg;
+                }, value);
+        }
+
+        return lua_args;
     }
 
     void Lua::Service::init() {
@@ -24,10 +58,10 @@ namespace NIKE {
         //Lua state init
         lua_state->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table, sol::lib::io);
 
-       //Register all bindings here
+        //Register all bindings here
         luaBasicBinds(*lua_state);
         luaKeyBinds(*lua_state);
-        luaMathBinds(*lua_state);
+        //luaMathBinds(*lua_state);
 
         ////Log out all 
         //for (auto& pair : lua_state->globals()) {

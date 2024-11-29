@@ -112,7 +112,7 @@ namespace NIKE {
 		//UI Entities
 		std::unordered_map<Entity::Type, std::string> ui_entities;
 		for (auto const& entity : NIKE_UI_SERVICE->getAllButtons()) {
-			ui_entities.emplace(entity.second.first, entity.first);
+			ui_entities.emplace(entity.second.entity_id, entity.first);
 		}
 
 		//Iterate through all layers in current scene
@@ -221,7 +221,10 @@ namespace NIKE {
 
 					//Check if entity is a UI entity
 					if (e_data.at("Entity").contains("UI ID")) {
-						NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), std::make_pair(entity, false));
+						UI::UIBtn btn;
+						btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+						btn.b_hovered = false;
+						NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), btn);
 					}
 				}
 			}
