@@ -13,23 +13,25 @@
 
 namespace NIKE {
 	void Health::registerComponents() {
-		//Register transform components
+		// Register transform components
 		NIKE_ECS_MANAGER->registerComponent<Health>();
 
-		//Register transform for serialization
+		// Register transform for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Health>(
-			//Serialize
+			// Serialize
 			[](Health const& comp) -> nlohmann::json {
 				return	{
 						{ "Lives", comp.lives },
 						{ "Health", comp.health },
+						{ "InvulnerableFlag", comp.invulnerableFlag }
 				};
 			},
 
-			//Deserialize
+			// Deserialize
 			[](Health& comp, nlohmann::json const& data) {
 				comp.lives = data.at("Lives").get<int>();
 				comp.health = data.at("Health").get<float>();
+				comp.invulnerableFlag = data.value("InvulnerableFlag", false);
 			}
 		);
 
@@ -44,26 +46,26 @@ namespace NIKE {
 
 					ImGui::DragFloat("Health", &comp.health, 0.1f);
 
-					//Check if begin editing
+					// Check if begin editing
 					if (ImGui::IsItemActivated()) {
 						before_change_health = comp.health;
 					}
 
-					//Check if finished editing
+					// Check if finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
 						LevelEditor::Action change_health;
 
-						//Change do action
+						// Change do action
 						change_health.do_action = [&, health = comp.health]() {
 							comp.health = health;
 							};
 
-						//Change undo action
+						// Change undo action
 						change_health.undo_action = [&, health = before_change_health]() {
 							comp.health = health;
 							};
 
-						//Execute action
+						// Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_health));
 					}
 				}
@@ -74,27 +76,49 @@ namespace NIKE {
 
 					ImGui::DragInt("Lives", &comp.lives, 1, 1);
 
-					//Check if begin editing
+					// Check if begin editing
 					if (ImGui::IsItemActivated()) {
 						before_change_lives = comp.lives;
 					}
 
-					//Check if finished editing
+					// Check if finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
 						LevelEditor::Action change_lives;
 
-						//Change do action
+						// Change do action
 						change_lives.do_action = [&, lives = comp.lives]() {
 							comp.lives = lives;
 							};
 
-						//Change undo action
+						// Change undo action
 						change_lives.undo_action = [&, lives = before_change_lives]() {
 							comp.lives = lives;
 							};
 
-						//Execute action
+						// Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_lives));
+					}
+				}
+
+				// For invulnerable flag
+				{
+					bool prev_flag = comp.invulnerableFlag;
+
+					if (ImGui::Checkbox("Invulnerable", &comp.invulnerableFlag)) {
+						LevelEditor::Action toggle_invulnerability;
+
+						// Change do action
+						toggle_invulnerability.do_action = [&, flag = comp.invulnerableFlag]() {
+							comp.invulnerableFlag = flag;
+							};
+
+						// Change undo action
+						toggle_invulnerability.undo_action = [&, flag = prev_flag]() {
+							comp.invulnerableFlag = flag;
+							};
+
+						// Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(toggle_invulnerability));
 					}
 				}
 			}

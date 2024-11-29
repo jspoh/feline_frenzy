@@ -1,7 +1,23 @@
 {
     "Components": {
+        "Enemy::Attack": {
+            "Cooldown": 10.0,
+            "Function": "enemyBullet",
+            "LastShotTime": 2.1666653156280518,
+            "Layer": 1,
+            "Offset": 150.0,
+            "PrefabPath": "damageBullet.prefab",
+            "Range": 10.0,
+            "ScriptID": "",
+            "ScriptLoaded": false,
+            "ScriptPath": "assets/Scripts/enemyBullet.lua"
+        },
+        "Health::Health": {
+            "Health": 100.0,
+            "Lives": 1
+        },
         "Physics::Collider": {
-            "B_Collided": false,
+            "B_Collided": true,
             "Resolution": 0
         },
         "Render::Texture": {
@@ -26,11 +42,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Top_Middle_256px_V1"
-        },
-        "Shooting::Shooting": {
-            "Cooldown": 10.0,
-            "LastShotTime": 0.0
+            "Texture_ID": "Tree_Orange"
         },
         "Transform::Transform": {
             "Position": {
@@ -39,8 +51,8 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 49.99999237060547,
-                "y": 49.99999237060547
+                "x": 99.99998474121094,
+                "y": 99.99998474121094
             }
         }
     }

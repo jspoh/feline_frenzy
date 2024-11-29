@@ -15,14 +15,15 @@
 
 namespace NIKE {
 	namespace Health {
-		struct Health {
-			int lives;
-			float health;
+        struct Health {
+            int lives;
+            float health;
+            bool invulnerableFlag; // New flag
 
-			Health() : lives(1), health(100.f) {};
-			Health(int const& lives, float const& health)
-				: lives{ lives }, health{ health } {}
-		};
+            Health() : lives(1), health(100.f), invulnerableFlag(false) {};
+            Health(int const& lives, float const& health, bool const& invulnerableFlag = false)
+                : lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {}
+        };
 
 		void registerComponents();
 	}

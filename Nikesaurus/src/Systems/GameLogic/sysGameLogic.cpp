@@ -9,7 +9,6 @@
 #include "Core/stdafx.h"
 #include "Systems/GameLogic/sysGameLogic.h"
 #include "Core/Engine.h"
-//#include "Systems/GameLogic/sysLua.h"
 
 namespace NIKE {
 
@@ -43,9 +42,6 @@ namespace NIKE {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
-		// Get entities marked for deletion
-		auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
-
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
 
@@ -56,9 +52,6 @@ namespace NIKE {
 			//Iterate through all entities
 			for (auto& entity : entities) {
 				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-					// Skip entities marked for deletion
-					//if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
-					//	continue;
 
 					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 						continue;
@@ -84,8 +77,11 @@ namespace NIKE {
 						// Get shooting comp
 						auto& shoot_comp = e_shoot_comp.value().get();
 
-						// Accumulate time since last shot
-						shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						// If shooting is on cooldown
+						if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
+							// Accumulate time since last shot
+							shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						}
 
 						// Create bullet
 						if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
@@ -96,9 +92,9 @@ namespace NIKE {
 								Vector2f shooter_pos = e_transform_comp.value().get().position;
 
 								// !TODO: Set these in cShooting
-								std::string script_path = "assets/Scripts/createBullet.lua";
-								std::string function_name = "createBullet";
-								std::string prefab_path = "damageBullet.prefab";
+								std::string script_path = shoot_comp.script.script_path;
+								std::string function_name = shoot_comp.script.function;
+								std::string prefab_path = shoot_comp.prefab_path;
 
 								// Load Lua Script
 								std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
@@ -110,7 +106,6 @@ namespace NIKE {
 
 								// Execute Lua Script
 								sol::protected_function create_bullet_func = NIKE_LUA_SERVICE->executeScript(script_id, function_name);
-
 
 								// Checking if something went wrong w cpp func
 								if (!create_bullet_func.valid()) {
@@ -139,10 +134,31 @@ namespace NIKE {
 							}
 						}
 					}
+
+					//Check for despawn comp
+					// Currently bugged, please do not use until it is fixed
+					/*
+					auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
+					if (e_despawn_comp.has_value()) {
+						auto& e_despawn = e_despawn_comp.value().get();
+
+						// update current lifetime
+						e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+						NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
+						NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
+
+						// if current lifetime > max lifetime, mark for deletion
+						if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
+							if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+								NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+							}
+						}
+					}
+					*/
 				}
 
 				// Destroy all entities that are marked for deletion
-				//NIKEE_CORE_INFO("GG TO DESTROY MARKED ENTITIES");
 				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}

@@ -50,5 +50,6 @@
     <None Include="assets\Scripts\createBullet.lua" />
     <None Include="src\Core\Config.json" />
     <None Include="assets\Scenes\main_menu.scn" />
+    <None Include="assets\Scripts\enemyBullet.lua" />
   </ItemGroup>
 </Project>

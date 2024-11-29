@@ -50,16 +50,21 @@ namespace NIKE {
             auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(target);
 
             if (attacker_damage_comp && target_health_comp) {
-                auto& target_health = target_health_comp.value().get().health;
+                auto& target_health = target_health_comp.value().get();
                 auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
+                // Check invulnerability flag
+                if (target_health.invulnerableFlag) {
+                    return; // Skip damage
+                }
+
                 // Apply damage
-                target_health -= attacker_damage;
+                target_health.health -= attacker_damage;
                 NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
-                    target, attacker_damage, attacker, target_health);
+                    target, attacker_damage, attacker, target_health.health);
 
                 // Check if target health drops to zero or below
-                if (target_health <= 0) {
+                if (target_health.health <= 0) {
                     NIKE_ECS_MANAGER->markEntityForDeletion(target);
                     NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
                 }
