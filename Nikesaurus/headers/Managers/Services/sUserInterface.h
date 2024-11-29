@@ -125,6 +125,9 @@ namespace NIKE {
 			//Check if entity is UI
 			bool checkEntity(Entity::Type entity) const;
 
+			//Check if UI ID has been registered
+			bool checkUIEntity(std::string const& btn_id);
+
 			//Set button script
 			void setButtonScript(std::string const& btn_id, Lua::Script const& script);
 

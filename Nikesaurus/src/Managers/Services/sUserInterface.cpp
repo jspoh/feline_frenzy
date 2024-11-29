@@ -152,7 +152,6 @@ namespace NIKE {
 			}
 
 			auto getVertices = []() {
-
 				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model")->vertices;
 
 				std::vector<Vector2f> vert;
@@ -160,8 +159,9 @@ namespace NIKE {
 					vert.push_back(v.pos);
 				}
 				return vert;
-			};
+				};
 
+			vert = getVertices();
 			for (auto& point : vert) {
 				point.x *= e_transform.scale.x;
 				point.y *= e_transform.scale.y;
@@ -312,6 +312,10 @@ namespace NIKE {
 		return false;
 	}
 
+	bool UI::Service::checkUIEntity(std::string const& btn_id) {
+		return ui_entities.find(btn_id) != ui_entities.end();
+	}
+
 	void UI::Service::setButtonScript(std::string const& btn_id, Lua::Script const& script) {
 		auto it = ui_entities.find(btn_id);
 		if (it == ui_entities.end()) {
@@ -403,8 +407,6 @@ namespace NIKE {
 			//Clamp scale
 			e_text.scale = std::clamp(e_text.scale, EPSILON, 10.0f);
 
-			static bool play = true;
-
 			//Check if button is hovered
 			if (buttonHovered(entity.second.entity_id)) {
 				entity.second.b_hovered = true;
@@ -417,11 +419,6 @@ namespace NIKE {
 
 				//Hover
 				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
-				if (play)
-				{
-					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f, 0, false);
-					play = false;
-				}
 
 				//Execute script for trigger
 				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
@@ -434,7 +431,6 @@ namespace NIKE {
 					e_transform.scale = hover_container[entity.first].first.scale;
 					hover_container[entity.first].second = false;
 				}
-				play = true;
 			}
 		}
 	}
