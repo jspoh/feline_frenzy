@@ -247,6 +247,8 @@ namespace NIKE {
 			//Accumulated time ( Fixed DT )
 			double accumulated_time;
 
+			bool window_is_focused{ true };
+
 		public:
 			//Default constructor
 			Service() : ptr_window{ nullptr }, delta_time{ 0.0f }, target_fps{ 60 }, 
@@ -282,6 +284,10 @@ namespace NIKE {
 
 			//Get interpolation factor
 			float getInterpolationFactor() const;
+
+			bool getWindowFocus() const;
+
+			void setWindowFocus(bool focus);
 
 			//Calculate Delta Time
 			void calculateDeltaTime();

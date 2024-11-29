@@ -366,7 +366,9 @@ namespace NIKE {
 		static bool is_fullscreen;
 
 		if (event->focused) {
-			glfwRestoreWindow(ptr_window);
+			NIKE_WINDOWS_SERVICE->setWindowFocus(true);
+
+			//glfwRestoreWindow(ptr_window);
 
 			if (is_fullscreen) {
 				setFullScreen(true);
@@ -383,10 +385,15 @@ namespace NIKE {
 			NIKE_AUDIO_SERVICE->resumeAllChannels();
 		}
 		else {
+			// lost focus
+			NIKE_WINDOWS_SERVICE->setWindowFocus(false);
+
 			GLFWmonitor* monitor = glfwGetWindowMonitor(ptr_window);
 			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
 
 			NIKE_AUDIO_SERVICE->pauseAllChannels();
+
+			//glfwIconifyWindow(ptr_window);
 		}
 
 		err = glGetError();
@@ -473,5 +480,13 @@ namespace NIKE {
 			accumulated_time -= (static_cast<double>(1) / target_fps);
 			curr_num_steps++;
 		}
+	}
+
+	bool Windows::Service::getWindowFocus() const {
+		return window_is_focused;
+	}
+
+	void Windows::Service::setWindowFocus(bool focus) {
+		window_is_focused = focus;
 	}
 }
