@@ -15,7 +15,7 @@
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
 #include "Components/cEnemy.h"
-#include "Managers/Services/sLua.h"
+#include "Managers/Services/Lua/sLua.h"
 
 namespace NIKE {
 	namespace Enemy {

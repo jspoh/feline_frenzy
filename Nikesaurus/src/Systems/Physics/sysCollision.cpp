@@ -373,8 +373,6 @@ namespace NIKE {
         }
 
         // Bounce Resolution
-        if (collider_a.is_trigger || collider_b.is_trigger) return;
-
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             bounceResolution(transform_a, dynamics_b, collider_a, transform_b, dynamics_a, collider_b, info);
             return;
