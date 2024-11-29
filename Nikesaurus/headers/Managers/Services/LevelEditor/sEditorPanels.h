@@ -26,6 +26,7 @@ namespace NIKE {
 		class GameWindowPanel;
 		class TileMapPanel;
 		class ComponentsPanel;
+		class PrefabsPanel;
 
 		//Panel Interface
 		class IPanel {
@@ -174,8 +175,20 @@ namespace NIKE {
 			EditorEntity(bool b_locked) : b_locked{ b_locked }{}
 		};
 
+		//Set entity ref event
+		struct SetEntityRef : public Events::IEvent {
+			Entity::Type entity;
+			std::string ref;
+
+			SetEntityRef(Entity::Type entity, std::string const& ref) :entity{ entity }, ref{ ref }{}
+		};
+
 		//Entities Management Panel
-		class EntitiesPanel : public IPanel, public Events::IEventListener<Coordinator::EntitiesChanged> {
+		class EntitiesPanel :
+			public IPanel,
+			public Events::IEventListener<Coordinator::EntitiesChanged>,
+			public Events::IEventListener<SetEntityRef>
+		{
 		private:
 			//Sort entities
 			struct EntitySorter{
@@ -190,6 +203,9 @@ namespace NIKE {
 			//BI-Mapping of entity type to string * vice versa
 			std::unordered_map<Entity::Type, std::string> entity_to_name;
 			std::unordered_map<std::string, Entity::Type> name_to_entity;
+
+			// Track entities created for prefab editing.
+			std::set<Entity::Type> prefab_entities; 
 
 			//Selected entity
 			Entity::Type selected_entity;
@@ -220,6 +236,9 @@ namespace NIKE {
 
 			//On entities changed event
 			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
+
+			//On setting of entity ref
+			void onEvent(std::shared_ptr<SetEntityRef> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -245,6 +264,11 @@ namespace NIKE {
 
 			//Get entity name
 			std::string getEntityName(Entity::Type entity);
+
+			// For prefab entity handling
+			void addPrefabEntity(Entity::Type entity);
+
+			void removePrefabEntity(Entity::Type entity);
 
 			//Get selected entity
 			Entity::Type getSelectedEntity() const;
@@ -320,6 +344,9 @@ namespace NIKE {
 			//Reference to main panel
 			std::weak_ptr<MainPanel> main_panel;
 
+			//Reference to p[refab panel
+			std::weak_ptr<PrefabsPanel> prefab_panel;
+
 			//Reference to tilemap panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
@@ -334,17 +361,11 @@ namespace NIKE {
 
 			std::string comp_string_ref;
 
-			//Add Components popup
-			std::function<void()> addComponentPopUp(std::string const& popup_id);
-
 			//Save Prefab popup
 			std::function<void()> createPrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
-
-			//Remove Component confirmation popup
-			std::function<void()> removeComponentPopUp(std::string const& popup_id);
 
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
@@ -372,11 +393,19 @@ namespace NIKE {
 				return "Components Management";
 			}
 
+			//Add Components popup
+			std::function<void()> addComponentPopUp(std::string const& popup_id);
+
+			//Remove Component confirmation popup
+			std::function<void()> removeComponentPopUp(std::string const& popup_id);
+
 			//Init
 			void init() override;
 
 			//Update
 			void update() override;
+
+			void setCompStringRef(std::string const& to_set);
 
 			//Render
 			void render() override;
@@ -435,18 +464,30 @@ namespace NIKE {
 
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
+
+			// Reference to entities panel
+			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			// Boolean for checking if entity is created from prefab
+			bool b_is_prefab_entity;
+
+
+			// Msg for pop up
+			std::shared_ptr<std::string> msg;
+			std::shared_ptr<std::string> clear_msg;
+
 		public:
 			PrefabsPanel() = default;
 			~PrefabsPanel() = default;
 
 			//Panel Name
 			std::string getName() const override {
-				return "Prefab Management";
+				return "Prefab Editor";
 			}
 
 			//Static panel name
 			static std::string getStaticName() {
-				return "Prefab Management";
+				return "Prefab Editor";
 			}
 
 			//Init
@@ -463,6 +504,10 @@ namespace NIKE {
 
 			// For component stuff
 			void renderPrefabComponents();
+
+			std::optional<Entity::Type> getTempPrefabEntity() const;
+
+			void applyPrefabToEntity(Entity::Type prefab, Entity::Type new_entity);
 
 			// Utility functions for managing prefab entity
 			void createTempPrefabEntity(const std::string& file_path);
@@ -667,8 +712,8 @@ namespace NIKE {
 			//Create button popup
 			std::function<void()> createButtonPopup(std::string const& popup_id);
 
-			//Delete button popup
-			std::function<void()> deleteButtonPopup(std::string const& popup_id);
+			//Weak reference to entity panel
+			std::weak_ptr<EntitiesPanel> entities_panel;
 		public:
 			UIPanel() = default;
 			~UIPanel() = default;
@@ -872,8 +917,6 @@ namespace NIKE {
 			//Render
 			void render() override;
 		};
-
-
 	}
 }
 

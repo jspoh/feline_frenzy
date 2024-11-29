@@ -295,7 +295,7 @@ namespace NIKE {
 		}
 		else if (ext == ".wav") {
 			auto filepath = path.string();
-			std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](unsigned char c) { return std::tolower(c); });
+			std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](char c) { return static_cast<char>(std::tolower(static_cast<unsigned char>(c))); });
 
 			if (filepath.find("assets\\audios\\music") != std::string::npos) {
 				return Assets::Types::Music;

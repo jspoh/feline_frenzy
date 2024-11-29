@@ -558,15 +558,15 @@ namespace NIKE {
 	* Playlist Management
 	*********************************************************************/
 
-	void Audio::Service::createChannelPlaylist(std::string channel_id) {
+	void Audio::Service::createChannelPlaylist(const std::string& channel_id) {
 		if (channel_playlists.find(channel_id) != channel_playlists.end()) {
 			NIKEE_CORE_ERROR("Error: Channel Playlist already exists! Skipping.");
 			return;
 		}
-		channel_playlists.emplace(channel_id, std::queue<std::string>());
+		channel_playlists[channel_id] = Playlist{ {}, false};
 	}
 
-	std::queue<std::string>& Audio::Service::getChannelPlaylist(std::string channel_id) {
+	const Audio::Service::Playlist& Audio::Service::getChannelPlaylist(const std::string& channel_id) {
 		// Find channel's playlist
 		auto it = channel_playlists.find(channel_id);
 		if (it == channel_playlists.end()) {
@@ -575,13 +575,49 @@ namespace NIKE {
 		return it->second;
 	}
 
-	void Audio::Service::queueAudioToPlaylist(std::string channel_id, std::string audio_id) {
+	void Audio::Service::queueAudioToPlaylist(const std::string& channel_id, const std::string& audio_id) {
 		auto it = channel_playlists.find(channel_id);
 		if (it == channel_playlists.end()) {
 			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
 			return;
 		}
-		it->second.push(audio_id);
+		it->second.tracks.push_back(audio_id);
+	}
+
+	void Audio::Service::popAudioFromPlaylist(const std::string& channel_id) {
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
+			return;
+		}
+		it->second.tracks.pop_front();
+	}
+
+	void Audio::Service::setPlaylistLoop(const std::string& channel_id, bool loop) {
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
+			return;
+		}
+		it->second.loop = loop;
+	}
+
+	bool Audio::Service::isPlaylistLooping(const std::string& channel_id) const{
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
+			return false;
+		}
+		return it->second.loop;
+	}
+
+	void Audio::Service::clearPlaylist(const std::string& channel_id) {
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
+			return;
+		}
+		it->second.tracks.clear();
 	}
 
 	void Audio::Service::update() {

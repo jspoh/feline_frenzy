@@ -393,8 +393,14 @@ namespace NIKE {
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 
+			// Playlist Management
+			struct Playlist {
+				std::deque<std::string> tracks;
+				bool loop = false;
+			};
+
 			//Queue for each channel's playlist
-			std::unordered_map<std::string , std::queue<std::string>> channel_playlists;
+			std::unordered_map<std::string , Playlist> channel_playlists;
 
 		public:
 
@@ -456,16 +462,25 @@ namespace NIKE {
 			* Playlist Management
 			*********************************************************************/
 			// Create channel playlist and add to map
-			void createChannelPlaylist(std::string audio_id);
+			void createChannelPlaylist(const std::string& audio_id);
 
 			// Get individual channel's playlist
-			std::queue<std::string>& getChannelPlaylist(std::string audio_id);
+			const Playlist& getChannelPlaylist(const std::string& audio_id);
 
 			// Queue audio to playlist
-			void queueAudioToPlaylist(std::string channel_id, std::string audio_id);
+			void queueAudioToPlaylist(const std::string& channel_id, const std::string& audio_id);
 
-			// Loop map
-			std::unordered_map<std::string, bool> channel_playlists_loop;
+			// Pop audio from playlist
+			void popAudioFromPlaylist(const std::string& channel_id);
+
+			// Enable or disable looping for a playlist
+			void setPlaylistLoop(const std::string& channel_id, bool loop);
+
+			// Check if a playlist is looping
+			bool isPlaylistLooping(const std::string& channel_id) const;
+
+			// Clear playlist
+			void clearPlaylist(const std::string& channel_id);
 
 
 			//Update Loop

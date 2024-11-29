@@ -677,11 +677,24 @@ namespace NIKE {
 		updateEntities(event->entities);
 	}
 
+	void LevelEditor::EntitiesPanel::onEvent(std::shared_ptr<SetEntityRef> event) {
+		event->setEventProcessed(true);
+		auto name_it = name_to_entity.find(event->ref);
+		if (name_it != name_to_entity.end()) {
+			NIKEE_CORE_WARN("Duplicate entity refs being instantiated. Current ref discarded.");
+			return;
+		}
+
+		name_to_entity[event->ref] = event->entity;
+		entity_to_name[event->entity] = event->ref;
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Setup events listening
 		std::shared_ptr<LevelEditor::EntitiesPanel> entitiespanel_wrapped(this, [](LevelEditor::EntitiesPanel*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(entitiespanel_wrapped);
+		NIKE_EVENTS_SERVICE->addEventListeners<SetEntityRef>(entitiespanel_wrapped);
 
 		//Register popups
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
@@ -814,6 +827,11 @@ namespace NIKE {
 			//Iterate through all entities to showcase active entities
 			for (auto& entity : entities) {
 
+				// Skip prefab entites
+				if (prefab_entities.find(entity.first) != prefab_entities.end()) {
+					continue;
+				}
+
 				//Check if entity is selected
 				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity.first).c_str() == entity_to_name.at(selected_entity).c_str();
 
@@ -893,6 +911,16 @@ namespace NIKE {
 		return it->second;
 	}
 
+	void LevelEditor::EntitiesPanel::addPrefabEntity(Entity::Type entity)
+	{
+		prefab_entities.insert(entity);
+	}
+
+	void LevelEditor::EntitiesPanel::removePrefabEntity(Entity::Type entity)
+	{
+		prefab_entities.erase(entity);
+	}
+
 	Entity::Type LevelEditor::EntitiesPanel::getSelectedEntity() const {
 		return selected_entity;
 	}
@@ -959,6 +987,11 @@ namespace NIKE {
 		//Add new entities from the ECS that are not yet in the editor
 		for (auto& entity : ecs_entities) {
 			if (entities.find(entity) == entities.end()) {
+
+				// Skip prefab entities
+				if (prefab_entities.find(entity) != prefab_entities.end()) {
+					continue;
+				}
 
 				//Create identifier for entity
 				char entity_name[32];
@@ -1416,11 +1449,16 @@ namespace NIKE {
 			//Add spacing before components
 			ImGui::Spacing();
 
+			// Either prefab entity or the normal pool of entities
+			auto prefab_entity = prefab_panel.lock()->getTempPrefabEntity();
+			Entity::Type selected_entity = entities_panel.lock()->getSelectedEntity();
+			Entity::Type target_entity = prefab_entity.has_value() ? prefab_entity.value() : selected_entity;
+
 			//Iterate over all registered components
 			for (const auto& component : comps) {
 
 				//Check if component already exists
-				if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second))
+				if (NIKE_ECS_MANAGER->checkEntityComponent(target_entity, component.second))
 					continue;
 
 				//Display each component as a button
@@ -1440,7 +1478,7 @@ namespace NIKE {
 					//add_comp.do_action = [=]() {
 
 						//Add default comp to entity
-					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
+					NIKE_ECS_MANAGER->addDefEntityComponent(target_entity, component.second);
 					//	};
 
 					//Execute add component action
@@ -1590,6 +1628,8 @@ namespace NIKE {
 			//Add spacing
 			ImGui::Spacing();
 
+
+
 			//Click set to set layer
 			if (ImGui::Button("Ok")) {
 
@@ -1597,12 +1637,15 @@ namespace NIKE {
 
 				//Values to copy
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
+				// Either prefab entity or the normal pool of entities
+				auto prefab_entity = prefab_panel.lock()->getTempPrefabEntity();
 				Entity::Type entity_copy = entities_panel.lock()->getSelectedEntity();
-				auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
+				Entity::Type target_entity = prefab_entity.has_value() ? prefab_entity.value() : entity_copy;
+				auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(target_entity, comp_type_copy);
 
 				//Do Action
 				//remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
-				NIKE_ECS_MANAGER->removeEntityComponent(entity_copy, comp_type_copy);
+				NIKE_ECS_MANAGER->removeEntityComponent(target_entity, comp_type_copy);
 				//	};
 
 				//Undo Action
@@ -1643,6 +1686,9 @@ namespace NIKE {
 		//Tilemap panel reference
 		tilemap_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
 
+		//Prefab panel reference
+		prefab_panel = std::dynamic_pointer_cast<PrefabsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(PrefabsPanel::getStaticName()));
+
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
@@ -1669,6 +1715,11 @@ namespace NIKE {
 				}
 				});
 		}
+	}
+
+	void LevelEditor::ComponentsPanel::setCompStringRef(std::string const& to_set)
+	{
+		comp_string_ref = to_set;
 	}
 
 	void LevelEditor::ComponentsPanel::render() {
@@ -2297,10 +2348,10 @@ namespace NIKE {
 				float pitch = channel.second->getPitch();
 
 				ImGui::Text("Adjust Volume & Pitch");
-				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
+				if (ImGui::SliderFloat(std::string("Volume##" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
 					channel.second->setVolume(volume);
 				}
-				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
+				if (ImGui::SliderFloat(std::string("Pitch##" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
 					channel.second->setPitch(pitch);
 				}
 
@@ -2310,6 +2361,13 @@ namespace NIKE {
 				if (ImGui::Button(channel.second->getPaused() ? std::string("Unpause Channel##" + channel.first).c_str() : std::string("Pause Channel##" + channel.first).c_str() )) {
 					channel.second->setPaused(!channel.second->getPaused());
 				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(std::string("Stop Audio In Channel##" + channel.first).c_str())) {
+					channel.second->stop();
+				}
+
 
 				ImGui::Spacing();
 
@@ -2330,12 +2388,12 @@ namespace NIKE {
 				}
 				bool& open_playlist = open_playlists[channel.first];
 
+				ImGui::Checkbox(std::string("Open Playlist##" + channel.first).c_str(), &open_playlists[channel.first]);
 
-				ImGui::Checkbox(std::string("Open Playlist##CHECKBOXPLAYLIST_" + channel.first).c_str(), &open_playlists[channel.first]);
 				ImGui::Spacing();
 
 				if (open_playlist) {
-					auto & loop_playlists = NIKE_AUDIO_SERVICE->channel_playlists_loop;
+					bool loop_playlist = NIKE_AUDIO_SERVICE->isPlaylistLooping(channel.first);
 					// Get channel audio id and index from map
 					if (channel_audio_ids.find(channel.first) == channel_audio_ids.end()) {
 						channel_audio_ids[channel.first] = "";
@@ -2343,15 +2401,10 @@ namespace NIKE {
 					if (channel_indices.find(channel.first) == channel_indices.end()) {
 						channel_indices[channel.first] = -1;
 					}
-					if (loop_playlists.find(channel.first) == loop_playlists.end()) {
-						loop_playlists[channel.first] = false;
-					}
 
 					std::string& current_audio_id = channel_audio_ids[channel.first];
 					int& current_index = channel_indices[channel.first];
 
-
-					ImGui::Checkbox(std::string("Loop Playlist##CHECKBOXLOOPPLAYLIST_" + channel.first).c_str(), &loop_playlists[channel.first]);
 					ImGui::Spacing();
 
 					if (current_index == -1) {
@@ -2387,15 +2440,30 @@ namespace NIKE {
 
 					ImGui::Spacing();
 
-					std::queue<std::string> display_queue = NIKE_AUDIO_SERVICE->getChannelPlaylist(channel.first);
+
+					if (ImGui::Button((std::string("Clear Playlist##" + channel.first).c_str()))) {
+						NIKE_AUDIO_SERVICE->clearPlaylist(channel.first);
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Checkbox(std::string("Loop Playlist##" + channel.first).c_str(), &loop_playlist)) {
+						NIKE_AUDIO_SERVICE->setPlaylistLoop(channel.first, loop_playlist);
+					}
+
+					const auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channel.first);
+
+
+					ImGui::Spacing();
 
 					ImGui::Text(std::string(channel.first + " Playlist:").c_str());
-					if (display_queue.empty()) {
+					if (playlist.tracks.empty()) {
 						ImGui::BulletText("No audio queued");
 					}
-					while (!display_queue.empty()) {
-						ImGui::BulletText("%s", display_queue.front().c_str()); // Display the current track
-						display_queue.pop(); // Remove it from the temporary queue
+					else {
+						for (const auto& track : playlist.tracks) {
+							ImGui::BulletText("%s", track.c_str());
+						}
 					}
 
 					ImGui::Spacing();
@@ -2416,6 +2484,18 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::init() {
 		//Components panel reference
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
+
+		// Editor entities panel ref
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+
+		registerPopUp("Add Component", comps_panel.lock()->addComponentPopUp("Add Component"));
+		registerPopUp("Remove Component", comps_panel.lock()->removeComponentPopUp("Remove Component"));
+
+		// Default pop up for saving prefab
+		msg = std::make_shared<std::string>("Prefab Saved!");
+		registerPopUp("Success", defPopUp("Success", msg));
+		clear_msg = std::make_shared<std::string>("Prefab cleared!");
+		registerPopUp("Clear", defPopUp("Clear", clear_msg));
 	}
 
 	void LevelEditor::PrefabsPanel::update() {
@@ -2431,21 +2511,31 @@ namespace NIKE {
 		// Display prefab details
 		ImGui::Text("Loaded Prefab: %s", prefab_temp_entity.file_path.c_str());
 
-		// Show components attached to the prefab entity
-		renderPrefabComponents();
+		if (!prefab_temp_entity.file_path.empty())
+		{
+			// Add a button to save changes to the prefab file
+			if (ImGui::Button("Save Prefab")) {
+				std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_temp_entity.file_path);
+				NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_full_path.string());
+				openPopUp("Success");
+			}
 
-		// Add a button to save changes to the prefab file
-		if (ImGui::Button("Save Prefab")) {
-			NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_temp_entity.file_path);
+			// Add a button to clear the current prefab
+			ImGui::SameLine();
+			if (ImGui::Button("Clear Prefab")) {
+				clearTempPrefabEntity();
+				openPopUp("Clear");
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Add Component")) {
+				openPopUp("Add Component");
+			}
+
+			// Show components attached to the prefab entity
+			renderPrefabComponents();
+
 		}
-
-		// Add a button to clear the current prefab
-		ImGui::SameLine();
-		if (ImGui::Button("Clear Prefab")) {
-			clearTempPrefabEntity();
-		}
-
-
 
 		renderPopUps();
 
@@ -2455,7 +2545,6 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::prefabAcceptPayload()
 	{
 		if (ImGui::BeginDragDropTarget()) {
-			//Scene file payload
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Prefab_FILE")) {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
@@ -2478,21 +2567,30 @@ namespace NIKE {
 				// Use the component's UI rendering logic
 				comps_panel.lock()->getCompsUI().at(comp.first)(*comps_panel.lock(), comp.second.get());
 
+				// For removing component purpose
+				comps_panel.lock()->setCompStringRef(comp.first);
+
 				// Add a button to remove the component
-				if (ImGui::Button(std::string("RemovePrefabComponent##" + comp.first).c_str())) {
-					comps_panel.lock()->openPopUp("Remove Component");
+				if (ImGui::Button(std::string("Remove Prefab Component##" + comp.first).c_str())) {
+					openPopUp("Remove Component");
 				}
 			}
 		}
 	}
 
+	std::optional<Entity::Type> LevelEditor::PrefabsPanel::getTempPrefabEntity() const
+	{
+		if (b_is_prefab_entity) {
+			return prefab_temp_entity.entity;
+		}
+		return std::nullopt;
+
+	}
+
 	void LevelEditor::PrefabsPanel::createTempPrefabEntity(const std::string& file_path)
 	{
 		// Clear any existing prefab
-		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
-		{
-			// clearTempPrefabEntity();
-		}
+		clearTempPrefabEntity();
 
 		// Create a temporary entity (excluded from systems)
 		Entity::Type temp_entity = NIKE_ECS_MANAGER->createEntity();
@@ -2500,16 +2598,45 @@ namespace NIKE {
 		std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(file_path);
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, prefab_full_path.string());
 
+		cout << "Loading prefab from: " << prefab_full_path << endl;
+
 		// Store the prefab information
 		prefab_temp_entity = { file_path, temp_entity };
+
+		// Notify entities panel to exclude this entity
+		entities_panel.lock()->addPrefabEntity(temp_entity);
+
+		b_is_prefab_entity = true;
 	}
+
+	void LevelEditor::PrefabsPanel::applyPrefabToEntity(Entity::Type prefab, Entity::Type new_entity) {
+		// Get all components from the prefab entity
+		auto components = NIKE_ECS_MANAGER->getAllEntityComponents(prefab);
+
+		// Add each component to the new entity
+		for (const auto& [comp_name, comp_data] : components) {
+			auto comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+			// Add the component to the new entity
+			NIKE_ECS_MANAGER->addDefEntityComponent(new_entity, comp_type);
+
+			// Set the component data
+			NIKE_ECS_MANAGER->setEntityComponent(new_entity, comp_type, comp_data);
+		}
+	}
+
 
 	void LevelEditor::PrefabsPanel::clearTempPrefabEntity()
 	{
-		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
-		{
+		if (prefab_temp_entity.entity != Entity::MAX && NIKE_ECS_MANAGER->checkEntity(prefab_temp_entity.entity)) {
 			NIKE_ECS_MANAGER->destroyEntity(prefab_temp_entity.entity);
+
+			// Notify entity panel to stop excluding this entity
+			entities_panel.lock()->removePrefabEntity(prefab_temp_entity.entity);
+
 			prefab_temp_entity = { "", 0 };
+
+			b_is_prefab_entity = false;
 		}
 
 	}
@@ -2625,7 +2752,7 @@ namespace NIKE {
 		for (const auto& dir : directories) {
 
 			//Skip dir not matching searching filter
-			if (dir == NIKE_PATH_SERVICE->resolvePath("Game_Assets:/") || dir.string().find(search_filter) == dir.string().npos) {
+			if (dir == NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/") || dir.string().find(search_filter) == dir.string().npos) {
 				continue;
 			}
 
@@ -3508,6 +3635,8 @@ namespace NIKE {
 					btn_id.resize(strlen(btn_id.c_str()));
 				}
 			}
+			
+			ImGui::Separator();
 
 			//Button Text
 			static Render::Text btn_text;
@@ -3533,8 +3662,10 @@ namespace NIKE {
 
 				//Adjust btn color
 				ImGui::Text("Button Text Color: ");
-				ImGui::ColorPicker4("##BtnTextColor", &btn_text.color.x, ImGuiColorEditFlags_AlphaBar);
+				ImGui::ColorEdit4("##BtnTextColor", &btn_text.color.x, ImGuiColorEditFlags_AlphaBar);
 			}
+
+			ImGui::Separator();
 
 			//Static btn transform
 			static Transform::Transform btn_transform;
@@ -3560,6 +3691,8 @@ namespace NIKE {
 					ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
 				}
 			}
+
+			ImGui::Separator();
 
 			static int texture_index = -1;
 			static int model_index = -1;
@@ -3604,7 +3737,7 @@ namespace NIKE {
 
 					//Adjust btn color
 					ImGui::Text("Button Color: ");
-					ImGui::ColorPicker4("##BtnColor", &btn_color.x, ImGuiColorEditFlags_AlphaBar);
+					ImGui::ColorEdit4("##BtnColor", &btn_color.x, ImGuiColorEditFlags_AlphaBar);
 				}
 			}
 
@@ -3621,11 +3754,13 @@ namespace NIKE {
 				//Create button based on mode
 				if (b_model) {
 					//Create button
-					NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Shape(render_ref, btn_color));
+					auto entity = NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Shape(render_ref, btn_color));
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SetEntityRef>(entity, btn_id));
 				}
 				else {
 					//Create button
-					NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Texture(render_ref, btn_color, false, 0.5f, true));
+					auto entity = NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Texture(render_ref, btn_color, false, 0.5f, true));
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<SetEntityRef>(entity, btn_id));
 				}
 
 				//Reset btn id
@@ -3675,31 +3810,6 @@ namespace NIKE {
 				render_ref = "";
 				b_model = true;
 				btn_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-				//Close popup
-				closePopUp(popup_id);
-			}
-			};
-	}
-
-	std::function<void()> LevelEditor::UIPanel::deleteButtonPopup(std::string const& popup_id) {
-		return [this, popup_id]() {
-
-			//Add spacing
-			ImGui::Spacing();
-
-			//Display each component as a button
-			if (ImGui::Button("Delete")) {
-
-				//Close popup
-				closePopUp(popup_id);
-			}
-
-			//Same line
-			ImGui::SameLine();
-
-			//Cancel createing new btn
-			if (ImGui::Button("Cancel")) {
 
 				//Close popup
 				closePopUp(popup_id);
@@ -3709,7 +3819,8 @@ namespace NIKE {
 
 	void LevelEditor::UIPanel::init() {
 		registerPopUp("Create Button", createButtonPopup("Create Button"));
-		registerPopUp("Delete Button", deleteButtonPopup("Delete Button"));
+
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 	}
 
 	void LevelEditor::UIPanel::update() {
@@ -3743,6 +3854,17 @@ namespace NIKE {
 
 			//Collapsing button
 			if (ImGui::CollapsingHeader(std::string("Button: " + button.first).c_str(), ImGuiTreeNodeFlags_None)) {
+
+				//Set trigger state
+				{
+					//Select Input State
+					static int trigger_index = 0;
+					trigger_index = static_cast<int>(button.second.input_state);
+					ImGui::Text("Button Input State: ");
+					if (ImGui::Combo("##BtnInputState", &trigger_index, "Pressed\0Triggered\0Released\0")) {
+						button.second.input_state = static_cast<UI::InputStates>(trigger_index);
+					}
+				}
 
 				//Select script
 				{
@@ -3794,6 +3916,125 @@ namespace NIKE {
 							// Validate the selected index and get the new font ID
 							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
 								button.second.script.function = funcs[script_func_index];
+							}
+						}
+					}
+				}
+
+				//Set variadic arguements
+				{
+					//Get arguments
+					auto& args = button.second.script.named_args;
+
+					//Display all arguments
+					ImGui::Text("Arguments:");
+					if (args.empty()) {
+						ImGui::Text("No arguments.");
+					}
+					for (auto it = args.begin(); it != args.end(); ++it) {
+						const auto& key = it->first;
+						const auto& value = it->second;
+
+						//Display arguments
+						if (ImGui::CollapsingHeader(std::string("Key: " + key).c_str(), ImGuiTreeNodeFlags_Bullet)) {
+
+							//Display value based on its type
+							std::visit(
+								[&](auto&& arg) {
+									using T = std::decay_t<decltype(arg)>;
+									if constexpr (std::is_same_v<T, int>) {
+										ImGui::Text("Value (int): %d", arg);
+									}
+									else if constexpr (std::is_same_v<T, float>) {
+										ImGui::Text("Value (float): %.2f", arg);
+									}
+									else if constexpr (std::is_same_v<T, std::string>) {
+										ImGui::Text("Value (string): %s", arg.c_str());
+									}
+									else if constexpr (std::is_same_v<T, bool>) {
+										ImGui::Text("Value (bool): %s", arg ? "true" : "false");
+									}
+								},
+								value
+							);
+
+							//Remove argument button
+							if (ImGui::Button("Remove Argument")) {
+								it = args.erase(it);
+								break;
+							}
+						}
+					}
+
+					//Seperator
+					ImGui::Separator();
+
+					//Static variables
+					static int val_type_index = 0;
+					static std::string named_key = "";
+					static std::string str_val = "";
+					static int int_val = 0;
+					static float float_val = 0.0f;
+					static bool bool_val = false;
+
+					//Set arguments
+					if (ImGui::InputText("Input Key", named_key.data(), named_key.capacity() + 1)) {
+						named_key.resize(strlen(named_key.c_str()));
+					}
+
+					//Select value type
+					ImGui::Combo("Value Type", &val_type_index, "Int\0Float\0String\0Bool\0");
+
+					//Take in input based on selected combo
+					switch (val_type_index) {
+					case 0: {
+						ImGui::InputInt("Value (int)", &int_val);
+						break;
+					}
+					case 1: {
+						ImGui::InputFloat("Value (float)", &float_val);
+						break;
+					}
+					case 2: {
+						if (ImGui::InputText("Value (string)", str_val.data(), str_val.capacity() + 1)) {
+							str_val.resize(strlen(str_val.c_str()));
+						}
+						break;
+					}
+					case 3: {
+						ImGui::Checkbox("Value (bool)", &bool_val);
+						break;
+					}
+					default: {
+						break;
+					}
+					}
+
+					//Add argument button
+					if (ImGui::Button("Add Argument")) {
+
+						//Check if named key is correct
+						if (!named_key.empty() && args.find(named_key) == args.end()) {
+							switch (val_type_index) {
+							case 0: {
+								args[named_key] = int_val;
+								break;
+							}
+							case 1: {
+								args[named_key] = float_val;
+								break;
+							}
+							case 2: {
+								args[named_key] = str_val;
+								break;
+							}
+							case 3: {
+								args[named_key] = bool_val;
+								break;
+							}
+							default: {
+								break;
+							}
 							}
 						}
 					}
@@ -4642,7 +4883,7 @@ namespace NIKE {
 				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 				//Default place holder text
-				std::string place_holder{ "Hello World! Ah Pan Tat!" };
+				std::string place_holder{ "New text" };
 
 				//Create entity
 				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
