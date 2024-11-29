@@ -120,5 +120,15 @@
     <None Include="headers\Math\Vector2\Vector2.inl" />
     <None Include="headers\Math\Vector3\Vector3.inl" />
     <None Include="headers\Math\Vector4\Vector4.inl" />
+    <None Include="assets\Shaders\base.frag" />
+    <None Include="assets\Shaders\base.vert" />
+    <None Include="assets\Shaders\batched_base.frag" />
+    <None Include="assets\Shaders\batched_base.vert" />
+    <None Include="assets\Shaders\batched_texture.frag" />
+    <None Include="assets\Shaders\batched_texture.vert" />
+    <None Include="assets\Shaders\text.frag" />
+    <None Include="assets\Shaders\text.vert" />
+    <None Include="assets\Shaders\texture.frag" />
+    <None Include="assets\Shaders\texture.vert" />
   </ItemGroup>
 </Project>
