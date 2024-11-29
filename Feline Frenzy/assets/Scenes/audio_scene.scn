@@ -7,14 +7,13 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "click-sound",
+                                "Audio_ID": "Laser1.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "MASTER",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             }
                         },
-                        "Entity Name": "click_sound_audio",
                         "Layer ID": 0
                     }
                 },
@@ -22,14 +21,13 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "begin",
+                                "Audio_ID": "Pop1.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "MASTER",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             }
                         },
-                        "Entity Name": "begin_audio",
                         "Layer ID": 0
                     }
                 },
@@ -37,14 +35,13 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "no-ammo",
+                                "Audio_ID": "BuildSuccess.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "MASTER",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             }
                         },
-                        "Entity Name": "no_ammo_audio",
                         "Layer ID": 0
                     }
                 }

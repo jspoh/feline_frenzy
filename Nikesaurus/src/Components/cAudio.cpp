@@ -198,7 +198,7 @@ namespace NIKE {
 						static bool pitch_changed = false;
 
 						//Set pitch
-						if (ImGui::SliderFloat("Pitch", &comp.pitch, 0.f, 1.f, "%.2f")) {
+						if (ImGui::SliderFloat("Pitch", &comp.pitch, 0.5f, 2.f, "%.2f")) {
 							pitch_changed = true;
 						}
 

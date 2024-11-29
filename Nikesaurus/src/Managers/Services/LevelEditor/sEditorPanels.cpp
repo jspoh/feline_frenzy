@@ -2289,10 +2289,10 @@ namespace NIKE {
 				float pitch = channel.second->getPitch();
 
 				ImGui::Text("Adjust Volume & Pitch");
-				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f)) {
+				if (ImGui::SliderFloat(std::string("Volume##VOLUME_" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
 					channel.second->setVolume(volume);
 				}
-				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f)) {
+				if (ImGui::SliderFloat(std::string("Pitch##PITCH_" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
 					channel.second->setPitch(pitch);
 				}
 
