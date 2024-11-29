@@ -43,6 +43,9 @@ Database& Database::getInstance() {
 
 
 bool Database::forceUpdate() {
+	// !TODO: this function should not be called until impl has been shifted to a public dir.
+	return false;
+
 	try {
 		std::ofstream ofs{ dbPath };
 		ofs << data.dump(2);
