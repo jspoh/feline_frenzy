@@ -118,7 +118,6 @@ namespace NIKE {
 		// set window icon
 		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
 
-		GLFWimage icon;
 
 		int width, height, size;
 		bool is_tex_or_png_ext;
@@ -126,6 +125,7 @@ namespace NIKE {
 			::prepareImageData(ICON_PATH, width, height, size, is_tex_or_png_ext);
 
 		if (icon_data) {
+			GLFWimage icon;
 			icon.width = width;
 			icon.height = height;
 			icon.pixels = const_cast<unsigned char*>(icon_data);
