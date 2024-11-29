@@ -78,7 +78,7 @@
       <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s  /r  /y  /q
-xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.json" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)Feline Frenzy\Config.json" "$(OutDir)" /s /r /y /q
 xcopy "$(SolutionDir)Feline Frenzy\imgui.ini" "$(OutDir)" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -106,8 +106,11 @@ xcopy "$(SolutionDir)Feline Frenzy\imgui.ini" "$(OutDir)" /s /r /y /q</Command>
       <AdditionalLibraryDirectories>$(SolutionDir)Nikesaurus\dependencies\lib\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*" "$(OutDir)" /s /r /y /q
-xcopy "$(SolutionDir)Feline Frenzy\src\Core\Config.json" "$(OutDir)" /s /r /y /q
+      <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s /r /y /q
+xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*.pdb" "$(OutDir)" /s /r /y /q
+xcopy "$(SolutionDir)Feline Frenzy\Config.json" "$(OutDir)" /s /r /y /q
 
 rem Delete all files in GAMEDIRECTORY
 del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*" &gt;nul 2&gt;&amp;1
@@ -131,13 +134,9 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Core/pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\Core\main.cpp" />
-    <ClCompile Include="src\Scenes\MainMenu.cpp" />
-    <ClCompile Include="src\Scenes\SplashScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Core\pch.h" />
-    <ClInclude Include="headers\Scenes\MainMenu.h" />
-    <ClInclude Include="headers\Scenes\SplashScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\Models\circle.txt" />
@@ -150,6 +149,7 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.pdb" &gt;nul 2&gt;&amp;1
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\player.lua" />
+    <None Include="assets\Scripts\test.lua" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
     <None Include="assets\Shaders\batched_base.frag" />

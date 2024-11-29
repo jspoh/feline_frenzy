@@ -84,4 +84,15 @@ namespace NIKE {
 		// If intersect count is odd, the point is inside
 		return (intersectCount % 2) == 1;
 	}
+
+	std::string Utility::extractFileName(const std::string& file_path)
+	{
+		size_t last_slash = file_path.find_last_of("/\\");
+		size_t last_dot = file_path.find_last_of(".");
+		return file_path.substr(last_slash + 1, last_dot - last_slash - 1);
+	}
+	std::string Utility::makeRelativePath(const std::string& base_path, const std::string& target_path)
+	{
+		return std::filesystem::relative(target_path, std::filesystem::path(base_path).parent_path()).string();
+	}
 }

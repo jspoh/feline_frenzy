@@ -2,7 +2,8 @@
  * \file   sysAudio.cpp
  * \brief
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (70%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -18,7 +19,7 @@ namespace NIKE {
 	}
 
 	void Audio::Manager::update() {
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 
 			//SKip inactive layer
 			if (!layer->getLayerState())
@@ -36,14 +37,30 @@ namespace NIKE {
 					auto& e_sfx = e_sfx_comp.value().get();
 
 					//Play SFX
-					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->checkAudioExist(e_sfx.audio_id) && NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
-						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false);
+					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->isAssetRegistered(e_sfx.audio_id) && NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
+						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false, false);
 						e_sfx.b_play_sfx = false;
 					}
 					else {
 						e_sfx.b_play_sfx = false;
 					}
 				}
+			}
+		}
+
+		// Handle Playlists
+		for (auto& channels : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
+
+			if (!channels.second->isPlaying() && !channels.second->getPaused()) {
+				auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channels.first);
+				if (!playlist.empty()) {
+					const std::string& audio_id = std::move(playlist.front());
+
+					NIKE_AUDIO_SERVICE->playAudio(audio_id, "", channels.first, 1.f, 1.f, false, true);
+
+					playlist.pop();
+				}
+
 			}
 		}
 	}

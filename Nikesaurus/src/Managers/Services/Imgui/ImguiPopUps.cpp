@@ -470,12 +470,14 @@ namespace NIKE
                     full_file_path = NIKE_ASSETS_SERVICE->getLoadedTextures().at(key)->file_path;
 
                 }
-                else if (asset_type == "Audio") {
+                else if (asset_type == "SFX") {
                     // Retrieve the audio file path for deletion
-                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedAudios().at(key)->getFilePath();
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedSfx().at(key)->getFilePath();
 
                 }
-                else if (asset_type == "All_Prefabs") {
+                else if (asset_type == "Music") {
+                    // Retrieve the audio file path for deletion
+                    full_file_path = NIKE_ASSETS_SERVICE->getLoadedMusic().at(key)->getFilePath();
 
                 }
 
@@ -491,8 +493,11 @@ namespace NIKE
                     else if (asset_type == "Textures") {
                         NIKE_ASSETS_SERVICE->unloadTexture(key);
                     }
-                    else if (asset_type == "Audio") {
-                        // Not needed to reload
+                    else if (asset_type == "SFX") {
+                        NIKE_ASSETS_SERVICE->unloadSfx(key);
+                    }
+                    else if (asset_type == "Music") {
+                        NIKE_ASSETS_SERVICE->unloadMusic(key);
                     }
                     
                     deleted = true;
@@ -533,6 +538,18 @@ namespace NIKE
                     if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getPrefabsPath()))
                     {
                         NIKE_ASSETS_SERVICE->loadPrefabFiles();
+                    }
+                }
+                else if (asset_type == "SFX") {
+                    if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getSfxPath()))
+                    {
+                        NIKE_ASSETS_SERVICE->reloadAssets("Audio");
+                    }
+                }
+                else if (asset_type == "Music") {
+                    if (NIKE_ASSETS_SERVICE->deleteAllFiles(NIKE_ASSETS_SERVICE->getMusicPath()))
+                    {
+                        NIKE_ASSETS_SERVICE->reloadAssets("Audio");
                     }
                 }
 

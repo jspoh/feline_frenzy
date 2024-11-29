@@ -14,6 +14,8 @@
 
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
+#include "Managers/Services/Assets/sAssets.h"
+#include "Managers/ECS/mCoordinator.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -99,6 +101,9 @@ namespace NIKE {
 
 			//Render filled triangle to draw list
 			void worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color);
+
+			//Render line to draw list
+			void worldLine(ImDrawList* draw_list, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
 			#endif // Only in nike build
 		};
 
@@ -168,7 +173,7 @@ namespace NIKE {
 		};
 
 		//Entities Management Panel
-		class EntitiesPanel : public IPanel {
+		class EntitiesPanel : public IPanel, public Events::IEventListener<Coordinator::EntitiesChanged> {
 		private:
 			//Sort entities
 			struct EntitySorter{
@@ -210,6 +215,9 @@ namespace NIKE {
 
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
+
+			//On entities changed event
+			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -257,46 +265,49 @@ namespace NIKE {
 			//Check entity changed
 			bool isEntityChanged() const;
 
+			//Update entities list
+			void updateEntities(std::set<Entity::Type> ecs_entities);
+
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
-		};
-
-		//Gizmo modes
-		enum class GizmoMode {
-			Translate = 0,
-			Scale,
-			Rotate
-		};
-
-		//Gizmo object
-		struct Gizmo {
-			//Gizmo mode
-			GizmoMode mode;
-
-			//Gizmo sensitivity
-			float sensitivity;
-
-			//boolean for checking interaction with gizmo
-			bool b_interacting;
-
-			//Drag up
-			bool b_dragging_vert;
-
-			//Drag down
-			bool b_dragging_hori;
-
-			//Prev transform
-			Transform::Transform prev_transform;
-
-			//Gizmo objects
-			std::unordered_map<std::string, Transform::Transform> objects;
-
-			Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
 		};
 
 		//Components Management Panel
 		class ComponentsPanel : public IPanel {
 		private:
+
+			//Gizmo modes
+			enum class GizmoMode {
+				Translate = 0,
+				Scale,
+				Rotate
+			};
+
+			//Gizmo object
+			struct Gizmo {
+				//Gizmo mode
+				GizmoMode mode;
+
+				//Gizmo sensitivity
+				float sensitivity;
+
+				//boolean for checking interaction with gizmo
+				bool b_interacting;
+
+				//Drag up
+				bool b_dragging_vert;
+
+				//Drag down
+				bool b_dragging_hori;
+
+				//Prev transform
+				Transform::Transform prev_transform;
+
+				//Gizmo objects ( transform & color )
+				std::unordered_map<std::string, std::pair<Transform::Transform, Vector4i>> objects;
+
+				Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
+			};
 
 			//Reference to game window panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
@@ -319,14 +330,19 @@ namespace NIKE {
 			//Gizmo interaction
 			void interactGizmo();
 
+			std::string comp_string_ref;
+
 			//Add Components popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
 			//Save Prefab popup
-			std::function<void()> savePrefabPopUp(std::string const& popup_id);
+			std::function<void()> createPrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
+
+			//Remove Component confirmation popup
+			std::function<void()> removeComponentPopUp(std::string const& popup_id);
 
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
@@ -372,6 +388,9 @@ namespace NIKE {
 			//Set error message for popup
 			void setPopUpSuccessMsg(std::string const& msg);
 
+			//Gettor for comps_ui
+			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>>& getCompsUI();
+
 			//Add component UI function
 			template<typename T>
 			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
@@ -396,6 +415,56 @@ namespace NIKE {
 
 			//Check if entity is snapping to grid
 			bool checkGridSnapping() const;
+		};
+
+		//Prefabs Management panel
+		class PrefabsPanel : public IPanel {
+		private:
+
+			struct TemporaryEntity {
+				// Stores file path to prefab
+				std::string file_path;
+				// The prefab temp entity
+				Entity::Type entity;
+			};
+
+			// For prefab temp entity
+			TemporaryEntity prefab_temp_entity;
+
+			// Reference to component panel
+			std::weak_ptr<ComponentsPanel> comps_panel;
+		public:
+			PrefabsPanel() = default;
+			~PrefabsPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Prefab Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Prefab Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+
+			// Accept payload from file management
+			void prefabAcceptPayload();
+
+			// For component stuff
+			void renderPrefabComponents();
+
+			// Utility functions for managing prefab entity
+			void createTempPrefabEntity(const std::string& file_path);
+			void clearTempPrefabEntity();
 		};
 
 		//Debug Management Panel
@@ -425,11 +494,108 @@ namespace NIKE {
 			void render() override;
 		};
 
-		//Assets Management Panel
-		class ResourcePanel : public IPanel {
+		//Audio Management Panel
+		class AudioPanel : public IPanel {
 		private:
+
+			// Selected channel
+			std::string selected_channel_name;
+			//Create entity popup
+			std::function<void()> createChannelPopUp(std::string const& popup_id);
+
+			//Delete Channel popup
+			std::function<void()> deleteChannelPopUp(std::string const& popup_id);
+
 		public:
-			ResourcePanel() = default;
+			AudioPanel() = default;
+			~AudioPanel() = default;
+
+
+			//Panel Name
+			std::string getName() const override {
+				return "Audio Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Audio Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+
+		};
+
+		//Resource Management panel
+		class ResourcePanel : public IPanel, public Events::IEventListener<Assets::FileDropEvent> {
+		private:
+			//Directories
+			std::vector<std::filesystem::path> directories;
+
+			//Files
+			std::vector<std::filesystem::path> files;
+
+			//Root Path
+			std::string root_path;
+
+			//Current Path
+			std::string current_path;
+
+			//Search filter
+			std::string search_filter;
+
+			//Icon size
+			Vector2f icon_size;
+
+			//Selected file
+			std::string selected_asset_id;
+
+			//File payload type string
+			std::string payload_typestring;
+
+			//Selected directory mode
+			int directory_mode;
+
+			//File dropped
+			bool b_file_dropped;
+
+			//Setting error message ( Usage: Editing error popup message )
+			std::shared_ptr<std::string> error_msg;
+
+			//Setting success message ( Usage: Editing success popup message )
+			std::shared_ptr<std::string> success_msg;
+
+			//Internal asset icon picking
+			unsigned int fileIcon(std::filesystem::path const& path);
+
+			//Internal rendering of an asset browser
+			void renderAssetsBrowser(std::string const& virtual_path);
+
+			//Delete asset popup
+			std::function<void()> deleteAssetPopup(std::string const& popup_id);
+
+			//Delete directory content popup
+			std::function<void()> deleteDirectoryPopup(std::string const& popup_id);
+
+			//New folder popup
+			std::function<void()> newFolderPopup(std::string const& popup_id);
+
+			//Moving file accept payload
+			void moveFileAcceptPayload(std::string const& virtual_path);
+
+			//Entities panel for string reference
+			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			//On drop file event
+			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
+		public:
+			ResourcePanel() : directory_mode{ 0 }, b_file_dropped{ false } { }
 			~ResourcePanel() = default;
 
 			//Panel Name
@@ -508,6 +674,12 @@ namespace NIKE {
 			//Booelean for snapping entities to grid
 			bool b_snap_to_grid;
 
+			// Setting error message ( Usage: Editing error popup message )
+			std::shared_ptr<std::string> error_msg;
+
+			// Setting success message ( Usage: Editing success popup message )
+			std::shared_ptr<std::string> success_msg;
+
 			//Reference to game window panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
@@ -534,6 +706,9 @@ namespace NIKE {
 			//Render
 			void render() override;
 
+			//Save grid popup
+			std::function<void()> saveGridPopUp(std::string const& popup_id);
+
 			//Render grid
 			void renderGrid(void* draw_list, Vector2f const& render_size);
 
@@ -542,6 +717,66 @@ namespace NIKE {
 
 			//Get grid snapping
 			bool checkGridSnapping() const;
+		};
+
+		//Scenes Management panel
+		class ScenesPanel : public IPanel {
+		private:
+
+			// For storing editing layer mask id
+			unsigned int edit_mask_id;
+
+			bool bit_state = false;
+
+			// For storing selected layer index
+			unsigned int selected_layer_index;
+
+			// For storing bit_position
+			unsigned int bit_position;
+
+			//Error msg
+			std::shared_ptr<std::string> err_msg;
+
+			//Success msg
+			std::shared_ptr<std::string> success_msg;
+
+			// To store layer names
+			std::vector<std::string> layer_names;
+
+			//Create scene popup
+			std::function<void()> createScenePopup(std::string const& popup_id);
+
+			//Delete scene popup
+			std::function<void()> deleteScenePopup(std::string const& popup_id);
+
+		public:
+			ScenesPanel() = default;
+			~ScenesPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "Scenes Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "Scenes Management";
+			}
+
+			//Set error message for popup
+			void setPopUpErrorMsg(std::string const& msg);
+
+			//Update layer names
+			void updateLayerNames();
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
 		};
 
 		//Game Window Panel
@@ -567,6 +802,9 @@ namespace NIKE {
 
 			//Game window render event
 			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
+
+			//Render accept payload
+			void renderAcceptPayload();
 
 		public:
 			GameWindowPanel() : texture_id{ 0 } {}
@@ -600,6 +838,8 @@ namespace NIKE {
 			//Render
 			void render() override;
 		};
+
+
 	}
 }
 

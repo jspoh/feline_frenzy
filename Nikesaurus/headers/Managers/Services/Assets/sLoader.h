@@ -1,6 +1,6 @@
 ﻿/*****************************************************************//**
- * \file   sysFont.h
- * \brief	Font render manager
+ * \file	sLoader.h
+ * \brief	Loading manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
@@ -162,16 +162,6 @@ namespace NIKE {
 		public:
 			RenderLoader() = default;
 			~RenderLoader() = default;
-
-			/**
-			 * compiles shader and adds to shader_programs.
-			 *
-			 * \param shader_ref	shader program's reference string
-			 * \param vtx_path		path to vertex shader
-			 * \param frag_path		path to fragment shader
-			 */
-			unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
-
 			/**
 			 * creates vertex array object. from mesh data and registers it to meshes.
 			 *

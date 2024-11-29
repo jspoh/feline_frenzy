@@ -100,8 +100,14 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+		// Add the map file path at the top of the scene JSON
+		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
+		nlohmann::json m_data;
+		m_data["Grid ID"] = grid_id;
+		data.push_back(m_data);
+
 		//Layers in scene
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//UI Entities
 		std::unordered_map<Entity::Type, std::string> ui_entities;
@@ -131,7 +137,7 @@ namespace NIKE {
 
 				//Serialize entity
 				e_data["Entity"] = serializeEntity(entity);
-				e_data["Entity"]["Entity Name"] = NIKE_IMGUI_SERVICE->getEntityByType(entity);
+				//e_data["Entity"]["Entity Name"] = NIKE_LVLEDITOR_SERVICE->getEntityByType(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
 				//If entity is a UI Entity
@@ -178,15 +184,30 @@ namespace NIKE {
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
+			//Load map grid if a map file path is specified
+			if (l_data.contains("Grid ID")) {
+				std::string grid_id = l_data.at("Grid ID").get<std::string>();
+				std::string full_grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
+
+				if (std::filesystem::exists(full_grid_path)) {
+					// Deserialize map grid
+					NIKE_SERIALIZE_SERVICE->loadGridFromFile(full_grid_path);
+				}
+				else {
+					// Log error or handle missing map file
+					NIKEE_CORE_ERROR("Map file not found: " + grid_id);
+				}
+			}
+
 			//If data contains layer
 			if (l_data.contains("Layer")) {
 				//Deserialize layer
-				if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
-					auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+				if (!NIKE_SCENES_SERVICE->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
+					auto layer = NIKE_SCENES_SERVICE->createLayer();
 					layer->deserialize(l_data.at("Layer"));
 				}
 				else {
-					NIKE_SCENES_SERVICE->getCurrScene()->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
+					NIKE_SCENES_SERVICE->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
 				}
 
 				//Iterate through all entities within layer
@@ -195,7 +216,7 @@ namespace NIKE {
 					//Deserialize all entities
 					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
 					deserializeEntity(entity, e_data.at("Entity"));
-					NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
+					//NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
 					NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
 
 					//Check if entity is a UI entity
@@ -233,6 +254,38 @@ namespace NIKE {
 
 	std::string const& Serialization::Service::getCurrSceneFile() const {
 		return curr_scene_file;
+	}
+
+	void Serialization::Service::saveGridToFile(const std::string& file_path)
+	{
+		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::out);
+
+		if (!std::filesystem::exists(file_path))
+			NIKEE_CORE_ERROR("File does not exist!");
+		
+		// Save data into file
+		file << grid_data.dump(4);
+
+		file.close();
+	}
+
+	void Serialization::Service::loadGridFromFile(const std::string& file_path)
+	{
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::in);
+
+		if (!file.is_open()) {
+			NIKEE_CORE_ERROR("Failed to open .map file for loading: " + file_path);
+		}
+
+		nlohmann::json grid_data;
+		file >> grid_data;
+		file.close();
+
+		NIKE_MAP_SERVICE->deserialize(grid_data);
 	}
 
 	//void Serialization::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {

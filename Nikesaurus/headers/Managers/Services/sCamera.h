@@ -25,7 +25,7 @@ namespace NIKE {
 			Service();
 
 			//Init camera
-			void init(nlohmann::json config);
+			void init(nlohmann::json const& config);
 
 			// Return active Cam id
 			Entity::Type getCamId() const;

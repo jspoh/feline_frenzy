@@ -144,7 +144,7 @@ namespace NIKE {
 			base_component.timer = 0.0f;
 
 			//If End Has Been Reached
-			if (sprite_component.curr_index == sprite_component.end_index) {
+			if (sprite_component.curr_index.x >= sprite_component.end_index.x && sprite_component.curr_index.y >= sprite_component.end_index.y) {
 				//Check If Animation Is Finished
 				animationEndChecker(base_component);
 
@@ -169,7 +169,7 @@ namespace NIKE {
 			}
 
 			//If CurrSprite Is At Start
-			if (sprite_component.curr_index == sprite_component.start_index && base_component.b_reverse) {
+			if ((sprite_component.curr_index.x <= sprite_component.start_index.x && sprite_component.curr_index.y <= sprite_component.start_index.y) && base_component.b_reverse) {
 				//Check If Animation Is Finished
 				animationEndChecker(base_component);
 

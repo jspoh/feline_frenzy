@@ -46,11 +46,34 @@ namespace NIKE {
         };
 
         struct Collider {
-            bool b_collided;
-            Resolution resolution;
-            
-            Collider() : b_collided{ false }, resolution{ Resolution::NONE }{}
-            Collider(Resolution resolution) : b_collided{ false }, resolution{ resolution } {}
+
+            //Shape type
+            enum class ShapeType {
+                AABB,
+                Circle,
+                Polygon
+            };
+
+            // Collider properties
+            ShapeType shape_type;          // Type of collider shape
+            std::vector<Vector2f> vertices; // Vertices for polygon shapes
+
+            // Collider transform
+            bool b_bind_to_entity;
+            Transform::Transform transform;
+            Vector2f pos_offset;
+
+            // Collision flags
+            bool b_collided;               // Collision flag
+            Resolution resolution;         // Collision resolution type (NONE, SLIDE, BOUNCE)
+
+            Collider()
+                : shape_type{ ShapeType::AABB },
+                transform(),
+                pos_offset{ 0.0f, 0.0f },
+                b_bind_to_entity{ true },
+                b_collided{ false },
+                resolution{ Resolution::NONE } {}
         };
 
         //Change physics world variables

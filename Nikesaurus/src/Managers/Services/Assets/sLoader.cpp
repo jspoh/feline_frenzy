@@ -1,6 +1,6 @@
 /*****************************************************************//**
- * \file   sysFont.cpp
- * \brief	Font render manager
+ * \file	sLoader.cpp
+ * \brief	Loader manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
@@ -124,6 +124,7 @@ namespace NIKE {
 	/*****************************************************************//**
 	* RENDER LOADER
 	*********************************************************************/
+
 	void Assets::RenderLoader::createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Assets::Model& model) {
 		// VBO (Vertex Buffer Object)
 		glCreateBuffers(1, &model.vboid);
@@ -476,6 +477,12 @@ namespace NIKE {
 	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
 		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
+		const std::set<std::string> valid_tex_ext = { "png", "jpg", "jpeg" }; // accepted file types
+
+		// Transform each character in string ext to lowercase
+		for (char& c : filetype) {
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		}
 
 		if (filetype == "tex") {
 			is_tex_or_png_ext = true;
@@ -512,14 +519,8 @@ namespace NIKE {
 		}
 
 		// is not .tex file
-		if (filetype == "png" || filetype == "PNG" || filetype == "jpg" || filetype == "jpeg" || filetype == "JPG" || filetype == "JPEG") {
+		if (valid_tex_ext.find(filetype) != valid_tex_ext.end()) {
 			is_tex_or_png_ext = true;
-		}
-		else {
-			is_tex_or_png_ext = false;
-		}
-
-		if (is_tex_or_png_ext) {
 			int channels;
 			stbi_set_flip_vertically_on_load(true);
 			const int desired_channels = 4;
@@ -542,84 +543,11 @@ namespace NIKE {
 
 			return img_data;
 		}
-
+			
 		// If the file type is unsupported (not .tex, .png, .jpg, or .jpeg)
+		is_tex_or_png_ext = false;
 		NIKEE_CORE_ERROR("Unsupported file format: {}", path_to_texture);
 		return nullptr;
-	}
-
-	unsigned int Assets::RenderLoader::compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
-		// read and compile vertex shader
-		std::ifstream vtx_file{ vtx_path };
-		if (!vtx_file.is_open()) {
-			cerr << "Failed to open vertex shader file: " << vtx_path << endl;
-			throw std::exception();
-		}
-
-		std::stringstream vtx_buffer;
-		vtx_buffer << vtx_file.rdbuf();
-		vtx_file.close();
-		const std::string vtx_str = vtx_buffer.str();
-		const char* vtx_src = vtx_str.c_str();
-
-		unsigned int vtx_handle = glCreateShader(GL_VERTEX_SHADER);
-		if (!vtx_handle) {
-			cerr << "Failed to create vertex shader program " << shader_ref << endl;
-			throw std::exception();
-		}
-		glShaderSource(vtx_handle, 1, &vtx_src, nullptr);
-		glCompileShader(vtx_handle);
-
-		// read and compile fragment shader
-		std::ifstream frag_file{ frag_path };
-		if (!frag_file.is_open()) {
-			cerr << "Failed to open fragment shader file: " << frag_path << endl;
-			throw std::exception();
-		}
-
-		std::stringstream frag_buffer;
-		frag_buffer << frag_file.rdbuf();
-		frag_file.close();
-		const std::string frag_str = frag_buffer.str();
-		const char* frag_src = frag_str.c_str();
-
-		unsigned int frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
-		if (!frag_handle) {
-			cerr << "Failed to create fragment shader program " << shader_ref << endl;
-			throw std::exception();
-		}
-		glShaderSource(frag_handle, 1, &frag_src, nullptr);
-		glCompileShader(frag_handle);
-
-		// link shaders
-		unsigned int shader_handle = glCreateProgram();
-		if (!shader_handle) {
-			cerr << "Failed to create shader program " << shader_ref << endl;
-			throw std::exception();
-		}
-
-		glAttachShader(shader_handle, vtx_handle);
-		glAttachShader(shader_handle, frag_handle);
-		glLinkProgram(shader_handle);
-
-		// validate shader program
-		int success = false;
-		glGetProgramiv(shader_handle, GL_LINK_STATUS, &success);
-
-		if (!success) {
-			char info_log[512];
-			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
-			cerr << "Failed to link shader program " << shader_ref << ": " << info_log << endl;
-			//throw std::exception();
-		}
-
-		// cleanup shaders
-		glDeleteShader(vtx_handle);
-		glDeleteShader(frag_handle);
-
-		NIKEE_CORE_INFO("Sucessfully loaded shader from " + vtx_path + " " + frag_path);
-
-		return shader_handle;
 	}
 
 	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh, bool for_batched_rendering) {

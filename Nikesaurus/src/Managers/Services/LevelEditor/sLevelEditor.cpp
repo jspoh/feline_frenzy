@@ -289,6 +289,7 @@ namespace NIKE {
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+		ImGui::LoadIniSettingsFromDisk(io.IniFilename);
 
 		//Init editor action manager
 		action_manager = std::make_unique<ActionManager>();
@@ -308,10 +309,20 @@ namespace NIKE {
 		panels.push_back(components_panel);
 		panels_map.emplace(components_panel->getName(), components_panel);
 
+		//Add prefab management panel
+		auto prefab_panel = std::make_shared<PrefabsPanel>();
+		panels.push_back(prefab_panel);
+		panels_map.emplace(prefab_panel->getName(), prefab_panel);
+
 		//Add debug management panel
 		auto debug_panel = std::make_shared<DebugPanel>();
 		panels.push_back(debug_panel);
 		panels_map.emplace(debug_panel->getName(), debug_panel);
+
+		//Add audio management panel
+		auto audio_panel = std::make_shared<AudioPanel>();
+		panels.push_back(audio_panel);
+		panels_map.emplace(audio_panel->getName(), audio_panel);
 
 		//Add resource management panel
 		auto resource_panel = std::make_shared<ResourcePanel>();
@@ -332,6 +343,11 @@ namespace NIKE {
 		auto game_panel = std::make_shared<GameWindowPanel>();
 		panels.push_back(game_panel);
 		panels_map.emplace(game_panel->getName(), game_panel);
+
+		// Add layer management window panel
+		auto layer_panel = std::make_shared<ScenesPanel>();
+		panels.push_back(layer_panel);
+		panels_map.emplace(layer_panel->getName(), layer_panel);
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
@@ -359,6 +375,9 @@ namespace NIKE {
 		for (auto& panel : panels) {
 			panel->update();
 		}
+
+		//Save imgui layouts
+		ImGui::SaveIniSettingsToDisk(io.IniFilename);
 	}
 
 	void LevelEditor::Service::render() {

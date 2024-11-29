@@ -5,7 +5,7 @@
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu(70%)
  * \coauthor Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (30%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -14,8 +14,94 @@
 
 namespace NIKE {
 
+	void Shader::Manager::compileShader(std::string const& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+		// read and compile vertex shader
+		std::ifstream vtx_file{ vtx_path };
+		if (!vtx_file.is_open()) {
+			cerr << "Failed to open vertex shader file: " << vtx_path << endl;
+			throw std::exception();
+		}
+
+		std::stringstream vtx_buffer;
+		vtx_buffer << vtx_file.rdbuf();
+		vtx_file.close();
+		const std::string vtx_str = vtx_buffer.str();
+		const char* vtx_src = vtx_str.c_str();
+
+		unsigned int vtx_handle = glCreateShader(GL_VERTEX_SHADER);
+		if (!vtx_handle) {
+			cerr << "Failed to create vertex shader program " << shader_ref << endl;
+			throw std::exception();
+		}
+		glShaderSource(vtx_handle, 1, &vtx_src, nullptr);
+		glCompileShader(vtx_handle);
+
+		// read and compile fragment shader
+		std::ifstream frag_file{ frag_path };
+		if (!frag_file.is_open()) {
+			cerr << "Failed to open fragment shader file: " << frag_path << endl;
+			throw std::exception();
+		}
+
+		std::stringstream frag_buffer;
+		frag_buffer << frag_file.rdbuf();
+		frag_file.close();
+		const std::string frag_str = frag_buffer.str();
+		const char* frag_src = frag_str.c_str();
+
+		unsigned int frag_handle = glCreateShader(GL_FRAGMENT_SHADER);
+		if (!frag_handle) {
+			cerr << "Failed to create fragment shader program " << shader_ref << endl;
+			throw std::exception();
+		}
+		glShaderSource(frag_handle, 1, &frag_src, nullptr);
+		glCompileShader(frag_handle);
+
+		// link shaders
+		unsigned int shader_handle = glCreateProgram();
+		if (!shader_handle) {
+			cerr << "Failed to create shader program "<< shader_ref << endl;
+			throw std::exception();
+		}
+
+		glAttachShader(shader_handle, vtx_handle);
+		glAttachShader(shader_handle, frag_handle);
+		glLinkProgram(shader_handle);
+
+		// validate shader program
+		int success = false;
+		glGetProgramiv(shader_handle, GL_LINK_STATUS, &success);
+
+		if (!success) {
+			char info_log[512];
+			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
+			cerr << "Failed to link shader program " << ": " << info_log << endl;
+			//throw std::exception();
+		}
+
+		// cleanup shaders
+		glDeleteShader(vtx_handle);
+		glDeleteShader(frag_handle);
+
+		NIKEE_CORE_INFO("Sucessfully loaded shader from " + vtx_path + " " + frag_path);
+
+		shaders[shader_ref] = shader_handle;
+	}
+
+	void Shader::Manager::init() {
+		//Load all shaders
+		compileShader("base", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base.frag").string());
+		compileShader("batched_base", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_base.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_base.frag").string());
+		compileShader("texture", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/texture.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/texture.frag").string());
+		compileShader("batched_texture", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_texture.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_texture.frag").string());
+		compileShader("text", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.frag").string());
+	}
+
 	void Shader::Manager::useShader(const std::string& shader_ref) {
-		glUseProgram(NIKE_ASSETS_SERVICE->getShader(shader_ref));
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		glUseProgram(shaders.at(shader_ref));
 	}
 
 	void Shader::Manager::unuseShader() {
@@ -25,7 +111,10 @@ namespace NIKE {
 	// Uniform setters
 
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			glUniform1i(location, value);
 		}
@@ -35,7 +124,10 @@ namespace NIKE {
 	}
 
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			glUniform1f(location, value);
 		}
@@ -45,7 +137,10 @@ namespace NIKE {
 	}
 
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Matrix_33& value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			glUniformMatrix3fv(location, 1, GL_FALSE, &value(0, 0));
 		}
@@ -55,7 +150,10 @@ namespace NIKE {
 	}
 
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			glUniform3fv(location, 1, &value.x);
 		}
@@ -65,7 +163,10 @@ namespace NIKE {
 	}
 
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector2f& value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			glUniform2f(location, value.x, value.y);
 		}
@@ -75,7 +176,10 @@ namespace NIKE {
 	}
 
 	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector4f& value) {
-		int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+		int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			glUniform4f(location, value.x, value.y, value.z, value.w);
 		}
@@ -90,10 +194,14 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at start of {0}: {1}", __FUNCTION__, err);
 		}
 
-		const int location = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), name.c_str());
+		if (shaders.find(shader_ref) == shaders.end()) {
+			throw std::runtime_error("Shader does not exist.");
+		}
+
+		const int location = glGetUniformLocation(shaders.at(shader_ref), name.c_str());
 		if (location >= 0) {
 			for (size_t i{}; i < vals.size(); i++) {
-				const int idx_loc = glGetUniformLocation(NIKE_ASSETS_SERVICE->getShader(shader_ref), (name + "[" + std::to_string(i) + "]").c_str());
+				const int idx_loc = glGetUniformLocation(shaders.at(shader_ref), (name + "[" + std::to_string(i) + "]").c_str());
 				if (idx_loc >= 0) {
 					glUniform1i(idx_loc, vals[i]);
 				}

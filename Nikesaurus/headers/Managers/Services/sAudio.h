@@ -4,6 +4,7 @@
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -116,6 +117,7 @@ namespace NIKE {
 
 			//Get parent channel group
 			virtual std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const = 0;
+
 		};
 
 		//Abstract channel class
@@ -290,6 +292,7 @@ namespace NIKE {
 			void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) override;
 
 			std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const override;
+
 		};
 
 		//NIKE Audio Group
@@ -389,6 +392,10 @@ namespace NIKE {
 
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
+
+			//Queue for each channel's playlist
+			std::unordered_map<std::string , std::queue<std::string> > channel_playlists;
+
 		public:
 
 			//Default Constructor
@@ -431,10 +438,7 @@ namespace NIKE {
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
 			//Channel ID will override each other if the same id is specified more than once
-			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused = false);
-
-			//Update Loop
-			void update();
+			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
 
 			/**
 			 * pauses all audio.
@@ -447,6 +451,22 @@ namespace NIKE {
 			 * 
 			 */
 			void resumeAllChannels();
+
+			/*****************************************************************//**
+			* Playlist Management
+			*********************************************************************/
+			// Create channel playlist and add to map
+			void createChannelPlaylist(std::string audio_id);
+
+			// Get individual channel's playlist
+			std::queue<std::string>& getChannelPlaylist(std::string audio_id);
+
+			// Queue audio to playlist
+			void queueAudioToPlaylist(std::string channel_id, std::string audio_id);
+
+			//Update Loop
+			void update();
+
 		};
 
 		//Re-enable DLL Export warning

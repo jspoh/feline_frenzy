@@ -16,6 +16,7 @@
 #include "../sEvents.h"
 #include "../sInput.h"
 #include "../sWindows.h"
+#include "../Assets/sAssets.h"
 
 //Level Editor Helpers
 #include "sEditorActions.h"

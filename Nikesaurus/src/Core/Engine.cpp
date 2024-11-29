@@ -48,16 +48,16 @@ namespace NIKE {
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
-		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 
 		//Register physics manager
-		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
-		game_logic_sys->registerLuaSystem(physics_sys);
+		//game_logic_sys->registerLuaSystem(physics_sys);
 
 		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
@@ -79,7 +79,7 @@ namespace NIKE {
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
 		provideService(std::make_shared<Coordinator::Manager>());
 
-		//Provide Services
+		//Provide Service
 		provideService(std::make_shared<Windows::Service>());
 		provideService(std::make_shared<Scenes::Service>());
 		provideService(std::make_shared<Events::Service>());
@@ -88,12 +88,12 @@ namespace NIKE {
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
-		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
 		provideService(std::make_shared<LevelEditor::Service>());
 		provideService(std::make_shared<Lua::Service>());
+		provideService(std::make_shared<Path::Service>());
 
 		//Create console
 #ifndef NDEBUG
@@ -119,50 +119,59 @@ namespace NIKE {
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
 		//Add event listeners for window resized
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
-		getService<Events::Service>()->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for key event
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse event
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse move event
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 
 		//Add event listeners for mouse scroll event
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
-
-		//Add event listeners for drop files event
-		getService<Events::Service>()->addEventListeners<Assets::FileDropEvent>(NIKE_ASSETS_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+		
+		//Init paths
+		NIKE_PATH_SERVICE->init(json_config);
 
 		//Setup Audio
-		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
+		NIKE_AUDIO_SERVICE->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
 
-		//Setup assets loading with systems for loading
-		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
+		//Initialize assets service
+		NIKE_ASSETS_SERVICE->init(NIKE_AUDIO_SERVICE->getAudioSystem());
 
-		//Init imgui
-		//NIKE_IMGUI_SERVICE->init();
+		//Register all assets in the game and engine folder
+		NIKE_ASSETS_SERVICE->scanAssetDirectory("Game_Assets:/", true);
 
 		//Init camera
 		NIKE_CAMERA_SERVICE->init(json_config);
+
+		//Init scene
+		NIKE_SCENES_SERVICE->init();
 
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
 
 		//Init UI
 		NIKE_UI_SERVICE->init();
+
+		//Init Lua
+		NIKE_LUA_SERVICE->init();
+
+		// For testing imgui combo - lim
+		NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
 
 		//Register Def Components
 		registerDefComponents();
@@ -227,9 +236,6 @@ namespace NIKE {
 			//Update all systems
 			NIKE_ECS_MANAGER->updateSystems();
 
-			////ImGui Render & Update
-			//NIKE_IMGUI_SERVICE->update();
-
 			//Update Level Editor
 			NIKE_LVLEDITOR_SERVICE->update();
 
@@ -244,6 +250,9 @@ namespace NIKE {
 				NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 			}
 		}
+
+		//Stop watching all directories
+		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();

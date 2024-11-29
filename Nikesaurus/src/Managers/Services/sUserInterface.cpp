@@ -119,8 +119,13 @@ namespace NIKE {
 		if (e_shape_comp.has_value()) {
 			auto const& e_shape = e_shape_comp.value().get();
 
+			//Check if model is registered
+			if (!NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
+				return false;
+			}
+
 			auto getVertices = [e_shape]() {
-				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id)->vertices;
+				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(e_shape.model_id)->vertices;
 
 				std::vector<Vector2f> vert;
 				for (const Assets::Vertex& v : vertices) {
@@ -142,8 +147,13 @@ namespace NIKE {
 				}
 		}
 		else {
+			if (!NIKE_ASSETS_SERVICE->isAssetRegistered("square-texture.model")) {
+				return false;
+			}
+
 			auto getVertices = []() {
-				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getModel("square-texture")->vertices;
+
+				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model")->vertices;
 
 				std::vector<Vector2f> vert;
 				for (const Assets::Vertex& v : vertices) {
@@ -188,12 +198,12 @@ namespace NIKE {
 	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape) {
 
 		//Create an extra layer if there is only 1 layer
-		if (NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() <= 1) {
-			NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+		if (NIKE_SCENES_SERVICE->getLayerCount() <= 1) {
+			NIKE_SCENES_SERVICE->createLayer();
 		}
 
 		//Place always place UI entity at the top layer
-		ui_entities.emplace(btn_id, std::make_pair(NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), false));
+		ui_entities.emplace(btn_id, std::make_pair(NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1), false));
 
 		//Add components for UI
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(trans));
@@ -214,12 +224,12 @@ namespace NIKE {
 	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture) {
 
 		//Create an extra layer if there is only 1 layer
-		if (NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() <= 1) {
-			NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
+		if (NIKE_SCENES_SERVICE->getLayerCount() <= 1) {
+			NIKE_SCENES_SERVICE->createLayer();
 		}
 
 		//Place always place UI entity at the top layer
-		ui_entities.emplace(btn_id, std::make_pair(NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1), false));
+		ui_entities.emplace(btn_id, std::make_pair(NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1), false));
 
 		//Add components for UI
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(trans));
@@ -316,8 +326,8 @@ namespace NIKE {
 		for (auto& entity : ui_entities) {
 
 			//Always set UI layer entity to the last layer
-			if (NIKE_ECS_MANAGER->getEntityLayerID(entity.second.first) != NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1) {
-				NIKE_ECS_MANAGER->setEntityLayerID(entity.second.first, NIKE_SCENES_SERVICE->getCurrScene()->getLayerCount() - 1);
+			if (NIKE_ECS_MANAGER->getEntityLayerID(entity.second.first) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+				NIKE_ECS_MANAGER->setEntityLayerID(entity.second.first, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 			}
 
 			//Reset all input checks to false
@@ -367,7 +377,7 @@ namespace NIKE {
 				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
 				if (play)
 				{
-					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f,0);
+					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f, 0, false);
 					play = false;
 				}
 				

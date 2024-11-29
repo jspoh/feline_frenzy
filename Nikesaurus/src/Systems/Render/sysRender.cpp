@@ -121,7 +121,7 @@ namespace NIKE {
 			shader_system->setUniform("base", "model_to_ndc", x_form);
 
 			//Get model
-			auto model = NIKE_ASSETS_SERVICE->getModel(e_shape.model_id);
+			auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(e_shape.model_id);
 
 			//Draw
 			glBindVertexArray(model->vaoid);
@@ -165,7 +165,7 @@ namespace NIKE {
 			return;
 		}
 
-		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_square");
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_square.model");
 
 		// create buffer of vertices
 		std::vector<Assets::Vertex> vertices;
@@ -327,7 +327,7 @@ namespace NIKE {
 			return;
 		}
 
-		Assets::Model& model = *NIKE_ASSETS_SERVICE->getModel("batched_texture");
+		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_texture.model");
 
 		// create vector of texture handles
 		// map with texture handle as key and binding unit as value
@@ -457,7 +457,7 @@ namespace NIKE {
 
 		//Calculate size of text
 		for (char c : e_text.text) {
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(e_text.font_id)->char_map[c];
 
 			//Calculate width
 			text_size.x += (ch.advance >> 6) * e_text.scale;
@@ -496,7 +496,7 @@ namespace NIKE {
 		//Iterate through all characters
 		for (char c : e_text.text)
 		{
-			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getFont(e_text.font_id)->char_map[c];
+			Assets::Font::Character ch = NIKE_ASSETS_SERVICE->getAsset<Assets::Font>(e_text.font_id)->char_map[c];
 
 			float xpos = pos.x + ch.bearing.x * e_text.scale;
 			float ypos = pos.y - (ch.size.y - ch.bearing.y) * e_text.scale;
@@ -544,7 +544,7 @@ namespace NIKE {
 		shader_system->setUniform("base", "model_to_ndc", x_form);
 
 		//Get model
-		auto model = NIKE_ASSETS_SERVICE->getModel("square");
+		auto model = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square.model");
 
 		//Draw model
 		glBindVertexArray(model->vaoid);
@@ -574,11 +574,11 @@ namespace NIKE {
 			auto& e_texture = e_texture_comp.value().get();
 
 			//Check if texture is loaded
-			if (NIKE_ASSETS_SERVICE->checkTextureExist(e_texture.texture_id)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
 				//Allow stretching of texture
 				if (!e_texture.b_stretch) {
 					//Copy transform for texture mapping ( Locks the transformation of a texture )
-					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
+					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
 					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 				}
 
@@ -593,7 +593,7 @@ namespace NIKE {
 			auto& e_shape = e_shape_comp.value().get();
 
 			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->checkModelExist(e_shape.model_id)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
 				// Transform matrix here
 				transformMatrix(e_transform, matrix, cam_ndcx);
 
@@ -613,11 +613,16 @@ namespace NIKE {
 				if (e_collider.b_collided) {
 					wire_frame_color = { 0.0f, 1.0f, 0.0f, 1.0f };
 				}
-			}
 
-			//Calculate wireframe matrix
-			transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
-			renderWireFrame(matrix, wire_frame_color);
+				//Calculate wireframe matrix
+				transformMatrixDebug(e_collider.transform, matrix, cam_ndcx, true);
+				renderWireFrame(matrix, wire_frame_color);
+			}
+			else {
+				//Calculate wireframe matrix
+				transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
+				renderWireFrame(matrix, wire_frame_color);
+			}
 
 			//Calculate direction matrix
 			if (auto e_velo_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);  e_velo_comp.has_value()) {
@@ -650,15 +655,18 @@ namespace NIKE {
 		if (!e_text_comp.has_value()) return;
 		auto& e_text = e_text_comp.value().get();
 
-		//Make copy of transform, scale to 1.0f for calculating matrix
-		Transform::Transform copy = e_transform;
-		copy.scale = { 1.0f, 1.0f };
+		//Check if font exists
+		if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
+			//Make copy of transform, scale to 1.0f for calculating matrix
+			Transform::Transform copy = e_transform;
+			copy.scale = { 1.0f, 1.0f };
 
-		//Transform text matrix
-		transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+			//Transform text matrix
+			transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
 
-		//Render text
-		renderText(matrix, e_text);
+			//Render text
+			renderText(matrix, e_text);
+		}
 	}
 
 	void Render::Manager::renderViewport() {
@@ -670,12 +678,12 @@ namespace NIKE {
 		glClearColor(1, 1, 0, 1);		// set background to yellow for easier debugging
 
 		//Render to frame buffer if imgui is active
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
@@ -700,7 +708,7 @@ namespace NIKE {
 		}
 
 		// render text last
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
+		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
@@ -710,7 +718,7 @@ namespace NIKE {
 			}
 		}
 
-		if (NIKE_IMGUI_SERVICE->getImguiActive() || NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}
@@ -746,6 +754,9 @@ namespace NIKE {
 
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();
+
+		//Init shader system
+		shader_system->init();
 
 		//GL enable opacity blending option
 		glEnable(GL_BLEND);
