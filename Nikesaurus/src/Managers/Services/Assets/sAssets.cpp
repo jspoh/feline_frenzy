@@ -283,7 +283,7 @@ namespace NIKE {
 
 	Assets::Types Assets::Service::getAssetType(std::filesystem::path const& path) const {
 		auto ext = path.extension().string();
-		constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
+		// constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
 		if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tex") {
 			return Assets::Types::Texture;
 		}
@@ -293,11 +293,16 @@ namespace NIKE {
 		else if (ext == ".ttf") {
 			return Assets::Types::Font;
 		}
-		else if (ext == ".wav" && std::filesystem::file_size(path) >= music_threshold) {
-			return Assets::Types::Music;
-		}
-		else if (ext == ".wav" && std::filesystem::file_size(path) < music_threshold) {
-			return Assets::Types::Sound;
+		else if (ext == ".wav") {
+			auto filepath = path.string();
+			std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](unsigned char c) { return std::tolower(c); });
+
+			if (filepath.find("assets\\audios\\music") != std::string::npos) {
+				return Assets::Types::Music;
+			}
+			else {
+				return Assets::Types::Sound;
+			}
 		}
 		else if (ext == ".scn") {
 			return Assets::Types::Scene;

@@ -1,4 +1,4 @@
-/*****************************************************************//**
+	/*****************************************************************//**
  * \file   sEditorPanels.cpp
  * \brief  Level Editor panel implementation
  *
@@ -2276,7 +2276,7 @@ namespace NIKE {
 		static std::unordered_map<std::string, int> channel_indices;
 		static std::unordered_map<std::string, bool> open_playlists;
 		
-		const auto& all_loaded_sounds = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Sound);
+		const auto& all_loaded_sounds = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Music);
 
 		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
 			ImGui::Spacing();
@@ -2304,13 +2304,6 @@ namespace NIKE {
 				}
 
 				ImGui::Spacing();
-				
-				if (open_playlists.find(channel.first) == open_playlists.end()) {
-					open_playlists[channel.first] = false;
-				}
-				bool& open_playlist = open_playlists[channel.first];
-
-				ImGui::Spacing();
 
 				if (ImGui::Button((std::string("Delete Channel##" + channel.first).c_str()))) {
 					selected_channel_name = channel.first;
@@ -2324,11 +2317,17 @@ namespace NIKE {
 				ImGui::Text("Playlist Management");
 				ImGui::Spacing();
 
+				if (open_playlists.find(channel.first) == open_playlists.end()) {
+					open_playlists[channel.first] = false;
+				}
+				bool& open_playlist = open_playlists[channel.first];
+
+
 				ImGui::Checkbox(std::string("Open Playlist##CHECKBOXPLAYLIST_" + channel.first).c_str(), &open_playlists[channel.first]);
 				ImGui::Spacing();
 
 				if (open_playlist) {
-
+					auto & loop_playlists = NIKE_AUDIO_SERVICE->channel_playlists_loop;
 					// Get channel audio id and index from map
 					if (channel_audio_ids.find(channel.first) == channel_audio_ids.end()) {
 						channel_audio_ids[channel.first] = "";
@@ -2336,9 +2335,16 @@ namespace NIKE {
 					if (channel_indices.find(channel.first) == channel_indices.end()) {
 						channel_indices[channel.first] = -1;
 					}
+					if (loop_playlists.find(channel.first) == loop_playlists.end()) {
+						loop_playlists[channel.first] = false;
+					}
 
 					std::string& current_audio_id = channel_audio_ids[channel.first];
 					int& current_index = channel_indices[channel.first];
+
+
+					ImGui::Checkbox(std::string("Loop Playlist##CHECKBOXLOOPPLAYLIST_" + channel.first).c_str(), &loop_playlists[channel.first]);
+					ImGui::Spacing();
 
 					if (current_index == -1) {
 						auto it = std::find(all_loaded_sounds.begin(), all_loaded_sounds.end(), current_audio_id);

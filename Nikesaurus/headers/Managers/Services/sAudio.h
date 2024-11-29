@@ -394,7 +394,7 @@ namespace NIKE {
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 
 			//Queue for each channel's playlist
-			std::unordered_map<std::string , std::queue<std::string> > channel_playlists;
+			std::unordered_map<std::string , std::queue<std::string>> channel_playlists;
 
 		public:
 
@@ -463,6 +463,10 @@ namespace NIKE {
 
 			// Queue audio to playlist
 			void queueAudioToPlaylist(std::string channel_id, std::string audio_id);
+
+			// Loop map
+			std::unordered_map<std::string, bool> channel_playlists_loop;
+
 
 			//Update Loop
 			void update();

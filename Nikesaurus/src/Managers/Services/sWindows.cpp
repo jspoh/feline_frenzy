@@ -105,7 +105,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("GL init success");
 
 		// enable debug logging
-#ifndef NDEBUG
+		#ifndef NDEBUG
 		// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -113,7 +113,7 @@ namespace NIKE {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
 			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-#endif
+		#endif
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
@@ -344,7 +344,6 @@ namespace NIKE {
 			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
 
 			NIKE_AUDIO_SERVICE->pauseAllChannels();
-			//glfwIconifyWindow(ptr_window); // minimize the window if unfocused
 		}
 
 		err = glGetError();
