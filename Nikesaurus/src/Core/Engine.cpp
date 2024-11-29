@@ -197,7 +197,7 @@ namespace NIKE {
 			//Update scenes manager
 			NIKE_SCENES_SERVICE->update();
 
-			static constexpr bool JS_TEXTURE_TEST = true;
+			static constexpr bool JS_TEXTURE_TEST = false;
 			//Render entity to mouse click
 			if 
 				(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
