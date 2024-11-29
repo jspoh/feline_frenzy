@@ -35,7 +35,7 @@ OutputBaseFilename=Feline-Frenzy_Setup
 LicenseFile=INSTALLERFILES\DigiPen_EULA.txt
 
 ; Path to the icon for the installer (TCR check requires custom icon)
-SetupIconFile=.\INSTALLERFILES\SetupIcon.ico
+SetupIconFile=.\INSTALLERFILES\Icon.ico
 
 ; Compression scheme for the installer. Check Inno Setup help files for more options.
 Compression=lzma
@@ -87,10 +87,10 @@ Source: .\REDIST\VC_redist.x64.exe; DestDir: {tmp}; Flags: ignoreversion
 ;   {group} is the start menu location that the game will install shortcuts to.
 ;   {commondesktop} is your Windows desktop directory.
 [Icons]
-Name: {group}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
+Name: {group}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; WorkingDir: {app}; IconFilename: "{app}\assets\Icons\Icon.ico"
 Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe}
-Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe};  IconFilename: "{app}\Icon.ico"
-Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\Icon.ico"
+Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe};  IconFilename: "{app}\assets\Icons\Icon.ico"
+Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\assets\Icons\Icon.ico"
 
 ; List of items to execute in the installer.
 ; Note that this will run all executables in their silent versions as required by the TCRs.
