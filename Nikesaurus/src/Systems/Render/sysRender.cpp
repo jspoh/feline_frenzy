@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = false;
+constexpr bool BATCHED_RENDERING = true;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
@@ -61,17 +61,22 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
-	}
+	}	
 
-	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
+	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip) {
 		//Transform matrix here
 		Matrix_33 result, scale_mat, rot_mat, trans_mat;
 
-		Matrix_33RotDeg(rot_mat, obj.rotation);
+		const Matrix_33 FLIP_X_MAT = { -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+		const Matrix_33 FLIP_Y_MAT = { 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
+		Matrix_33RotDeg(rot_mat, obj.rotation);
 		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
+		result = 
+			(flip.x ? FLIP_X_MAT : Matrix_33::Identity())
+			* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity())
+			* world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
 
 		// OpenGL requires matrix in col maj so transpose
 		Matrix_33Transpose(x_form, result);
@@ -583,7 +588,7 @@ namespace NIKE {
 				}
 
 				// Transform matrix here
-				transformMatrix(e_transform, matrix, cam_ndcx);
+				transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
 
 				// Render Texture
 				renderObject(matrix, e_texture);
