@@ -150,6 +150,12 @@ namespace NIKE {
 		}
 
 
+		// default startup to fullscreen (M3 1931)
+		setFullScreen(true);
+		width, height;
+		glfwGetFramebufferSize(ptr_window, &width, &height);
+		glViewport(0, 0, width, height);
+
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
