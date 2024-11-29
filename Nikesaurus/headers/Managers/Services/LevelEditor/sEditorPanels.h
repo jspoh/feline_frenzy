@@ -659,6 +659,35 @@ namespace NIKE {
 			void render() override;
 		};
 
+		//User interface Management Panel
+		class UIPanel : public IPanel {
+		private:
+			//Create button popup
+			std::function<void()> createButtonPopup(std::string const& popup_id);
+		public:
+			UIPanel() = default;
+			~UIPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "User Interface Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "User Interface Management";
+			}
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
 		//Grid Management Panel
 		class TileMapPanel : public IPanel {
 		private:
