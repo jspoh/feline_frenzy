@@ -109,7 +109,16 @@
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />

@@ -111,6 +111,9 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
