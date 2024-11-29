@@ -29,10 +29,10 @@ namespace NIKE {
         luaKeyBinds(*lua_state);
         luaMathBinds(*lua_state);
 
-        //Log out all 
-        for (auto& pair : lua_state->globals()) {
-            cout << pair.first.as<std::string>() << "\n";
-        }
+        ////Log out all 
+        //for (auto& pair : lua_state->globals()) {
+        //    cout << pair.first.as<std::string>() << "\n";
+        //}
     }
 
     sol::load_result Lua::Service::loadScript(std::string const& virtual_path) {

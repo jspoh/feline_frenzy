@@ -71,7 +71,8 @@ namespace NIKE {
 	}
 
 	void Input::Service::onEvent(std::shared_ptr<MouseMovedEvent> event) {
-		mouse.pos = event->window_pos;
+		mouse.window_pos = event->window_pos;
+		mouse.world_pos = event->world_pos;
 	}
 
 	void Input::Service::onEvent(std::shared_ptr<MouseScrollEvent> event) {
@@ -110,8 +111,12 @@ namespace NIKE {
 		return return_state;
 	}
 
-	Vector2f Input::Service::getMousePos() const {
-		return mouse.pos;
+	Vector2f Input::Service::getMouseWindowPos() const {
+		return mouse.window_pos;
+	}
+
+	Vector2f Input::Service::getMouseWorldPos() const {
+		return mouse.world_pos;
 	}
 
 	Vector2f Input::Service::getMouseScroll() const {
