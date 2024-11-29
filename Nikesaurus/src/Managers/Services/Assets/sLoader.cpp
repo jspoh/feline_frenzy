@@ -613,6 +613,10 @@ namespace NIKE {
 		return nullptr;
 	}
 
+	void Assets::RenderLoader::freeImageData(unsigned char* img_data) {
+		stbi_image_free(img_data);
+	}
+
 	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
 		Assets::Model model;
 

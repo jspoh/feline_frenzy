@@ -166,6 +166,15 @@ namespace NIKE {
 			 */
 			static unsigned char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
 
+			/**
+			 * free images loaded with `prepareImageData`.
+			 * 
+			 * for buffers created with stbi_image_load
+			 * 
+			 * \param data
+			 */
+			static void freeImageData(unsigned char* data);
+
 
 			/**
 			 * creates vertex array object. from mesh data and registers it to meshes.

@@ -142,7 +142,8 @@ namespace NIKE {
 			}
 
 			glfwSetWindowIcon(ptr_window, 1, &icon);
-			//stbi_image_free(const_cast<char*>(icon_data));
+			NIKE::Assets::RenderLoader
+				::freeImageData(const_cast<unsigned char*>(icon_data));
 		}
 		else {
 			NIKEE_CORE_ERROR("Failed to load window icon in {0}", __FUNCTION__);
