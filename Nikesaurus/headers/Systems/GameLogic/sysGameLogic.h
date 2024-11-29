@@ -12,7 +12,6 @@
 #define GAME_LOGIC_HPP
 
 #include "Managers/ECS/mSystem.h"
-#include "Managers/Services/sLua.h"
 
 namespace NIKE {
     namespace GameLogic {
@@ -42,8 +41,8 @@ namespace NIKE {
 			//Init Inputs
 			void init() override;
 
-			//Register systems for lua
-			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+			////Register systems for lua
+			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 		    //Update Inputs
 		    void update() override;

@@ -47,6 +47,8 @@ namespace NIKE {
         };
 
         struct Collider {
+
+            //Shape type
             enum class ShapeType {
                 AABB,
                 Circle,
@@ -55,63 +57,24 @@ namespace NIKE {
 
             // Collider properties
             ShapeType shape_type;          // Type of collider shape
-            Vector2f position;             // Collider's position in world space
-            Vector2f size;                 // Dimensions: width and height for AABB, or radius for Circle
             std::vector<Vector2f> vertices; // Vertices for polygon shapes
-            Vector2f offset;               // Offset relative to the Transform
-            float rotation;                // Collider's independent rotation (in degrees)
+
+            // Collider transform
+            bool b_bind_to_entity;
+            Transform::Transform transform;
+            Vector2f pos_offset;
 
             // Collision flags
-            bool is_static;                // Whether the Collider is static (non-moving)
-            bool is_trigger;               // Whether the Collider acts as a trigger (no physical resolution)
             bool b_collided;               // Collision flag
             Resolution resolution;         // Collision resolution type (NONE, SLIDE, BOUNCE)
 
-            // Initialization flag
-            bool isInitialized;            // True if Collider has been initialized from Transform
-
-            // Default constructor
             Collider()
                 : shape_type{ ShapeType::AABB },
-                position{ 0.0f, 0.0f },
-                size{ 0.0f, 0.0f },
-                offset{ 0.0f, 0.0f },
-                rotation{ 0.0f },
-                is_static{ false },
-                is_trigger{ false },
+                transform(),
+                pos_offset{ 0.0f, 0.0f },
+                b_bind_to_entity{ true },
                 b_collided{ false },
-                resolution{ Resolution::NONE },
-                isInitialized{ false } {}
-
-            // Constructor with parameters
-            Collider(ShapeType type, Vector2f size, Vector2f offset, float rotation,
-                bool is_static, bool is_trigger, Resolution resolution)
-                : shape_type{ type },
-                position{ 0.0f, 0.0f },
-                size{ size },
-                offset{ offset },
-                rotation{ rotation },
-                is_static{ is_static },
-                is_trigger{ is_trigger },
-                b_collided{ false },
-                resolution{ resolution },
-                isInitialized{ true } {}
-
-            // Initialize Collider from a Transform
-            void initializeFromTransform(const Transform::Transform& transform) {
-                position = transform.position + offset;
-                size = transform.scale;
-                rotation = transform.rotation;
-            }
-
-            // Sync Transform to Collider state
-            void syncTransform(Transform::Transform& transform) const {
-                if (!is_static) {
-                    transform.position = position - offset;
-                    transform.scale = size;
-                    transform.rotation = rotation;
-                }
-            }
+                resolution{ Resolution::NONE } {}
         };
 
         //Change physics world variables

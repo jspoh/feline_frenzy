@@ -336,7 +336,7 @@ namespace NIKE {
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
 			//Save Prefab popup
-			std::function<void()> savePrefabPopUp(std::string const& popup_id);
+			std::function<void()> createPrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
@@ -388,6 +388,9 @@ namespace NIKE {
 			//Set error message for popup
 			void setPopUpSuccessMsg(std::string const& msg);
 
+			//Gettor for comps_ui
+			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>>& getCompsUI();
+
 			//Add component UI function
 			template<typename T>
 			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
@@ -417,6 +420,19 @@ namespace NIKE {
 		//Prefabs Management panel
 		class PrefabsPanel : public IPanel {
 		private:
+
+			struct TemporaryEntity {
+				// Stores file path to prefab
+				std::string file_path;
+				// The prefab temp entity
+				Entity::Type entity;
+			};
+
+			// For prefab temp entity
+			TemporaryEntity prefab_temp_entity;
+
+			// Reference to component panel
+			std::weak_ptr<ComponentsPanel> comps_panel;
 		public:
 			PrefabsPanel() = default;
 			~PrefabsPanel() = default;
@@ -439,6 +455,16 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			// Accept payload from file management
+			void prefabAcceptPayload();
+
+			// For component stuff
+			void renderPrefabComponents();
+
+			// Utility functions for managing prefab entity
+			void createTempPrefabEntity(const std::string& file_path);
+			void clearTempPrefabEntity();
 		};
 
 		//Debug Management Panel
@@ -563,6 +589,9 @@ namespace NIKE {
 			//Moving file accept payload
 			void moveFileAcceptPayload(std::string const& virtual_path);
 
+			//Entities panel for string reference
+			std::weak_ptr<EntitiesPanel> entities_panel;
+
 			//On drop file event
 			void onEvent(std::shared_ptr<Assets::FileDropEvent> event) override;
 		public:
@@ -619,6 +648,35 @@ namespace NIKE {
 
 			//Camera change action
 			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
+
+			//Init
+			void init() override;
+
+			//Update
+			void update() override;
+
+			//Render
+			void render() override;
+		};
+
+		//User interface Management Panel
+		class UIPanel : public IPanel {
+		private:
+			//Create button popup
+			std::function<void()> createButtonPopup(std::string const& popup_id);
+		public:
+			UIPanel() = default;
+			~UIPanel() = default;
+
+			//Panel Name
+			std::string getName() const override {
+				return "User Interface Management";
+			}
+
+			//Static panel name
+			static std::string getStaticName() {
+				return "User Interface Management";
+			}
 
 			//Init
 			void init() override;
@@ -809,6 +867,8 @@ namespace NIKE {
 			//Render
 			void render() override;
 		};
+
+
 	}
 }
 

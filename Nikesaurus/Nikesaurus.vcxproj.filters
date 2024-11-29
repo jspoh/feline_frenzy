@@ -43,7 +43,7 @@
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
     <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
-    <ClCompile Include="src\Managers\Services\sLua.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLua.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
@@ -57,6 +57,7 @@
     <ClCompile Include="src\Components\cEnemy.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysEnemy.cpp" />
     <ClCompile Include="src\Components\cDespawn.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -111,7 +112,7 @@
     <ClInclude Include="headers\Managers\Services\sMap.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
-    <ClInclude Include="headers\Managers\Services\sLua.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
@@ -126,6 +127,7 @@
     <ClInclude Include="headers\Components\cEnemy.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysEnemy.h" />
     <ClInclude Include="headers\Components\cDespawn.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

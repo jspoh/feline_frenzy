@@ -92,8 +92,8 @@ namespace NIKE {
 
 		//Check if mouse is over any entity currently
 		std::for_each(ui_entities.begin(), ui_entities.end(), 
-			[&event](std::pair<std::string, std::pair<Entity::Type, bool>> entity){
-				if (entity.second.second) {
+			[&event](std::pair<std::string, UIBtn> entity){
+				if (entity.second.b_hovered) {
 					event->setEventProcessed(true);
 					return;
 				}
@@ -152,7 +152,6 @@ namespace NIKE {
 			}
 
 			auto getVertices = []() {
-
 				std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model")->vertices;
 
 				std::vector<Vector2f> vert;
@@ -160,8 +159,9 @@ namespace NIKE {
 					vert.push_back(v.pos);
 				}
 				return vert;
-			};
+				};
 
+			vert = getVertices();
 			for (auto& point : vert) {
 				point.x *= e_transform.scale.x;
 				point.y *= e_transform.scale.y;
@@ -203,14 +203,17 @@ namespace NIKE {
 		}
 
 		//Place always place UI entity at the top layer
-		ui_entities.emplace(btn_id, std::make_pair(NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1), false));
+		UIBtn btn;
+		btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+		btn.b_hovered = false;
+		ui_entities.emplace(btn_id, btn);
 
 		//Add components for UI
-		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(trans));
-		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
-		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(shape));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(trans));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(text));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(shape));
 
-		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).entity_id);
 
 		//Add transform into hover container
 		if (btn_transform_comp.has_value()) {
@@ -218,7 +221,7 @@ namespace NIKE {
 			hover_container[btn_id].second = false;
 		}
 
-		return ui_entities.at(btn_id).first;
+		return ui_entities.at(btn_id).entity_id;
 	}
 
 	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture) {
@@ -229,14 +232,17 @@ namespace NIKE {
 		}
 
 		//Place always place UI entity at the top layer
-		ui_entities.emplace(btn_id, std::make_pair(NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1), false));
+		UIBtn btn;
+		btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+		btn.b_hovered = false;
+		ui_entities.emplace(btn_id, btn);
 
 		//Add components for UI
-		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(trans));
-		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(text));
-		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).first, std::move(texture));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(trans));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(text));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(texture));
 
-		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).first);
+		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).entity_id);
 
 		//Add transform into hover container
 		if (btn_transform_comp.has_value()) {
@@ -244,7 +250,7 @@ namespace NIKE {
 			hover_container[btn_id].second = false;
 		}
 
-		return ui_entities.at(btn_id).first;
+		return ui_entities.at(btn_id).entity_id;
 	}
 
 	bool UI::Service::isButtonHovered(std::string const& btn_id) const {
@@ -256,12 +262,12 @@ namespace NIKE {
 		}
 
 		//Return hover state
-		return it->second.second;
+		return it->second.b_hovered;
 	}
 
-	bool UI::Service::isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state) {
+	bool UI::Service::isButtonClicked(std::string const& btn_id, int keyorbtn_code) {
 
-		if (ui_entities.at(btn_id).second) {
+		if (ui_entities.at(btn_id).b_hovered) {
 			input_checks[keyorbtn_code].first = true;
 		}
 		else {
@@ -272,7 +278,7 @@ namespace NIKE {
 		bool return_state = false;
 
 		//Return state & if button hovered
-		switch (state) {
+		switch (ui_entities.at(btn_id).input_state) {
 		case InputStates::PRESSED:
 			return input_checks[keyorbtn_code].second.pressed;
 			break;
@@ -293,17 +299,57 @@ namespace NIKE {
 		return false;
 	}
 
-	std::unordered_map<std::string, std::pair<Entity::Type, bool>> UI::Service::getAllButtons() const {
+	std::unordered_map<std::string, UI::UIBtn> UI::Service::getAllButtons() const {
 		return ui_entities;
 	}
 
 	bool UI::Service::checkEntity(Entity::Type entity) const {
 		for (auto const& ui_entity : ui_entities) {
-			if (ui_entity.second.first == entity)
+			if (ui_entity.second.entity_id == entity)
 				return true;
 		}
 
 		return false;
+	}
+
+	bool UI::Service::checkUIEntity(std::string const& btn_id) {
+		return ui_entities.find(btn_id) != ui_entities.end();
+	}
+
+	void UI::Service::setButtonScript(std::string const& btn_id, Lua::Script const& script) {
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button does not exist");
+		}
+
+		it->second.script = script;
+	}
+
+	Lua::Script UI::Service::getButtonScript(std::string const& btn_id) const {
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button does not exist");
+		}
+
+		return it->second.script;
+	}
+
+	void UI::Service::setButtonInputState(std::string const& btn_id, InputStates state) {
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button does not exist");
+		}
+
+		it->second.input_state = state;
+	}
+
+	UI::InputStates UI::Service::getButtonInputState(std::string const& btn_id) const {
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button does not exist");
+		}
+
+		return it->second.input_state;
 	}
 
 	void UI::Service::init() {
@@ -313,7 +359,7 @@ namespace NIKE {
 	void UI::Service::update() {
 		//Remove inactive entities
 		for (auto it = ui_entities.begin(); it != ui_entities.end();) {
-			if (!NIKE_ECS_MANAGER->checkEntity(it->second.first)) {
+			if (!NIKE_ECS_MANAGER->checkEntity(it->second.entity_id)) {
 
 				it = ui_entities.erase(it);
 			}
@@ -326,8 +372,8 @@ namespace NIKE {
 		for (auto& entity : ui_entities) {
 
 			//Always set UI layer entity to the last layer
-			if (NIKE_ECS_MANAGER->getEntityLayerID(entity.second.first) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
-				NIKE_ECS_MANAGER->setEntityLayerID(entity.second.first, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			if (NIKE_ECS_MANAGER->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+				NIKE_ECS_MANAGER->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 			}
 
 			//Reset all input checks to false
@@ -336,12 +382,12 @@ namespace NIKE {
 			}
 
 			//Get transform comp
-			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.first);
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.entity_id);
 			if (!e_transform_comp.has_value()) continue;
 			auto& e_transform = e_transform_comp.value().get();
 
 			//Get text comp
-			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.first);
+			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.entity_id);
 			if (!e_text_comp.has_value()) continue;
 			auto& e_text = e_text_comp.value().get();
 
@@ -361,11 +407,9 @@ namespace NIKE {
 			//Clamp scale
 			e_text.scale = std::clamp(e_text.scale, EPSILON, 10.0f);
 
-			static bool play = true;
-
 			//Check if button is hovered
-			if (buttonHovered(entity.second.first)) {
-				entity.second.second = true;
+			if (buttonHovered(entity.second.entity_id)) {
+				entity.second.b_hovered = true;
 
 				//Save data before hover
 				if (!hover_container[entity.first].second) {
@@ -375,20 +419,18 @@ namespace NIKE {
 
 				//Hover
 				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
-				if (play)
-				{
-					NIKE_AUDIO_SERVICE->playAudio("begin", "test", "MASTER", 0.5f,1.f, 0, false);
-					play = false;
+
+				//Execute script for trigger
+				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
+					NIKE_LUA_SERVICE->executeScript(entity.second.script);
 				}
-				
 			}
 			else {
-				entity.second.second = false;
+				entity.second.b_hovered = false;
 				if (hover_container[entity.first].second) {
 					e_transform.scale = hover_container[entity.first].first.scale;
 					hover_container[entity.first].second = false;
 				}
-				play = true;
 			}
 		}
 	}

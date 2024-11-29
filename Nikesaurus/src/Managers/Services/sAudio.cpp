@@ -4,6 +4,7 @@
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -269,14 +270,6 @@ namespace NIKE {
 		return Audio::Service::convertChannelGroup(new Audio::NIKEChannelGroup(parent_group));
 	}
 
-	void Audio::NIKEChannelGroup::setSystemChannel(bool value) {
-		isSystemChannel = value;
-	}
-
-	bool Audio::NIKEChannelGroup::checkSystemChannel() const{
-		return isSystemChannel;
-	}
-
 	/*****************************************************************//**
 	* NIKE AUDIO SYSTEM
 	*********************************************************************/
@@ -291,7 +284,7 @@ namespace NIKE {
 		// Check if fmod studio system is created
 		if (result != FMOD_OK)
 		{
-			cerr << "CREATION OF FMOD STUDIO SYSTEM FAILED!" << endl;
+			LOG_CRASH("CREATION OF FMOD STUDIO SYSTEM FAILED!");
 			exit(-1);
 		}
 
@@ -299,7 +292,7 @@ namespace NIKE {
 		// Check if fmod studio system is initialized
 		if (result != FMOD_OK)
 		{
-			cerr << "INITIALIZATION OF STUDIO FMOD SYSTEM FAILED!" << endl;
+			LOG_CRASH("INITIALIZATION OF STUDIO FMOD SYSTEM FAILED!");
 			exit(-1);
 		}
 		else {
@@ -319,7 +312,7 @@ namespace NIKE {
 		// Check for audio file validadity
 		if (result != FMOD_OK)
 		{
-			throw std::runtime_error("INVALID FILE PATH.");
+			LOG_CRASH("INVALID FILE PATH.");
 		}
 
 		NIKEE_CORE_INFO("Sucessfully loaded sound from " + file_path);
@@ -339,7 +332,7 @@ namespace NIKE {
 		// Check for audio file validadity
 		if (result != FMOD_OK)
 		{
-			throw std::runtime_error("INVALID FILE PATH.");
+			LOG_CRASH("INVALID FILE PATH.");
 		}
 
 		NIKEE_CORE_INFO("Sucessfully loaded music from " + file_path);
@@ -354,7 +347,7 @@ namespace NIKE {
 		result = fmod_system->createChannelGroup(identifier.c_str(), &temp);
 		if (result != FMOD_OK)
 		{
-			throw std::runtime_error("AUDIO GROUP NOT INITIALIZED");
+			LOG_CRASH("AUDIO GROUP NOT INITIALIZED");
 		}
 		
 		return std::make_shared<Audio::NIKEChannelGroup>(temp);
@@ -412,11 +405,14 @@ namespace NIKE {
 		// Check if the group already exists in the map
 		if (channel_groups.find(channel_group_id) != channel_groups.end())
 		{
-			throw std::runtime_error("AUDIO GROUP ALREADY EXISTS");
+			NIKEE_CORE_ERROR("Error: Channel Group '{}' already exists! Skipping.", channel_group_id);
+			return;
 		}
 
 		//Emplace into audio group list
 		channel_groups.emplace(std::piecewise_construct, std::forward_as_tuple(channel_group_id), std::forward_as_tuple(std::move(std::static_pointer_cast<Audio::NIKEChannelGroup>(audio_system->createChannelGroup(channel_group_id)))));
+		//Create a playlist for each group
+		createChannelPlaylist(channel_group_id);
 	}
 
 	void Audio::Service::unloadChannelGroup(std::string const& channel_group_id) {
@@ -425,7 +421,8 @@ namespace NIKE {
 		//Check if group exists
 		if (it == channel_groups.end())
 		{
-			throw std::runtime_error("AUDIO GROUP DOES NOT EXISTS");
+			NIKEE_CORE_ERROR("Error: Channel Group '{}' does not exists! Skipping.", channel_group_id);
+			return;
 		}
 
 		//Unload channel group
@@ -435,7 +432,9 @@ namespace NIKE {
 			group->release();
 		}
 		//Erase channel group from map
-		channel_groups.erase(it);
+		it = channel_groups.erase(it);
+		//Erase channel playlist
+		channel_playlists.erase(channel_group_id);
 	}
 
 	void Audio::Service::destroyChannelGroups() {
@@ -469,7 +468,8 @@ namespace NIKE {
 		// Check if the group already exists in the map
 		if (it == channel_groups.end())
 		{
-			throw std::runtime_error("AUDIO GROUP DOES NOT EXISTS");
+			NIKEE_CORE_ERROR("AUDIO GROUP DOES NOT EXISTS");
+			return nullptr;
 		}
 
 		//Return channel group
@@ -483,7 +483,8 @@ namespace NIKE {
 		// Check if the group already exists in the map
 		if (it == channels.end())
 		{
-			throw std::runtime_error("CHANNEL DOES NOT EXISTS, OR HAS BEEN DELETED");
+			NIKEE_CORE_ERROR("CHANNEL DOES NOT EXISTS, OR HAS BEEN DELETED");
+			return nullptr;
 		}
 
 		//Return channel group
@@ -554,38 +555,33 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
-	* BGM
+	* Playlist Management
 	*********************************************************************/
-	std::queue<std::string>& Audio::Service::getBGMQueue() {
-		return bgm_playlist;
-	}
 
-	bool Audio::Service::checkIsBGMPlaying() {
-		return is_bgm_playing;
-	}
-
-	void Audio::Service::setIsBGMPlaying(bool value) {
-		is_bgm_playing = value;
-	}
-
-	void Audio::Service::addBGMToQueue(std::string const& audio_id) {
-		bgm_playlist.push(audio_id);
-
-		if (!is_bgm_playing) {
-			playBGM();  // If no BGM is playing, start playing immediately
+	void Audio::Service::createChannelPlaylist(std::string channel_id) {
+		if (channel_playlists.find(channel_id) != channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Channel Playlist already exists! Skipping.");
+			return;
 		}
+		channel_playlists.emplace(channel_id, std::queue<std::string>());
 	}
 
-	void Audio::Service::playBGM() {
-		if (!bgm_playlist.empty()) {
-			std::string current_bgm = bgm_playlist.front();
-			bgm_playlist.pop();
-
-
-			playAudio(current_bgm, "", "BGM", 1.0f, 1.0f, false, true);
-
-			is_bgm_playing = true;
+	std::queue<std::string>& Audio::Service::getChannelPlaylist(std::string channel_id) {
+		// Find channel's playlist
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			LOG_CRASH("Error: Unable to find channel's playlist");
 		}
+		return it->second;
+	}
+
+	void Audio::Service::queueAudioToPlaylist(std::string channel_id, std::string audio_id) {
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
+			return;
+		}
+		it->second.push(audio_id);
 	}
 
 	void Audio::Service::update() {

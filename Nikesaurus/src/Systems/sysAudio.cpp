@@ -2,7 +2,8 @@
  * \file   sysAudio.cpp
  * \brief
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (70%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -47,17 +48,19 @@ namespace NIKE {
 			}
 		}
 
-		// Handle BGM
-		if (NIKE_AUDIO_SERVICE->checkIsBGMPlaying()) {
+		// Handle Playlists
+		for (auto& channels : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
 
-			if (NIKE_AUDIO_SERVICE->getChannelGroup("BGM") && !NIKE_AUDIO_SERVICE->getChannelGroup("BGM")->isPlaying()) {
-				// If the BGM has finished playing, play the next track in the playlist
-				if (!NIKE_AUDIO_SERVICE->getBGMQueue().empty()) {
-					NIKE_AUDIO_SERVICE->playBGM();  // Play the next track
+			if (!channels.second->isPlaying() && !channels.second->getPaused()) {
+				auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channels.first);
+				if (!playlist.empty()) {
+					const std::string& audio_id = std::move(playlist.front());
+
+					NIKE_AUDIO_SERVICE->playAudio(audio_id, "", channels.first, 1.f, 1.f, false, true);
+
+					playlist.pop();
 				}
-				else {
-					NIKE_AUDIO_SERVICE->setIsBGMPlaying(false);  // No more tracks to play
-				}
+
 			}
 		}
 	}

@@ -27,40 +27,36 @@ namespace NIKE {
 
         // Calculate impulse magnitude based on collision response
         float impulse_magnitude = -(1 + restitution) * normal_vel;
-        Vector2f impulse = info.collision_normal * impulse_magnitude;
+
+        // Calculate the reflection vector for angular bounce
+        Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
 
         if (collider_a.resolution == Physics::Resolution::NONE) {
-            // Move collider B back
-            collider_b.position += info.mtv;
+            // Transform back outside of collision
+            transform_b.position += info.mtv;
 
-            // Apply impulse
+            // Apply impluse to velocity
             dynamics_b.velocity -= impulse;
 
-            // Update Transform B
-            transform_b.position = collider_b.position - collider_b.offset;
+            //Update bounding box
+            collider_b.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
+            collider_b.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
         else if (collider_b.resolution == Physics::Resolution::NONE) {
-            // Move collider A back
-            collider_a.position += info.mtv;
+            // Transform back outside of collision
+            transform_a.position += info.mtv;
 
-            // Apply impulse
+            // Apply impluse to velocity
             dynamics_a.velocity += impulse;
-
-            // Update Transform A
-            transform_a.position = collider_a.position - collider_a.offset;
         }
         else {
-            // Split MTV between A and B
-            collider_a.position += info.mtv * 0.5f;
-            collider_b.position -= info.mtv * 0.5f;
+            // Transform back outside of collision
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
 
-            // Apply impulse based on mass
-            dynamics_a.velocity += impulse * (dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
-            dynamics_b.velocity -= impulse * (dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
-
-            // Update Transform positions
-            transform_a.position = collider_a.position - collider_a.offset;
-            transform_b.position = collider_b.position - collider_b.offset;
+            // Apply impulse to velocity based on mass
+            dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
+            dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
         }
     }
 
@@ -73,26 +69,26 @@ namespace NIKE {
         return restitution;
     }
 
-bool Collision::System::detectAABBRectRect(
+    bool Collision::System::detectAABBRectRect(
         Physics::Dynamics const& dynamics_a, Physics::Collider const& collider_a,
         Physics::Dynamics const& dynamics_b, Physics::Collider const& collider_b,
         CollisionInfo& info) {
         
         // References to components
         AABB aabb_a({
-            collider_a.position.x - (collider_a.size.x * 0.5f),
-            collider_a.position.y - (collider_a.size.y * 0.5f)
+            collider_a.transform.position.x - (collider_a.transform.scale.x * 0.5f),
+            collider_a.transform.position.y - (collider_a.transform.scale.y * 0.5f)
         }, {
-            collider_a.position.x + (collider_a.size.x * 0.5f),
-            collider_a.position.y + (collider_a.size.y * 0.5f)
+            collider_a.transform.position.x + (collider_a.transform.scale.x * 0.5f),
+            collider_a.transform.position.y + (collider_a.transform.scale.y * 0.5f)
         });
 
         AABB aabb_b({
-            collider_b.position.x - (collider_b.size.x * 0.5f),
-            collider_b.position.y - (collider_b.size.y * 0.5f)
+            collider_b.transform.position.x - (collider_b.transform.scale.x * 0.5f),
+            collider_b.transform.position.y - (collider_b.transform.scale.y * 0.5f)
         }, {
-            collider_b.position.x + (collider_b.size.x * 0.5f),
-            collider_b.position.y + (collider_b.size.y * 0.5f)
+            collider_b.transform.position.x + (collider_b.transform.scale.x * 0.5f),
+            collider_b.transform.position.y + (collider_b.transform.scale.y * 0.5f)
         });
 
         // Get delta time
@@ -188,14 +184,31 @@ bool Collision::System::detectAABBRectRect(
         // Initialize vertex list based on model type
         std::vector<Vector2f> vertices;
 
-        if (model_id == "triangle") {
+        // quad models
+        constexpr std::array<const char*, 4> QUAD_MODELS {
+            "square.model",
+            "square-texture.model",
+            "batched_square.model",
+            "batched_texture.model"
+        };
+
+        if (model_id == "triangle.model") {
             vertices = {
                 Vector2f(-0.5f, -0.5f),
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.0f, 0.5f)
             };
         }
-        else if (model_id == "square" || model_id == "square-texture") {
+        else if (std::find(QUAD_MODELS.begin(), QUAD_MODELS.end(), model_id) != QUAD_MODELS.end()) {
+            vertices = {
+                Vector2f(0.5f, -0.5f),
+                Vector2f(0.5f, 0.5f),
+                Vector2f(-0.5f, 0.5f),
+                Vector2f(-0.5f, -0.5f)
+            };
+        }
+        //Fallback default to square
+        else {
             vertices = {
                 Vector2f(0.5f, -0.5f),
                 Vector2f(0.5f, 0.5f),
@@ -205,12 +218,12 @@ bool Collision::System::detectAABBRectRect(
         }
 
         // Apply scaling and rotation based on Collider properties
-        float angleRad = collider.rotation * static_cast<float>(M_PI) / 180.0f; // Convert degrees to radians
+        float angleRad = collider.transform.rotation * static_cast<float>(M_PI) / 180.0f; // Convert degrees to radians
         float cosAngle = cos(angleRad);
         float sinAngle = sin(angleRad);
 
-        Vector2f position = collider.position; // Collider's position is independent of Transform
-        Vector2f scale = collider.size;
+        Vector2f position = collider.transform.position; // Collider's position is independent of Transform
+        Vector2f scale = collider.transform.scale;
 
         for (Vector2f& vertex : vertices) {
             // Scale the vertex
@@ -318,7 +331,7 @@ bool Collision::System::detectAABBRectRect(
         // Step 3: If collision is detected, assign the MTV and collision normal
         if (collisionDetected) {
             // Calculate consistent MTV direction based on relative position
-            Vector2f relativePosition = colliderA.position - colliderB.position;
+            Vector2f relativePosition = colliderA.transform.position - colliderB.transform.position;
             float biasFactor = 0.001f;
 
             if (relativePosition.dot(smallestAxis) < 0) {
@@ -367,81 +380,32 @@ bool Collision::System::detectAABBRectRect(
             return;
         }
 
-        // Apply MTV to Collider
-        collider_a.position += info.mtv * 0.5f;
-        collider_b.position -= info.mtv * 0.5f;
-
-        // Update Transform to reflect Collider's new status
-        collider_a.syncTransform(transform_a);
-        collider_b.syncTransform(transform_b);
-
-    }
-
-
-
-
-    /* Temporary storage for mouse click detection functions
-        // Detect if the mouse is inside a rectangular area
-        bool Collision::Manager::detectMClickRect(const Vector2& center, float width, float height) {
-        // Get the mouse position from Input::Manager
-        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
-        float mouseX = mouse.button_pos.x;
-        float mouseY = mouse.button_pos.y;
-
-        // Calculate the boundaries of the rectangle
-        float left = center.x - (width * 0.5f);
-        float right = center.x + (width * 0.5f);
-        float top = center.y - (height * 0.5f);
-        float bottom = center.y + (height * 0.5f);
-
-        // Check if the mouse is inside the rectangle
-        if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
-
-            // Check if the mouse is exactly at the center
-            if (mouseX == center.x && mouseY == center.y) {
-                cout << "Mouse is exactly at the center of the rectangle." << endl;
-            }
-            else {
-                // Print where the mouse is relative to the center of the rectangle
-                if (mouseX < center.x)
-                    cout << "Mouse is on the left side of the center." << endl;
-                else
-                    cout << "Mouse is on the right side of the center." << endl;
-
-                if (mouseY < center.y)
-                    cout << "Mouse is above the center." << endl;
-                else
-                    cout << "Mouse is below the center." << endl;
-            }
-
-            return true;
+        // Slide To Slide Resolution
+        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
+            transform_a.position += info.mtv.operator*(0.5f);
+            transform_b.position -= info.mtv.operator*(0.5f);
+            return;
         }
 
-        return false;
-    }
-
-
-    // Detect if the mouse is inside a circular area
-    bool Collision::Manager::detectMClickCircle(const Vector2& center, float radius) {
-
-        // Get the mouse position from Input::Manager
-        const Input::Mouse mouse = Input::Manager::getInstance()->getMouse();
-        float mouseX = mouse.button_pos.x;
-        float mouseY = mouse.button_pos.y;
-
-        // Calculate the distance from the mouse to the center of the circle
-        float distX = mouseX - center.x;
-        float distY = mouseY - center.y;
-        float distance = std::sqrt(distX * distX + distY * distY);
-
-        // Check if the mouse is inside the circle
-        if (distance <= radius) {
-            cout << "Mouse is inside the circle." << endl;
-            return true;
+        // Resolution::NONE currently makes movement object "bounce"
+        switch (collider_a.resolution) {
+        case Physics::Resolution::NONE:
+            break;
+        case Physics::Resolution::SLIDE:
+            transform_a.position += info.mtv;
+            break;
+        default:
+            break;
         }
 
-        return false;
+        switch (collider_b.resolution) {
+        case Physics::Resolution::NONE:
+            break;
+        case Physics::Resolution::SLIDE:
+            transform_b.position -= info.mtv;
+            break;
+        default:
+            break;
+        }
     }
-    */
-
 }

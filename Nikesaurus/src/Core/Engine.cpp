@@ -65,19 +65,19 @@ namespace NIKE {
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
-		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Shooting::Shooting>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
 
 		//Register physics manager
-		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
-		game_logic_sys->registerLuaSystem(physics_sys);
+		//game_logic_sys->registerLuaSystem(physics_sys);
 
 		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
@@ -108,9 +108,7 @@ namespace NIKE {
 
 	}
 
-	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
-
-		//Provide ecs coordinator service for internal engine usage
+	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
 		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Provide Service
@@ -158,24 +156,24 @@ namespace NIKE {
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for key event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse move event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse scroll event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
 		
 		//Init paths
 		NIKE_PATH_SERVICE->init(json_config);
@@ -201,6 +199,9 @@ namespace NIKE {
 		//Init UI
 		NIKE_UI_SERVICE->init();
 
+		//Init Lua
+		NIKE_LUA_SERVICE->init();
+
 		// For testing imgui combo - lim
 		NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
 
@@ -209,6 +210,10 @@ namespace NIKE {
 
 		//Register Def Managers
 		registerDefSystems();
+
+		int max_texture_units;
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
 	}
 
 	void Core::Engine::run() {
@@ -235,14 +240,15 @@ namespace NIKE {
 
 			static constexpr bool JS_TEXTURE_TEST = false;
 			//Render entity to mouse click
-			if constexpr(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			if 
+				(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
 				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
 				for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
 					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
 					Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-					Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+					Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
@@ -273,6 +279,11 @@ namespace NIKE {
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+			}
 		}
 
 		//Stop watching all directories
