@@ -134,7 +134,7 @@ namespace NIKE {
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {
 		if(b_virtual) {
 			if (!isPathValid(path)) {
-				NIKEE_CORE_ERROR("Invalid path detected. Asset will not be registered.");
+				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
 				return "";
 			}
 			auto asset_id = getIDFromPath(path);
@@ -145,7 +145,7 @@ namespace NIKE {
 		}
 		else {
 			if (!isPathValid(path, false)) {
-				NIKEE_CORE_ERROR("Invalid path detected. Asset will not be registered.");
+				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
 				return "";
 			}
 			auto asset_id = getIDFromPath(path, false);
@@ -431,7 +431,7 @@ namespace NIKE {
 
 				//Check for valid path before registering
 				if (valid_extensions.find(file.path().extension().string()) == valid_extensions.end()) {
-					NIKEE_CORE_ERROR("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
+					NIKEE_CORE_WARN("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
 					continue;
 				}
 
@@ -454,7 +454,7 @@ namespace NIKE {
 
 			//Check for valid path before registering
 			if (valid_extensions.find(file.path().extension().string()) == valid_extensions.end()) {
-				NIKEE_CORE_ERROR("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
+				NIKEE_CORE_WARN("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
 				continue;
 			}
 
