@@ -17,6 +17,24 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		//Define a Lua-compatible value type
+		using LuaValue = std::variant<int, float, std::string, bool>;
+
+		//Lua script component
+		struct NIKE_API Script {
+			std::string script_id;
+			std::string function;
+			std::unordered_map<std::string, LuaValue> named_args;
+
+			Script() : script_id{ "" }, function{ "" } {}
+
+			//Serialize script comp
+			nlohmann::json serialize() const;
+
+			//Deserialize script comp
+			void deserialize(nlohmann::json const& data);
+		};
+
 		//Lua Service
 		class NIKE_API Service {
 		private:
@@ -26,6 +44,9 @@ namespace NIKE {
 
 			//Internal get sol table asset
 			std::shared_ptr<sol::load_result> getLuaAssset(std::string const& script_id) const;
+
+			//Convert script to sol::table args
+			sol::table convertScriptArgs(Script const& script) const;
 		public:
 			Service() = default;
 			~Service() = default;
@@ -69,7 +90,6 @@ namespace NIKE {
 			sol::object executeScript(sol::load_result& script, std::string const& function, int argc, Args&&... args) {
 
 				try {
-
 					//Check if script is loaded correctly
 					if (!script.valid()) {
 						throw std::runtime_error("Invalid Lua script: script is not loaded correctly.");
@@ -118,25 +138,26 @@ namespace NIKE {
 
 			//Execute lua script based on asset service id
 			template<typename ...Args>
-			sol::object executeScript(std::string const& script_id, std::string const& function, int argc, Args&&... args) {
+			sol::object executeScript(Script const& script) {
+
 				try {
 					//Get script table from asset service
-					auto script = getLuaAssset(script_id);
+					auto loaded_script = getLuaAssset(script.script_id);
 
 					//Check if script is loaded correctly
-					if (!script->valid()) {
+					if (!loaded_script->valid()) {
 						throw std::runtime_error("Invalid Lua script: script is not loaded correctly.");
 					}
 
 					//Execute script
-					sol::protected_function_result result = (*script)();
+					sol::protected_function_result result = (*loaded_script)();
 
 					//No function to be called
-					if (function.empty()) {
+					if (script.function.empty()) {
 
 						//Execute script table
 						if (result.get_type() == sol::type::table) {
-							return sol::make_object(script->lua_state(), result);
+							return sol::make_object(loaded_script->lua_state(), result);
 						}
 
 						//Execute script function
@@ -156,13 +177,13 @@ namespace NIKE {
 					sol::table script_table = result;
 
 					//Function to be called
-					sol::function script_function = script_table[function];
+					sol::function script_function = script_table[script.function];
 					if (!script_function.valid()) {
-						throw std::runtime_error("Function not found in script table: " + function);
+						throw std::runtime_error("Function not found in script table: " + script.function);
 					}
 
 					//Execute the Lua function with provided arguments
-					return script_function(argc, std::forward<Args>(args)...);
+					return script_function(script.named_args.size(), convertScriptArgs(script));
 				}
 				catch (std::runtime_error const& e) {
 					NIKEE_CORE_WARN(e.what());

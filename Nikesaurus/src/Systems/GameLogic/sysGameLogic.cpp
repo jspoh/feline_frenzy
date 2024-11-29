@@ -64,8 +64,8 @@ namespace NIKE {
 					if (e_player.script.script_path == "")
 						continue;
 
-					//Execute script
-					NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
+					////Execute script
+					//NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
 				}
 			}
 		}
