@@ -142,7 +142,11 @@ namespace NIKE {
         
         // Mouse position getter
         lua_state->set_function("getMousePos", [this]() -> sol::table {
-            Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMousePos();
+            // Get mouse position
+            Vector2f mouse_pos = {
+                NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2),
+                -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2))
+            };
             sol::table pos_table = lua_state->create_table();
             pos_table["x"] = mouse_pos.x;
             pos_table["y"] = mouse_pos.y;
