@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = true;
+constexpr bool BATCHED_RENDERING = false;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
@@ -279,8 +279,8 @@ namespace NIKE {
 			shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
 
 			//Flip texture options
-			shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+			//shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			//shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
 			//Get model
 			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
