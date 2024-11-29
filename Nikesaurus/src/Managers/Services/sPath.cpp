@@ -80,7 +80,7 @@ namespace NIKE {
 		}
 
 		//Return resolved path
-		return it->second / relative_path;
+		return normalizePath(it->second / relative_path);
 	}
 
 	std::filesystem::path Path::Service::normalizePath(std::filesystem::path const& path) const {

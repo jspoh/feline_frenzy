@@ -174,8 +174,20 @@ namespace NIKE {
 			EditorEntity(bool b_locked) : b_locked{ b_locked }{}
 		};
 
+		//Set entity ref event
+		struct SetEntityRef : public Events::IEvent {
+			Entity::Type entity;
+			std::string ref;
+
+			SetEntityRef(Entity::Type entity, std::string const& ref) :entity{ entity }, ref{ ref }{}
+		};
+
 		//Entities Management Panel
-		class EntitiesPanel : public IPanel, public Events::IEventListener<Coordinator::EntitiesChanged> {
+		class EntitiesPanel :
+			public IPanel,
+			public Events::IEventListener<Coordinator::EntitiesChanged>,
+			public Events::IEventListener<SetEntityRef>
+		{
 		private:
 			//Sort entities
 			struct EntitySorter{
@@ -220,6 +232,9 @@ namespace NIKE {
 
 			//On entities changed event
 			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
+
+			//On setting of entity ref
+			void onEvent(std::shared_ptr<SetEntityRef> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -667,8 +682,8 @@ namespace NIKE {
 			//Create button popup
 			std::function<void()> createButtonPopup(std::string const& popup_id);
 
-			//Delete button popup
-			std::function<void()> deleteButtonPopup(std::string const& popup_id);
+			//Weak reference to entity panel
+			std::weak_ptr<EntitiesPanel> entities_panel;
 		public:
 			UIPanel() = default;
 			~UIPanel() = default;
@@ -872,8 +887,6 @@ namespace NIKE {
 			//Render
 			void render() override;
 		};
-
-
 	}
 }
 
