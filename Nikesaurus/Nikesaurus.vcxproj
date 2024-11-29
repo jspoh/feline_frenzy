@@ -110,13 +110,10 @@
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />

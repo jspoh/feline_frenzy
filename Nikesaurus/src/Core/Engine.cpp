@@ -91,7 +91,9 @@ namespace NIKE {
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
+#ifndef NDEBUG
 		provideService(std::make_shared<LevelEditor::Service>());
+#endif
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
 
@@ -199,6 +201,10 @@ namespace NIKE {
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
+
+
+		// !TODO: remove this, hardcoded for testing only
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 	}
 
 	void Core::Engine::run() {

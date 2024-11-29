@@ -108,9 +108,6 @@
     <ClInclude Include="headers\Managers\Services\Lua\sLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
