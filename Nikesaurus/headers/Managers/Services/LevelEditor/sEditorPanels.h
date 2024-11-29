@@ -664,6 +664,9 @@ namespace NIKE {
 		private:
 			//Create button popup
 			std::function<void()> createButtonPopup(std::string const& popup_id);
+
+			//Delete button popup
+			std::function<void()> deleteButtonPopup(std::string const& popup_id);
 		public:
 			UIPanel() = default;
 			~UIPanel() = default;
