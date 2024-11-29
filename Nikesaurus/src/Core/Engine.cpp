@@ -227,10 +227,9 @@ namespace NIKE {
 
 			static constexpr bool JS_TEXTURE_TEST = false;
 			//Render entity to mouse click
-			if 
-				(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			if(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
-				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+				static const int NUM_ENTITIES_TO_SPAWN = 1;
 
 				for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
 					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();

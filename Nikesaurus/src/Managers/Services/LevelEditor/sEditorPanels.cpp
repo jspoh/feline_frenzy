@@ -813,6 +813,11 @@ namespace NIKE {
 			//Iterate through all entities to showcase active entities
 			for (auto& entity : entities) {
 
+				// Skip prefab entites
+				if (prefab_entities.find(entity.first) != prefab_entities.end()) {
+					continue;
+				}
+
 				//Check if entity is selected
 				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity.first).c_str() == entity_to_name.at(selected_entity).c_str();
 
@@ -892,6 +897,16 @@ namespace NIKE {
 		return it->second;
 	}
 
+	void LevelEditor::EntitiesPanel::addPrefabEntity(Entity::Type entity)
+	{
+		prefab_entities.insert(entity);
+	}
+
+	void LevelEditor::EntitiesPanel::removePrefabEntity(Entity::Type entity)
+	{
+		prefab_entities.erase(entity);
+	}
+
 	Entity::Type LevelEditor::EntitiesPanel::getSelectedEntity() const {
 		return selected_entity;
 	}
@@ -958,6 +973,11 @@ namespace NIKE {
 		//Add new entities from the ECS that are not yet in the editor
 		for (auto& entity : ecs_entities) {
 			if (entities.find(entity) == entities.end()) {
+
+				// Skip prefab entities
+				if (prefab_entities.find(entity) != prefab_entities.end()) {
+					continue;
+				}
 
 				//Create identifier for entity
 				char entity_name[32];
@@ -1414,6 +1434,8 @@ namespace NIKE {
 
 			//Add spacing before components
 			ImGui::Spacing();
+
+			cout << "run" << endl;
 
 			//Iterate over all registered components
 			for (const auto& component : comps) {
@@ -2408,6 +2430,9 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::init() {
 		//Components panel reference
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
+
+		// Editor entities panel ref
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 	}
 
 	void LevelEditor::PrefabsPanel::update() {
@@ -2426,16 +2451,27 @@ namespace NIKE {
 		// Show components attached to the prefab entity
 		renderPrefabComponents();
 
-		// Add a button to save changes to the prefab file
-		if (ImGui::Button("Save Prefab")) {
-			NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_temp_entity.file_path);
+		if (!prefab_temp_entity.file_path.empty())
+		{
+			// Add a button to save changes to the prefab file
+			if (ImGui::Button("Save Prefab")) {
+				NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_temp_entity.entity, prefab_temp_entity.file_path);
+			}
+
+			// Add a button to clear the current prefab
+			ImGui::SameLine();
+			if (ImGui::Button("Clear Prefab")) {
+				clearTempPrefabEntity();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Add Component")) {
+				comps_panel.lock()->openPopUp("Add Component");
+			}
+
 		}
 
-		// Add a button to clear the current prefab
-		ImGui::SameLine();
-		if (ImGui::Button("Clear Prefab")) {
-			clearTempPrefabEntity();
-		}
+
 
 
 
@@ -2457,6 +2493,16 @@ namespace NIKE {
 
 			ImGui::EndDragDropTarget();
 		}
+	}
+
+	void LevelEditor::PrefabsPanel::setBoolPrefabEntity(bool to_set)
+	{
+		b_is_prefab_entity = to_set;
+	}
+
+	bool& LevelEditor::PrefabsPanel::getBoolPrefabEntity()
+	{
+		return b_is_prefab_entity;
 	}
 
 	void LevelEditor::PrefabsPanel::renderPrefabComponents()
@@ -2481,27 +2527,33 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::createTempPrefabEntity(const std::string& file_path)
 	{
 		// Clear any existing prefab
-		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
-		{
-			// clearTempPrefabEntity();
-		}
+		clearTempPrefabEntity();
 
 		// Create a temporary entity (excluded from systems)
 		Entity::Type temp_entity = NIKE_ECS_MANAGER->createEntity();
+
+		b_is_prefab_entity = true;
 
 		std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(file_path);
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, prefab_full_path.string());
 
 		// Store the prefab information
 		prefab_temp_entity = { file_path, temp_entity };
+
+		// Notify entities panel to exclude this entity
+		entities_panel.lock()->addPrefabEntity(temp_entity);
 	}
 
 	void LevelEditor::PrefabsPanel::clearTempPrefabEntity()
 	{
-		if (!NIKE_ECS_MANAGER->getAllEntities().empty())
-		{
+		if (prefab_temp_entity.entity != Entity::MAX && NIKE_ECS_MANAGER->checkEntity(prefab_temp_entity.entity)) {
 			NIKE_ECS_MANAGER->destroyEntity(prefab_temp_entity.entity);
+
+			// Notify entity panel to stop excluding this entity
+			entities_panel.lock()->removePrefabEntity(prefab_temp_entity.entity);
+
 			prefab_temp_entity = { "", 0 };
+			b_is_prefab_entity = false;
 		}
 
 	}
@@ -4634,7 +4686,7 @@ namespace NIKE {
 				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 				//Default place holder text
-				std::string place_holder{ "Hello World! Ah Pan Tat!" };
+				std::string place_holder{ "New text" };
 
 				//Create entity
 				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);

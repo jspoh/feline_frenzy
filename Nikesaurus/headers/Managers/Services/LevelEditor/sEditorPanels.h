@@ -191,6 +191,9 @@ namespace NIKE {
 			std::unordered_map<Entity::Type, std::string> entity_to_name;
 			std::unordered_map<std::string, Entity::Type> name_to_entity;
 
+			// Track entities created for prefab editing.
+			std::set<Entity::Type> prefab_entities; 
+
 			//Selected entity
 			Entity::Type selected_entity;
 
@@ -245,6 +248,11 @@ namespace NIKE {
 
 			//Get entity name
 			std::string getEntityName(Entity::Type entity);
+
+			// For prefab entity handling
+			void addPrefabEntity(Entity::Type entity);
+
+			void removePrefabEntity(Entity::Type entity);
 
 			//Get selected entity
 			Entity::Type getSelectedEntity() const;
@@ -435,6 +443,12 @@ namespace NIKE {
 
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
+
+			// Reference to entities panel
+			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			// Boolean to tell editor entity is created for prefab purposes
+			bool b_is_prefab_entity;
 		public:
 			PrefabsPanel() = default;
 			~PrefabsPanel() = default;
@@ -460,6 +474,12 @@ namespace NIKE {
 
 			// Accept payload from file management
 			void prefabAcceptPayload();
+
+			// Settor for boolean
+			void setBoolPrefabEntity(bool to_set);
+
+			// Gettor for boolean
+			bool& getBoolPrefabEntity();
 
 			// For component stuff
 			void renderPrefabComponents();
