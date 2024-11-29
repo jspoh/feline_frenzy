@@ -241,7 +241,7 @@ namespace NIKE {
 		//Translate UV offset to bottom left
 		uv_offset.y = std::abs(1 - uv_offset.y - framesize.y);
 
-		const unsigned int tex_hdl = NIKE_ASSETS_SERVICE->getTexture(e_texture.texture_id)->gl_data;
+		const unsigned int tex_hdl = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data;
 
 		if constexpr (!BATCHED_RENDERING) {
 			//Set polygon mode
@@ -279,7 +279,7 @@ namespace NIKE {
 			shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
 			//Get model
-			auto& model = *NIKE_ASSETS_SERVICE->getModel("square-texture");
+			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
 
 			//Draw
 			glBindVertexArray(model.vaoid);

@@ -188,7 +188,7 @@ namespace NIKE {
 			 * \param path_to_mesh
 			 * \return success
 			 */
-			Model compileModel(const std::string& path_to_mesh, bool for_batched_rendering = false);
+			Model compileModel(const std::string& path_to_mesh);
 
 			/**
 			 * registers textures.

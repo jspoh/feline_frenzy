@@ -550,7 +550,7 @@ namespace NIKE {
 		return nullptr;
 	}
 
-	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh, bool for_batched_rendering) {
+	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
 		Assets::Model model;
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
@@ -634,6 +634,9 @@ namespace NIKE {
 		for (int i{}; i < tex_coords.size(); i++) {
 			model.vertices[i].tex_coords = tex_coords[i];
 		}
+
+		static constexpr const char* BATCHED_PREFIX = "batched_";
+		const bool for_batched_rendering = path_to_mesh.find(BATCHED_PREFIX) != std::string::npos;
 
 		if (tex_coords.size() == 0) {
 			if (for_batched_rendering) {
