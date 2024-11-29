@@ -76,9 +76,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
 	}
 
-	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
-
-		//Provide ecs coordinator service for internal engine usage
+	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
 		provideService(std::make_shared<Coordinator::Manager>());
 
 		//Provide Service
@@ -180,6 +178,10 @@ namespace NIKE {
 
 		//Register Def Managers
 		registerDefSystems();
+
+		int max_texture_units;
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
 	}
 
 	void Core::Engine::run() {
@@ -206,7 +208,8 @@ namespace NIKE {
 
 			static constexpr bool JS_TEXTURE_TEST = false;
 			//Render entity to mouse click
-			if constexpr(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			if 
+				(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
 				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
@@ -241,6 +244,11 @@ namespace NIKE {
 
 			//Swap Buffers
 			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+			}
 		}
 
 		//Stop watching all directories
