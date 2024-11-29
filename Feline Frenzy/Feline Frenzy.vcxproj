@@ -78,6 +78,7 @@
       <Command>xcopy "$(SolutionDir)$(ProjectName)\assets\*" "$(OutDir)assets\" /s  /r  /y  /q
 xcopy "$(SolutionDir)Nikesaurus\dependencies\shared\*" "$(OutDir)" /s  /r  /y  /q
 xcopy "$(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\Nikesaurus.dll" "$(OutDir)" /s  /r  /y  /q
+xcopy "(SolutionDir)bin\output\$(Configuration)-$(Platform)\Nikesaurus\*.pdb" "$(OutDir)" /s /r /y q
 xcopy "$(SolutionDir)Feline Frenzy\Config.json" "$(OutDir)" /s /r /y /q
 xcopy "$(SolutionDir)Feline Frenzy\imgui.ini" "$(OutDir)" /s /r /y /q</Command>
     </PostBuildEvent>

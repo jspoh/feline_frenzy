@@ -27,10 +27,12 @@ namespace NIKE {
 
 		struct RenderInstance {
 			Matrix_33 xform{};
+			bool to_blend_color = false;
 			Vector4f color{};
 			unsigned int tex{};
 			Vector2f framesize{};
 			Vector2f uv_offset{};
+			float blend_intensity{};
 		};
 
 		//Render Manager

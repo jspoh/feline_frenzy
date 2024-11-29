@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = false;
+constexpr bool BATCHED_RENDERING = true;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
@@ -300,6 +300,9 @@ namespace NIKE {
 			instance.tex = tex_hdl;
 			instance.framesize = framesize;
 			instance.uv_offset = uv_offset;
+			instance.to_blend_color = e_texture.b_blend;
+			instance.color = e_texture.color;
+			instance.blend_intensity = e_texture.intensity;
 
 			render_instances_texture.push_back(instance);
 
@@ -374,6 +377,13 @@ namespace NIKE {
 				v.transform = render_instances_texture[i].xform;
 				v.framesize = render_instances_texture[i].framesize;
 				v.uv_offset = render_instances_texture[i].uv_offset;
+				v.to_blend_color = render_instances_texture[i].to_blend_color;
+
+				if (v.to_blend_color) {
+					v.to_blend_color = !!v.to_blend_color;
+					v.col = render_instances_texture[i].color;
+					v.blend_intensity = render_instances_texture[i].blend_intensity;
+				}
 
 				// get index of texture hdl in texture_binding_unit_map vector
 				if (texture_binding_unit_map.find(render_instances_texture[i].tex) == texture_binding_unit_map.end()) {
