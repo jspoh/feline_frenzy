@@ -51,9 +51,15 @@
     <ClCompile Include="src\Managers\ECS\mCoordinator.cpp" />
     <ClCompile Include="src\Managers\ECS\mComponent.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sAssets.cpp" />
-    <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp" />
-    <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
-    <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
+    <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />

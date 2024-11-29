@@ -40,6 +40,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Dynamics>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Dynamics& comp) {
 				ImGui::Text("Edit Physics Dynamics:");
@@ -205,6 +206,7 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 
 		//Register Collider for serializarion
 		NIKE_SERIALIZE_SERVICE->registerComponent<Physics::Collider>(
@@ -223,6 +225,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Collider>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Collider& comp) {
 				// For collider response
@@ -400,5 +403,6 @@ namespace NIKE {
 					}
 				}
 			});
+#endif
 	}
 }

@@ -39,6 +39,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		//Register SFX for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Audio::SFX>(
 			[](LevelEditor::ComponentsPanel& comp_panel, Audio::SFX& comp) {
@@ -245,5 +246,6 @@ namespace NIKE {
 				
 			}
 		);
+#endif
 	}
 }
