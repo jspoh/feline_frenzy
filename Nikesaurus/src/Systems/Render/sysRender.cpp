@@ -245,7 +245,7 @@ namespace NIKE {
 
 		if constexpr (!BATCHED_RENDERING) {
 			//Set polygon mode
-			glPolygonMode(GL_FRONT, GL_FILL);
+			//glPolygonMode(GL_FRONT, GL_FILL);			// do not use this, 1280: invalid enum
 
 			// use shader
 			shader_system->useShader("texture");
