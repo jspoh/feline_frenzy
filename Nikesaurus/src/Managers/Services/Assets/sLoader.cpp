@@ -428,7 +428,7 @@ namespace NIKE {
 		// batched_texture.vert location=11
 		static constexpr int BLEND_ATTRIB_INDEX = 11;
 		static constexpr int BLEND_ATTRIB_SIZE = 1;		// num elements (x, y)
-		static constexpr int BLEND_DATA_TYPE = GL_INT;
+		static constexpr int BLEND_DATA_TYPE = GL_FLOAT;
 		static constexpr int BLEND_DATA_OFFSET = offsetof(Vertex, to_blend_color);
 		glEnableVertexArrayAttrib(model.vaoid, BLEND_ATTRIB_INDEX);		// vertex attrib index 1
 		glVertexArrayAttribFormat(

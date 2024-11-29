@@ -377,7 +377,7 @@ namespace NIKE {
 				v.transform = render_instances_texture[i].xform;
 				v.framesize = render_instances_texture[i].framesize;
 				v.uv_offset = render_instances_texture[i].uv_offset;
-				v.to_blend_color = render_instances_texture[i].to_blend_color;
+				v.to_blend_color = render_instances_texture[i].to_blend_color ? 1.f : 0.f;
 
 				if (v.to_blend_color) {
 					v.col = render_instances_texture[i].color;

@@ -24,7 +24,7 @@ namespace NIKE {
 			Matrix_33 transform{};		// column major
 			Vector2f framesize{};
 			Vector2f uv_offset{};
-			bool to_blend_color{ false };		// used for texture rendering
+			float to_blend_color{};		// used for texture rendering. is bool value
 			float blend_intensity{};		// used for texture rendering
 
 			//Vertex() : pos(), col(), tex_coords(), transform(), sampler_idx{} {}

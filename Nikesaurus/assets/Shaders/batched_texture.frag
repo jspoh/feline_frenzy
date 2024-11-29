@@ -8,7 +8,7 @@
 layout (location=0) in vec2 f_texcoord;
 layout (location=1) flat in float f_sampler_idx;
 //layout (location=2) in vec2 dbg_framesize;
-layout (location=3) flat in int f_blend;
+layout (location=3) flat in float f_blend;
 layout (location=4) flat in vec4 f_color;
 layout (location=5) flat in float f_blend_intensity;
 
