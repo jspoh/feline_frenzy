@@ -2858,22 +2858,65 @@ namespace NIKE {
 		}
 	}
 
+	int LevelEditor::ResourcePanel::TextCallback(ImGuiInputTextCallbackData* data) {
+		EditorState* editor_state = static_cast<EditorState*>(data->UserData);
+		editor_state->cursor_pos = data->CursorPos;
+		return 0;
+	}
+
+	void LevelEditor::ResourcePanel::extractCurrentWord(std::string const& content, size_t cursor_pos, std::string& buffer) {
+		size_t word_start = content.find_last_of(" \n\t", cursor_pos - 1);
+		word_start = (word_start == std::string::npos) ? 0 : word_start + 1;
+		size_t word_end = content.find_first_of(" \n\t", cursor_pos);
+		word_end = (word_end == std::string::npos) ? content.size() : word_end;
+		buffer = content.substr(word_start, word_end - word_start);
+	}
+
+	void LevelEditor::ResourcePanel::showLuaIntellisense(std::string& content, size_t cursor_pos, std::string& buffer) {
+
+		//Search for matching functions
+		if (!buffer.empty()) {
+			for (const auto& func : NIKE_LUA_SERVICE->getGlobalLuaFunctions()) {
+				if (func.find(buffer.c_str()) != std::string::npos) {
+					if (ImGui::Selectable(func.c_str())) {
+						auto pos = cursor_pos - buffer.size();
+						content.erase(pos, buffer.size());
+						content.insert(pos, func.c_str());
+					}
+				}
+			}
+		}
+	}
+
 	void LevelEditor::ResourcePanel::renderFileEditor() {
 		for (decltype(file_editing_map)::iterator it = file_editing_map.begin(); it != file_editing_map.end(); ++it) {
 			ImGui::Begin(it->first.c_str());
 
 			//Editing file
+			static EditorState editor_state;
 			ImGui::Text("Editing: %s", it->first.c_str());
-			ImGui::InputTextMultiline("##editor", &it->second[0], it->second.capacity(),
+			if (ImGui::InputTextMultiline("##editor", &it->second[0], it->second.capacity(),
 				ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y),
-				ImGuiInputTextFlags_AllowTabInput);
+				ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CallbackAlways, TextCallback, &editor_state)) {
+				it->second.resize(strlen(it->second.c_str()));
+			}
+
+			//Special lua intellisense
+			if (NIKE_ASSETS_SERVICE->getAssetType(it->first) == Assets::Types::Script) {
+				//Lua intellisense
+				static std::string current_word;
+				current_word.reserve(64);
+				extractCurrentWord(it->second, editor_state.cursor_pos, current_word);
+				showLuaIntellisense(it->second, editor_state.cursor_pos, current_word);
+			}
 
 			//Save file
-			if (ImGui::Button("Save##Save file")) {
+			if (ImGui::Button("Save##Save file") || (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyDown(ImGuiKey_S))) {
 				std::ofstream file(NIKE_ASSETS_SERVICE->getAssetPath(it->first));
 				if (file.is_open()) {
 					file << it->second;
 					file.close();
+					NIKEE_CORE_INFO("File saved.");
 				}
 				else {
 					NIKEE_CORE_WARN("Failed to save file");
@@ -3401,6 +3444,7 @@ namespace NIKE {
 
 						//Check if file is already open
 						if (file_editing_map.find(selected_asset_id) == file_editing_map.end()) {
+							file_editing_map[selected_asset_id].reserve(1024);
 							// Read file content
 							file_editing_map[selected_asset_id].assign((std::istreambuf_iterator<char>(file)),
 								std::istreambuf_iterator<char>());

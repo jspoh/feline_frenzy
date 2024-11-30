@@ -627,6 +627,22 @@ namespace NIKE {
 			//Internal rendering of an asset browser
 			void renderAssetsBrowser(std::string const& virtual_path);
 
+#ifdef NIKE_BUILD_DLL
+			//File editor state
+			struct EditorState {
+				int cursor_pos = 0;
+			};
+
+			//Text callback
+			static int TextCallback(ImGuiInputTextCallbackData* data);
+#endif
+
+			//Extract current word being edited
+			void extractCurrentWord(std::string const& content, size_t cursor_pos, std::string& buffer);
+
+			//Lua intellisense
+			void showLuaIntellisense(std::string& content, size_t cursor_pos, std::string& buffer);
+
 			//Internal rendering of a file editor
 			void renderFileEditor();
 
