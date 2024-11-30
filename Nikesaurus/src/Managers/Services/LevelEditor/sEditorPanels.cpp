@@ -2849,6 +2849,42 @@ namespace NIKE {
 		}
 	}
 
+	void LevelEditor::ResourcePanel::renderFileEditor() {
+		for (decltype(file_editing_map)::iterator it = file_editing_map.begin(); it != file_editing_map.end(); ++it) {
+			ImGui::Begin(it->first.c_str());
+
+			//Editing file
+			ImGui::Text("Editing: %s", it->first.c_str());
+			ImGui::InputTextMultiline("##editor", &it->second[0], it->second.capacity(),
+				ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y),
+				ImGuiInputTextFlags_AllowTabInput);
+
+			//Save file
+			if (ImGui::Button("Save##Save file")) {
+				std::ofstream file(NIKE_ASSETS_SERVICE->getAssetPath(it->first));
+				if (file.is_open()) {
+					file << it->second;
+					file.close();
+				}
+				else {
+					NIKEE_CORE_WARN("Failed to save file");
+					file.close();
+				}
+			}
+
+			ImGui::SameLine();
+
+			//Close file
+			if (ImGui::Button("Close##CloseFile")) {
+				it = file_editing_map.erase(it);
+				ImGui::End();
+				break;
+			}
+
+			ImGui::End();
+		}
+	}
+
 	std::function<void()> LevelEditor::ResourcePanel::deleteAssetPopup(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -3261,8 +3297,8 @@ namespace NIKE {
 			ImVec2 uv1(1.0f, 0.0f);
 			ImGui::Image(display, { 256, 256 }, uv0, uv1);
 
-			//Non executable type actions
-			if (!NIKE_ASSETS_SERVICE->isAssetExecutableType(selected_asset_id)) {
+			//Loadable type actions
+			if (NIKE_ASSETS_SERVICE->isAssetLoadable(selected_asset_id)) {
 				//Asset loading or unloading
 				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
 					//Unload action
@@ -3346,6 +3382,32 @@ namespace NIKE {
 				ImGui::SameLine();
 			}
 
+			//Editable type actions
+			if (NIKE_ASSETS_SERVICE->isAssetEditable(selected_asset_id)) {
+				if (ImGui::Button("Edit##EditableAsset")) {
+
+					//Read file into string
+					std::ifstream file(NIKE_ASSETS_SERVICE->getAssetPath(selected_asset_id));
+					if (file.is_open()) {
+
+						//Check if file is already open
+						if (file_editing_map.find(selected_asset_id) == file_editing_map.end()) {
+							// Read file content
+							file_editing_map[selected_asset_id].assign((std::istreambuf_iterator<char>(file)),
+								std::istreambuf_iterator<char>());
+							file.close();
+						}
+					}
+					else {
+						NIKEE_CORE_WARN("Failed to open file");
+						file.close();
+					}
+				}
+
+				//Same line
+				ImGui::SameLine();
+			}
+
 			//Prefab asset loading
 			if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Prefab) {
 				if (ImGui::Button("Create Entity with Prefab"))
@@ -3360,7 +3422,7 @@ namespace NIKE {
 			}
 
 			//Delete asset
-			if (ImGui::Button("Delete")) {
+			if (ImGui::Button("Delete##DeleteAsset")) {
 				openPopUp("Delete Asset");
 			}
 
@@ -3368,7 +3430,7 @@ namespace NIKE {
 			ImGui::SameLine();
 
 			//Unload action
-			if (ImGui::Button("Close")) {
+			if (ImGui::Button("Close##CloseAsset")) {
 
 				//Reset selected asset id
 				selected_asset_id.clear();
@@ -3379,6 +3441,9 @@ namespace NIKE {
 
 			ImGui::End();
 		}
+
+		//Render file editor
+		renderFileEditor();
 
 		//File dropped popup
 		if (b_file_dropped) {

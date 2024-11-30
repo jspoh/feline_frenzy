@@ -612,6 +612,9 @@ namespace NIKE {
 			//File dropped
 			bool b_file_dropped;
 
+			//Map of file content
+			std::unordered_map<std::string, std::string> file_editing_map;
+
 			//Setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
 
@@ -623,6 +626,9 @@ namespace NIKE {
 
 			//Internal rendering of an asset browser
 			void renderAssetsBrowser(std::string const& virtual_path);
+
+			//Internal rendering of a file editor
+			void renderFileEditor();
 
 			//Delete asset popup
 			std::function<void()> deleteAssetPopup(std::string const& popup_id);
