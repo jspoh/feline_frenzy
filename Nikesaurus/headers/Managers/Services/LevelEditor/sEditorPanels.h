@@ -176,6 +176,12 @@ namespace NIKE {
 			EntityMetaData() : entity_id{ "" }, prefab_id{ "" }, b_locked{ false } {}
 			EntityMetaData(std::string const& entity_id, std::string const& prefab_id, bool b_locked)
 				: entity_id{ entity_id }, b_locked{ b_locked }, prefab_id{ prefab_id } {}
+
+			//Serialization
+			nlohmann::json serialize() const;
+
+			//Deserialization
+			void deserialize(nlohmann::json const& data);
 		};
 
 		//Entities Management Panel

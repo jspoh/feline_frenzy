@@ -439,6 +439,20 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entities Panel
 	*********************************************************************/
+	nlohmann::json LevelEditor::EntityMetaData::serialize() const {
+		return	{
+		{"Entity_ID", entity_id},
+		{"Prefab_ID", prefab_id},
+		{"B_Locked", b_locked}
+		};
+	}
+
+	void LevelEditor::EntityMetaData::deserialize(nlohmann::json const& data) {
+		entity_id = data["Entity_ID"].get<std::string>();
+		prefab_id = data["Prefab_ID"].get<std::string>();
+		b_locked = data["B_Locked"].get<bool>();
+	}
+
 	std::function<void()> LevelEditor::EntitiesPanel::createEntityPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -1792,13 +1806,6 @@ namespace NIKE {
 			//Set layer id popup
 			if (ImGui::Button("Set Layer ID")) {
 				openPopUp("Set Layer ID");
-			}
-
-			ImGui::SameLine();
-
-			//Save prefab popup
-			if (ImGui::Button("Create Prefab")) {
-				openPopUp("Create Prefab");
 			}
 
 			//Add Spacing
