@@ -1,8 +1,10 @@
-	/*****************************************************************//**
+/*****************************************************************//**
  * \file   sEditorPanels.cpp
  * \brief  Level Editor panel implementation
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (70%)
+ * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (15%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (15%)
  * \date   September 2024
  *  All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
