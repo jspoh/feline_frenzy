@@ -56,7 +56,7 @@ namespace NIKE {
 					continue;
 				
 				//Check for player logic comp
-				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
+				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_player_comp.has_value()) {
 					auto& e_player = e_player_comp.value().get();
 
