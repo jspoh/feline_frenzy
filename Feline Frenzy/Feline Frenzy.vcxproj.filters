@@ -52,5 +52,6 @@
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\enemyBullet.lua" />
     <None Include="assets\Scripts\test.lua" />
+    <None Include="assets\Scripts\ChangeScene.lua" />
   </ItemGroup>
 </Project>

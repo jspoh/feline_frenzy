@@ -58,10 +58,24 @@ namespace NIKE {
 		render_loader = std::make_unique<Assets::RenderLoader>();
 		audio_system = audio_sys;
 
-		//Add executable types
-		executable_types.insert(Types::Scene);
-		executable_types.insert(Types::Prefab);
-		executable_types.insert(Types::Grid);
+		//Set loadable
+		asset_types[Types::Texture].set(Modes::Loadable, true);
+		asset_types[Types::Model].set(Modes::Loadable, true);
+		asset_types[Types::Font].set(Modes::Loadable, true);
+		asset_types[Types::Music].set(Modes::Loadable, true);
+		asset_types[Types::Sound].set(Modes::Loadable, true);
+		asset_types[Types::Script].set(Modes::Loadable, true);
+
+		//Set executables
+		asset_types[Types::Scene].set(Modes::Executable, true);
+		asset_types[Types::Prefab].set(Modes::Executable, true);
+		asset_types[Types::Grid].set(Modes::Executable, true);
+
+		//Set editable
+		asset_types[Types::Scene].set(Modes::Editable, true);
+		asset_types[Types::Prefab].set(Modes::Editable, true);
+		asset_types[Types::Grid].set(Modes::Editable, true);
+		asset_types[Types::Script].set(Modes::Editable, true);
 
 		//Texture extensions
 		addValidExtensions(".png");
@@ -84,6 +98,9 @@ namespace NIKE {
 		addValidExtensions(".grid");
 		addValidExtensions(".lua");
 		addValidExtensions(".json");
+
+		//Add invalid keys
+		addInvalidKeys("batched_");
 
 		//Register texture loader
 		registerLoader(Assets::Types::Texture, [this](std::filesystem::path const& primary_path) {
@@ -134,7 +151,7 @@ namespace NIKE {
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {
 		if(b_virtual) {
 			if (!isPathValid(path)) {
-				NIKEE_CORE_ERROR("Invalid path detected. Asset will not be registered.");
+				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
 				return "";
 			}
 			auto asset_id = getIDFromPath(path);
@@ -145,7 +162,7 @@ namespace NIKE {
 		}
 		else {
 			if (!isPathValid(path, false)) {
-				NIKEE_CORE_ERROR("Invalid path detected. Asset will not be registered.");
+				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
 				return "";
 			}
 			auto asset_id = getIDFromPath(path, false);
@@ -174,8 +191,8 @@ namespace NIKE {
 
 	void Assets::Service::cacheAsset(std::string const& asset_id) {
 
-		//Check if asset is an executable
-		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+		//Check if asset is loadable
+		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
 
@@ -205,8 +222,8 @@ namespace NIKE {
 	}
 
 	void Assets::Service::uncacheAsset(std::string const& asset_id) {
-		//Check if asset is an executable
-		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+		//Check if asset is loadable
+		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
 
@@ -219,8 +236,8 @@ namespace NIKE {
 
 	void Assets::Service::recacheAsset(std::string const& asset_id) {
 
-		//Check if asset is an executable
-		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+		//Check if asset is loadable
+		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
 		
@@ -234,7 +251,7 @@ namespace NIKE {
 	void Assets::Service::getExecutable(std::string const& asset_id) {
 
 		//Check if asset is a executable asset type
-		if (executable_types.find(getAssetType(asset_id)) == executable_types.end()) {
+		if (!(asset_types[getAssetType(asset_id)].test(Modes::Executable))) {
 			NIKEE_CORE_WARN("Wrong usage! For fetching normal type assets use getAsset<T>().");
 			return;
 		}
@@ -257,17 +274,21 @@ namespace NIKE {
 		loader_it->second(meta_it->second.primary_path);
 	}
 
-	void Assets::Service::addTypeAsExecutable(Types type) {
-		executable_types.insert(type);
+	bool Assets::Service::isAssetLoadable(std::string const& asset_id) const {
+		return asset_types.at(getAssetType(asset_id)).test(Modes::Loadable);
 	}
 
-	bool Assets::Service::isAssetExecutableType(std::string const& asset_id) const {
-		return executable_types.find(getAssetType(asset_id)) != executable_types.end();
+	bool Assets::Service::isAssetExecutable(std::string const& asset_id) const {
+		return asset_types.at(getAssetType(asset_id)).test(Modes::Executable);
+	}
+
+	bool Assets::Service::isAssetEditable(std::string const& asset_id) const {
+		return asset_types.at(getAssetType(asset_id)).test(Modes::Editable);
 	}
 
 	Assets::Types Assets::Service::getAssetType(std::string const& asset_id) const {
 		if (asset_registry.find(asset_id) == asset_registry.end()) {
-			throw std::runtime_error("Asset not yet registered.");
+			return Assets::Types::None;
 		}
 
 		return asset_registry.at(asset_id).type;
@@ -275,7 +296,7 @@ namespace NIKE {
 
 	std::string Assets::Service::getAssetTypeString(std::string const& asset_id) const {
 		if (asset_registry.find(asset_id) == asset_registry.end()) {
-			throw std::runtime_error("Asset not yet registered.");
+			return typeToString(Assets::Types::None);
 		}
 
 		return typeToString(asset_registry.at(asset_id).type);
@@ -283,7 +304,7 @@ namespace NIKE {
 
 	Assets::Types Assets::Service::getAssetType(std::filesystem::path const& path) const {
 		auto ext = path.extension().string();
-		constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
+		// constexpr size_t music_threshold = 5 * 1024 * 1024; // 5 MB
 		if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tex") {
 			return Assets::Types::Texture;
 		}
@@ -293,11 +314,16 @@ namespace NIKE {
 		else if (ext == ".ttf") {
 			return Assets::Types::Font;
 		}
-		else if (ext == ".wav" && std::filesystem::file_size(path) >= music_threshold) {
-			return Assets::Types::Music;
-		}
-		else if (ext == ".wav" && std::filesystem::file_size(path) < music_threshold) {
-			return Assets::Types::Sound;
+		else if (ext == ".wav") {
+			auto filepath = path.string();
+			std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](char c) { return static_cast<char>(std::tolower(static_cast<unsigned char>(c))); });
+
+			if (filepath.find("assets\\audios\\music") != std::string::npos) {
+				return Assets::Types::Music;
+			}
+			else {
+				return Assets::Types::Sound;
+			}
 		}
 		else if (ext == ".scn") {
 			return Assets::Types::Scene;
@@ -327,9 +353,25 @@ namespace NIKE {
 	std::vector<const char*> Assets::Service::getAssetRefs(Assets::Types type) const {
 		std::vector<const char*> asset_refs;
 		for (auto it = asset_registry.begin(); it != asset_registry.end(); ++it) {
-			if (it->second.type == type) {
-				asset_refs.push_back(it->first.c_str());
+
+			//Check if the asset contains any invalid keys
+			bool is_invalid = false;
+			for (const auto& invalid_key : invalid_keys) {
+
+				//If invalid key is found
+				if (it->second.primary_path.filename().string().find(invalid_key) != std::string::npos) {
+					is_invalid = true;
+					break;
+				}
 			}
+
+			//Skip invalid keys or mismatched types
+			if (is_invalid || it->second.type != type) {
+				continue;
+			}
+
+			//Push to assets refs
+			asset_refs.push_back(it->first.c_str());
 		}
 
 		return asset_refs;
@@ -360,6 +402,18 @@ namespace NIKE {
 
 	void Assets::Service::addValidExtensions(std::string const& ext) {
 		valid_extensions.insert(ext);
+	}
+
+	std::set<std::string> Assets::Service::getValidExtensions() const {
+		return valid_extensions;
+	}
+
+	void Assets::Service::addInvalidKeys(std::string const& key) {
+		invalid_keys.insert(key);
+	}
+
+	std::set<std::string> Assets::Service::getInvalidKeys() const {
+		return invalid_keys;
 	}
 
 	bool Assets::Service::isPathValid(std::string const& path, bool b_virtual) const {
@@ -426,7 +480,7 @@ namespace NIKE {
 
 				//Check for valid path before registering
 				if (valid_extensions.find(file.path().extension().string()) == valid_extensions.end()) {
-					NIKEE_CORE_ERROR("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
+					NIKEE_CORE_WARN("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
 					continue;
 				}
 
@@ -449,7 +503,7 @@ namespace NIKE {
 
 			//Check for valid path before registering
 			if (valid_extensions.find(file.path().extension().string()) == valid_extensions.end()) {
-				NIKEE_CORE_ERROR("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
+				NIKEE_CORE_WARN("Asset will not be registered. Invalid extension found: " + file.path().extension().string() + " In path: " + file.path().string());
 				continue;
 			}
 

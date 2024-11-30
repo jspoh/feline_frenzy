@@ -105,7 +105,7 @@ namespace NIKE {
 		NIKEE_CORE_INFO("GL init success");
 
 		// enable debug logging
-#ifndef NDEBUG
+		#ifndef NDEBUG
 		// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -113,7 +113,43 @@ namespace NIKE {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
 			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-#endif
+		#endif
+
+		// set window icon
+		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
+
+
+		int width, height, size;
+		bool is_tex_or_png_ext;
+		const unsigned char* icon_data = NIKE::Assets::RenderLoader
+			::prepareImageData(ICON_PATH, width, height, size, is_tex_or_png_ext);
+
+		if (icon_data) {
+			GLFWimage icon;
+			icon.width = width;
+			icon.height = height;
+			icon.pixels = const_cast<unsigned char*>(icon_data);
+
+			// flip stbi image around for opengl
+			static constexpr int channels = 4;
+			const int row_size = width * channels;
+			for (int i = 0; i < height / 2; ++i) {
+				unsigned char* topRow = icon.pixels + i * row_size;
+				unsigned char* bottomRow = icon.pixels + (height - 1 - i) * row_size;
+				for (int j = 0; j < row_size; ++j) {
+					std::swap(topRow[j], bottomRow[j]);
+				}
+			}
+
+			glfwSetWindowIcon(ptr_window, 1, &icon);
+			NIKE::Assets::RenderLoader
+				::freeImageData(const_cast<unsigned char*>(icon_data));
+		}
+		else {
+			NIKEE_CORE_ERROR("Failed to load window icon in {0}", __FUNCTION__);
+		}
+
+
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
@@ -323,11 +359,15 @@ namespace NIKE {
 		static bool is_fullscreen;
 
 		if (event->focused) {
+			NIKE_WINDOWS_SERVICE->setWindowFocus(true);
+
+#ifdef NDEBUG
 			glfwRestoreWindow(ptr_window);
 
 			if (is_fullscreen) {
-				setFullScreen(true);
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 			}
+#endif
 
 			// in case of resizes
 			int width, height;
@@ -340,11 +380,16 @@ namespace NIKE {
 			NIKE_AUDIO_SERVICE->resumeAllChannels();
 		}
 		else {
+			// lost focus
+			NIKE_WINDOWS_SERVICE->setWindowFocus(false);
+
 			GLFWmonitor* monitor = glfwGetWindowMonitor(ptr_window);
 			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
 
 			NIKE_AUDIO_SERVICE->pauseAllChannels();
-			//glfwIconifyWindow(ptr_window); // minimize the window if unfocused
+#ifdef NDEBUG
+			glfwIconifyWindow(ptr_window);
+#endif
 		}
 
 		err = glGetError();
@@ -431,5 +476,13 @@ namespace NIKE {
 			accumulated_time -= (static_cast<double>(1) / target_fps);
 			curr_num_steps++;
 		}
+	}
+
+	bool Windows::Service::getWindowFocus() const {
+		return window_is_focused;
+	}
+
+	void Windows::Service::setWindowFocus(bool focus) {
+		window_is_focused = focus;
 	}
 }

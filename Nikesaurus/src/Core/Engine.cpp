@@ -123,7 +123,9 @@ namespace NIKE {
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
+#ifndef NDEBUG
 		provideService(std::make_shared<LevelEditor::Service>());
+#endif
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
 
@@ -153,28 +155,43 @@ namespace NIKE {
 		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
+
+#ifndef NDEBUG
+		//imgui event listeners ( ImGui listens first for all events except window resized )
+
+		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
 
 		//Add event listeners for key event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse move event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse scroll event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+#endif
+
+		//Add event listeners for key event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse move event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
 
 		//Add event listeners for mouse scroll event
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
-		
+
+
 		//Init paths
 		NIKE_PATH_SERVICE->init(json_config);
 
@@ -193,17 +210,16 @@ namespace NIKE {
 		//Init scene
 		NIKE_SCENES_SERVICE->init();
 
+#ifndef NDEBUG
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init();
+#endif
 
 		//Init UI
 		NIKE_UI_SERVICE->init();
 
 		//Init Lua
 		NIKE_LUA_SERVICE->init();
-
-		// For testing imgui combo - lim
-		NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
 
 		//Register Def Components
 		registerDefComponents();
@@ -214,44 +230,87 @@ namespace NIKE {
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
+
+#ifdef NDEBUG
+		// default startup to fullscreen (M3 1931)
+		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+#endif
 	}
 
 	void Core::Engine::run() {
+		// !TODO: remove this, hardcoding for installer
+		//NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
-			//Calculate Delta Time
-			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+			// get delta time first
+			if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+				//Calculate Delta Time
+				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+			}
 
+			// have to poll events regardless of focus
 			//Poll system events
 			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-			//Clear buffer
-			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+			if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
 
-			//Update all audio pending actions
-			NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+				//Clear buffer
+				NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-			//update UI First
-			NIKE_UI_SERVICE->update();
+				//Update all audio pending actions
+				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
-			//Update scenes manager
-			NIKE_SCENES_SERVICE->update();
+				//Update scenes manager
+				NIKE_SCENES_SERVICE->update();
 
-			static constexpr bool JS_TEXTURE_TEST = false;
-			//Render entity to mouse click
-			if 
-				(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+				//static constexpr bool JS_TEXTURE_TEST = true;
+				////Render entity to mouse click
+				//if 
+				//	(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
 
-				static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+				//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
 
-				for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-					Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-					Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+				//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
+				//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+				//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
+				//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+				//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
+				//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
+				//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+				//	}
+				//}
+
+				//Escape Key
+				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				}
+
+				//Toggle full screen
+				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+				}
+
+				//Update all systems
+				NIKE_ECS_MANAGER->updateSystems();
+
+#ifndef NDEBUG
+				//Update Level Editor
+				NIKE_LVLEDITOR_SERVICE->update();
+
+				//Render Level Editor
+				NIKE_LVLEDITOR_SERVICE->render();
+				
+				//update UI First
+				NIKE_UI_SERVICE->update();
+#endif
+
+				//Swap Buffers
+				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+				GLenum err = glGetError();
+				if (err != GL_NO_ERROR) {
+					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 				}
 			}
 
@@ -286,11 +345,14 @@ namespace NIKE {
 			}
 		}
 
+
 		//Stop watching all directories
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
+#ifndef NDEBUG
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();
+#endif
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();

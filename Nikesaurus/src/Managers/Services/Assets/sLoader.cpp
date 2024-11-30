@@ -522,16 +522,17 @@ namespace NIKE {
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
 	}
 
-	char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
+	unsigned char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
 		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
-		const std::set<std::string> valid_tex_ext = { "png", "jpg", "jpeg" }; // accepted file types
+		const std::set<std::string> valid_tex_ext = { "png", "jpg", "jpeg", "ico"}; // accepted file types
 
 		// Transform each character in string ext to lowercase
 		for (char& c : filetype) {
 			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 		}
 
+		/*
 		if (filetype == "tex") {
 			is_tex_or_png_ext = true;
 
@@ -565,14 +566,15 @@ namespace NIKE {
 
 			return tex_data;
 		}
+		*/
 
 		// is not .tex file
 		if (valid_tex_ext.find(filetype) != valid_tex_ext.end()) {
 			is_tex_or_png_ext = true;
 			int channels;
 			stbi_set_flip_vertically_on_load(true);
-			const int desired_channels = 4;
-			char* img_data = reinterpret_cast<char*>(stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels));
+			static constexpr int desired_channels = 4;
+			unsigned char* img_data = stbi_load(path_to_texture.c_str(), &width, &height, &channels, desired_channels);
 			if (img_data == nullptr || width == 0 || height == 0) {
 				NIKEE_CORE_ERROR("Failed to load image data: {}", path_to_texture);
 				NIKEE_CORE_ERROR("stb_image error:  {}", stbi_failure_reason());
@@ -589,6 +591,19 @@ namespace NIKE {
 
 			tex_size = width * height * 4;  // RGBA format
 
+			// flip image around for opengl
+			/*
+			const int row_size = width * channels;
+			for (int i = 0; i < height / 2; ++i) {
+				unsigned char* topRow = img_data + i * row_size;
+				unsigned char* bottomRow = img_data + (height - 1 - i) * row_size;
+
+				for (int j = 0; j < row_size; ++j) {
+					std::swap(topRow[j], bottomRow[j]);
+				}
+			}
+			*/
+
 			return img_data;
 		}
 			
@@ -596,6 +611,10 @@ namespace NIKE {
 		is_tex_or_png_ext = false;
 		NIKEE_CORE_ERROR("Unsupported file format: {}", path_to_texture);
 		return nullptr;
+	}
+
+	void Assets::RenderLoader::freeImageData(unsigned char* img_data) {
+		stbi_image_free(img_data);
 	}
 
 	Assets::Model Assets::RenderLoader::compileModel(const std::string& path_to_mesh) {
@@ -720,7 +739,7 @@ namespace NIKE {
 		int tex_height{};
 		int tex_size{};
 		bool is_tex_or_png_ext = false;
-		const char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
+		const unsigned char* tex_data = prepareImageData(path_to_texture, tex_width, tex_height, tex_size, is_tex_or_png_ext);
 
 		if (tex_data == nullptr) {
 			NIKEE_CORE_ERROR("Failed to load image : {} ", path_to_texture);

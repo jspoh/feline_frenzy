@@ -37,10 +37,6 @@ namespace NIKE {
 
             // Apply impluse to velocity
             dynamics_b.velocity -= impulse;
-
-            //Update bounding box
-            collider_b.transform.position.x = transform_b.position.x + collider_b.pos_offset.x;
-            collider_b.transform.position.y = transform_b.position.y + collider_b.pos_offset.y;
         }
         else if (collider_b.resolution == Physics::Resolution::NONE) {
             // Transform back outside of collision

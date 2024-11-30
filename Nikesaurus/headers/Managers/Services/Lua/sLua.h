@@ -45,6 +45,9 @@ namespace NIKE {
 			//Internal get sol table asset
 			std::shared_ptr<sol::load_result> getLuaAssset(std::string const& script_id) const;
 
+			//Uncache lua asset
+			void uncacheLuaAsset(std::string const& script_id) const;
+
 			//Convert script to sol::table args
 			sol::table convertScriptArgs(Script const& script) const;
 		public:
@@ -187,6 +190,7 @@ namespace NIKE {
 				}
 				catch (std::runtime_error const& e) {
 					NIKEE_CORE_WARN(e.what());
+					uncacheLuaAsset(script.script_id);
 					return sol::nil;
 				}
 			}

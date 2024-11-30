@@ -52,13 +52,16 @@ namespace NIKE {
 		for (auto& channels : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
 
 			if (!channels.second->isPlaying() && !channels.second->getPaused()) {
-				auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channels.first);
-				if (!playlist.empty()) {
-					const std::string& audio_id = std::move(playlist.front());
-
+				const auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channels.first);
+				if (!playlist.tracks.empty()) {
+					const std::string& audio_id = std::move(playlist.tracks.front());
+					
 					NIKE_AUDIO_SERVICE->playAudio(audio_id, "", channels.first, 1.f, 1.f, false, true);
 
-					playlist.pop();
+					if (NIKE_AUDIO_SERVICE->isPlaylistLooping(channels.first)) {
+						NIKE_AUDIO_SERVICE->queueAudioToPlaylist(channels.first, audio_id);
+					}
+					NIKE_AUDIO_SERVICE->popAudioFromPlaylist(channels.first);
 				}
 
 			}

@@ -39,6 +39,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		//Register SFX for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Audio::SFX>(
 			[](LevelEditor::ComponentsPanel& comp_panel, Audio::SFX& comp) {
@@ -198,7 +199,7 @@ namespace NIKE {
 						static bool pitch_changed = false;
 
 						//Set pitch
-						if (ImGui::SliderFloat("Pitch", &comp.pitch, 0.f, 1.f, "%.2f")) {
+						if (ImGui::SliderFloat("Pitch", &comp.pitch, 0.5f, 2.f, "%.2f")) {
 							pitch_changed = true;
 						}
 
@@ -245,5 +246,6 @@ namespace NIKE {
 				
 			}
 		);
+#endif
 	}
 }

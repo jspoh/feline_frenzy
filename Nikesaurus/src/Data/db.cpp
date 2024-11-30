@@ -43,14 +43,17 @@ Database& Database::getInstance() {
 
 
 bool Database::forceUpdate() {
-	try {
-		std::ofstream ofs{ dbPath };
-		ofs << data.dump(2);
-		ofs.close();
-	}
-	catch (std::exception& e) {
-		cerr << "failed to update file: " << e.what() << "\n";
-		return false;
-	}
-	return true;
+	// !TODO: this function should not be called until impl has been shifted to a documents dir.
+	return false;
+
+	//try {
+	//	std::ofstream ofs{ dbPath };
+	//	ofs << data.dump(2);
+	//	ofs.close();
+	//}
+	//catch (std::exception& e) {
+	//	cerr << "failed to update file: " << e.what() << "\n";
+	//	return false;
+	//}
+	//return true;
 }

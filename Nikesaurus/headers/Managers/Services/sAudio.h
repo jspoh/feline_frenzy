@@ -2,8 +2,8 @@
  * \file   sAudio.h
  * \brief  Audio system manager function declarations
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
- * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (35%)
+ * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -393,8 +393,14 @@ namespace NIKE {
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 
+			// Playlist Management
+			struct Playlist {
+				std::deque<std::string> tracks;
+				bool loop = false;
+			};
+
 			//Queue for each channel's playlist
-			std::unordered_map<std::string , std::queue<std::string> > channel_playlists;
+			std::unordered_map<std::string , Playlist> channel_playlists;
 
 		public:
 
@@ -417,7 +423,7 @@ namespace NIKE {
 			void unloadChannelGroup(std::string const& channel_group_id);
 
 			//Clean channel groups
-			void destroyChannelGroups();
+			void clearAllChannelGroups();
 
 			//Conversion from raw to shared pointer
 			static std::shared_ptr<Audio::IChannelGroup> convertChannelGroup(Audio::IChannelGroup*&& group);
@@ -456,16 +462,36 @@ namespace NIKE {
 			* Playlist Management
 			*********************************************************************/
 			// Create channel playlist and add to map
-			void createChannelPlaylist(std::string audio_id);
+			void createChannelPlaylist(const std::string& channel_id);
 
 			// Get individual channel's playlist
-			std::queue<std::string>& getChannelPlaylist(std::string audio_id);
+			const Playlist& getChannelPlaylist(const std::string& channel_id);
+
+			void assignTracksToPlaylist(const std::string& channel_id, const std::deque<std::string>& new_tracks);
 
 			// Queue audio to playlist
-			void queueAudioToPlaylist(std::string channel_id, std::string audio_id);
+			void queueAudioToPlaylist(const std::string& channel_id, const std::string& audio_id);
+
+			// Pop audio from playlist
+			void popAudioFromPlaylist(const std::string& channel_id);
+
+			// Enable or disable looping for a playlist
+			void setPlaylistLoop(const std::string& channel_id, bool loop);
+
+			// Check if a playlist is looping
+			bool isPlaylistLooping(const std::string& channel_id) const;
+
+			// Clear playlist
+			void clearPlaylist(const std::string& channel_id);
 
 			//Update Loop
 			void update();
+
+			// Serialize
+			nlohmann::json serializeAudioChannels() const;
+
+			// Deserialize
+			void deserializeAudioChannels(nlohmann::json const& data);
 
 		};
 

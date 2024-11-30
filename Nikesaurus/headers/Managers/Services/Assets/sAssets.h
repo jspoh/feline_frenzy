@@ -31,6 +31,13 @@ namespace NIKE {
 				: count{ count }, paths{ paths } {}
 		};
 
+		//Asset modes
+		enum Modes : unsigned int {
+			Loadable = 0,
+			Executable,
+			Editable
+		};
+
 		//Asset types
 		enum class Types {
 			None = 0,
@@ -63,11 +70,14 @@ namespace NIKE {
 			//Loader function
 			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
 
-			//List of invalid extension
+			//List of valid extension
 			std::set<std::string> valid_extensions;
 
-			//List of executable asset type
-			std::set<Types> executable_types;
+			//List of key words to exclude
+			std::set<std::string> invalid_keys;
+
+			//Asset types
+			std::unordered_map<Types, std::bitset<3>> asset_types;
 
 			//Asset registry of meta data
 			std::unordered_map<std::string, MetaData> asset_registry;
@@ -121,8 +131,7 @@ namespace NIKE {
 			std::shared_ptr<T> getAsset(std::string const& asset_id) {
 
 				//Check if asset is a executable asset type
-				if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
-					NIKEE_CORE_WARN("Wrong usage! For fetching executable type assets use getExecutable().");
+				if (!(asset_types[getAssetType(asset_id)].test(Modes::Loadable))) {
 					return nullptr;
 				}
 
@@ -163,11 +172,14 @@ namespace NIKE {
 			//Get executable
 			void getExecutable(std::string const& asset_id);
 
-			//Add asset type as executable
-			void addTypeAsExecutable(Types type);
+			//check if asset is loadable type
+			bool isAssetLoadable(std::string const& asset_id) const;
 
-			//check if asset is executable type
-			bool isAssetExecutableType(std::string const& asset_id) const;
+			//Check if asset is executable type
+			bool isAssetExecutable(std::string const& asset_id) const;
+
+			//Check if asset is editable type
+			bool isAssetEditable(std::string const& asset_id) const;
 
 			//Get asset type from registered asset id
 			Types getAssetType(std::string const& asset_id) const;
@@ -190,8 +202,17 @@ namespace NIKE {
 			//Check if asset is loaded from file path
 			bool isAssetCached(std::filesystem::path const& path) const;
 	
-			//Add invalid extension
+			//Add valid extension
 			void addValidExtensions(std::string const& ext);
+
+			//Get all valid extensions
+			std::set<std::string> getValidExtensions() const;
+
+			//Add invalid keys
+			void addInvalidKeys(std::string const& key);
+
+			//Get all invalid keys
+			std::set<std::string> getInvalidKeys() const;
 
 			//Check for valid path
 			bool isPathValid(std::string const& path, bool b_virtual = true) const;

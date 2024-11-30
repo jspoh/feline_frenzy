@@ -110,9 +110,15 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		if (!BATCHED_RENDERING) {
+		constexpr std::array<const char*, 1> QUAD_SHAPE_MODELS = { "square.model" };
+
+// disable warning, using `BATCHED_RENDERING` to determine to use batched rendering or not
+#pragma warning(push)
+#pragma warning(disable : 4127)
+		if (!BATCHED_RENDERING || std::find(QUAD_SHAPE_MODELS.begin(), QUAD_SHAPE_MODELS.end(), e_shape.model_id) == QUAD_SHAPE_MODELS.end()) {
+#pragma warning(pop)
 			//Set polygon mode
-			glPolygonMode(GL_FRONT, GL_FILL);
+			// glPolygonMode(GL_FRONT, GL_FILL);
 			glEnable(GL_BLEND);
 
 			// use shader
@@ -390,7 +396,7 @@ namespace NIKE {
 					throw std::exception();
 				}
 
-				const int texture_idx = std::distance(texture_binding_unit_map.begin(), texture_binding_unit_map.find(render_instances_texture[i].tex));
+				const int texture_idx = static_cast<int>(std::distance(texture_binding_unit_map.begin(), texture_binding_unit_map.find(render_instances_texture[i].tex)));
 
 				v.sampler_idx = static_cast<float>(texture_idx);
 				//v.sampler_idx = 0;
@@ -688,13 +694,15 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		glClearColor(0, 0, 0, 1);		// set background to yellow for easier debugging
+		glClearColor(0, 0, 0, 1);	
 
+#ifndef NDEBUG
 		//Render to frame buffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
+#endif
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			//SKip inactive layer
@@ -715,7 +723,11 @@ namespace NIKE {
 					continue;
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
+#ifndef NDEBUG
 					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
+#else
+					transformAndRenderEntity(entity, false);
+#endif
 				}
 			}
 		}
@@ -736,10 +748,12 @@ namespace NIKE {
 			}
 		}
 
+#ifndef NDEBUG
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}
+#endif
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {

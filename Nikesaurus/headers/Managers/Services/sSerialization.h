@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   mSerialization.cpp
+ * \file   mSerialization.h
  * \brief  Serialization manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
@@ -74,11 +74,19 @@ namespace NIKE {
 				comp_registry->registerComponent<T>(serialize, deserialize);
 			}
 
+			// Save grid to .map file
+			void saveGridToFile(const std::string& file_path);
+
+			void loadGridFromFile(const std::string& file_path);
+
 			//Serialize Entity into file path
 			void saveEntityToFile(Entity::Type entity, std::string const& file_path);
 
 			//Load entity from file path
 			void loadEntityFromFile(Entity::Type entity, std::string const& file_path);
+
+			//Get current scene file path
+			std::string const& getCurrSceneFile() const;
 
 			//Serialize Scene into file path
 			void saveSceneToFile(std::string const& file_path);
@@ -89,13 +97,6 @@ namespace NIKE {
 			//Load json file path
 			nlohmann::json loadJsonFile(std::string const& file_path);
 
-			//Get current scene file path
-			std::string const& getCurrSceneFile() const;
-
-			// Save grid to .map file
-			void saveGridToFile(const std::string& file_path);
-
-			void loadGridFromFile(const std::string& file_path);
 		};
 
 		//Re-enable DLL Export warning

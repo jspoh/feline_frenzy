@@ -30,6 +30,12 @@ namespace NIKE {
 
 		//Lua math binds
 		void luaMathBinds(sol::state& lua_state);
+
+		//Lua scenes binds
+		void luaSceneBinds(sol::state& lua_state);
+
+		//Lua ECS Binds
+		void luaECSBinds(sol::state& lua_state);
 	}
 }
 

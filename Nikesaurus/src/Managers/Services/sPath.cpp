@@ -12,8 +12,8 @@
 namespace NIKE {
 
 	void Path::Service::init(nlohmann::json const& config) {
-		//Identify root directory
-		root_path = findRootDirectory();
+		//Identify current working directory
+		root_path = std::filesystem::current_path();
 
 		try {
 			auto const& data = config.at("PathsConfig");
@@ -80,7 +80,7 @@ namespace NIKE {
 		}
 
 		//Return resolved path
-		return it->second / relative_path;
+		return normalizePath(it->second / relative_path);
 	}
 
 	std::filesystem::path Path::Service::normalizePath(std::filesystem::path const& path) const {

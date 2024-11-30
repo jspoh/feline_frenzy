@@ -13,6 +13,18 @@
 
 namespace NIKE {
 
+	nlohmann::json UI::UIBtn::serialize() const {
+		return	{
+		{"Input_State", static_cast<int>(input_state)},
+		{"Script", script.serialize()}
+		};
+	}
+
+	void UI::UIBtn::deserialize(nlohmann::json const& data) {
+		input_state = static_cast<UI::InputStates>(data["Input_State"].get<int>());
+		script.deserialize(data["Script"]);
+	}
+
 	void UI::Service::onEvent(std::shared_ptr<Input::KeyEvent> event) {
 
 		//Check if UI is polling for this event
@@ -253,6 +265,26 @@ namespace NIKE {
 		return ui_entities.at(btn_id).entity_id;
 	}
 
+	void UI::Service::destroyButton(std::string const& btn_id) {
+		//Check if button exists
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button doesnt exist.");
+		}
+
+		//Destroy entity
+		NIKE_ECS_MANAGER->destroyEntity(it->second.entity_id);
+
+		//Check if hovering button exists
+		auto hover_it = hover_container.find(btn_id);
+		if (hover_it != hover_container.end()) {
+			hover_it = hover_container.erase(hover_it);
+		}
+
+		//Erase button
+		it = ui_entities.erase(it);
+	}
+
 	bool UI::Service::isButtonHovered(std::string const& btn_id) const {
 
 		//Check if button exists
@@ -299,8 +331,12 @@ namespace NIKE {
 		return false;
 	}
 
-	std::unordered_map<std::string, UI::UIBtn> UI::Service::getAllButtons() const {
+	std::unordered_map<std::string, UI::UIBtn>& UI::Service::getAllButtons() {
 		return ui_entities;
+	}
+
+	void UI::Service::destroyAllButtons() {
+		ui_entities.clear();
 	}
 
 	bool UI::Service::checkEntity(Entity::Type entity) const {
@@ -391,6 +427,9 @@ namespace NIKE {
 			if (!e_text_comp.has_value()) continue;
 			auto& e_text = e_text_comp.value().get();
 
+			//Clamp rotation ( Disable rotating buttons for now )
+			e_transform.rotation = 0.0f;
+
 			//Clamp Rectangle Size
 			e_transform.scale.x = std::clamp(e_transform.scale.x, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x));
 			e_transform.scale.y = std::clamp(e_transform.scale.y, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y));
@@ -431,6 +470,9 @@ namespace NIKE {
 					e_transform.scale = hover_container[entity.first].first.scale;
 					hover_container[entity.first].second = false;
 				}
+
+				//Reset polling for Mouse left button
+				input_checks[NIKE_MOUSE_BUTTON_LEFT].first = false;
 			}
 		}
 	}

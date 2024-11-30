@@ -81,6 +81,9 @@ namespace NIKE {
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
 
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
+
 		//Clear layers
 		layers.clear();
 
@@ -105,6 +108,9 @@ namespace NIKE {
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
 
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
+
 		//Clear layers
 		layers.clear();
 
@@ -127,6 +133,9 @@ namespace NIKE {
 
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
+
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
 
 		//Clear layers
 		layers.clear();
@@ -212,9 +221,9 @@ namespace NIKE {
 		return layers;
 	}
 
-	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent&& new_event) {
+	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent const& new_event) {
 		if (!event_queue) {
-			event_queue = std::make_shared<Scenes::SceneEvent>(std::move(new_event));
+			event_queue = std::make_shared<Scenes::SceneEvent>(new_event);
 		}
 		else {
 			NIKEE_CORE_INFO("Multiple new scene event. First scene event will be used");

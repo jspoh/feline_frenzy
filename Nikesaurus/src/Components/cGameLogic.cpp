@@ -45,6 +45,7 @@ namespace NIKE {
 		);
 
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<GameLogic::Movement>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, GameLogic::Movement& comp) {
 
@@ -116,5 +117,6 @@ namespace NIKE {
 				ImGui::Text("Function: %s", comp.script.function.c_str());
 			}
 		);
+#endif
 	}
 }

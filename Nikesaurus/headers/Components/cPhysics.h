@@ -32,7 +32,7 @@ namespace NIKE {
             float mass;
             Vector2f velocity;
             Vector2f force; //Depricated to be removed
-            std::vector<Force> forces;
+            std::vector<Force> forces; //Future implementation!!!
 
             Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ EPSILON }, velocity(), force() {}
             Dynamics(float max_speed, float drag, float mass)

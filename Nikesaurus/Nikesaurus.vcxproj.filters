@@ -115,9 +115,6 @@
     <ClInclude Include="headers\Managers\Services\Lua\sLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
-    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
     <ClInclude Include="headers\Components\cShooting.h" />
     <ClInclude Include="headers\Components\cHealth.h" />
@@ -128,6 +125,9 @@
     <ClInclude Include="headers\Systems\GameLogic\sysEnemy.h" />
     <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
+    <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
