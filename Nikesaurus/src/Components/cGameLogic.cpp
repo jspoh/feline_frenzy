@@ -14,15 +14,11 @@
 namespace NIKE {
 
 	nlohmann::json ScriptSerialize(GameLogic::ILogic const& comp) {
-		return	{
-				{ "Script_ID", comp.script.script_id },
-				{ "Function", comp.script.function },
-		};
+		comp.script.serialize();
 	}
 
 	void ScriptDeserialize(GameLogic::ILogic& comp, nlohmann::json const& data) {
-		comp.script.script_id = data.at("Script_Path").get<std::string>();
-		comp.script.function = data.at("Function").get<std::string>();
+		comp.script.deserialize(data);
 	}
 
 	void GameLogic::registerComponents() {
