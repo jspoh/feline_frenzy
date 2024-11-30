@@ -68,9 +68,15 @@ namespace NIKE {
         //luaMathBinds(*lua_state);
         luaSceneBinds(*lua_state);
 
-        //Log out all 
-        for (auto& pair : lua_state->globals()) {
-            cout << pair.first.as<std::string>() << "\n";
+        //Get all lua global functions
+        sol::table globals = lua_state->globals();
+        for (const auto& pair : globals) {
+            sol::object key = pair.first;
+            sol::object value = pair.second;
+
+            if (value.is<sol::function>()) {
+                lua_global_funcs.insert(key.as<std::string>());
+            }
         }
     }
 
@@ -188,5 +194,9 @@ namespace NIKE {
 
         //Return extracted functions
         return functions;
+    }
+
+    std::unordered_set<std::string> Lua::Service::getGlobalLuaFunctions() const {
+        return lua_global_funcs;
     }
 }
