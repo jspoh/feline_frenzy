@@ -4684,7 +4684,7 @@ namespace NIKE {
 
 	void LevelEditor::TileMapPanel::removeGrid(std::filesystem::path scn_id)
 	{
-		std::string grid_file_name = Utility::extractFileName(scn_id.string());
+		std::string grid_file_name = Utility::extractFileName(scn_id.string()) + ".grid";
 
 		std::string grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_file_name).string();
 
