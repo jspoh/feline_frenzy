@@ -159,7 +159,7 @@ namespace NIKE {
 						static bool vol_changed = false;
 
 						// Set volume
-						if (ImGui::SliderFloat("Volume", &comp.volume, 0.f, 1.f, "%.2f")) {
+						if (ImGui::SliderFloat("Volume", &comp.volume, 0.f, 1.f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
 							vol_changed = true;
 						}
 
@@ -199,7 +199,7 @@ namespace NIKE {
 						static bool pitch_changed = false;
 
 						//Set pitch
-						if (ImGui::SliderFloat("Pitch", &comp.pitch, 0.5f, 2.f, "%.2f")) {
+						if (ImGui::SliderFloat("Pitch", &comp.pitch, 0.5f, 2.f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
 							pitch_changed = true;
 						}
 

@@ -94,7 +94,7 @@ namespace NIKE {
 					static Vector2f scale_before_change;
 
 					//Change scale
-					ImGui::DragFloat2("Scale##Transform", &comp.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+					ImGui::DragFloat2("Scale##Transform", &comp.scale.x, 0.1f, 0.f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if scale has beguin editing
 					if (ImGui::IsItemActivated()) {
@@ -126,7 +126,7 @@ namespace NIKE {
 					static float rotation_before_change;
 
 					//Change rotation
-					ImGui::DragFloat("Rotation##Transform", &comp.rotation, 0.1f, -360.f, 360.f);
+					ImGui::DragFloat("Rotation##Transform", &comp.rotation, 0.1f, -360.f, 360.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if rotation has begun editing
 					if (ImGui::IsItemActivated()) {

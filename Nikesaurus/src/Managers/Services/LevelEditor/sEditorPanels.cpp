@@ -1440,9 +1440,6 @@ namespace NIKE {
 	std::function<void()> LevelEditor::ComponentsPanel::addComponentPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
-			// Warning message
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
-
 			//Select a component to add
 			ImGui::Text("Select a component to add:");
 
@@ -1824,7 +1821,7 @@ namespace NIKE {
 					//Set Gizmo Sensitivity
 					{
 						ImGui::Text("Set Gizmo Sensitivity: ");
-						ImGui::DragFloat("##GizmoSensitivity", &gizmo.sensitivity, 0.01f, 0.0f, 5.0f);
+						ImGui::DragFloat("##GizmoSensitivity", &gizmo.sensitivity, 0.01f, 0.0f, 5.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 						//Before editing
 						static float sensitivity_before_change = gizmo.sensitivity;
@@ -2357,10 +2354,10 @@ namespace NIKE {
 				float pitch = channel.second->getPitch();
 
 				ImGui::Text("Adjust Volume & Pitch");
-				if (ImGui::SliderFloat(std::string("Volume##" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f")) {
+				if (ImGui::SliderFloat(std::string("Volume##" + channel.first).c_str(), &volume, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
 					channel.second->setVolume(volume);
 				}
-				if (ImGui::SliderFloat(std::string("Pitch##" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f")) {
+				if (ImGui::SliderFloat(std::string("Pitch##" + channel.first).c_str(), &pitch, 0.5f, 2.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
 					channel.second->setPitch(pitch);
 				}
 
@@ -3286,7 +3283,7 @@ namespace NIKE {
 			{
 				ImGui::Text("Icon Size: ");
 				ImGui::PushItemWidth(50.0f);
-				ImGui::DragFloat("##IconSizing", &icon_size.x, 1.0f, 32.0f, 256.0f, "%.f");
+				ImGui::DragFloat("##IconSizing", &icon_size.x, 1.0f, 32.0f, 256.0f, "%.f", ImGuiSliderFlags_AlwaysClamp);
 				ImGui::PopItemWidth();
 				icon_size.y = icon_size.x;
 			}
@@ -3791,7 +3788,7 @@ namespace NIKE {
 				{
 					//Change scale
 					ImGui::Text("Scale");
-					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, 0.f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 				}
 
 				////Edit Rotation ( Temporarily Disabled )
@@ -4311,7 +4308,7 @@ namespace NIKE {
 
 			//Adjust cell size
 			ImGui::Text("Adjust cell size: ");
-			ImGui::DragFloat2("##Cell Size", &cell_size.x, 0.1f, 0, INT16_MAX);
+			ImGui::DragFloat2("##Cell Size", &cell_size.x, 0.1f, 0, INT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 			//Check if cell has begun editing
 			if (ImGui::IsItemActivated()) {
@@ -4382,7 +4379,7 @@ namespace NIKE {
 		{
 			static float thickness_before_change = 0.0f;
 			ImGui::Text("Adjust grid thickness: ");
-			ImGui::DragFloat("##Grid Thickness", &grid_thickness, 0.1f, 1.0f, 10.0f);
+			ImGui::DragFloat("##Grid Thickness", &grid_thickness, 0.1f, 1.0f, 10.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 			//Check if thickness has begun editing
 			if (ImGui::IsItemActivated()) {

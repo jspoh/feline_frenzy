@@ -58,7 +58,7 @@ namespace NIKE {
 
 					ImGui::Text("Number of Animations ");
 					ImGui::Text("If set to 0, infinite animations");
-					ImGui::DragInt("##If set to 0, infinite animations", &comp.animations_to_complete, 1);
+					ImGui::DragInt("##If set to 0, infinite animations", &comp.animations_to_complete, 1, 0.f, float(UINT16_MAX), "%d", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -91,7 +91,7 @@ namespace NIKE {
 					// Before change
 					static float before_frame_duration = 0.0f;
 
-					ImGui::DragFloat("Frame Duration", &comp.frame_duration, .001f);
+					ImGui::DragFloat("Frame Duration", &comp.frame_duration, .001f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
