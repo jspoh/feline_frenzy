@@ -129,6 +129,9 @@ namespace NIKE {
 			//Get all buttons
 			std::unordered_map<std::string, UI::UIBtn>& getAllButtons();
 
+			//Destroy all buttons
+			void destroyAllButtons();
+
 			//Check if entity is UI
 			bool checkEntity(Entity::Type entity) const;
 

@@ -267,7 +267,7 @@ namespace NIKE {
 
 	Assets::Types Assets::Service::getAssetType(std::string const& asset_id) const {
 		if (asset_registry.find(asset_id) == asset_registry.end()) {
-			throw std::runtime_error("Asset not yet registered.");
+			return Assets::Types::None;
 		}
 
 		return asset_registry.at(asset_id).type;
@@ -275,7 +275,7 @@ namespace NIKE {
 
 	std::string Assets::Service::getAssetTypeString(std::string const& asset_id) const {
 		if (asset_registry.find(asset_id) == asset_registry.end()) {
-			throw std::runtime_error("Asset not yet registered.");
+			return typeToString(Assets::Types::None);
 		}
 
 		return typeToString(asset_registry.at(asset_id).type);

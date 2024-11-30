@@ -335,6 +335,10 @@ namespace NIKE {
 		return ui_entities;
 	}
 
+	void UI::Service::destroyAllButtons() {
+		ui_entities.clear();
+	}
+
 	bool UI::Service::checkEntity(Entity::Type entity) const {
 		for (auto const& ui_entity : ui_entities) {
 			if (ui_entity.second.entity_id == entity)
@@ -422,6 +426,9 @@ namespace NIKE {
 			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.entity_id);
 			if (!e_text_comp.has_value()) continue;
 			auto& e_text = e_text_comp.value().get();
+
+			//Clamp rotation ( Disable rotating buttons for now )
+			e_transform.rotation = 0.0f;
 
 			//Clamp Rectangle Size
 			e_transform.scale.x = std::clamp(e_transform.scale.x, 0.0f, static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x));

@@ -2826,7 +2826,7 @@ namespace NIKE {
 			ImGui::PopStyleColor();
 
 			//Start drag-and-drop source
-			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(file.filename().string()) && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 				auto filetype_string = NIKE_ASSETS_SERVICE->getAssetTypeString(file.filename().string());
 				//Set drag payload with asset name
 				ImGui::SetDragDropPayload(std::string(filetype_string + "_FILE").c_str(), file.filename().string().c_str(), file.filename().string().size() + 1);
@@ -3251,7 +3251,7 @@ namespace NIKE {
 		renderAssetsBrowser(current_path);
 
 		//Render selected asset options
-		if (!selected_asset_id.empty()) {
+		if (!selected_asset_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(selected_asset_id)) {
 
 			// Center the panel
 			ImGui::Begin("Selected Asset", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings);
@@ -3626,6 +3626,7 @@ namespace NIKE {
 
 			//Button ID
 			static std::string btn_id = "";
+			btn_id.reserve(64);
 			{
 				//Enter new button ID
 				ImGui::Text("New button id: ");
@@ -3640,6 +3641,7 @@ namespace NIKE {
 
 			//Button Text
 			static Render::Text btn_text;
+			btn_text.text.reserve(64);
 			static int font_index = -1;
 			{
 				// Get all loaded fonts
@@ -3684,12 +3686,12 @@ namespace NIKE {
 					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
 				}
 
-				//Edit Rotation
-				{
-					//Change rotation
-					ImGui::Text("Rotation");
-					ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
-				}
+				////Edit Rotation ( Temporarily Disabled )
+				//{
+				//	//Change rotation
+				//	ImGui::Text("Rotation");
+				//	ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
+				//}
 			}
 
 			ImGui::Separator();
@@ -3972,7 +3974,9 @@ namespace NIKE {
 					//Static variables
 					static int val_type_index = 0;
 					static std::string named_key = "";
+					named_key.reserve(64);
 					static std::string str_val = "";
+					str_val.reserve(64);
 					static int int_val = 0;
 					static float float_val = 0.0f;
 					static bool bool_val = false;

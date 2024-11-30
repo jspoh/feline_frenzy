@@ -232,9 +232,6 @@ namespace NIKE {
 				//Update all audio pending actions
 				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
-				//update UI First
-				NIKE_UI_SERVICE->update();
-
 				//Update scenes manager
 				NIKE_SCENES_SERVICE->update();
 
@@ -274,6 +271,9 @@ namespace NIKE {
 
 				//Render Level Editor
 				NIKE_LVLEDITOR_SERVICE->render();
+				
+				//update UI First
+				NIKE_UI_SERVICE->update();
 #endif
 
 				//Swap Buffers

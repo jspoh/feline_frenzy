@@ -81,6 +81,9 @@ namespace NIKE {
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
 
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
+
 		//Clear layers
 		layers.clear();
 
@@ -105,6 +108,9 @@ namespace NIKE {
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
 
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
+
 		//Clear layers
 		layers.clear();
 
@@ -127,6 +133,9 @@ namespace NIKE {
 
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
+
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
 
 		//Clear layers
 		layers.clear();
