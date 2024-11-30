@@ -58,10 +58,24 @@ namespace NIKE {
 		render_loader = std::make_unique<Assets::RenderLoader>();
 		audio_system = audio_sys;
 
-		//Add executable types
-		executable_types.insert(Types::Scene);
-		executable_types.insert(Types::Prefab);
-		executable_types.insert(Types::Grid);
+		//Set loadable
+		asset_types[Types::Texture].set(Modes::Loadable, true);
+		asset_types[Types::Model].set(Modes::Loadable, true);
+		asset_types[Types::Font].set(Modes::Loadable, true);
+		asset_types[Types::Music].set(Modes::Loadable, true);
+		asset_types[Types::Sound].set(Modes::Loadable, true);
+		asset_types[Types::Script].set(Modes::Loadable, true);
+
+		//Set executables
+		asset_types[Types::Scene].set(Modes::Executable, true);
+		asset_types[Types::Prefab].set(Modes::Executable, true);
+		asset_types[Types::Grid].set(Modes::Executable, true);
+
+		//Set editable
+		asset_types[Types::Scene].set(Modes::Editable, true);
+		asset_types[Types::Prefab].set(Modes::Editable, true);
+		asset_types[Types::Grid].set(Modes::Editable, true);
+		asset_types[Types::Script].set(Modes::Editable, true);
 
 		//Texture extensions
 		addValidExtensions(".png");
@@ -177,8 +191,8 @@ namespace NIKE {
 
 	void Assets::Service::cacheAsset(std::string const& asset_id) {
 
-		//Check if asset is an executable
-		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+		//Check if asset is loadable
+		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
 
@@ -208,8 +222,8 @@ namespace NIKE {
 	}
 
 	void Assets::Service::uncacheAsset(std::string const& asset_id) {
-		//Check if asset is an executable
-		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+		//Check if asset is loadable
+		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
 
@@ -222,8 +236,8 @@ namespace NIKE {
 
 	void Assets::Service::recacheAsset(std::string const& asset_id) {
 
-		//Check if asset is an executable
-		if (executable_types.find(getAssetType(asset_id)) != executable_types.end()) {
+		//Check if asset is loadable
+		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
 		
@@ -237,7 +251,7 @@ namespace NIKE {
 	void Assets::Service::getExecutable(std::string const& asset_id) {
 
 		//Check if asset is a executable asset type
-		if (executable_types.find(getAssetType(asset_id)) == executable_types.end()) {
+		if (!(asset_types[getAssetType(asset_id)].test(Modes::Executable))) {
 			NIKEE_CORE_WARN("Wrong usage! For fetching normal type assets use getAsset<T>().");
 			return;
 		}
@@ -260,12 +274,16 @@ namespace NIKE {
 		loader_it->second(meta_it->second.primary_path);
 	}
 
-	void Assets::Service::addTypeAsExecutable(Types type) {
-		executable_types.insert(type);
+	bool Assets::Service::isAssetLoadable(std::string const& asset_id) const {
+		return asset_types.at(getAssetType(asset_id)).test(Modes::Loadable);
 	}
 
-	bool Assets::Service::isAssetExecutableType(std::string const& asset_id) const {
-		return executable_types.find(getAssetType(asset_id)) != executable_types.end();
+	bool Assets::Service::isAssetExecutable(std::string const& asset_id) const {
+		return asset_types.at(getAssetType(asset_id)).test(Modes::Executable);
+	}
+
+	bool Assets::Service::isAssetEditable(std::string const& asset_id) const {
+		return asset_types.at(getAssetType(asset_id)).test(Modes::Editable);
 	}
 
 	Assets::Types Assets::Service::getAssetType(std::string const& asset_id) const {
