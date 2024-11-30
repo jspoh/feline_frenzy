@@ -45,10 +45,11 @@
     <None Include="assets\Shaders\batched_base.vert" />
     <None Include="assets\Shaders\batched_texture.vert" />
     <None Include="assets\Shaders\batched_texture.frag" />
-    <None Include="assets\Scripts\player.lua" />
+    <None Include="assets\Scripts\Player.lua" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="src\Core\Config.json" />
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\ChangeScene.lua" />
+    <None Include="assets\Scripts\GameFlow.lua" />
   </ItemGroup>
 </Project>

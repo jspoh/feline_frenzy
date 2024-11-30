@@ -65,7 +65,7 @@ namespace NIKE {
         //Register all bindings here
         luaBasicBinds(*lua_state);
         luaKeyBinds(*lua_state);
-        //luaMathBinds(*lua_state);
+        luaInputBinds(*lua_state);
         luaSceneBinds(*lua_state);
 
         //Get all lua global functions

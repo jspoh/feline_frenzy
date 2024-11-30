@@ -156,8 +156,9 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
   <ItemGroup>
     <None Include="assets\Scenes\mainmenu.scn" />
     <None Include="assets\Scenes\main_menu.scn" />
+    <None Include="assets\Scripts\GameFlow.lua" />
     <None Include="assets\Scripts\move.lua" />
-    <None Include="assets\Scripts\player.lua" />
+    <None Include="assets\Scripts\Player.lua" />
     <None Include="assets\Scripts\ChangeScene.lua" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />

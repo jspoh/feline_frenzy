@@ -20,13 +20,8 @@ namespace NIKE {
 		//Lua basic binds
 		void luaBasicBinds(sol::state& lua_state);
 
-		//Vector2 registration
-		template<typename T>
-		void registerVector2(sol::state& lua_state, const std::string& type_name);
-
-		//Vector4 registration
-		template<typename T>
-		void registerVector4(sol::state& lua_state, const std::string& type_name);
+		//Lua input binds
+		void luaInputBinds(sol::state& lua_state);
 
 		//Lua math binds
 		void luaMathBinds(sol::state& lua_state);
@@ -36,6 +31,9 @@ namespace NIKE {
 
 		//Lua ECS Binds
 		void luaECSBinds(sol::state& lua_state);
+
+		//Lua game binds
+		void luaGameBinds(sol::state& lua_state);
 	}
 }
 

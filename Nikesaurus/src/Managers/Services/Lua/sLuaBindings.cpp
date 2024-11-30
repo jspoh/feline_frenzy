@@ -135,17 +135,9 @@ namespace NIKE {
             "RIGHT_ALT", NIKE_KEY_RIGHT_ALT,
             "RIGHT_SUPER", NIKE_KEY_RIGHT_SUPER,
             "MENU", NIKE_KEY_MENU,
-            "MOUSE_BUTTON_1", NIKE_MOUSE_BUTTON_1,
-            "MOUSE_BUTTON_2", NIKE_MOUSE_BUTTON_2,
-            "MOUSE_BUTTON_3", NIKE_MOUSE_BUTTON_3,
-            "MOUSE_BUTTON_4", NIKE_MOUSE_BUTTON_4,
-            "MOUSE_BUTTON_5", NIKE_MOUSE_BUTTON_5,
-            "MOUSE_BUTTON_6", NIKE_MOUSE_BUTTON_6,
-            "MOUSE_BUTTON_7", NIKE_MOUSE_BUTTON_7,
-            "MOUSE_BUTTON_8", NIKE_MOUSE_BUTTON_8,
-            "MOUSE_BUTTON_LEFT", NIKE_MOUSE_BUTTON_LEFT,
-            "MOUSE_BUTTON_RIGHT", NIKE_MOUSE_BUTTON_RIGHT,
-            "MOUSE_BUTTON_MIDDLE", NIKE_MOUSE_BUTTON_MIDDLE
+            "MOUSE_LEFT", NIKE_MOUSE_BUTTON_LEFT,
+            "MOUSE_RIGHT", NIKE_MOUSE_BUTTON_RIGHT,
+            "MOUSE_MIDDLE", NIKE_MOUSE_BUTTON_MIDDLE
         );
     }
 
@@ -156,6 +148,12 @@ namespace NIKE {
                 cout << "[Lua] " << msg << endl;
             },
             [](int value) {
+                cout << "[Lua] " << value << endl;
+            },
+            [](bool value) {
+                cout << "[Lua] " << value << endl;
+            },
+            [](float value) {
                 cout << "[Lua] " << value << endl;
             }
         ));
@@ -168,59 +166,41 @@ namespace NIKE {
         )");
     }
 
-    template<typename T>
-    void Lua::registerVector2(sol::state& lua_state, const std::string& type_name) {
-        using Vector2Type = Vector2<T>;
+    void Lua::luaInputBinds(sol::state& lua_state) {
+        lua_state.set_function("IsKeyPressed", [](int key) -> bool {
+            return NIKE_INPUT_SERVICE->isKeyPressed(key);
+            });
 
-        auto math = lua_state["Math"].get_or_create<sol::table>();
+        lua_state.set_function("IsKeyTriggered", [](int key) -> bool {
+            return NIKE_INPUT_SERVICE->isKeyTriggered(key);
+            });
 
-        math.new_usertype<Vector2Type>(type_name.c_str(),
-            sol::constructors<Vector2Type(), Vector2Type(T, T)>(),
-            "x", &Vector2Type::x,
-            "y", &Vector2Type::y,
-            "length", &Vector2Type::length,
-            "normalize", &Vector2Type::normalize,
-            "dot", &Vector2Type::dot,
-            sol::meta_function::addition, &Vector2Type::operator+,
-            sol::meta_function::subtraction, &Vector2Type::operator-,
-            sol::meta_function::multiplication, [](Vector2Type& lhs, T scalar) { return lhs * scalar; },
-            sol::meta_function::division, & Vector2Type::operator/
-        );
-    }
+        lua_state.set_function("IsKeyReleased", [](int key) -> bool {
+            return NIKE_INPUT_SERVICE->isKeyReleased(key);
+            });
 
-    template<typename T>
-    void Lua::registerVector4(sol::state& lua_state, const std::string& type_name) {
-        using Vector4Type = Vector4<T>;
+        lua_state.set_function("IsMousePressed", [](int key) -> bool {
+            return NIKE_INPUT_SERVICE->isMousePressed(key);
+            });
 
-        auto math = lua_state["Math"].get_or_create<sol::table>();
+        lua_state.set_function("IsMouseTriggered", [](int key) -> bool {
+            return NIKE_INPUT_SERVICE->isMouseTriggered(key);
+            });
 
-        math.new_usertype<Vector4Type>(type_name.c_str(),
-            sol::constructors<Vector4Type(), Vector4Type(T, T, T, T)>(),
-            "x", &Vector4Type::x,
-            "y", &Vector4Type::y,
-            "z", &Vector4Type::z,
-            "w", &Vector4Type::w,
-            "r", &Vector4Type::r,
-            "g", &Vector4Type::g,
-            "b", &Vector4Type::b,
-            "a", &Vector4Type::a,
-            "length", &Vector4Type::length,
-            "normalize", &Vector4Type::normalize,
-            "dot", &Vector4Type::dot,
-            sol::meta_function::addition, &Vector4Type::operator+,
-            sol::meta_function::subtraction, &Vector4Type::operator-,
-            sol::meta_function::multiplication, [](Vector4Type& lhs, T scalar) { return lhs * scalar; },
-            sol::meta_function::division, & Vector4Type::operator/
-        );
+        lua_state.set_function("IsMouseReleased", [](int key) -> bool {
+            return NIKE_INPUT_SERVICE->isMouseReleased(key);
+            });
+
+        lua_state.set_function("WorldMousePos", []() {
+            return NIKE_INPUT_SERVICE->getMouseWorldPos();
+            });
+
+        lua_state.set_function("WindowMousePos", []() {
+            return NIKE_INPUT_SERVICE->getMouseWindowPos();
+            });
     }
 
     void Lua::luaMathBinds(sol::state& lua_state) {
-
-        registerVector2<float>(lua_state, "Vector2f");
-        registerVector2<int>(lua_state, "Vector2i");
-
-        registerVector4<float>(lua_state, "Vector4f");
-        registerVector4<int>(lua_state, "Vector4i");
     }
 
     void Lua::luaSceneBinds(sol::state& lua_state) {
@@ -258,6 +238,27 @@ namespace NIKE {
         lua_state.set_function("KillEntity", [&](Entity::Type entity) {
             NIKE_ECS_MANAGER->destroyEntity(entity);
             });
+
+    }
+
+    void Lua::luaGameBinds(sol::state& lua_state) {
+        //Fire Bullet
+        lua_state.set_function("FireBullet", [&]() {
+            Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath("Bullet.prefab").string());
+            });
+
+        //Spawn enemy function
+        lua_state.set_function("Spawn Enemy", [&](float x, float y) {
+            Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath("Enemy.prefab").string());
+            auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+            if (e_trans_comp.has_value()) {
+                e_trans_comp.value().get().position.x = x;
+                e_trans_comp.value().get().position.y = y;
+            }
+            });
+
 
     }
 }
