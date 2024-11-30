@@ -27,7 +27,7 @@
                 "y": 0
             }
         },
-        "GameLogic::Movement": {
+        "GameLogic::ILogic": {
             "Function": "update",
             "Script_Path": "assets/Scripts/player.lua"
         },
