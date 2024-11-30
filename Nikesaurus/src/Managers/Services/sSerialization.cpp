@@ -162,11 +162,8 @@ namespace NIKE {
 		// Extract grid_id from the scene file name
 		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
 
-		// Determine the path to the "Grids" folder
-		std::filesystem::path grids_folder = std::filesystem::path(file_path).parent_path() / "Grids";
-
 		// Check if the "Grids" folder contains the .grid file
-		if (std::filesystem::exists(grids_folder / grid_id)) {
+		if (std::filesystem::exists(grid_id)) {
 			// Add grid ID data only if the file exists
 			nlohmann::json m_data;
 			m_data["Grid ID"] = grid_id;

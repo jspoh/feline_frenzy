@@ -1530,11 +1530,21 @@ namespace NIKE {
 					path /= std::string(prefab_id + ".prefab");
 				}
 
-				//Save current state of the scene to file
-				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
 
-				//Set new scn id
-				NIKE_SCENES_SERVICE->setCurrSceneID(std::string(prefab_id + ".prefab"));
+				// Open the file for writing
+				std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
+
+				// Check if the file opened successfully
+				if (!file.is_open()) {
+					openPopUp("Error");
+				}
+				else
+				{
+					openPopUp("Success");
+				}
+
+				// Write the serialized prefab data to the file
+				NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel.lock()->getSelectedEntity(), path.string());
 
 				//Reset scene id buffer
 				prefab_id.clear();
@@ -4144,31 +4154,44 @@ namespace NIKE {
 
 		if (ImGui::Button("Save Grid"))
 		{
-			//// For saving of the prefab file with the extension
-			//std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+			// For saving of the prefab file with the extension
+			std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
 
-			//std::string grid_file_name = Utility::extractFileName(curr_scene) + ".grid";
+			std::string grid_file_name = Utility::extractFileName(curr_scene);
 
-			//std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + grid_file_name;
+			std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
 
-			//// Serialize the grid data using the grid service
-			//nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+			// Serialize the grid data using the grid service
+			nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
 
-			//// Open the file for writing
-			//std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
+			// Saving of grid
+			if (!grid_file_name.empty() && (grid_file_name.find(".grid") == grid_file_name.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(grid_file_name)) {
 
-			//// Check if the file opened successfully
-			//if (!file.is_open()) {
-			//	openPopUp("Error");
-			//}
-			//else
-			//{
-			//	openPopUp("Success");
-			//}
+				//Craft file path from name
+				if (std::filesystem::exists(path)) {
+					path /= std::string(grid_file_name + ".grid");
+				}
+				else {
+					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
+					path /= std::string(grid_file_name + ".grid");
+				}
+			}
 
-			//// Write the serialized grid data to the file
-			//file << grid_data.dump(4);
-			//file.close();
+			// Open the file for writing
+			std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
+
+			// Check if the file opened successfully
+			if (!file.is_open()) {
+				openPopUp("Error");
+			}
+			else
+			{
+				openPopUp("Success");
+			}
+
+			// Write the serialized grid data to the file
+			file << grid_data.dump(4);
+			file.close();
 		}
 
 		//Adjust grid mode
