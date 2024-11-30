@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = false;
+constexpr bool BATCHED_RENDERING = true;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
@@ -118,7 +118,7 @@ namespace NIKE {
 		if (!BATCHED_RENDERING || std::find(QUAD_SHAPE_MODELS.begin(), QUAD_SHAPE_MODELS.end(), e_shape.model_id) == QUAD_SHAPE_MODELS.end()) {
 #pragma warning(pop)
 			//Set polygon mode
-				glPolygonMode(GL_FRONT, GL_FILL);
+			// glPolygonMode(GL_FRONT, GL_FILL);
 			glEnable(GL_BLEND);
 
 			// use shader
