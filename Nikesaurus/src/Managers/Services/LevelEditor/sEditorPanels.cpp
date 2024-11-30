@@ -2603,11 +2603,10 @@ namespace NIKE {
 				// Use the component's UI rendering logic
 				comps_panel.lock()->getCompsUI().at(comp.first)(*comps_panel.lock(), comp.second.get());
 
-				// For removing component purpose
-				comps_panel.lock()->setCompStringRef(comp.first);
-
 				// Add a button to remove the component
 				if (ImGui::Button(std::string("Remove Prefab Component##" + comp.first).c_str())) {
+					// For removing component purpose
+					comps_panel.lock()->setCompStringRef(comp.first);
 					openPopUp("Remove Component");
 				}
 			}
