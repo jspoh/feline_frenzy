@@ -2,7 +2,8 @@
  * \file   cGameLogic.cpp
  * \brief	Game logic components
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \date   October 2024
  *  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/

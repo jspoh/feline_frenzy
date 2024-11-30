@@ -1,12 +1,11 @@
 /*****************************************************************//**
  * \file   cGameLogic.h
- * \brief	Game logic components
+ * \brief  Game Logic components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
  * \date   October 2024
  *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
-
 #pragma once
 
 #ifndef C_GAMELOGIC_HPP

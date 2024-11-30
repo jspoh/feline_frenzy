@@ -3,7 +3,7 @@
  * \brief  Assets manager function definitions
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
- * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu 
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -149,7 +149,7 @@ namespace NIKE {
 	}
 
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {
-		if(b_virtual) {
+		if (b_virtual) {
 			if (!isPathValid(path)) {
 				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
 				return "";
@@ -240,7 +240,7 @@ namespace NIKE {
 		if (!isAssetLoadable(asset_id)) {
 			return;
 		}
-		
+
 		//Uncache asset
 		uncacheAsset(asset_id);
 
@@ -613,10 +613,10 @@ namespace NIKE {
 
 		//Serialize registry meta data
 		for (const auto& [id, metadata] : asset_registry) {
-			data[id] =	{
+			data[id] = {
 						{"Type", static_cast<int>(metadata.type)},
 						{"Primary_Path", metadata.primary_path.string()},
-						};
+			};
 		}
 
 		return data;

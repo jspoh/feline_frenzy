@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   sysAnimation.h
+ * \file   sysAnimation.cpp
  * \brief	Animation manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
