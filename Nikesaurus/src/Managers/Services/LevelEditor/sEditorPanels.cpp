@@ -4195,48 +4195,6 @@ namespace NIKE {
 
 		ImGui::Spacing();
 
-		if (ImGui::Button("Save Grid"))
-		{
-			// For saving of the prefab file with the extension
-			std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
-
-			std::string grid_file_name = Utility::extractFileName(curr_scene);
-
-			std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
-
-			// Serialize the grid data using the grid service
-			nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
-
-			// Saving of grid
-			if (!grid_file_name.empty() && (grid_file_name.find(".grid") == grid_file_name.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(grid_file_name)) {
-
-				//Craft file path from name
-				if (std::filesystem::exists(path)) {
-					path /= std::string(grid_file_name + ".grid");
-				}
-				else {
-					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
-					path /= std::string(grid_file_name + ".grid");
-				}
-			}
-
-			// Open the file for writing
-			std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
-
-			// Check if the file opened successfully
-			if (!file.is_open()) {
-				openPopUp("Error");
-			}
-			else
-			{
-				openPopUp("Success");
-			}
-
-			// Write the serialized grid data to the file
-			file << grid_data.dump(4);
-			file.close();
-		}
-
 		//Adjust grid mode
 		{
 			//Adjust grid mode
@@ -4455,6 +4413,48 @@ namespace NIKE {
 		ImGui::End();
 	}
 
+	void LevelEditor::TileMapPanel::saveGird()
+	{
+		// For saving of the prefab file with the extension
+		std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+
+		std::string grid_file_name = Utility::extractFileName(curr_scene);
+
+		std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
+
+		// Serialize the grid data using the grid service
+		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+		// Saving of grid
+		if (!grid_file_name.empty() && (grid_file_name.find(".grid") == grid_file_name.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(grid_file_name)) {
+
+			//Craft file path from name
+			if (std::filesystem::exists(path)) {
+				path /= std::string(grid_file_name + ".grid");
+			}
+			else {
+				path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
+				path /= std::string(grid_file_name + ".grid");
+			}
+		}
+
+		// Open the file for writing
+		std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
+
+		// Check if the file opened successfully
+		if (!file.is_open()) {
+			openPopUp("Error");
+		}
+		else
+		{
+			openPopUp("Success");
+		}
+
+		// Write the serialized grid data to the file
+		file << grid_data.dump(4);
+		file.close();
+	}
+
 	std::function<void()> LevelEditor::TileMapPanel::saveGridPopUp(std::string const& popup_id)
 	{
 		return [this, popup_id]() {
@@ -4604,6 +4604,8 @@ namespace NIKE {
 					path /= std::string(scn_id + ".scn");
 				}
 
+
+
 				//Save current state of the scene to file
 				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
 
@@ -4689,6 +4691,9 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Scene", deleteScenePopup("Delete Scene"));
 		registerPopUp("Create Scene", createScenePopup("Create Scene"));
+
+		// Weak ptr ref to tile panel
+		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
 	}
 
 	void LevelEditor::ScenesPanel::update()
@@ -4744,6 +4749,9 @@ namespace NIKE {
 		{
 			if (ImGui::Button("Save Scene")) {
 				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+
+					// When user click save scene, grid is saved together
+					tile_panel.lock()->saveGird();
 
 					//Save scene
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());

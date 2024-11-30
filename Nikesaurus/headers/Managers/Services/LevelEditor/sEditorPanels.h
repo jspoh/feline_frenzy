@@ -807,6 +807,8 @@ namespace NIKE {
 			//Render
 			void render() override;
 
+			void saveGird();
+
 			//Save grid popup
 			std::function<void()> saveGridPopUp(std::string const& popup_id);
 
@@ -843,6 +845,9 @@ namespace NIKE {
 
 			// To store layer names
 			std::vector<std::string> layer_names;
+
+			// Ref to tile map
+			std::weak_ptr<TileMapPanel> tile_panel;
 
 			//Create scene popup
 			std::function<void()> createScenePopup(std::string const& popup_id);

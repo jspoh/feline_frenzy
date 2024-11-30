@@ -1,5 +1,11 @@
 [
     {
+        "Channels": null
+    },
+    {
+        "Grid ID": "main_menu.grid"
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -42,7 +48,6 @@
                                 }
                             }
                         },
-                        "Entity Name": "entity_0002",
                         "Layer ID": 0
                     }
                 },
@@ -85,7 +90,6 @@
                                 }
                             }
                         },
-                        "Entity Name": "texture_3",
                         "Layer ID": 0
                     }
                 },
@@ -128,7 +132,6 @@
                                 }
                             }
                         },
-                        "Entity Name": "entity_0004",
                         "Layer ID": 0
                     }
                 },
@@ -171,7 +174,6 @@
                                 }
                             }
                         },
-                        "Entity Name": "texture_2",
                         "Layer ID": 0
                     }
                 },
@@ -214,7 +216,6 @@
                                 }
                             }
                         },
-                        "Entity Name": "texture_1",
                         "Layer ID": 0
                     }
                 }
