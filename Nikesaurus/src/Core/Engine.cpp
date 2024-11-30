@@ -189,9 +189,6 @@ namespace NIKE {
 		//Init Lua
 		NIKE_LUA_SERVICE->init();
 
-		// For testing imgui combo - lim
-		NIKE_AUDIO_SERVICE->createChannelGroup("MASTER");
-
 		//Register Def Components
 		registerDefComponents();
 
