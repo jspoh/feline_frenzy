@@ -1538,16 +1538,15 @@ namespace NIKE {
 				if (!file.is_open()) {
 					openPopUp("Error");
 				}
-				else
-				{
-					openPopUp("Success");
-				}
+					
 
 				// Write the serialized prefab data to the file
 				NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel.lock()->getSelectedEntity(), path.string());
 
 				//Reset scene id buffer
 				prefab_id.clear();
+
+				openPopUp("Success");
 
 				//Close popup
 				closePopUp(popup_id);
@@ -4132,7 +4131,7 @@ namespace NIKE {
 	void LevelEditor::TileMapPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 		registerPopUp("Save Grid", saveGridPopUp("Save Grid"));
-		error_msg = std::make_shared<std::string>("Saving Error");
+		error_msg = std::make_shared<std::string>("Saving Error, Please load a scene first before saving!");
 		success_msg = std::make_shared<std::string>("Saving Success");
 		registerPopUp("Error", defPopUp("Error", error_msg));
 		registerPopUp("Success", defPopUp("Success", success_msg));
