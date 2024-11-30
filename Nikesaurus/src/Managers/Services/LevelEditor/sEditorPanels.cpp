@@ -4643,7 +4643,7 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void LevelEditor::TileMapPanel::saveGird(std::filesystem::path scn_id)
+	void LevelEditor::TileMapPanel::saveGrid(std::filesystem::path scn_id)
 	{
 		std::string grid_file_name = Utility::extractFileName(scn_id.string());
 
@@ -4680,6 +4680,24 @@ namespace NIKE {
 		// Write the serialized grid data to the file
 		file << grid_data.dump(4);
 		file.close();
+	}
+
+	void LevelEditor::TileMapPanel::removeGrid(std::filesystem::path scn_id)
+	{
+		std::string grid_file_name = Utility::extractFileName(scn_id.string());
+
+		std::string grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_file_name).string();
+
+		// Saving of grid
+		if (std::filesystem::exists(grid_path)) {
+			try {
+				// Attempt to remove the grid file
+				std::filesystem::remove(grid_path);
+			}
+			catch (const std::filesystem::filesystem_error& e) {
+				NIKEE_CORE_ERROR("Error removing grid file");
+			}
+		}
 	}
 
 	std::function<void()> LevelEditor::TileMapPanel::saveGridPopUp(std::string const& popup_id)
@@ -4832,7 +4850,7 @@ namespace NIKE {
 				}
 
 				// When user click save/create scene, grid is saved together
-				tile_panel.lock()->saveGird(scn_id);
+				tile_panel.lock()->saveGrid(scn_id);
 
 				//Save current state of the scene to file
 				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
@@ -4879,6 +4897,8 @@ namespace NIKE {
 
 				//Get selected asset path
 				auto path = NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID());
+
+				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
 
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
@@ -4982,7 +5002,7 @@ namespace NIKE {
 					std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
 
 					// When user click save scene, grid is saved together
-					tile_panel.lock()->saveGird(scn_id);
+					tile_panel.lock()->saveGrid(scn_id);
 
 					//Save scene
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
