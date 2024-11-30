@@ -168,26 +168,20 @@ namespace NIKE {
 		};
 
 		//Entities management structure
-		struct EditorEntity {
+		struct EntityMetaData {
+			std::string entity_id;
+			std::string prefab_id;
 			bool b_locked;
 
-			EditorEntity() :b_locked{ false } {}
-			EditorEntity(bool b_locked) : b_locked{ b_locked }{}
-		};
-
-		//Set entity ref event
-		struct SetEntityRef : public Events::IEvent {
-			Entity::Type entity;
-			std::string ref;
-
-			SetEntityRef(Entity::Type entity, std::string const& ref) :entity{ entity }, ref{ ref }{}
+			EntityMetaData() : entity_id{ "" }, prefab_id{ "" }, b_locked{ false } {}
+			EntityMetaData(std::string const& entity_id, std::string const& prefab_id, bool b_locked)
+				: entity_id{ entity_id }, b_locked{ b_locked }, prefab_id{ prefab_id } {}
 		};
 
 		//Entities Management Panel
 		class EntitiesPanel :
 			public IPanel,
-			public Events::IEventListener<Coordinator::EntitiesChanged>,
-			public Events::IEventListener<SetEntityRef>
+			public Events::IEventListener<Coordinator::EntitiesChanged>
 		{
 		private:
 			//Sort entities
@@ -198,14 +192,11 @@ namespace NIKE {
 			};
 
 			//Set of active entities
-			std::map<Entity::Type, EditorEntity, EntitySorter> entities;
+			std::map<Entity::Type, EntityMetaData, EntitySorter> entities;
 
 			//BI-Mapping of entity type to string * vice versa
 			std::unordered_map<Entity::Type, std::string> entity_to_name;
 			std::unordered_map<std::string, Entity::Type> name_to_entity;
-
-			// Track entities created for prefab editing.
-			std::set<Entity::Type> prefab_entities; 
 
 			//Selected entity
 			Entity::Type selected_entity;
@@ -236,9 +227,6 @@ namespace NIKE {
 
 			//On entities changed event
 			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
-
-			//On setting of entity ref
-			void onEvent(std::shared_ptr<SetEntityRef> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -265,11 +253,6 @@ namespace NIKE {
 			//Get entity name
 			std::string getEntityName(Entity::Type entity);
 
-			// For prefab entity handling
-			void addPrefabEntity(Entity::Type entity);
-
-			void removePrefabEntity(Entity::Type entity);
-
 			//Get selected entity
 			Entity::Type getSelectedEntity() const;
 			
@@ -279,11 +262,23 @@ namespace NIKE {
 			//Unselect entity
 			void unselectEntity();
 
+			//Set entity metadata
+			void setEntityMetaData(Entity::Type entity, EntityMetaData data);
+
+			//Get entity metadata
+			EntityMetaData getEntityMetaData(Entity::Type entity) const;
+
 			//Get selected entity editor variables
-			std::optional<std::reference_wrapper<LevelEditor::EditorEntity>> getSelectedEntityEditor();
+			std::optional<std::reference_wrapper<LevelEditor::EntityMetaData>> getSelectedEntityMetaData();
+
+			//Lock entity
+			void lockEntity(Entity::Type entity);
 
 			//Lock all entities
 			void lockAllEntities();
+
+			//Unlock entity
+			void unlockEntity(Entity::Type entity);
 
 			//Unlock all entities
 			void unlockAllEntities();
@@ -344,9 +339,6 @@ namespace NIKE {
 			//Reference to main panel
 			std::weak_ptr<MainPanel> main_panel;
 
-			//Reference to p[refab panel
-			std::weak_ptr<PrefabsPanel> prefab_panel;
-
 			//Reference to tilemap panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
@@ -361,8 +353,8 @@ namespace NIKE {
 
 			std::string comp_string_ref;
 
-			//Save Prefab popup
-			std::function<void()> createPrefabPopUp(std::string const& popup_id);
+			////Save Prefab popup
+			//std::function<void()> createPrefabPopUp(std::string const& popup_id);
 
 			//Set Layer ID popup
 			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
@@ -405,6 +397,7 @@ namespace NIKE {
 			//Update
 			void update() override;
 
+			//Set comp removal string reference
 			void setCompStringRef(std::string const& to_set);
 
 			//Render
@@ -421,6 +414,9 @@ namespace NIKE {
 
 			//Gettor for comps_ui
 			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>>& getCompsUI();
+
+			//Get all comps
+			std::unordered_map<std::string, Component::Type> getComps() const;
 
 			//Add component UI function
 			template<typename T>
@@ -451,16 +447,23 @@ namespace NIKE {
 		//Prefabs Management panel
 		class PrefabsPanel : public IPanel {
 		private:
+			//For prefab temp entity
+			Entity::Type prefab_display;
 
-			struct TemporaryEntity {
-				// Stores file path to prefab
-				std::string file_path;
-				// The prefab temp entity
-				Entity::Type entity;
-			};
+			//Prefab ID
+			std::filesystem::path prefab_path;
 
-			// For prefab temp entity
-			TemporaryEntity prefab_temp_entity;
+			//Boolean for checking if prefab editing is active
+			bool b_editing_prefab;
+
+			//Count of entities using the same prefab
+			size_t copy_count;
+
+			//For comp management
+			std::string comp_ref;
+
+			// Msg for pop up
+			std::shared_ptr<std::string> msg;
 
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
@@ -468,17 +471,26 @@ namespace NIKE {
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
-			// Boolean for checking if entity is created from prefab
-			bool b_is_prefab_entity;
+			//Add component popup
+			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
+			//Remove component popup
+			std::function<void()> removeComponentPopUp(std::string const& popup_id);
+
+			//Load prefab popup
 			std::function<void()> loadPrefabPopUp(std::string const& popup_id);
 
-			// Msg for pop up
-			std::shared_ptr<std::string> msg;
-			std::shared_ptr<std::string> clear_msg;
+			//Create prefab popup
+			std::function<void()> createPrefabPopUp(std::string const& popup_id);
+
+			//Create entity popup
+			std::function<void()> createEntityPopup(std::string const& popup_id);
+
+			//Save prefab
+			void savePrefab();
 
 		public:
-			PrefabsPanel() = default;
+			PrefabsPanel() : prefab_display{ UINT16_MAX }, b_editing_prefab{ false }, copy_count{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name
@@ -506,13 +518,14 @@ namespace NIKE {
 			// For component stuff
 			void renderPrefabComponents();
 
-			std::optional<Entity::Type> getTempPrefabEntity() const;
-
-			void applyPrefabToEntity(Entity::Type prefab, Entity::Type new_entity);
-
 			// Utility functions for managing prefab entity
-			void createTempPrefabEntity(const std::string& file_path);
-			void clearTempPrefabEntity();
+			void createDisplayPrefab(const std::string& file_path);
+
+			//Destroy display prefab
+			void destroyDisplayPrefab();
+
+			//Get prefab editing state
+			bool isPrefabEditing() const;
 		};
 
 		//Debug Management Panel
