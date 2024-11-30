@@ -63,8 +63,11 @@ namespace NIKE {
 			//Loader function
 			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
 
-			//List of invalid extension
+			//List of valid extension
 			std::set<std::string> valid_extensions;
+
+			//List of key words to exclude
+			std::set<std::string> invalid_keys;
 
 			//List of executable asset type
 			std::set<Types> executable_types;
@@ -190,8 +193,17 @@ namespace NIKE {
 			//Check if asset is loaded from file path
 			bool isAssetCached(std::filesystem::path const& path) const;
 	
-			//Add invalid extension
+			//Add valid extension
 			void addValidExtensions(std::string const& ext);
+
+			//Get all valid extensions
+			std::set<std::string> getValidExtensions() const;
+
+			//Add invalid keys
+			void addInvalidKeys(std::string const& key);
+
+			//Get all invalid keys
+			std::set<std::string> getInvalidKeys() const;
 
 			//Check for valid path
 			bool isPathValid(std::string const& path, bool b_virtual = true) const;

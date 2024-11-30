@@ -241,4 +241,23 @@ namespace NIKE {
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CLOSE, ""));
             });
     }
+
+    void Lua::luaECSBinds(sol::state& lua_state) {
+
+        //Register create entity
+        lua_state.set_function("NewEntity", [&]() -> Entity::Type {
+            return NIKE_ECS_MANAGER->createEntity();
+            });
+
+        //Register destroy entities
+        lua_state.set_function("KillAllEntities", [&]() {
+            NIKE_ECS_MANAGER->destroyAllEntities();
+            });
+
+        //Register destroy entity
+        lua_state.set_function("KillEntity", [&](Entity::Type entity) {
+            NIKE_ECS_MANAGER->destroyEntity(entity);
+            });
+
+    }
 }

@@ -85,6 +85,9 @@ namespace NIKE {
 		addValidExtensions(".lua");
 		addValidExtensions(".json");
 
+		//Add invalid keys
+		addInvalidKeys("batched_");
+
 		//Register texture loader
 		registerLoader(Assets::Types::Texture, [this](std::filesystem::path const& primary_path) {
 			return std::make_shared<Texture>(render_loader->compileTexture(primary_path.string()));
@@ -332,9 +335,25 @@ namespace NIKE {
 	std::vector<const char*> Assets::Service::getAssetRefs(Assets::Types type) const {
 		std::vector<const char*> asset_refs;
 		for (auto it = asset_registry.begin(); it != asset_registry.end(); ++it) {
-			if (it->second.type == type) {
-				asset_refs.push_back(it->first.c_str());
+
+			//Check if the asset contains any invalid keys
+			bool is_invalid = false;
+			for (const auto& invalid_key : invalid_keys) {
+
+				//If invalid key is found
+				if (it->second.primary_path.filename().string().find(invalid_key) != std::string::npos) {
+					is_invalid = true;
+					break;
+				}
 			}
+
+			//Skip invalid keys or mismatched types
+			if (is_invalid || it->second.type != type) {
+				continue;
+			}
+
+			//Push to assets refs
+			asset_refs.push_back(it->first.c_str());
 		}
 
 		return asset_refs;
@@ -365,6 +384,18 @@ namespace NIKE {
 
 	void Assets::Service::addValidExtensions(std::string const& ext) {
 		valid_extensions.insert(ext);
+	}
+
+	std::set<std::string> Assets::Service::getValidExtensions() const {
+		return valid_extensions;
+	}
+
+	void Assets::Service::addInvalidKeys(std::string const& key) {
+		invalid_keys.insert(key);
+	}
+
+	std::set<std::string> Assets::Service::getInvalidKeys() const {
+		return invalid_keys;
 	}
 
 	bool Assets::Service::isPathValid(std::string const& path, bool b_virtual) const {

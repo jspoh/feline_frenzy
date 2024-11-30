@@ -3085,170 +3085,160 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ResourcePanel::render() {
-		if (!ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
+		if (ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
 
-			//File dropped popup
-			if (b_file_dropped) {
-				openPopUp("Success");
-				b_file_dropped = false;
+			ImGui::BeginMenuBar();
+
+			//Parent path navigation
+			{
+				//Back button
+				if (!current_path.empty() && ImGui::Button("< Back")) {
+
+					//Stop searching for parent at root directory
+					if (current_path != root_path) {
+						current_path = NIKE_PATH_SERVICE->getVirtualParentPath(current_path);
+
+						//Update directories & files
+						directories = NIKE_PATH_SERVICE->listDirectories(current_path);
+						files = NIKE_PATH_SERVICE->listFiles(current_path);
+					}
+				}
+				moveFileAcceptPayload(NIKE_PATH_SERVICE->getVirtualParentPath(current_path));
 			}
 
-			//Render popups
-			renderPopUps();
+			ImGui::Spacing();
 
-			//Return if window is not being shown
-			ImGui::End();
-			return;
-		}
+			//New folder
+			{
+				//Create new folder popup
+				if (ImGui::Button("New Folder")) {
+					openPopUp("New Folder");
+				}
+			}
 
-		ImGui::BeginMenuBar();
+			ImGui::Spacing();
 
-		//Parent path navigation
-		{
-			//Back button
-			if (!current_path.empty() && ImGui::Button("< Back")) {
+			//Directory level actions
+			{
+				//Array of load directories
+				const char* load_directory[] = { "Current", "Current *", "Root *" };
 
-				//Stop searching for parent at root directory
-				if (current_path != root_path) {
-					current_path = NIKE_PATH_SERVICE->getVirtualParentPath(current_path);
+				//Render the dropdown
+				ImGui::PushItemWidth(100.0f);
+				ImGui::Combo("##Directory", &directory_mode, load_directory, IM_ARRAYSIZE(load_directory));
+				ImGui::PopItemWidth();
 
+				//Load all from directory
+				if (ImGui::Button("Load All")) {
+
+					//Check for directory mode
+					switch (directory_mode) {
+					case 0: {
+						NIKE_ASSETS_SERVICE->cacheAssetDirectory(current_path);
+						success_msg->assign("All assets in: \"" + current_path + "\" loaded.");
+						openPopUp("Success");
+						break;
+					}
+					case 1: {
+						NIKE_ASSETS_SERVICE->cacheAssetDirectory(current_path, true);
+						success_msg->assign("All assets in: \"" + current_path + "*\" loaded.");
+						openPopUp("Success");
+						break;
+					}
+					case 2: {
+						NIKE_ASSETS_SERVICE->cacheAssetDirectory(root_path, true);
+						success_msg->assign("All assets in: \"" + root_path + "*\" loaded.");
+						openPopUp("Success");
+						break;
+					}
+					default: {
+						break;
+					}
+					}
+				}
+
+				//Unload all from directory
+				if (ImGui::Button("Unload All")) {
+
+					//Check for directory mode
+					switch (directory_mode) {
+					case 0: {
+						NIKE_ASSETS_SERVICE->uncacheAssetDirectory(current_path);
+						success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
+						openPopUp("Success");
+						break;
+					}
+					case 1: {
+						NIKE_ASSETS_SERVICE->uncacheAssetDirectory(current_path, true);
+						success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
+						openPopUp("Success");
+						break;
+					}
+					case 2: {
+						NIKE_ASSETS_SERVICE->uncacheAssetDirectory(root_path, true);
+						success_msg->assign("All assets in: \"" + root_path + "*\" unloaded.");
+						openPopUp("Success");
+						break;
+					}
+					default: {
+						break;
+					}
+					}
+				}
+
+				//Delete all from directory
+				if (ImGui::Button("Delete All")) {
+					openPopUp("Clear Directory");
+				}
+			}
+
+			ImGui::Spacing();
+
+			//Customize icon size
+			{
+				ImGui::Text("Icon Size: ");
+				ImGui::PushItemWidth(50.0f);
+				ImGui::DragFloat("##IconSizing", &icon_size.x, 1.0f, 32.0f, 256.0f, "%.f");
+				ImGui::PopItemWidth();
+				icon_size.y = icon_size.x;
+			}
+
+			ImGui::Spacing();
+
+			//Search filter
+			{
+				//Input filter
+				ImGui::Text("Filter: ");
+				ImGui::SameLine();
+				ImGui::PushItemWidth(100.0f);
+				if (ImGui::InputTextWithHint("##SearchFilter", "Search...", search_filter.data(), search_filter.capacity() + 1)) {
+					search_filter.resize(strlen(search_filter.c_str()));
+				}
+				ImGui::PopItemWidth();
+			}
+
+			ImGui::Spacing();
+
+			//Refresh directory
+			{
+				if (ImGui::Button("Refresh")) {
 					//Update directories & files
 					directories = NIKE_PATH_SERVICE->listDirectories(current_path);
 					files = NIKE_PATH_SERVICE->listFiles(current_path);
 				}
 			}
-			moveFileAcceptPayload(NIKE_PATH_SERVICE->getVirtualParentPath(current_path));
+
+			//Render popups
+			renderPopUps();
+
+			ImGui::EndMenuBar();
+
+			//Render all assets & folders
+			renderAssetsBrowser(current_path);
+
+			//Render popups
+			renderPopUps();
 		}
-
-		ImGui::Spacing();
-
-		//New folder
-		{
-			//Create new folder popup
-			if (ImGui::Button("New Folder")) {
-				openPopUp("New Folder");
-			}
-		}
-
-		ImGui::Spacing();
-
-		//Directory level actions
-		{
-			//Array of load directories
-			const char* load_directory[] = { "Current", "Current *", "Root *" };
-
-			//Render the dropdown
-			ImGui::PushItemWidth(100.0f);
-			ImGui::Combo("##Directory", &directory_mode, load_directory, IM_ARRAYSIZE(load_directory));
-			ImGui::PopItemWidth();
-
-			//Load all from directory
-			if (ImGui::Button("Load All")) {
-
-				//Check for directory mode
-				switch (directory_mode) {
-				case 0: {
-					NIKE_ASSETS_SERVICE->cacheAssetDirectory(current_path);
-					success_msg->assign("All assets in: \"" + current_path + "\" loaded.");
-					openPopUp("Success");
-					break;
-				}
-				case 1: {
-					NIKE_ASSETS_SERVICE->cacheAssetDirectory(current_path, true);
-					success_msg->assign("All assets in: \"" + current_path + "*\" loaded.");
-					openPopUp("Success");
-					break;
-				}
-				case 2: {
-					NIKE_ASSETS_SERVICE->cacheAssetDirectory(root_path, true);
-					success_msg->assign("All assets in: \"" + root_path + "*\" loaded.");
-					openPopUp("Success");
-					break;
-				}
-				default: {
-					break;
-				}
-				}
-			}
-
-			//Unload all from directory
-			if (ImGui::Button("Unload All")) {
-
-				//Check for directory mode
-				switch (directory_mode) {
-				case 0: {
-					NIKE_ASSETS_SERVICE->uncacheAssetDirectory(current_path);
-					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
-					openPopUp("Success");
-					break;
-				}
-				case 1: {
-					NIKE_ASSETS_SERVICE->uncacheAssetDirectory(current_path, true);
-					success_msg->assign("All assets in: \"" + current_path + "*\" unloaded.");
-					openPopUp("Success");
-					break;
-				}
-				case 2: {
-					NIKE_ASSETS_SERVICE->uncacheAssetDirectory(root_path, true);
-					success_msg->assign("All assets in: \"" + root_path + "*\" unloaded.");
-					openPopUp("Success");
-					break;
-				}
-				default: {
-					break;
-				}
-				}
-			}
-
-			//Delete all from directory
-			if (ImGui::Button("Delete All")) {
-				openPopUp("Clear Directory");
-			}
-		}
-
-		ImGui::Spacing();
-
-		//Customize icon size
-		{
-			ImGui::Text("Icon Size: ");
-			ImGui::PushItemWidth(50.0f);
-			ImGui::DragFloat("##IconSizing", &icon_size.x, 1.0f, 32.0f, 256.0f, "%.f");
-			ImGui::PopItemWidth();
-			icon_size.y = icon_size.x;
-		}
-
-		ImGui::Spacing();
-
-		//Search filter
-		{
-			//Input filter
-			ImGui::Text("Filter: ");
-			ImGui::SameLine();
-			ImGui::PushItemWidth(100.0f);
-			if (ImGui::InputTextWithHint("##SearchFilter", "Search...", search_filter.data(), search_filter.capacity() + 1)) {
-				search_filter.resize(strlen(search_filter.c_str()));
-			}
-			ImGui::PopItemWidth();
-		}
-
-		ImGui::Spacing();
-
-		//Refresh directory
-		{
-			if (ImGui::Button("Refresh")) {
-				//Update directories & files
-				directories = NIKE_PATH_SERVICE->listDirectories(current_path);
-				files = NIKE_PATH_SERVICE->listFiles(current_path);
-			}
-		}
-
-		//Render popups
-		renderPopUps();
-
-		ImGui::EndMenuBar();
-
-		//Render all assets & folders
-		renderAssetsBrowser(current_path);
 
 		//Render selected asset options
 		if (!selected_asset_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(selected_asset_id)) {
