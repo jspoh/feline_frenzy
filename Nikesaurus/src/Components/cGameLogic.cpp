@@ -28,7 +28,7 @@ namespace NIKE {
 	void GameLogic::registerComponents() {
 
 		//Register logic components
-		NIKE_ECS_MANAGER->registerComponent<GameLogic::Movement>();
+		NIKE_ECS_MANAGER->registerComponent<GameLogic::ILogic>();
 		NIKE_ECS_MANAGER->registerComponent<GameLogic::StateMachine>();
 
 		//Register Player For Serialization
@@ -46,10 +46,10 @@ namespace NIKE {
 
 
 #ifndef NDEBUG
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<GameLogic::Movement>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, GameLogic::Movement& comp) {
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<GameLogic::ILogic>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, GameLogic::ILogic& comp) {
 
-				ImGui::Text("Edit Movement Logic Component");
+				ImGui::Text("Edit Logic Component");
 
 				// Static vars for string input mangement
 				static std::string script_input;

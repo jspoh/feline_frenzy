@@ -39,10 +39,10 @@ namespace NIKE {
 		//};
 
 		//Movement logic component
-		struct Movement {
+		struct ILogic {
 			Lua::Script script;
 
-			Movement() : script() {}
+			ILogic() : script() {}
 			// Movement(std::string const& script) : script(script) {}
 		};
 
