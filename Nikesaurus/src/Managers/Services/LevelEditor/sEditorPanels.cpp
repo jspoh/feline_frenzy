@@ -4643,12 +4643,9 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void LevelEditor::TileMapPanel::saveGird()
+	void LevelEditor::TileMapPanel::saveGird(std::filesystem::path scn_id)
 	{
-		// For saving of the prefab file with the extension
-		std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
-
-		std::string grid_file_name = Utility::extractFileName(curr_scene);
+		std::string grid_file_name = Utility::extractFileName(scn_id.string());
 
 		std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
 
@@ -4834,7 +4831,8 @@ namespace NIKE {
 					path /= std::string(scn_id + ".scn");
 				}
 
-
+				// When user click save/create scene, grid is saved together
+				tile_panel.lock()->saveGird(scn_id);
 
 				//Save current state of the scene to file
 				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
@@ -4980,11 +4978,16 @@ namespace NIKE {
 			if (ImGui::Button("Save Scene")) {
 				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
 
+
+					std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
+
 					// When user click save scene, grid is saved together
-					tile_panel.lock()->saveGird();
+					tile_panel.lock()->saveGird(scn_id);
 
 					//Save scene
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+					
+
 
 					success_msg->assign("Scene successfully saved.");
 					openPopUp("Success");

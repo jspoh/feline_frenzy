@@ -170,12 +170,12 @@ namespace NIKE {
 		std::string grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
 
 		// Check if the "Grids" folder contains the .grid file
-		if (std::filesystem::exists(grid_path)) {
+		//if (std::filesystem::exists(grid_path)) {
 			// Add grid ID data only if the file exists
 			nlohmann::json m_data;
 			m_data["Grid ID"] = grid_id;
 			data.push_back(m_data);
-		}
+		//}
 
 		//UI Entities
 		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();

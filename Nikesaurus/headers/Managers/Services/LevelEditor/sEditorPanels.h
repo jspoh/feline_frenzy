@@ -821,7 +821,7 @@ namespace NIKE {
 			//Render
 			void render() override;
 
-			void saveGird();
+			void saveGird(std::filesystem::path);
 
 			//Save grid popup
 			std::function<void()> saveGridPopUp(std::string const& popup_id);
