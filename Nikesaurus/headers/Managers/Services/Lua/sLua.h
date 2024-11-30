@@ -42,6 +42,9 @@ namespace NIKE {
 			//Lua State
 			std::unique_ptr<sol::state> lua_state;
 
+			//List of global functions to use in lua
+			std::unordered_set<std::string> lua_global_funcs;
+
 			//Internal get sol table asset
 			std::shared_ptr<sol::load_result> getLuaAssset(std::string const& script_id) const;
 
@@ -194,6 +197,9 @@ namespace NIKE {
 					return sol::nil;
 				}
 			}
+
+			//Get all lua global functions
+			std::unordered_set<std::string> getGlobalLuaFunctions() const;
 		};
 
 		//Re-enable DLL Export warning

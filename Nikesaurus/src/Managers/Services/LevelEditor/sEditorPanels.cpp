@@ -1532,14 +1532,23 @@ namespace NIKE {
 					path /= std::string(prefab_id + ".prefab");
 				}
 
-				//Save current state of the scene to file
-				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
 
-				//Set new scn id
-				NIKE_SCENES_SERVICE->setCurrSceneID(std::string(prefab_id + ".prefab"));
+				// Open the file for writing
+				std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
+
+				// Check if the file opened successfully
+				if (!file.is_open()) {
+					openPopUp("Error");
+				}
+					
+
+				// Write the serialized prefab data to the file
+				NIKE_SERIALIZE_SERVICE->saveEntityToFile(entities_panel.lock()->getSelectedEntity(), path.string());
 
 				//Reset scene id buffer
 				prefab_id.clear();
+
+				openPopUp("Success");
 
 				//Close popup
 				closePopUp(popup_id);
@@ -2851,22 +2860,65 @@ namespace NIKE {
 		}
 	}
 
+	int LevelEditor::ResourcePanel::TextCallback(ImGuiInputTextCallbackData* data) {
+		EditorState* editor_state = static_cast<EditorState*>(data->UserData);
+		editor_state->cursor_pos = data->CursorPos;
+		return 0;
+	}
+
+	void LevelEditor::ResourcePanel::extractCurrentWord(std::string const& content, size_t cursor_pos, std::string& buffer) {
+		size_t word_start = content.find_last_of(" \n\t", cursor_pos - 1);
+		word_start = (word_start == std::string::npos) ? 0 : word_start + 1;
+		size_t word_end = content.find_first_of(" \n\t", cursor_pos);
+		word_end = (word_end == std::string::npos) ? content.size() : word_end;
+		buffer = content.substr(word_start, word_end - word_start);
+	}
+
+	void LevelEditor::ResourcePanel::showLuaIntellisense(std::string& content, size_t cursor_pos, std::string& buffer) {
+
+		//Search for matching functions
+		if (!buffer.empty()) {
+			for (const auto& func : NIKE_LUA_SERVICE->getGlobalLuaFunctions()) {
+				if (func.find(buffer.c_str()) != std::string::npos) {
+					if (ImGui::Selectable(func.c_str())) {
+						auto pos = cursor_pos - buffer.size();
+						content.erase(pos, buffer.size());
+						content.insert(pos, func.c_str());
+					}
+				}
+			}
+		}
+	}
+
 	void LevelEditor::ResourcePanel::renderFileEditor() {
 		for (decltype(file_editing_map)::iterator it = file_editing_map.begin(); it != file_editing_map.end(); ++it) {
 			ImGui::Begin(it->first.c_str());
 
 			//Editing file
+			static EditorState editor_state;
 			ImGui::Text("Editing: %s", it->first.c_str());
-			ImGui::InputTextMultiline("##editor", &it->second[0], it->second.capacity(),
+			if (ImGui::InputTextMultiline("##editor", &it->second[0], it->second.capacity(),
 				ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y),
-				ImGuiInputTextFlags_AllowTabInput);
+				ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CallbackAlways, TextCallback, &editor_state)) {
+				it->second.resize(strlen(it->second.c_str()));
+			}
+
+			//Special lua intellisense
+			if (NIKE_ASSETS_SERVICE->getAssetType(it->first) == Assets::Types::Script) {
+				//Lua intellisense
+				static std::string current_word;
+				current_word.reserve(64);
+				extractCurrentWord(it->second, editor_state.cursor_pos, current_word);
+				showLuaIntellisense(it->second, editor_state.cursor_pos, current_word);
+			}
 
 			//Save file
-			if (ImGui::Button("Save##Save file")) {
+			if (ImGui::Button("Save##Save file") || (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyDown(ImGuiKey_S))) {
 				std::ofstream file(NIKE_ASSETS_SERVICE->getAssetPath(it->first));
 				if (file.is_open()) {
 					file << it->second;
 					file.close();
+					NIKEE_CORE_INFO("File saved.");
 				}
 				else {
 					NIKEE_CORE_WARN("Failed to save file");
@@ -3394,6 +3446,7 @@ namespace NIKE {
 
 						//Check if file is already open
 						if (file_editing_map.find(selected_asset_id) == file_editing_map.end()) {
+							file_editing_map[selected_asset_id].reserve(1024);
 							// Read file content
 							file_editing_map[selected_asset_id].assign((std::istreambuf_iterator<char>(file)),
 								std::istreambuf_iterator<char>());
@@ -4124,7 +4177,7 @@ namespace NIKE {
 	void LevelEditor::TileMapPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 		registerPopUp("Save Grid", saveGridPopUp("Save Grid"));
-		error_msg = std::make_shared<std::string>("Saving Error");
+		error_msg = std::make_shared<std::string>("Saving Error, Please load a scene first before saving!");
 		success_msg = std::make_shared<std::string>("Saving Success");
 		registerPopUp("Error", defPopUp("Error", error_msg));
 		registerPopUp("Success", defPopUp("Success", success_msg));
@@ -4143,35 +4196,6 @@ namespace NIKE {
 		ImGui::Begin(getName().c_str());
 
 		ImGui::Spacing();
-
-		if (ImGui::Button("Save Grid"))
-		{
-			//// For saving of the prefab file with the extension
-			//std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
-
-			//std::string grid_file_name = Utility::extractFileName(curr_scene) + ".grid";
-
-			//std::string grid_full_path = NIKE_ASSETS_SERVICE->getGridsPath() + grid_file_name;
-
-			//// Serialize the grid data using the grid service
-			//nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
-
-			//// Open the file for writing
-			//std::ofstream file(grid_full_path, std::ios::out | std::ios::trunc);
-
-			//// Check if the file opened successfully
-			//if (!file.is_open()) {
-			//	openPopUp("Error");
-			//}
-			//else
-			//{
-			//	openPopUp("Success");
-			//}
-
-			//// Write the serialized grid data to the file
-			//file << grid_data.dump(4);
-			//file.close();
-		}
 
 		//Adjust grid mode
 		{
@@ -4391,6 +4415,48 @@ namespace NIKE {
 		ImGui::End();
 	}
 
+	void LevelEditor::TileMapPanel::saveGird()
+	{
+		// For saving of the prefab file with the extension
+		std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
+
+		std::string grid_file_name = Utility::extractFileName(curr_scene);
+
+		std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
+
+		// Serialize the grid data using the grid service
+		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+		// Saving of grid
+		if (!grid_file_name.empty() && (grid_file_name.find(".grid") == grid_file_name.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(grid_file_name)) {
+
+			//Craft file path from name
+			if (std::filesystem::exists(path)) {
+				path /= std::string(grid_file_name + ".grid");
+			}
+			else {
+				path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
+				path /= std::string(grid_file_name + ".grid");
+			}
+		}
+
+		// Open the file for writing
+		std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
+
+		// Check if the file opened successfully
+		if (!file.is_open()) {
+			openPopUp("Error");
+		}
+		else
+		{
+			openPopUp("Success");
+		}
+
+		// Write the serialized grid data to the file
+		file << grid_data.dump(4);
+		file.close();
+	}
+
 	std::function<void()> LevelEditor::TileMapPanel::saveGridPopUp(std::string const& popup_id)
 	{
 		return [this, popup_id]() {
@@ -4540,6 +4606,8 @@ namespace NIKE {
 					path /= std::string(scn_id + ".scn");
 				}
 
+
+
 				//Save current state of the scene to file
 				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
 
@@ -4625,6 +4693,9 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Scene", deleteScenePopup("Delete Scene"));
 		registerPopUp("Create Scene", createScenePopup("Create Scene"));
+
+		// Weak ptr ref to tile panel
+		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
 	}
 
 	void LevelEditor::ScenesPanel::update()
@@ -4680,6 +4751,9 @@ namespace NIKE {
 		{
 			if (ImGui::Button("Save Scene")) {
 				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+
+					// When user click save scene, grid is saved together
+					tile_panel.lock()->saveGird();
 
 					//Save scene
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());

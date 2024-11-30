@@ -51,9 +51,16 @@ namespace NIKE {
 
 			//Iterate through all entities
 			for (auto& entity : entities) {
-				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+					continue;
+				
+				//Check for player logic comp
+				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
+				if (e_player_comp.has_value()) {
+					auto& e_player = e_player_comp.value().get();
 
-					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+					//Skip if script id has not been set
+					if (e_player.script.script_id == "")
 						continue;
 
 

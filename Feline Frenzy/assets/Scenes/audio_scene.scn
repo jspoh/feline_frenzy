@@ -10,6 +10,9 @@
         }
     },
     {
+        "Grid ID": "audio_scene.grid"
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [

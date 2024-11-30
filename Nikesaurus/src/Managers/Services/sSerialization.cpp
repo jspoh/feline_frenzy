@@ -166,11 +166,10 @@ namespace NIKE {
 		// Extract grid_id from the scene file name
 		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
 
-		// Determine the path to the "Grids" folder
-		std::filesystem::path grids_folder = std::filesystem::path(file_path).parent_path() / "Grids";
+		std::string grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
 
 		// Check if the "Grids" folder contains the .grid file
-		if (std::filesystem::exists(grids_folder / grid_id)) {
+		if (std::filesystem::exists(grid_path)) {
 			// Add grid ID data only if the file exists
 			nlohmann::json m_data;
 			m_data["Grid ID"] = grid_id;
@@ -178,9 +177,10 @@ namespace NIKE {
 		}
 
 		//UI Entities
-		std::unordered_map<Entity::Type, std::string> ui_entities;
-		for (auto const& entity : NIKE_UI_SERVICE->getAllButtons()) {
-			ui_entities.emplace(entity.second.entity_id, entity.first);
+		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
+		std::unordered_map<Entity::Type, std::string> ui_entity_to_ref;
+		for (auto it = ui_entities.begin(); it != ui_entities.end(); ++it) {
+			ui_entity_to_ref.emplace(it->second.entity_id, it->first);
 		}
 
 		//Layers in scene
@@ -212,8 +212,9 @@ namespace NIKE {
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
 				//If entity is a UI Entity
-				if (ui_entities.find(entity) != ui_entities.end()) {
-					e_data["Entity"]["UI ID"] = ui_entities.at(entity);
+				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
+					e_data["Entity"]["UI ID"] = ui_entity_to_ref.at(entity);
+					e_data["Entity"]["UI Btn"] = ui_entities.at(ui_entity_to_ref.at(entity)).serialize();
 				}
 
 				//Push entity into layer data
@@ -297,10 +298,12 @@ namespace NIKE {
 
 					//Check if entity is a UI entity
 					if (e_data.at("Entity").contains("UI ID")) {
+
 						UI::UIBtn btn;
 						btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 						btn.b_hovered = false;
-						NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), btn);
+						btn.deserialize(e_data.at("Entity").at("UI Btn"));
+						NIKE_UI_SERVICE->ui_entities[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
 					}
 				}
 			}
