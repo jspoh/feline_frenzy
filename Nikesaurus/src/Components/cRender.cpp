@@ -47,7 +47,7 @@ namespace NIKE {
 					//Position before change
 					static float before_change;
 
-					ImGui::DragFloat("Camera Zoom", &comp.zoom, 0.1f);
+					ImGui::DragFloat("Camera Zoom", &comp.zoom, 0.1f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if position has begun editing
 					if (ImGui::IsItemActivated()) {
@@ -124,10 +124,7 @@ namespace NIKE {
 					static float editing_initial_scale = 0.0f;
 
 					// Allow scale adjustment UI
-					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f);
-
-					//Clamp scale
-					comp.scale = std::clamp(comp.scale, EPSILON, 10.0f);
+					ImGui::DragFloat("Text Scale", &comp.scale, 0.1f, 0.f, 10.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
@@ -640,7 +637,7 @@ namespace NIKE {
 						// Before change
 						static float intensity_bef_change;
 
-						ImGui::DragFloat("Texture Intensity", &comp.intensity, 0.001f, 0.f, 1.f);
+						ImGui::DragFloat("Texture Intensity", &comp.intensity, 0.001f, 0.f, 1.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 
 						//Check if has begun editing

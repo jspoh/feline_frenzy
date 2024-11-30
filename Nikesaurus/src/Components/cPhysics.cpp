@@ -83,7 +83,7 @@ namespace NIKE {
 					static float max_speed_before_change;
 
 					//Drag 
-					ImGui::DragFloat("Max Speed", &comp.max_speed, 0.1f);
+					ImGui::DragFloat("Max Speed", &comp.max_speed, 0.1f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if has begun editing
 					if (ImGui::IsItemActivated()) {
@@ -115,7 +115,7 @@ namespace NIKE {
 					static Vector2f force_before_change;
 
 					//Drag position
-					ImGui::DragFloat2("Force", &comp.force.x, 0.1f);
+					ImGui::DragFloat2("Force", &comp.force.x, 0.1f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if position has begun editing
 					if (ImGui::IsItemActivated()) {
@@ -179,7 +179,7 @@ namespace NIKE {
 					static float mass_before_change;
 
 					//Drag 
-					ImGui::DragFloat("Mass", &comp.mass, 0.1f);
+					ImGui::DragFloat("Mass", &comp.mass, 0.1f, 0.0f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if has begun editing
 					if (ImGui::IsItemActivated()) {
@@ -314,7 +314,7 @@ namespace NIKE {
 								static Vector2f scale_before_change;
 
 								//Change scale
-								ImGui::DragFloat2("Scale##Collider", &comp.transform.scale.x, 0.1f, EPSILON, (float)UINT16_MAX);
+								ImGui::DragFloat2("Scale##Collider", &comp.transform.scale.x, 0.1f, 0.f, float(UINT16_MAX), "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
 								//Check if scale has beguin editing
 								if (ImGui::IsItemActivated()) {
@@ -346,7 +346,7 @@ namespace NIKE {
 								static float rotation_before_change;
 
 								//Change rotation
-								ImGui::DragFloat("Rotation##Collider", &comp.transform.rotation, 0.1f, -360.f, 360.f);
+								ImGui::DragFloat("Rotation##Collider", &comp.transform.rotation, 0.1f, -360.f, 360.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
 								//Check if rotation has begun editing
 								if (ImGui::IsItemActivated()) {

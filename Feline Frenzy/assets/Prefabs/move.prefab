@@ -1,6 +1,6 @@
 {
     "Components": {
-        "GameLogic::Movement": {
+        "GameLogic::ILogic": {
             "Function": "update",
             "Script_Path": "assets/Scripts/move.lua"
         },
