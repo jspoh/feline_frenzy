@@ -1627,59 +1627,43 @@ namespace NIKE {
 	std::function<void()> LevelEditor::ComponentsPanel::removeComponentPopUp(std::string const& popup_id)
 	{
 		return [this, popup_id] {
-
 			// Warning message
 			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "This action cannot be undone!");
 
-			//Set a layer ID
+			// Confirmation message
 			ImGui::Text("Are you sure you want to remove the component?");
-
-			//Add spacing
 			ImGui::Spacing();
 
-
-
-			//Click set to set layer
+			// Confirm button
 			if (ImGui::Button("Ok")) {
-
-				//Action remove_comp;
-
-				//Values to copy
+				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
-				// Either prefab entity or the normal pool of entities
+
+				// Determine target entity (prefab or selected entity from the level editor)
 				auto prefab_entity = prefab_panel.lock()->getTempPrefabEntity();
 				Entity::Type entity_copy = entities_panel.lock()->getSelectedEntity();
 				Entity::Type target_entity = prefab_entity.has_value() ? prefab_entity.value() : entity_copy;
-				auto comp_copy = NIKE_ECS_MANAGER->getCopiedEntityComponent(target_entity, comp_type_copy);
 
-				//Do Action
-				//remove_comp.do_action = [&, entity_copy, comp_type_copy]() {
+				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(target_entity, comp_type_copy);
-				//	};
 
-				//Undo Action
-				//remove_comp.undo_action = [&, entity_copy, comp_type_copy, comp_copy]() {
-				//	NIKE_ECS_MANAGER->addDefEntityComponent(entity_copy, comp_type_copy);
-				//	NIKE_ECS_MANAGER->setEntityComponent(entity_copy, comp_type_copy, comp_copy);
-				//};
+				// Update `comp_string_ref` to the first available component, or clear if none remain
+				auto const& active_components = NIKE_ECS_MANAGER->getAllEntityComponents(target_entity);
+				comp_string_ref = active_components.empty() ? "" : active_components.begin()->first;
 
-				//Execute action
-				//NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove_comp));
-
+				// Close popup
 				closePopUp(popup_id);
 			}
 
-			//Add Spacing
 			ImGui::Spacing();
 
-			//Cancel setting layer id
+			// Cancel button
 			if (ImGui::Button("Cancel")) {
-
-				//Close popup
 				closePopUp(popup_id);
 			}
-			};
+		};
 	}
+
 
 	void LevelEditor::ComponentsPanel::init() {
 
@@ -1899,13 +1883,12 @@ namespace NIKE {
 					//Display Component UI
 					comps_ui.at(comp.first)(*this, comp.second.get());
 
-					comp_string_ref = comp.first;
-
 					//Add Spacing
 					ImGui::Spacing();
 
 					//Remove component button
 					if (ImGui::Button(std::string("Remove Component##" + comp.first).c_str())) {
+						comp_string_ref = comp.first;
 						openPopUp("Remove Component");
 					}
 				}
@@ -2606,8 +2589,6 @@ namespace NIKE {
 
 		std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(file_path);
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp_entity, prefab_full_path.string());
-
-		cout << "Loading prefab from: " << prefab_full_path << endl;
 
 		// Store the prefab information
 		prefab_temp_entity = { file_path, temp_entity };
