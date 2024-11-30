@@ -21,11 +21,6 @@ namespace NIKE {
 
 	void Log::Init()
 	{
-		// Get the path to the Desktop folder
-		if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
-			cerr << "Failed to get desktop path!" << endl;
-		}
-
 		spdlog::set_pattern("%^[%X] %n: %v%$");
 
 		// Core Logger (Logging related to engine)
@@ -42,6 +37,10 @@ namespace NIKE {
 	void Log::InitCrashLogger()
 	{
 		if (!s_CrashFileLogger) {
+			// Get the path to the Desktop folder
+			if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+				cerr << "Failed to get desktop path!" << endl;
+			}
 			// Create a file sink (append crash log into file)
 			auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::string{ documents_path } + R"(\feline-frenzy-logs\crash-log.txt)", false);
 

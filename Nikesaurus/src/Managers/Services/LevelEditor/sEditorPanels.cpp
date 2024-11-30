@@ -2653,6 +2653,8 @@ namespace NIKE {
 
 					//Reset channel name
 					channel_name.clear();
+					valid_name = true;
+
 
 					//Close popup
 					closePopUp(popup_id);
@@ -2665,6 +2667,7 @@ namespace NIKE {
 
 				//Reset entity name
 				channel_name.clear();
+				valid_name = true;
 
 				//Close popup
 				closePopUp(popup_id);
