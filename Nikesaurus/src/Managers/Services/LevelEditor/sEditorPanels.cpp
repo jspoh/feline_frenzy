@@ -4700,13 +4700,8 @@ namespace NIKE {
 
 		// Saving of grid
 		if (std::filesystem::exists(grid_path)) {
-			try {
-				// Attempt to remove the grid file
-				std::filesystem::remove(grid_path);
-			}
-			catch (const std::filesystem::filesystem_error& e) {
-				NIKEE_CORE_ERROR("Error removing grid file");
-			}
+			// Attempt to remove the grid file
+			std::filesystem::remove(grid_path);
 		}
 	}
 

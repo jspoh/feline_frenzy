@@ -200,9 +200,6 @@ namespace NIKE {
             });
     }
 
-    void Lua::luaMathBinds(sol::state& lua_state) {
-    }
-
     void Lua::luaSceneBinds(sol::state& lua_state) {
 
         lua_state.set_function("ChangeScene", [&](std::string const& scene) {
