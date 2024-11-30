@@ -28,22 +28,22 @@ namespace NIKE {
 		};
 
 		//Script data
-		struct Script {
-			std::string script_id;
-			std::string script_path;
-			std::string function;
-			bool b_loaded;
+		//struct Script {
+		//	std::string script_id;
+		//	std::string script_path;
+		//	std::string function;
+		//	bool b_loaded;
 
-			Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
-			Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
-		};
+		//	Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
+		//	Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
+		//};
 
 		//Movement logic component
 		struct Movement {
-			Script script;
+			Lua::Script script;
 
 			Movement() : script() {}
-			Movement(std::string const& script) : script(script) {}
+			// Movement(std::string const& script) : script(script) {}
 		};
 
 		void registerComponents();

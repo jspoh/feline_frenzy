@@ -60,8 +60,8 @@ namespace NIKE {
 				if (e_player_comp.has_value()) {
 					auto& e_player = e_player_comp.value().get();
 
-					//Skip if script  has not been set
-					if (e_player.script.script_path == "")
+					//Skip if script id has not been set
+					if (e_player.script.script_id == "")
 						continue;
 
 					////Execute script
