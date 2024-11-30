@@ -14,7 +14,7 @@
 namespace NIKE {
 
 	nlohmann::json ScriptSerialize(GameLogic::ILogic const& comp) {
-		comp.script.serialize();
+		return comp.script.serialize();
 	}
 
 	void ScriptDeserialize(GameLogic::ILogic& comp, nlohmann::json const& data) {

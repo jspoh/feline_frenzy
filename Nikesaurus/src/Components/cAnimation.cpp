@@ -58,7 +58,7 @@ namespace NIKE {
 
 					ImGui::Text("Number of Animations ");
 					ImGui::Text("If set to 0, infinite animations");
-					ImGui::DragInt("##If set to 0, infinite animations", &comp.animations_to_complete, 1, 0.f, float(UINT16_MAX), "%d", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::DragInt("##If set to 0, infinite animations", &comp.animations_to_complete, 1, 0, UINT16_MAX, "%d", ImGuiSliderFlags_AlwaysClamp);
 
 					//Check if begin editing
 					if (ImGui::IsItemActivated()) {
