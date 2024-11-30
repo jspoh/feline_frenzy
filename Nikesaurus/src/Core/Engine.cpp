@@ -104,7 +104,7 @@ namespace NIKE {
 		//Register enemy manager
 		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
-		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
 
 	}
 

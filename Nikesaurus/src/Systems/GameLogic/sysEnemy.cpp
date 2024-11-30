@@ -71,7 +71,7 @@ namespace NIKE {
 
 						// Look for entity w player component
 						for (auto& other_entity : entities) {
-							auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(other_entity);
+							auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
 							// If player entity exists
 							if (e_player_comp.has_value()) {
 								// Check if player is within range & shot not on cooldown

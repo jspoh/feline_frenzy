@@ -59,28 +59,18 @@ namespace NIKE {
 				if (e_player_comp.has_value()) {
 					auto& e_player = e_player_comp.value().get();
 
-					//Skip if script id has not been set
-					if (e_player.script.script_id == "")
-						continue;
+				//Skip if script id has not been set
+				if (e_player.script.script_id == "")
+					continue;
 
+					int move = static_cast<int>(Utility::randFloat() * 3);
 
-					//Check for player logic comp
-					auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Movement>(entity);
-					if (e_player_comp.has_value()) {
-						auto& e_player = e_player_comp.value().get();
+					std::filesystem::path path = NIKE_ASSETS_SERVICE->getAssetPath("assets/Scripts/player.lua");
 
-						//Skip if script  has not been set
-						if (e_player.script.script_path == "")
-							continue;
-
-						int move = static_cast<int>(Utility::randFloat() * 3);
-
-						std::filesystem::path path = NIKE_ASSETS_SERVICE->getAssetPath("assets/Scripts/player.lua");
-
-						sol::load_result result = NIKE_LUA_SERVICE->loadScript(path);
-						/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
-						NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
-					}
+					sol::load_result result = NIKE_LUA_SERVICE->loadScript(path);
+					/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
+					NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
+				}
 
 					// Check for shooting comp
 					auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
@@ -177,7 +167,7 @@ namespace NIKE {
 			}
 		}
 	}
-}
+
 	//void GameLogic::Manager::init() {
 
 	//	// Variable to store player entity ID
