@@ -23,7 +23,7 @@ namespace NIKE {
 		    void operator=(Manager const& copy) = delete;
 
 			//Internal script management
-			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
 	    public:
 		    //Default constructor

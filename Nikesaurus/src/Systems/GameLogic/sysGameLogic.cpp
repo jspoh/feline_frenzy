@@ -52,115 +52,115 @@ namespace NIKE {
 			for (auto& entity : entities) {
 				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
-				
+
 				//Check for player logic comp
 				auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
 
-				//Skip if script id has not been set
-				
-				// if (e_player.script.script_id == "")
-				// 	continue;
+					//Skip if script id has not been set
 
-				// 	int move = static_cast<int>(Utility::randFloat() * 3);
+					// if (e_player.script.script_id == "")
+					// 	continue;
 
-				// 	std::filesystem::path path = NIKE_ASSETS_SERVICE->getAssetPath("assets/Scripts/player.lua");
+					// 	int move = static_cast<int>(Utility::randFloat() * 3);
 
-				// 	sol::load_result result = NIKE_LUA_SERVICE->loadScript(path);
-				// 	/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
-				// 	NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
-				// }
+					// 	std::filesystem::path path = NIKE_ASSETS_SERVICE->getAssetPath("assets/Scripts/player.lua");
 
-				// 	// Check for shooting comp
-				// 	auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
-				// 	if (e_shoot_comp.has_value()) {
+					// 	sol::load_result result = NIKE_LUA_SERVICE->loadScript(path);
+					// 	/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
+					// 	NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
+					// }
 
-				// 		// Get shooting comp
-				// 		auto& shoot_comp = e_shoot_comp.value().get();
+					// 	// Check for shooting comp
+					// 	auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
+					// 	if (e_shoot_comp.has_value()) {
 
-				// 		// If shooting is on cooldown
-				// 		if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
-				// 			// Accumulate time since last shot
-				// 			shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-				// 		}
+					// 		// Get shooting comp
+					// 		auto& shoot_comp = e_shoot_comp.value().get();
 
-				// 		// Create bullet
-				// 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
-				// 			// Cooldown
-				// 			if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
-				// 				// Get entity's position
-				// 				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-				// 				Vector2f shooter_pos = e_transform_comp.value().get().position;
+					// 		// If shooting is on cooldown
+					// 		if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
+					// 			// Accumulate time since last shot
+					// 			shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					// 		}
 
-				// 				// !TODO: Set these in cShooting
-				// 				//std::string script_path = shoot_comp.script.script_path;
-				// 				//std::string function_name = shoot_comp.script.function;
-				// 				//std::string prefab_path = shoot_comp.prefab_path;
+					// 		// Create bullet
+					// 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
+					// 			// Cooldown
+					// 			if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
+					// 				// Get entity's position
+					// 				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+					// 				Vector2f shooter_pos = e_transform_comp.value().get().position;
 
-				// 				// Load Lua Script
-				// 				//std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
+					// 				// !TODO: Set these in cShooting
+					// 				//std::string script_path = shoot_comp.script.script_path;
+					// 				//std::string function_name = shoot_comp.script.function;
+					// 				//std::string prefab_path = shoot_comp.prefab_path;
 
-				// 				//// Check if the script is loaded successfully
-				// 				//if (script_id.empty()) {
-				// 				//	NIKEE_CORE_ERROR("Failed to load script: " + script_path);
-				// 				//}
+					// 				// Load Lua Script
+					// 				//std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
 
-				// 				// Execute Lua Script
-				// 				sol::protected_function create_bullet_func = executeScript(shoot_comp.script.script_path, shoot_comp.script.script_id, shoot_comp.script.b_loaded, shoot_comp.script.function);
+					// 				//// Check if the script is loaded successfully
+					// 				//if (script_id.empty()) {
+					// 				//	NIKEE_CORE_ERROR("Failed to load script: " + script_path);
+					// 				//}
 
-				// 				// Checking if something went wrong w cpp func
-				// 				if (!create_bullet_func.valid()) {
-				// 					NIKEE_CORE_ERROR("Failed to execute Lua script");
-				// 				}
-				// 				else {
-				// 					// Function was valid 
-				// 					sol::protected_function_result result = create_bullet_func(shoot_comp.layer, shoot_comp.prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
+					// 				// Execute Lua Script
+					// 				sol::protected_function create_bullet_func = executeScript(shoot_comp.script.script_path, shoot_comp.script.script_id, shoot_comp.script.b_loaded, shoot_comp.script.function);
 
-				// 					// Checking if something went wrong with lua func
-				// 					if (!result.valid()) {
-				// 						sol::error err = result;
-				// 						NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
-				// 					}
-				// 				}
+					// 				// Checking if something went wrong w cpp func
+					// 				if (!create_bullet_func.valid()) {
+					// 					NIKEE_CORE_ERROR("Failed to execute Lua script");
+					// 				}
+					// 				else {
+					// 					// Function was valid 
+					// 					sol::protected_function_result result = create_bullet_func(shoot_comp.layer, shoot_comp.prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
 
-				// 				// Reset the last shot time after shooting
-				// 				shoot_comp.last_shot_time = 0.f;
+					// 					// Checking if something went wrong with lua func
+					// 					if (!result.valid()) {
+					// 						sol::error err = result;
+					// 						NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
+					// 					}
+					// 				}
 
-				// 				//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
-				// 				//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
-				// 			}
-				// 			else {
-				// 				// Cooldown not up
-				// 				NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
-				// 			}
-				// 		}
-				// 	}
-					
-					//Check for despawn comp
-					// Currently bugged, please do not use until it is fixed
-					/*
-					auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
-					if (e_despawn_comp.has_value()) {
-						auto& e_despawn = e_despawn_comp.value().get();
+					// 				// Reset the last shot time after shooting
+					// 				shoot_comp.last_shot_time = 0.f;
 
-						// update current lifetime
-						e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					// 				//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+					// 				//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
+					// 			}
+					// 			else {
+					// 				// Cooldown not up
+					// 				NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
+					// 			}
+					// 		}
+					// 	}
 
-						NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
-						NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
+						//Check for despawn comp
+						// Currently bugged, please do not use until it is fixed
+						/*
+						auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
+						if (e_despawn_comp.has_value()) {
+							auto& e_despawn = e_despawn_comp.value().get();
 
-						// if current lifetime > max lifetime, mark for deletion
-						if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
-							if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-								NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+							// update current lifetime
+							e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+							NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
+							NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
+
+							// if current lifetime > max lifetime, mark for deletion
+							if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
+								if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+									NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+								}
 							}
 						}
-					}
-					*/
-					////Execute script
-					//NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
-					//Skip if script id has not been set
+						*/
+						////Execute script
+						//NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
+						//Skip if script id has not been set
 					if (e_logic.script.script_id == "")
 						continue;
 
@@ -176,6 +176,7 @@ namespace NIKE {
 			}
 		}
 	}
+}
 
 	//void GameLogic::Manager::init() {
 
