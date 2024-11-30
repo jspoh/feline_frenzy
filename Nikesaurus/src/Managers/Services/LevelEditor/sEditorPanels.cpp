@@ -3151,7 +3151,7 @@ namespace NIKE {
 			}
 
 			//Save file
-			if (ImGui::Button("Save##Save file") || (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyDown(ImGuiKey_S))) {
+			if (ImGui::Button("Save##Save file") || (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_S))) {
 				std::ofstream file(NIKE_ASSETS_SERVICE->getAssetPath(it->first));
 				if (file.is_open()) {
 					file << it->second;
@@ -3563,9 +3563,6 @@ namespace NIKE {
 
 			//Render all assets & folders
 			renderAssetsBrowser(current_path);
-
-			//Render popups
-			renderPopUps();
 		}
 
 		//Render selected asset options
@@ -3701,19 +3698,6 @@ namespace NIKE {
 				ImGui::SameLine();
 			}
 
-			//Prefab asset loading
-			if (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Prefab) {
-				if (ImGui::Button("Create Entity with Prefab"))
-				{
-					// Load the prefab
-					Entity::Type temp = NIKE_ECS_MANAGER->createEntity();
-					std::filesystem::path prefab_full_path = NIKE_ASSETS_SERVICE->getAssetPath(selected_asset_id);
-					NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp, prefab_full_path.string());
-					success_msg->assign("Entity with prefab created!");
-					openPopUp("Success");
-				}
-			}
-
 			//Delete asset
 			if (ImGui::Button("Delete##DeleteAsset")) {
 				openPopUp("Delete Asset");
@@ -3739,7 +3723,7 @@ namespace NIKE {
 		renderFileEditor();
 
 		//File dropped popup
-		if (b_file_dropped) {
+		if (b_file_dropped && !checkPopUpShowing()) {
 			openPopUp("Success");
 			b_file_dropped = false;
 		}
