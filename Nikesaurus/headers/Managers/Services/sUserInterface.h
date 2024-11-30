@@ -83,8 +83,15 @@ namespace NIKE {
 			//Button hover check
 			bool buttonHovered(Entity::Type entity) const;
 
+			//Hover data
+			struct HoverData {
+				Transform::Transform btn_transform;
+				Render::Text btn_text;
+				bool b_hovered;
+			};
+
 			//Button hovering container
-			std::unordered_map<std::string, std::pair<Transform::Transform, bool>> hover_container;
+			std::unordered_map<std::string, HoverData> hover_container;
 
 			//Unordered map of UI Entities
 			std::unordered_map<std::string, UIBtn> ui_entities;

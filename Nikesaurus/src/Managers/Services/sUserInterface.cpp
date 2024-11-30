@@ -226,11 +226,13 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(shape));
 
 		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).entity_id);
+		auto btn_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(ui_entities.at(btn_id).entity_id);
 
 		//Add transform into hover container
 		if (btn_transform_comp.has_value()) {
-			hover_container[btn_id].first = btn_transform_comp.value().get();
-			hover_container[btn_id].second = false;
+			hover_container[btn_id].btn_transform = btn_transform_comp.value().get();
+			hover_container[btn_id].b_hovered = false;
+			hover_container[btn_id].btn_text = btn_text_comp.value().get();
 		}
 
 		return ui_entities.at(btn_id).entity_id;
@@ -255,11 +257,13 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(texture));
 
 		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).entity_id);
+		auto btn_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(ui_entities.at(btn_id).entity_id);
 
 		//Add transform into hover container
 		if (btn_transform_comp.has_value()) {
-			hover_container[btn_id].first = btn_transform_comp.value().get();
-			hover_container[btn_id].second = false;
+			hover_container[btn_id].btn_transform = btn_transform_comp.value().get();
+			hover_container[btn_id].b_hovered = false;
+			hover_container[btn_id].btn_text = btn_text_comp.value().get();
 		}
 
 		return ui_entities.at(btn_id).entity_id;
@@ -451,13 +455,19 @@ namespace NIKE {
 				entity.second.b_hovered = true;
 
 				//Save data before hover
-				if (!hover_container[entity.first].second) {
-					hover_container[entity.first].first.scale = e_transform.scale;
-					hover_container[entity.first].second = true;
+				if (!hover_container[entity.first].b_hovered) {
+					hover_container[entity.first].btn_transform.scale = e_transform.scale;
+					hover_container[entity.first].btn_text.color = e_text.color;
+					hover_container[entity.first].b_hovered = true;
 				}
 
 				//Hover
-				e_transform.scale = hover_container[entity.first].first.scale * 1.05f;
+				e_transform.scale = hover_container[entity.first].btn_transform.scale * 1.05f;
+
+				//Increase color channel
+				e_text.color.r = hover_container[entity.first].btn_text.color.r + 0.15f;
+				e_text.color.g = hover_container[entity.first].btn_text.color.g + 0.15f;
+				e_text.color.b = hover_container[entity.first].btn_text.color.b + 0.15f;
 
 				//Execute script for trigger
 				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
@@ -466,9 +476,10 @@ namespace NIKE {
 			}
 			else {
 				entity.second.b_hovered = false;
-				if (hover_container[entity.first].second) {
-					e_transform.scale = hover_container[entity.first].first.scale;
-					hover_container[entity.first].second = false;
+				if (hover_container[entity.first].b_hovered) {
+					e_transform.scale = hover_container[entity.first].btn_transform.scale;
+					e_text.color = hover_container[entity.first].btn_text.color;
+					hover_container[entity.first].b_hovered = false;
 				}
 
 				//Reset polling for Mouse left button
