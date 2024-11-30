@@ -159,6 +159,10 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+		nlohmann::json channels_data;
+		channels_data["Channels"] = NIKE_AUDIO_SERVICE->serializeAudioChannels();
+		data.push_back(channels_data);
+
 		// Extract grid_id from the scene file name
 		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
 
@@ -169,8 +173,6 @@ namespace NIKE {
 			m_data["Grid ID"] = grid_id;
 			data.push_back(m_data);
 		}
-
-
 
 		//UI Entities
 		std::unordered_map<Entity::Type, std::string> ui_entities;
@@ -247,8 +249,13 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
+		
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
+
+			if (l_data.contains("Channels")) {
+				NIKE_AUDIO_SERVICE->deserializeAudioChannels(l_data["Channels"]);
+			}
 
 			//Load map grid if a map file path is specified
 			if (l_data.contains("Grid ID")) {

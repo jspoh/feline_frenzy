@@ -2,8 +2,8 @@
  * \file   sAudio.cpp
  * \brief  Audio manager function definitions 
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
- * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (35%)
+ * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -437,15 +437,19 @@ namespace NIKE {
 		channel_playlists.erase(channel_group_id);
 	}
 
-	void Audio::Service::destroyChannelGroups() {
+	void Audio::Service::clearAllChannelGroups() {
 		//Clear channel groups
 		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
-			std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup()->stop();
-			std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup()->release();
+			auto channel_group = std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup();
+			if (channel_group) {
+				channel_group->stop();
+				channel_group->release();
+			}
+			// Erase the channel group from the map
+			it = channel_groups.erase(it);
 		}
-
-		//Clear groups
-		channel_groups.clear();
+		// Clear playlists associated with the channel groups
+		channel_playlists.clear();
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::Service::convertChannelGroup(Audio::IChannelGroup*&& group) {
@@ -575,6 +579,15 @@ namespace NIKE {
 		return it->second;
 	}
 
+	void Audio::Service::assignTracksToPlaylist(const std::string& channel_id, const std::deque<std::string>& new_tracks) {
+		auto it = channel_playlists.find(channel_id);
+		if (it == channel_playlists.end()) {
+			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
+			return;
+		}
+		it->second.tracks = new_tracks;
+	}
+
 	void Audio::Service::queueAudioToPlaylist(const std::string& channel_id, const std::string& audio_id) {
 		auto it = channel_playlists.find(channel_id);
 		if (it == channel_playlists.end()) {
@@ -635,4 +648,39 @@ namespace NIKE {
 		}
 	
 	}
+	// Serialize audio channels and data
+	nlohmann::json Audio::Service::serializeAudioChannels() const {
+		nlohmann::json channels_data;
+		for (const auto& [channel_name, playlist] : channel_playlists) {
+			nlohmann::json playlist_data;
+
+			playlist_data["tracks"] = playlist.tracks;
+			playlist_data["loop"] = playlist.loop;
+
+			channels_data[channel_name] = playlist_data;
+		}
+		return channels_data;
+	}
+
+	// Deserialize audio channels and data
+	void Audio::Service::deserializeAudioChannels(nlohmann::json const& data) {
+		clearAllChannelGroups();
+
+		// Deserialize new channels and playlists
+		for (const auto& [channel_name, channel_data] : data.items()) {
+			// Create new channel group
+			createChannelGroup(channel_name);
+
+			// Set playlist loop if specified
+			if (channel_data.contains("loop")) {
+				setPlaylistLoop(channel_name, channel_data["loop"].get<bool>());
+			}
+
+			// Assign tracks to the playlist if specified
+			if (channel_data.contains("tracks")) {
+				assignTracksToPlaylist(channel_name, channel_data["tracks"].get<std::deque<std::string>>());
+			}
+		}
+	}
+
 }
