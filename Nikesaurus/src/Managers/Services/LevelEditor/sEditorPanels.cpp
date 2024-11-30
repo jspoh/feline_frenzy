@@ -2470,6 +2470,8 @@ namespace NIKE {
 		ImGui::End();
 	}
 
+
+
 	/*****************************************************************//**
 	* Prefab Management Panel
 	*********************************************************************/
@@ -2482,12 +2484,53 @@ namespace NIKE {
 
 		registerPopUp("Add Component", comps_panel.lock()->addComponentPopUp("Add Component"));
 		registerPopUp("Remove Component", comps_panel.lock()->removeComponentPopUp("Remove Component"));
+		registerPopUp("Load Prefab",loadPrefabPopUp("Load Prefab"));
 
 		// Default pop up for saving prefab
 		msg = std::make_shared<std::string>("Prefab Saved!");
 		registerPopUp("Success", defPopUp("Success", msg));
 		clear_msg = std::make_shared<std::string>("Prefab cleared!");
 		registerPopUp("Clear", defPopUp("Clear", clear_msg));
+	}
+
+	std::function<void()> LevelEditor::PrefabsPanel::loadPrefabPopUp(std::string const& popup_id)
+	{
+		return [this, popup_id]
+		{
+				// Display header
+				ImGui::Text("Select a Prefab to Load:");
+
+				// Retrieve all loaded prefab files
+				const auto& all_loaded_prefabs = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
+
+				// Track the selected prefab
+				static int current_index = -1;
+				static int previous_index = -1;
+
+				// Display a combo box for prefab selection
+				if (ImGui::Combo("##SelectPrefab", &current_index, all_loaded_prefabs.data(), static_cast<int>(all_loaded_prefabs.size()))) {
+					// Clear any temporary prefab entity before creating a new one
+					if (current_index >= 0 && current_index < static_cast<int>(all_loaded_prefabs.size())) {
+						std::string selected_prefab_path = all_loaded_prefabs[current_index];
+
+						createTempPrefabEntity(selected_prefab_path);
+						// Update the previous index
+						previous_index = current_index;
+
+						current_index = -1;
+
+						// Close the popup after loading
+						closePopUp(popup_id);
+					}
+				}
+
+				// Cancel button
+				if (ImGui::Button("Cancel")) {
+					// Clear the temporary prefab entity if canceled
+					clearTempPrefabEntity();
+					closePopUp(popup_id);
+				}
+		};
 	}
 
 	void LevelEditor::PrefabsPanel::update() {
@@ -2502,6 +2545,10 @@ namespace NIKE {
 
 		// Display prefab details
 		ImGui::Text("Loaded Prefab: %s", prefab_temp_entity.file_path.c_str());
+
+		if (ImGui::Button("Load Prefab")) {
+			openPopUp("Load Prefab");
+		}
 
 		if (!prefab_temp_entity.file_path.empty())
 		{

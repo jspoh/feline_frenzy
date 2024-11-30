@@ -471,6 +471,7 @@ namespace NIKE {
 			// Boolean for checking if entity is created from prefab
 			bool b_is_prefab_entity;
 
+			std::function<void()> loadPrefabPopUp(std::string const& popup_id);
 
 			// Msg for pop up
 			std::shared_ptr<std::string> msg;
