@@ -1,5 +1,9 @@
 {
     "Components": {
+        "Despawn::Lifetime": {
+            "CurrentLifetime": 7.033370494842529,
+            "MaxLifetime": 10.0
+        },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
             "Pos_Offset": {
