@@ -111,7 +111,7 @@ namespace NIKE {
 					if (function.empty()) {
 						//Execute script table
 						if (result.get_type() == sol::type::table) {
-							return sol::make_object(script->lua_state(), result);
+							return sol::make_object(script.lua_state(), result);
 						}
 
 						//Execute script function

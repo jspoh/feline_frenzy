@@ -713,9 +713,9 @@ namespace NIKE {
 		//Render to frame buffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-			glClear(GL_COLOR_BUFFER_BIT);
 		}
 #endif
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			//SKip inactive layer
@@ -723,6 +723,11 @@ namespace NIKE {
 				continue;
 
 			for (auto& entity : entities) {
+
+				// Skip entities marked for deletion
+				//if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
+				//	continue;
+
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 

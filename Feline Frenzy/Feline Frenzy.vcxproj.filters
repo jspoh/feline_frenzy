@@ -47,8 +47,11 @@
     <None Include="assets\Shaders\batched_texture.frag" />
     <None Include="assets\Scripts\Player.lua" />
     <None Include="assets\Scripts\move.lua" />
+    <None Include="assets\Scripts\createBullet.lua" />
     <None Include="src\Core\Config.json" />
     <None Include="assets\Scenes\main_menu.scn" />
+    <None Include="assets\Scripts\enemyBullet.lua" />
+    <None Include="assets\Scripts\test.lua" />
     <None Include="assets\Scripts\ChangeScene.lua" />
     <None Include="assets\Scripts\GameFlow.lua" />
   </ItemGroup>

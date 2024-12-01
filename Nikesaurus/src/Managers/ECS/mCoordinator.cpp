@@ -89,6 +89,43 @@ namespace NIKE {
 		return system_manager->getAllSystems();
 	}
 
+	void Coordinator::Manager::markEntityForDeletion(Entity::Type entity) {
+		// Checking if entity is valid
+		if (!checkEntity(entity)) {
+			NIKEE_CORE_WARN("Attempted to mark invalid entity {} for deletion.", entity);
+			return;
+		}
+
+		if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) == entities_to_destroy.end()) {
+			entities_to_destroy.push_back(entity);
+		}
+		else {
+			NIKEE_CORE_INFO("Entity already marked for deletion");
+		}
+	}
+
+	void Coordinator::Manager::destroyMarkedEntities() {
+		//NIKEE_CORE_INFO("IN DESTROY MARKED ENTITIES");
+		for (auto entity : entities_to_destroy) {
+			if (checkEntity(entity)) {
+				//NIKEE_CORE_INFO("DESTROYING AN ENTITY");
+				destroyEntity(entity);
+				//NIKEE_CORE_INFO("AFTER DESTROYING AN ENTITY");
+			}
+			else {
+				NIKEE_CORE_INFO("Entity {} failed the checkEntity() check.", entity);
+				continue;
+			}
+		}
+		entities_to_destroy.clear();
+	}
+
+	std::vector<Entity::Type> Coordinator::Manager::getEntitiesToDestroy() const{
+		return entities_to_destroy;
+	}
+
+
+
 	/*****************************************************************//**
 	* Component Methods
 	*********************************************************************/

@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #pragma once
 
@@ -32,6 +32,9 @@ namespace NIKE {
 			std::unique_ptr<Entity::Manager> entity_manager;
 			std::unique_ptr<Component::Manager> component_manager;
 			std::unique_ptr<System::Manager> system_manager;
+
+			// Vector to store entities that are marked for deletion
+			std::vector<Entity::Type> entities_to_destroy;
 
 		public:
 
@@ -70,6 +73,16 @@ namespace NIKE {
 
 			//Get entity layer id
 			unsigned int getEntityLayerID(Entity::Type entity) const;
+
+			//Mark entity for deletion
+			void markEntityForDeletion(Entity::Type entity);
+
+			//Destroy entities that are marked for deletion
+			void destroyMarkedEntities();
+
+			//Get entities marked for deletion
+			std::vector<Entity::Type> getEntitiesToDestroy() const;
+
 
 			/*****************************************************************//**
 			* Component Methods

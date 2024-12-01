@@ -774,6 +774,8 @@ namespace NIKE {
 
 		//Check if there are entities present
 		if (!entities.empty()) {
+			// Get entities marked for deletion
+			auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
 
 			//Check for disable entity interaction flag
 			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
