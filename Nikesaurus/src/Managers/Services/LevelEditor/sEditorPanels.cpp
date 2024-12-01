@@ -3830,6 +3830,7 @@ namespace NIKE {
 	}
 
 	void LevelEditor::CameraPanel::render() {
+
 		ImGui::Begin(getName().c_str());
 
 		//Select camera
@@ -3855,6 +3856,19 @@ namespace NIKE {
 		if (ImGui::Combo("##CameraSelector", &combo_index, cam_name, &cam_entities, static_cast<int>(cam_entities.size()))) {
 			dispatch = true;
 		}
+
+		// Ensure combo_index is valid
+		if (combo_index < 0 || combo_index >= cam_entities.size()) {
+			combo_index = 0;
+
+		}
+
+		// Ensure last_dispatched_index is valid
+		if (last_dispatched_index < 0 || last_dispatched_index >= cam_entities.size()) {
+			last_dispatched_index = 0;
+
+		}
+
 
 		//If dispatch is actived
 		if (dispatch) {

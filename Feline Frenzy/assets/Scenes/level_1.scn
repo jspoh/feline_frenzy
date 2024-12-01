@@ -767,6 +767,124 @@
                             "Prefab_ID": ""
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Completed_Animations": 4291,
+                                "Frame_Duration": 0.054999999701976776,
+                                "Mode": 0,
+                                "Timer": 0.01666666753590107
+                            },
+                            "Animation::Sprite": {
+                                "Curr_Index": {
+                                    "x": 4,
+                                    "y": 0
+                                },
+                                "End_Index": {
+                                    "x": 5,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 10,
+                                    "y": 16
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "GameLogic::ILogic": {
+                                "Function": "update",
+                                "Named_Args": {
+                                    "entity": 42
+                                },
+                                "Script_ID": "player.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 4.641254901885986,
+                                    "y": 11.085182189941406
+                                },
+                                "Resolution": 2,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 80.67974090576172,
+                                    "y": 116.1510009765625
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 1.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 1.0,
+                                "Max_Speed": 150.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 4.641254901885986,
+                                    "y": 11.085182189941406
+                                },
+                                "Zoom": 0.6000000238418579
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 4,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 10,
+                                    "y": 16
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_animation_sprite.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 4.641254901885986,
+                                    "y": 11.085182189941406
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 80.67974090576172,
+                                    "y": 116.1510009765625
+                                }
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "player",
+                            "Prefab_ID": "playerfix.prefab"
+                        }
+                    }
                 }
             ],
             "ID": 0,

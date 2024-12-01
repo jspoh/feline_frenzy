@@ -37,7 +37,7 @@
         "GameLogic::ILogic": {
             "Function": "update",
             "Named_Args": {
-                "entity": 0
+                "entity": 41
             },
             "Script_ID": "player.lua"
         },
@@ -67,8 +67,8 @@
             "Mass": 2.0,
             "Max_Speed": 150.0,
             "Velocity": {
-                "x": 0.0,
-                "y": 0.0
+                "x": 0.0005741190980188549,
+                "y": -0.006255199201405048
             }
         },
         "Render::Texture": {

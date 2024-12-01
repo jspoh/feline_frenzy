@@ -29,4 +29,9 @@ function Scenes:Close()
 CloseScene()
 end
 
+--Quit Window
+function Scenes:Quit()
+QuitScene()
+end
+
 return Scenes

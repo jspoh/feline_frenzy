@@ -622,7 +622,7 @@ namespace NIKE {
 
 		std::ifstream mesh_file{ path_to_mesh, std::ios::in };
 		if (!mesh_file.is_open()) {
-			throw std::exception("Failed to open model file.");
+			throw std::runtime_error("Failed to open model file.");
 		}
 
 		mesh_file.seekg(0, std::ios::beg);
@@ -681,11 +681,9 @@ namespace NIKE {
 				break;
 			}
 			default:
-				std::string error = "Unknown data type in mesh file: " + type;
-				throw std::exception(error.c_str());
+				throw std::runtime_error("Unknown data type in mesh file: " + std::string(1, type));
 			}
 		}
-		mesh_file.close();
 
 		std::vector<Vector2f> pos_vertices;
 		pos_vertices.reserve(model.vertices.size());
@@ -694,7 +692,7 @@ namespace NIKE {
 		}
 
 		if (tex_coords.size() && tex_coords.size() != pos_vertices.size()) {
-			throw std::exception("Texture coordinates do not match number of vertices.");
+			throw std::runtime_error("Texture coordinates do not match number of vertices.");
 		}
 
 		// set texcoords into model vertex
@@ -731,9 +729,7 @@ namespace NIKE {
 
 	Assets::Texture Assets::RenderLoader::compileTexture(const std::string& path_to_texture) {
 		// find file type
-		std::filesystem::path file_path(path_to_texture);
-		std::string filetype = file_path.extension().string();
-		filetype = filetype.substr(1);  // Remove the leading '.' character
+		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
 
 		int tex_width{};
 		int tex_height{};
@@ -754,8 +750,7 @@ namespace NIKE {
 		glTextureStorage2D(tex_id, 1, GL_RGBA8, tex_width, tex_height);
 		glTextureSubImage2D(tex_id, 0, 0, 0, tex_width, tex_height, (is_tex_or_png_ext ? GL_RGBA : GL_RGB), GL_UNSIGNED_BYTE, tex_data);
 
-		// no longer needed
-		delete[] tex_data;
+		stbi_image_free(static_cast<unsigned char*>(const_cast<void*>(reinterpret_cast<const void*>(tex_data))));
 
 		NIKEE_CORE_INFO("Sucessfully loaded texture from " + path_to_texture);
 
