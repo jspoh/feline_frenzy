@@ -3,15 +3,11 @@
 1. Project Settings and Configurations
 
 Build Modes:
-- **Debug Mode**: Use this mode for development and debugging. Includes extra logging and debugging symbols to help track down issues.
-- **Release Mode**: This mode is optimized for performance. Debug symbols and extra logging are turned off, providing a faster runtime.
+- **Debug Mode**: Use this mode for development, level editor and debugging. Includes extra logging and debugging symbols to help track down issues.
+- **Release Mode**: This mode is to build for the game. 
 
 2. Level Editor Activation
 
 Turning On/Off the Level Editor
 - **Real-Time Activation**:
   - Press 'TAB' to toggle the level editor on or off while the engine is running.
-
-3. Player Logic Script
-- Go to "Levels" Tab next to "Assets List"
-- Load animation_scene.scn, WASD to move the character, W to move up, A to move left, S to move down, D to move right.
