@@ -10,6 +10,11 @@
 --Player object
 Player = {}
 
+--Cheat mode state
+local cheatModeEnabled = false
+local godModeEnabled = false
+local highDamageEnabled = false
+
 --Player animation
 function Player:Animate(entity, args)
 
@@ -108,6 +113,11 @@ Player:Animate(args.entity, args)
 Player:Move(args.entity)
 
 Player:Shoot(args.entity)
+
+    -- Cheat mode enable
+    if isKeyTriggered(Key.KEY_0) then
+        cheatModeEnabled = not cheatModeEnabled
+    end
 
 end
 
