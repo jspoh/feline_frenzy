@@ -1,0 +1,61 @@
+[
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "Laser1.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "MASTER",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "Pop1.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "MASTER",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "BuildSuccess.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "MASTER",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
+            "ID": 1,
+            "Mask": 2
+        }
+    }
+]

@@ -45,6 +45,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		// Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Shooting>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Shooting& comp) {
@@ -215,5 +216,6 @@ namespace NIKE {
 				ImGui::Text("Last Shot time: %f", comp.last_shot_time);
 			}
 		);
+#endif
 	}
 }
