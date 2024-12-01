@@ -245,11 +245,29 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		// Ensure framebuffer is bound and valid
+		GLint framebuffer_id;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer_id);
+		if (framebuffer_id != 0) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			NIKEE_CORE_ERROR("Incomplete framebuffer in {0} with status: {1}", __FUNCTION__, status);
+			switch (status) {
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: Attachment is not complete.");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: No images attached.");
+				break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: Unsupported configuration.");
+				break;
+			default:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: Unknown error ({0}).", status);
+				break;
+			}
 		}
 
 		glfwSwapBuffers(ptr_window);
