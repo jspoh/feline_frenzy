@@ -33,6 +33,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		// Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Lifetime>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Lifetime& comp) {
@@ -100,5 +101,6 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 	}
 }

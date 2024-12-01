@@ -1,0 +1,342 @@
+[
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": true,
+                                "Resolution": 2
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 100.0,
+                                "Max_Speed": 500.0,
+                                "Velocity": {
+                                    "x": -123.86152648925781,
+                                    "y": 123.0870361328125
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_Bullet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -374.1875305175781,
+                                    "y": -48.0372314453125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 160.1990509033203,
+                                    "y": 160.1990509033203
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": true,
+                                "Resolution": 0
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.10537189245223999,
+                                    "y": 0.7727272510528564,
+                                    "z": 0.24945992231369019
+                                },
+                                "Model_ID": "square.model"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -273.56072998046875,
+                                    "y": 10.701385498046875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 41.054534912109375,
+                                    "y": 518.3856811523438
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": true,
+                                "Resolution": 0
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.10537189245223999,
+                                    "y": 0.7727272510528564,
+                                    "z": 0.24945992231369019
+                                },
+                                "Model_ID": "square.model"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -794.1309814453125,
+                                    "y": 4.387939453125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 41.054534912109375,
+                                    "y": 518.3856811523438
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": false,
+                                "Resolution": 0
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.10537189245223999,
+                                    "y": 0.7727272510528564,
+                                    "z": 0.24945992231369019
+                                },
+                                "Model_ID": "square.model"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -321.2185974121094,
+                                    "y": 371.1910095214844
+                                },
+                                "Rotation": 51.20582580566406,
+                                "Scale": {
+                                    "x": 41.054534912109375,
+                                    "y": 358.08599853515625
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": true,
+                                "Resolution": 0
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.10537189245223999,
+                                    "y": 0.7727272510528564,
+                                    "z": 0.24945992231369019
+                                },
+                                "Model_ID": "square.model"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -722.644287109375,
+                                    "y": 368.702880859375
+                                },
+                                "Rotation": 133.25022888183594,
+                                "Scale": {
+                                    "x": 41.054534912109375,
+                                    "y": 358.08599853515625
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": false,
+                                "Resolution": 0
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.10537189245223999,
+                                    "y": 0.7727272510528564,
+                                    "z": 0.24945992231369019
+                                },
+                                "Model_ID": "square.model"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -684.1513671875,
+                                    "y": -384.9595947265625
+                                },
+                                "Rotation": 51.20582580566406,
+                                "Scale": {
+                                    "x": 41.054534912109375,
+                                    "y": 358.08599853515625
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Collided": false,
+                                "Resolution": 0
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.10537189245223999,
+                                    "y": 0.7727272510528564,
+                                    "z": 0.24945992231369019
+                                },
+                                "Model_ID": "square.model"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -411.0353088378906,
+                                    "y": -403.97906494140625
+                                },
+                                "Rotation": 133.25022888183594,
+                                "Scale": {
+                                    "x": 41.054534912109375,
+                                    "y": 358.08599853515625
+                                }
+                            }
+                        },
+                        "Layer ID": 0
+                    }
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
+            "ID": 1,
+            "Mask": 2
+        }
+    }
+]
