@@ -149,6 +149,9 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("Failed to load window icon in {0}", __FUNCTION__);
 		}
 
+		// vsync
+		glfwSwapInterval(1);
+
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
