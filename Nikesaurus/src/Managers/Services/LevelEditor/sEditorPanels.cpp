@@ -439,6 +439,20 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entities Panel
 	*********************************************************************/
+	nlohmann::json LevelEditor::EntityMetaData::serialize() const {
+		return	{
+		{"Entity_ID", entity_id},
+		{"Prefab_ID", prefab_id},
+		{"B_Locked", b_locked}
+		};
+	}
+
+	void LevelEditor::EntityMetaData::deserialize(nlohmann::json const& data) {
+		entity_id = data["Entity_ID"].get<std::string>();
+		prefab_id = data["Prefab_ID"].get<std::string>();
+		b_locked = data["B_Locked"].get<bool>();
+	}
+
 	std::function<void()> LevelEditor::EntitiesPanel::createEntityPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -469,10 +483,20 @@ namespace NIKE {
 				//Create a shared id for do & undo functions
 				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
 
+				// Determine the next available index
+				int next_index{};
+				if (!reusable_indices.empty()) {
+					next_index = *reusable_indices.begin();
+					reusable_indices.erase(reusable_indices.begin());
+				}
+				else {
+					next_index = static_cast<int>(NIKE_ECS_MANAGER->getEntitiesCount());
+				}
+
 				//If entity name is not provided (Create a default)
 				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
 				{
-					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
+					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", next_index);
 				}
 
 				//Do Action
@@ -493,6 +517,9 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+
+						// Add index back to the reusable pool
+						reusable_indices.insert(next_index);
 					}
 					};
 
@@ -546,6 +573,8 @@ namespace NIKE {
 				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
 				int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
 
+
+
 				//Setup undo action for remove
 				remove.undo_action = [&, shared_id, comps, comp_types, layer_id]() {
 
@@ -573,8 +602,13 @@ namespace NIKE {
 					//Check if entity is still alive
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 
+						int index = std::stoi(shared_id->substr(7));
+
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+
+						// Add index back to the reusable pool
+						reusable_indices.insert(index);
 
 						//Set selected entity back to first entity
 						selected_entity = entities.empty() ? 0 : entities.begin()->first;
@@ -1796,13 +1830,6 @@ namespace NIKE {
 				openPopUp("Set Layer ID");
 			}
 
-			ImGui::SameLine();
-
-			//Save prefab popup
-			if (ImGui::Button("Create Prefab")) {
-				openPopUp("Create Prefab");
-			}
-
 			//Add Spacing
 			ImGui::Spacing();
 
@@ -2655,6 +2682,8 @@ namespace NIKE {
 
 					//Reset channel name
 					channel_name.clear();
+					valid_name = true;
+
 
 					//Close popup
 					closePopUp(popup_id);
@@ -2667,6 +2696,7 @@ namespace NIKE {
 
 				//Reset entity name
 				channel_name.clear();
+				valid_name = true;
 
 				//Close popup
 				closePopUp(popup_id);
@@ -4645,12 +4675,9 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void LevelEditor::TileMapPanel::saveGird()
+	void LevelEditor::TileMapPanel::saveGrid(std::filesystem::path scn_id)
 	{
-		// For saving of the prefab file with the extension
-		std::string curr_scene = NIKE_SERIALIZE_SERVICE->getCurrSceneFile();
-
-		std::string grid_file_name = Utility::extractFileName(curr_scene);
+		std::string grid_file_name = Utility::extractFileName(scn_id.string());
 
 		std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
 
@@ -4685,6 +4712,19 @@ namespace NIKE {
 		// Write the serialized grid data to the file
 		file << grid_data.dump(4);
 		file.close();
+	}
+
+	void LevelEditor::TileMapPanel::removeGrid(std::filesystem::path scn_id)
+	{
+		std::string grid_file_name = Utility::extractFileName(scn_id.string()) + ".grid";
+
+		std::string grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_file_name).string();
+
+		// Saving of grid
+		if (std::filesystem::exists(grid_path)) {
+			// Attempt to remove the grid file
+			std::filesystem::remove(grid_path);
+		}
 	}
 
 	std::function<void()> LevelEditor::TileMapPanel::saveGridPopUp(std::string const& popup_id)
@@ -4836,7 +4876,8 @@ namespace NIKE {
 					path /= std::string(scn_id + ".scn");
 				}
 
-
+				// When user click save/create scene, grid is saved together
+				tile_panel.lock()->saveGrid(scn_id);
 
 				//Save current state of the scene to file
 				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
@@ -4884,8 +4925,15 @@ namespace NIKE {
 				//Get selected asset path
 				auto path = NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID());
 
+				// Clear containers containing entities string refs
+				NIKE_ECS_MANAGER->destroyAllEntities();
+
+				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
+
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
+
+
 
 				//Close popup
 				closePopUp(popup_id);
@@ -4982,8 +5030,11 @@ namespace NIKE {
 			if (ImGui::Button("Save Scene")) {
 				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
 
+
+					std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
+
 					// When user click save scene, grid is saved together
-					tile_panel.lock()->saveGird();
+					tile_panel.lock()->saveGrid(scn_id);
 
 					//Save scene
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());

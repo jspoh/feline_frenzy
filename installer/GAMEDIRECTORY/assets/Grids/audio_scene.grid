@@ -1,85 +1,92 @@
 {
     "Cell_Size": {
-        "x": 10.0,
-        "y": 10.0
+        "x": 12.0,
+        "y": 12.0
     },
     "Grid": [
         [
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": -50.0
+                    "x": -66.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": -50.0
+                    "x": -54.0,
+                    "y": -66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": -50.0
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": -50.0
+                    "x": -18.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": -50.0
+                    "x": -6.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": -50.0
+                    "x": 6.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": -50.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": -50.0
+                    "x": 18.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": -50.0
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": -50.0
+                    "x": 42.0,
+                    "y": -66.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": -50.0
+                    "x": 54.0,
+                    "y": -66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": -66.0
                 }
             }
         ],
@@ -87,78 +94,85 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": -40.0
+                    "x": -66.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": -40.0
+                    "x": -54.0,
+                    "y": -54.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": -40.0
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": -40.0
+                    "x": -18.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": -40.0
+                    "x": -6.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": -40.0
+                    "x": 6.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": -40.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": -40.0
+                    "x": 18.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": -40.0
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": -40.0
+                    "x": 42.0,
+                    "y": -54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": -40.0
+                    "x": 54.0,
+                    "y": -54.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": -54.0
                 }
             }
         ],
@@ -166,14 +180,107 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
+                    "x": -66.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -54.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -30.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -18.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -6.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 6.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 18.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 30.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 42.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 54.0,
+                    "y": -42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": -42.0
+                }
+            }
+        ],
+        [
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -66.0,
                     "y": -30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
+                    "x": -54.0,
+                    "y": -30.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
                     "y": -30.0
                 }
             },
@@ -187,35 +294,28 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
+                    "x": -18.0,
                     "y": -30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
+                    "x": -6.0,
                     "y": -30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
+                    "x": 6.0,
                     "y": -30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": -30.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
+                    "x": 18.0,
                     "y": -30.0
                 }
             },
@@ -229,14 +329,21 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
+                    "x": 42.0,
                     "y": -30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
+                    "x": 54.0,
+                    "y": -30.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
                     "y": -30.0
                 }
             }
@@ -245,78 +352,85 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": -20.0
+                    "x": -66.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": -20.0
+                    "x": -54.0,
+                    "y": -18.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": -20.0
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": -20.0
+                    "x": -18.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": -20.0
+                    "x": -6.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": -20.0
+                    "x": 6.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": -20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": -20.0
+                    "x": 18.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": -20.0
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": -20.0
+                    "x": 42.0,
+                    "y": -18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": -20.0
+                    "x": 54.0,
+                    "y": -18.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": -18.0
                 }
             }
         ],
@@ -324,78 +438,85 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": -10.0
+                    "x": -66.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": -10.0
+                    "x": -54.0,
+                    "y": -6.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": -10.0
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": -10.0
+                    "x": -18.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": -10.0
+                    "x": -6.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": -10.0
+                    "x": 6.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": -10.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": -10.0
+                    "x": 18.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": -10.0
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": -10.0
+                    "x": 42.0,
+                    "y": -6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": -10.0
+                    "x": 54.0,
+                    "y": -6.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": -6.0
                 }
             }
         ],
@@ -403,78 +524,85 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": 0.0
+                    "x": -66.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": 0.0
+                    "x": -54.0,
+                    "y": 6.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": 0.0
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": 0.0
+                    "x": -18.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": 0.0
+                    "x": -6.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": 0.0
+                    "x": 6.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": 0.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": 0.0
+                    "x": 18.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": 0.0
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": 0.0
+                    "x": 42.0,
+                    "y": 6.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": 0.0
+                    "x": 54.0,
+                    "y": 6.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": 6.0
                 }
             }
         ],
@@ -482,78 +610,85 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": 10.0
+                    "x": -66.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": 10.0
+                    "x": -54.0,
+                    "y": 18.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": 10.0
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": 10.0
+                    "x": -18.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": 10.0
+                    "x": -6.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": 10.0
+                    "x": 6.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": 10.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": 10.0
+                    "x": 18.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": 10.0
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": 10.0
+                    "x": 42.0,
+                    "y": 18.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": 10.0
+                    "x": 54.0,
+                    "y": 18.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": 18.0
                 }
             }
         ],
@@ -561,93 +696,21 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -40.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -30.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -20.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -10.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 0.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 10.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 30.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 40.0,
-                    "y": 20.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 50.0,
-                    "y": 20.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -50.0,
+                    "x": -66.0,
                     "y": 30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
+                    "x": -54.0,
+                    "y": 30.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
                     "y": 30.0
                 }
             },
@@ -661,35 +724,28 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
+                    "x": -18.0,
                     "y": 30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
+                    "x": -6.0,
                     "y": 30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
+                    "x": 6.0,
                     "y": 30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": 30.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
+                    "x": 18.0,
                     "y": 30.0
                 }
             },
@@ -703,14 +759,21 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
+                    "x": 42.0,
                     "y": 30.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
+                    "x": 54.0,
+                    "y": 30.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
                     "y": 30.0
                 }
             }
@@ -719,78 +782,85 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": 40.0
+                    "x": -66.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": 40.0
+                    "x": -54.0,
+                    "y": 42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": 40.0
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": 40.0
+                    "x": -18.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": 40.0
+                    "x": -6.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": 40.0
+                    "x": 6.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": 40.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": 40.0
+                    "x": 18.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": 40.0
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": 40.0
+                    "x": 42.0,
+                    "y": 42.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": 40.0
+                    "x": 54.0,
+                    "y": 42.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": 42.0
                 }
             }
         ],
@@ -798,84 +868,177 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -50.0,
-                    "y": 50.0
+                    "x": -66.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -40.0,
-                    "y": 50.0
+                    "x": -54.0,
+                    "y": 54.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": -30.0,
-                    "y": 50.0
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -20.0,
-                    "y": 50.0
+                    "x": -18.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -10.0,
-                    "y": 50.0
+                    "x": -6.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 0.0,
-                    "y": 50.0
+                    "x": 6.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 10.0,
-                    "y": 50.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 20.0,
-                    "y": 50.0
+                    "x": 18.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
                     "x": 30.0,
-                    "y": 50.0
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 40.0,
-                    "y": 50.0
+                    "x": 42.0,
+                    "y": 54.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 50.0,
-                    "y": 50.0
+                    "x": 54.0,
+                    "y": 54.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": 54.0
+                }
+            }
+        ],
+        [
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -66.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -54.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -42.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -30.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -18.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": -6.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 6.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 18.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 30.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 42.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 54.0,
+                    "y": 66.0
+                }
+            },
+            {
+                "Blocked": false,
+                "Position": {
+                    "x": 66.0,
+                    "y": 66.0
                 }
             }
         ]
     ],
     "Grid_Size": {
-        "x": 11,
-        "y": 11
+        "x": 12,
+        "y": 12
     }
 }

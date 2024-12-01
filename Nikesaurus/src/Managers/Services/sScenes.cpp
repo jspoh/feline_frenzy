@@ -84,6 +84,9 @@ namespace NIKE {
 		//Clear UI Entities
 		NIKE_UI_SERVICE->destroyAllButtons();
 
+		//Stop all audios
+		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
 		//Clear layers
 		layers.clear();
 
@@ -111,6 +114,9 @@ namespace NIKE {
 		//Clear UI Entities
 		NIKE_UI_SERVICE->destroyAllButtons();
 
+		//Stop all audios
+		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
 		//Clear layers
 		layers.clear();
 
@@ -136,6 +142,9 @@ namespace NIKE {
 
 		//Clear UI Entities
 		NIKE_UI_SERVICE->destroyAllButtons();
+
+		//Stop all audios
+		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
 		//Clear layers
 		layers.clear();

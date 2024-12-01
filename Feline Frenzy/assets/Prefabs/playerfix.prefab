@@ -4,14 +4,14 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 3939,
+            "Completed_Animations": 3965,
             "Frame_Duration": 0.054999999701976776,
             "Mode": 0,
-            "Timer": 0.01666666753590107
+            "Timer": 0.05000000447034836
         },
         "Animation::Sprite": {
             "Curr_Index": {
-                "x": 9,
+                "x": 8,
                 "y": 4
             },
             "End_Index": {
@@ -78,7 +78,7 @@
                 "z": 0.0
             },
             "Frame_Index": {
-                "x": 9,
+                "x": 8,
                 "y": 4
             },
             "Frame_Size": {

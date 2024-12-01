@@ -176,6 +176,12 @@ namespace NIKE {
 			EntityMetaData() : entity_id{ "" }, prefab_id{ "" }, b_locked{ false } {}
 			EntityMetaData(std::string const& entity_id, std::string const& prefab_id, bool b_locked)
 				: entity_id{ entity_id }, b_locked{ b_locked }, prefab_id{ prefab_id } {}
+
+			//Serialization
+			nlohmann::json serialize() const;
+
+			//Deserialization
+			void deserialize(nlohmann::json const& data);
 		};
 
 		//Entities Management Panel
@@ -215,6 +221,8 @@ namespace NIKE {
 
 			//Error msg
 			std::shared_ptr<std::string> error_msg;
+
+			std::set<unsigned int> reusable_indices;
 
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
@@ -821,7 +829,9 @@ namespace NIKE {
 			//Render
 			void render() override;
 
-			void saveGird();
+			void saveGrid(std::filesystem::path);
+
+			void removeGrid(std::filesystem::path);
 
 			//Save grid popup
 			std::function<void()> saveGridPopUp(std::string const& popup_id);

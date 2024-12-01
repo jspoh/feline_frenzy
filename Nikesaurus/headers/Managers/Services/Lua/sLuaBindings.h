@@ -23,9 +23,6 @@ namespace NIKE {
 		//Lua input binds
 		void luaInputBinds(sol::state& lua_state);
 
-		//Lua math binds
-		void luaMathBinds(sol::state& lua_state);
-
 		//Lua scenes binds
 		void luaSceneBinds(sol::state& lua_state);
 

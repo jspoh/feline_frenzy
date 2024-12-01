@@ -167,15 +167,13 @@ namespace NIKE {
 		// Extract grid_id from the scene file name
 		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
 
-		std::string grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
-
 		// Check if the "Grids" folder contains the .grid file
-		if (std::filesystem::exists(grid_path)) {
+		//if (std::filesystem::exists(grid_path)) {
 			// Add grid ID data only if the file exists
 			nlohmann::json m_data;
 			m_data["Grid ID"] = grid_id;
 			data.push_back(m_data);
-		}
+		//}
 
 		//UI Entities
 		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
@@ -212,12 +210,17 @@ namespace NIKE {
 				//e_data["Entity"]["Entity Name"] = NIKE_LVLEDITOR_SERVICE->getEntityByType(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
+				//Serialize entity editor meta data
+				#ifndef NDEBUG
+				e_data["Entity"]["MetaData"] = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(entity).serialize();
+				#endif
+
 				//If entity is a UI Entity
 				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
 					e_data["Entity"]["UI ID"] = ui_entity_to_ref.at(entity);
 					e_data["Entity"]["UI Btn"] = ui_entities.at(ui_entity_to_ref.at(entity)).serialize();
 				}
-
+				
 				//Push entity into layer data
 				l_data["Layer"]["Entities"].push_back(e_data);
 			}
@@ -292,19 +295,25 @@ namespace NIKE {
 				for (const auto& e_data : l_data["Layer"]["Entities"]) {
 
 					//Deserialize all entities
-					Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+					Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").at("Layer ID").get<unsigned int>());
 					deserializeEntity(entity, e_data.at("Entity"));
-					//NIKE_IMGUI_SERVICE->addEntityRef(e_data.at("Entity").at("Entity Name").get<std::string>(), entity);
-					NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
+
+					// Wrapped for Release to build!
+					//Deserialize entity metadata
+					#ifndef NDEBUG
+					LevelEditor::EntityMetaData meta_data;
+					meta_data.deserialize(e_data.at("Entity").at("MetaData"));
+					NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
+					#endif
 
 					//Check if entity is a UI entity
 					if (e_data.at("Entity").contains("UI ID")) {
 
 						UI::UIBtn btn;
-						btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
-						btn.b_hovered = false;
 						btn.deserialize(e_data.at("Entity").at("UI Btn"));
-						NIKE_UI_SERVICE->ui_entities[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
+						btn.entity_id = entity;
+						btn.b_hovered = false;
+						NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
 					}
 				}
 			}
