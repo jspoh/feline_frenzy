@@ -67,6 +67,7 @@ namespace NIKE {
         luaKeyBinds(*lua_state);
         luaInputBinds(*lua_state);
         luaSceneBinds(*lua_state);
+        luaGameBinds(*lua_state);
 
         //Get all lua global functions
         sol::table globals = lua_state->globals();

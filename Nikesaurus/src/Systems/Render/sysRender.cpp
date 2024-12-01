@@ -700,6 +700,10 @@ namespace NIKE {
 		//Render to frame buffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE) {
+				NIKEE_CORE_ERROR("Framebuffer incomplete: {0}", status);
+			}
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
 #endif
