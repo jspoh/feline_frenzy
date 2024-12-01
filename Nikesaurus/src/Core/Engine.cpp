@@ -269,7 +269,7 @@ namespace NIKE {
 					}
 
 					//Toggle full screen
-					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+					if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
 						NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 					}
 
@@ -301,7 +301,6 @@ namespace NIKE {
 				throw e;
 			}
 		}
-
 
 		//Stop watching all directories
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
