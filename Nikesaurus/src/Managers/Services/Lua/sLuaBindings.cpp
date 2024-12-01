@@ -403,8 +403,8 @@ namespace NIKE {
             auto const& player_transform = player_transform_comp.value().get();
 
             //Calculate direction vector (mouse - player)
-            float direction = atan2((-player_transform.position.y - NIKE_INPUT_SERVICE->getMouseWorldPos().y), (player_transform.position.x + NIKE_INPUT_SERVICE->getMouseWorldPos().x));
-            Vector2f bull_direction = { cosf(direction), sinf(direction) };
+            float direction = atan2((NIKE_INPUT_SERVICE->getMouseWorldPos().y + player_transform.position.y), (NIKE_INPUT_SERVICE->getMouseWorldPos().x - player_transform.position.x));
+            Vector2f bull_direction = { cosf(direction), -sinf(direction) };
 
             //Normalize direction
             if (bull_direction.length() != 0) {
