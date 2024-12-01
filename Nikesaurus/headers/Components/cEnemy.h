@@ -35,7 +35,7 @@ namespace NIKE {
 			float offset;			// Offset for bullet spawn position
 			int layer;				// Bullet spawn layer
 
-			Attack() :script(), prefab_path("damageBullet.prefab"), range(10.f), cooldown(10.f), last_shot_time(cooldown), offset(100.f), layer(1) {};
+			Attack() :script(), prefab_path("bullet.prefab"), range(10.f), cooldown(10.f), last_shot_time(cooldown), offset(100.f), layer(0) {};
 			Attack(std::string const& script, std::string const& prefab_path, float const& range,  float const& cooldown, float const& last_shot_time, float const& offset, int const& layer)
 				: script{ script }, prefab_path{ prefab_path }, range { range }, 
 				cooldown{ cooldown }, last_shot_time{ last_shot_time }, offset{ offset }, layer{ layer } {}

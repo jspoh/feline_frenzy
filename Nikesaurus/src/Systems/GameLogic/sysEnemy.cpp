@@ -115,7 +115,7 @@ namespace NIKE {
 		 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
 		 // Calculate direction for bullet (Enemy Pos - Player Pos)
-		 Vector2f direction = enemy_pos - player_pos;
+		 Vector2f direction = player_pos - enemy_pos;
 		 direction.normalize();
 
 		 // Offset spawn position of bullet

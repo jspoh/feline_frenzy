@@ -36,7 +36,7 @@ namespace NIKE {
 
 			// Set last_shot_time equal to cooldown to allow player to shoot immediately
 			// !TODO: Make offset automatic based on spawning entity's scale?
-			Shooting() :script(), prefab_path("despawnBullet.prefab"), cooldown(.5f), last_shot_time(cooldown), offset(150.f), layer(1) {};
+			Shooting() :script(), prefab_path("bullet.prefab"), cooldown(.5f), last_shot_time(cooldown), offset(150.f), layer(0) {};
 			Shooting(std::string const& script, std::string const& prefab_path, float const& cooldown, float const& last_shot_time, float const& offset, int const& layer)
 				: script{ script }, prefab_path{prefab_path}, cooldown{ cooldown }, last_shot_time{ last_shot_time }, offset{ offset }, layer{ layer } {}
 		};

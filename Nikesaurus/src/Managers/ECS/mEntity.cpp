@@ -37,8 +37,6 @@ namespace NIKE {
 			throw std::runtime_error("Layer does not exist.");
 		}
 
-		//Assign layer id to entity
-		entities.at(id).second = layer_id;
 
 		return id;
 	}
