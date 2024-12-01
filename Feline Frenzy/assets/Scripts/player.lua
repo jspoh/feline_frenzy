@@ -11,7 +11,7 @@
 Player = {}
 
 --Player animation
-function Player:Animate(entity)
+function Player:Animate(entity, args)
 
 --Get velocity
 local velo = Velocity(entity)
@@ -19,11 +19,12 @@ local velo = Velocity(entity)
 --Get speed
 local speed = NetVelocity(entity)
 
-if speed == 0 then
+if speed < 1.0 then
     -- Idle Animation
     AnimationStart(entity, 0, 0)
     AnimationEnd(entity, 5, 0)
     FlipX(entity, false)
+	PlaySFX(entity, false)
 else
     -- Determine horizontal or vertical priority
     if math.abs(velo.x) > math.abs(velo.y) then
@@ -33,11 +34,13 @@ else
             AnimationStart(entity, 0, 5)
             AnimationEnd(entity, 9, 5)
             FlipX(entity, false)
+			PlaySFX(entity, true)
         else
             -- Moving left
             AnimationStart(entity, 0, 5)
             AnimationEnd(entity, 9, 5)
             FlipX(entity, true)
+			PlaySFX(entity,true)
         end
     else
         -- Vertical movement
@@ -46,11 +49,13 @@ else
             AnimationStart(entity, 0, 7)
             AnimationEnd(entity, 9, 7)
             FlipX(entity, false)
+			PlaySFX(entity, true)
         else
             -- Moving down
             AnimationStart(entity, 0, 4)
             AnimationEnd(entity, 9, 4)
             FlipX(entity, false)
+			PlaySFX(entity, true)
         end
     end
 end
@@ -98,7 +103,7 @@ end
 --Player update function
 function Player:update(args)
 
-Player:Animate(args.entity)
+Player:Animate(args.entity, args)
 
 Player:Move(args.entity)
 

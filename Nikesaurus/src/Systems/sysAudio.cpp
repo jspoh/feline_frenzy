@@ -37,11 +37,20 @@ namespace NIKE {
 					auto& e_sfx = e_sfx_comp.value().get();
 
 					//Play SFX
-					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->isAssetRegistered(e_sfx.audio_id) && NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
+					if (e_sfx.b_play_sfx && NIKE_ASSETS_SERVICE->isAssetRegistered(e_sfx.audio_id) && !e_sfx.channel_group_id.empty()) {
+
+						//Check if channel group exists, else create one
+						if (!NIKE_AUDIO_SERVICE->checkChannelGroupExist(e_sfx.channel_group_id)) {
+							NIKE_AUDIO_SERVICE->createChannelGroup(e_sfx.channel_group_id);
+						}
+
+						//Play SFX
 						NIKE_AUDIO_SERVICE->playAudio(e_sfx.audio_id, "", e_sfx.channel_group_id, e_sfx.volume, e_sfx.pitch, false, false);
 						e_sfx.b_play_sfx = false;
 					}
 					else {
+
+						//Set play sfx to false
 						e_sfx.b_play_sfx = false;
 					}
 				}

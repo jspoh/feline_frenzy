@@ -45,6 +45,14 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Audio::SFX>(
 			[](LevelEditor::ComponentsPanel& comp_panel, Audio::SFX& comp) {
 
+				//Static variables for string input management
+				static std::string channel_group;
+
+				//Initialization of string inputs upon collapsible shown
+				if (ImGui::IsItemActivated() || comp_panel.isEntityChanged()) {
+					channel_group = comp.channel_group_id;
+				}
+
 				//Set audio ID
 				{
 					// Display a combo box for selecting a audio
@@ -95,56 +103,32 @@ namespace NIKE {
 
 				//Set Channel Group ID
 				{
-					// Display a combo box for selecting a audio
-					ImGui::Text("Select Channel Group:");
-
-					// Hold the current and previous audio selection
-					static std::string previous_channel_group_id = comp.channel_group_id;
-					std::string current_channel_group_id = comp.channel_group_id;
-
-					// Get all loaded audios
-					const auto& all_loaded_channel_groups = NIKE_AUDIO_SERVICE->getAllChannelGroups();
-
-					// Get the string from the map and change to const char* for imgui combo
-					std::vector<const char*> all_channel_group_names;
-					for (auto& elem : all_loaded_channel_groups)
-					{
-						all_channel_group_names.push_back(elem.first.c_str());
+					//Set Text input
+					ImGui::Text("Enter channel group:");
+					if (ImGui::InputText("##ChannelGroup", channel_group.data(), channel_group.capacity() + 1)) {
+						channel_group.resize(strlen(channel_group.c_str()));
 					}
 
-					// Find the index of the currently selected audio in the list
-					int current_index = -1;
-					for (size_t i = 0; i < all_channel_group_names.size(); ++i) {
-						if (current_channel_group_id == all_channel_group_names[i]) {
-							current_index = static_cast<int>(i);
-							break;
-						}
-					}
+					ImGui::SameLine();
 
-					// Display combo box for audio selection
-					if (ImGui::Combo("##SelectChannelGroup", &current_index, all_channel_group_names.data(), static_cast<int>(all_channel_group_names.size()))) {
-						// Validate the selected index and get the new audio ID
-						if (current_index >= 0 && current_index < static_cast<int>(all_channel_group_names.size())) {
-							std::string new_channel_group_id = all_channel_group_names[current_index];
-							if (new_channel_group_id != comp.channel_group_id) {
-								// Save action
-								LevelEditor::Action change_channel_group_id_action;
-								change_channel_group_id_action.do_action = [&, channel_group_id = new_channel_group_id]() {
-									comp.channel_group_id = channel_group_id;
-									};
+					//Save group Button
+					if (ImGui::Button("Save##Channel Group") && !channel_group.empty()) {
+						LevelEditor::Action save_group;
 
-								// Undo action
-								change_channel_group_id_action.undo_action = [&, channel_group_id = previous_channel_group_id]() {
-									comp.channel_group_id = channel_group_id;
-									};
+						//Save group action
+						save_group.do_action = [&, group = channel_group]() {
+							comp.channel_group_id = group;
+							channel_group = comp.channel_group_id;
+							};
 
-								// Execute the action
-								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_channel_group_id_action));
+						//Undo save group action
+						save_group.undo_action = [&, group = comp.channel_group_id]() {
+							comp.channel_group_id = group;
+							channel_group = comp.channel_group_id;
+							};
 
-								// Update the previous audio ID
-								previous_channel_group_id = new_channel_group_id;
-							}
-						}
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_group));
 					}
 				}
 

@@ -472,7 +472,7 @@ namespace NIKE {
 		// Check if the group already exists in the map
 		if (it == channel_groups.end())
 		{
-			NIKEE_CORE_ERROR("AUDIO GROUP DOES NOT EXISTS");
+			NIKEE_CORE_WARN("AUDIO GROUP DOES NOT EXISTS");
 			return nullptr;
 		}
 
