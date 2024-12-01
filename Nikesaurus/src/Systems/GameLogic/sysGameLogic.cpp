@@ -149,12 +149,13 @@ namespace NIKE {
 		const auto& player_shoot_comp = p_shoot_comp.value().get();
 		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
 		const auto& player_transform_comp = p_transform_comp.value().get();
+		const std::string& bullet_prefab = player_shoot_comp.prefab_path;
 
 		// Create entity for bullet
 		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(player_shoot_comp.layer);
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
 
 		// Calculate direction for bullet (Mouse Pos - Player Pos)
 		const Vector2f& player_pos = player_transform_comp.position;

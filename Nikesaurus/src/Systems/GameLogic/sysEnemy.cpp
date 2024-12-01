@@ -107,12 +107,13 @@ namespace NIKE {
 		 const Vector2f& enemy_pos = e_transform_comp.value().get().position;
 		 const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
 		 const auto& enemy_attack_comp = e_attack_comp.value().get();
+		 const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
 
 		 // Create entity for bullet
 		 Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
 
 		 // Load entity from prefab
-		 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+		 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
 
 		 // Calculate direction for bullet (Enemy Pos - Player Pos)
 		 Vector2f direction = player_pos - enemy_pos;
