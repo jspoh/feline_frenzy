@@ -91,7 +91,7 @@ namespace NIKE {
 
 		float distance = (dist_x * dist_x) + (dist_y * dist_y);
 
-		NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
+		//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
 		
 		// It is recommended to use enemy_range^2, but it's probably easier this way
 		return distance < enemy_range;

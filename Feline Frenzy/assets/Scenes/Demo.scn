@@ -68,14 +68,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 8332,
+                                "Completed_Animations": 9308,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 2,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -112,8 +112,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 328.4156494140625,
-                                    "y": -113.3967056274414
+                                    "x": 85.84313201904297,
+                                    "y": -128.7656707763672
                                 },
                                 "Resolution": 2,
                                 "Rotation": 0.0,
@@ -131,8 +131,8 @@
                                 "Mass": 2.0,
                                 "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 8.428242290392518e-05,
+                                    "y": 0.0003606877289712429
                                 }
                             },
                             "Render::Texture": {
@@ -149,7 +149,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -171,8 +171,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 328.4156494140625,
-                                    "y": -113.3967056274414
+                                    "x": 85.84313201904297,
+                                    "y": -128.7656707763672
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -352,8 +352,20 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Enemy::Attack": {
+                                "Cooldown": 2.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 2.016665458679199,
+                                "Layer": 0,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 15.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
                             "Health::Health": {
-                                "Health": 100.0,
+                                "Health": 50.0,
                                 "InvulnerableFlag": false,
                                 "Lives": 1
                             },
@@ -364,8 +376,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 559.3935546875,
-                                    "y": 0.0
+                                    "x": 555.749755859375,
+                                    "y": -200.40484619140625
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -400,8 +412,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 559.3935546875,
-                                    "y": 0.0
+                                    "x": 555.749755859375,
+                                    "y": -200.40484619140625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -413,8 +425,89 @@
                         "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "Enemy",
-                            "Prefab_ID": "Enemy.prefab"
+                            "Entity_ID": "Elite",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Enemy::Attack": {
+                                "Cooldown": 2.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 2.016665458679199,
+                                "Layer": 0,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 15.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
+                            "Health::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 384.49468994140625,
+                                    "y": 300.6073303222656
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 384.49468994140625,
+                                    "y": 300.6073303222656
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "Box",
+                            "Prefab_ID": ""
                         }
                     }
                 }

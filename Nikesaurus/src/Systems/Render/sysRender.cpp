@@ -18,7 +18,7 @@
 
 
  // batched rendering
-constexpr bool BATCHED_RENDERING = true;
+constexpr bool BATCHED_RENDERING = false;
 std::unordered_set<unsigned int> NIKE::Render::Manager::curr_instance_unique_tex_hdls{};
 
 namespace NIKE {
