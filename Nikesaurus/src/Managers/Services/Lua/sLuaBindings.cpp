@@ -297,8 +297,19 @@ namespace NIKE {
         lua_state.set_function("AnimationStart", [&](Entity::Type entity, int start_x, int start_y) {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
             if (e_animate_comp.has_value()) {
-                e_animate_comp.value().get().start_index.x = start_x;
-                e_animate_comp.value().get().start_index.y = start_y;
+                static Vector2i prev_start = e_animate_comp.value().get().start_index;
+
+                if (prev_start != Vector2i(start_x, start_y)) {
+                    e_animate_comp.value().get().start_index.x = start_x;
+                    e_animate_comp.value().get().start_index.y = start_y;
+                    prev_start = e_animate_comp.value().get().start_index;
+
+                    //Restart animation
+                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+                    if (e_base_comp.has_value()) {
+                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
+                    }
+                }
             }
             });
 
@@ -306,8 +317,19 @@ namespace NIKE {
         lua_state.set_function("AnimationEnd", [&](Entity::Type entity, int end_x, int end_y) {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
             if (e_animate_comp.has_value()) {
-                e_animate_comp.value().get().end_index.x = end_x;
-                e_animate_comp.value().get().end_index.y = end_y;
+                static Vector2i prev_end = e_animate_comp.value().get().end_index;
+
+                if (prev_end != Vector2i(end_x, end_y)) {
+                    e_animate_comp.value().get().end_index.x = end_x;
+                    e_animate_comp.value().get().end_index.y = end_y;
+                    prev_end = e_animate_comp.value().get().end_index;
+
+                    //Restart animation
+                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+                    if (e_base_comp.has_value()) {
+                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
+                    }
+                }
             }
             });
 
