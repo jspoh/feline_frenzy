@@ -257,6 +257,11 @@ namespace NIKE {
         lua_state.set_function("CloseScene", [&]() {
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CLOSE, ""));
             });
+
+        lua_state.set_function("QuitScene", [&]() {
+            NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+            });
+            
     }
 
     void Lua::luaECSBinds(sol::state& lua_state) {
