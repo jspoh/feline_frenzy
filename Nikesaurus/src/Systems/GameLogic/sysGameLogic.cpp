@@ -157,12 +157,12 @@ namespace NIKE {
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
 		// Calculate direction for bullet (Mouse Pos - Player Pos)
-		Vector2f mouse_pos = { NIKE_INPUT_SERVICE.get()->getMouseWorldPos().x, -NIKE_INPUT_SERVICE.get()->getMouseWorldPos().y };
-		const Vector2f direction = mouse_pos - player_transform_comp.position;
+		const Vector2f mouse_pos = { NIKE_INPUT_SERVICE.get()->getMouseWorldPos().x, -NIKE_INPUT_SERVICE.get()->getMouseWorldPos().y };
+		Vector2f direction = mouse_pos - player_transform_comp.position;
+		direction.normalize();
+
 		// Offset spawn position of bullet
 		const Vector2f bullet_pos = player_transform_comp.position + (direction * player_shoot_comp.offset);
-
-		NIKEE_CORE_WARN("Bullet Pos x: {}, y: {}", bullet_pos.x, bullet_pos.y);
 
 		// Set bullet's position
 		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
