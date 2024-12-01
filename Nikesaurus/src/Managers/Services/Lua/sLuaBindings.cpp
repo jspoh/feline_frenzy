@@ -429,6 +429,12 @@ namespace NIKE {
             if (bullet_transform.has_value()) {
                 bullet_transform.value().get().position = player_transform.position + (bull_direction.normalize() * (player_transform.scale.length() * 0.75f));
             }
+
+            //Set player bullet SFX
+            auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
+            if (bullet_sfx.has_value()) {
+                bullet_sfx.value().get().b_play_sfx = true;
+            }
             });
 
         //Spawn enemy function
