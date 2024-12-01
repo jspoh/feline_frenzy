@@ -12,30 +12,6 @@ Player = {}
 
 --Player update function
 function Player:update(entity)
-
-    --Reset force
-    applyXForce(entity, 0.0)
-    applyYForce(entity, 0.0)
-
-    --Upward force
-    if isKeyPressed(Key.W) then
-        applyYForce(entity, 100.0)
-    end
-
-    --Downward force
-    if isKeyPressed(Key.S) then
-        applyYForce(entity, -100.0)
-    end
-
-    --Left force
-    if isKeyPressed(Key.A) then
-        applyXForce(entity, -100.0)
-    end
-
-    --Right force
-    if isKeyPressed(Key.D) then
-        applyXForce(entity, 100.0)
-    end
 end
 
 --Return player object
