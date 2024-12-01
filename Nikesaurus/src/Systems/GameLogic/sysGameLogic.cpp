@@ -16,14 +16,13 @@ namespace NIKE {
 	}
 
 	void GameLogic::Manager::update() {
-
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
 
-			//SKip inactive layer
+			//Skip inactive layer
 			if (!(*layer)->getLayerState())
 				continue;
 
@@ -31,13 +30,28 @@ namespace NIKE {
 			for (auto& entity : entities) {
 				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
-				
+
 				//Check for player logic comp
 				auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
 
 					//Skip if script id has not been set
+
+					// if (e_player.script.script_id == "")
+					// 	continue;
+
+					// 	int move = static_cast<int>(Utility::randFloat() * 3);
+
+					// 	std::filesystem::path path = NIKE_ASSETS_SERVICE->getAssetPath("assets/Scripts/player.lua");
+
+					// 	sol::load_result result = NIKE_LUA_SERVICE->loadScript(path);
+					// 	/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
+					// 	NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
+					// }
+						////Execute script
+						//NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
+						//Skip if script id has not been set
 					if (e_logic.script.script_id == "")
 						continue;
 
@@ -47,9 +61,103 @@ namespace NIKE {
 					//Execute script
 					NIKE_LUA_SERVICE->executeScript(e_logic.script);
 				}
+
+				// Check for shooting comp
+				auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
+				if (e_shoot_comp.has_value()) {
+
+					// Get shooting comp
+					auto& shoot_comp = e_shoot_comp.value().get();
+
+					// If shooting is on cooldown
+					if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
+						// Accumulate time since last shot
+						shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					}
+
+					// Create bullet
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
+						// Cooldown
+						if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
+							// Get entity's position
+							auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+							Vector2f shooter_pos = e_transform_comp.value().get().position;
+
+							// Shoot bullet towards cursor position from player pos
+							shootCursor(entity);
+
+							// Reset the last shot time after shooting
+							shoot_comp.last_shot_time = 0.f;
+						}
+						else {
+							// Cooldown not up
+							NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
+						}
+					}
+				}
+
+				//Check for despawn comp
+				//auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
+				//if (e_despawn_comp.has_value()) {
+				//	auto& e_despawn = e_despawn_comp.value().get();
+
+				//	// update current lifetime
+				//	e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+				//	NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
+				//	NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
+
+				//	// if current lifetime > max lifetime, mark for deletion
+				//	if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
+				//		if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+				//			NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+				//		}
+				//	}
+				//}
+
+				// Destroy all entities that are marked for deletion
+				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}
 	}
+	void GameLogic::Manager::shootCursor(const Entity::Type& player_entity) {
+		// Get player components (Making copies to avoid dangling pointer warning)
+		const auto p_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(player_entity);
+		const auto& player_shoot_comp = p_shoot_comp.value().get();
+		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
+		const auto& player_transform_comp = p_transform_comp.value().get();
+		const std::string& bullet_prefab = player_shoot_comp.prefab_path;
+
+		// Create entity for bullet
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(player_shoot_comp.layer);
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
+
+		// Calculate direction for bullet (Mouse Pos - Player Pos)
+		const Vector2f& player_pos = player_transform_comp.position;
+		const Vector2f mouse_pos = { NIKE_INPUT_SERVICE.get()->getMouseWorldPos().x, -NIKE_INPUT_SERVICE.get()->getMouseWorldPos().y };
+		Vector2f direction = mouse_pos - player_pos;
+		direction.normalize();
+
+		// Offset spawn position of bullet
+		const float& offset = player_shoot_comp.offset;
+		const Vector2f bullet_pos = player_pos + (direction * offset);
+
+		// Set bullet's position
+		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
+		if (bullet_transform_comp.has_value()) {
+			bullet_transform_comp.value().get().position = bullet_pos;
+		}
+
+		// Set bullet physics
+		auto bullet_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
+		if (bullet_physics_comp.has_value()) {
+			// Set force
+			bullet_physics_comp.value().get().force = { direction.x, direction.y };
+		}
+	}
+}
 
 	//void GameLogic::Manager::init() {
 
@@ -265,5 +373,5 @@ namespace NIKE {
 	//	// If no player entity is found, return default entity...
 	//	return Entity::Type{}; // Need to adjust if no player entity in scene
 	//}
-}
+
 

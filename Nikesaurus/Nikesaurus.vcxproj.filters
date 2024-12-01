@@ -49,7 +49,14 @@
     <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp" />
+    <ClCompile Include="src\Components\cShooting.cpp" />
+    <ClCompile Include="src\Components\cHealth.cpp" />
+    <ClCompile Include="src\Components\cDamage.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
     <ClCompile Include="src\Managers\Services\sPath.cpp" />
+    <ClCompile Include="src\Components\cEnemy.cpp" />
+    <ClCompile Include="src\Systems\GameLogic\sysEnemy.cpp" />
+    <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -109,7 +116,14 @@
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
+    <ClInclude Include="headers\Components\cShooting.h" />
+    <ClInclude Include="headers\Components\cHealth.h" />
+    <ClInclude Include="headers\Components\cDamage.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
+    <ClInclude Include="headers\Components\cEnemy.h" />
+    <ClInclude Include="headers\Systems\GameLogic\sysEnemy.h" />
+    <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />

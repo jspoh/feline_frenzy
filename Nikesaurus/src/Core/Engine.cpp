@@ -16,6 +16,8 @@
 #include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
 #include "Systems/Render/sysRender.h"
+#include "Systems/GameLogic/sysInteraction.h"
+#include "Systems/GameLogic/sysEnemy.h"
 
 namespace NIKE {
 
@@ -43,12 +45,30 @@ namespace NIKE {
 
 		//Register render components
 		GameLogic::registerComponents();
+
+		//Register shooting components
+		Shooting::registerComponents();
+
+		//Register Health components
+		Health::registerComponents();
+
+		//Register Damage components
+		Damage::registerComponents();
+
+		//Register Enemy components
+		Enemy::registerComponents();
+
+		//Register Despawn components
+		Despawn::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
 		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Shooting::Shooting>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
 
 		//Register physics manager
@@ -74,6 +94,18 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Text>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Shape>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
+
+		//Register interaction manager
+		auto interaction_sys = NIKE_ECS_MANAGER->registerSystem<Interaction::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Health::Health>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Damage::Damage>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
+
+		//Register enemy manager
+		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
+
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
@@ -308,6 +340,36 @@ namespace NIKE {
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
 				throw e;
+			}
+
+			//Escape Key
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+			}
+
+			//Toggle full screen
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			}
+
+			//Update all systems
+			NIKE_ECS_MANAGER->updateSystems();
+
+			//Update Level Editor
+			NIKE_LVLEDITOR_SERVICE->update();
+
+			//Update Level Editor
+			NIKE_LVLEDITOR_SERVICE->update();
+
+			//Render Level Editor
+			NIKE_LVLEDITOR_SERVICE->render();
+
+			//Swap Buffers
+			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 			}
 		}
 

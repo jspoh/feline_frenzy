@@ -154,8 +154,9 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <Text Include="assets\Models\triangle.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\Scenes\mainmenu.scn" />
+    <None Include="assets\Scripts\createBullet.lua" />
     <None Include="assets\Scenes\main_menu.scn" />
+    <None Include="assets\Scripts\enemyBullet.lua" />
     <None Include="assets\Scripts\GameFlow.lua" />
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\Player.lua" />

@@ -14,6 +14,8 @@
 
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
+#include "Components/cHealth.h"
+#include "Components/cDamage.h"
 
 namespace NIKE {
     namespace Collision {
@@ -68,7 +70,7 @@ namespace NIKE {
             bool detectSATCollision(const Physics::Collider& colliderA, const Physics::Collider& colliderB, const std::string& model_idA, const std::string& model_idB, CollisionInfo& info);
 
             // Collision resolution
-            void collisionResolution(Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
+            void collisionResolution(Entity::Type entity_a, Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a, Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b, CollisionInfo const& info);
         };
     }
 }

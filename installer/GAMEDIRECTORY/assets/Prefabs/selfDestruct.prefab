@@ -1,0 +1,47 @@
+{
+    "Components": {
+        "Physics::Collider": {
+            "B_Collided": false,
+            "Resolution": 0
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.0,
+            "Texture_ID": "Top_Middle_256px_V1"
+        },
+        "Shooting::Shooting": {
+            "Cooldown": 10.0,
+            "LastShotTime": 0.0
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 49.99999237060547,
+                "y": 49.99999237060547
+            }
+        }
+    }
+}

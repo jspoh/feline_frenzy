@@ -1,0 +1,59 @@
+{
+    "Components": {
+        "Damage::Damage": {
+            "Damage": 1.0
+        },
+        "Physics::Collider": {
+            "B_Collided": true,
+            "Resolution": 3
+        },
+        "Physics::Dynamics": {
+            "Drag": 0.0,
+            "Force": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Mass": 9.999999747378752e-05,
+            "Max_Speed": 1000.0,
+            "Velocity": {
+                "x": 0.0,
+                "y": 0.0
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.0,
+            "Texture_ID": "Player_Bullet"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 149.99998474121094,
+                "y": 149.99998474121094
+            }
+        }
+    }
+}

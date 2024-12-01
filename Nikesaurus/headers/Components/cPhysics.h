@@ -42,7 +42,8 @@ namespace NIKE {
         enum class Resolution {
             NONE = 0,
             SLIDE,
-            BOUNCE
+            BOUNCE,
+            DESTROY
         };
 
         struct Collider {
@@ -82,6 +83,15 @@ namespace NIKE {
 
             ChangePhysicsEvent(float restitution)
                 : restitution{ restitution } {}
+        };
+
+        //For damage and health interaction
+        struct CollisionEvent : public Events::IEvent {
+            Entity::Type entity_a; 
+            Entity::Type entity_b;
+            
+            CollisionEvent(Entity::Type a, Entity::Type b)
+                : entity_a{ a }, entity_b{ b } {}
         };
 
         void registerComponents();

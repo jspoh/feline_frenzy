@@ -382,7 +382,7 @@ namespace NIKE {
 
 					//Collider resolution
 					ImGui::Text("Choose Collider Resolution:");
-					static const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE" };
+					static const char* resolution_names[] = { "NONE", "SLIDE", "BOUNCE", "DESTROY" };
 					// Hold the current selection and the previous value
 					static NIKE::Physics::Resolution before_select_resolution;
 					static int previous_resolution = static_cast<int>(comp.resolution);
