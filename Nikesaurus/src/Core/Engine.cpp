@@ -159,7 +159,6 @@ namespace NIKE {
 		//Add event listeners for mouse scroll event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
 
-
 		//Init paths
 		NIKE_PATH_SERVICE->init(json_config);
 
