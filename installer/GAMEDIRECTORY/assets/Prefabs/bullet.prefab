@@ -1,5 +1,12 @@
 {
     "Components": {
+        "Audio::SFX": {
+            "Audio_ID": "Pop1.wav",
+            "B_Play_SFX": false,
+            "Channel_Group_ID": "BulletSFX",
+            "Pitch": 1.0,
+            "Volume": 0.5
+        },
         "Damage::Damage": {
             "Damage": 10.0
         },
