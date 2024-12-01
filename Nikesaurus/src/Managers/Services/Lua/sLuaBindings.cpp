@@ -164,6 +164,46 @@ namespace NIKE {
                 -- No operation
             end
         )");
+
+        //New usertype vector2f
+        lua_state.new_usertype<Vector2f>("Vector2f",
+            sol::constructors<Vector2f(), Vector2f(float, float)>(),
+            "x", &Vector2f::x,
+            "y", &Vector2f::y
+        );
+
+        //New usertype vector2i
+        lua_state.new_usertype<Vector2i>("Vector2i",
+            sol::constructors<Vector2i(), Vector2i(int, int)>(),
+            "x", &Vector2i::x,
+            "y", &Vector2i::y
+        );
+
+        //New usertype vector2f
+        lua_state.new_usertype<Vector4f>("Vector4f",
+            sol::constructors<Vector4f(), Vector4f(float, float, float, float)>(),
+            "x", &Vector4f::x,
+            "y", &Vector4f::y,
+            "z", &Vector4f::z,
+            "w", &Vector4f::w,
+            "r", &Vector4f::r,
+            "g", &Vector4f::g,
+            "b", &Vector4f::b,
+            "a", &Vector4f::a
+        );
+
+        //New usertype vector2i
+        lua_state.new_usertype<Vector4i>("Vector4i",
+            sol::constructors<Vector4i(), Vector4i(int, int, int, int)>(),
+            "x", &Vector4i::x,
+            "y", &Vector4i::y,
+            "z", &Vector4i::z,
+            "w", &Vector4i::w,
+            "r", &Vector4i::r,
+            "g", &Vector4i::g,
+            "b", &Vector4i::b,
+            "a", &Vector4i::a
+        );
     }
 
     void Lua::luaInputBinds(sol::state& lua_state) {
@@ -239,6 +279,70 @@ namespace NIKE {
     }
 
     void Lua::luaGameBinds(sol::state& lua_state) {
+        //Apply force to entities
+        lua_state.set_function("ApplyForce", [&](Entity::Type entity, float x, float y) {
+            auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_trans_comp.has_value()) {
+                e_trans_comp.value().get().force.x = x;
+                e_trans_comp.value().get().force.y = y;
+            }
+            });
+
+        //Change animation start & end
+        lua_state.set_function("AnimationStart", [&](Entity::Type entity, int start_x, int start_y) {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            if (e_animate_comp.has_value()) {
+                e_animate_comp.value().get().start_index.x = start_x;
+                e_animate_comp.value().get().start_index.y = start_y;
+            }
+            });
+
+        //Change animation start & end
+        lua_state.set_function("AnimationEnd", [&](Entity::Type entity, int end_x, int end_y) {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            if (e_animate_comp.has_value()) {
+                e_animate_comp.value().get().end_index.x = end_x;
+                e_animate_comp.value().get().end_index.y = end_y;
+            }
+            });
+
+        //Flip texture
+        lua_state.set_function("FlipX", [&](Entity::Type entity, bool yes_or_no) {
+            auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+            if (e_texture_comp.has_value()) {
+                e_texture_comp.value().get().b_flip.x = yes_or_no;
+            }
+            });
+
+        lua_state.set_function("FlipY", [&](Entity::Type entity, bool yes_or_no) {
+            auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+            if (e_texture_comp.has_value()) {
+                e_texture_comp.value().get().b_flip.y = yes_or_no;
+            }
+            });
+
+        //Get Velocity
+        lua_state.set_function("Velocity", [&](Entity::Type entity) -> sol::optional<Vector2f> {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_animate_comp.has_value()) {
+                return e_animate_comp.value().get().velocity;
+            }
+            else {
+                return sol::optional<Vector2f>();
+            }
+            });
+
+        //Get Net Velocity
+        lua_state.set_function("NetVelocity", [&](Entity::Type entity) -> sol::optional<float> {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_animate_comp.has_value()) {
+                return e_animate_comp.value().get().velocity.length();
+            }
+            else {
+                return sol::optional<float>();
+            }
+            });
+
         //Fire Bullet
         lua_state.set_function("FireBullet", [&]() {
             Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
