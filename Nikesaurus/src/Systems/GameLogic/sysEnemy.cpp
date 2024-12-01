@@ -110,7 +110,8 @@ namespace NIKE {
 		 const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
 
 		 // Create entity for bullet
-		 Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
+		 //Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
+		 Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
 
 		 // Load entity from prefab
 		 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
