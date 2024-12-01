@@ -261,7 +261,7 @@ namespace NIKE {
         lua_state.set_function("QuitScene", [&]() {
             NIKE_WINDOWS_SERVICE->getWindow()->terminate();
             });
-            
+
     }
 
     void Lua::luaECSBinds(sol::state& lua_state) {
@@ -379,16 +379,6 @@ namespace NIKE {
             Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
-        // Cheat mode functions
-
-        // Set/Teleport entity position
-        lua_state.set_function("setPosition", [&](Entity::Type entity, float x, float y) {
-                auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                if (transform.has_value()) {
-                    transform.value().get().position = { x, y };
-                }
-                });
-
 #ifndef NDEBUG
             auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
             data.prefab_id = "bullet.prefab";
@@ -441,6 +431,14 @@ namespace NIKE {
         //Play audio
         lua_state.set_function("PlayAudio", [&](std::string const& audio_id) {
             NIKE_AUDIO_SERVICE->playAudio(audio_id, "", "SFX", 1.f, 1.f, false, false);
+            });
+
+        // Set/Teleport entity
+        lua_state.set_function("SetPosition", [&](Entity::Type entity, float x, float y) {
+            auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+            if (transform.has_value()) {
+                transform.value().get().position = { x, y };
+            }
             });
 
     }

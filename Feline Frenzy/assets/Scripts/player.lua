@@ -115,8 +115,29 @@ Player:Move(args.entity)
 Player:Shoot(args.entity)
 
     -- Cheat mode enable
-    if isKeyTriggered(Key.KEY_0) then
+    if IsKeyTriggered(Key.KEY_0) and IsKeyTriggered(Key.KEY_9) then
         cheatModeEnabled = not cheatModeEnabled
+        if cheatModeEnabled then
+            cout("Cheat mode enabled")
+        end
+        if not cheatModeEnabled then
+            cout("Cheat mode disabled")
+        end
+    end
+
+     if cheatModeEnabled then
+        -- Teleport to cursor cheat
+        if isKeyTriggered(Key.KEY_1) then
+            -- Get mouse position
+            local mousePos = WorldMousePos()
+
+            -- Set player position to the mouse position
+            setPosition(entity, mousePos.x, mousePos.y)
+
+            -- Log the new position
+            cout("Teleported player to: X = " .. mousePos.x .. ", Y = " .. mousePos.y)
+        end
+
     end
 
 end
