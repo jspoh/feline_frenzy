@@ -26,7 +26,7 @@ namespace NIKE {
 			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
 			// Player Shooting
-			void shootPlayerBullet(const Entity::Type& player_entity);
+			void shootCursor(const Entity::Type& player_entity);
 
 	    public:
 		    //Default constructor

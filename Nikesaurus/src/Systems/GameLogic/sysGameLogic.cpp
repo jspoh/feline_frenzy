@@ -38,6 +38,7 @@ namespace NIKE {
 	// }
 
 	void GameLogic::Manager::update() {
+		//NIKEE_CORE_WARN("Mouse X: {} Y: {}", NIKE_INPUT_SERVICE.get()->getMouseWorldPos().x, NIKE_INPUT_SERVICE.get()->getMouseWorldPos().y);
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
@@ -71,97 +72,6 @@ namespace NIKE {
 					// 	/*NIKE_LUA_SERVICE->executeScript(e_player.script.script_path, e_player.script.script_id, e_player.script.b_loaded, e_player.script.function)(2, entity, move);*/
 					// 	NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
 					// }
-
-					 	// Check for shooting comp
-					 	auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
-					 	if (e_shoot_comp.has_value()) {
-
-					 		// Get shooting comp
-					 		auto& shoot_comp = e_shoot_comp.value().get();
-
-					 		// If shooting is on cooldown
-					 		if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
-					 			// Accumulate time since last shot
-					 			shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-					 		}
-
-					 		// Create bullet
-					 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
-					 			// Cooldown
-					 			if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
-					 				// Get entity's position
-					 				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-					 				Vector2f shooter_pos = e_transform_comp.value().get().position;
-
-									// Shoot bullet towards cursor position from player pos
-									
-
-
-					// 				// !TODO: Set these in cShooting
-					// 				//std::string script_path = shoot_comp.script.script_path;
-					// 				//std::string function_name = shoot_comp.script.function;
-					// 				//std::string prefab_path = shoot_comp.prefab_path;
-
-					// 				// Load Lua Script
-					// 				//std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
-
-					// 				//// Check if the script is loaded successfully
-					// 				//if (script_id.empty()) {
-					// 				//	NIKEE_CORE_ERROR("Failed to load script: " + script_path);
-					// 				//}
-
-					// 				// Execute Lua Script
-					// 				sol::protected_function create_bullet_func = executeScript(shoot_comp.script.script_path, shoot_comp.script.script_id, shoot_comp.script.b_loaded, shoot_comp.script.function);
-
-					// 				// Checking if something went wrong w cpp func
-					// 				if (!create_bullet_func.valid()) {
-					// 					NIKEE_CORE_ERROR("Failed to execute Lua script");
-					// 				}
-					// 				else {
-					// 					// Function was valid 
-					// 					sol::protected_function_result result = create_bullet_func(shoot_comp.layer, shoot_comp.prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
-
-					// 					// Checking if something went wrong with lua func
-					// 					if (!result.valid()) {
-					// 						sol::error err = result;
-					// 						NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
-					// 					}
-					// 				}
-
-					 				// Reset the last shot time after shooting
-					 				shoot_comp.last_shot_time = 0.f;
-									
-									//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
-					 				//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
-					 			}
-					 			else {
-					 				// Cooldown not up
-					 				NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
-					 			}
-					 		}
-					 	}
-
-						//Check for despawn comp
-						// Currently bugged, please do not use until it is fixed
-						/*
-						auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
-						if (e_despawn_comp.has_value()) {
-							auto& e_despawn = e_despawn_comp.value().get();
-
-							// update current lifetime
-							e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-
-							NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
-							NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
-
-							// if current lifetime > max lifetime, mark for deletion
-							if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
-								if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-									NIKE_ECS_MANAGER->markEntityForDeletion(entity);
-								}
-							}
-						}
-						*/
 						////Execute script
 						//NIKE_LUA_SERVICE->executeScript("test.lua", "update", 0);
 						//Skip if script id has not been set
@@ -175,28 +85,132 @@ namespace NIKE {
 					NIKE_LUA_SERVICE->executeScript(e_logic.script);
 				}
 
+				// Check for shooting comp
+				auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
+				if (e_shoot_comp.has_value()) {
+
+					// Get shooting comp
+					auto& shoot_comp = e_shoot_comp.value().get();
+
+					// If shooting is on cooldown
+					if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
+						// Accumulate time since last shot
+						shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					}
+
+					// Create bullet
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
+						// Cooldown
+						if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
+							// Get entity's position
+							auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+							Vector2f shooter_pos = e_transform_comp.value().get().position;
+
+							// Shoot bullet towards cursor position from player pos
+							shootCursor(entity);
+
+
+							// 				// !TODO: Set these in cShooting
+							// 				//std::string script_path = shoot_comp.script.script_path;
+							// 				//std::string function_name = shoot_comp.script.function;
+							// 				//std::string prefab_path = shoot_comp.prefab_path;
+
+							// 				// Load Lua Script
+							// 				//std::string script_id = NIKE_LUA_SERVICE->loadScript(script_path);
+
+							// 				//// Check if the script is loaded successfully
+							// 				//if (script_id.empty()) {
+							// 				//	NIKEE_CORE_ERROR("Failed to load script: " + script_path);
+							// 				//}
+
+							// 				// Execute Lua Script
+							// 				sol::protected_function create_bullet_func = executeScript(shoot_comp.script.script_path, shoot_comp.script.script_id, shoot_comp.script.b_loaded, shoot_comp.script.function);
+
+							// 				// Checking if something went wrong w cpp func
+							// 				if (!create_bullet_func.valid()) {
+							// 					NIKEE_CORE_ERROR("Failed to execute Lua script");
+							// 				}
+							// 				else {
+							// 					// Function was valid 
+							// 					sol::protected_function_result result = create_bullet_func(shoot_comp.layer, shoot_comp.prefab_path, shooter_pos.x, shooter_pos.y, shoot_comp.offset);
+
+							// 					// Checking if something went wrong with lua func
+							// 					if (!result.valid()) {
+							// 						sol::error err = result;
+							// 						NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
+							// 					}
+							// 				}
+
+											// Reset the last shot time after shooting
+							shoot_comp.last_shot_time = 0.f;
+
+							//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+							//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
+						}
+						else {
+							// Cooldown not up
+							NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
+						}
+					}
+				}
+
+				//Check for despawn comp
+				auto e_despawn_comp = NIKE_ECS_MANAGER->getEntityComponent<Despawn::Lifetime>(entity);
+				if (e_despawn_comp.has_value()) {
+					auto& e_despawn = e_despawn_comp.value().get();
+
+					// update current lifetime
+					e_despawn.current_lifetime += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+					NIKEE_CORE_WARN("Current Lifetime: {}", e_despawn.current_lifetime);
+					NIKEE_CORE_WARN("Max Lifetime: {}", e_despawn.max_lifetime);
+
+					// if current lifetime > max lifetime, mark for deletion
+					if (e_despawn.current_lifetime >= e_despawn.max_lifetime) {
+						if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+							NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+						}
+					}
+				}
+
 				// Destroy all entities that are marked for deletion
 				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}
 	}
-
-	void GameLogic::Manager::shootPlayerBullet(const Entity::Type& player_entity) {
-		// Get player components
-		// Making copies to avoid dangling pointer warning
-		auto p_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(player_entity);
-		auto& shoot_comp = p_shoot_comp.value().get();
-		auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
-		auto& transform_comp = p_transform_comp.value().get();
+	void GameLogic::Manager::shootCursor(const Entity::Type& player_entity) {
+		// Get player components (Making copies to avoid dangling pointer warning)
+		const auto p_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(player_entity);
+		const auto& player_shoot_comp = p_shoot_comp.value().get();
+		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
+		const auto& player_transform_comp = p_transform_comp.value().get();
 
 		// Create entity for bullet
-		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(shoot_comp.layer);
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("Bullet.prefab").string());
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(player_shoot_comp.layer);
 
-		// Set bullet's position to player's position
-		auto 
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
+		// Calculate direction for bullet (Mouse Pos - Player Pos)
+		Vector2f mouse_pos = { NIKE_INPUT_SERVICE.get()->getMouseWorldPos().x, -NIKE_INPUT_SERVICE.get()->getMouseWorldPos().y };
+		const Vector2f direction = mouse_pos - player_transform_comp.position;
+		// Offset spawn position of bullet
+		const Vector2f bullet_pos = player_transform_comp.position + (direction * player_shoot_comp.offset);
 
+		NIKEE_CORE_WARN("Bullet Pos x: {}, y: {}", bullet_pos.x, bullet_pos.y);
+
+		// Set bullet's position
+		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
+		if (bullet_transform_comp.has_value()) {
+			bullet_transform_comp.value().get().position = bullet_pos;
+		}
+
+		// Set bullet physics
+		auto bullet_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
+		if (bullet_physics_comp.has_value()) {
+			// Set force
+			bullet_physics_comp.value().get().force = { direction.x, direction.y };
+		}
 	}
 }
 
