@@ -223,9 +223,9 @@ namespace NIKE {
 		shader_system->useShader("batched_base");
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+		//glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
-		//glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_quad.size()));
+		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_quad.size()));
 
 		// cleanup
 		glBindVertexArray(0);
@@ -443,9 +443,9 @@ namespace NIKE {
 
 		// bind vao
 		glBindVertexArray(model.vaoid);
-		glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
+		//glDrawElements(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr);
 
-		//glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
+		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), INDICES_TYPE, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
 
 		// cleanup
 		glBindVertexArray(0);
@@ -702,10 +702,6 @@ namespace NIKE {
 		//Render to frame buffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			if (status != GL_FRAMEBUFFER_COMPLETE) {
-				NIKEE_CORE_ERROR("Framebuffer incomplete: {0}", status);
-			}
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
 #endif
