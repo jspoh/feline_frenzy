@@ -4,14 +4,14 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 3965,
+            "Completed_Animations": 3988,
             "Frame_Duration": 0.054999999701976776,
             "Mode": 0,
             "Timer": 0.05000000447034836
         },
         "Animation::Sprite": {
             "Curr_Index": {
-                "x": 8,
+                "x": 5,
                 "y": 4
             },
             "End_Index": {
@@ -30,7 +30,7 @@
         "GameLogic::ILogic": {
             "Function": "update",
             "Named_Args": {
-                "entity": 0
+                "entity": 41
             },
             "Script_ID": "player.lua"
         },
@@ -41,8 +41,8 @@
                 "y": 0.0
             },
             "Position": {
-                "x": -4.5486578941345215,
-                "y": 0.0
+                "x": -17.66033172607422,
+                "y": 9.839482307434082
             },
             "Resolution": 2,
             "Rotation": 0.0,
@@ -60,8 +60,8 @@
             "Mass": 2.0,
             "Max_Speed": 150.0,
             "Velocity": {
-                "x": 0.0,
-                "y": 0.0
+                "x": 0.0005741190980188549,
+                "y": -0.006255199201405048
             }
         },
         "Render::Texture": {
@@ -78,7 +78,7 @@
                 "z": 0.0
             },
             "Frame_Index": {
-                "x": 8,
+                "x": 5,
                 "y": 4
             },
             "Frame_Size": {
@@ -90,8 +90,8 @@
         },
         "Transform::Transform": {
             "Position": {
-                "x": -4.5486578941345215,
-                "y": 0.0
+                "x": -17.66033172607422,
+                "y": 9.839482307434082
             },
             "Rotation": 0.0,
             "Scale": {
