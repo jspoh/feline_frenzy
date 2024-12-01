@@ -72,26 +72,30 @@ namespace NIKE {
 					// 	NIKE_LUA_SERVICE->executeScript(result, e_player.script.function,3, 2, entity, move);
 					// }
 
-					// 	// Check for shooting comp
-					// 	auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
-					// 	if (e_shoot_comp.has_value()) {
+					 	// Check for shooting comp
+					 	auto e_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(entity);
+					 	if (e_shoot_comp.has_value()) {
 
-					// 		// Get shooting comp
-					// 		auto& shoot_comp = e_shoot_comp.value().get();
+					 		// Get shooting comp
+					 		auto& shoot_comp = e_shoot_comp.value().get();
 
-					// 		// If shooting is on cooldown
-					// 		if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
-					// 			// Accumulate time since last shot
-					// 			shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-					// 		}
+					 		// If shooting is on cooldown
+					 		if (shoot_comp.last_shot_time < shoot_comp.cooldown) {
+					 			// Accumulate time since last shot
+					 			shoot_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					 		}
 
-					// 		// Create bullet
-					// 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
-					// 			// Cooldown
-					// 			if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
-					// 				// Get entity's position
-					// 				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-					// 				Vector2f shooter_pos = e_transform_comp.value().get().position;
+					 		// Create bullet
+					 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_1)) {
+					 			// Cooldown
+					 			if (shoot_comp.last_shot_time >= shoot_comp.cooldown) {
+					 				// Get entity's position
+					 				auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+					 				Vector2f shooter_pos = e_transform_comp.value().get().position;
+
+									// Shoot bullet towards cursor position from player pos
+									
+
 
 					// 				// !TODO: Set these in cShooting
 					// 				//std::string script_path = shoot_comp.script.script_path;
@@ -124,18 +128,18 @@ namespace NIKE {
 					// 					}
 					// 				}
 
-					// 				// Reset the last shot time after shooting
-					// 				shoot_comp.last_shot_time = 0.f;
-
-					// 				//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
-					// 				//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
-					// 			}
-					// 			else {
-					// 				// Cooldown not up
-					// 				NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
-					// 			}
-					// 		}
-					// 	}
+					 				// Reset the last shot time after shooting
+					 				shoot_comp.last_shot_time = 0.f;
+									
+									//NIKEE_CORE_INFO("Bullet created via Lua script: " + prefab_path);
+					 				//NIKEE_CORE_INFO("Bullet created at x: " + std::to_string(shooter_pos.x) + " y:" + std::to_string(shooter_pos.y));
+					 			}
+					 			else {
+					 				// Cooldown not up
+					 				NIKEE_CORE_INFO("Cannot shoot yet. Time until next shot: " + std::to_string(shoot_comp.cooldown - shoot_comp.last_shot_time));
+					 			}
+					 		}
+					 	}
 
 						//Check for despawn comp
 						// Currently bugged, please do not use until it is fixed
@@ -175,6 +179,24 @@ namespace NIKE {
 				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}
+	}
+
+	void GameLogic::Manager::shootPlayerBullet(const Entity::Type& player_entity) {
+		// Get player components
+		// Making copies to avoid dangling pointer warning
+		auto p_shoot_comp = NIKE_ECS_MANAGER->getEntityComponent<Shooting::Shooting>(player_entity);
+		auto& shoot_comp = p_shoot_comp.value().get();
+		auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
+		auto& transform_comp = p_transform_comp.value().get();
+
+		// Create entity for bullet
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(shoot_comp.layer);
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("Bullet.prefab").string());
+
+		// Set bullet's position to player's position
+		auto 
+
+
 	}
 }
 
