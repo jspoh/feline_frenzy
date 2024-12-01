@@ -4903,10 +4903,15 @@ namespace NIKE {
 				//Get selected asset path
 				auto path = NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID());
 
+				// Clear containers containing entities string refs
+				NIKE_ECS_MANAGER->destroyAllEntities();
+
 				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
 
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
+
+
 
 				//Close popup
 				closePopUp(popup_id);
@@ -4947,6 +4952,9 @@ namespace NIKE {
 
 		// Weak ptr ref to tile panel
 		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
+
+		// Weak ptr ref 
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 	}
 
 	void LevelEditor::ScenesPanel::update()
@@ -5011,8 +5019,6 @@ namespace NIKE {
 
 					//Save scene
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
-					
-
 
 					success_msg->assign("Scene successfully saved.");
 					openPopUp("Success");
