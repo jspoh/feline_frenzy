@@ -4952,9 +4952,6 @@ namespace NIKE {
 
 		// Weak ptr ref to tile panel
 		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
-
-		// Weak ptr ref 
-		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 	}
 
 	void LevelEditor::ScenesPanel::update()
