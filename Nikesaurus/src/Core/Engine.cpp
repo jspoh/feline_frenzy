@@ -209,76 +209,82 @@ namespace NIKE {
 		//NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "animation_scene.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+			try {
 
-			// get delta time first
-			if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-				//Calculate Delta Time
-				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-			}
-
-			// have to poll events regardless of focus
-			//Poll system events
-			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
-
-			if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-
-				//Clear buffer
-				NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
-
-				//Update all audio pending actions
-				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
-
-				//Update scenes manager
-				NIKE_SCENES_SERVICE->update();
-
-				//static constexpr bool JS_TEXTURE_TEST = true;
-				////Render entity to mouse click
-				//if 
-				//	(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
-
-				//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
-
-				//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-				//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-				//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-				//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-				//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-				//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-				//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
-				//	}
-				//}
-
-				//Escape Key
-				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				// get delta time first
+				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+					//Calculate Delta Time
+					NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 				}
 
-				//Toggle full screen
-				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
-					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
-				}
+				// have to poll events regardless of focus
+				//Poll system events
+				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-				//Update all systems
-				NIKE_ECS_MANAGER->updateSystems();
+				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+
+					//Clear buffer
+					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+
+					//Update all audio pending actions
+					NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+
+					//Update scenes manager
+					NIKE_SCENES_SERVICE->update();
+
+					//static constexpr bool JS_TEXTURE_TEST = true;
+					////Render entity to mouse click
+					//if 
+					//	(JS_TEXTURE_TEST && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+
+					//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
+
+					//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
+					//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
+					//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
+					//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMouseWindowPos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMouseWindowPos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
+					//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
+					//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
+					//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
+					//	}
+					//}
+
+					//Escape Key
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+						NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+					}
+
+					//Toggle full screen
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+						NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+					}
+
+					//Update all systems
+					NIKE_ECS_MANAGER->updateSystems();
 
 #ifndef NDEBUG
-				//Update Level Editor
-				NIKE_LVLEDITOR_SERVICE->update();
+					//Update Level Editor
+					NIKE_LVLEDITOR_SERVICE->update();
 
-				//Render Level Editor
-				NIKE_LVLEDITOR_SERVICE->render();
-				
-				//update UI First
-				NIKE_UI_SERVICE->update();
+					//Render Level Editor
+					NIKE_LVLEDITOR_SERVICE->render();
+
+					//update UI First
+					NIKE_UI_SERVICE->update();
 #endif
 
-				//Swap Buffers
-				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+					//Swap Buffers
+					NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
-				GLenum err = glGetError();
-				if (err != GL_NO_ERROR) {
-					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+					GLenum err = glGetError();
+					if (err != GL_NO_ERROR) {
+						NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+					}
 				}
+			}
+			catch (std::runtime_error const& e) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
+				throw e;
 			}
 		}
 
