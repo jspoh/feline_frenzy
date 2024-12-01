@@ -13,7 +13,7 @@ AppId={{DBE1979A-0CA9-4A8B-81DE-029260E99EE2}
 ; Standard app data stuff
 ; !!NOTE!!: Replace all instances of "Feline-Frenzy" with your game name.
 AppName=Feline-Frenzy
-AppVerName=Feline-Frenzy Version 0.1.0
+AppVerName=Feline-Frenzy Version 1.1
 AppPublisher=DigiPen Institute of Technology
 AppPublisherURL=http://www.digipen.edu/
 AppSupportURL=http://www.digipen.edu/
