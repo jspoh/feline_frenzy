@@ -105,7 +105,6 @@ namespace NIKE {
 		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
-
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
@@ -280,6 +279,10 @@ namespace NIKE {
 					//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
 					//	}
 					//}
+
+					if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_A)) {
+						cout << "PRESSED" << endl;
+					}
 
 					//Escape Key
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {

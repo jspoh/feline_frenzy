@@ -1,7 +1,7 @@
 [
     {
         "Channels": {
-            "BGM": {
+            "Menu_BGM": {
                 "loop": true,
                 "tracks": [
                     "BGM_Menu_v1.wav"
@@ -20,44 +20,6 @@
         "Layer": {
             "B_State": true,
             "Entities": [
-                {
-                    "Entity": {
-                        "Components": {
-                            "Audio::SFX": {
-                                "Audio_ID": "Laser1.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "SFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            }
-                        },
-                        "Layer ID": 0,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "laser1_audio",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Audio::SFX": {
-                                "Audio_ID": "Pop1.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "SFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            }
-                        },
-                        "Layer ID": 0,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "pop1_audio",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
                 {
                     "Entity": {
                         "Components": {
@@ -117,6 +79,13 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuYesOpen.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
                             "Render::Shape": {
                                 "Color": {
                                     "w": 0.0,
@@ -176,6 +145,13 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuYesOpen.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
                             "Render::Shape": {
                                 "Color": {
                                     "w": 0.0,
@@ -233,6 +209,13 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuNoClose.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
                             "Render::Shape": {
                                 "Color": {
                                     "w": 0.0,

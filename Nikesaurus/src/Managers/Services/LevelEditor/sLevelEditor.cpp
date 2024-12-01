@@ -97,7 +97,7 @@ namespace NIKE {
 		ImGuiIO& io = ImGui::GetIO();
 
 		//Check if imgui wants to capture keyboard events
-		if (io.WantCaptureKeyboard) {
+		if (io.WantCaptureKeyboard && ImGui::IsAnyItemFocused()) {
 
 			//Process key event
 			switch (event->state) {
