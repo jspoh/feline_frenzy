@@ -298,6 +298,7 @@ namespace NIKE {
 					Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").at("Layer ID").get<unsigned int>());
 					deserializeEntity(entity, e_data.at("Entity"));
 
+					// Wrapped for Release to build!
 					//Deserialize entity metadata
 					#ifndef NDEBUG
 					LevelEditor::EntityMetaData meta_data;

@@ -222,6 +222,8 @@ namespace NIKE {
 			//Error msg
 			std::shared_ptr<std::string> error_msg;
 
+			std::set<unsigned int> reusable_indices;
+
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 

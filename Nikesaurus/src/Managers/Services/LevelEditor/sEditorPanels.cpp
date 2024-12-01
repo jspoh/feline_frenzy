@@ -483,10 +483,20 @@ namespace NIKE {
 				//Create a shared id for do & undo functions
 				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
 
+				// Determine the next available index
+				int next_index{};
+				if (!reusable_indices.empty()) {
+					next_index = *reusable_indices.begin();
+					reusable_indices.erase(reusable_indices.begin());
+				}
+				else {
+					next_index = static_cast<int>(NIKE_ECS_MANAGER->getEntitiesCount());
+				}
+
 				//If entity name is not provided (Create a default)
 				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
 				{
-					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
+					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", next_index);
 				}
 
 				//Do Action
@@ -507,6 +517,9 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+
+						// Add index back to the reusable pool
+						reusable_indices.insert(next_index);
 					}
 					};
 
@@ -560,6 +573,8 @@ namespace NIKE {
 				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
 				int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
 
+
+
 				//Setup undo action for remove
 				remove.undo_action = [&, shared_id, comps, comp_types, layer_id]() {
 
@@ -587,8 +602,13 @@ namespace NIKE {
 					//Check if entity is still alive
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 
+						int index = std::stoi(shared_id->substr(7));
+
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+
+						// Add index back to the reusable pool
+						reusable_indices.insert(index);
 
 						//Set selected entity back to first entity
 						selected_entity = entities.empty() ? 0 : entities.begin()->first;
