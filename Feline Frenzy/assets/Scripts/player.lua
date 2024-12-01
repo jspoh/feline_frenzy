@@ -108,12 +108,6 @@ end
 --Player update function
 function Player:update(args)
 
-Player:Animate(args.entity, args)
-
-Player:Move(args.entity)
-
-Player:Shoot(args.entity)
-
     -- Cheat mode enable
     if IsKeyTriggered(Key.KEY_0) and IsKeyTriggered(Key.KEY_9) then
         cheatModeEnabled = not cheatModeEnabled
@@ -127,18 +121,37 @@ Player:Shoot(args.entity)
 
      if cheatModeEnabled then
         -- Teleport to cursor cheat
-        if isKeyTriggered(Key.KEY_1) then
+        if IsKeyTriggered(Key.KEY_1) then
             -- Get mouse position
             local mousePos = WorldMousePos()
 
             -- Set player position to the mouse position
-            setPosition(entity, mousePos.x, mousePos.y)
+            SetPosition(entity, mousePos.x, mousePos.y)
 
             -- Log the new position
             cout("Teleported player to: X = " .. mousePos.x .. ", Y = " .. mousePos.y)
         end
 
+        -- God Mode toggle
+        if IsKeyTriggered(Key.KEY_2) then
+            godModeEnabled = not godModeEnabled
+            SetGodMode(entity, godModeEnabled)
+        end
+
+        -- High Damage toggle
+        if IsKeyTriggered(Key.KEY_3) then
+            highDamageEnabled = not highDamageEnabled
+            SetHighDamage(entity, highDamageEnabled)
+        end
+
     end
+
+Player:Animate(args.entity, args)
+
+Player:Move(args.entity)
+
+Player:Shoot(args.entity)
+
 
 end
 
