@@ -370,9 +370,46 @@ namespace NIKE {
             });
 
         //Fire Bullet
-        lua_state.set_function("FireBullet", [&]() {
-            Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath("Bullet.prefab").string());
+        lua_state.set_function("FireBullet", [&](Entity::Type entity) {
+            Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
+            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+
+#ifndef NDEBUG
+            auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
+            data.prefab_id = "bullet.prefab";
+            NIKE_LVLEDITOR_SERVICE->setEntityMetaData(bullet_entity, data);
+#endif
+
+            //Player position
+            auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+            if (!player_transform_comp.has_value()) {
+                return;
+            }
+
+            //Get player transform
+            auto const& player_transform = player_transform_comp.value().get();
+
+            //Calculate direction vector (mouse - player)
+            Vector2f direction = player_transform.position - NIKE_INPUT_SERVICE->getMouseWorldPos();
+            direction.x = -direction.x;
+
+            //Full force
+            int constexpr BULLET_SPEED = 100;
+
+            //Calculate bullet force vector
+            Vector2f bullet_force = direction * BULLET_SPEED;
+
+            // Apply force to the bullet
+            auto bullet_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
+            if (bullet_dynamics.has_value()) {
+                bullet_dynamics.value().get().force = bullet_force;
+            }
+
+            //Set initial bullet position to player's position
+            auto bullet_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
+            if (bullet_transform.has_value()) {
+                bullet_transform.value().get().position = player_transform.position + (direction.normalize() * (player_transform.scale.length() * 0.75f));
+            }
             });
 
         //Spawn enemy function

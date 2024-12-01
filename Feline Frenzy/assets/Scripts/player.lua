@@ -66,10 +66,10 @@ end
 --Player movement
 function Player:Move(entity)
 
--- Initialize force variables
+--Initialize force variables
 local fx, fy = 0.0, 0.0
 
--- Accumulate forces based on key presses
+--Accumulate forces based on key presses
 if IsKeyPressed(Key.W) then
 	fy = fy + 100.0 -- Add upward force
 end
@@ -86,7 +86,7 @@ if IsKeyPressed(Key.D) then
    fx = fx + 100.0 -- Add rightward force
 end
 
--- Apply the combined force to the entity
+--Apply the combined force to the entity
 ApplyForce(entity, fx, fy)
 
 end
@@ -95,7 +95,7 @@ end
 function Player:Shoot(entity)
 
 if IsMouseTriggered(Key.MOUSE_LEFT) then
-cout("SHOOTING NIGGERS")
+    FireBullet(entity)
 end
 
 end
