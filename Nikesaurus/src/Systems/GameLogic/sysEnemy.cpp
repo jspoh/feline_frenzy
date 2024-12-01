@@ -14,30 +14,7 @@
 
 namespace NIKE {
 	void Enemy::Manager::init() {
-		//NIKE_LUA_SERVICE->init();
 	}
-
-	//void Enemy::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
-	//	//Add system to lua
-	//	NIKE_LUA_SERVICE->registerLuaSystem(system);
-	//}
-
-	//sol::protected_function Enemy::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
-	//	//Run script
-	//	if (script_id == "") {
-	//		script_id = NIKE_LUA_SERVICE->loadScript(file_path);
-	//		b_loaded = true;
-	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
-	//	}
-	//	else if (b_loaded) {
-	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
-	//	}
-	//	else {
-	//		NIKE_LUA_SERVICE->reloadScript(script_id);
-	//		b_loaded = true;
-	//		return NIKE_LUA_SERVICE->executeScript(script_id, function);
-	//	}
-	//}
 
 	void Enemy::Manager::update() {
 		//Get layers
@@ -76,8 +53,11 @@ namespace NIKE {
 							if (e_player_comp.has_value()) {
 								// Check if player is within range & shot not on cooldown
 								if (enemy_comp.last_shot_time >= enemy_comp.cooldown && withinRange(entity, other_entity)) {
-									//NIKEE_CORE_INFO("Yes");
+									// Shoot bullet towards player pos from enemy pos
 									shootBullet(entity, other_entity);
+
+									// Reset the last shot time after shooting
+									enemy_comp.last_shot_time = 0.f;
 								}
 							}
 						}
@@ -87,7 +67,7 @@ namespace NIKE {
 		}
 	}
 
-	 bool Enemy::Manager::withinRange(const Entity::Type enemy, const Entity::Type player) {
+	 bool Enemy::Manager::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
 		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		Vector2f player_pos = player_transform_comp.value().get().position;
@@ -117,45 +97,42 @@ namespace NIKE {
 		return distance < enemy_range;
 	}
 
-	 void Enemy::Manager::shootBullet(const Entity::Type enemy, const Entity::Type player) {
-		 // Get player transform
-		 auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		 Vector2f player_pos = player_transform_comp.value().get().position;
+	 void Enemy::Manager::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
+		 // Get player transform component
+		 const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		 const Vector2f& player_pos = p_transform_comp.value().get().position;
 
-		 // Get enemy transform
-		 auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
-		 Vector2f enemy_pos = enemy_transform_comp.value().get().position;
+		 // Get enemy components
+		 const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		 const Vector2f& enemy_pos = e_transform_comp.value().get().position;
+		 const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		 const auto& enemy_attack_comp = e_attack_comp.value().get();
 
-		 // Enemy attack
-		 auto& enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy).value().get();
+		 // Create entity for bullet
+		 Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
 
-		 // Load Lua Script
-		 //std::string script_id = NIKE_LUA_SERVICE->loadScript(enemy_attack_comp.script.script_path);
+		 // Load entity from prefab
+		 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
-		 // Check if the script is loaded successfully
-		 //if (script_id.empty()) {
-			// NIKEE_CORE_ERROR("Failed to load script.");
-		 //}
+		 // Calculate direction for bullet (Enemy Pos - Player Pos)
+		 Vector2f direction = enemy_pos - player_pos;
+		 direction.normalize();
 
-		 // Execute Lua Script
-		 //sol::protected_function enemy_bullet_func = executeScript(enemy_attack_comp.script.script_path, enemy_attack_comp.script.script_id, enemy_attack_comp.script.b_loaded, enemy_attack_comp.script.function);
+		 // Offset spawn position of bullet
+		 const float& offset = enemy_attack_comp.offset;
+		 Vector2f bullet_pos = enemy_pos + (direction * offset);
 
-		 // Checking if something went wrong w cpp func
-		 //if (!enemy_bullet_func.valid()) {
-			// NIKEE_CORE_ERROR("Failed to execute Lua script: " + enemy_attack_comp.script.function);
-		 //}
-		 //else {
-			// // Function was valid 
-			// sol::protected_function_result result = enemy_bullet_func(enemy_attack_comp.layer, enemy_attack_comp.prefab_path, enemy_pos.x, enemy_pos.y, player_pos.x, player_pos.y, enemy_attack_comp.offset);
+		 // Set bullet's position
+		 auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
+		 if (bullet_transform_comp.has_value()) {
+			 bullet_transform_comp.value().get().position = bullet_pos;
+		 }
 
-			// // Checking if something went wrong with lua func
-			// if (!result.valid()) {
-			//	 sol::error err = result;
-			//	 NIKEE_CORE_ERROR(fmt::format("Lua error: {}", err.what()));
-			// }
-		 //}
-
-		 // Reset the last shot time after shooting
-		 enemy_attack_comp.last_shot_time = 0.f;
+		 // Set bullet physics
+		 auto bullet_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
+		 if (bullet_physics_comp.has_value()) {
+			 // Set force
+			 bullet_physics_comp.value().get().force = { direction.x, direction.y };
+		 }
 	 }
 }

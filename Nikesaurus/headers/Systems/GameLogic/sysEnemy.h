@@ -32,10 +32,10 @@ namespace NIKE {
 			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
 			// Check if player is within range
-			bool withinRange(const Entity::Type enemy, const Entity::Type player);
+			bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
 
 			// Shoot bullet
-			void shootBullet(const Entity::Type enemy, const Entity::Type player);
+			void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
 
 		public:
 			//Default Constructor
