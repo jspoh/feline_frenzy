@@ -135,7 +135,7 @@ namespace NIKE {
 		//float timePerAnimation{ base_component.animation_duration / frameCount(sprite_component) };
 
 		//Increment timer with delta time
-		base_component.timer += NIKE_WINDOWS_SERVICE->getDeltaTime();
+		base_component.timer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
 		//Wait For Next Iteration
 		if (base_component.timer >= base_component.frame_duration && (base_component.animation_mode == Mode::PLAYING)) {
@@ -144,7 +144,7 @@ namespace NIKE {
 			base_component.timer = 0.0f;
 
 			//If End Has Been Reached
-			if (sprite_component.curr_index == sprite_component.end_index) {
+			if (sprite_component.curr_index.x >= sprite_component.end_index.x && sprite_component.curr_index.y >= sprite_component.end_index.y) {
 				//Check If Animation Is Finished
 				animationEndChecker(base_component);
 
@@ -169,7 +169,7 @@ namespace NIKE {
 			}
 
 			//If CurrSprite Is At Start
-			if (sprite_component.curr_index == sprite_component.start_index && base_component.b_reverse) {
+			if ((sprite_component.curr_index.x <= sprite_component.start_index.x && sprite_component.curr_index.y <= sprite_component.start_index.y) && base_component.b_reverse) {
 				//Check If Animation Is Finished
 				animationEndChecker(base_component);
 

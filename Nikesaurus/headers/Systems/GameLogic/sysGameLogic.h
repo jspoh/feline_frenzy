@@ -12,7 +12,6 @@
 #define GAME_LOGIC_HPP
 
 #include "Managers/ECS/mSystem.h"
-#include "sysLua.h"
 
 namespace NIKE {
     namespace GameLogic {
@@ -23,11 +22,11 @@ namespace NIKE {
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
 
-			//Internal lua system
-			std::unique_ptr<Lua::System> lua_system;
-
 			//Internal script management
-			sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+
+			// Player Shooting
+			void shootCursor(const Entity::Type& player_entity);
 
 	    public:
 		    //Default constructor
@@ -45,8 +44,8 @@ namespace NIKE {
 			//Init Inputs
 			void init() override;
 
-			//Register systems for lua
-			void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+			////Register systems for lua
+			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 		    //Update Inputs
 		    void update() override;

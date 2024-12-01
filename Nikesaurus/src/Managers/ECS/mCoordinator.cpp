@@ -1,5 +1,15 @@
+/*****************************************************************//**
+ * \file   mCoordinator.cpp
+ * \brief  ECS Coordinator
+ *
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
+ * \date   September 2024
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 #include "Core/stdafx.h"
 #include "Managers/ECS/mCoordinator.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	//Default constructor
@@ -12,7 +22,12 @@ namespace NIKE {
 	* Entity Methods
 	*********************************************************************/
 	Entity::Type Coordinator::Manager::createEntity(unsigned int layer_id) {
-		return entity_manager->createEntity(layer_id);
+		auto entity = entity_manager->createEntity(layer_id);
+
+		//Dispatch event
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
+
+		return entity;
 	}
 
 	Entity::Type Coordinator::Manager::cloneEntity(Entity::Type copy) {
@@ -20,6 +35,8 @@ namespace NIKE {
 		component_manager->cloneEntity(new_entity, copy);
 		entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
 		system_manager->cloneEntity(new_entity, copy);
+
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
 
 		return new_entity;
 	}
@@ -30,6 +47,8 @@ namespace NIKE {
 		entity_manager->destroyEntity(entity);
 		component_manager->entityDestroyed(entity);
 		system_manager->entityDestroyed(entity); 
+
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
 	}
 
 	bool Coordinator::Manager::checkEntity(Entity::Type entity) const {
@@ -66,6 +85,47 @@ namespace NIKE {
 		system_manager->updateSystems();
 	}
 
+	std::vector<std::shared_ptr<System::ISystem>>& Coordinator::Manager::getAllSystems() {
+		return system_manager->getAllSystems();
+	}
+
+	void Coordinator::Manager::markEntityForDeletion(Entity::Type entity) {
+		// Checking if entity is valid
+		if (!checkEntity(entity)) {
+			NIKEE_CORE_WARN("Attempted to mark invalid entity {} for deletion.", entity);
+			return;
+		}
+
+		if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) == entities_to_destroy.end()) {
+			entities_to_destroy.push_back(entity);
+		}
+		else {
+			NIKEE_CORE_INFO("Entity already marked for deletion");
+		}
+	}
+
+	void Coordinator::Manager::destroyMarkedEntities() {
+		//NIKEE_CORE_INFO("IN DESTROY MARKED ENTITIES");
+		for (auto entity : entities_to_destroy) {
+			if (checkEntity(entity)) {
+				//NIKEE_CORE_INFO("DESTROYING AN ENTITY");
+				destroyEntity(entity);
+				//NIKEE_CORE_INFO("AFTER DESTROYING AN ENTITY");
+			}
+			else {
+				NIKEE_CORE_INFO("Entity {} failed the checkEntity() check.", entity);
+				continue;
+			}
+		}
+		entities_to_destroy.clear();
+	}
+
+	std::vector<Entity::Type> Coordinator::Manager::getEntitiesToDestroy() const{
+		return entities_to_destroy;
+	}
+
+
+
 	/*****************************************************************//**
 	* Component Methods
 	*********************************************************************/
@@ -95,15 +155,39 @@ namespace NIKE {
 		system_manager->updateEntitiesList(entity, sign);
 	}
 
-	void* Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
+	std::shared_ptr<void> Coordinator::Manager::getEntityComponent(Entity::Type entity, Component::Type type) {
 		return component_manager->getEntityComponent(entity, type);
 	}
 
-	std::unordered_map<std::string, void*> Coordinator::Manager::getAllComponents(Entity::Type entity) const {
-		return component_manager->getAllComponents(entity);
+	std::shared_ptr<void> Coordinator::Manager::getCopiedEntityComponent(Entity::Type entity, Component::Type type) {
+		return component_manager->getCopiedEntityComponent(entity, type);
+	}
+
+	void Coordinator::Manager::setEntityComponent(Entity::Type entity, Component::Type type, std::shared_ptr<void> comp) {
+		component_manager->setEntityComponent(entity, type, comp);
+	}
+
+	size_t Coordinator::Manager::getComponentEntitiesCount(Component::Type comp_type) {
+		return component_manager->getComponentEntitiesCount(comp_type);
+	}
+
+	std::set<Entity::Type> Coordinator::Manager::getAllComponentEntities(Component::Type comp_type) {
+		return component_manager->getAllComponentEntities(comp_type);
+	}
+
+	std::unordered_map<std::string, std::shared_ptr<void>> Coordinator::Manager::getAllEntityComponents(Entity::Type entity) const {
+		return component_manager->getAllEntityComponents(entity);
+	}
+
+	std::unordered_map<std::string, std::shared_ptr<void>> Coordinator::Manager::getAllCopiedEntityComponents(Entity::Type entity) const {
+		return component_manager->getAllCopiedEntityComponents(entity);
 	}
 
 	std::unordered_map<std::string, Component::Type> Coordinator::Manager::getAllComponentTypes() const {
 		return component_manager->getAllComponentTypes();
+	}
+
+	size_t Coordinator::Manager::getComponentsCount() const {
+		return component_manager->getComponentsCount();
 	}
 }

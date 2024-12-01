@@ -20,8 +20,8 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		//Forward declaration of IScene for friending layer
-		class IScene;
+		//Forward declaration of Scene service for friending layer
+		class Service;
 
 		//Layer class
 		class NIKE_API Layer {
@@ -29,7 +29,7 @@ namespace NIKE {
 			using LayerMask = std::bitset<64>;
 		private:
 			//Friend of layer class
-			friend class IScene;
+			friend class Service;
 
 			//Layer mask
 			LayerMask mask;
@@ -65,23 +65,53 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 		};
 
-		//Scene interface
-		class NIKE_API IScene {
+		//Scene manager actions
+		enum class NIKE_API Actions {
+			CHANGE = 0,
+			RESTART,
+			PREVIOUS,
+			CLOSE
+		};
+
+		//Change Scene Event
+		struct NIKE_API SceneEvent {
+			Actions scene_action;
+			std::string next_scene_id;
+
+			//Constructor
+			SceneEvent(Actions scene_action, std::string next_scene_id)
+				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {}
+		};
+
+		class NIKE_API Service {
 		private:
-			//File path to scene
-			std::string file_path;
+
+			//Curr scene
+			std::string curr_scene;
+
+			//Prev scene
+			std::string prev_scene;
+
+			//Scene event queue
+			std::shared_ptr<Scenes::SceneEvent> event_queue;
 
 			//Layers within scene
 			std::vector<std::shared_ptr<Layer>> layers;
-		public:
-			//Default constructor
-			IScene() = default;
 
-			//Phases
-			virtual void load() = 0;
-			virtual void init() = 0;
-			virtual void exit() = 0;
-			virtual void unload() = 0;
+			//Init starting scene
+			void initScene(std::string const& scene_id);
+
+			//Change scene
+			void changeScene(std::string const& scene_id);
+
+			//Restart scene
+			void restartScene();
+
+			//Go To Previous scene
+			void previousScene();
+		public:
+			Service() = default;
+			~Service() = default;
 
 			//Create layer
 			std::shared_ptr<Layer> createLayer(int index = -1);
@@ -101,91 +131,20 @@ namespace NIKE {
 			//Get all layers
 			std::vector<std::shared_ptr<Layer>>& getLayers();
 
-			//Default virtual destructor
-			virtual ~IScene() = default;
-		};
+			//Queue scene event
+			void queueSceneEvent(Scenes::SceneEvent const& event);
 
-		//Scene manager actions
-		enum class NIKE_API Actions {
-			CHANGE = 0,
-			RESTART,
-			PREVIOUS,
-			CLOSE
-		};
+			//Set curr scene id
+			void setCurrSceneID(std::string const& new_scene_id);
 
-		//Change Scene Event
-		struct NIKE_API SceneEvent {
-			Actions scene_action;
-			std::string next_scene_id;
-
-			//Constructor
-			SceneEvent(Actions scene_action, std::string next_scene_id)
-				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {}
-		};
-
-		//Scenes manager
-		class NIKE_API Service {
-		private:
-			//Delete Copy Constructor & Copy Assignment
-			Service(Service const& copy) = delete;
-			void operator=(Service const& copy) = delete;
-
-			//Map of scene files ( To be implemented )
-			std::unordered_map<std::string, std::shared_ptr<IScene>> scenes;
-
-			//Current scene
-			std::shared_ptr<IScene> curr_scene;
-
-			//Prev scene
-			std::shared_ptr<IScene> prev_scene;
-
-			//Scene event queue
-			std::shared_ptr<Scenes::SceneEvent> event_queue;
-
-			//Init starting scene
-			void initScene(std::string scene_id);
-
-			//Change scene
-			void changeScene(std::string scene_id);
-
-			//Restart scene
-			void restartScene();
-
-			//Go To Previous scene
-			void previousScene();
-
-		public:
-
-			//Default Constructor
-			Service() = default;
-
-			//Register scenes
-			template<typename T>
-			void registerScene(std::string const& scene_id) {
-
-				//New scene
-				std::shared_ptr<T> scene{ std::make_shared<T>() };
-
-				//Construct scene obj
-				scenes.emplace(std::piecewise_construct, std::forward_as_tuple(scene_id), std::forward_as_tuple(scene));
-
-				//Create first layer for scene
-				scenes.at(scene_id)->createLayer();
-
-				//Default starting state will be the first state registered
-				if (!curr_scene) {
-					initScene(scene_id);
-				}
-			}
-
-			//Get Current Scene
-			std::shared_ptr<IScene> getCurrScene();
-
-			//Get Current Scene ID
+			//Get curr scene id
 			std::string getCurrSceneID() const;
 
-			//Queue scene event
-			void queueSceneEvent(Scenes::SceneEvent&& event);
+			//Get prev scene id
+			std::string getPrevSceneID() const;
+
+			//Init scene service
+			void init();
 
 			//Update scene event
 			void update();

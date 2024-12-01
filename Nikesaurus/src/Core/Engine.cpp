@@ -15,10 +15,9 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Systems/Animation/sysAnimation.h"
 #include "Systems/sysAudio.h"
-#include "../headers/Systems/Physics/sysPhysics.h"
-#include "../headers/Systems/Animation/sysAnimation.h"
-#include "../headers/Systems/Render/sysRender.h"
 #include "Systems/Render/sysRender.h"
+#include "Systems/GameLogic/sysInteraction.h"
+#include "Systems/GameLogic/sysEnemy.h"
 
 namespace NIKE {
 
@@ -34,7 +33,7 @@ namespace NIKE {
 
 		//Register physics components
 		Physics::registerComponents();
-		
+
 		//Register animation components
 		Animation::registerComponents();
 
@@ -46,21 +45,39 @@ namespace NIKE {
 
 		//Register render components
 		GameLogic::registerComponents();
+
+		//Register shooting components
+		Shooting::registerComponents();
+
+		//Register Health components
+		Health::registerComponents();
+
+		//Register Damage components
+		Damage::registerComponents();
+
+		//Register Enemy components
+		Enemy::registerComponents();
+
+		//Register Despawn components
+		Despawn::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
-		auto game_logic_sys = NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
-		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Movement>());
+		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Shooting::Shooting>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
 
 		//Register physics manager
-		auto physics_sys = NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
+		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
-		game_logic_sys->registerLuaSystem(physics_sys);
+		//game_logic_sys->registerLuaSystem(physics_sys);
 
 		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
@@ -77,14 +94,23 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Text>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Shape>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Render::Manager>(NIKE_ECS_MANAGER->getComponentType<Render::Texture>());
+
+		//Register interaction manager
+		auto interaction_sys = NIKE_ECS_MANAGER->registerSystem<Interaction::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Health::Health>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Damage::Damage>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
+
+		//Register enemy manager
+		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
+		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
 	}
 
-	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {
-
-		//Provide ecs coordinator service for internal engine usage
+	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
 		provideService(std::make_shared<Coordinator::Manager>());
 
-		//Provide Services
+		//Provide Service
 		provideService(std::make_shared<Windows::Service>());
 		provideService(std::make_shared<Scenes::Service>());
 		provideService(std::make_shared<Events::Service>());
@@ -93,20 +119,28 @@ namespace NIKE {
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Serialization::Service>());
 		provideService(std::make_shared<Debug::Service>());
-		provideService(std::make_shared<IMGUI::Service>());
 		provideService(std::make_shared<Map::Service>());
+		provideService(std::make_shared<Camera::Service>());
 		provideService(std::make_shared<UI::Service>());
+#ifndef NDEBUG
+		provideService(std::make_shared<LevelEditor::Service>());
+#endif
+		provideService(std::make_shared<Lua::Service>());
+		provideService(std::make_shared<Path::Service>());
 
 		//Create console
-		#ifndef NDEBUG
+#ifndef NDEBUG
 		NIKE_WINDOWS_SERVICE->createConsole(custom_welcome);
-		#endif
+#endif
 
 		//Init Logger
 		NIKE::Log::Init();
 
+		//Deserialize Config File
+		auto json_config = NIKE_SERIALIZE_SERVICE->loadJsonFile(file_path);
+
 		//Setup window with config file
-		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(file_path));
+		NIKE_WINDOWS_SERVICE->setWindow(std::make_shared<Windows::NIKEWindow>(json_config));
 
 		//Set Target FPS
 		NIKE_WINDOWS_SERVICE->setTargetFPS(fps);
@@ -117,100 +151,166 @@ namespace NIKE {
 		//Setup input modes
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 
-		//Add Event Listeners
-		getService<Events::Service>()->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		//Add event listeners for window resized
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
 
-		//Add event listener for UI
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
+#ifndef NDEBUG
+		//imgui event listeners ( ImGui listens first for all events except window resized )
 
-		//Add event listener for Input
-		getService<Events::Service>()->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
-		getService<Events::Service>()->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+		//Add event listeners for window resized
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for key event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse move event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_LVLEDITOR_SERVICE);
+
+		//Add event listeners for mouse scroll event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_LVLEDITOR_SERVICE);
+#endif
+
+		//Add event listeners for key event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
+
+		//Add event listeners for mouse event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
+
+		//Add event listeners for mouse move event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
+
+		//Add event listeners for mouse scroll event
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseScrollEvent>(NIKE_INPUT_SERVICE);
+
+		//Init paths
+		NIKE_PATH_SERVICE->init(json_config);
 
 		//Setup Audio
-		getService<Audio::Service>()->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
+		NIKE_AUDIO_SERVICE->setAudioSystem(std::make_shared<Audio::NIKEAudioSystem>());
 
-		//Setup assets loading with systems for loading
-		getService<Assets::Service>()->configAssets(getService<Audio::Service>()->getAudioSystem());
+		//Initialize assets service
+		NIKE_ASSETS_SERVICE->init(NIKE_AUDIO_SERVICE->getAudioSystem());
 
-		//Init imgui
-		NIKE_IMGUI_SERVICE->init();
+		//Register all assets in the game and engine folder
+		NIKE_ASSETS_SERVICE->scanAssetDirectory("Game_Assets:/", true);
+
+		//Init camera
+		NIKE_CAMERA_SERVICE->init(json_config);
+
+		//Init scene
+		NIKE_SCENES_SERVICE->init();
+
+#ifndef NDEBUG
+		//Init Level Editor
+		NIKE_LVLEDITOR_SERVICE->init();
+#endif
 
 		//Init UI
 		NIKE_UI_SERVICE->init();
+
+		//Init Lua
+		NIKE_LUA_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();
 
 		//Register Def Managers
 		registerDefSystems();
+
+		int max_texture_units;
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+		NIKEE_CORE_INFO("System max texture units: {0}", max_texture_units);
+
+#ifdef NDEBUG
+		// default startup to fullscreen (M3 1931)
+		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+#endif
 	}
 
 	void Core::Engine::run() {
+		// !TODO: remove this, hardcoding for installer
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+			try {
 
-			//Calculate Delta Time
-			NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+				// get delta time first
+				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+					//Calculate Delta Time
+					NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+				}
 
-			//Update all audio pending actions
-			getService<Audio::Service>()->getAudioSystem()->update();
+				// have to poll events regardless of focus
+				//Poll system events
+				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-			//Poll system events
-			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
+				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
 
-			//Clear buffer ( Temp )
-			NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+					//Clear buffer
+					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-			//Escape Key Testing //!MOVE OUT SOON
-			if (getService<Input::Service>()->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+					//Update all audio pending actions
+					NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+
+					//Update scenes manager
+					NIKE_SCENES_SERVICE->update();
+
+					//Escape Key
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+						NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+					}
+
+					//Toggle full screen
+					if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+						NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+					}
+
+					//Update all systems
+					NIKE_ECS_MANAGER->updateSystems();
+
+#ifndef NDEBUG
+					//Update Level Editor
+					NIKE_LVLEDITOR_SERVICE->update();
+
+					//Render Level Editor
+					NIKE_LVLEDITOR_SERVICE->render();
+
+					//update UI First
+					NIKE_UI_SERVICE->update();
+#endif
+
+					//Swap Buffers
+					NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+					GLenum err = glGetError();
+					if (err != GL_NO_ERROR) {
+						NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+					}
+				}
 			}
-
-			//update UI First
-			NIKE_UI_SERVICE->update();
-
-			//Update scenes manager
-			NIKE_SCENES_SERVICE->update();
-
-			//Render entity to mouse click
-			//if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
-
-			//	static constexpr int NUM_ENTITIES_TO_SPAWN = 1;
-
-			//	for (int _{}; _ < NUM_ENTITIES_TO_SPAWN; _++) {
-			//		Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-			//		Vector2f randsize{ Utility::randFloat() * 50.0f, Utility::randFloat() * 50.0f };
-			//		Vector2f randpos{ NIKE_INPUT_SERVICE->getMousePos().x - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f), -(NIKE_INPUT_SERVICE->getMousePos().y - (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f)) };
-			//		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(randpos, randsize, Utility::randFloat() * 360.0f));
-			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape("square", { Utility::randFloat() ,Utility::randFloat() , Utility::randFloat() , 1.f }));
-			//		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(entity, Render::Texture("Tree_Orange", { 1.0f, 1.0f, 1.0f, 1.0f }));
-			//	}
-			//}
-
-			//if (NIKE_UI_SERVICE->isButtonClicked("Test", NIKE_MOUSE_BUTTON_LEFT, NIKE::UI::InputStates::TRIGGERED)) {
-			//	cout << "TRUE" << endl;
-			//}
-
-			//Update all systems
-			NIKE_ECS_MANAGER->updateSystems();
-
-			//ImGui Render & Update
-			NIKE_IMGUI_SERVICE->update();
-		
-			//Control FPS
-			NIKE_WINDOWS_SERVICE->controlFPS();
-
-			//Swap Buffers
-			NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+			catch (std::runtime_error const& e) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
+				throw e;
+			}
 		}
+
+		//Stop watching all directories
+		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
+
+#ifndef NDEBUG
+		//Clean up level editor
+		NIKE_LVLEDITOR_SERVICE->cleanUp();
+#endif
 
 		//Clean up window resources
 		NIKE_WINDOWS_SERVICE->getWindow()->cleanUp();
-
 	}
 }

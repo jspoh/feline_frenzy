@@ -2,8 +2,9 @@
  * \file   sAudio.h
  * \brief  Audio system manager function declarations
  *
- * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (50%)
- * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
+ * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (35%)
+ * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -12,12 +13,6 @@
 
 #ifndef SERVICE_AUDIO_HPP
 #define SERVICE_AUDIO_HPP
-
-/************************************
-* SOME NOTES TO TAKE NOTE OF:
-* - AUDIO WILL BE PLAYED LIKE AE
-* - THERE WILL BE AUIDIO GROUP AND AUDIO
-/****************************************/
 
 namespace NIKE {
 	namespace Audio {
@@ -38,6 +33,9 @@ namespace NIKE {
 
 			//Release Audio
 			virtual void release() = 0;
+
+			//Get audio file path
+			virtual std::string getFilePath() const = 0;
 
 			//Get length of audio ( Milliseconds )
 			virtual unsigned int getLength() const = 0;
@@ -119,6 +117,7 @@ namespace NIKE {
 
 			//Get parent channel group
 			virtual std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const = 0;
+
 		};
 
 		//Abstract channel class
@@ -223,13 +222,17 @@ namespace NIKE {
 		class NIKEAudio : public IAudio {
 		private:
 			FMOD::Sound* sound{ nullptr };
+			std::string file_path;
+
 		public:
-			NIKEAudio(FMOD::Sound* sound);
+			NIKEAudio(FMOD::Sound* sound, const std::string& path);
 			~NIKEAudio() = default;
 
 			FMOD::Sound* getAudio();
 
 			void release() override;
+
+			std::string getFilePath() const override;
 
 			unsigned int getLength() const override;
 
@@ -289,6 +292,7 @@ namespace NIKE {
 			void addChildGroup(std::shared_ptr<Audio::IChannelGroup> child_group) override;
 
 			std::shared_ptr<Audio::IChannelGroup> getChildGroup(int index) const override;
+
 		};
 
 		//NIKE Audio Group
@@ -388,6 +392,16 @@ namespace NIKE {
 
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
+
+			// Playlist Management
+			struct Playlist {
+				std::deque<std::string> tracks;
+				bool loop = false;
+			};
+
+			//Queue for each channel's playlist
+			std::unordered_map<std::string , Playlist> channel_playlists;
+
 		public:
 
 			//Default Constructor
@@ -409,7 +423,7 @@ namespace NIKE {
 			void unloadChannelGroup(std::string const& channel_group_id);
 
 			//Clean channel groups
-			void destroyChannelGroups();
+			void clearAllChannelGroups();
 
 			//Conversion from raw to shared pointer
 			static std::shared_ptr<Audio::IChannelGroup> convertChannelGroup(Audio::IChannelGroup*&& group);
@@ -430,10 +444,55 @@ namespace NIKE {
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
 			//Channel ID will override each other if the same id is specified more than once
-			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool start_paused = false);
+			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
+
+			/**
+			 * pauses all audio.
+			 * 
+			 */
+			void pauseAllChannels();
+
+			/**
+			 * resumes all audio.
+			 * 
+			 */
+			void resumeAllChannels();
+
+			/*****************************************************************//**
+			* Playlist Management
+			*********************************************************************/
+			// Create channel playlist and add to map
+			void createChannelPlaylist(const std::string& channel_id);
+
+			// Get individual channel's playlist
+			const Playlist& getChannelPlaylist(const std::string& channel_id);
+
+			void assignTracksToPlaylist(const std::string& channel_id, const std::deque<std::string>& new_tracks);
+
+			// Queue audio to playlist
+			void queueAudioToPlaylist(const std::string& channel_id, const std::string& audio_id);
+
+			// Pop audio from playlist
+			void popAudioFromPlaylist(const std::string& channel_id);
+
+			// Enable or disable looping for a playlist
+			void setPlaylistLoop(const std::string& channel_id, bool loop);
+
+			// Check if a playlist is looping
+			bool isPlaylistLooping(const std::string& channel_id) const;
+
+			// Clear playlist
+			void clearPlaylist(const std::string& channel_id);
 
 			//Update Loop
 			void update();
+
+			// Serialize
+			nlohmann::json serializeAudioChannels() const;
+
+			// Deserialize
+			void deserializeAudioChannels(nlohmann::json const& data);
+
 		};
 
 		//Re-enable DLL Export warning

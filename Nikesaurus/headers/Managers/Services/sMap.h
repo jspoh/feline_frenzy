@@ -19,37 +19,81 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
-		class NIKE_API Service {
+		struct Cell {
+			bool b_blocked;
+			Vector2f position;
+
+			Cell() : b_blocked{ false } {}
+		};
+
+		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
 		public:
-			Service() : width(0), height(0), blockedCells{} {}
+			Service();
 			~Service() = default;
 
-			// Initializa Grid
-			void initializeGrid(float map_width, float map_height, const std::vector<std::vector<int>>& tileData);
+			//Init
+			void init(Vector2i const& gridsize, Vector2f const& cellsize);
 
-			// Check if cell is blocked
-			bool isCellBlocked(float x, float y) const;
+			//Changes whether cell is blocked
+			void setCellBlocked(size_t x, size_t y, bool blocked);
 
-			// Changes whether cell is blocked
-			void setCellBlocked(float x, float y, bool blocked);
+			//Check if cell is blocked
+			bool isCellBlocked(size_t x, size_t y) const;
 
-			// Pathfinding
-			std::vector<NIKE::Math::Vector2f> findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal);
+			//Set grid size
+			void setGridSize(Vector2i const& size);
 
-			//Load map from file path
-			//void loadMapFromFile(const std::string& file,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer,
-			//	std::vector<std::vector<int>>& grid,
-			//	const NIKE::Math::Vector2<float>& center);
+			//Get grid size
+			Vector2i getGridSize() const;
 
+			//Set cell size
+			void setCellSize(Vector2f const& size);
+
+			//Get cell size
+			Vector2f getCellSize() const;
+
+			//Get grid scale
+			Vector2f getGridScale() const;
+
+			//Get cell cursor is in
+			std::optional<std::reference_wrapper<Map::Cell>> getCursorCell();
+
+			//Get cell based on position
+			std::optional<std::reference_wrapper<Map::Cell>> getCellAtPosition(Vector2f const& position);
+
+			//Get grid
+			std::vector<std::vector<Cell>>const& getGrid() const;
+
+			//Serialize map
+			nlohmann::json serialize() const;
+
+			//Deserialize map
+			void deserialize(nlohmann::json const& data);
+
+			//// Pathfinding
+			//std::vector<NIKE::Math::Vector2f> findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal);
 		private:
-			float width, height;
-			std::vector<bool> blockedCells;  // Example structure for grid data
-			//Create Tile
-			//void createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-			//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer);
+
+			//Internal cell pos update
+			void updateCells();
+
+			//On mouse move event
+			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
+
+			//Grid vector
+			std::vector<std::vector<Cell>> grid;
+
+			//Grid size
+			Vector2i grid_size;
+
+			//Cell size
+			Vector2f cell_size;
+
+			//Grid scale
+			Vector2f grid_scale;
+
+			//Cursor position relative to game window
+			Vector2f cursor_pos;
 		};
 
 		//Re-enable DLL Export warning

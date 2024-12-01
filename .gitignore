@@ -21,3 +21,6 @@ Release
 venv/
 src/Managers/crash_log.txt
 Feline Frenzy/logs/crash-log.txt
+Feline Frenzy/imgui.ini
+!installer/REDIST/VC_redist.x64.exe
+!installer/INSTALLER/*

@@ -5,51 +5,54 @@
 * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
 * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (20%)
 * \date   September 2024
-* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+* All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 *********************************************************************/
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sWindows.h"
 #include "Managers/Services/sEvents.h"
+#include "Core/Engine.h"
 
 namespace NIKE {
 	/*****************************************************************//**
 	* NIKE Window
 	*********************************************************************/
 	Windows::NIKEWindow::NIKEWindow(Vector2i window_size, std::string window_title)
-		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }, aspect_ratio{ 0.0f }
 	{
 	}
 
-	Windows::NIKEWindow::NIKEWindow(std::string const& file_path)
-		: ptr_window{ nullptr }, b_full_screen{ false }
+	Windows::NIKEWindow::NIKEWindow(nlohmann::json const& config)
+		: ptr_window{ nullptr }, window_pos(), window_size{ window_size }, window_title{ window_title }, b_full_screen{ false }, aspect_ratio{ 0.0f }
 	{
-		//Get file stream
-		std::fstream fileStream;
-		fileStream.open(file_path, std::ios::in);
-
-		//Temp string
-		std::string temp;
-
-		//Extract data from file stream
-		if (fileStream) {
-			std::string data;
-			std::getline(fileStream, data);
-			window_title = data.substr(data.find_first_of('"') + 1, data.find_last_of('"') - data.find_first_of('"') - 1);
-			std::getline(fileStream, data);
-			std::stringstream(data) >> temp >> window_size.x;
-			std::getline(fileStream, data);
-			std::stringstream(data) >> temp >> window_size.y;
+		try {
+			auto const& data = config.at("WindowsConfig");
+			window_title = data.at("Title").get<std::string>();
+			window_size.fromJson(data.at("Window_Size"));
+			size_before_fullscreen = window_size;
+			world_size.fromJson(data.at("World_Size"));
+			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+			calculateViewport();
 		}
+		catch (const nlohmann::json::exception& e) {
+			NIKEE_CORE_WARN(e.what());
+			NIKEE_CORE_WARN("Window config invalid! Reverting to default window config");
 
-		//Close file stream
-		fileStream.close();
+			window_title = "Window";
+			window_size = { 1600, 900 };
+			size_before_fullscreen = window_size;
+			world_size = { 1600.0f, 900.0f };
+			aspect_ratio = static_cast<float>(window_size.x) / static_cast<float>(window_size.y);
+			calculateViewport();
+		}
 
 		//Configure Window Setup
 		configWindow();
 	}
 
 	void Windows::NIKEWindow::configWindow() {
+		GLenum err;
+
 		if (!glfwInit()) {
 			cerr << "Failed to initialize GLFW\n";
 			throw std::exception();
@@ -80,30 +83,90 @@ namespace NIKE {
 		}
 
 		glfwMakeContextCurrent(ptr_window);
+		if (!glfwGetCurrentContext()) {
+			NIKEE_CORE_ERROR("No valid OpenGL context available");
+		}
 
-		GLenum err = glewInit();
+		// clear glErrors
+		while (glGetError() != GL_NO_ERROR) { }
+
+		err = glewInit();
 		if (err != GLEW_OK) {
 			cerr << "GLEW init failed: " << glewGetErrorString(err) << endl;
 			throw std::exception();
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at after GL init in {0}: {1}", __FUNCTION__, err);
 		}
 
 		//Engine Init Successful
 		NIKEE_CORE_INFO("GL init success");
 
 		// enable debug logging
-#ifndef NDEBUG
+		#ifndef NDEBUG
 		// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
-			//NIKEE_CORE_ERROR("GL Debug Message: {0}\nSource: {1}", message, source);
+			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-#endif
+		#endif
+
+		// set window icon
+		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
+
+
+		int width, height, size;
+		bool is_tex_or_png_ext;
+		const unsigned char* icon_data = NIKE::Assets::RenderLoader
+			::prepareImageData(ICON_PATH, width, height, size, is_tex_or_png_ext);
+
+		if (icon_data) {
+			GLFWimage icon;
+			icon.width = width;
+			icon.height = height;
+			icon.pixels = const_cast<unsigned char*>(icon_data);
+
+			// flip stbi image around for opengl
+			static constexpr int channels = 4;
+			const int row_size = width * channels;
+			for (int i = 0; i < height / 2; ++i) {
+				unsigned char* topRow = icon.pixels + i * row_size;
+				unsigned char* bottomRow = icon.pixels + (height - 1 - i) * row_size;
+				for (int j = 0; j < row_size; ++j) {
+					std::swap(topRow[j], bottomRow[j]);
+				}
+			}
+
+			glfwSetWindowIcon(ptr_window, 1, &icon);
+			NIKE::Assets::RenderLoader
+				::freeImageData(const_cast<unsigned char*>(icon_data));
+		}
+		else {
+			NIKEE_CORE_ERROR("Failed to load window icon in {0}", __FUNCTION__);
+		}
+
+		// vsync
+		glfwSwapInterval(1);
+
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
-	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
-		return ptr_window;
+	void Windows::NIKEWindow::calculateViewport() {
+		//Manage aspect ratio
+		viewport_size.x = static_cast<float>(window_size.x);
+		viewport_size.y = viewport_size.x / aspect_ratio;
+		if (viewport_size.y > static_cast<float>(window_size.y)) {
+			viewport_size.y = static_cast<float>(window_size.y);
+			viewport_size.x = viewport_size.y * aspect_ratio;
+		}
 	}
 
 	void Windows::NIKEWindow::setWindowMode(int mode, int value) {
@@ -120,17 +183,14 @@ namespace NIKE {
 		GLFWmonitor* monitor;
 		const GLFWvidmode* mode;
 
-		//Static Window Size For Remembering Size Before FullScreen
-		static Vector2i win_size;
-
 		if (value == GLFW_TRUE && !b_full_screen) {
 			//Get FullScreen Attributes
 			monitor = glfwGetPrimaryMonitor();
 			mode = glfwGetVideoMode(monitor);
 
 			// Get the window position and size
-			glfwGetWindowPos(ptr_window, &window_pos.x, &window_pos.y);
-			glfwGetWindowSize(ptr_window, &win_size.x, &win_size.y);
+			glfwGetWindowPos(ptr_window, &pos_before_fullscreen.x, &pos_before_fullscreen.y);
+			glfwGetWindowSize(ptr_window, &size_before_fullscreen.x, &size_before_fullscreen.y);
 
 			// Recreate the window in fullscreen mode
 			glfwSetWindowMonitor(ptr_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
@@ -144,11 +204,20 @@ namespace NIKE {
 			monitor = nullptr;
 
 			// Recreate the window in windowed mode at the stored position and size
-			glfwSetWindowMonitor(ptr_window, nullptr, window_pos.x, window_pos.y, win_size.x, win_size.y, 0);
+			glfwSetWindowMonitor(ptr_window, nullptr, pos_before_fullscreen.x, pos_before_fullscreen.y, size_before_fullscreen.x, size_before_fullscreen.y, 0);
 
 			//Set Full Screen Mode False
 			b_full_screen = false;
 		}
+	}
+
+	bool Windows::NIKEWindow::getFullScreen() const {
+		return b_full_screen;
+	}
+
+	Vector2f Windows::NIKEWindow::getFullScreenScale() const {
+		return { std::clamp(static_cast<float>(viewport_size.x) / static_cast<float>(size_before_fullscreen.x), 0.0f, (float)UINT16_MAX),
+					std::clamp(static_cast<float>(viewport_size.y) / static_cast<float>(size_before_fullscreen.y), 0.0f, (float)UINT16_MAX) };
 	}
 
 	void Windows::NIKEWindow::setupEventCallbacks() {
@@ -157,6 +226,8 @@ namespace NIKE {
 		glfwSetMouseButtonCallback(ptr_window, Events::Service::mousebutton_cb);
 		glfwSetCursorPosCallback(ptr_window, Events::Service::mousepos_cb);
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
+		glfwSetWindowFocusCallback(ptr_window, Events::Service::windowfocus_cb);
+		glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value) {
@@ -169,7 +240,42 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::swapBuffers() {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
+		// Ensure framebuffer is bound and valid
+		GLint framebuffer_id;
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer_id);
+		if (framebuffer_id != 0) {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			switch (status) {
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: Attachment is not complete.");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: No images attached.");
+				break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: Unsupported configuration.");
+				break;
+			default:
+				NIKEE_CORE_ERROR("Framebuffer incomplete: Unknown error ({0}).", status);
+				break;
+			}
+		}
+
 		glfwSwapBuffers(ptr_window);
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Windows::NIKEWindow::clearBuffer() {
@@ -184,6 +290,10 @@ namespace NIKE {
 		return window_title;
 	}
 
+	Vector2f Windows::NIKEWindow::getWorldSize() const {
+		return world_size;
+	}
+
 	void Windows::NIKEWindow::setWindowSize(int width, int height) {
 		window_size.x = width;
 		window_size.y = height;
@@ -193,6 +303,26 @@ namespace NIKE {
 
 	Vector2i Windows::NIKEWindow::getWindowSize() const {
 		return window_size;
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportSize() const {
+		return viewport_size;
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportRatio() const {
+		return { std::clamp(viewport_size.x / window_size.x, 0.0f, 1.0f), std::clamp(viewport_size.y / window_size.y, 0.0f, 1.0f) };
+	}
+
+	Vector2f Windows::NIKEWindow::getViewportWindowGap() const {
+		return { std::clamp(window_size.x - viewport_size.x, 0.0f, (float)UINT16_MAX), std::clamp(window_size.y - viewport_size.y, 0.0f, (float)UINT16_MAX) };
+	}
+
+	void Windows::NIKEWindow::setAspectRatio(float ratio) {
+		aspect_ratio = ratio;
+	}
+
+	float Windows::NIKEWindow::getAspectRatio() const {
+		return aspect_ratio;
 	}
 
 	GLFWwindow* Windows::NIKEWindow::getWindowPtr() const {
@@ -215,10 +345,6 @@ namespace NIKE {
 
 	void Windows::NIKEWindow::cleanUp() {
 		//Clean up window
-		// These 3 functions are from cleanup() in imgui sys, this is temp, theres no accessSys anymore sadly
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
 		glfwDestroyWindow(ptr_window);
 		glfwTerminate();
 	}
@@ -230,15 +356,80 @@ namespace NIKE {
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowResized> event) {
-		glViewport(0, 0, event->frame_buffer.x, event->frame_buffer.y);
+
+		//Window size
 		window_size = event->frame_buffer;
+
+		//Calculate viewport
+		calculateViewport();
+
+		//Center the viewport within the window
+		int x_offset = (window_size.x - static_cast<int>(viewport_size.x)) / 2;
+		int y_offset = (window_size.y - static_cast<int>(viewport_size.y)) / 2;
+
+		//Set viewport
+		glViewport(x_offset, y_offset, static_cast<GLsizei>(viewport_size.x), static_cast<GLsizei>(viewport_size.y));
+	}
+
+	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		static bool is_fullscreen;
+
+		if (event->focused) {
+			NIKE_WINDOWS_SERVICE->setWindowFocus(true);
+
+#ifdef NDEBUG
+			glfwRestoreWindow(ptr_window);
+
+			if (is_fullscreen) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			}
+#endif
+
+			// in case of resizes
+			int width, height;
+			glfwGetFramebufferSize(ptr_window, &width, &height);
+			glViewport(0, 0, width, height);
+
+			// just in case
+			glfwMakeContextCurrent(ptr_window);
+
+			NIKE_AUDIO_SERVICE->resumeAllChannels();
+		}
+		else {
+			// lost focus
+			NIKE_WINDOWS_SERVICE->setWindowFocus(false);
+
+			GLFWmonitor* monitor = glfwGetWindowMonitor(ptr_window);
+			is_fullscreen = !!monitor;		// will be NULL if not fullscreen
+
+			NIKE_AUDIO_SERVICE->pauseAllChannels();
+#ifdef NDEBUG
+			glfwIconifyWindow(ptr_window);
+#endif
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL WindowFocusEvent error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	/*****************************************************************//**
 	* Window Service
 	*********************************************************************/
 	Windows::Service::Service(std::shared_ptr<IWindow> window)
-		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 }, actual_fps{ 0.0f }, curr_time{ 0.0f } {}
+		: ptr_window{ window }, delta_time{ 0.0f }, target_fps{ 60 },
+		actual_fps{ 0.0f }, curr_time{ 0.0f }, curr_num_steps{ 0 },
+		accumulated_time{ 0.0 } {}
+
+	std::shared_ptr<Windows::IWindow> Windows::Service::getWindow() {
+		return ptr_window;
+	}
 
 	void Windows::Service::setWindow(std::shared_ptr<IWindow> window) {
 		ptr_window = window;
@@ -275,6 +466,18 @@ namespace NIKE {
 		return delta_time;
 	}
 
+	float Windows::Service::getFixedDeltaTime() const {
+		return (static_cast<float>(1) / target_fps);
+	}
+
+	int Windows::Service::getCurrentNumOfSteps() const {
+		return curr_num_steps;
+	}
+
+	float Windows::Service::getInterpolationFactor() const {
+		return static_cast<float>(accumulated_time / (static_cast<float>(1) / target_fps));
+	}
+
 	void Windows::Service::calculateDeltaTime() {
 		//Static prev time
 		static double prev_time = glfwGetTime();
@@ -284,15 +487,23 @@ namespace NIKE {
 		delta_time = static_cast<float>(curr_time - prev_time);
 		actual_fps = 1.0f / delta_time;
 		prev_time = curr_time;
+
+		//Reset curr num of steps
+		curr_num_steps = 0;
+
+		//control frame rate
+		accumulated_time += delta_time;
+		while (accumulated_time >= (static_cast<double>(1) / target_fps)) {
+			accumulated_time -= (static_cast<double>(1) / target_fps);
+			curr_num_steps++;
+		}
 	}
 
-	void Windows::Service::controlFPS() {
+	bool Windows::Service::getWindowFocus() const {
+		return window_is_focused;
+	}
 
-		//Target delta time
-		double target_frame_time = 1.0 / target_fps;
-
-		//Limit FPS based on target frame time
-		while (glfwGetTime() - curr_time < target_frame_time) {
-		}
+	void Windows::Service::setWindowFocus(bool focus) {
+		window_is_focused = focus;
 	}
 }

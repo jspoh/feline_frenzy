@@ -16,6 +16,7 @@
 * ISystem
 *********************************************************************/
 namespace NIKE {
+
 	void System::ISystem::setComponentsLinked(bool state) {
 		b_components_linked = state;
 	}
@@ -116,7 +117,11 @@ namespace NIKE {
 
 	void System::Manager::updateSystems()
 	{
-		std::chrono::steady_clock::time_point total_start_time = std::chrono::steady_clock::now();
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
 		// Vector to hold each of the system duration
 		std::vector<double> system_times;
 
@@ -127,27 +132,20 @@ namespace NIKE {
 			{
 				std::chrono::steady_clock::time_point system_start_time = std::chrono::steady_clock::now();
 
-				// When game is paused make sure all systems are not running except render (!TODO CHANGE TO Deactive Active state)
-				if (!NIKE_IMGUI_SERVICE->getGamePaused() || system->getSysName() == "Render System") {
-					//Break system update loop if system update returns true
-					system->update();
-				}
+				//Break system update loop if system update returns true
+				system->update();
 
 				std::chrono::steady_clock::time_point system_end_time = std::chrono::steady_clock::now();
 
 				// Calculate the time taken by the system
 				std::chrono::duration<double, std::milli> system_duration = system_end_time - system_start_time;
 				system_times.push_back(system_duration.count());
-
 			}
 			else {
 				//Push system no run time
 				system_times.push_back(0.0);
 			}
 		}
-		// Track total end time for the update call
-		std::chrono::steady_clock::time_point total_end_time = std::chrono::steady_clock::now();
-		double total_game_loop_time = std::chrono::duration<double, std::milli>(total_end_time - total_start_time).count();
 
 		// Call runtime percentage function every 30 seconds
 		std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
@@ -158,10 +156,19 @@ namespace NIKE {
 		if (time_since_last_call >= 1000)
 		{
 			// Call to calculate and display system runtime percentage
-			NIKE_DEBUG_SERVICE->updateSystemPercentage(total_game_loop_time, system_times, systems);
+			NIKE_DEBUG_SERVICE->updateSystemPercentage(system_times, systems);
 
 			// Update the last debug call time to the current time
 			last_call_time = current_time;
 		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	std::vector<std::shared_ptr<System::ISystem>>& System::Manager::getAllSystems() {
+		return systems;
 	}
 }

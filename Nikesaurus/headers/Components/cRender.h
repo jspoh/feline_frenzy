@@ -34,31 +34,21 @@ namespace NIKE {
 
 		struct Cam {
 			Vector2f position;	// Position of camera
-			float height;	// represents how much of the world is visible vertically (zoom level).
+			float zoom;	// represents how much of the world is visible vertically (zoom level).
 
-			Cam() : position(), height{ 0.0f } {}
-			Cam(float height) : position(), height{height} {}
-			Cam(Vector2f const& position, float height) : position{ position }, height{ height } {}
+			Cam() : position(), zoom{ 1.0f } {}
+			Cam(float zoom) : position(), zoom{ zoom } {}
+			Cam(Vector2f const& position, float zoom) : position{ position }, zoom{ zoom } {}
 		};
 
 		//Change camera event
 		struct ChangeCamEvent : public Events::IEvent {
 			Entity::Type entity_id;
+			std::shared_ptr<Render::Cam> fallback_cam;
 
 			//If a entity id does not have a camera attached, default camera is deployed
-			ChangeCamEvent(Entity::Type entity_id)
-				: entity_id{ entity_id } {}
-		};
-
-		//Update camera event
-		struct UpdateCamEvent : public Events::IEvent {
-			std::optional<CamPosition> edit_position; // Optional position change
-			std::optional<CamZoom> edit_zoom;      // Optional zoom level change
-
-			UpdateCamEvent(
-				std::optional<CamPosition> pos = std::nullopt,
-				std::optional<CamZoom> zoom = std::nullopt)
-				: edit_position{ pos }, edit_zoom { zoom } {}
+			ChangeCamEvent(Entity::Type entity_id, std::shared_ptr<Render::Cam> fallback_cam = nullptr)
+				: entity_id{ entity_id }, fallback_cam{ fallback_cam } {}
 		};
 
 		//Viewport texture event
@@ -70,10 +60,10 @@ namespace NIKE {
 
 		enum class TextOrigin {
 			CENTER = 0,
-			BOTTOM,
 			TOP,
-			LEFT,
-			RIGHT
+			BOTTOM,
+			RIGHT,
+			LEFT
 		};
 
 		struct Text {
@@ -84,7 +74,7 @@ namespace NIKE {
 			Vector2f size;
 			TextOrigin origin;
 
-			Text() : font_id{ "" }, text{ "" }, color(), scale{ 1.0f }, size(), origin { TextOrigin::CENTER } {}
+			Text() : font_id{ "" }, text{ "" }, color{0.0f, 0.0f, 0.0f, 1.0f}, scale{ 1.0f }, size(), origin{ TextOrigin::CENTER } {}
 			Text(std::string const& font_id, std::string const& text, Vector4f const& color, float scale, TextOrigin origin = TextOrigin::CENTER)
 				: font_id{ font_id }, text{ text }, color{ color }, scale{ scale }, size(), origin{ origin } {}
 		};
@@ -97,7 +87,7 @@ namespace NIKE {
 			Vector4f color;
 			bool use_override_color;
 
-			Shape() :model_id{ "square" }, color(1.f, 1.f, 1.f, 1.f), pos{}, use_override_color { false } {}
+			Shape() :model_id{}, color(1.f, 1.f, 1.f, 1.f), pos{}, use_override_color { false } {}
 			Shape(std::string const& model_id, Vector2f const& pos) : model_id{ model_id }, pos{ pos }, color(), use_override_color{ false } {};
 			Shape(const std::string& model_id, const Vector4f& color, const Vector2f& pos)
 				: model_id{ model_id }, pos{ pos }, color{ color }, use_override_color{ true } {}
@@ -114,7 +104,7 @@ namespace NIKE {
 			bool b_stretch;
 			Vector2b b_flip;
 
-			Texture() : texture_id{ "placeholder" }, color(0.f,0.f,0.f,1.f), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(1,1), frame_index(0,0), b_flip{false, false} {}
+			Texture() : texture_id{}, color(0.f,0.f,0.f,1.f), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(1,1), frame_index(0,0), b_flip{false, false} {}
 			Texture(std::string const& texture_id, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};

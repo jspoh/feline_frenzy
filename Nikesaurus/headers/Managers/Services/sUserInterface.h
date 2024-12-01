@@ -13,6 +13,7 @@
 #include "sInput.h"
 #include "sEvents.h"
 #include "sSerialization.h"
+#include "Lua/sLua.h"
 
 //Forward declaration of friend class
 namespace NIKE {
@@ -34,6 +35,20 @@ namespace NIKE {
 			RELEASED
 		};
 
+		//UI Data Structure
+		struct UIBtn {
+			Entity::Type entity_id;
+			bool b_hovered;
+			InputStates input_state;
+			Lua::Script script;
+
+			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, script() {};
+
+			nlohmann::json serialize() const;
+
+			void deserialize(nlohmann::json const& data);
+		};
+
 		//Change btn ratio event
 		struct ChangeBtnTxtRatio : Events::IEvent {
 			Vector2f ratio;
@@ -47,14 +62,12 @@ namespace NIKE {
 			:	public Events::IEventListener<Input::KeyEvent>,
 				public Events::IEventListener<Input::MouseMovedEvent>,
 				public Events::IEventListener<Input::MouseBtnEvent>,
-				public Events::IEventListener<IMGUI::ViewPortEvent>,
 				public Events::IEventListener<ChangeBtnTxtRatio> {
 
 		//Friend class
 		friend class NIKE::Serialization::Service;
 
 		private:
-
 			//On key btn event
 			void onEvent(std::shared_ptr<Input::KeyEvent> event) override;
 
@@ -64,20 +77,24 @@ namespace NIKE {
 			//On mouse move event
 			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
 
-			//On new imgui viewport event
-			void onEvent(std::shared_ptr<IMGUI::ViewPortEvent> event) override;
-
 			//On Change btn txt ratio
 			void onEvent(std::shared_ptr<ChangeBtnTxtRatio> event) override;
 
 			//Button hover check
-			bool buttonHovered(Entity::Type entity);
+			bool buttonHovered(Entity::Type entity) const;
+
+			//Hover data
+			struct HoverData {
+				Transform::Transform btn_transform;
+				Render::Text btn_text;
+				bool b_hovered;
+			};
 
 			//Button hovering container
-			std::unordered_map<std::string, std::pair<Transform::Transform, bool>> hover_container;
+			std::unordered_map<std::string, HoverData> hover_container;
 
 			//Unordered map of UI Entities
-			std::unordered_map<std::string, std::pair<Entity::Type, bool>> ui_entities;
+			std::unordered_map<std::string, UIBtn> ui_entities;
 
 			//Data structure of state
 			struct EventStates {
@@ -91,12 +108,6 @@ namespace NIKE {
 
 			//Mouse Position
 			Vector2f mouse_pos;
-
-			//Window Pos
-			Vector2f window_pos;
-
-			//Window Size
-			Vector2f window_size;
 
 			//Button Txt Ratio
 			Vector2f btn_ratio;
@@ -113,14 +124,38 @@ namespace NIKE {
 			//Create texture button
 			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture);
 
+			//Destroy button
+			void destroyButton(std::string const& btn_id);
+
+			//Check button hovered
+			bool isButtonHovered(std::string const& btn_id) const;
+
 			//Check Button Clicked
-			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code, InputStates state);
+			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code);
 
 			//Get all buttons
-			std::unordered_map<std::string, std::pair<Entity::Type, bool>> getAllButtons() const;
+			std::unordered_map<std::string, UI::UIBtn>& getAllButtons();
+
+			//Destroy all buttons
+			void destroyAllButtons();
 
 			//Check if entity is UI
 			bool checkEntity(Entity::Type entity) const;
+
+			//Check if UI ID has been registered
+			bool checkUIEntity(std::string const& btn_id);
+
+			//Set button script
+			void setButtonScript(std::string const& btn_id, Lua::Script const& script);
+
+			//Get button script
+			Lua::Script getButtonScript(std::string const& btn_id) const;
+
+			//Set button input state
+			void setButtonInputState(std::string const& btn_id, InputStates state);
+
+			//Get button input state
+			InputStates getButtonInputState(std::string const& btn_id) const;
 
 			//UI init function
 			void init();

@@ -17,7 +17,6 @@
 #include "Managers/ECS/mSystem.h"
 
 #include "Systems/Render/sysShader.h"
-#include "Systems/Render/sysCamera.h"
 
 #include "Components/cRender.h"
 #include "Components/cTransform.h"
@@ -27,23 +26,28 @@ namespace NIKE {
 	namespace Render {
 
 		struct RenderInstance {
-			Matrix_33 xform;
-			Vector4f color;
+			Matrix_33 xform{};
+			bool to_blend_color = false;
+			Vector4f color{};
+			unsigned int tex{};
+			Vector2f framesize{};
+			Vector2f uv_offset{};
+			float blend_intensity{};
 		};
 
 		//Render Manager
-		class Manager : public System::ISystem {
+		class Manager : public System::ISystem, public Events::IEventListener<Windows::WindowResized> {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
 
+			//On windows resized event
+			void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
+
 			//Shader system
 			std::unique_ptr<Shader::Manager> shader_system;
-
-			//Camera System
-			std::shared_ptr<Camera::System> camera_system;
 
 			//For rendering viewport
 			unsigned int frame_buffer, texture_color_buffer;
@@ -52,7 +56,7 @@ namespace NIKE {
 			unsigned int VAO, VBO;
 
 			//Transform matrix
-			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
+			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip = {false, false});
 
 			//Transform matrix debug
 			void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
@@ -90,6 +94,10 @@ namespace NIKE {
 			void transformAndRenderText(Entity::Type entity);
 		public:
 			constexpr static unsigned int MAX_INSTANCES = 1000;
+
+			// hashset used to store unique texture handles in
+			static std::unordered_set<unsigned int> curr_instance_unique_tex_hdls;
+			static constexpr int MAX_UNIQUE_TEX_HDLS = 32;
 
 			//Constructor
 			Manager();

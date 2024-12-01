@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   sysAnimation.h
+ * \file   sysAnimation.cpp
  * \brief	Animation manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu(100%)
@@ -18,27 +18,38 @@ namespace NIKE {
 	}
 
 	void Animation::Manager::update() {
-		//Iterate through layers
-		for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
-			//SKip inactive layer
-			if (!layer->getLayerState())
-				continue;
 
-			//Iterate through all entities
-			for (auto& entity : entities) {
+		//Iteration every fixed step for fixed delta time
+		for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
 
-				//Skip entities that are not present within layer, or doesnt have the base animators
-				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Animation::Base>(entity))
+			//Iterate through layers
+			for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+				//SKip inactive layer
+				if (!layer->getLayerState())
 					continue;
 
-				//Update entities with spritesheet
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Animation::Sprite>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity)) {
-					auto& e_baseanimator = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-					auto& e_spriteanimator = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-					auto& e_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+				//Iterate through all entities
+				for (auto& entity : entities) {
 
-					//Animate spritesheet
-					sprite_animator->animateSprite(e_baseanimator, e_spriteanimator, e_texture);
+					//Skip entities that are not present within layer, or doesnt have the base animators
+					if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+						continue;
+
+					//Get base animator comp
+					auto e_baseanimator_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+					if (!e_baseanimator_comp.has_value()) continue;
+					auto& e_baseanimator = e_baseanimator_comp.value().get();
+
+					//Update entities with spritesheet
+					auto e_spriteanimator_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+					auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+					if (e_spriteanimator_comp.has_value() && e_texture_comp.has_value()) {
+						auto& e_spriteanimator = e_spriteanimator_comp.value().get();
+						auto& e_texture = e_texture_comp.value().get();
+
+						//Animate spritesheet
+						sprite_animator->animateSprite(e_baseanimator, e_spriteanimator, e_texture);
+					}
 				}
 			}
 		}

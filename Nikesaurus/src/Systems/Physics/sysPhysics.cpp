@@ -7,7 +7,7 @@
  *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
  * 
  * \date   September 2024
- * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -27,158 +27,190 @@ namespace NIKE {
     }
 
     void Physics::Manager::update() {
-        float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
-        //Iterate through layers
-        for (auto& layer : NIKE_SCENES_SERVICE->getCurrScene()->getLayers()) {
-            //SKip inactive layer
-            if (!layer->getLayerState())
-                continue;
+        //Delta time
+        float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
-            //Iterate through all entities
-            for (auto& entity : entities) {
+        // Get entities marked for deletion
+        auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
 
-                //Skip entities that are not present within layer & entities without transform component
-                if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity) || !NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
+        //Iteration every fixed step for fixed delta time
+        for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
+
+            //Iterate through layers
+            for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+                //SKip inactive layer
+                if (!layer->getLayerState())
                     continue;
 
-                //Update entities with dynamics
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity) && 
-                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-                    auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                    auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                //Iterate through all entities
+                for (auto& entity : entities) {
 
-                    //// Retrieve the logic state to determine behavior
-                    //if (NIKE_ECS_MANAGER->checkEntityComponent<Logic::State>(entity)) {
-                    //    auto& e_state = NIKE_ECS_MANAGER->getEntityComponent<Logic::State>(entity);
-
-                    //    switch (e_state.current_state) {
-                    //    case Logic::EntityStateType::IDLE:
-                    //        // In IDLE, entity is stationary
-                    //        e_dynamics.velocity = Vector2f(0.0f, 0.0f);
-                    //        break;
-
-                    //    case Logic::EntityStateType::PATROLLING:
-                    //        // In PATROLLING, entity moves to random points in patrol radius
-                    //        if (e_dynamics.velocity.length() < 0.01f) {
-                    //            // Check if entity has reached patrol target, if so wait 2 seconds
-                    //            e_dynamics.velocity = getRandomDirection() * e_dynamics.max_speed;
-                    //        }
-                    //        e_transform.position += e_dynamics.velocity * dt;
-                    //        break;
-
-                    //    case Logic::EntityStateType::CHASING: {
-                    //        // In CHASING, entity moves toward the player
-                    //        auto player_entity = GameLogic::Manager::getPlayerEntity();
-                    //        if (player_entity && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(player_entity)) {
-                    //            auto& player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player_entity);
-                    //            Vector2f chase_direction = (player_transform.position - e_transform.position).normalize();
-                    //            e_dynamics.velocity = chase_direction * e_dynamics.max_speed;
-                    //            e_transform.position += e_dynamics.velocity * dt;
-                    //        }
-                    //        break;
-                    //    }
-
-                    //    default:
-                    //        break;
-                    //    }
+                    // Skip entities marked for deletion
+                    //if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end()) {
+                    //    NIKEE_CORE_INFO("Skipping entity {} marked for deletion", entity);
+                    //    continue;
                     //}
 
-
-                    //Ensure that mass is not negative
-                    e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
-
-                    //Apply forces & mass to calculate direction
-                    Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
-
-                    //Update velocity based on acceleration
-                    e_dynamics.velocity += acceleration * dt;
-
-                    //Add drag/friction
-                    e_dynamics.velocity -= e_dynamics.velocity * e_dynamics.drag * dt;
-
-                    //Cap Velocity
-                    if (e_dynamics.velocity.length() > e_dynamics.max_speed) {
-                        e_dynamics.velocity = e_dynamics.velocity.normalize() * e_dynamics.max_speed;
-                    }
-
-                    //Set velocity to zero if net velo < 0.01
-                    if (e_dynamics.velocity.length() < 0.0001f) {
-                        e_dynamics.velocity = { 0.0f, 0.0f };
-                    }
-
-                    //Update position based on velocity
-                    e_transform.position.x += e_dynamics.velocity.x * dt;
-                    e_transform.position.y += e_dynamics.velocity.y * dt;
-                }
-
-                //Pathfinding
-                //if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity) &&
-                //    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-                //    auto& e_pathfinding = NIKE_ECS_SERVICE->getEntityComponent<Pathfinding::Path>(entity);
-
-                //}
-
-                //Collision detection
-                if (NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(entity) &&
-                    NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity) &&
-                    NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity)
-                    ) {
-
-                    //Get entity collider
-                    auto& e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                    auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-                    auto& e_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-
-                    //Check for collision with other entities
-                    for (auto& colliding_entity : entities) {
-
-                        //Skip entities colliding entites that are not in the layer mask
-                        if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
-                            entity == colliding_entity ||
-                            !NIKE_ECS_MANAGER->checkEntityComponent<Physics::Collider>(colliding_entity))
+                    try {
+                        if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
                             continue;
+                    }
+                    catch (const std::exception& e) {
+                        NIKEE_CORE_ERROR("Error accessing entity layer ID: {}", e.what());
+                        continue;
+                    }
 
-                        //Get colliding entity's data
-                        auto& other_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
-                        auto& other_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
-                        auto& other_collider = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
-                       
-                        // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
-                        std::string e_model_id;
-                        std::string other_model_id;
-                        if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
-                            e_model_id = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity).model_id;
+
+                    //Skip entities that are not present within layer & entities without transform component
+                    //if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+                    //    continue;
+
+                    //Skip entities with no transform
+                    auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+                    if (!e_transform_comp) continue;
+                    auto& e_transform = e_transform_comp.value().get();
+
+                    //Update entities with dynamics
+                    auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                    if (e_dynamics_comp) {
+                        auto& e_dynamics = e_dynamics_comp.value().get();
+
+                        //Ensure that mass is not negative
+                        e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
+
+                        //Calculate netforce
+                        Vector2f net_force;
+
+                        //iterate through forces to get net force and remove inactive forces
+                        for (auto it = e_dynamics.forces.begin(); it != e_dynamics.forces.end();) {
+                            it->life_time -= dt;
+                            if (it->life_time > 0.0f) {
+                                net_force += it->direction;
+                                it++;
+                            }
+                            else {
+                                it = e_dynamics.forces.erase(it);
+                            }
+                        }
+
+                        //Apply forces & mass to calculate direction
+                        Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
+
+                        //Update velocity based on acceleration
+                        e_dynamics.velocity += acceleration * dt;
+
+                        //Add drag/friction
+                        e_dynamics.velocity -= e_dynamics.velocity * e_dynamics.drag * dt;
+
+                        //Cap Velocity
+                        if (e_dynamics.velocity.length() > e_dynamics.max_speed) {
+                            e_dynamics.velocity = e_dynamics.velocity.normalize() * e_dynamics.max_speed;
+                        }
+
+                        //Set velocity to zero if net velo < 0.01
+                        if (e_dynamics.velocity.length() < EPSILON) {
+                            e_dynamics.velocity = { 0.0f, 0.0f };
+                        }
+
+                        //Update Transform position based on velocity
+                        e_transform.position.x += e_dynamics.velocity.x * dt;
+                        e_transform.position.y += e_dynamics.velocity.y * dt;
+                    }
+
+                    // Collision detection
+                    Physics::Dynamics def_dynamics;
+                    auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
+                    if (e_collider_comp.has_value()) {
+                        auto& e_collider = e_collider_comp.value().get();
+                        auto& e_dynamics = e_dynamics_comp.has_value() ? e_dynamics_comp.value().get() : def_dynamics;
+
+                        //Update collision transform
+                        if (e_collider.b_bind_to_entity) {
+                            e_collider.transform = e_transform;
                         }
                         else {
-                            e_model_id = "square"; // Default to square for SAT
-                        }
-                        if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(colliding_entity)) {
-                            other_model_id = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity).model_id;
-                        }
-                        else {
-                            other_model_id = "square"; // Default to square for SAT
+                            e_collider.transform.position = e_transform.position + e_collider.pos_offset;
                         }
 
-                        Collision::CollisionInfo info;
-                        if (!(static_cast<int>(e_transform.rotation) % 180) && !(static_cast<int>(other_transform.rotation) % 180) && collision_system->detectAABBRectRect(e_transform, e_dynamics, other_transform, other_dynamics, info)) {
-                            //Set the flag of colliders
-                            e_collider.b_collided = true;
-                            other_collider.b_collided = true;
+                        // Check for collisions with other entities
+                        for (auto& colliding_entity : entities) {
 
-                            //Collision resolution
-                            collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
-                        }
-                        else if (collision_system->detectSATCollision(e_transform, other_transform, e_model_id, other_model_id, info)) {
-                            //Set the flag of colliders
-                            e_collider.b_collided = true;
-                            other_collider.b_collided = true;
+                            // Skip colliding entities that are not in the layer mask or are the same entity
+                            if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
+                                entity == colliding_entity)
+                                continue;
 
-                            //Collision resolution
-                            collision_system->collisionResolution(e_transform, e_dynamics, e_collider, other_transform, other_dynamics, other_collider, info);
-                        }
-                        else {
-                            //Set the flag of colliders
+                            auto other_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
+                            auto other_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
+                            auto other_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
+
+                            if (!other_collider_comp.has_value() || !other_transform_comp.has_value()) continue;
+
+                            auto& other_transform = other_transform_comp.value().get();
+                            auto& other_collider = other_collider_comp.value().get();
+                            auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
+
+                            //Update collision transform
+                            if (other_collider.b_bind_to_entity) {
+                                other_collider.transform = other_transform;
+                            }
+                            else {
+                                other_collider.transform.position = other_transform.position + other_collider.pos_offset;
+                            }
+
+                            // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
+                            std::string e_model_id = "square.model"; // Default model
+                            std::string other_model_id = "square.model"; // Default model
+                            auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+                            if (e_shape_comp.has_value()) {
+                                e_model_id = e_shape_comp.value().get().model_id;
+                            }
+                            auto other_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity);
+                            if (other_shape_comp.has_value()) {
+                                other_model_id = other_shape_comp.value().get().model_id;
+                            }
+
+                            Collision::CollisionInfo info;
+
+                            // Perform AABB collision detection first
+                            if (!(static_cast<int>(e_collider.transform.rotation) % 180) &&
+                                !(static_cast<int>(other_collider.transform.rotation) % 180)) {
+
+                                //If AABB collision
+                                if (collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
+                                    // Set the collision flags
+                                    e_collider.b_collided = true;
+                                    other_collider.b_collided = true;
+
+                                    // Perform collision resolution
+                                    collision_system->collisionResolution(
+                                        entity, e_transform, e_dynamics, e_collider,
+                                        colliding_entity, other_transform, other_dynamics, other_collider,
+                                        info
+                                    );
+
+                                    return;
+                                }
+                            }
+                            // Perform SAT collision detection if AABB fails
+                            else if (collision_system->detectSATCollision(e_collider, other_collider, e_model_id, other_model_id, info)) {
+
+                                // Set the collision flags
+                                e_collider.b_collided = true;
+                                other_collider.b_collided = true;
+
+                                // Perform collision resolution
+                                collision_system->collisionResolution(
+                                    entity, e_transform, e_dynamics, e_collider,
+                                    colliding_entity, other_transform, other_dynamics, other_collider,
+                                    info
+                                );
+
+                                return;
+                            }
+
+                            // Reset collision flags if no collision
                             e_collider.b_collided = false;
                             other_collider.b_collided = false;
                         }
@@ -191,32 +223,5 @@ namespace NIKE {
     void Physics::Manager::onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) {
         collision_system->setRestitution(event->restitution);
         event->setEventProcessed(true);
-    }
-
-    void Physics::Manager::applyXForce(Entity::Type entity, float force) {
-        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
-            return;
-
-        //Get dynamics
-        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        e_dynamics.force.x = force;
-    }
-
-    void Physics::Manager::applyYForce(Entity::Type entity, float force) {
-        if (!NIKE_ECS_MANAGER->checkEntityComponent<Physics::Dynamics>(entity))
-            return;
-
-        //Get dynamics
-        auto& e_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-        e_dynamics.force.y = force;
-    }
-
-    void Physics::Manager::registerLuaBindings(sol::state& lua_state) {
-        lua_state.set_function("applyXForce", [this](unsigned int entity, float x_force) {
-            applyXForce(static_cast<Entity::Type>(entity), x_force);
-            });
-        lua_state.set_function("applyYForce", [this](unsigned int entity, float y_force) {
-            applyYForce(static_cast<Entity::Type>(entity), y_force);
-            });
     }
 }

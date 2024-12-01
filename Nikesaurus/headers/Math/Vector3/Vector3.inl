@@ -71,7 +71,7 @@ inline typename Vector3<T>::type Vector3<T>::dot(const Vector3<T>& rhs) const {
 
 template<typename T>
 inline typename Vector3<T>::type Vector3<T>::length() const {
-	return sqrt(lengthSq());
+	return static_cast<typename Vector3<T>::type>(sqrt(lengthSq()));
 }
 
 template<typename T>

@@ -2,7 +2,8 @@
  * \file   mSerialization.cpp
  * \brief  Serialization manager
  *
- * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
+ * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (80%)
+ * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (20%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -24,14 +25,65 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Serialization Services
 	*********************************************************************/
+
+	/*****************************************************************//**
+	* Audio Channels
+	*********************************************************************/
+
+	
+
+	/*****************************************************************//**
+	* Grid
+	*********************************************************************/
+
+	void Serialization::Service::saveGridToFile(const std::string& file_path)
+	{
+		nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
+
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::out);
+
+		if (!std::filesystem::exists(file_path))
+		{
+			NIKEE_CORE_ERROR("File does not exist!");
+			return;
+		}
+
+
+		// Save data into file
+		file << grid_data.dump(4);
+
+		file.close();
+	}
+
+	void Serialization::Service::loadGridFromFile(const std::string& file_path)
+	{
+		// Get file path to seri
+		std::fstream file(file_path, std::ios::in);
+
+		if (!file.is_open()) {
+			NIKEE_CORE_ERROR("Failed to open .map file for loading: " + file_path);
+			return;
+		}
+
+		nlohmann::json grid_data;
+		file >> grid_data;
+		file.close();
+
+		NIKE_MAP_SERVICE->deserialize(grid_data);
+	}
+
+	/*****************************************************************//**
+	* Entity
+	*********************************************************************/
 	nlohmann::json Serialization::Service::serializeEntity(Entity::Type entity) {
 
 		//Create new data
 		nlohmann::json data;
 
 		//Iterate through all comp
-		for (auto const& comp : NIKE_ECS_MANAGER->getAllComponents(entity)) {
-			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second);
+		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
 		return data;
@@ -53,7 +105,7 @@ namespace NIKE {
 			}
 
 			//Deserialize data into component
-			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type), comp_data);
+			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 		}
 	}
 
@@ -96,24 +148,49 @@ namespace NIKE {
 		file.close();
 	}
 
+	/*****************************************************************//**
+	* Scenes
+	*********************************************************************/
+
+	std::string const& Serialization::Service::getCurrSceneFile() const {
+		return curr_scene_file;
+	}
+
 	void Serialization::Service::saveSceneToFile(std::string const& file_path) {
 		//Json Data
 		nlohmann::json data;
 
-		//Layers in scene
-		auto& layers = NIKE_SCENES_SERVICE->getCurrScene()->getLayers();
+		nlohmann::json channels_data;
+		channels_data["Channels"] = NIKE_AUDIO_SERVICE->serializeAudioChannels();
+		data.push_back(channels_data);
+
+		// Extract grid_id from the scene file name
+		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
+
+		// Check if the "Grids" folder contains the .grid file
+		//if (std::filesystem::exists(grid_path)) {
+			// Add grid ID data only if the file exists
+			nlohmann::json m_data;
+			m_data["Grid ID"] = grid_id;
+			data.push_back(m_data);
+		//}
 
 		//UI Entities
-		std::unordered_map<Entity::Type, std::string> ui_entities;
-		for (auto const& entity : NIKE_UI_SERVICE->getAllButtons()) {
-			ui_entities.emplace(entity.second.first, entity.first);
+		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
+		std::unordered_map<Entity::Type, std::string> ui_entity_to_ref;
+		for (auto it = ui_entities.begin(); it != ui_entities.end(); ++it) {
+			ui_entity_to_ref.emplace(it->second.entity_id, it->first);
 		}
+
+		//Layers in scene
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//Iterate through all layers in current scene
 		for (auto const& layer : layers) {
 
 			//Serialize layer
 			nlohmann::json l_data;
+
 			l_data["Layer"] = layer->serialize();
 
 			//Create json array
@@ -130,13 +207,20 @@ namespace NIKE {
 
 				//Serialize entity
 				e_data["Entity"] = serializeEntity(entity);
+				//e_data["Entity"]["Entity Name"] = NIKE_LVLEDITOR_SERVICE->getEntityByType(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
-				//If entity is a UI Entity
-				if (ui_entities.find(entity) != ui_entities.end()) {
-					e_data["Entity"]["UI ID"] = ui_entities.at(entity);
-				}
+				//Serialize entity editor meta data
+				#ifndef NDEBUG
+				e_data["Entity"]["MetaData"] = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(entity).serialize();
+				#endif
 
+				//If entity is a UI Entity
+				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
+					e_data["Entity"]["UI ID"] = ui_entity_to_ref.at(entity);
+					e_data["Entity"]["UI Btn"] = ui_entities.at(ui_entity_to_ref.at(entity)).serialize();
+				}
+				
 				//Push entity into layer data
 				l_data["Layer"]["Entities"].push_back(e_data);
 			}
@@ -173,29 +257,64 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
+		
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
-			//Deserialize layer
-			if (!NIKE_SCENES_SERVICE->getCurrScene()->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
-				auto layer = NIKE_SCENES_SERVICE->getCurrScene()->createLayer();
-				layer->deserialize(l_data.at("Layer"));
-			}
-			else {
-				NIKE_SCENES_SERVICE->getCurrScene()->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
+			if (l_data.contains("Channels")) {
+				NIKE_AUDIO_SERVICE->deserializeAudioChannels(l_data["Channels"]);
 			}
 
-			//Iterate through all entities within layer
-			for (const auto& e_data : l_data["Layer"]["Entities"]) {
+			//Load map grid if a map file path is specified
+			if (l_data.contains("Grid ID")) {
+				std::string grid_id = l_data.at("Grid ID").get<std::string>();
+				std::string full_grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
 
-				//Deserialize all entities
-				Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-				deserializeEntity(entity, e_data.at("Entity"));
-				NIKE_ECS_MANAGER->setEntityLayerID(entity, e_data.at("Entity").at("Layer ID").get<unsigned int>());
+				if (std::filesystem::exists(full_grid_path)) {
+					// Deserialize map grid
+					NIKE_SERIALIZE_SERVICE->loadGridFromFile(full_grid_path);
+				}
+				else {
+					// Log error or handle missing map file
+					NIKEE_CORE_ERROR("Map file not found: " + grid_id);
+				}
+			}
 
-				//Check if entity is a UI entity
-				if (e_data.at("Entity").contains("UI ID")) {
-					NIKE_UI_SERVICE->ui_entities.emplace(e_data.at("Entity").at("UI ID").get<std::string>(), std::make_pair(entity, false));
+			//If data contains layer
+			if (l_data.contains("Layer")) {
+				//Deserialize layer
+				if (!NIKE_SCENES_SERVICE->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
+					auto layer = NIKE_SCENES_SERVICE->createLayer();
+					layer->deserialize(l_data.at("Layer"));
+				}
+				else {
+					NIKE_SCENES_SERVICE->getLayer(l_data.at("Layer").at("ID").get<int>())->deserialize(l_data.at("Layer"));
+				}
+
+				//Iterate through all entities within layer
+				for (const auto& e_data : l_data["Layer"]["Entities"]) {
+
+					//Deserialize all entities
+					Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").at("Layer ID").get<unsigned int>());
+					deserializeEntity(entity, e_data.at("Entity"));
+
+					// Wrapped for Release to build!
+					//Deserialize entity metadata
+					#ifndef NDEBUG
+					LevelEditor::EntityMetaData meta_data;
+					meta_data.deserialize(e_data.at("Entity").at("MetaData"));
+					NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
+					#endif
+
+					//Check if entity is a UI entity
+					if (e_data.at("Entity").contains("UI ID")) {
+
+						UI::UIBtn btn;
+						btn.deserialize(e_data.at("Entity").at("UI Btn"));
+						btn.entity_id = entity;
+						btn.b_hovered = false;
+						NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
+					}
 				}
 			}
 		}
@@ -207,9 +326,24 @@ namespace NIKE {
 		curr_scene_file = file_path;
 	}
 
-	std::string const& Serialization::Service::getCurrSceneFile() const {
-		return curr_scene_file;
+	nlohmann::json Serialization::Service::loadJsonFile(std::string const& file_path) {
+		//Json Data
+		nlohmann::json data;
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::in);
+
+		//Return empty data if there is no data
+		if (!std::filesystem::exists(file_path))
+			return data;
+
+		//Read data from file
+		file >> data;
+
+		//Return loaded json data
+		return data;
 	}
+
 
 	//void Serialization::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
 	//	// Open Scene file

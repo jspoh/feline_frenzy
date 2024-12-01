@@ -1,12 +1,11 @@
 /*****************************************************************//**
  * \file   cGameLogic.h
- * \brief	Game logic components
+ * \brief  Game Logic components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu
  * \date   October 2024
  *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
-
 #pragma once
 
 #ifndef C_GAMELOGIC_HPP
@@ -28,22 +27,22 @@ namespace NIKE {
 		};
 
 		//Script data
-		struct Script {
-			std::string script_id;
-			std::string script_path;
-			std::string function;
-			bool b_loaded;
+		//struct Script {
+		//	std::string script_id;
+		//	std::string script_path;
+		//	std::string function;
+		//	bool b_loaded;
 
-			Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
-			Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
-		};
+		//	Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
+		//	Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
+		//};
 
 		//Movement logic component
-		struct Movement {
-			Script script;
+		struct ILogic {
+			Lua::Script script;
 
-			Movement() : script() {}
-			Movement(std::string const& script) : script(script) {}
+			ILogic() : script() {}
+			// Movement(std::string const& script) : script(script) {}
 		};
 
 		void registerComponents();

@@ -1,6 +1,6 @@
 ﻿/*****************************************************************//**
- * \file   sysFont.h
- * \brief	Font render manager
+ * \file	sLoader.h
+ * \brief	Loading manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
@@ -17,19 +17,23 @@ namespace NIKE {
 
 		// Vertex data structure
 		struct Vertex {
-			Vector2f pos;
-			Vector4f col;
-			Vector2f tex_coords;
-			unsigned int tex_hdl;
-			unsigned int tex_binding_idx;
-			Matrix_33 transform;		// column major
+			Vector2f pos{};
+			Vector4f col{};
+			Vector2f tex_coords{};
+			float sampler_idx{};	// index to use in sampler2DArray
+			Matrix_33 transform{};		// column major
+			Vector2f framesize{};
+			Vector2f uv_offset{};
+			float to_blend_color{};		// used for texture rendering. is bool value
+			float blend_intensity{};		// used for texture rendering
 
-			Vertex() : pos(), col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, tex_hdl{}, tex_binding_idx{} {}
-			Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, unsigned int tex_hdl, unsigned int tex_binding_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), tex_hdl{ tex_hdl }, tex_binding_idx{ tex_binding_idx } {}
+			//Vertex() : pos(), col(), tex_coords(), transform(), sampler_idx{} {}
+			//Vertex(const Vector2f& pos) : pos{ pos }, col(), tex_coords(), transform(), sampler_idx{} {}
+			//Vertex(const Vector2f& pos, const Matrix_33& transform) : pos{ pos }, col{}, tex_coords{}, transform{ transform }, sampler_idx{} {}
+			//Vertex(const Vector2f& pos, const Vector4f& col) : pos{ pos }, col{ col }, tex_coords{}, transform{}, sampler_idx{} {}
+			//Vertex(const Vector2f& pos, const Vector4f& col, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords(), transform{ transform }, sampler_idx{} {}
+			//Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, float sampler_idx, const Matrix_33& transform) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform(transform), sampler_idx{ sampler_idx } {}
+			//Vertex(const Vector2f& pos, const Vector4f& col, const Vector2f& tex_coords, float sampler_idx, const Matrix_33& transform, const Vector2f& framesize, const Vector2f& uv_offset) : pos{ pos }, col{ col }, tex_coords{ tex_coords }, transform{ transform }, sampler_idx{ sampler_idx }, framesize{ framesize }, uv_offset{ uv_offset } {}
 		};
 
 		//Font Type Data Structure
@@ -110,9 +114,11 @@ namespace NIKE {
 		struct Texture {
 			unsigned int gl_data;
 			Vector2i size;
+			std::string file_path;
 
-			Texture() : gl_data{ 0 }, size() {}
-			Texture(unsigned int gl_data, Vector2i&& size) : gl_data{ gl_data }, size{ size } {}
+			Texture() : gl_data{ 0 }, size{}, file_path{ "" } {}
+			Texture(unsigned int gl_data, Vector2i size, std::string file_path)
+				: gl_data{ gl_data }, size{ std::move(size) }, file_path{ std::move(file_path) } {}
 		};
 
 		//Shader/Model/Texture Loader
@@ -127,7 +133,7 @@ namespace NIKE {
 			 */
 			void createBaseBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, Model& model);
 
-			
+
 			void createBatchedBaseBuffers(Model& model);
 
 			/**
@@ -138,6 +144,14 @@ namespace NIKE {
 			 * \param model		vao will be stored here
 			 */
 			void createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Model& model);
+
+			void createBatchedTextureBuffers(Model& model);
+
+
+		public:
+			RenderLoader() = default;
+			~RenderLoader() = default;
+
 
 			/**
 			 * all .tex files should be 256x256 in RGBA8 format.
@@ -150,21 +164,17 @@ namespace NIKE {
 			 *
 			 * @returns dynamically allocated char*
 			 */
-			char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
-
-
-		public:
-			RenderLoader() = default;
-			~RenderLoader() = default;
+			static unsigned char* prepareImageData(const std::string& path_to_texture, int& width, int& height, int& size, bool& is_tex_or_png_ext);
 
 			/**
-			 * compiles shader and adds to shader_programs.
-			 *
-			 * \param shader_ref	shader program's reference string
-			 * \param vtx_path		path to vertex shader
-			 * \param frag_path		path to fragment shader
+			 * free images loaded with `prepareImageData`.
+			 * 
+			 * for buffers created with stbi_image_load
+			 * 
+			 * \param data
 			 */
-			unsigned int compileShader(const std::string& shader_ref, const std::string& vtx_path, const std::string& frag_path);
+			static void freeImageData(unsigned char* data);
+
 
 			/**
 			 * creates vertex array object. from mesh data and registers it to meshes.
@@ -192,7 +202,7 @@ namespace NIKE {
 			 * \param path_to_mesh
 			 * \return success
 			 */
-			Model compileModel(const std::string& path_to_mesh, bool for_batched_rendering = false);
+			Model compileModel(const std::string& path_to_mesh);
 
 			/**
 			 * registers textures.

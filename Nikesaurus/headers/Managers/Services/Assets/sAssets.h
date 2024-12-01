@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   mAssets.h
+ * \file   sAssets.h
  * \brief  Assets manager function declarations
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (100%)
@@ -22,228 +22,228 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		//File Drop Event
+		struct NIKE_API FileDropEvent : public Events::IEvent {
+			int count;
+			const char** paths;
+
+			FileDropEvent(int count, const char** paths)
+				: count{ count }, paths{ paths } {}
+		};
+
+		//Asset modes
+		enum Modes : unsigned int {
+			Loadable = 0,
+			Executable,
+			Editable
+		};
+
+		//Asset types
+		enum class Types {
+			None = 0,
+			Texture,
+			Model,
+			Font,
+			Music,
+			Sound,
+			Scene,
+			Prefab,
+			Grid,
+			Script
+		};
+
+		//Asset service
 		class NIKE_API Service {
 		private:
-			//Delete Copy Constructor & Copy Assignment
-			Service(Service const& copy) = delete;
-			void operator=(Service const& copy) = delete;
 
-			/*****************************************************************//**
-			* Font Private Members
-			*********************************************************************/
+			//Assset meta data
+			struct MetaData {
+				Types type;
+				std::filesystem::path primary_path;
+				std::weak_ptr<void> cached;
+				
+				MetaData() : type{ 0 } {};
+				MetaData(Types type, std::filesystem::path const& primary_path)
+					: type{ type }, primary_path{ primary_path } {}
+			};
 
-			//Free type lib
+			//Loader function
+			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
+
+			//List of valid extension
+			std::set<std::string> valid_extensions;
+
+			//List of key words to exclude
+			std::set<std::string> invalid_keys;
+
+			//Asset types
+			std::unordered_map<Types, std::bitset<3>> asset_types;
+
+			//Asset registry of meta data
+			std::unordered_map<std::string, MetaData> asset_registry;
+
+			//Asset loader
+			std::unordered_map<Types, LoaderFunc> asset_loader;
+
+			//Assets cache for storing assets ( Optionally change to weakptr for a more event driven approach )
+			std::unordered_map<std::string, std::shared_ptr<void>> asset_cache;
+
+			//Font loader
 			std::unique_ptr<Assets::FontLoader> font_loader;
 
-			//Maps to fonts
-			std::unordered_map<std::string, std::shared_ptr<Assets::Font>> fonts_list;
-
-			/*****************************************************************//**
-			* Render Private Members
-			*********************************************************************/
+			//Render loader
 			std::unique_ptr<Assets::RenderLoader> render_loader;
 
-			//Map to shaders for render
-			std::unordered_map<std::string, unsigned int> shaders_list;
-
-			//Map to models for render
-			std::unordered_map<std::string, std::shared_ptr<Assets::Model>> models_list;
-
-			// Map to textures for render
-			std::unordered_map<std::string, std::shared_ptr<Assets::Texture>> textures_list;
-
-			/*****************************************************************//**
-			* Audio Private Members
-			*********************************************************************/
-
-			//Fmod System
+			//Audio loader
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
 
-			//Map of audios
-			std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>> audio_list;
-
-			/*****************************************************************//**
-			* File Paths for specific asset types
-			*********************************************************************/
-			std::string texture_path = "assets/Textures/";
-			std::string audio_path = "assets/Audios/";
-			std::string font_path = "assets/Fonts/";
-			std::string models_path = "assets/Models/";
-			std::string scenes_path = "assets/Scenes/";
-			std::string shaders_path = "assets/Shaders/";
-			std::string prefabs_path = "assets/Prefabs/";
-
-			/*****************************************************************//**
-			* Scn (Levels) private members
-			*********************************************************************/
-			std::unordered_map<std::string, std::filesystem::path> levels_list;
-
-			// Prefabs paths containers
-			std::unordered_map<std::string, std::filesystem::path> prefabs_list;
-
+			//Conversion from type to string
+			std::string typeToString(Types type) const;
 		public:
 
-			//Default constructor
+			//Default constructor and destructor
 			Service() = default;
+			~Service() = default;
 
-			// Dtor
-			~Service();
+			//Initialization
+			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
-			//Configure Assets Manager
-			void configAssets(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+			//Register asset
+			std::string registerAsset(std::string const& path, bool b_virtual = true);
 
-			/*****************************************************************//**
-			* Font
-			*********************************************************************/
-			//Register font
-			void loadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+			//Unregister asset
+			void unregisterAsset(std::string const& asset_id);
 
-			//Reload font
-			void reloadFont(std::string const& font_id, std::string const& file_path, Vector2f const& pixel_sizes = { 0.0f, 48.0f });
+			//Register loader
+			void registerLoader(Types asset_type, LoaderFunc loader);
 
-			//Unload font
-			void unloadFont(std::string const& fond_id);
+			//Cache asset
+			void cacheAsset(std::string const& asset_id);
 
-			//Unload all fonts
-			void unloadAllFonts();
+			//Uncache asset
+			void uncacheAsset(std::string const& asset_id);
 
-			//Get font
-			std::shared_ptr<Assets::Font> const& getFont(std::string const& font_id) const;
+			//Recache asset
+			void recacheAsset(std::string const& asset_id);
 
-			//Get loaded fonts
-			const std::unordered_map<std::string, std::shared_ptr<Assets::Font>>& getLoadedFonts() const;
+			//Get asset
+			template <typename T>
+			std::shared_ptr<T> getAsset(std::string const& asset_id) {
 
-			// Checker
-			bool checkFontExist(std::string const& font_id);
+				//Check if asset is a executable asset type
+				if (!(asset_types[getAssetType(asset_id)].test(Modes::Loadable))) {
+					return nullptr;
+				}
 
-			/*****************************************************************//**
-			* Render ( Texture, Model, Shaders )
-			*********************************************************************/
+				//Check asset cache
+				auto cache_it = asset_cache.find(asset_id);
+				if (cache_it != asset_cache.end()) {
+					if (cache_it->second) {
+ 						return std::static_pointer_cast<T>(cache_it->second);
+					}
+				}
 
-			//Load shader
-			void loadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+				//Get asset meta data
+				auto meta_it = asset_registry.find(asset_id);
+				if (meta_it == asset_registry.end()) {
 
-			//Reload shader
-			void reloadShader(std::string const& shader_id, const std::string& vtx_path, const std::string& frag_path);
+					//Return nullptr
+					return nullptr;
+				}
 
-			//Unload shader
-			void unloadShader(std::string const& shader_id);
+				//Load assset through registered loaded
+				auto loader_it = asset_loader.find(meta_it->second.type);
+				if (loader_it == asset_loader.end()) {
 
-			//Unload all shaders
-			void unloadAllShaders();
+					//Return nullptr
+					throw std::runtime_error("Loader not registered for asset type");
+				}
 
-			//Get shader
-			unsigned int getShader(std::string const& shader_id);
+				//Get loaded asset
+				auto asset = loader_it->second(meta_it->second.primary_path);
 
-			//Get shaders
-			const std::unordered_map<std::string, unsigned int>& getLoadedShaders();
+				//Insert loaded asset into asset cache
+				asset_cache.emplace(asset_id, asset);
 
-			//Load model
-			void loadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
+				//Return asset
+				return std::static_pointer_cast<T>(asset);
+			}
 
-			//Reload model
-			void reloadModel(std::string const& model_id, std::string const& file_path, bool for_batched_rendering = false);
+			//Get executable
+			void getExecutable(std::string const& asset_id);
 
-			//Unload model
-			void unloadModel(std::string const& model_id);
+			//check if asset is loadable type
+			bool isAssetLoadable(std::string const& asset_id) const;
 
-			//Unload all models
-			void unloadAllModels();
+			//Check if asset is executable type
+			bool isAssetExecutable(std::string const& asset_id) const;
 
-			//Get model
-			std::shared_ptr<Assets::Model> getModel(std::string const& model_id);
+			//Check if asset is editable type
+			bool isAssetEditable(std::string const& asset_id) const;
 
-			//Get models
-			const std::unordered_map<std::string, std::shared_ptr<Assets::Model>>& getLoadedModels();
+			//Get asset type from registered asset id
+			Types getAssetType(std::string const& asset_id) const;
 
-			// Check model
-			bool checkModelExist(std::string const& model_id);
+			//Get asset type string from registered asset id
+			std::string getAssetTypeString(std::string const& asset_id) const;
 
-			//Load texture
-			void loadTexture(std::string const& texture_id, std::string const& file_path);
+			//Get asset type from path
+			Types getAssetType(std::filesystem::path const& path) const;
 
-			//Reload texture
-			void reloadTexture(std::string const& texture_id, std::string const& file_path);
+			//Get asset path from registered asset id
+			std::filesystem::path getAssetPath(std::string const& asset_id) const;
 
-			// Unload texture
-			void unloadTexture(std::string const& texture_id);
+			//Get all asset ref of type
+			std::vector<const char*> getAssetRefs(Types type) const;
 
-			// Unload all textures
-			void unloadAllTextures();
+			//Check if asset is loaded from asset id
+			bool isAssetCached(std::string const& asset_id) const;
 
-			//Get texture
-			std::shared_ptr<Assets::Texture> getTexture(std::string const& texture_id);
+			//Check if asset is loaded from file path
+			bool isAssetCached(std::filesystem::path const& path) const;
+	
+			//Add valid extension
+			void addValidExtensions(std::string const& ext);
 
-			//Check if texture exist
-			bool checkTextureExist(std::string const& texture_id);
+			//Get all valid extensions
+			std::set<std::string> getValidExtensions() const;
 
-			//Check if texture loaded
-			const std::unordered_map<std::string, std::shared_ptr<Assets::Texture>>& getLoadedTextures();
+			//Add invalid keys
+			void addInvalidKeys(std::string const& key);
 
-			/*****************************************************************//**
-			* Audio
-			*********************************************************************/
-			// Load sound audio
-			void loadSound(std::string const& audio_id, std::string const& file_path);
+			//Get all invalid keys
+			std::set<std::string> getInvalidKeys() const;
 
-			// Reload sound
-			void reloadSound(std::string const& audio_id, std::string const& file_path);
+			//Check for valid path
+			bool isPathValid(std::string const& path, bool b_virtual = true) const;
 
-			//Load music audio
-			void loadMusic(std::string const& audio_id, std::string const& file_path);
+			//Check for registration
+			bool isAssetRegistered(std::string const& asset_id) const;
 
-			// Reload music
-			void reloadMusic(std::string const& audio_id, std::string const& file_path);
+			//Get ref from path
+			std::string getIDFromPath(std::string const& path, bool b_virtual = true) const;
 
-			//Unload Audio
-			void unloadAudio(std::string const& audio_id);
+			//Clear expired cache
+			void clearCache();
 
-			//Unload all audios
-			void unloadAllAudios();
+			//Register all assets from directory tree
+			void scanAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
 
-			//Get audio
-			std::shared_ptr<Audio::IAudio> getAudio(std::string const& audio_tag);
+			//Cache all assets from directory tree
+			void cacheAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
 
-			//Get audios
-			const std::unordered_map<std::string, std::shared_ptr<Audio::IAudio>>& getLoadedAudios();
+			//Remove cache for all assets from directory tree
+			void uncacheAssetDirectory(std::string const& virtual_path, bool b_diretory_tree = false);
 
-			bool checkAudioExist(std::string const& audio_tag);
+			//Log assets reigstry
+			void logAssetsRegistry() const;
 
-			/*****************************************************************//**
-			* Scn File path
-			*********************************************************************/
-			void loadScn(const std::filesystem::directory_entry& entry);
-			void loadScnFiles();
-			bool checkScnFileExist(const std::string& entry);
-			void reloadScn(std::string const& scn_key, std::filesystem::path const& scn_file_path);
-			std::unordered_map<std::string, std::filesystem::path>& getLevelsList();
+			//Serialize asset registry
+			nlohmann::json serialize() const;
 
-			/*****************************************************************//**
-			* Prefab File path
-			*********************************************************************/
-			void loadPrefab(const std::filesystem::directory_entry& entry);
-			void loadPrefabFiles();
-			bool checkPrefabFileExist(const std::string& entry);
-			void reloadPrefab(std::string const&, std::filesystem::path const&);
-			std::unordered_map<std::string, std::filesystem::path>& getLoadedPrefabs();
+			//Deserialize asset registry
+			void deserialize(nlohmann::json const& data);
 
-			/*****************************************************************//**
-			* File path gettors
-			*********************************************************************/
-			std::string const& getTexturePath(); 
-			std::string const& getAudioPath(); 
-			std::string const& getFontPath(); 
-			std::string const& getModelsPath(); 
-			std::string const& getScenesPath(); 
-			std::string const& getShadersPath(); 
-			std::string const& getPrefabsPath();
-
-			/*****************************************************************//**
-			* Reload of specific asset types
-			*********************************************************************/
-			void reloadAssets(const std::string& asset_type);
-			bool deleteFile(std::string const& file_path);
-			bool deleteAllFiles(std::string const& file_path);
 		};
 
 		//Re-enable DLL Export warning

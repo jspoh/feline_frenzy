@@ -29,12 +29,6 @@
  *********************************************************************/
 #include "FMOD_CORE/fmod.h"
 #include "FMOD_CORE/fmod.hpp"
-#include "FMOD_CORE/fmod_codec.h"
-#include "FMOD_CORE/fmod_common.h"
-#include "FMOD_CORE/fmod_dsp.h"
-#include "FMOD_CORE/fmod_dsp_effects.h"
-#include "FMOD_CORE/fmod_errors.h"
-#include "FMOD_CORE/fmod_output.h"
 
  /*****************************************************************//**
  * Freetype
@@ -62,13 +56,12 @@
  /*****************************************************************//**
  * LUA CORE HEADER
  *********************************************************************/
-extern "C" {
-#include "Lua/lua.h"
-#include "Lua/lualib.h"
-#include "Lua/lauxlib.h"
-}
-
 #include "sol/sol.hpp"
+
+/*****************************************************************//**
+* FILE WATCHER HEADER
+*********************************************************************/
+#include "FileWatch/FileWatch.hpp"
 
  /*****************************************************************//**
  * Spdlog (LOGGING)
@@ -103,11 +96,14 @@ extern "C" {
 #include <chrono>
 #include <thread>
 #include <optional>
+#include <stack>
+#include <regex>
 
  /*****************************************************************//**
  * Data (json)
  *********************************************************************/
 #include "Data/json.hpp"
+#include "Data/db.h"
 
  /*****************************************************************//**
  * Math headers
