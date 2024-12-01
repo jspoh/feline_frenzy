@@ -256,6 +256,10 @@ namespace NIKE {
             }
             });
 
+        //Play audio
+        lua_state.set_function("PlayAudio", [&](std::string const& audio_id) {
+            NIKE_AUDIO_SERVICE->playAudio(audio_id, "", "SFX", 1.f, 1.f, false, false);
+            });
 
     }
 }

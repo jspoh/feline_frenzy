@@ -4866,13 +4866,12 @@ namespace NIKE {
 
 				//Craft file path from name
 				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
-				if (std::filesystem::exists(path)) {
-					path /= std::string(scn_id + ".scn");
+
+				if (!std::filesystem::exists(path)) {
+					std::filesystem::create_directories(path); // Create the directory if it doesn't exist
 				}
-				else {
-					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
-					path /= std::string(scn_id + ".scn");
-				}
+
+				path /= std::string(scn_id + ".scn");
 
 				// When user click save/create scene, grid is saved together
 				tile_panel.lock()->saveGrid(scn_id);
