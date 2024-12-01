@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
@@ -379,6 +379,14 @@ namespace NIKE {
             Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
+            // Set/Teleport entity position
+            lua_state.set_function("setPosition", [&](Entity::Type entity, float x, float y) {
+                auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+                if (transform.has_value()) {
+                    transform.value().get().position = { x, y };
+                }
+                });
+
 #ifndef NDEBUG
             auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
             data.prefab_id = "bullet.prefab";
@@ -395,14 +403,20 @@ namespace NIKE {
             auto const& player_transform = player_transform_comp.value().get();
 
             //Calculate direction vector (mouse - player)
-            Vector2f direction = player_transform.position - NIKE_INPUT_SERVICE->getMouseWorldPos();
-            direction.x = -direction.x;
+            float direction = atan2((-player_transform.position.y - NIKE_INPUT_SERVICE->getMouseWorldPos().y), (player_transform.position.x + NIKE_INPUT_SERVICE->getMouseWorldPos().x));
+            Vector2f bull_direction = { cosf(direction), sinf(direction) };
 
-            //Full force
+            //Normalize direction
+            if (bull_direction.length() != 0) {
+                bull_direction.x /= bull_direction.length();
+                bull_direction.y /= bull_direction.length();
+            }
+
+            //Bullet Speed
             int constexpr BULLET_SPEED = 100;
 
             //Calculate bullet force vector
-            Vector2f bullet_force = direction * BULLET_SPEED;
+            Vector2f bullet_force = bull_direction * BULLET_SPEED;
 
             // Apply force to the bullet
             auto bullet_dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
@@ -413,7 +427,7 @@ namespace NIKE {
             //Set initial bullet position to player's position
             auto bullet_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
             if (bullet_transform.has_value()) {
-                bullet_transform.value().get().position = player_transform.position + (direction.normalize() * (player_transform.scale.length() * 0.75f));
+                bullet_transform.value().get().position = player_transform.position + (bull_direction.normalize() * (player_transform.scale.length() * 0.75f));
             }
             });
 
