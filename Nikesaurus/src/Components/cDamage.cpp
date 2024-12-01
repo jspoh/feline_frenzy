@@ -31,6 +31,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Damage>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Damage& comp) {
 
@@ -67,5 +68,6 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 	}
 }

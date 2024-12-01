@@ -35,6 +35,7 @@ namespace NIKE {
 			}
 		);
 
+#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Health>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Health& comp) {
 
@@ -123,5 +124,6 @@ namespace NIKE {
 				}
 			}
 		);
+#endif
 	}
 }
