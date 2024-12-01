@@ -283,21 +283,27 @@ namespace NIKE {
 				}
 
 				// debug to see framerate on window title
-				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-				const float fps = NIKE_WINDOWS_SERVICE->getCurrentFPS();
+				//const float fps = NIKE_WINDOWS_SERVICE->getCurrentFPS();
 
-				constexpr int NUM_FPS_FOR_AVG = 100;
-				static std::deque<float> all_fps;
-				all_fps.push_back(fps);
+				//static int elapsed_frames{};
+				//constexpr int NUM_FPS_FOR_AVG = 100;
+				//elapsed_frames++;
 
-				while (all_fps.size() > NUM_FPS_FOR_AVG) {
-					all_fps.pop_front();
-				}
+				//static std::deque<float> all_fps;
+				//all_fps.push_back(fps);
 
-				float sum_fps = std::accumulate(all_fps.begin(), all_fps.end(), 0.f, [](float sum, float v) {return sum + v;});
+				//while (all_fps.size() > NUM_FPS_FOR_AVG) {
+				//	all_fps.pop_front();
+				//}
 
-				const float avg_fps = sum_fps / NUM_FPS_FOR_AVG;
-				NIKE_WINDOWS_SERVICE->getWindow()->setWindowTitle(std::to_string(avg_fps).c_str());
+				//float sum_fps = std::accumulate(all_fps.begin(), all_fps.end(), 0.f, [](float sum, float v) {return sum + v;});
+
+				//const float avg_fps = sum_fps / NUM_FPS_FOR_AVG;
+
+				//if (elapsed_frames >= NUM_FPS_FOR_AVG) {
+				//	elapsed_frames = 0;
+				//	NIKE_WINDOWS_SERVICE->getWindow()->setWindowTitle(std::to_string(avg_fps).c_str());
+				//}
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
