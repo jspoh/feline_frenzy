@@ -483,20 +483,10 @@ namespace NIKE {
 				//Create a shared id for do & undo functions
 				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
 
-				// Determine the next available index
-				int next_index{};
-				if (!reusable_indices.empty()) {
-					next_index = *reusable_indices.begin();
-					reusable_indices.erase(reusable_indices.begin());
-				}
-				else {
-					next_index = static_cast<int>(NIKE_ECS_MANAGER->getEntitiesCount());
-				}
-
 				//If entity name is not provided (Create a default)
 				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
 				{
-					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", next_index);
+					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
 				}
 
 				//Do Action
@@ -517,9 +507,6 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						// Add index back to the reusable pool
-						reusable_indices.insert(next_index);
 					}
 					};
 
@@ -602,16 +589,12 @@ namespace NIKE {
 					//Check if entity is still alive
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 
-						int index = std::stoi(shared_id->substr(7));
-
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
-						// Add index back to the reusable pool
-						reusable_indices.insert(index);
-
 						//Set selected entity back to first entity
 						selected_entity = entities.empty() ? 0 : entities.begin()->first;
+
 					}
 					};
 
@@ -737,6 +720,20 @@ namespace NIKE {
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
+		int index = 0;
+		for (auto it = entities.begin(); it != entities.end(); ++it) {
+			//Update entities ref
+			if (it->second.entity_id.find("entity_") != std::string::npos) {
+
+				//Create identifier for entity
+				char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", index++);
+				auto data = getEntityMetaData(it->first);
+				data.entity_id = entity_name;
+				setEntityMetaData(it->first, data);
+			}
+		}
+
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
