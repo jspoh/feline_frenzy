@@ -281,6 +281,23 @@ namespace NIKE {
 						NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 					}
 				}
+
+				// debug to see framerate on window title
+				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+				const float fps = NIKE_WINDOWS_SERVICE->getCurrentFPS();
+
+				constexpr int NUM_FPS_FOR_AVG = 100;
+				static std::deque<float> all_fps;
+				all_fps.push_back(fps);
+
+				while (all_fps.size() > NUM_FPS_FOR_AVG) {
+					all_fps.pop_front();
+				}
+
+				float sum_fps = std::accumulate(all_fps.begin(), all_fps.end(), 0.f, [](float sum, float v) {return sum + v;});
+
+				const float avg_fps = sum_fps / NUM_FPS_FOR_AVG;
+				NIKE_WINDOWS_SERVICE->getWindow()->setWindowTitle(std::to_string(avg_fps).c_str());
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
