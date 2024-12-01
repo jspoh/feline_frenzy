@@ -67,6 +67,7 @@ namespace NIKE {
         luaKeyBinds(*lua_state);
         luaInputBinds(*lua_state);
         luaSceneBinds(*lua_state);
+        luaGameBinds(*lua_state);
 
         //Get all lua global functions
         sol::table globals = lua_state->globals();
@@ -85,10 +86,23 @@ namespace NIKE {
         //Resolve virtual path
         auto path = NIKE_PATH_SERVICE->resolvePath(virtual_path);
 
+        //Lua error
+        if (lua_state == nullptr) {
+            throw std::runtime_error("Lua Error!");
+        }
+
+        // Check file size (ensure not empty)
+        if (std::filesystem::file_size(path) == 0) {
+            throw std::runtime_error("File is empty");
+        }
+
         //Ensure the extension is ".lua"
         if (path.extension() != ".lua") {
             throw std::runtime_error("Invalid file extension");
         }
+
+        // Lock the mutex for thread safety
+        std::lock_guard<std::mutex> lock(lua_mutex);
 
         //Load script
         sol::load_result script = lua_state->load_file(path.string());
@@ -103,10 +117,23 @@ namespace NIKE {
     }
 
     sol::load_result Lua::Service::loadScript(std::filesystem::path const& path) {
-        //Ensure the extension is ".lua"
-        if (path.extension() != ".lua") {
-            throw std::runtime_error("Invalid file extension");
+        //Ensure the extension is ".lua" &  path is value
+        if (path.extension() != ".lua" || !std::filesystem::exists(path.string())) {
+            throw std::runtime_error("Invalid file extension or invalid path.");
         }
+
+        //Lua error
+        if (lua_state == nullptr) {
+            throw std::runtime_error("Lua Error!");
+        }
+
+        // Check file size (ensure not empty)
+        if (std::filesystem::file_size(path) == 0) {
+            throw std::runtime_error("File is empty");
+        }
+
+        // Lock the mutex for thread safety
+        std::lock_guard<std::mutex> lock(lua_mutex);
 
         //Load script
         sol::load_result script = lua_state->load_file(path.string());

@@ -483,20 +483,10 @@ namespace NIKE {
 				//Create a shared id for do & undo functions
 				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
 
-				// Determine the next available index
-				int next_index{};
-				if (!reusable_indices.empty()) {
-					next_index = *reusable_indices.begin();
-					reusable_indices.erase(reusable_indices.begin());
-				}
-				else {
-					next_index = static_cast<int>(NIKE_ECS_MANAGER->getEntitiesCount());
-				}
-
 				//If entity name is not provided (Create a default)
 				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
 				{
-					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", next_index);
+					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
 				}
 
 				//Do Action
@@ -517,9 +507,6 @@ namespace NIKE {
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						// Add index back to the reusable pool
-						reusable_indices.insert(next_index);
 					}
 					};
 
@@ -602,16 +589,12 @@ namespace NIKE {
 					//Check if entity is still alive
 					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
 
-						int index = std::stoi(shared_id->substr(7));
-
 						//Destroy entity
 						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
 
-						// Add index back to the reusable pool
-						reusable_indices.insert(index);
-
 						//Set selected entity back to first entity
 						selected_entity = entities.empty() ? 0 : entities.begin()->first;
+
 					}
 					};
 
@@ -737,6 +720,20 @@ namespace NIKE {
 	}
 
 	void LevelEditor::EntitiesPanel::update() {
+		int index = 0;
+		for (auto it = entities.begin(); it != entities.end(); ++it) {
+			//Update entities ref
+			if (it->second.entity_id.find("entity_") != std::string::npos) {
+
+				//Create identifier for entity
+				char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", index++);
+				auto data = getEntityMetaData(it->first);
+				data.entity_id = entity_name;
+				setEntityMetaData(it->first, data);
+			}
+		}
+
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
@@ -3405,19 +3402,27 @@ namespace NIKE {
 		//Setup directory watching for 
 		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
 
+			//Enngine engine assets path
+			static auto engine_assets = NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/");
+
 			//Skip directories
 			if (std::filesystem::is_directory(file) ||
 				!NIKE_ASSETS_SERVICE->isPathValid(file.string(), false) ||
-				file == NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/")) {
+				file == engine_assets) {
 				return;
 			}
+
+			// Handle file events
+			static std::unordered_map<std::string, std::chrono::steady_clock::time_point> last_modified_times;
+			auto now = std::chrono::steady_clock::now();
 
 			//Watch for events
 			switch (event) {
 			case filewatch::Event::added: {
-
-				//Register assets
-				NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
+				auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
+				if (!NIKE_ASSETS_SERVICE->isAssetRegistered(asset_id)) {
+					NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
+				}
 				break;
 			}
 			case filewatch::Event::removed: {
@@ -3430,6 +3435,14 @@ namespace NIKE {
 				//Only recache assets that are already cached
 				auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
 				if (NIKE_ASSETS_SERVICE->isAssetCached(asset_id)) {
+
+					//Prevent multiple modifications
+					if (last_modified_times[file.string()] + std::chrono::milliseconds(1000) > now) {
+						return;
+					}
+					last_modified_times[file.string()] = now;
+
+					//Recache asset
 					NIKE_ASSETS_SERVICE->recacheAsset(asset_id);
 				}
 				break;
@@ -3713,7 +3726,7 @@ namespace NIKE {
 
 						//Check if file is already open
 						if (file_editing_map.find(selected_asset_id) == file_editing_map.end()) {
-							file_editing_map[selected_asset_id].reserve(1024);
+							file_editing_map[selected_asset_id].reserve(1024 * 1024); // 1mb storage for file editing
 							// Read file content
 							file_editing_map[selected_asset_id].assign((std::istreambuf_iterator<char>(file)),
 								std::istreambuf_iterator<char>());
@@ -4868,13 +4881,12 @@ namespace NIKE {
 
 				//Craft file path from name
 				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
-				if (std::filesystem::exists(path)) {
-					path /= std::string(scn_id + ".scn");
+
+				if (!std::filesystem::exists(path)) {
+					std::filesystem::create_directories(path); // Create the directory if it doesn't exist
 				}
-				else {
-					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
-					path /= std::string(scn_id + ".scn");
-				}
+
+				path /= std::string(scn_id + ".scn");
 
 				// When user click save/create scene, grid is saved together
 				tile_panel.lock()->saveGrid(scn_id);
