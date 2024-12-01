@@ -17,7 +17,7 @@ on a mission to rescue your lost friend while outsmarting robotic guards and unc
 
 Input keys: 
 In Main Menu scene: 
-- Press 'Play' button to go to the gameplay scene
+- Press "Start Game" button to go to the gameplay scene
 
 Gameplay scene (game prototype demo):
 - 'W' key to move up, 'S' key to move down, 'A' key to move left, 'D' key to move right
@@ -26,6 +26,6 @@ Gameplay scene (game prototype demo):
 - Enemies will also shoot at the player (Incomplete).
 - Press '0' and '9' together to toggle Cheat Mode
 - Press '1' in Cheat Mode to teleport player to mouse cursor
-- Press '2' in Cheat Mode to enable "god mode" for player (cannot take damage)
-- Press '3' in Cheat Mode to enable "max damage" for player (attacks will instantly kill enemies)
+- Press '2' in Cheat Mode to toggle "god mode" for player (cannot take damage)
+- Press '3' in Cheat Mode to toggle "max damage" for player (attacks will instantly kill enemies)
 

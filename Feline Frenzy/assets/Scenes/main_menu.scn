@@ -134,7 +134,7 @@
                             "Script": {
                                 "Function": "Change",
                                 "Named_Args": {
-                                    "scene": "gameplay.scn"
+                                    "scene": "level_1.scn"
                                 },
                                 "Script_ID": "ChangeScene.lua"
                             }

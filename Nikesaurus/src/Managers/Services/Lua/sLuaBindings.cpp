@@ -379,6 +379,16 @@ namespace NIKE {
             Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
             NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
+        // Cheat mode functions
+
+        // Set/Teleport entity position
+        lua_state.set_function("setPosition", [&](Entity::Type entity, float x, float y) {
+                auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+                if (transform.has_value()) {
+                    transform.value().get().position = { x, y };
+                }
+                });
+
 #ifndef NDEBUG
             auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
             data.prefab_id = "bullet.prefab";
