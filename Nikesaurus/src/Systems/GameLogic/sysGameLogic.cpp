@@ -15,30 +15,7 @@ namespace NIKE {
 	void GameLogic::Manager::init() {
 	}
 
-	//void GameLogic::Manager::registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system) {
-	//	//Add system to lua
-	//	NIKE_LUA_SERVICE->registerLuaSystem(system);
-	//}
-
-	// sol::protected_function GameLogic::Manager::executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function) {
-		//Run script
-		//if (script_id == "") {
-		//	script_id = NIKE_LUA_SERVICE->loadScript(file_path);
-		//	b_loaded = true;
-		//	return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		//}
-		//else if (b_loaded) {
-		//	return NIKE_LUA_SERVICE->executeScript(script_id, function);
-		//}
-		//else {
-		//	NIKE_LUA_SERVICE->reloadScript(script_id);
-		//	b_loaded = true;
-		//}
-	// 	return 0;
-	// }
-
 	void GameLogic::Manager::update() {
-		//NIKEE_CORE_WARN("Mouse X: {} Y: {}", NIKE_INPUT_SERVICE.get()->getMouseWorldPos().x, NIKE_INPUT_SERVICE.get()->getMouseWorldPos().y);
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
