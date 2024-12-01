@@ -1,4 +1,7 @@
+
 Editor Guide
+
+---
 
 Table of Contents
 1. Introduction
@@ -8,67 +11,111 @@ Table of Contents
     - Entity Component Window
 3. Using the Editor
     - Adding a New Entity
+    - Cloning an Entity
     - Editing Entities
     - Managing Assets
+    - Dragging and Dropping Assets
     - Saving and Loading Scenes
 4. Shortcuts and Tips
 
 ---
 
 1. Introduction
-Welcome to the Level Editor Guide! This document will help you navigate the editor's features and show you how to create and modify levels for your game. Follow the instructions in each section to get familiar with the editor.
+
+Welcome to the Level Editor Guide! This document will help you navigate the editor's features and guide you in creating and modifying levels for your game. Follow the instructions in each section to get familiar with the editor.
+
+---
 
 2. Interface Overview
 
 Main Window
-The main window displays your level and all the entities within it. This area is where you can visually position and modify game objects.
+The Main Window displays your level and all the entities within it. This is the viewport where you can visually position, edit, and modify game objects.  
 
-Asset List
-The Asset List window shows all the assets loaded into your project, such as textures, prefabs, shaders, models and audio files. You can navigate through various tabs to view specific asset types:
-- Textures: Displays all texture files. Textures can be dragged to the viewport to create new entity from it.
-- Prefabs: Shows predefined objects that can be reused.
-- Models: Models used for renderin
-- Shaders
+- Drag assets from the Asset List into this window to create new entities.
+- Right-click on entities for a context menu to perform quick actions like deletion or duplication.
+
+---
+
+File Management
+The File Management shows all the assets loaded into your project, such as textures, prefabs, shaders, models, and audio files. Use the folders to navigate between different asset types:  
+
+- Textures: Displays all texture files. Drag a texture into the viewport to create a new entity.
 - Audio: Contains audio files for background music and sound effects.
+- Scene:  
+  - View and manage .scn files (scene files).  
+  - Save the current scene or load an existing one directly from this tab.
 
-Using the "Levels" Tab
-In the Levels tab, you can access and load .scn files (scene files) directly into the editor. Use this tab to manage different levels or scenes.
+Important Note: Textures and other assets are automatically categorized. Dragging them into the viewport will automatically create an entity.
 
-- Save Scene: Click to save the current scene to a specified .scn file.
-- Load Scene: Click to load an existing .scn file. Loading a new scene will replace the existing entities in the editor.
+---
 
 Entity Component Window
-The Entity Component Window allows you to view and edit components attached to selected entities. This window is divided into collapsible sections, each representing a component type. Here you can modify component properties, such as position, rotation, and scale, or add/remove components.
+The Entity Component Window allows you to manage components attached to selected entities.  
+
+- Collapsible Sections: Each component type has its own collapsible section.  
+- Editable Properties: Modify properties such as position, rotation, scale, and other component-specific settings.  
+- Add or Remove Components: Use the buttons at the bottom to add new components or remove existing ones.  
+
+---
 
 3. Using the Editor
 
 Adding a New Entity
-1. Open the Entities Window: Go to the "Entities Window" tab.
-2. Create Entity: Click the "Create Entity" button. A pop-up will appear, prompting you to enter a name for the new entity.
-3. Rename or Customize: Once created, the entity will appear in the list. You can rename or assign components to it using the Entity Component Window.
+1. Open the Entities Panel.  
+2. Click the Create Entity button. A popup will appear asking for:  
+   - Name: The entity's name (optional, defaults to entity_XXXX).  
+   - Layer ID: Specify the layer where the entity should reside.  
+3. Once created, the entity will appear in the Entities Panel. Assign components or modify its properties in the Entity Component Window.
+
+---
 
 Cloning an Entity
-1. Select an entity from the list.
-2. Click the "Clone Entity" button.
-3. A pop-up will ask you to enter a new name for the clone (default name will be the original entity name with _clone appended).
-4. The cloned entity will appear in the list, and you can modify its components separately.
+1. Select an entity from the Entities Panel.  
+2. Click the Clone Entity button. A popup will prompt for a new name (default: original name with _clone appended).  
+3. The cloned entity will appear in the list. Its components are duplicated and can be modified independently.
+
+---
 
 Editing Entities
-1. Select an Entity: Click on an entity in the Entities Window to select it.
-2. Modify Components: Go to the Entity Component Window to view and modify the components attached to the entity. Editable properties include transform values like position, rotation, and scale.
+1. Select an Entity: Click on an entity in the Entities Panel.  
+2. Modify Components: Use the Entity Component Window to adjust properties or add/remove components.  
 
-Removing an Entity
-1. Select the entity you want to remove in the Entities Window.
-2. Click the "Remove Entity" button.
-3. Confirm the action in the pop-up window.
+---
 
 Managing Assets
-To use an asset, simply drag and drop it from the Asset List into the scene or attach it to an entity as a component (e.g., texture for rendering).
+- Reload Textures: Use the Refresh button in the file management window to refresh assets.  
+- File Management window is responsible for loading, unloading all assets, regardless of types.
+- Able to create folder and delete asset
+- Unload Assets: Remove unused assets from memory to optimize performance.  
+
+---
+
+Dragging and Dropping Assets
+- Textures: Drag a texture from the Textures folder into the viewport. An entity will then be created.
+
+---
+
+Prefab editor: Able to create, edit and use the prefab to create entities
+  - Prefab editor able to save changes to all entities created with that particular prefab
+  - Able to do changes to master copy prefab
+
+---
 
 Saving and Loading Scenes
-1. Save Scene: Click the "Save Scene" button in the Levels tab, then enter a file name (it will automatically save with the .scn extension).
-2. Load Scene: Select a .scn file from the Levels tab to load it into the editor. This will replace any existing entities in the scene.
+1. Save Scene:  
+   - Go to the File Management window, "Scenes" Folder.  
+   - Click the Save Scene button.  
+   - Enter a file name (the .scn extension is added automatically).  
+2. Load Scene:  
+   - Select a .scn file from the "Scenes" Tab and drag into the "Game Window" window to load the scene.  
+   - Loading a scene will replace all existing entities in the editor.
+
+---
 
 4. Shortcuts and Tips
-- Duplicate Entities: Select an entity and click "Clone Entity" to quickly duplicate it.
-- Refresh Assets: Use the Refresh Textures button in the Asset List to reload textures without restarting the editor.
+- Duplicate Entities: Use the Clone Entity button to quickly duplicate an entity and its components.  
+- Refresh Assets: Reload textures or assets by clicking the Refresh Textures button in the Asset List.  
+- Manage Layers: Use the layer ID input when creating or dragging assets to organize entities within specific layers, use the layer management window to edit the layers.  
+- Undo/Redo: Every action (e.g., creating, deleting, or modifying entities) is reversible through the editor's undo/redo functionality.  
+
+---

@@ -9,7 +9,7 @@ IMGD	SOH Zhi Jie Bryan	Design Lead	    Programmer	    Physics Champion
 BFA	    HAN Si Ling	        Art Lead	    Art Champion
 
 Demo
-lv_1.scn will be used for game prototype demo.
+Demo.scn will be used for game prototype demo.
 
 Game Concept
 Feline Frenzy is a game where you play as Chonkers the cat hero, navigating an abandoned laboratory, 
