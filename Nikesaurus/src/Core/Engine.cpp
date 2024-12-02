@@ -252,7 +252,7 @@ namespace NIKE {
 				//Poll system events
 				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+
 
 					//Clear buffer
 					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
@@ -294,7 +294,6 @@ namespace NIKE {
 					if (err != GL_NO_ERROR) {
 						NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 					}
-				}
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);

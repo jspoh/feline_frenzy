@@ -2246,7 +2246,7 @@ namespace NIKE {
 				NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_path.string());
 
 				//Add metadata to entity
-				EntityMetaData data(entity_name, prefab_path.filename().string(), false);
+				EntityMetaData data(entity_name.c_str(), prefab_path.filename().string(), false);
 				entities_panel.lock()->setEntityMetaData(new_id, data);
 
 				//Reset layer id
