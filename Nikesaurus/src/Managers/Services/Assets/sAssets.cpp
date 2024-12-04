@@ -253,9 +253,6 @@ namespace NIKE {
 
 	void Assets::Service::recacheAsset(std::string const& asset_id) {
 
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
-
 		//Check if asset is loadable
 		if (!isAssetLoadable(asset_id)) {
 			return;

@@ -138,6 +138,9 @@ namespace NIKE {
 					return nullptr;
 				}
 
+				// Lock the mutex for thread safety
+				std::lock_guard<std::mutex> lock(asset_mutex);
+
 				//Check asset cache
 				auto cache_it = asset_cache.find(asset_id);
 				if (cache_it != asset_cache.end()) {
