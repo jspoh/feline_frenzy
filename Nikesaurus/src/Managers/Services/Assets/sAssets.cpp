@@ -149,6 +149,10 @@ namespace NIKE {
 	}
 
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {
+
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
+
 		if (b_virtual) {
 			if (!isPathValid(path)) {
 				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
@@ -174,6 +178,9 @@ namespace NIKE {
 	}
 
 	void Assets::Service::unregisterAsset(std::string const& asset_id) {
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
+
 		//Check asset registry
 		auto register_it = asset_registry.find(asset_id);
 		if (register_it != asset_registry.end()) {
@@ -186,10 +193,16 @@ namespace NIKE {
 			throw std::runtime_error("Loader already registered.");
 		}
 
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
+
 		asset_loader.emplace(asset_type, loader);
 	}
 
 	void Assets::Service::cacheAsset(std::string const& asset_id) {
+
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
 
 		//Check if asset is loadable
 		if (!isAssetLoadable(asset_id)) {
@@ -222,6 +235,10 @@ namespace NIKE {
 	}
 
 	void Assets::Service::uncacheAsset(std::string const& asset_id) {
+
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
+
 		//Check if asset is loadable
 		if (!isAssetLoadable(asset_id)) {
 			return;
@@ -236,6 +253,9 @@ namespace NIKE {
 
 	void Assets::Service::recacheAsset(std::string const& asset_id) {
 
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
+
 		//Check if asset is loadable
 		if (!isAssetLoadable(asset_id)) {
 			return;
@@ -249,6 +269,9 @@ namespace NIKE {
 	}
 
 	void Assets::Service::getExecutable(std::string const& asset_id) {
+
+		// Lock the mutex for thread safety
+		std::lock_guard<std::mutex> lock(asset_mutex);
 
 		//Check if asset is a executable asset type
 		if (!(asset_types[getAssetType(asset_id)].test(Modes::Executable))) {
@@ -487,8 +510,9 @@ namespace NIKE {
 				//Configure asset type
 				Types asset_type = getAssetType(file.path());
 
-				//Add into registry
-				asset_registry[getIDFromPath(file.path().string(), false)] = MetaData(asset_type, NIKE_PATH_SERVICE->normalizePath(file.path()));
+
+				//Register asset
+				registerAsset(file.path().string(), false);
 
 				//Log registration
 				NIKEE_CORE_INFO("Succesfully registered " + getIDFromPath(file.path().string(), false) + " Asset Type: " + typeToString(asset_type));
@@ -510,8 +534,8 @@ namespace NIKE {
 			//Configure asset type
 			Types asset_type = getAssetType(file.path());
 
-			//Add into registry
-			asset_registry[getIDFromPath(file.path().string(), false)] = MetaData(asset_type, NIKE_PATH_SERVICE->normalizePath(file.path()));
+			//Register asset
+			registerAsset(file.path().string(), false);
 
 			//Log registration
 			NIKEE_CORE_INFO("Succesfully registered " + getIDFromPath(file.path().string(), false) + " Asset Type: " + typeToString(asset_type));

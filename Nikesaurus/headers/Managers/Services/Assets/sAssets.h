@@ -67,6 +67,9 @@ namespace NIKE {
 					: type{ type }, primary_path{ primary_path } {}
 			};
 
+			//Mutex for thread safe asset registering and loading
+			std::mutex asset_mutex;
+
 			//Loader function
 			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
 
