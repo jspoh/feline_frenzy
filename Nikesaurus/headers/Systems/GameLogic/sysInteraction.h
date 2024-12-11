@@ -11,6 +11,7 @@
 #ifndef INTERACTION_HPP
 #define INTERACTION_HPP
 
+#include "Components/cElement.h"
 #include "Components/cHealth.h"
 #include "Components/cDamage.h"
 #include "Components/cPhysics.h"
@@ -53,6 +54,9 @@ namespace NIKE {
 
             // Apply damage
             void applyDamage(Entity::Type attacker, Entity::Type target);
+
+            // Change element
+            void changeElement(Entity::Type player, Entity::Type source);
         };
 
     }

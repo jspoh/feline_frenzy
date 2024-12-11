@@ -50,6 +50,7 @@
     <ClCompile Include="src\Components\cAudio.cpp" />
     <ClCompile Include="src\Components\cDamage.cpp" />
     <ClCompile Include="src\Components\cDespawn.cpp" />
+    <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
     <ClCompile Include="src\Components\cHealth.cpp" />
     <ClCompile Include="src\Components\cPathfinding.cpp" />
@@ -136,6 +137,7 @@
     </ClInclude>
     <ClInclude Include="headers\Components\cDamage.h" />
     <ClInclude Include="headers\Components\cDespawn.h" />
+    <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
     <ClInclude Include="headers\Components\cHealth.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />

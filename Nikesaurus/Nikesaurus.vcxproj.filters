@@ -58,6 +58,7 @@
     <ClCompile Include="src\Systems\GameLogic\sysEnemy.cpp" />
     <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
+    <ClCompile Include="src\Components\cElement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -128,6 +129,7 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
+    <ClInclude Include="headers\Components\cElement.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

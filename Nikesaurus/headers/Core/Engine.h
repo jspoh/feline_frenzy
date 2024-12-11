@@ -39,6 +39,7 @@
 #include "Components/cDamage.h"
 #include "Components/cEnemy.h"
 #include "Components/cDespawn.h"
+#include "Components/cElement.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

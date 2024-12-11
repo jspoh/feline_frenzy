@@ -60,6 +60,9 @@ namespace NIKE {
 
 		//Register Despawn components
 		Despawn::registerComponents();
+
+		//Register Element components
+		Element::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -100,8 +103,9 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Health::Health>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Damage::Damage>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Element::Player>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Element::Source>());
 
-		//Register enemy manager
 		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());

@@ -32,15 +32,11 @@ namespace NIKE {
         }
 
         void Manager::handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
+            // Player Element Swapping
+            // !TODO: Check for E Key input before changing element
+            changeElement(entity_a, entity_b);
 
-            // Get entity's health and damage components
-            auto a_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity_a);
-            auto b_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity_b);
-
-            auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_a);
-            auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_b);
-
-            // Apply damage if applicable
+            // Collision between damage and health
             applyDamage(entity_a, entity_b);
             applyDamage(entity_b, entity_a);
         }
@@ -68,6 +64,19 @@ namespace NIKE {
                     NIKE_ECS_MANAGER->markEntityForDeletion(target);
                     NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
                 }
+            }
+        }
+
+        void Manager::changeElement(Entity::Type player, Entity::Type source) {
+            auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Player>(player);
+            auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
+
+            if (player_element_comp && source_element_comp) {
+                auto& player_element = player_element_comp.value().get().current_element;
+                auto& source_element = source_element_comp.value().get().element;
+
+                // Set player element to source element
+                player_element = source_element;
             }
         }
     }
