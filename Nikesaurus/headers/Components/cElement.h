@@ -22,13 +22,13 @@ namespace NIKE {
 			GRASS,
 		};
 
-		struct Player {
-			Elements current_element;			// Currently equipped element
+		struct Entity {
+			Elements element;			// Currently equipped element
 			// !TODO: Maybe make it random at the start?
 
-			Player() : current_element(Elements::NONE) {};
-			Player(int element)
-				: current_element{ element } {}
+			Entity() : element(Elements::NONE) {};
+			Entity(int element)
+				: element{ element } {}
 		};
 
 		struct Source {

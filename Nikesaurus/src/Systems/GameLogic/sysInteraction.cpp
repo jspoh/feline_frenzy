@@ -70,15 +70,18 @@ namespace NIKE {
         }
 
         void Manager::changeElement(Entity::Type player, Entity::Type source) {
-            auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Player>(player);
-            auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
+            // Checking if it is the player that collided with element source
+            if (NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player)) {
+                auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+                auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
 
-            if (player_element_comp && source_element_comp) {
-                auto& player_element = player_element_comp.value().get().current_element;
-                auto& source_element = source_element_comp.value().get().element;
+                if (player_element_comp && source_element_comp) {
+                    auto& player_element = player_element_comp.value().get().element;
+                    auto& source_element = source_element_comp.value().get().element;
 
-                // Set player element to source element
-                player_element = source_element;
+                    // Set player element to source element
+                    player_element = source_element;
+                }
             }
         }
     }

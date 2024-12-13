@@ -14,28 +14,28 @@
 namespace NIKE {
 	void Element::registerComponents() {
 		// Register components
-		NIKE_ECS_MANAGER->registerComponent<Player>();
+		NIKE_ECS_MANAGER->registerComponent<Entity>();
 		NIKE_ECS_MANAGER->registerComponent<Source>();
 
 		// Register for Player serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Player>(
+		NIKE_SERIALIZE_SERVICE->registerComponent<Entity>(
 			// Serialize
-			[](Player const& comp) -> nlohmann::json {
+			[](Entity const& comp) -> nlohmann::json {
 				return {
-					{ "CurrentElement" , comp.current_element }
+					{ "Element" , comp.element }
 				};
 			},
 
 			// Deserialize
-			[](Player& comp, nlohmann::json const& data) {
-				comp.current_element = data.at("CurrentElement").get<Elements>();
+			[](Entity& comp, nlohmann::json const& data) {
+				comp.element = data.at("Element").get<Elements>();
 			}
 		);
 
 #ifndef NDEBUG
 		// UI Registration for Player
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Player>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Player& comp) {
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Entity>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Entity& comp) {
 
 				ImGui::Text("Edit Element:");
 
@@ -43,32 +43,32 @@ namespace NIKE {
 				{
 					static Elements before_change_element;
 
-					ImGui::DragInt("Current Element", reinterpret_cast<int*>(&comp.current_element), 1);
+					ImGui::DragInt("Current Element", reinterpret_cast<int*>(&comp.element), 1);
 
 					// Check if begin editing
 					if (ImGui::IsItemActivated()) {
-						before_change_element = comp.current_element;
+						before_change_element = comp.element;
 					}
 
 					// Check if finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
 						// Within valid range check
 						// !TODO: Consider using a dropdown box instead?
-						if (static_cast<int>(comp.current_element) < static_cast<int>(Elements::NONE) ||
-							static_cast<int>(comp.current_element) > static_cast<int>(Elements::GRASS)) {
-							comp.current_element = Elements::NONE; 
+						if (static_cast<int>(comp.element) < static_cast<int>(Elements::NONE) ||
+							static_cast<int>(comp.element) > static_cast<int>(Elements::GRASS)) {
+							comp.element = Elements::NONE;
 						}
 
 						LevelEditor::Action change_element;
 
 						// Change do action
-						change_element.do_action = [&, current_element = comp.current_element]() {
-							comp.current_element = current_element;
+						change_element.do_action = [&, element = comp.element]() {
+							comp.element = element;
 							};
 
 						// Change undo action
-						change_element.undo_action = [&, current_element = before_change_element]() {
-							comp.current_element = current_element;
+						change_element.undo_action = [&, element = before_change_element]() {
+							comp.element = element;
 							};
 
 						// Execute action

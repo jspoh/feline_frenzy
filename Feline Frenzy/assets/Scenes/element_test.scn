@@ -12,7 +12,7 @@
         }
     },
     {
-        "Grid ID": "Demo.grid"
+        "Grid ID": "element_test.grid"
     },
     {
         "Layer": {
@@ -72,14 +72,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 0,
+                                "Completed_Animations": 6,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 5,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -102,8 +102,8 @@
                                 "Pitch": 1.0,
                                 "Volume": 0.5
                             },
-                            "Element::Player": {
-                                "CurrentElement": 0
+                            "Element::Entity": {
+                                "Element": 3
                             },
                             "GameLogic::ILogic": {
                                 "Function": "update",
@@ -119,8 +119,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 94.43165588378906,
-                                    "y": -164.29942321777344
+                                    "x": 77.72573852539063,
+                                    "y": -121.30448913574219
                                 },
                                 "Resolution": 2,
                                 "Rotation": 0.0,
@@ -138,8 +138,8 @@
                                 "Mass": 2.0,
                                 "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": 0.4327293038368225,
-                                    "y": -0.530447781085968
+                                    "x": 4.138790700380923e-06,
+                                    "y": -0.0873316153883934
                                 }
                             },
                             "Render::Texture": {
@@ -156,7 +156,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 5,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -178,8 +178,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 94.43165588378906,
-                                    "y": -164.29942321777344
+                                    "x": 77.72573852539063,
+                                    "y": -121.30448913574219
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -359,6 +359,11 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Health": {
+                                "Health": 50.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
                             "Enemy::Attack": {
                                 "Cooldown": 2.0,
                                 "Function": "enemyBullet",
@@ -370,11 +375,6 @@
                                 "ScriptID": "",
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                            },
-                            "Health::Health": {
-                                "Health": 50.0,
-                                "InvulnerableFlag": false,
-                                "Lives": 1
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -440,6 +440,11 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
                             "Enemy::Attack": {
                                 "Cooldown": 2.0,
                                 "Function": "enemyBullet",
@@ -451,11 +456,6 @@
                                 "ScriptID": "",
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                            },
-                            "Health::Health": {
-                                "Health": 100.0,
-                                "InvulnerableFlag": false,
-                                "Lives": 1
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -522,7 +522,7 @@
                     "Entity": {
                         "Components": {
                             "Element::Source": {
-                                "Element": 1
+                                "Element": 3
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -531,8 +531,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 235.1019287109375,
-                                    "y": -200.40484619140625
+                                    "x": -69.14898681640625,
+                                    "y": -123.88662719726563
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -567,8 +567,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 235.1019287109375,
-                                    "y": -200.40484619140625
+                                    "x": -69.14898681640625,
+                                    "y": -123.88662719726563
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
