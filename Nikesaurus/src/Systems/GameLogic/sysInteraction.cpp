@@ -44,8 +44,8 @@ namespace NIKE {
         }
 
         void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {
-            auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(attacker);
-            auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(target);
+            auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
+            auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
 
             if (attacker_damage_comp && target_health_comp) {
                 auto& target_health = target_health_comp.value().get();

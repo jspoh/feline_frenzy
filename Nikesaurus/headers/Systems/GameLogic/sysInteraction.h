@@ -11,10 +11,6 @@
 #ifndef INTERACTION_HPP
 #define INTERACTION_HPP
 
-#include "Components/cElement.h"
-#include "Components/cHealth.h"
-#include "Components/cDamage.h"
-#include "Components/cPhysics.h"
 #include "Managers/Services/sEvents.h"
 #include "Managers/ECS/mEntity.h"
 #include "Managers/ECS/mSystem.h"

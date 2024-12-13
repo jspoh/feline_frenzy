@@ -49,12 +49,6 @@ namespace NIKE {
 		//Register shooting components
 		Shooting::registerComponents();
 
-		//Register Health components
-		Health::registerComponents();
-
-		//Register Damage components
-		Damage::registerComponents();
-
 		//Register Enemy components
 		Enemy::registerComponents();
 
@@ -63,6 +57,9 @@ namespace NIKE {
 
 		//Register Element components
 		Element::registerComponents();
+
+		//Register Combat components
+		Combat::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -100,8 +97,8 @@ namespace NIKE {
 
 		//Register interaction manager
 		auto interaction_sys = NIKE_ECS_MANAGER->registerSystem<Interaction::Manager>(false);
-		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Health::Health>());
-		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Damage::Damage>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Combat::Health>());
+		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Combat::Damage>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Element::Player>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Element::Source>());

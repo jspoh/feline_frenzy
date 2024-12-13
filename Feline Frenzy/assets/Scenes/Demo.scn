@@ -1,6 +1,10 @@
 [
     {
         "Channels": {
+            "BulletSFX": {
+                "loop": false,
+                "tracks": []
+            },
             "PlayerSFX": {
                 "loop": false,
                 "tracks": []
@@ -68,14 +72,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 9308,
+                                "Completed_Animations": 9600,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -131,8 +135,8 @@
                                 "Mass": 2.0,
                                 "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": 8.428242290392518e-05,
-                                    "y": 0.0003606877289712429
+                                    "x": 0.0,
+                                    "y": 0.0
                                 }
                             },
                             "Render::Texture": {
@@ -149,7 +153,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -352,6 +356,11 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Health": {
+                                "Health": 50.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
                             "Enemy::Attack": {
                                 "Cooldown": 2.0,
                                 "Function": "enemyBullet",
@@ -363,11 +372,6 @@
                                 "ScriptID": "",
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                            },
-                            "Health::Health": {
-                                "Health": 50.0,
-                                "InvulnerableFlag": false,
-                                "Lives": 1
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -433,6 +437,11 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
                             "Enemy::Attack": {
                                 "Cooldown": 2.0,
                                 "Function": "enemyBullet",
@@ -444,11 +453,6 @@
                                 "ScriptID": "",
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                            },
-                            "Health::Health": {
-                                "Health": 100.0,
-                                "InvulnerableFlag": false,
-                                "Lives": 1
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
