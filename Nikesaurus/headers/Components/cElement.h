@@ -22,6 +22,15 @@ namespace NIKE {
 			GRASS,
 		};
 
+		constexpr float elemental_multiplier_table[4][4] = {
+			//			NONE  FIRE   WATER  GRASS
+			/* NONE */ { 1.0f, 1.0f, 1.0f, 1.0f },
+			/* FIRE */ { 1.0f, 1.0f, 0.5f, 2.0f },
+			/* WATER */ { 1.0f, 2.0f, 1.0f, 0.5f },
+			/* GRASS */ { 1.0f, 0.5f, 2.0f, 1.0f }
+		};
+
+
 		struct Entity {
 			Elements element;			// Currently equipped element
 			// !TODO: Maybe make it random at the start?
