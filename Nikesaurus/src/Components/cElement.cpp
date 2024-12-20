@@ -37,42 +37,36 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Entity>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Entity& comp) {
 
-				ImGui::Text("Edit Element:");
-
 				// For current element
 				{
-					static Elements before_change_element;
+					ImGui::Text("Adjust element:");
+					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS" };
 
-					ImGui::DragInt("Current Element", reinterpret_cast<int*>(&comp.element), 1);
+					static Elements before_select_element;
+					static int previous_element = static_cast<int>(comp.element);
+					int current_element = static_cast<int>(comp.element);
 
-					// Check if begin editing
-					if (ImGui::IsItemActivated()) {
-						before_change_element = comp.element;
-					}
+					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
+						Elements new_element = static_cast<Elements>(current_element);
+						if (new_element != comp.element) {
+							// Save action
+							LevelEditor::Action save_element;
+							save_element.do_action = [&, element = new_element]() {
+								comp.element = element;
+								};
 
-					// Check if finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						// Within valid range check
-						// !TODO: Consider using a dropdown box instead?
-						if (static_cast<int>(comp.element) < static_cast<int>(Elements::NONE) ||
-							static_cast<int>(comp.element) > static_cast<int>(Elements::GRASS)) {
-							comp.element = Elements::NONE;
+							// Undo action
+							save_element.undo_action = [&, element = before_select_element]() {
+								comp.element = element;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
+
+							// Update the previous value
+							before_select_element = comp.element;
+							// Apply the new element
+							comp.element = new_element;
 						}
-
-						LevelEditor::Action change_element;
-
-						// Change do action
-						change_element.do_action = [&, element = comp.element]() {
-							comp.element = element;
-							};
-
-						// Change undo action
-						change_element.undo_action = [&, element = before_change_element]() {
-							comp.element = element;
-							};
-
-						// Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_element));
 					}
 				}
 			}
@@ -99,42 +93,36 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Source>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Source& comp) {
 
-				ImGui::Text("Edit Element:");
-
 				// For current element
 				{
-					static Elements before_change_element;
+					ImGui::Text("Adjust element:");
+					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS"};
 
-					ImGui::DragInt("Element", reinterpret_cast<int*>(&comp.element), 1);
+					static Elements before_select_element;
+					static int previous_element = static_cast<int>(comp.element);
+					int current_element = static_cast<int>(comp.element);
+					
+					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
+						Elements new_element = static_cast<Elements>(current_element);
+						if (new_element != comp.element) {
+							// Save action
+							LevelEditor::Action save_element;
+							save_element.do_action = [&, element = new_element]() {
+								comp.element = element;
+								};
 
-					// Check if begin editing
-					if (ImGui::IsItemActivated()) {
-						before_change_element = comp.element;
-					}
+							// Undo action
+							save_element.undo_action = [&, element = before_select_element]() {
+								comp.element = element;
+								};
 
-					// Check if finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						// Within valid range check
-						// !TODO: Consider using a dropdown box instead?
-						if (static_cast<int>(comp.element) < static_cast<int>(Elements::NONE) ||
-							static_cast<int>(comp.element) > static_cast<int>(Elements::GRASS)) {
-							comp.element = Elements::NONE;
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
+
+							// Update the previous value
+							before_select_element = comp.element;
+							// Apply the new element
+							comp.element = new_element;
 						}
-
-						LevelEditor::Action change_element;
-
-						// Change do action
-						change_element.do_action = [&, current_element = comp.element]() {
-							comp.element = current_element;
-							};
-
-						// Change undo action
-						change_element.undo_action = [&, current_element = before_change_element]() {
-							comp.element = current_element;
-							};
-
-						// Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_element));
 					}
 				}
 			}
