@@ -5373,14 +5373,39 @@ namespace NIKE {
 				//Default place holder text
 				std::string place_holder{ "New text" };
 
-				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+				// For lamda to use
+				auto entity_id = std::make_shared<Entity::Type>();
 
-				//Add transform
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(Vector2f(world_mouse_pos.x, -world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
+				// Define an undo/redo action
+				Action drag_drop_action;
 
-				//Add texture
-				NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(entity, Render::Text(asset_id, place_holder, color, 1.0f));
+				// For lamda to capture
+				Vector2f local_world_mouse_pos = getWorldMousePos();
+
+				//Do Action
+				drag_drop_action.do_action = [entity_id, color, asset_id, place_holder, local_world_mouse_pos]() {
+					//Creat new entity 
+					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+
+					//Add transform
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(Vector2f(local_world_mouse_pos.x, -local_world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
+
+					//Add texture
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(*entity_id, Render::Text(asset_id, place_holder, color, 1.0f));
+					};
+
+				//Undo Action
+				drag_drop_action.undo_action = [entity_id]() {
+
+					//Check if entity is still alive
+					if (NIKE_ECS_MANAGER->checkEntity(*entity_id)) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(*entity_id);
+					}
+					};
+
+				// Execute the action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(drag_drop_action));
 			}
 
 			//Scene file payload
