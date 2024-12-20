@@ -32,43 +32,81 @@ namespace NIKE {
         }
 
         void Manager::handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
+            // Player Element Swapping
+            // Check for E key pressed
+            if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
+                changeElement(entity_a, entity_b);
+            }
 
-            // Get entity's health and damage components
-            auto a_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity_a);
-            auto b_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity_b);
-
-            auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_a);
-            auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity_b);
-
-            // Apply damage if applicable
+            // Collision between damage and health
             applyDamage(entity_a, entity_b);
             applyDamage(entity_b, entity_a);
         }
 
         void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {
-            auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(attacker);
-            auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(target);
+            auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
+            auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
+            auto attacker_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(attacker);
+            auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
-            if (attacker_damage_comp && target_health_comp) {
-                auto& target_health = target_health_comp.value().get();
-                auto& attacker_damage = attacker_damage_comp.value().get().damage;
+            // Return if no damage comp and health comp
+            if (!(attacker_damage_comp && target_health_comp)) {
+                return;
+            }
 
-                // Check invulnerability flag
-                if (target_health.invulnerableFlag) {
-                    return; // Skip damage
-                }
+            auto& target_health = target_health_comp.value().get();
+            auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
-                // Apply damage
-                target_health.health -= attacker_damage;
-                NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
-                    target, attacker_damage, attacker, target_health.health);
+            // Check invulnerability flag
+            if (target_health.invulnerableFlag) {
+                return; // Skip damage
+            }
 
-                // Check if target health drops to zero or below
-                if (target_health.health <= 0) {
-                    NIKE_ECS_MANAGER->markEntityForDeletion(target);
-                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
-                }
+            // Default dmg multiplier
+            float multiplier = 1.f;
+
+            // Apply elemental damage multiplier
+            if (attacker_element_comp && target_element_comp) {
+                auto attacker_element = attacker_element_comp.value().get().element;
+                auto target_element = target_element_comp.value().get().element;
+
+                multiplier = getElementMultiplier(attacker_element, target_element);
+            }
+
+            // Apply damage
+            target_health.health -= (attacker_damage * multiplier);
+            NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
+                target, attacker_damage, attacker, target_health.health);
+
+            // Check if target health drops to zero or below
+            if (target_health.health <= 0) {
+                NIKE_ECS_MANAGER->markEntityForDeletion(target);
+                NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
             }
         }
+
+        void Manager::changeElement(Entity::Type player, Entity::Type source) {
+
+            // Checking if it is the player that collided with element source
+            if (!NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player)) {
+                return;
+            }
+
+            auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+            auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
+
+            if (player_element_comp && source_element_comp) {
+                auto& player_element = player_element_comp.value().get().element;
+                auto& source_element = source_element_comp.value().get().element;
+
+                // Set player element to source element
+                player_element = source_element;
+            }
+        }
+
+        float Manager::getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
+            return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
+        }
+
     }
 }

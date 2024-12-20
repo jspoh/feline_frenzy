@@ -12,7 +12,7 @@
         }
     },
     {
-        "Grid ID": "Demo.grid"
+        "Grid ID": "element_test.grid"
     },
     {
         "Layer": {
@@ -72,7 +72,7 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 9648,
+                                "Completed_Animations": 6,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.01666666753590107
@@ -102,6 +102,9 @@
                                 "Pitch": 1.0,
                                 "Volume": 0.5
                             },
+                            "Element::Entity": {
+                                "Element": 3
+                            },
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
@@ -116,8 +119,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 85.84313201904297,
-                                    "y": -128.7656707763672
+                                    "x": 77.72573852539063,
+                                    "y": -121.30448913574219
                                 },
                                 "Resolution": 2,
                                 "Rotation": 0.0,
@@ -135,8 +138,8 @@
                                 "Mass": 2.0,
                                 "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 4.138790700380923e-06,
+                                    "y": -0.0873316153883934
                                 }
                             },
                             "Render::Texture": {
@@ -175,8 +178,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 85.84313201904297,
-                                    "y": -128.7656707763672
+                                    "x": 77.72573852539063,
+                                    "y": -121.30448913574219
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -511,6 +514,73 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "Box",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Element::Source": {
+                                "Element": 3
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -69.14898681640625,
+                                    "y": -123.88662719726563
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 106.31781005859375,
+                                    "y": 106.31781005859375
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Icon_32x32.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -69.14898681640625,
+                                    "y": -123.88662719726563
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 106.31781005859375,
+                                    "y": 106.31781005859375
+                                }
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "ElementSource",
                             "Prefab_ID": ""
                         }
                     }

@@ -485,7 +485,7 @@ namespace NIKE {
 
         // God mode toggle
         lua_state.set_function("SetGodMode", [&](Entity::Type entity, bool enable) {
-            auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Health::Health>(entity);
+            auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
             if (health_comp) {
                 health_comp.value().get().invulnerableFlag = enable;
                 if (health_comp.value().get().invulnerableFlag) {
@@ -499,7 +499,7 @@ namespace NIKE {
 
         // High Damage toggle
         lua_state.set_function("SetHighDamage", [&](Entity::Type entity, bool enable) {
-            auto damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Damage::Damage>(entity);
+            auto damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity);
             if (damage_comp) {
                 if (enable) {
                     damage_comp.value().get().damage = 9999.0f; // High damage

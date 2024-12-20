@@ -11,9 +11,6 @@
 #ifndef INTERACTION_HPP
 #define INTERACTION_HPP
 
-#include "Components/cHealth.h"
-#include "Components/cDamage.h"
-#include "Components/cPhysics.h"
 #include "Managers/Services/sEvents.h"
 #include "Managers/ECS/mEntity.h"
 #include "Managers/ECS/mSystem.h"
@@ -53,6 +50,12 @@ namespace NIKE {
 
             // Apply damage
             void applyDamage(Entity::Type attacker, Entity::Type target);
+
+            // Change element
+            void changeElement(Entity::Type player, Entity::Type source);
+
+            // Get Elemental Multiplier for Elements
+            float getElementMultiplier(Element::Elements attacker, Element::Elements target);
         };
 
     }

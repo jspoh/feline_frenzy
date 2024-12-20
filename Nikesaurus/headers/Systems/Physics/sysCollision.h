@@ -14,8 +14,6 @@
 
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
-#include "Components/cHealth.h"
-#include "Components/cDamage.h"
 
 namespace NIKE {
     namespace Collision {
