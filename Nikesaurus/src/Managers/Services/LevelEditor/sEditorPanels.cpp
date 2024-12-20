@@ -5327,14 +5327,36 @@ namespace NIKE {
 				//Default model color
 				Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-				//Create entity
-				auto entity = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+				// Define an undo/redo action
+				Action drag_drop_action;
 
-				//Add transform
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(entity, Transform::Transform(render_pos, size, 0.0f));
+				// For lamda to use
+				auto entity_id = std::make_shared<Entity::Type>();
 
-				//Add model
-				NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(entity, Render::Shape(asset_id, color));
+				//Do Action
+				drag_drop_action.do_action = [entity_id, size, color, asset_id, render_pos]() {
+					//Creat new entity 
+					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+
+					//Add transform
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(render_pos, size, 0.0f));
+
+					//Add model
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(*entity_id, Render::Shape(asset_id, color));
+					};
+
+				//Undo Action
+				drag_drop_action.undo_action = [entity_id]() {
+
+					//Check if entity is still alive
+					if (NIKE_ECS_MANAGER->checkEntity(*entity_id)) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(*entity_id);
+					}
+					};
+
+				// Execute the action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(drag_drop_action));
 			}
 
 			//Texture font payload
