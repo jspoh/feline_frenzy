@@ -17,6 +17,13 @@
 namespace NIKE {
 	namespace Audio {
 
+		// Game pause event
+		struct PausedEvent : public Events::IEvent {
+			bool b_game_state;
+
+			PausedEvent(bool b_game_state) : b_game_state{ b_game_state } {}
+		};
+
 		//SFX Struct
 		struct SFX {
 			bool b_play_sfx;

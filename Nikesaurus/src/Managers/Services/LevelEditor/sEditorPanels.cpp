@@ -318,15 +318,17 @@ namespace NIKE {
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
 					Action set_game_state;
-
+					
 					//Do game mode
 					set_game_state.do_action = [&, mode = !b_game_state]() {
 						setGameState(mode);
+						NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(mode));
 						};
 
 					//Undo game mode
 					set_game_state.undo_action = [&, mode = b_game_state]() {
 						setGameState(mode);
+						NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(mode));
 						};
 
 					//Execute action

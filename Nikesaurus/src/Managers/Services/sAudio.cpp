@@ -393,7 +393,23 @@ namespace NIKE {
 	//Definition of static groups
 	std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> NIKE::Audio::Service::channel_groups;
 
-	void NIKE::Audio::Service::setAudioSystem(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
+	void Audio::Service::onEvent(std::shared_ptr<Audio::PausedEvent> event) {
+		
+		if (event->b_game_state) {
+			resumeAllChannels();
+		}
+		else {
+			pauseAllChannels();
+		}
+
+		event->setEventProcessed(true);
+	}
+
+	void NIKE::Audio::Service::init(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
+		//Setup events listening
+		std::shared_ptr<Audio::Service> audio_sys_wrapped(this, [](Audio::Service*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Audio::PausedEvent>(audio_sys_wrapped);
+
 		audio_system = audio_sys;
 	}
 

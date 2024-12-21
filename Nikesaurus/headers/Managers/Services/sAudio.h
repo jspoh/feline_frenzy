@@ -14,6 +14,8 @@
 #ifndef SERVICE_AUDIO_HPP
 #define SERVICE_AUDIO_HPP
 
+#include "Components/cAudio.h"
+
 namespace NIKE {
 	namespace Audio {
 		//Temporary Disable DLL Export Warning
@@ -377,12 +379,16 @@ namespace NIKE {
 		* Audio Service
 		*********************************************************************/
 
-		//Audio Service
-		class NIKE_API Service {
+		class NIKE_API Service
+			: public Events::IEventListener<Audio::PausedEvent> {
+
 		private:
 			// Delete Copy Constructor & Copy Assignment
 			Service(Service const& rhs) = delete;
 			void operator=(Service const& copy) = delete;
+
+			// On Pause event;
+			void onEvent(std::shared_ptr<Audio::PausedEvent> event) override;
 
 			//Audio System
 			std::shared_ptr<Audio::IAudioSystem> audio_system;
@@ -410,8 +416,8 @@ namespace NIKE {
 			//Destructor
 			~Service() = default;
 
-			//Set Audio system
-			void setAudioSystem(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+			//Init Audio Service
+			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
 
 			//Get Audio System
 			std::shared_ptr<Audio::IAudioSystem> getAudioSystem() const;
