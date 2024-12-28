@@ -1085,6 +1085,9 @@ namespace NIKE {
 
 		//Get transform component
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto camera_height = NIKE_CAMERA_SERVICE->getCameraHeight();
+
+		float gizmo_base_scale = camera_height * 0.05f;
 		if (!e_transform_comp.has_value())
 			return;
 
@@ -1098,8 +1101,8 @@ namespace NIKE {
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
 			//Extra object for translate ( Move box )
-			gizmo.objects["Move Box"].first.position = { e_transform.position.x + (e_transform.scale.x * 0.75f), e_transform.position.y + (e_transform.scale.y * 0.75f) };
-			gizmo.objects["Move Box"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Move Box"].first.position = { e_transform.position.x + gizmo_base_scale * 2.5f + gizmo.x_axis_offset, e_transform.position.y + gizmo_base_scale * 2.5f + gizmo.y_axis_offset };
+			gizmo.objects["Move Box"].first.scale = { gizmo_base_scale, gizmo_base_scale };
 			gizmo.objects["Move Box"].second = { 100, 100, 100, 255 };
 
 			//Interaction with move box
@@ -1115,17 +1118,17 @@ namespace NIKE {
 				}
 
 				//Apply transformation
-				e_transform.position = { world_mouse.x - (e_transform.scale.x * 0.75f),  -world_mouse.y - (e_transform.scale.y * 0.75f) };
+				e_transform.position = { world_mouse.x - (gizmo_base_scale * 2.5f + gizmo.x_axis_offset),  -world_mouse.y - (gizmo_base_scale * 2.5f + gizmo.y_axis_offset) };
 			}
 
 			//Add gizmo up
-			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f) };
-			gizmo.objects["Up"].first.scale = { e_transform.scale.x * 0.05f, e_transform.scale.y };
+			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset };
+			gizmo.objects["Up"].first.scale = { gizmo_base_scale * 0.3f , gizmo_base_scale * 4 };
 			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + e_transform.scale.y };
-			gizmo.objects["Up Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo_base_scale * 2.5f + gizmo.y_axis_offset};
+			gizmo.objects["Up Point"].first.scale = { gizmo_base_scale * 0.7f, gizmo_base_scale };
 			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
 			//Interaction with up
@@ -1157,13 +1160,13 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].first.position = { e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y };
-			gizmo.objects["Right"].first.scale = { e_transform.scale.x, e_transform.scale.y * 0.05f };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset , e_transform.position.y };
+			gizmo.objects["Right"].first.scale = { gizmo_base_scale * 4, gizmo_base_scale * 0.3f };
 			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].first.position = { e_transform.position.x + e_transform.scale.x, e_transform.position.y };
-			gizmo.objects["Right Point"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo_base_scale * 2.5f + gizmo.x_axis_offset, e_transform.position.y };
+			gizmo.objects["Right Point"].first.scale = { gizmo_base_scale, gizmo_base_scale * 0.7f };
 			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
 			//Interaction with right
@@ -1194,9 +1197,9 @@ namespace NIKE {
 			}
 
 			//Add gizmo center
-			gizmo.objects["Center"].first.position = { e_transform.position.x, e_transform.position.y };
-			gizmo.objects["Center"].first.scale = { e_transform.scale.x * 0.25f, e_transform.scale.y * 0.25f };
-			gizmo.objects["Center"].second = { 255, 255, 255, 255 };
+			//gizmo.objects["Center"].first.position = { e_transform.position.x, e_transform.position.y };
+			//gizmo.objects["Center"].first.scale = { gizmo_base_scale, gizmo_base_scale };
+			//gizmo.objects["Center"].second = { 255, 255, 255, 255 };
 
 			//Dragging stopped
 			if ((gizmo.b_dragging_hori || gizmo.b_dragging_vert) && ImGui::GetIO().MouseReleased[ImGuiMouseButton_Left]) {
@@ -1806,6 +1809,10 @@ namespace NIKE {
 						interactGizmo();
 					}
 				}
+				ImGui::Text("Set X Axis Offset: ");
+				ImGui::DragFloat("##GizmoXAxis", &gizmo.x_axis_offset, 0.01f, 0.0f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+				ImGui::Text("Set Y Axis Offset : ");
+				ImGui::DragFloat("##GizmoYAxis", &gizmo.y_axis_offset, 0.01f, 0.0f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 			}
 
 			//Add Spacing
@@ -1966,8 +1973,8 @@ namespace NIKE {
 			worldTriangleFilled(draw, right_point.first, ImGuiDir::ImGuiDir_Right, rendersize, IM_COL32(right_point.second.r, right_point.second.g, right_point.second.b, right_point.second.a));
 
 			//Draw center
-			auto const& center = gizmo.objects["Center"];
-			worldCircleFilled(draw, center.first, rendersize, IM_COL32(center.second.r, center.second.g, center.second.b, center.second.a));
+			//auto const& center = gizmo.objects["Center"];
+			//worldCircleFilled(draw, center.first, rendersize, IM_COL32(center.second.r, center.second.g, center.second.b, center.second.a));
 
 			break;
 		}
