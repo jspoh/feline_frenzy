@@ -2425,7 +2425,7 @@ namespace NIKE {
 		ImGui::SetCursorPos(pos);
 
 		//Check if prefab display is valid
-		if (prefab_display != UINT16_MAX) {
+		if (prefab_display != UINT16_MAX && NIKE_ECS_MANAGER->checkEntity(prefab_display)) {
 
 			//Set flag to true
 			b_editing_prefab = true;
@@ -2587,7 +2587,7 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::createDisplayPrefab(const std::string& file_path)
 	{
 		//Destroy previous master copy
-		if (prefab_display != UINT16_MAX) {
+		if (prefab_display != UINT16_MAX && NIKE_ECS_MANAGER->checkEntity(prefab_display)) {
 			destroyDisplayPrefab();
 		}
 
