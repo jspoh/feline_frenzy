@@ -318,7 +318,7 @@ namespace NIKE {
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
 					Action set_game_state;
-					
+
 					//Do game mode
 					set_game_state.do_action = [&, mode = !b_game_state]() {
 						setGameState(mode);
@@ -724,6 +724,7 @@ namespace NIKE {
 	void LevelEditor::EntitiesPanel::update() {
 		int index = 0;
 		for (auto it = entities.begin(); it != entities.end(); ++it) {
+
 			//Update entities ref
 			if (it->second.entity_id.find("entity_") != std::string::npos) {
 
@@ -851,6 +852,11 @@ namespace NIKE {
 			//Iterate through all entities to showcase active entities
 			for (auto& entity : entities) {
 
+				// Skip through "Prefab Master" entity
+				if (entity.second.entity_id.find("Prefab Master") != std::string::npos) {
+					continue;
+				}
+
 				//Check if entity is selected
 				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity.first).c_str() == entity_to_name.at(selected_entity).c_str();
 
@@ -895,7 +901,7 @@ namespace NIKE {
 						auto prev_entity = selected_entity;
 
 						// Define the do action for unselecting
-						unselect_entity_action.do_action = [&, prev_entity]() {
+						unselect_entity_action.do_action = [&, prev_entity]() {	
 							unselectEntity();
 							b_entity_changed = true;
 							};
@@ -963,7 +969,7 @@ namespace NIKE {
 		name_to_entity[data.entity_id] = entity;
 	}
 
-	LevelEditor::EntityMetaData LevelEditor::EntitiesPanel::getEntityMetaData(Entity::Type entity) const{
+	LevelEditor::EntityMetaData LevelEditor::EntitiesPanel::getEntityMetaData(Entity::Type entity) const {
 		//Get selected entity data
 		auto it = entities.find(entity);
 
@@ -1042,6 +1048,7 @@ namespace NIKE {
 
 		//Add new entities from the ECS that are not yet in the editor
 		for (auto& entity : ecs_entities) {
+
 			if (entities.find(entity) == entities.end()) {
 
 				//Create identifier for entity
@@ -1638,7 +1645,7 @@ namespace NIKE {
 			if (ImGui::Button("Cancel")) {
 				closePopUp(popup_id);
 			}
-		};
+			};
 	}
 
 	void LevelEditor::ComponentsPanel::init() {
@@ -2871,7 +2878,7 @@ namespace NIKE {
 		static std::unordered_map<std::string, std::string> channel_audio_ids;
 		static std::unordered_map<std::string, int> channel_indices;
 		static std::unordered_map<std::string, bool> open_playlists;
-		
+
 		const auto& all_loaded_sounds = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Music);
 
 		for (auto& channel : NIKE_AUDIO_SERVICE->getAllChannelGroups()) {
@@ -2895,7 +2902,7 @@ namespace NIKE {
 				ImGui::Spacing();
 
 
-				if (ImGui::Button(channel.second->getPaused() ? std::string("Unpause Channel##" + channel.first).c_str() : std::string("Pause Channel##" + channel.first).c_str() )) {
+				if (ImGui::Button(channel.second->getPaused() ? std::string("Unpause Channel##" + channel.first).c_str() : std::string("Pause Channel##" + channel.first).c_str())) {
 					channel.second->setPaused(!channel.second->getPaused());
 				}
 
@@ -4133,7 +4140,7 @@ namespace NIKE {
 					btn_id.resize(strlen(btn_id.c_str()));
 				}
 			}
-			
+
 			ImGui::Separator();
 
 			//Button Text
@@ -4203,7 +4210,7 @@ namespace NIKE {
 				//Select render mode
 				ImGui::Text("Button Render: ");
 				ImGui::SameLine();
-				if(ImGui::SmallButton(b_model ? "Model" : "Texture")) {
+				if (ImGui::SmallButton(b_model ? "Model" : "Texture")) {
 					b_model = !b_model;
 				}
 
@@ -4220,10 +4227,10 @@ namespace NIKE {
 							render_ref = all_loaded_texture[texture_index];
 						}
 					}
-				} 
-				else{
+				}
+				else {
 					// Get all loaded fonts
-					const auto & all_loaded_models = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Model);
+					const auto& all_loaded_models = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Model);
 
 					// Display combo box for font selection
 					ImGui::Text("Button Shape: ");
@@ -5401,7 +5408,7 @@ namespace NIKE {
 
 					//Add texture
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(*entity_id, Render::Texture(asset_id, { 0.0f, 0.0f, 0.0f, 1.0f }));
-				};
+					};
 
 				//Undo Action
 				drag_drop_action.undo_action = [entity_id]() {
@@ -5411,7 +5418,7 @@ namespace NIKE {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(*entity_id);
 					}
-				};
+					};
 
 				// Execute the action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(drag_drop_action));
