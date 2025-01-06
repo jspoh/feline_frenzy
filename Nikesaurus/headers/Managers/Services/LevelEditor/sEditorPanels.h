@@ -320,8 +320,8 @@ namespace NIKE {
 				//Gizmo sensitivity
 				float sensitivity;
 
-				//Gizmo Scale
-				float gizmo_scale;
+				//Gizmo Scaling
+				float gizmo_scaling;
 
 				//Arrows Offset
 				float x_axis_offset;
@@ -342,7 +342,7 @@ namespace NIKE {
 				//Gizmo objects ( transform & color )
 				std::unordered_map<std::string, std::pair<Transform::Transform, Vector4i>> objects;
 
-				Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, gizmo_scale { 45.f }, x_axis_offset{ 98.5f }, y_axis_offset{ 98.5f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
+				Gizmo() : mode{ GizmoMode::Translate }, sensitivity{ 1.0f }, gizmo_scaling { 45.f }, x_axis_offset{ 98.5f }, y_axis_offset{ 98.5f }, b_interacting{ false }, b_dragging_vert{ false }, b_dragging_hori{ false }, prev_transform() {}
 			};
 
 			//Reference to game window panel

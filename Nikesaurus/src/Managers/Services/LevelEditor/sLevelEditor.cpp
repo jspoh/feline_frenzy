@@ -255,7 +255,7 @@ namespace NIKE {
 		//Return if editor is not active
 		if (!b_editor_active)
 			return;
-
+		
 		//Undo
 		static bool z_triggered = false;
 		if (io.KeyCtrl && io.KeysDown[ImGuiKey_Z]) {

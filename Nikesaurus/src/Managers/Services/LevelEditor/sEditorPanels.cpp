@@ -1092,6 +1092,12 @@ namespace NIKE {
 		//Get transform
 		auto& e_transform = e_transform_comp.value().get();
 
+		//Get camera zoom
+		float cam_zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+
+		//Get gizmo Scale
+		float gizmo_scale = gizmo.gizmo_scaling * cam_zoom;
+
 		//Get mouse pos
 		Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
 
@@ -1099,8 +1105,8 @@ namespace NIKE {
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
 			//Extra object for translate ( Move box )
-			gizmo.objects["Move Box"].first.position = { e_transform.position.x + gizmo.gizmo_scale * 2.5f + gizmo.x_axis_offset, e_transform.position.y + gizmo.gizmo_scale * 2.5f + gizmo.y_axis_offset };
-			gizmo.objects["Move Box"].first.scale = { gizmo.gizmo_scale, gizmo.gizmo_scale };
+			gizmo.objects["Move Box"].first.position = { e_transform.position.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Move Box"].first.scale = { gizmo_scale, gizmo_scale };
 			gizmo.objects["Move Box"].second = { 100, 100, 100, 255 };
 
 			//Interaction with move box
@@ -1116,17 +1122,17 @@ namespace NIKE {
 				}
 
 				//Apply transformation
-				e_transform.position = { world_mouse.x - (gizmo.gizmo_scale * 2.5f + gizmo.x_axis_offset),  -world_mouse.y - (gizmo.gizmo_scale * 2.5f + gizmo.y_axis_offset) };
+				e_transform.position = { world_mouse.x - (gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom),  -world_mouse.y - (gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom) };
 			}
 
 			//Add gizmo up
-			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset };
-			gizmo.objects["Up"].first.scale = { gizmo.gizmo_scale * 0.3f , gizmo.gizmo_scale * 4 };
+			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up"].first.scale = { gizmo_scale * 0.3f , gizmo_scale * 4 };
 			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.gizmo_scale * 2.5f + gizmo.y_axis_offset};
-			gizmo.objects["Up Point"].first.scale = { gizmo.gizmo_scale * 0.7f, gizmo.gizmo_scale };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up Point"].first.scale = { gizmo_scale * 0.7f, gizmo_scale };
 			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
 			//Interaction with up
@@ -1158,13 +1164,13 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset , e_transform.position.y };
-			gizmo.objects["Right"].first.scale = { gizmo.gizmo_scale * 4, gizmo.gizmo_scale * 0.3f };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset * cam_zoom , e_transform.position.y };
+			gizmo.objects["Right"].first.scale = { gizmo_scale * 4, gizmo_scale * 0.3f };
 			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo.gizmo_scale * 2.5f + gizmo.x_axis_offset, e_transform.position.y };
-			gizmo.objects["Right Point"].first.scale = { gizmo.gizmo_scale, gizmo.gizmo_scale * 0.7f };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y };
+			gizmo.objects["Right Point"].first.scale = { gizmo_scale, gizmo_scale * 0.7f };
 			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
 			//Interaction with right
@@ -1196,7 +1202,7 @@ namespace NIKE {
 
 			//Add gizmo center
 			//gizmo.objects["Center"].first.position = { e_transform.position.x, e_transform.position.y };
-			//gizmo.objects["Center"].first.scale = { gizmo.gizmo_scale, gizmo.gizmo_scale };
+			//gizmo.objects["Center"].first.scale = { gizmo_scale, gizmo_scale };
 			//gizmo.objects["Center"].second = { 255, 255, 255, 255 };
 
 			//Dragging stopped
@@ -1239,13 +1245,13 @@ namespace NIKE {
 		}
 		case GizmoMode::Scale: {
 			//Add gizmo up
-			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset };
-			gizmo.objects["Up"].first.scale = { gizmo.gizmo_scale * 0.3f , gizmo.gizmo_scale * 4 };
+			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up"].first.scale = { gizmo_scale * 0.3f , gizmo_scale * 4 };
 			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.gizmo_scale * 2.f + gizmo.y_axis_offset };
-			gizmo.objects["Up Point"].first.scale = { gizmo.gizmo_scale * 0.8f, gizmo.gizmo_scale * 0.8f };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo_scale * 2.f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up Point"].first.scale = { gizmo_scale * 0.8f, gizmo_scale * 0.8f };
 			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
 			//Interaction with up
@@ -1285,13 +1291,13 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset , e_transform.position.y };
-			gizmo.objects["Right"].first.scale = { gizmo.gizmo_scale * 4, gizmo.gizmo_scale * 0.3f };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset * cam_zoom, e_transform.position.y };
+			gizmo.objects["Right"].first.scale = { gizmo_scale * 4, gizmo_scale * 0.3f };
 			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo.gizmo_scale * 2.f + gizmo.x_axis_offset, e_transform.position.y };
-			gizmo.objects["Right Point"].first.scale = { gizmo.gizmo_scale * 0.8f, gizmo.gizmo_scale * 0.8f };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo_scale * 2.f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y };
+			gizmo.objects["Right Point"].first.scale = { gizmo_scale * 0.8f, gizmo_scale * 0.8f };
 			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
 			//Interaction with right
@@ -1364,7 +1370,7 @@ namespace NIKE {
 
 			//Add rotation circle
 			gizmo.objects["Rot Circle"].first.position = { e_transform.position.x, e_transform.position.y };
-			gizmo.objects["Rot Circle"].first.scale = { gizmo.gizmo_scale * 8, gizmo.gizmo_scale * 8 };
+			gizmo.objects["Rot Circle"].first.scale = { gizmo_scale * 8, gizmo_scale * 8 };
 			gizmo.objects["Rot Circle"].second = { 255, 255, 255, 255 };
 
 			//Click on circle and change rotation point
@@ -1403,10 +1409,10 @@ namespace NIKE {
 
 			//Add rotation point
 			gizmo.objects["Rot Point"].first.position = {
-				gizmo.objects["Rot Circle"].first.position.x + (gizmo.gizmo_scale * 4) * cos(e_transform.rotation * static_cast<float>(M_PI) / 180.0f),
-				gizmo.objects["Rot Circle"].first.position.y + (gizmo.gizmo_scale * 4) * sin(e_transform.rotation * static_cast<float>(M_PI) / 180.0f)
+				gizmo.objects["Rot Circle"].first.position.x + (gizmo_scale * 4) * cos(e_transform.rotation * static_cast<float>(M_PI) / 180.0f),
+				gizmo.objects["Rot Circle"].first.position.y + (gizmo_scale * 4) * sin(e_transform.rotation * static_cast<float>(M_PI) / 180.0f)
 			};
-			gizmo.objects["Rot Point"].first.scale = { gizmo.gizmo_scale * 0.8f, gizmo.gizmo_scale * 0.8f };
+			gizmo.objects["Rot Point"].first.scale = { gizmo_scale * 0.8f, gizmo_scale * 0.8f };
 			gizmo.objects["Rot Point"].second = { 100, 100, 100, 255 };
 
 			//Check for interactiom with rotation point
@@ -1813,23 +1819,23 @@ namespace NIKE {
 						// Set Gizmo Scale
 						{
 							ImGui::Text("Set Gizmo Scale: ");
-							ImGui::DragFloat("##GizmoScale", &gizmo.gizmo_scale, 0.1f, 0.1f, (float)UINT16_MAX, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+							ImGui::DragFloat("##GizmoScale", &gizmo.gizmo_scaling, 0.1f, 0.1f, (float)UINT16_MAX, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
-							static float scale_before_change = gizmo.gizmo_scale;
+							static float scale_before_change = gizmo.gizmo_scaling;
 
 							if (ImGui::IsItemActivated()) {
-								scale_before_change = gizmo.gizmo_scale;
+								scale_before_change = gizmo.gizmo_scaling;
 							}
 
 							if (ImGui::IsItemDeactivatedAfterEdit()) {
 								Action set_gizmo_scale;
 
-								set_gizmo_scale.do_action = [&, scale = gizmo.gizmo_scale]() {
-									gizmo.gizmo_scale = scale;
+								set_gizmo_scale.do_action = [&, scale = gizmo.gizmo_scaling]() {
+									gizmo.gizmo_scaling = scale;
 									};
 
 								set_gizmo_scale.undo_action = [&, scale = scale_before_change]() {
-									gizmo.gizmo_scale = scale;
+									gizmo.gizmo_scaling = scale;
 									};
 
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_gizmo_scale));
@@ -1994,7 +2000,7 @@ namespace NIKE {
 		if (gizmo.mode == GizmoMode::Rotate && main_panel.lock()->getGizmoState()) {
 			//Render rotation circle
 			auto const& rotation_circle = gizmo.objects["Rot Circle"];
-			worldCircle(draw, rotation_circle.first, rendersize, IM_COL32(rotation_circle.second.r, rotation_circle.second.g, rotation_circle.second.b, rotation_circle.second.a), gizmo.gizmo_scale * 0.15f);
+			worldCircle(draw, rotation_circle.first, rendersize, IM_COL32(rotation_circle.second.r, rotation_circle.second.g, rotation_circle.second.b, rotation_circle.second.a), gizmo.gizmo_scaling * 0.15f);
 		}
 		else {
 			//Render rotated rectangle
@@ -2093,7 +2099,7 @@ namespace NIKE {
 			auto const& rotation_point = gizmo.objects["Rot Point"];
 
 			//Draw line of rotation
-			worldLine(draw, e_transform.position, rotation_point.first.position, rendersize, IM_COL32(255, 255, 255, 255), gizmo.gizmo_scale * 0.15f);
+			worldLine(draw, e_transform.position, rotation_point.first.position, rendersize, IM_COL32(255, 255, 255, 255), gizmo.gizmo_scaling * 0.15f);
 
 			//Draw point of rotation
 			worldCircleFilled(draw, rotation_point.first, rendersize, IM_COL32(rotation_point.second.r, rotation_point.second.g, rotation_point.second.b, rotation_point.second.a));
@@ -4021,7 +4027,7 @@ namespace NIKE {
 			// Position Controls
 			ImGui::Text("Position:");
 
-			if (ImGui::Button("Up") || ImGui::IsItemActive()) {
+			if (ImGui::Button("Up") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_UP)) {
 				// Move camera position up
 				active_cam.position.y += 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4030,7 +4036,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Down") || ImGui::IsItemActive()) {
+			if (ImGui::Button("Down") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_DOWN)) {
 				// Move camera position down
 				active_cam.position.y -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4039,7 +4045,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Left") || ImGui::IsItemActive()) {
+			if (ImGui::Button("Left") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT)) {
 				// Move camera position left
 				active_cam.position.x -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4048,7 +4054,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Right") || ImGui::IsItemActive()) {
+			if (ImGui::Button("Right") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_RIGHT)) {
 				// Move camera position right
 				active_cam.position.x += 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4067,7 +4073,17 @@ namespace NIKE {
 			ImGui::Spacing();
 		}
 
+		ImGuiIO& io = ImGui::GetIO();
+		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+
 		// Zoom Controls
+
+		// Scroll To Zoom
+		if (!checkPopUpShowing() && game_window->isMouseInWindow()) {
+			active_cam.zoom -= io.MouseWheel * ImGui::GetIO().DeltaTime;
+			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
+		}
+
 		ImGui::Text("Zoom:");
 		if (ImGui::Button("Zoom In") || ImGui::IsItemActive()) {
 			active_cam.zoom -= 1.0f * ImGui::GetIO().DeltaTime;
