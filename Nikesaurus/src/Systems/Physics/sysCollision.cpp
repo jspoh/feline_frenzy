@@ -88,7 +88,7 @@ namespace NIKE {
         });
 
         // Get delta time
-        const float deltaTime = NIKE_ENGINE.getService<Windows::Service>()->getDeltaTime();
+        const float delta_time = NIKE_ENGINE.getService<Windows::Service>()->getFixedDeltaTime();
 
         // Step 1: Static collision detection
         if (!(aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x ||
@@ -125,7 +125,7 @@ namespace NIKE {
 
         // Initialize time of first and last collision along each axis
         Vector2f t_first = { 0.0f, 0.0f };
-        Vector2f t_last = { deltaTime, deltaTime };
+        Vector2f t_last = { delta_time, delta_time };
 
         // Check dynamic collision along x-axis
         if (std::abs(vel_rel.x) > EPSILON) {
@@ -161,7 +161,7 @@ namespace NIKE {
         float t_first_overall = Utility::getMax(t_first.x, t_first.y);
         float t_last_overall = Utility::getMin(t_last.x, t_last.y);
 
-        if (t_first_overall > t_last_overall || t_first_overall > deltaTime) {
+        if (t_first_overall > t_last_overall || t_first_overall > delta_time) {
             return false; // No collision detected
         }
 
