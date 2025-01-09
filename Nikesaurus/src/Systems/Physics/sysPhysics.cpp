@@ -39,7 +39,8 @@ namespace NIKE {
 
             //Iterate through layers
             for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
-                //SKip inactive layer
+
+                //Skip inactive layer
                 if (!layer->getLayerState())
                     continue;
 
@@ -62,6 +63,7 @@ namespace NIKE {
                     }
 
 
+
                     //Skip entities that are not present within layer & entities without transform component
                     //if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
                     //    continue;
@@ -74,6 +76,7 @@ namespace NIKE {
                     //Update entities with dynamics
                     auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
                     if (e_dynamics_comp) {
+
                         auto& e_dynamics = e_dynamics_comp.value().get();
 
                         //Ensure that mass is not negative
@@ -190,7 +193,7 @@ namespace NIKE {
                                         info
                                     );
 
-                                    return;
+                                    continue;
                                 }
                             }
                             // Perform SAT collision detection if AABB fails
@@ -207,7 +210,7 @@ namespace NIKE {
                                     info
                                 );
 
-                                return;
+                                continue;
                             }
 
                             // Reset collision flags if no collision
