@@ -4,14 +4,14 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 4292,
+            "Completed_Animations": 4,
             "Frame_Duration": 0.054999999701976776,
             "Mode": 0,
-            "Timer": 0.0
+            "Timer": 0.01666666753590107
         },
         "Animation::Sprite": {
             "Curr_Index": {
-                "x": 3,
+                "x": 5,
                 "y": 0
             },
             "End_Index": {
@@ -37,7 +37,7 @@
         "GameLogic::ILogic": {
             "Function": "update",
             "Named_Args": {
-                "entity": 1
+                "entity": 10
             },
             "Script_ID": "player.lua"
         },
@@ -48,8 +48,8 @@
                 "y": 0.0
             },
             "Position": {
-                "x": -9.835346221923828,
-                "y": 77.0213623046875
+                "x": -140.85226440429688,
+                "y": -69.94904327392578
             },
             "Resolution": 2,
             "Rotation": 0.0,
@@ -64,11 +64,11 @@
                 "x": 0.0,
                 "y": 0.0
             },
-            "Mass": 2.0,
+            "Mass": 0.5,
             "Max_Speed": 150.0,
             "Velocity": {
-                "x": 0.0025718845427036285,
-                "y": 0.0001951316517079249
+                "x": -0.1032002866268158,
+                "y": 0.09121019393205643
             }
         },
         "Render::Texture": {
@@ -85,7 +85,7 @@
                 "z": 0.0
             },
             "Frame_Index": {
-                "x": 2,
+                "x": 5,
                 "y": 0
             },
             "Frame_Size": {
@@ -107,8 +107,8 @@
         },
         "Transform::Transform": {
             "Position": {
-                "x": -9.835346221923828,
-                "y": 77.0213623046875
+                "x": -140.85226440429688,
+                "y": -69.94904327392578
             },
             "Rotation": 0.0,
             "Scale": {
