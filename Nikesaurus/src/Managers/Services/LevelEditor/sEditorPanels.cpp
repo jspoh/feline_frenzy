@@ -847,6 +847,34 @@ namespace NIKE {
 
 					}
 				}
+
+				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+
+					// If selected entity is not invalid
+					if (selected_entity != UINT16_MAX) {
+
+						LevelEditor::Action unselect_entity_action;
+
+						// Capture the current selected entity
+						auto prev_entity = selected_entity;
+
+						// Define the do action for unselecting
+						unselect_entity_action.do_action = [&, prev_entity]() {
+							unselectEntity();
+							b_entity_changed = true;
+							};
+
+						// Define the undo action for reselecting the previous entity
+						unselect_entity_action.undo_action = [&, prev_entity]() {
+							selected_entity = prev_entity;
+							b_entity_changed = true;
+							};
+
+						// Execute the action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+					}
+				}
+			
 			}
 
 			//Iterate through all entities to showcase active entities
@@ -2011,7 +2039,7 @@ namespace NIKE {
 		}
 		else {
 			//Render rotated rectangle
-			worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (e_transform.scale.length() * 0.02f));
+			worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (gizmo.gizmo_scaling * 0.05f));
 		}
 	}
 
@@ -4029,12 +4057,17 @@ namespace NIKE {
 		//Static camera variables for undo/redo
 		static Render::Cam cam_before_change = active_cam;
 
+		// Used to check if mouse is over the viewport
+		ImGuiIO& io = ImGui::GetIO();
+		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+
+
 		//If free camera is active
 		if (it->first == UINT16_MAX) {
 			// Position Controls
 			ImGui::Text("Position:");
 
-			if (ImGui::Button("Up") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_UP)) {
+			if (ImGui::Button("Up") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_UP)) {
 				// Move camera position up
 				active_cam.position.y += 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4043,7 +4076,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Down") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_DOWN)) {
+			if (ImGui::Button("Down") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_DOWN)) {
 				// Move camera position down
 				active_cam.position.y -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4052,7 +4085,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Left") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT)) {
+			if (ImGui::Button("Left") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT)) {
 				// Move camera position left
 				active_cam.position.x -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4061,7 +4094,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Right") || ImGui::IsItemActive() || NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_RIGHT)) {
+			if (ImGui::Button("Right") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_RIGHT)) {
 				// Move camera position right
 				active_cam.position.x += 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4079,9 +4112,6 @@ namespace NIKE {
 
 			ImGui::Spacing();
 		}
-
-		ImGuiIO& io = ImGui::GetIO();
-		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
 		// Zoom Controls
 
