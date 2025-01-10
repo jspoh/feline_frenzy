@@ -57,6 +57,7 @@ namespace NIKE {
 			
 			float duration{};		// in seconds. -1 for infinite. how long particle system should last
 			float time_alive{};		// in seconds. how long particle system has been alive
+			bool is_alive{};
 		};
 
 		class Manager {
