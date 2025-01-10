@@ -49,19 +49,13 @@ bool NPSM::addActiveParticleSystem(ParticlePresets preset, const Vector2f& start
 void NPSM::update() {
 	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
-	// remove dead particle systems
-	for (auto it{ active_particle_systems.end() }; it != active_particle_systems.begin(); it--) {
-		if (it->duration == -1) {
-			// particle system will never die
+	for (ParticleSystem& ps : active_particle_systems) {
+
+		if (ps.duration != -1 && ps.time_alive >= ps.duration) {
+			ps.is_alive = false;
 			continue;
 		}
-		
-		if (!it->is_alive || it->time_alive >= it->duration) {
-			active_particle_systems.erase(it);
-		}
-	}
 
-	for (ParticleSystem& ps : active_particle_systems) {
 		ps.time_alive += dt;
 
 		switch (ps.preset) {
@@ -86,9 +80,9 @@ void NPSM::update() {
 			// remove dead particles
 			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
 
-			if (ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-				// add new particle
+			// spawn new particles
 
+			if (ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
 				constexpr int NEW_PARTICLES_PER_SECOND = 1000;
 				const Vector2f PARTICLE_VELOCITY_RANGE = { 10.f, 20.f };
 
@@ -119,4 +113,7 @@ void NPSM::update() {
 		}
 		}
 	}
+
+	// remove dead particle systems
+	active_particle_systems.erase(std::remove_if(active_particle_systems.begin(), active_particle_systems.end(), [](const ParticleSystem& ps) { return !ps.is_alive; }), active_particle_systems.end());
 }
