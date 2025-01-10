@@ -37,6 +37,8 @@ bool NPSM::addActiveParticleSystem(ParticlePresets preset, const Vector2f& start
 	ParticleSystem new_particle_system;
 	new_particle_system.particles.reserve(MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
 	new_particle_system.preset = preset;
+	new_particle_system.start_pos = start_pos;
+	new_particle_system.is_alive = true;
 
 	active_particle_systems.push_back(new_particle_system);
 
@@ -45,18 +47,73 @@ bool NPSM::addActiveParticleSystem(ParticlePresets preset, const Vector2f& start
 
 
 void NPSM::update() {
+	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+	// remove dead particle systems
+	for (auto it{ active_particle_systems.end() }; it != active_particle_systems.begin(); it--) {
+		if (it->duration == -1) {
+			// particle system will never die
+			continue;
+		}
+		
+		if (!it->is_alive || it->time_alive >= it->duration) {
+			active_particle_systems.erase(it);
+		}
+	}
+
 	for (ParticleSystem& ps : active_particle_systems) {
+		ps.time_alive += dt;
+
 		switch (ps.preset) {
 		case ParticlePresets::BASIC: {
-			if (ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-				// add new particle
-				Particle new_particle;
+			for (auto& p : ps.particles) {
+				// Update particle
+				p.pos += p.velocity * dt;
+				p.velocity += p.acceleration * dt;
+				p.time_alive += dt;
 
+				// particle death
+
+				if (p.size.x <= 0 || p.size.y <= 0) {
+					p.is_alive = false;
+				}
+
+				if (p.color.a <= 0) {
+					p.is_alive = false;
+				}
 			}
 
+			// remove dead particles
+			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
 
-			for (auto& particle : ps.particles) {
-				// Update particle
+			if (ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+				// add new particle
+
+				constexpr int NEW_PARTICLES_PER_SECOND = 1000;
+				const Vector2f PARTICLE_VELOCITY_RANGE = { 10.f, 20.f };
+
+				for (int _{}; _ < NEW_PARTICLES_PER_SECOND; _++) {
+					Particle new_particle;
+					new_particle.preset = ParticlePresets::BASIC;
+					new_particle.pos = ps.start_pos;
+					new_particle.velocity = {
+						rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x,
+						rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x
+					};
+					new_particle.acceleration = { 0.f, 0.f };
+					new_particle.lifespan = -1;		// particle death not time dependent
+					new_particle.size = { 1.f, 1.f };
+					new_particle.color = {
+						rand() % 255 / 255.f,
+						rand() % 255 / 255.f,
+						rand() % 255 / 255.f,
+						1.f
+					};
+					new_particle.rotation = 0.f;
+					new_particle.is_alive = true;
+
+					ps.particles.push_back(new_particle);
+				}
 			}
 			break;
 		}

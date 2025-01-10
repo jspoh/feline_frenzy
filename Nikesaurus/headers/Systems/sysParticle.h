@@ -13,6 +13,7 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
+#include "Core/Engine.h"
 
 // !TODO: probably should implement lua for particles too on top of the presets
 
@@ -37,19 +38,25 @@ namespace NIKE {
 			ParticlePresets preset{ ParticlePresets::BASIC };
 
 			Vector2f pos{};
-			Vector2f velocity{};		// per second
-			Vector2f acceleration{};	// per second
-			Vector2f lifespan{};		// in seconds
-			Vector2f size;
-			Vector4f color;				// in range [0,1]
-			float opacity;				// in range [0,1]
-			float rotation;				// in degrees, anticlockwise
+			Vector2f velocity{};			// per second
+			Vector2f acceleration{};		// per second
+			float time_alive{};				// in seconds
+			float lifespan{};				// in seconds. -1 for infinite (-1 means particle death not dependent on time)
+			Vector2f size{};
+			Vector4f color{};				// in range [0,1]
+			float rotation{};				// in degrees, anticlockwise
+
+			bool is_alive{ true };
+
 		};
 
 		struct ParticleSystem {
-			Vector2f start_pos;
-			ParticlePresets preset;
-			std::vector<Particle> particles;
+			Vector2f start_pos{};
+			ParticlePresets preset{};
+			std::vector<Particle> particles{};
+			
+			float duration{};		// in seconds. -1 for infinite. how long particle system should last
+			float time_alive{};		// in seconds. how long particle system has been alive
 		};
 
 		class Manager {
