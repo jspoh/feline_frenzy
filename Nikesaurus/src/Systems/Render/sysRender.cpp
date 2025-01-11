@@ -842,10 +842,10 @@ namespace NIKE {
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
 		NIKEE_INFO("Starting viewport render with FBO: {0}", current_fbo);
 #ifndef NDEBUG
-		//Render to frame buffer if imgui is active
-		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
-			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-		}
+		////Render to frame buffer if imgui is active
+		//if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		//	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+		//}
 #endif
 		glClear(GL_COLOR_BUFFER_BIT);
 		GLenum error = glGetError();
@@ -872,7 +872,7 @@ namespace NIKE {
 
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 #ifndef NDEBUG
-					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
+					transformAndRenderEntity(entity, true);
 #else
 					transformAndRenderEntity(entity, false);
 #endif
@@ -897,10 +897,10 @@ namespace NIKE {
 		}
 
 #ifndef NDEBUG
-		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
-			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
-		}
+		//if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
+		//	NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		//}
 #endif
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {

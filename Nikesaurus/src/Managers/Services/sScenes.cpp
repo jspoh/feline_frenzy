@@ -257,6 +257,7 @@ namespace NIKE {
 	}
 
 	void Scenes::Service::update() {
+
 		if (!NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 		}
 

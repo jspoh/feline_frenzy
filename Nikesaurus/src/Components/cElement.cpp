@@ -32,46 +32,46 @@ namespace NIKE {
 			}
 		);
 
-#ifndef NDEBUG
-		// UI Registration for Player
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Entity>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Entity& comp) {
-
-				// For current element
-				{
-					ImGui::Text("Adjust element:");
-					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS" };
-
-					static Elements before_select_element;
-					static int previous_element = static_cast<int>(comp.element);
-					int current_element = static_cast<int>(comp.element);
-
-					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
-						Elements new_element = static_cast<Elements>(current_element);
-						if (new_element != comp.element) {
-							// Save action
-							LevelEditor::Action save_element;
-							save_element.do_action = [&, element = new_element]() {
-								comp.element = element;
-								};
-
-							// Undo action
-							save_element.undo_action = [&, element = before_select_element]() {
-								comp.element = element;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
-
-							// Update the previous value
-							before_select_element = comp.element;
-							// Apply the new element
-							comp.element = new_element;
-						}
-					}
-				}
-			}
-		);
-#endif
+//#ifndef NDEBUG
+//		// UI Registration for Player
+//		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Entity>(
+//			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Entity& comp) {
+//
+//				// For current element
+//				{
+//					ImGui::Text("Adjust element:");
+//					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS" };
+//
+//					static Elements before_select_element;
+//					static int previous_element = static_cast<int>(comp.element);
+//					int current_element = static_cast<int>(comp.element);
+//
+//					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
+//						Elements new_element = static_cast<Elements>(current_element);
+//						if (new_element != comp.element) {
+//							// Save action
+//							LevelEditor::Action save_element;
+//							save_element.do_action = [&, element = new_element]() {
+//								comp.element = element;
+//								};
+//
+//							// Undo action
+//							save_element.undo_action = [&, element = before_select_element]() {
+//								comp.element = element;
+//								};
+//
+//							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
+//
+//							// Update the previous value
+//							before_select_element = comp.element;
+//							// Apply the new element
+//							comp.element = new_element;
+//						}
+//					}
+//				}
+//			}
+//		);
+//#endif
 
 		// Register for Source serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Source>(
@@ -88,45 +88,45 @@ namespace NIKE {
 			}
 		);
 		
-#ifndef NDEBUG
-		// UI Registration for Source
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Source>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Source& comp) {
-
-				// For current element
-				{
-					ImGui::Text("Adjust element:");
-					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS"};
-
-					static Elements before_select_element;
-					static int previous_element = static_cast<int>(comp.element);
-					int current_element = static_cast<int>(comp.element);
-					
-					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
-						Elements new_element = static_cast<Elements>(current_element);
-						if (new_element != comp.element) {
-							// Save action
-							LevelEditor::Action save_element;
-							save_element.do_action = [&, element = new_element]() {
-								comp.element = element;
-								};
-
-							// Undo action
-							save_element.undo_action = [&, element = before_select_element]() {
-								comp.element = element;
-								};
-
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
-
-							// Update the previous value
-							before_select_element = comp.element;
-							// Apply the new element
-							comp.element = new_element;
-						}
-					}
-				}
-			}
-		);
-#endif
+//#ifndef NDEBUG
+//		// UI Registration for Source
+//		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Source>(
+//			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Source& comp) {
+//
+//				// For current element
+//				{
+//					ImGui::Text("Adjust element:");
+//					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS"};
+//
+//					static Elements before_select_element;
+//					static int previous_element = static_cast<int>(comp.element);
+//					int current_element = static_cast<int>(comp.element);
+//					
+//					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
+//						Elements new_element = static_cast<Elements>(current_element);
+//						if (new_element != comp.element) {
+//							// Save action
+//							LevelEditor::Action save_element;
+//							save_element.do_action = [&, element = new_element]() {
+//								comp.element = element;
+//								};
+//
+//							// Undo action
+//							save_element.undo_action = [&, element = before_select_element]() {
+//								comp.element = element;
+//								};
+//
+//							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
+//
+//							// Update the previous value
+//							before_select_element = comp.element;
+//							// Apply the new element
+//							comp.element = new_element;
+//						}
+//					}
+//				}
+//			}
+//		);
+//#endif
 	}
 }
