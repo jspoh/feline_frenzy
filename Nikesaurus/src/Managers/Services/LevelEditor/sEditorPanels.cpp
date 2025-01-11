@@ -3373,7 +3373,7 @@ namespace NIKE {
 				//Close popup
 				closePopUp(popup_id);
 			}
-			};
+		};
 	}
 
 	std::function<void()> LevelEditor::ResourcePanel::deleteDirectoryPopup(std::string const& popup_id) {
@@ -4845,6 +4845,17 @@ namespace NIKE {
 		ImGui::End();
 	}
 
+	void LevelEditor::TileMapPanel::resetGrid() {
+		// Reset grid UI
+		grid_thickness = 1.0f;
+		grid_color = {1.0f, 1.0f, 1.0f, 1.0f };
+		b_grid_edit = false;
+		// Reset grid cell amd grid sizes
+		b_snap_to_grid = false;
+		NIKE_MAP_SERVICE->setCellSize({1,1});
+		NIKE_MAP_SERVICE->setGridSize({1,1});
+	}
+
 	void LevelEditor::TileMapPanel::saveGrid(std::filesystem::path scn_id)
 	{
 		std::string grid_file_name = Utility::extractFileName(scn_id.string());
@@ -5057,6 +5068,12 @@ namespace NIKE {
 				//Reset scene id buffer
 				scn_id.clear();
 
+				// Reset grid numbers
+				tile_panel.lock()->resetGrid();
+
+				// When create new scene, delete all other entities from old scenes
+				NIKE_ECS_MANAGER->destroyAllEntities();
+
 				//Close popup
 				closePopUp(popup_id);
 			}
@@ -5096,6 +5113,9 @@ namespace NIKE {
 
 				// Clear containers containing entities string refs
 				NIKE_ECS_MANAGER->destroyAllEntities();
+
+				// Reset grid properties
+				tile_panel.lock()->resetGrid();
 
 				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
 

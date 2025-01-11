@@ -88,7 +88,7 @@ namespace NIKE {
 		}
 
 		// clear glErrors
-		while (glGetError() != GL_NO_ERROR) { }
+		while (glGetError() != GL_NO_ERROR) {}
 
 		err = glewInit();
 		if (err != GLEW_OK) {
@@ -105,15 +105,15 @@ namespace NIKE {
 		NIKEE_CORE_INFO("GL init success");
 
 		// enable debug logging
-		#ifndef NDEBUG
-		// !TODO: re-enable this
+#ifndef NDEBUG
+// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
 			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-		#endif
+#endif
 
 		// set window icon
 		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
@@ -270,6 +270,7 @@ namespace NIKE {
 			}
 		}
 
+		glFinish(); //  NICHOLAS SOLUTION 1
 		glfwSwapBuffers(ptr_window);
 
 		err = glGetError();

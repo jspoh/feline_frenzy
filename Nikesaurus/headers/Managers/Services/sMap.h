@@ -26,6 +26,26 @@ namespace NIKE {
 			Cell() : b_blocked{ false } {}
 		};
 
+		struct PathNode {
+			bool obstacle;
+			bool checked;
+			float distPlayer;
+			float distEnemy;
+			Vector2f index;
+			std::vector<PathNode*> neighbours;
+			PathNode* parent;
+
+			//Constructor
+			PathNode() : obstacle{ false }, checked{ false }, distPlayer{ static_cast<float>(INFINITY) },
+				distEnemy{ static_cast<float>(INFINITY) }, index{ 0, 0 }, parent{ nullptr } {}
+
+
+			//Destructor
+			~PathNode() {
+				neighbours.clear();
+			}
+		};
+
 		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
 		public:
 			Service();
@@ -54,6 +74,8 @@ namespace NIKE {
 
 			//Get grid scale
 			Vector2f getGridScale() const;
+
+			// Reset grid and cell size
 
 			//Get cell cursor is in
 			std::optional<std::reference_wrapper<Map::Cell>> getCursorCell();

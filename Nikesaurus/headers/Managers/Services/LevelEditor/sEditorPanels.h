@@ -836,6 +836,9 @@ namespace NIKE {
 			//Render
 			void render() override;
 
+			// Reset grid back to original state
+			void resetGrid();
+
 			void saveGrid(std::filesystem::path);
 
 			void removeGrid(std::filesystem::path);
