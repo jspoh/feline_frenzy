@@ -93,6 +93,9 @@ namespace NIKE {
 		//Create the first layer
 		createLayer();
 
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//Check if scene exists
 		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
 			throw std::runtime_error("Error scene file does not exist");
@@ -123,8 +126,12 @@ namespace NIKE {
 		//Create the first layer
 		createLayer();
 
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//ReRun scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+
 	}
 
 	void Scenes::Service::previousScene() {
@@ -156,6 +163,9 @@ namespace NIKE {
 		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
 			throw std::runtime_error("Error scene file does not exist");
 		}
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
 
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);

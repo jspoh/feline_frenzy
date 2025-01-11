@@ -6,85 +6,6 @@
     "Grid": [
         [
             {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -896.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -640.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -384.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -128.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 128.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 384.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 640.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 896.0,
-                    "y": -896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
-                    "y": -896.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": -640.0
-                }
-            },
-            {
                 "Blocked": false,
                 "Position": {
                     "x": -896.0,
@@ -137,26 +58,12 @@
                 "Blocked": false,
                 "Position": {
                     "x": 896.0,
-                    "y": -640.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
                     "y": -640.0
                 }
             }
         ],
         [
             {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": -384.0
-                }
-            },
-            {
                 "Blocked": false,
                 "Position": {
                     "x": -896.0,
@@ -209,26 +116,12 @@
                 "Blocked": false,
                 "Position": {
                     "x": 896.0,
-                    "y": -384.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
                     "y": -384.0
                 }
             }
         ],
         [
             {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": -128.0
-                }
-            },
-            {
                 "Blocked": false,
                 "Position": {
                     "x": -896.0,
@@ -281,26 +174,12 @@
                 "Blocked": false,
                 "Position": {
                     "x": 896.0,
-                    "y": -128.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
                     "y": -128.0
                 }
             }
         ],
         [
             {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": 128.0
-                }
-            },
-            {
                 "Blocked": false,
                 "Position": {
                     "x": -896.0,
@@ -353,26 +232,12 @@
                 "Blocked": false,
                 "Position": {
                     "x": 896.0,
-                    "y": 128.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
                     "y": 128.0
                 }
             }
         ],
         [
             {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": 384.0
-                }
-            },
-            {
                 "Blocked": false,
                 "Position": {
                     "x": -896.0,
@@ -425,26 +290,12 @@
                 "Blocked": false,
                 "Position": {
                     "x": 896.0,
-                    "y": 384.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
                     "y": 384.0
                 }
             }
         ],
         [
             {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": 640.0
-                }
-            },
-            {
                 "Blocked": false,
                 "Position": {
                     "x": -896.0,
@@ -498,91 +349,12 @@
                 "Position": {
                     "x": 896.0,
                     "y": 640.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
-                    "y": 640.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -1152.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -896.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -640.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -384.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": -128.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 128.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 384.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 640.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 896.0,
-                    "y": 896.0
-                }
-            },
-            {
-                "Blocked": true,
-                "Position": {
-                    "x": 1152.0,
-                    "y": 896.0
                 }
             }
         ]
     ],
     "Grid_Size": {
-        "x": 10,
-        "y": 8
+        "x": 8,
+        "y": 6
     }
 }

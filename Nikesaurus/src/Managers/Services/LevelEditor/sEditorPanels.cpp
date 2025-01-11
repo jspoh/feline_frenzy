@@ -4845,17 +4845,6 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	void LevelEditor::TileMapPanel::resetGrid() {
-		// Reset grid UI
-		grid_thickness = 1.0f;
-		grid_color = {1.0f, 1.0f, 1.0f, 1.0f };
-		b_grid_edit = false;
-		// Reset grid cell amd grid sizes
-		b_snap_to_grid = false;
-		NIKE_MAP_SERVICE->setCellSize({1,1});
-		NIKE_MAP_SERVICE->setGridSize({1,1});
-	}
-
 	void LevelEditor::TileMapPanel::saveGrid(std::filesystem::path scn_id)
 	{
 		std::string grid_file_name = Utility::extractFileName(scn_id.string());
@@ -5008,11 +4997,12 @@ namespace NIKE {
 		}
 
 		//Render dark hue over blocked squaress
+		// I changed to red so i can see clearer - lim
 		for (auto const& row : NIKE_MAP_SERVICE->getGrid()) {
 			for (auto const& cell : row) {
 				if (cell.b_blocked) {
 					draw->AddRectFilled(worldToScreen({ cell.position.x - (cell_size.x / 2.0f) + (grid_thickness / fullscreen_scale.x),  cell.position.y - (cell_size.y / 2.0f) + (grid_thickness / fullscreen_scale.x) }, rendersize),
-						worldToScreen({ cell.position.x + (cell_size.x / 2.0f) - (grid_thickness / fullscreen_scale.x),  cell.position.y + (cell_size.y / 2.0f) - (grid_thickness / fullscreen_scale.x) }, rendersize), IM_COL32(0, 0, 0, 100));
+						worldToScreen({ cell.position.x + (cell_size.x / 2.0f) - (grid_thickness / fullscreen_scale.x),  cell.position.y + (cell_size.y / 2.0f) - (grid_thickness / fullscreen_scale.x) }, rendersize), IM_COL32(255, 0, 0, 100));
 				}
 			}
 		}
@@ -5065,11 +5055,11 @@ namespace NIKE {
 				//Set new scn id
 				NIKE_SCENES_SERVICE->setCurrSceneID(std::string(scn_id + ".scn"));
 
+				// Reset grid cell grid size
+				NIKE_MAP_SERVICE->resetGrid();
+
 				//Reset scene id buffer
 				scn_id.clear();
-
-				// Reset grid numbers
-				tile_panel.lock()->resetGrid();
 
 				// When create new scene, delete all other entities from old scenes
 				NIKE_ECS_MANAGER->destroyAllEntities();
@@ -5114,15 +5104,13 @@ namespace NIKE {
 				// Clear containers containing entities string refs
 				NIKE_ECS_MANAGER->destroyAllEntities();
 
-				// Reset grid properties
-				tile_panel.lock()->resetGrid();
-
 				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
 
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
 
-
+				// Reset grid here
+				// NIKE_MAP_SERVICE->resetGrid();
 
 				//Close popup
 				closePopUp(popup_id);

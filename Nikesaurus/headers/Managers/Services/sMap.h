@@ -75,7 +75,8 @@ namespace NIKE {
 			//Get grid scale
 			Vector2f getGridScale() const;
 
-			// Reset grid and cell size
+			// Reset cell size and grid size
+			void resetGrid();
 
 			//Get cell cursor is in
 			std::optional<std::reference_wrapper<Map::Cell>> getCursorCell();

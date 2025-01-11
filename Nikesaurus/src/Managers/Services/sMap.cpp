@@ -100,6 +100,12 @@ namespace NIKE {
 		return grid_scale;
 	}
 
+	void Map::Service::resetGrid()
+	{
+		cell_size = { 1.f, 1.f };
+		grid_size = { 1, 1 };
+	}
+
 	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCursorCell() {
 
 		Vector2f translated_cursor { cursor_pos.x + (grid_scale.x / 2.0f), cursor_pos.y + (grid_scale.y / 2.0f) };
