@@ -204,6 +204,11 @@ namespace NIKE {
             "b", &Vector4i::b,
             "a", &Vector4i::a
         );
+
+        // atan2 function (lua math.atan2 apparantly doesn't exist)
+        lua_state.set_function("atan2", [](float y, float x) {
+            return std::atan2(y, x);  // Use the C++ std::atan2 function
+            });
     }
 
     void Lua::luaInputBinds(sol::state& lua_state) {
@@ -370,6 +375,24 @@ namespace NIKE {
             }
             });
 
+        //Apply force to entities (COMPONENT TO BE MOVED ELSE WHERE)
+        lua_state.set_function("SetLastDirection", [&](Entity::Type entity, int dir) {
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_physics_comp.has_value()) {
+                e_physics_comp.value().get().last_direction = dir;
+            }
+            });
+
+        //Get Last Direction (COMPONENT TO BE MOVED ELSE WHERE)
+        lua_state.set_function("LastDirection", [&](Entity::Type entity) -> sol::optional<int> {
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_physics_comp.has_value()) {
+                return e_physics_comp.value().get().last_direction;
+            }
+            else {
+                return sol::optional<int>();
+            }
+            });
         //Get SFX
         lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
             auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);

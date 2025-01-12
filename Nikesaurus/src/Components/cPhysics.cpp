@@ -205,6 +205,9 @@ namespace NIKE {
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_mass));
 					}
 				}
+
+				// Show last direction (TO BE MOVED)
+				ImGui::Text("Last Direction %d", comp.last_direction);
 			}
 		);
 #endif

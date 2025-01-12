@@ -840,7 +840,6 @@ namespace NIKE {
 		glClearColor(0, 0, 0, 1);
 		GLint current_fbo;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
-		NIKEE_INFO("Starting viewport render with FBO: {0}", current_fbo);
 #ifndef NDEBUG
 		//Render to frame buffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
@@ -925,15 +924,29 @@ namespace NIKE {
 		// Create a color attachment texture
 		glGenTextures(1, &texture_color_buffer);
 		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
 		// Check if framebuffer is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-
+		GLenum fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
+			NIKEE_CORE_ERROR("Framebuffer incomplete: {0:X}", fbStatus);
+			switch (fbStatus) {
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				NIKEE_CORE_ERROR("Incomplete attachment");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				NIKEE_CORE_ERROR("Missing attachment");
+				break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				NIKEE_CORE_ERROR("Unsupported framebuffer configuration");
+				break;
+			default:
+				NIKEE_CORE_ERROR("Unknown framebuffer error");
+			}
+		}
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

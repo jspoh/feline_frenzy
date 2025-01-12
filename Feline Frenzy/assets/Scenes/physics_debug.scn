@@ -133,14 +133,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 327,
+                                "Completed_Animations": 23,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.01666666753590107
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 2,
+                                    "x": 4,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -188,13 +188,13 @@
                                 }
                             },
                             "Physics::Dynamics": {
-                                "Drag": 1.0,
+                                "Drag": 15.0,
                                 "Force": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
                                 "Mass": 0.5,
-                                "Max_Speed": 150.0,
+                                "Max_Speed": 1000.0,
                                 "Velocity": {
                                     "x": 0.0,
                                     "y": 0.0
@@ -214,7 +214,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -236,8 +236,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -1078.3851318359375,
-                                    "y": -358.81341552734375
+                                    "x": -263.34246826171875,
+                                    "y": -65.07949829101563
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

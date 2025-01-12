@@ -398,8 +398,10 @@ namespace NIKE {
 
 			// just in case
 			glfwMakeContextCurrent(ptr_window);
+			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
+				NIKE_AUDIO_SERVICE->resumeAllChannels();
+			}
 
-			NIKE_AUDIO_SERVICE->resumeAllChannels();
 		}
 		else {
 			// lost focus
