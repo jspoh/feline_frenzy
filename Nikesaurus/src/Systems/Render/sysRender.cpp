@@ -146,8 +146,9 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Shape const& e_shape) {
+
 		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		// use shader
 		shader_system->useShader("base");
@@ -170,8 +171,9 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
+
 		//Set polygon mode
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		// use shader
 		shader_system->useShader("texture");
@@ -496,9 +498,15 @@ namespace NIKE {
 			}
 		}
 
+#ifndef NDEBUG
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(texture_color_buffer));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
+		}
+#endif
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
@@ -515,11 +523,29 @@ namespace NIKE {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
-		// Check if framebuffer is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-
+		GLenum fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
+			NIKEE_CORE_ERROR("Framebuffer incomplete: {0:X}", fbStatus);
+			switch (fbStatus) {
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				NIKEE_CORE_ERROR("Incomplete attachment");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				NIKEE_CORE_ERROR("Missing attachment");
+				break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				NIKEE_CORE_ERROR("Unsupported framebuffer configuration");
+				break;
+			default:
+				NIKEE_CORE_ERROR("Unknown framebuffer error");
+			}
+		}
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		//Setup event listening for frame buffer resize
+		std::shared_ptr<Render::Manager> render_sys_wrapped(this, [](Render::Manager*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(render_sys_wrapped);
 
 		//Create shader system
 		shader_system = std::make_unique<Shader::Manager>();
