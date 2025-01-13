@@ -56,7 +56,7 @@ namespace NIKE {
 			unsigned int VAO, VBO;
 
 			//Transform matrix
-			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip = {false, false});
+			void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
 
 			//Transform matrix debug
 			void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
@@ -67,16 +67,10 @@ namespace NIKE {
 			//
 			std::vector<RenderInstance> render_instances_quad;
 
-			// batch render shape
-			void batchRenderObject();
-
 			//Render Texture
 			void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
 			std::vector<RenderInstance> render_instances_texture;
-
-			// batch render texture
-			void batchRenderTextures();
 
 			//Render text
 			void renderText(Matrix_33 const& x_form, Render::Text& e_text);
