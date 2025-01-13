@@ -5046,23 +5046,20 @@ namespace NIKE {
 
 				path /= std::string(scn_id + ".scn");
 
-				// When user click save/create scene, grid is saved together
+				//Reset scene
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESET, ""));
+
+				//When user click save/create scene, grid is saved together
 				tile_panel.lock()->saveGrid(scn_id);
 
-				//Save current state of the scene to file
+				//Serialize new empty scene
 				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
 
-				//Set new scn id
-				NIKE_SCENES_SERVICE->setCurrSceneID(std::string(scn_id + ".scn"));
-
-				// Reset grid cell grid size
-				NIKE_MAP_SERVICE->resetGrid();
+				//Queue new scene
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, std::string(scn_id + ".scn")));
 
 				//Reset scene id buffer
 				scn_id.clear();
-
-				// When create new scene, delete all other entities from old scenes
-				NIKE_ECS_MANAGER->destroyAllEntities();
 
 				//Close popup
 				closePopUp(popup_id);

@@ -85,6 +85,7 @@ namespace NIKE {
 		glfwMakeContextCurrent(ptr_window);
 		if (!glfwGetCurrentContext()) {
 			NIKEE_CORE_ERROR("No valid OpenGL context available");
+			throw std::exception("Context creation failed.");
 		}
 
 		// clear glErrors
@@ -370,6 +371,11 @@ namespace NIKE {
 
 		//Set viewport
 		glViewport(x_offset, y_offset, static_cast<GLsizei>(viewport_size.x), static_cast<GLsizei>(viewport_size.y));
+
+		//Ensure context
+		if (!glfwGetCurrentContext()) {
+			glfwMakeContextCurrent(ptr_window);
+		}
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
@@ -396,8 +402,11 @@ namespace NIKE {
 			glfwGetFramebufferSize(ptr_window, &width, &height);
 			glViewport(0, 0, width, height);
 
-			// just in case
-			glfwMakeContextCurrent(ptr_window);
+			//Ensure context
+			if (!glfwGetCurrentContext()) {
+				glfwMakeContextCurrent(ptr_window);
+			}
+
 			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
 				NIKE_AUDIO_SERVICE->resumeAllChannels();
 			}
@@ -508,5 +517,15 @@ namespace NIKE {
 
 	void Windows::Service::setWindowFocus(bool focus) {
 		window_is_focused = focus;
+	}
+
+	void Windows::Service::resetOpenGL() {
+		glUseProgram(0);  // Unbind ImGui shader program
+		glBindVertexArray(0);  // Unbind VAO
+		glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind VBO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind EBO
+		glEnable(GL_DEPTH_TEST);  // Re-enable depth testing for 3D scene rendering
+		glEnable(GL_CULL_FACE);  // Re-enable face culling if used
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
 	}
 }

@@ -285,12 +285,17 @@ namespace NIKE {
 			//Get interpolation factor
 			float getInterpolationFactor() const;
 
+			//Get window focus
 			bool getWindowFocus() const;
 
+			//Set window focus
 			void setWindowFocus(bool focus);
 
 			//Calculate Delta Time
 			void calculateDeltaTime();
+
+			//Reset opengl state
+			void resetOpenGL();
 		};
 
 		//Re-enable DLL Export warning

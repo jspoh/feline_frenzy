@@ -70,6 +70,7 @@ namespace NIKE {
 			CHANGE = 0,
 			RESTART,
 			PREVIOUS,
+			RESET,
 			CLOSE
 		};
 
@@ -109,6 +110,9 @@ namespace NIKE {
 
 			//Go To Previous scene
 			void previousScene();
+
+			//Reset scene
+			void resetScene();
 		public:
 			Service() = default;
 			~Service() = default;
@@ -118,6 +122,9 @@ namespace NIKE {
 
 			//Get layer
 			std::shared_ptr<Layer> getLayer(unsigned int layer_id);
+
+			//Clear layers in curr scene
+			void clearLayers();
 
 			//Remove layer
 			void removeLayer(unsigned int layer_id);

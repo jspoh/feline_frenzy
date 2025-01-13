@@ -171,6 +171,26 @@ namespace NIKE {
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 	}
 
+	void Scenes::Service::resetScene() {
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
+		//Clear entities
+		NIKE_ECS_MANAGER->destroyAllEntities();
+
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
+
+		//Stop all audios
+		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
+		//Clear layers
+		layers.clear();
+
+		//Create the first layer
+		createLayer();
+	}
+
 	std::shared_ptr<Scenes::Layer> Scenes::Service::createLayer(int index) {
 		std::shared_ptr<Layer> layer = std::make_shared<Layer>();
 		//Insert layers at back
@@ -195,6 +215,10 @@ namespace NIKE {
 		}
 
 		return layers.at(layer_id);
+	}
+
+	void Scenes::Service::clearLayers() {
+		layers.clear();
 	}
 
 	void Scenes::Service::removeLayer(unsigned int layer_id) {
@@ -286,6 +310,9 @@ namespace NIKE {
 				break;
 			case Scenes::Actions::RESTART:
 				restartScene();
+				break;
+			case Scenes::Actions::RESET:
+				resetScene();
 				break;
 			case Scenes::Actions::CLOSE:
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
