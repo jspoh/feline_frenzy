@@ -13,8 +13,8 @@ layout(location = 1) out vec2 f_texcoord;
 uniform mat3 u_transform;
 uniform vec2 uvOffset;
 uniform vec2 frameSize;
-//uniform bool u_flipvertical;
-//uniform bool u_fliphorizontal;
+uniform bool u_flipvertical;
+uniform bool u_fliphorizontal;
 
 void main() {
     vec2 in_position_transformed = (u_transform * vec3(a_position, 1.0)).xy;
@@ -23,14 +23,14 @@ void main() {
     vec2 adjusted_texcoord = a_tex_coord;
 
     //Apply vertical flip
-    //if (u_flipvertical) {
-    //    adjusted_texcoord.y = 1.0 - adjusted_texcoord.y;
-    //}
+    if (u_flipvertical) {
+        adjusted_texcoord.y = 1.0 - adjusted_texcoord.y;
+    }
 
     //Apply horizontal flip
-    //if (u_fliphorizontal) {
-    //    adjusted_texcoord.x = 1.0 - adjusted_texcoord.x;
-    //}
+    if (u_fliphorizontal) {
+        adjusted_texcoord.x = 1.0 - adjusted_texcoord.x;
+    }
 
     f_texcoord = adjusted_texcoord * frameSize + uvOffset;
 }
