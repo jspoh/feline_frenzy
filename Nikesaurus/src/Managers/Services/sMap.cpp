@@ -12,7 +12,7 @@
 namespace NIKE {
 
 	Map::Service::Service() 
-		: grid_size{ 1, 1 }, cell_size{ 1.0f, 1.0f }, cursor_pos{ 0.0f, 0.0f } {
+		: grid_size{ DEFAULT_MAP_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f } {
 
 		//Initialize grid
 		grid.resize(grid_size.y);
@@ -102,8 +102,8 @@ namespace NIKE {
 
 	void Map::Service::resetGrid()
 	{
-		cell_size = { 1.f, 1.f };
-		grid_size = { 1, 1 };
+		cell_size = { DEFAULT_CELL_SIZE };
+		grid_size = { DEFAULT_MAP_SIZE };
 	}
 
 	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCursorCell() {
@@ -186,88 +186,94 @@ namespace NIKE {
 		updateCells();
 	}
 
-  //  std::vector<NIKE::Math::Vector2f> Map::Service::findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal) {
-		//// Node structure representing each position in the grid for pathfinding
-		//struct Node {
-		//	NIKE::Math::Vector2f position;
-		//	float gCost;  // Distance from the start node
-		//	float hCost;  // Heuristic distance to the goal node
-		//	float fCost() const { return gCost + hCost; }
-		//};
+	std::vector<Vector2f> Map::Service::findPath(Vector2f start, Vector2f goal)
+	{
+		// auto& pathfind_grid = getGrid();
+		// Vector2i pathfind_grid_size = getGridSize();
 
-		//// Custom comparator for priority queue to prioritize nodes with lower fCost
-		//struct CompareNode {
-		//	bool operator()(const Node& a, const Node& b) {
-		//		return a.fCost() > b.fCost();
-		//	}
-		//};
+		// Create a map of PathNodes
+		std::map<Vector2i, PathNode> node_map;
 
-		//// Heuristic function (Manhattan distance)
-		//auto calculate_heuristic = [](NIKE::Math::Vector2f a, NIKE::Math::Vector2f b) {
-		//	return std::abs(a.x - b.x) + std::abs(a.y - b.y);
-		//	};
+		// Init the pathnodes map
+		for (int y = 0; y < grid_size.y; ++y) {
+			for (int x = 0; x < grid_size.x; ++x) {
+				PathNode node;
+				node.index = Vector2f(static_cast<float>(x), static_cast<float>(y));
+				node.obstacle = grid[y][x].b_blocked;
+				node_map[{x, y}] = node;
+			}
+		}
 
-		//// Priority queue to store nodes to explore, prioritized by lowest fCost
-		//std::priority_queue<Node, std::vector<Node>, CompareNode> open_list;
-		//// Maps for reconstructing the path and tracking the cost from the start
-		//std::unordered_map<int, NIKE::Math::Vector2f> came_from;
-		//std::unordered_map<int, float> gScore;
+		// Set neighbors for each node
+		for (auto& elem : node_map) {
+			int x = static_cast<int>(elem.first.x);
+			int y = static_cast<int>(elem.first.y);
+			std::vector<Vector2i> neighbors = {
+				{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1},
+			};
+			for (auto& neighbor : neighbors) {
+				if (neighbor.x >= 0 && neighbor.x < grid_size.x &&
+					neighbor.y >= 0 && neighbor.y < grid_size.y) {
+					elem.second.neighbours.push_back(&node_map[neighbor]);
+				}
+			}
+		}
 
-		//// Helper function to convert a position to a unique hash for grid indexing
-		//auto hash_position = [this](NIKE::Math::Vector2f pos) {
-		//	int x = static_cast<int>(pos.x);
-		//	int y = static_cast<int>(pos.y);
-		//	return y * static_cast<int>(width) + x;
-		//	};
+		// Init start and end goat index and nodes
+		Vector2i start_index = Vector2i(static_cast<int>(start.x), static_cast<int>(start.y));
+		Vector2i goal_index = Vector2i(static_cast<int>(goal.x), static_cast<int>(goal.y));
+		PathNode* start_node = &node_map[start_index];
+		PathNode* goal_node = &node_map[goal_index];
 
-		//// Initialize start node and insert it into the open list
-		//open_list.push(Node{ start, 0.0f, calculate_heuristic(start, goal) });
-		//gScore[hash_position(start)] = 0.0f;
+		// Priority queue
+		std::priority_queue<PathNode*, std::vector<PathNode*>, NIKE::Map::PathNode::PathNodeComparator> open_list;
+		start_node->dist_player = 0;
+		start_node->dist_enemy = std::hypot(goal.x - start.x, goal.y - start.y);
+		open_list.push(start_node);
 
-		//// Possible movement directions (up, down, left, right)
-		//std::vector<NIKE::Math::Vector2f> directions = { {0.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f}, {-1.0f, 0.0f} };
+		// Pathfinding loop
+		while (!open_list.empty()) {
+			PathNode* current = open_list.top();
+			open_list.pop();
 
-		//// A* search loop
-		//while (!open_list.empty()) {
-		//	Node current = open_list.top();
-		//	open_list.pop();
+			// Check if goal reached
+			if (current == goal_node) break;
 
-		//	// If the goal is reached, reconstruct the path
-		//	if (current.position == goal) {
-		//		std::vector<NIKE::Math::Vector2f> path;
-		//		for (NIKE::Math::Vector2f pos = goal; pos != start; pos = came_from[hash_position(pos)]) {
-		//			path.push_back(pos);
-		//		}
-		//		path.push_back(start);
-		//		std::reverse(path.begin(), path.end());
-		//		return path;  // Return the found path
-		//	}
+			current->checked = true;
 
-		//	// Explore each direction
-		//	for (const auto& dir : directions) {
-		//		NIKE::Math::Vector2f neighbor_pos = current.position + dir;
+			// Explore neighbors nodes
+			for (auto neighbor : current->neighbours) {
 
-		//		// Check boundaries and if cell is blocked
-		//		if (neighbor_pos.x < 0 || neighbor_pos.x >= width ||
-		//			neighbor_pos.y < 0 || neighbor_pos.y >= height ||
-		//			isCellBlocked(neighbor_pos.x, neighbor_pos.y)) {
-		//			continue;
-		//		}
+				if (neighbor->checked || neighbor->obstacle) continue;
 
-		//		// Calculate tentative gScore
-		//		float tentativeGScore = gScore[hash_position(current.position)] + 1.0f;
+				float newDist = current->dist_player + std::hypot(neighbor->index.x - current->index.x,
+					neighbor->index.y - current->index.y);
 
-		//		int neighbor_hash = hash_position(neighbor_pos);
-		//		if (gScore.find(neighbor_hash) == gScore.end() || tentativeGScore < gScore[neighbor_hash]) {
-		//			came_from[neighbor_hash] = current.position;
-		//			gScore[neighbor_hash] = tentativeGScore;
-		//			float hCost = calculate_heuristic(neighbor_pos, goal);
-		//			open_list.push(Node{ neighbor_pos, tentativeGScore, hCost });
-		//		}
-		//	}
-		//}
+				if (newDist < neighbor->dist_player) {
+					neighbor->dist_player = newDist;
+					neighbor->dist_enemy = std::hypot(goal.x - neighbor->index.x, goal.y - neighbor->index.y);
+					neighbor->parent = current;
 
-		//// Return empty if no path is found
-		//return {};
-  //  }
-}
+					if (!neighbor->checked) {
+						open_list.push(neighbor);
+					}
+				}
+			}
+		}
+
+		// Construct the path after finising
+		std::vector<Vector2f> path;
+		PathNode* current_node = goal_node;
+		while (current_node && current_node != start_node) {
+			path.push_back(current_node->index);
+			current_node = current_node->parent;
+		}
+		if (current_node == start_node) {
+			path.push_back(start_node->index);
+		}
+
+		std::reverse(path.begin(), path.end());
+		return path;
+
+	}
+}	

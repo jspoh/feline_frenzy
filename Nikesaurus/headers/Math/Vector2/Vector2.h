@@ -36,6 +36,8 @@ namespace NIKE {
 
 			bool operator==(const Vector2& rhs);
 			bool operator!=(const Vector2& rhs);
+			bool operator<(const Vector2& rhs) const;
+
 
 			type dot(const Vector2& rhs) const;
 			type lengthSq() const;

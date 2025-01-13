@@ -14,6 +14,9 @@
 #ifndef M_MAP_HPP
 #define M_MAP_HPP
 
+#define DEFAULT_MAP_SIZE Vector2i{1,1}
+#define DEFAULT_CELL_SIZE Vector2f{256.f,256.f}
+
 namespace NIKE {
 	namespace Map {
 		//Temporary Disable DLL Export Warning
@@ -29,21 +32,27 @@ namespace NIKE {
 		struct PathNode {
 			bool obstacle;
 			bool checked;
-			float distPlayer;
-			float distEnemy;
+			float dist_player;
+			float dist_enemy;
 			Vector2f index;
 			std::vector<PathNode*> neighbours;
 			PathNode* parent;
 
 			//Constructor
-			PathNode() : obstacle{ false }, checked{ false }, distPlayer{ static_cast<float>(INFINITY) },
-				distEnemy{ static_cast<float>(INFINITY) }, index{ 0, 0 }, parent{ nullptr } {}
+			PathNode() : obstacle{ false }, checked{ false }, dist_player{ static_cast<float>(INFINITY) },
+				dist_enemy{ static_cast<float>(INFINITY) }, index{ 0, 0 }, parent{ nullptr } {}
 
 
 			//Destructor
 			~PathNode() {
 				neighbours.clear();
 			}
+
+			struct PathNodeComparator {
+				bool operator()(const PathNode* lhs, const PathNode* rhs) const {
+					return (lhs->dist_player + lhs->dist_enemy) > (rhs->dist_player + rhs->dist_enemy);
+				}
+			};
 		};
 
 		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
@@ -94,7 +103,7 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 
 			//// Pathfinding
-			//std::vector<NIKE::Math::Vector2f> findPath(NIKE::Math::Vector2f start, NIKE::Math::Vector2f goal);
+			std::vector<Vector2f> findPath(Vector2f start, Vector2f goal);
 		private:
 
 			//Internal cell pos update
