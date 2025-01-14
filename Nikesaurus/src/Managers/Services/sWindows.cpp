@@ -299,7 +299,9 @@ namespace NIKE {
 			}
 		}
 
-		glFinish(); //  NICHOLAS SOLUTION 1
+		// !NOTE: n.loo
+		//glFinish(); //  NICHOLAS SOLUTION 1
+
 		glfwSwapBuffers(ptr_window);
 
 		err = glGetError();
@@ -435,9 +437,11 @@ namespace NIKE {
 				glfwMakeContextCurrent(ptr_window);
 			}
 
+#ifndef NDEBUG
 			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
 				NIKE_AUDIO_SERVICE->resumeAllChannels();
 			}
+#endif
 
 		}
 		else {
