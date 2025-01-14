@@ -129,7 +129,6 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cCombat.h" />
-    <ClInclude Include="headers\Components\cMetaData.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
   </ItemGroup>
   <ItemGroup>

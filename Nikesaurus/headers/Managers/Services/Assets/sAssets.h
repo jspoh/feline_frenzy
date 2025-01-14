@@ -145,7 +145,6 @@ namespace NIKE {
 				auto cache_it = asset_cache.find(asset_id);
 				if (cache_it != asset_cache.end()) {
 					if (cache_it->second) {
-						NIKEE_CORE_INFO("Fetching Cached Asset");
  						return std::static_pointer_cast<T>(cache_it->second);
 					}
 				}

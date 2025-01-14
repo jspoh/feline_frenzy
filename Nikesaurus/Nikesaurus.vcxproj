@@ -139,7 +139,6 @@
     <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
-    <ClInclude Include="headers\Components\cMetaData.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />
