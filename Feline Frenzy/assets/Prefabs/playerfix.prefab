@@ -4,19 +4,19 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 11,
+            "Completed_Animations": 1,
             "Frame_Duration": 0.054999999701976776,
             "Mode": 0,
-            "Timer": 0.0
+            "Timer": 0.03333333507180214
         },
         "Animation::Sprite": {
             "Curr_Index": {
-                "x": 2,
-                "y": 0
+                "x": 4,
+                "y": 1
             },
             "End_Index": {
                 "x": 5,
-                "y": 0
+                "y": 1
             },
             "Sheet_Size": {
                 "x": 10,
@@ -24,7 +24,7 @@
             },
             "Start_Index": {
                 "x": 0,
-                "y": 0
+                "y": 1
             }
         },
         "Audio::SFX": {
@@ -37,7 +37,7 @@
         "GameLogic::ILogic": {
             "Function": "update",
             "Named_Args": {
-                "entity": 9
+                "entity": 109
             },
             "Script_ID": "player.lua"
         },
@@ -48,8 +48,8 @@
                 "y": 0.0
             },
             "Position": {
-                "x": -140.94630432128906,
-                "y": -69.86602783203125
+                "x": -198.37342834472656,
+                "y": -215.2398223876953
             },
             "Resolution": 2,
             "Rotation": 0.0,
@@ -67,14 +67,14 @@
             "Mass": 0.5,
             "Max_Speed": 150.0,
             "Velocity": {
-                "x": -0.007626034319400787,
-                "y": 0.00674002431333065
+                "x": -0.4921683073043823,
+                "y": -8.987713226815686e-05
             }
         },
         "Render::Texture": {
             "B_Blend": false,
             "B_Flip": {
-                "x": false,
+                "x": true,
                 "y": false
             },
             "B_Stretch": false,
@@ -85,8 +85,8 @@
                 "z": 0.0
             },
             "Frame_Index": {
-                "x": 1,
-                "y": 0
+                "x": 4,
+                "y": 1
             },
             "Frame_Size": {
                 "x": 10,
@@ -107,8 +107,8 @@
         },
         "Transform::Transform": {
             "Position": {
-                "x": -140.94630432128906,
-                "y": -69.86602783203125
+                "x": -198.37342834472656,
+                "y": -215.2398223876953
             },
             "Rotation": 0.0,
             "Scale": {
