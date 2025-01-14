@@ -437,9 +437,11 @@ namespace NIKE {
 				glfwMakeContextCurrent(ptr_window);
 			}
 
+#ifndef NDEBUG
 			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
 				NIKE_AUDIO_SERVICE->resumeAllChannels();
 			}
+#endif
 
 		}
 		else {
