@@ -1286,7 +1286,16 @@
                             "Prefab_ID": ""
                         }
                     }
-                },
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
                 {
                     "Entity": {
                         "Components": {
@@ -1319,7 +1328,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "LeftWall",
@@ -1359,7 +1368,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "RightWall",
@@ -1412,7 +1421,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "TopWall",
@@ -1452,7 +1461,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "BottomWall",
@@ -1467,19 +1476,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
+                                "Completed_Animations": 3,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
-                                    "y": 7
+                                    "x": 5,
+                                    "y": 1
                                 },
                                 "End_Index": {
-                                    "x": 9,
-                                    "y": 7
+                                    "x": 5,
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -1487,7 +1496,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 7
+                                    "y": 1
                                 }
                             },
                             "Audio::SFX": {
@@ -1500,7 +1509,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 118
+                                    "entity": 37
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -1511,8 +1520,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -76.9266128540039,
-                                    "y": -56.390281677246094
+                                    "x": -73.49088287353516,
+                                    "y": -150.60934448242188
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -1530,14 +1539,14 @@
                                 "Mass": 0.5,
                                 "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": 7.260634049544024e-08,
-                                    "y": 101.90813446044922
+                                    "x": -0.20643797516822815,
+                                    "y": -2.503148800961959e-22
                                 }
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": false,
+                                    "x": true,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -1548,8 +1557,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 7
+                                    "x": 5,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -1570,8 +1579,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -76.9266128540039,
-                                    "y": -58.088748931884766
+                                    "x": -73.49088287353516,
+                                    "y": -150.60934448242188
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1580,23 +1589,91 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "Player",
                             "Prefab_ID": "playerfix.prefab"
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Enemy::Attack": {
+                                "Cooldown": 1.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 1.0166664123535156,
+                                "Layer": 1,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 10.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -153.0
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 100.0,
+                                    "y": 112.28070831298828
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Normal_Enemy_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -153.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 100.0,
+                                    "y": 112.28070831298828
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "Enemy",
+                            "Prefab_ID": "Enemy.prefab"
+                        }
+                    }
                 }
             ],
-            "ID": 0,
-            "Mask": 1
-        }
-    },
-    {
-        "Layer": {
-            "B_State": true,
-            "Entities": [],
             "ID": 1,
             "Mask": 2
         }
