@@ -167,7 +167,7 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 
 		// bind vbo and ebo to vao
-		constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int VBO_BINDING_INDEX = 10;
 		static constexpr int VERTEX_SIZE = sizeof(Vertex);
 		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
@@ -299,7 +299,7 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 
 		// bind vbo and ebo to vao
-		constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int VBO_BINDING_INDEX = 10;
 		static constexpr int VERTEX_SIZE = sizeof(Vertex);
 		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);

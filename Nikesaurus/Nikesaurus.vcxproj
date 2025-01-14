@@ -74,6 +74,7 @@
     </ClCompile>
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
+    <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
@@ -158,6 +159,7 @@
     </ClInclude>
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
+    <ClInclude Include="headers\Managers\Services\sMetaData.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
