@@ -299,7 +299,9 @@ namespace NIKE {
 			}
 		}
 
-		glFinish(); //  NICHOLAS SOLUTION 1
+		// !NOTE: n.loo
+		//glFinish(); //  NICHOLAS SOLUTION 1
+
 		glfwSwapBuffers(ptr_window);
 
 		err = glGetError();

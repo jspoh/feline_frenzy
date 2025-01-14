@@ -35,90 +35,38 @@ namespace NIKE {
 	}
 
 	void Render::Manager::onEvent(std::shared_ptr<Windows::WindowResized> event) {
-		NIKEE_INFO("Window resize event triggered: {0}x{1}", event->frame_buffer.x, event->frame_buffer.y);
-
-		// Save current framebuffer binding to restore later
-		GLint previous_fbo;
-		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous_fbo);
-
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
 		}
 
-		// Ensure we're not trying to delete invalid resources
-		if (glIsFramebuffer(frame_buffer)) {
-			// Unbind framebuffer before deletion
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDeleteFramebuffers(1, &frame_buffer);
-			NIKEE_INFO("Deleted framebuffer: {0}", frame_buffer);
-		}
+		// Cleanup old resources
+		glDeleteFramebuffers(1, &frame_buffer);
+		glDeleteTextures(1, &texture_color_buffer);
 
-		if (glIsTexture(texture_color_buffer)) {
-			// Unbind texture before deletion
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glDeleteTextures(1, &texture_color_buffer);
-			NIKEE_INFO("Deleted texture: {0}", texture_color_buffer);
-		}
-
-		// Create and validate new framebuffer
+		// Create a new framebuffer
 		glGenFramebuffers(1, &frame_buffer);
-		if (!glIsFramebuffer(frame_buffer)) {
-			NIKEE_CORE_ERROR("Failed to create new framebuffer");
-			return;
-		}
-		NIKEE_INFO("Created new framebuffer: {0}", frame_buffer);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
-		// Create and validate new texture
+		// Create a color attachment texture
 		glGenTextures(1, &texture_color_buffer);
-		if (!glIsTexture(texture_color_buffer)) {
-			NIKEE_CORE_ERROR("Failed to create new texture");
-			glDeleteFramebuffers(1, &frame_buffer);
-			return;
-		}
-		NIKEE_INFO("Created new texture: {0}", texture_color_buffer);
-
 		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
-
-		// Validate dimensions
-		if (event->frame_buffer.x <= 0 || event->frame_buffer.y <= 0) {
-			NIKEE_CORE_ERROR("Invalid framebuffer dimensions: {0}x{1}",
-				event->frame_buffer.x, event->frame_buffer.y);
-			return;
-		}
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, event->frame_buffer.x, event->frame_buffer.y,
-			0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, event->frame_buffer.x, event->frame_buffer.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-			texture_color_buffer, 0);
+		// Check if framebuffer is complete
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
 
-		// Check framebuffer status
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			NIKEE_CORE_ERROR("Framebuffer incomplete with status: {0}", status);
-			// Cleanup on error
-			glDeleteFramebuffers(1, &frame_buffer);
-			glDeleteTextures(1, &texture_color_buffer);
-			frame_buffer = 0;
-			texture_color_buffer = 0;
-			return;
-		}
-
-		// Restore previous bindings
 		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, previous_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
-
-		NIKEE_INFO("Window resize event completed successfully");
 	}
 
 	void Render::Manager::transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip) {
@@ -296,25 +244,13 @@ namespace NIKE {
 	}
 
 	void Render::Manager::renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture) {
-		auto checkGLError = [](const char* location) {
-			GLenum err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
-				return true;
-			}
-			return false;
-			};
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
 		// !TODO: batched rendering for texture incomplete
-		//here i check for everything and anything - NICHOLAS SOLUTION 2
-		checkGLError("start of renderObject");
 
-		//save previious gl state
-		GLint previous_texture, previous_array_buffer, previous_vertex_array;
-		glGetIntegerv(GL_TEXTURE_BINDING_2D, &previous_texture);
-		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &previous_array_buffer);
-		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &previous_vertex_array);
-
-		// Caculate UV Offset
+		//Caculate UV Offset
 		const Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
 		Vector2f uv_offset{ e_texture.frame_index.x * framesize.x, e_texture.frame_index.y * framesize.y };
 
@@ -324,110 +260,50 @@ namespace NIKE {
 		const unsigned int tex_hdl = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->gl_data;
 
 		if constexpr (!BATCHED_RENDERING) {
-			// this validates texture handle
-			if (!glIsTexture(tex_hdl)) {
-				NIKEE_CORE_ERROR("not valid texture handle: {0}", tex_hdl);
-				return;
-			}
-			checkGLError("after texture validation");
-
 			//Set polygon mode
 			//glPolygonMode(GL_FRONT, GL_FILL);			// do not use this, 1280: invalid enum
 
-
-
 			// use shader
 			shader_system->useShader("texture");
-			checkGLError("after shader use");
 
-			// this validates the shader program
-			GLint current_program;
-			glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
-			if (current_program == 0) {
-				NIKEE_CORE_ERROR("dont have shader program bound before rendering texture");
-				return;
-			}
-
-			// Texture unit
+			//Texture unit
 			static constexpr int texture_unit = 6;
 
-			// validates the texture unit
-			GLint max_texture_units;
-			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_texture_units);
-			if (texture_unit >= max_texture_units) {
-				NIKEE_CORE_ERROR("this texture unit {0} exceeds maximum allowed: {1}", texture_unit, max_texture_units);
-				return;
-			}
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				tex_hdl
+			);
 
-			// bind texture
-			glBindTexture(GL_TEXTURE_2D, tex_hdl);
-			checkGLError("after texture bind");
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			// set texture parameters
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			checkGLError("after texture parameters");
-
-			// Set uniforms for texture rendering
+			//Set uniforms for texture rendering
 			shader_system->setUniform("texture", "u_tex2d", texture_unit);
 			shader_system->setUniform("texture", "u_opacity", e_texture.color.a);
 			shader_system->setUniform("texture", "u_transform", x_form);
 			shader_system->setUniform("texture", "uvOffset", uv_offset);
 			shader_system->setUniform("texture", "frameSize", framesize);
-			checkGLError("after setting uniforms 1");
 
-			// Blending options for texture
+			//Blending options for texture
 			shader_system->setUniform("texture", "u_color", Vector3f(e_texture.color.r, e_texture.color.g, e_texture.color.b));
 			shader_system->setUniform("texture", "u_blend", e_texture.b_blend);
 			shader_system->setUniform("texture", "u_intensity", e_texture.intensity);
-			checkGLError("after setting uniforms 2");
 
 			//Flip texture options
 			//shader_system->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
 			//shader_system->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
-
-			// Get and validate model
+			//Get model
 			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
 
-			// Verify VAO exists and is valid
-			if (!glIsVertexArray(model.vaoid)) {
-				NIKEE_CORE_ERROR("invalid vertex array object: {0}", model.vaoid);
-				return;
-			}
-			checkGLError("after VAO validation");
-
-			// this validates the primitive type (we put all idk what nike wants)
-			if (model.primitive_type != GL_TRIANGLES &&
-				model.primitive_type != GL_TRIANGLE_STRIP &&
-				model.primitive_type != GL_TRIANGLE_FAN &&
-				model.primitive_type != GL_LINES &&
-				model.primitive_type != GL_LINE_STRIP &&
-				model.primitive_type != GL_LINE_LOOP &&
-				model.primitive_type != GL_POINTS) {
-				NIKEE_CORE_ERROR("invalid primitive type: {0}", model.primitive_type);
-				return;
-			}
-
-			// Draw time
+			//Draw
 			glBindVertexArray(model.vaoid);
-			checkGLError("after VAO bind");
+			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
 
-			if (model.draw_count > 0) {
-				glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
-				checkGLError("after draw elements");
-			}
-			else {
-				NIKEE_CORE_ERROR("Invalid draw count: {0}", model.draw_count);
-				return;
-			}
-
-			// if fail here we will restore previous state
-			glBindVertexArray(previous_vertex_array);
-			glBindBuffer(GL_ARRAY_BUFFER, previous_array_buffer);
-			glBindTexture(GL_TEXTURE_2D, previous_texture);
+			//Unuse texture
+			glBindVertexArray(0);
 			shader_system->unuseShader();
-			checkGLError("after state restoration");
 		}
 		else {
 			// prepare for batched rendering
@@ -441,22 +317,22 @@ namespace NIKE {
 			instance.blend_intensity = e_texture.intensity;
 
 			render_instances_texture.push_back(instance);
+
 			// used to track number of unique texture handles
 			// system can only handle max 32 unique texture binding units, hence have to clear texture render instances or not all textures will render properly.
 			curr_instance_unique_tex_hdls.insert(tex_hdl);
 
-			if (render_instances_texture.size() >= MAX_INSTANCES ||
-				curr_instance_unique_tex_hdls.size() >= MAX_UNIQUE_TEX_HDLS) {
+			if (render_instances_texture.size() >= MAX_INSTANCES || curr_instance_unique_tex_hdls.size() >= MAX_UNIQUE_TEX_HDLS) {
 				batchRenderTextures();
-				checkGLError("after batch render textures");
 			}
 		}
-
-		checkGLError("end of renderObject");
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Render::Manager::batchRenderTextures() {
-
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -471,13 +347,7 @@ namespace NIKE {
 		}
 
 		Assets::Model& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("batched_texture.model");
-		shader_system->useShader("batched_texture");
-		GLint current_program;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
-		if (current_program == 0) {
-			NIKEE_CORE_ERROR("Failed to bind shader program for batch rendering");
-			return;
-		}
+
 		// create vector of texture handles
 		// map with texture handle as key and binding unit as value
 		// not using unordered_map as it uses hashingand i need the index
@@ -838,8 +708,7 @@ namespace NIKE {
 		}
 
 		glClearColor(0, 0, 0, 1);
-		GLint current_fbo;
-		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
+
 #ifndef NDEBUG
 		//Render to frame buffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
@@ -847,10 +716,7 @@ namespace NIKE {
 		}
 #endif
 		glClear(GL_COLOR_BUFFER_BIT);
-		GLenum error = glGetError();
-		if (error != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("Error during viewport clear: {0}", error);
-		}
+
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			//SKip inactive layer
 			if (!layer->getLayerState())
@@ -901,10 +767,7 @@ namespace NIKE {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
 		}
 #endif
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			NIKEE_CORE_ERROR("Incomplete framebuffer at end of viewport render: {0}", status);
-		}
+
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
@@ -913,40 +776,21 @@ namespace NIKE {
 
 	void Render::Manager::init() {
 
-
 		glGenFramebuffers(1, &frame_buffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-		static bool is_initialized = false;
-		if (is_initialized) {
-			NIKEE_CORE_ERROR("Attempting to initialize render manager multiple times");
-			return;
-		}
+
 		// Create a color attachment texture
 		glGenTextures(1, &texture_color_buffer);
 		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
 		// Check if framebuffer is complete
-		GLenum fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
-			NIKEE_CORE_ERROR("Framebuffer incomplete: {0:X}", fbStatus);
-			switch (fbStatus) {
-			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-				NIKEE_CORE_ERROR("Incomplete attachment");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-				NIKEE_CORE_ERROR("Missing attachment");
-				break;
-			case GL_FRAMEBUFFER_UNSUPPORTED:
-				NIKEE_CORE_ERROR("Unsupported framebuffer configuration");
-				break;
-			default:
-				NIKEE_CORE_ERROR("Unknown framebuffer error");
-			}
-		}
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -974,7 +818,6 @@ namespace NIKE {
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
-		is_initialized = true;
 	}
 
 	void Render::Manager::update() {
