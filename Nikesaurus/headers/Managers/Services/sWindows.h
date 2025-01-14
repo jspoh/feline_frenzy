@@ -156,6 +156,9 @@ namespace NIKE {
 
 			//Configure Window
 			void configWindow();
+
+			//Warm up GPU
+			void warmupGPU();
 		public:
 
 			NIKEWindow(Vector2i window_size, std::string window_title);

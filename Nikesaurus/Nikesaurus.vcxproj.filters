@@ -58,6 +58,7 @@
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cCombat.cpp" />
+    <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -128,6 +129,8 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cCombat.h" />
+    <ClInclude Include="headers\Components\cMetaData.h" />
+    <ClInclude Include="headers\Managers\Services\sMetaData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

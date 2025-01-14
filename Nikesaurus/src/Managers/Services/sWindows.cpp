@@ -105,6 +105,9 @@ namespace NIKE {
 		//Engine Init Successful
 		NIKEE_CORE_INFO("GL init success");
 
+		//Warm up GPU
+		warmupGPU();
+
 		// enable debug logging
 #ifndef NDEBUG
 // !TODO: re-enable this
@@ -158,6 +161,31 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
+	}
+
+	void Windows::NIKEWindow::warmupGPU() {
+		NIKEE_CORE_INFO("Warming up GPU...");
+
+		// Create a dummy VAO and VBO for warm-up
+		GLuint vao, vbo;
+		glGenVertexArrays(1, &vao);
+		glGenBuffers(1, &vbo);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, nullptr, GL_STATIC_DRAW);
+
+		// Dummy draw call
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		// Clean up warm-up objects
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glDeleteBuffers(1, &vbo);
+		glDeleteVertexArrays(1, &vao);
+
+		glFlush();  // Ensure all GPU commands are executed
+		NIKEE_CORE_INFO("GPU warm-up complete.");
 	}
 
 	void Windows::NIKEWindow::calculateViewport() {

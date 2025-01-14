@@ -74,6 +74,7 @@
     </ClCompile>
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
+    <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
     <ClCompile Include="src\Managers\Services\sEvents.cpp" />
     <ClCompile Include="src\Managers\Services\sInput.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
+    <ClInclude Include="headers\Components\cMetaData.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />
@@ -158,6 +160,7 @@
     </ClInclude>
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
+    <ClInclude Include="headers\Managers\Services\sMetaData.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
