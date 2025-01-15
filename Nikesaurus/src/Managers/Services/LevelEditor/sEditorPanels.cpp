@@ -4661,7 +4661,7 @@ namespace NIKE {
 			//Adjust snap to grid state
 			ImGui::Text("Snap entity to grid: ");
 			ImGui::SameLine();
-			ImGui::SmallButton(b_snap_to_grid ? "Disable##Snapping" : "Enable##Snapping");
+			ImGui::SmallButton(b_snap_to_grid ? "Enable##Snapping" : "Disable##Snapping");
 
 			//Check if button has been activated
 			if (ImGui::IsItemActivated()) {

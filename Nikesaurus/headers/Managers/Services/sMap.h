@@ -14,7 +14,7 @@
 #ifndef M_MAP_HPP
 #define M_MAP_HPP
 
-#define DEFAULT_MAP_SIZE Vector2i{1,1}
+#define DEFAULT_GRID_SIZE Vector2i{1,1}
 #define DEFAULT_CELL_SIZE Vector2f{256.f,256.f}
 
 namespace NIKE {
@@ -34,7 +34,7 @@ namespace NIKE {
 			bool checked;
 			float dist_player;
 			float dist_enemy;
-			Vector2f index;
+			Vector2i index;
 			std::vector<PathNode*> neighbours;
 			PathNode* parent;
 
@@ -102,7 +102,7 @@ namespace NIKE {
 			//Deserialize map
 			void deserialize(nlohmann::json const& data);
 
-			//// Pathfinding
+			// Pathfinding
 			std::vector<Vector2f> findPath(Vector2f start, Vector2f goal);
 		private:
 

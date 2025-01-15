@@ -14,6 +14,12 @@
 
 namespace NIKE {
 	void Enemy::Manager::init() {
+
+		// Init variables
+		movement_speed = 50.0f;
+		waypoint_threshold = 1.0f;
+		target_threshold = 1.0f;
+
 	}
 
 	void Enemy::Manager::update() {
@@ -34,31 +40,86 @@ namespace NIKE {
 					if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 						continue;
 
-					// Check for attack comp
-					auto e_enemy_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(entity);
-					if (e_enemy_comp.has_value()) {
+					// Check for pathfinding comp
+					if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity)) {
+						auto e_enemy_pathfind = NIKE_ECS_MANAGER->getEntityComponent<Pathfinding::Path>(entity);
+						auto& enemy_pathfind = e_enemy_pathfind.value().get();
 
-						auto& enemy_comp = e_enemy_comp.value().get();
+						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+						auto& enemy_transform = e_enemy_transform.value().get();
 
-						// If shot on cooldown
-						if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
-							// Accumulate time since last shot
-							enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						Vector2f start_target = enemy_transform.position;
+
+						// Find the first entity with the Render::Cam component
+						Entity::Type target_entity = Entity::MAX;
+						for (auto& other_entity : entities) { 
+							if (other_entity != entity && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(other_entity)) {
+								target_entity = other_entity;
+								break;
+							}
 						}
 
-						// Look for entity w player component
-						for (auto& other_entity : entities) {
-							auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-							// If player entity exists
-							if (e_player_comp.has_value()) {
-								// Check if player is within range & shot not on cooldown
-								if (enemy_comp.last_shot_time >= enemy_comp.cooldown && withinRange(entity, other_entity)) {
-									// Shoot bullet towards player pos from enemy pos
-									shootBullet(entity, other_entity);
+						// Check if a valid target entity was found
+						if (target_entity == Entity::MAX) {
+							cerr << "No other entity with Render::Cam component found!" << endl;
+							return;
+						}
 
-									// Reset the last shot time after shooting
-									enemy_comp.last_shot_time = 0.f;
-								}
+						// Check if the target entity has a Transform component
+						auto e_target_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(target_entity);
+						if (!e_target_transform.has_value()) {
+							cerr << "Target entity does not have a Transform component!" << endl;
+							return;
+						}
+
+						auto& target_transform = e_target_transform.value().get();
+						Vector2f end_target = target_transform.position;
+
+						// Perform pathfinding if no path is currently found
+						if (!enemy_pathfind.path_found) {
+
+							enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(start_target, end_target);
+							enemy_pathfind.path_found = !enemy_pathfind.path.empty();
+
+							//if (enemy_pathfind.path.empty()) {
+							//	cerr << "Pathfinding failed: No path found!" << endl;
+							//}
+						}
+
+						// Follow the path if found
+						if (enemy_pathfind.path_found) {
+							moveAlongPath(enemy_pathfind, enemy_transform);
+						}
+					}
+
+
+				
+
+
+				// Check for attack comp
+				auto e_enemy_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(entity);
+				if (e_enemy_comp.has_value()) {
+
+					auto& enemy_comp = e_enemy_comp.value().get();
+
+					// If shot on cooldown
+					if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
+						// Accumulate time since last shot
+						enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					}
+
+					// Look for entity w player component
+					for (auto& other_entity : entities) {
+						auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+						// If player entity exists
+						if (e_player_comp.has_value()) {
+							// Check if player is within range & shot not on cooldown
+							if (enemy_comp.last_shot_time >= enemy_comp.cooldown && withinRange(entity, other_entity)) {
+								// Shoot bullet towards player pos from enemy pos
+								shootBullet(entity, other_entity);
+
+								// Reset the last shot time after shooting
+								enemy_comp.last_shot_time = 0.f;
 							}
 						}
 					}
@@ -66,8 +127,49 @@ namespace NIKE {
 			}
 		}
 	}
+}
 
-	 bool Enemy::Manager::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
+	void NIKE::Enemy::Manager::moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform)
+	{
+		if (path.path_found && path.current_index < path.path.size()) {
+			Vector2f& current_target = path.path[path.current_index];
+
+			Vector2f target_world_position = {current_target.x * NIKE_MAP_SERVICE->getCellSize().x,
+			current_target.y * NIKE_MAP_SERVICE->getCellSize().y};
+
+			// Calculate direction
+			Vector2f direction = (target_world_position - transform.position).normalized();
+			transform.position += direction * movement_speed * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+			// Check if waypoint is reached
+			if ((transform.position - target_world_position).length() < waypoint_threshold) {
+				path.current_index++;
+				if (path.current_index >= path.path.size()) {
+					// Path traversal complete
+					path.path_found = false;
+				}
+			}
+		}
+	}
+
+	bool Enemy::Manager::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
+		return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);
+	}
+
+	void Enemy::Manager::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
+	{
+		// Compute a path if not already found or if the target has moved significantly
+		if (!path.path_found || hasTargetMoved(player_target.position, path)) {
+			path.path = NIKE_MAP_SERVICE->findPath(enemy.position, player_target.position);
+			path.current_index = 0;
+			path.path_found = !path.path.empty();
+		}
+
+		// Move along the path
+		moveAlongPath(path, enemy);
+	}
+
+	bool Enemy::Manager::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
 		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		Vector2f player_pos = player_transform_comp.value().get().position;
@@ -92,49 +194,49 @@ namespace NIKE {
 		float distance = (dist_x * dist_x) + (dist_y * dist_y);
 
 		//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
-		
+
 		// It is recommended to use enemy_range^2, but it's probably easier this way
 		return distance < enemy_range;
 	}
 
-	 void Enemy::Manager::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
-		 // Get player transform component
-		 const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		 const Vector2f& player_pos = p_transform_comp.value().get().position;
+	void Enemy::Manager::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
+		// Get player transform component
+		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		const Vector2f& player_pos = p_transform_comp.value().get().position;
 
-		 // Get enemy components
-		 const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
-		 const Vector2f& enemy_pos = e_transform_comp.value().get().position;
-		 const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
-		 const auto& enemy_attack_comp = e_attack_comp.value().get();
-		 const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
+		// Get enemy components
+		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
+		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		const auto& enemy_attack_comp = e_attack_comp.value().get();
+		const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
 
-		 // Create entity for bullet
-		 //Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
-		 Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
+		// Create entity for bullet
+		//Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
 
-		 // Load entity from prefab
-		 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
 
-		 // Calculate direction for bullet (Enemy Pos - Player Pos)
-		 Vector2f direction = player_pos - enemy_pos;
-		 direction.normalize();
+		// Calculate direction for bullet (Enemy Pos - Player Pos)
+		Vector2f direction = player_pos - enemy_pos;
+		direction.normalize();
 
-		 // Offset spawn position of bullet
-		 const float& offset = enemy_attack_comp.offset;
-		 Vector2f bullet_pos = enemy_pos + (direction * offset);
+		// Offset spawn position of bullet
+		const float& offset = enemy_attack_comp.offset;
+		Vector2f bullet_pos = enemy_pos + (direction * offset);
 
-		 // Set bullet's position
-		 auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
-		 if (bullet_transform_comp.has_value()) {
-			 bullet_transform_comp.value().get().position = bullet_pos;
-		 }
+		// Set bullet's position
+		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
+		if (bullet_transform_comp.has_value()) {
+			bullet_transform_comp.value().get().position = bullet_pos;
+		}
 
-		 // Set bullet physics
-		 auto bullet_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
-		 if (bullet_physics_comp.has_value()) {
-			 // Set force
-			 bullet_physics_comp.value().get().force = { direction.x, direction.y };
-		 }
-	 }
+		// Set bullet physics
+		auto bullet_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity);
+		if (bullet_physics_comp.has_value()) {
+			// Set force
+			bullet_physics_comp.value().get().force = { direction.x, direction.y };
+		}
+	}
 }

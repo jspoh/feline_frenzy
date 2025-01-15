@@ -12,7 +12,7 @@
 namespace NIKE {
 
 	Map::Service::Service() 
-		: grid_size{ DEFAULT_MAP_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f } {
+		: grid_size{ DEFAULT_GRID_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f } {
 
 		//Initialize grid
 		grid.resize(grid_size.y);
@@ -103,7 +103,7 @@ namespace NIKE {
 	void Map::Service::resetGrid()
 	{
 		cell_size = { DEFAULT_CELL_SIZE };
-		grid_size = { DEFAULT_MAP_SIZE };
+		grid_size = { DEFAULT_GRID_SIZE };
 	}
 
 	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCursorCell() {
@@ -112,6 +112,8 @@ namespace NIKE {
 
 		//Get index for cell
 		Vector2i index{ static_cast<int>(translated_cursor.x / cell_size.x), static_cast<int>(translated_cursor.y / cell_size.y) };
+
+		cout << index.x << ", " << index.y << endl;
 
 		//Check if index is valid
 		if (index.x < 0 || index.x >= grid_size.x || index.y < 0 || index.y >= grid_size.y) {
@@ -186,94 +188,85 @@ namespace NIKE {
 		updateCells();
 	}
 
-	std::vector<Vector2f> Map::Service::findPath(Vector2f start, Vector2f goal)
-	{
-		// auto& pathfind_grid = getGrid();
-		// Vector2i pathfind_grid_size = getGridSize();
-
-		// Create a map of PathNodes
+	std::vector<Vector2f> Map::Service::findPath(Vector2f start, Vector2f goal) {
 		std::map<Vector2i, PathNode> node_map;
 
-		// Init the pathnodes map
-		for (int y = 0; y < grid_size.y; ++y) {
-			for (int x = 0; x < grid_size.x; ++x) {
+		// Initialize nodes
+		for (int y = 0; y < getGridSize().y; ++y) {
+			for (int x = 0; x < getGridSize().x; ++x) {
 				PathNode node;
-				node.index = Vector2f(static_cast<float>(x), static_cast<float>(y));
+				node.index = Vector2i(x, y);
 				node.obstacle = grid[y][x].b_blocked;
 				node_map[{x, y}] = node;
 			}
 		}
 
-		// Set neighbors for each node
+		// Set neighbors
 		for (auto& elem : node_map) {
-			int x = static_cast<int>(elem.first.x);
-			int y = static_cast<int>(elem.first.y);
-			std::vector<Vector2i> neighbors = {
-				{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1},
-			};
-			for (auto& neighbor : neighbors) {
+			int x = elem.first.x, y = elem.first.y;
+			std::vector<Vector2i> neighbors = { {x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1} };
+			for (const auto& neighbor : neighbors) {
 				if (neighbor.x >= 0 && neighbor.x < grid_size.x &&
-					neighbor.y >= 0 && neighbor.y < grid_size.y) {
+					neighbor.y >= 0 && neighbor.y < grid_size.y &&
+					!node_map[neighbor].obstacle) {
 					elem.second.neighbours.push_back(&node_map[neighbor]);
 				}
 			}
 		}
 
-		// Init start and end goat index and nodes
-		Vector2i start_index = Vector2i(static_cast<int>(start.x), static_cast<int>(start.y));
-		Vector2i goal_index = Vector2i(static_cast<int>(goal.x), static_cast<int>(goal.y));
+		// A* Algorithm
+		//Translate position
+		Vector2f translated_start{ start.x + (grid_scale.x / 2.0f), start.y + (grid_scale.y / 2.0f) };
+		Vector2f translated_goal{ goal.x + (grid_scale.x / 2.0f), goal.y + (grid_scale.y / 2.0f) };
+
+		//Get index for start and goal
+		Vector2i start_index{ static_cast<int>(translated_start.x / cell_size.x), static_cast<int>(translated_start.y / cell_size.y) };
+		Vector2i goal_index{ static_cast<int>(translated_goal.x / cell_size.x), static_cast<int>(translated_goal.y / cell_size.y) };
+
 		PathNode* start_node = &node_map[start_index];
 		PathNode* goal_node = &node_map[goal_index];
 
-		// Priority queue
 		std::priority_queue<PathNode*, std::vector<PathNode*>, NIKE::Map::PathNode::PathNodeComparator> open_list;
 		start_node->dist_player = 0;
-		start_node->dist_enemy = std::hypot(goal.x - start.x, goal.y - start.y);
+		start_node->dist_enemy = abs(goal.x - start.x) + abs(goal.y - start.y);
 		open_list.push(start_node);
 
-		// Pathfinding loop
 		while (!open_list.empty()) {
 			PathNode* current = open_list.top();
 			open_list.pop();
 
-			// Check if goal reached
 			if (current == goal_node) break;
-
 			current->checked = true;
 
-			// Explore neighbors nodes
 			for (auto neighbor : current->neighbours) {
-
 				if (neighbor->checked || neighbor->obstacle) continue;
 
-				float newDist = current->dist_player + std::hypot(neighbor->index.x - current->index.x,
-					neighbor->index.y - current->index.y);
-
+				float newDist = current->dist_player + 1; 
 				if (newDist < neighbor->dist_player) {
 					neighbor->dist_player = newDist;
-					neighbor->dist_enemy = std::hypot(goal.x - neighbor->index.x, goal.y - neighbor->index.y);
+					neighbor->dist_enemy = abs(goal.x - neighbor->index.x) + abs(goal.y - neighbor->index.y);
 					neighbor->parent = current;
-
-					if (!neighbor->checked) {
-						open_list.push(neighbor);
-					}
+					open_list.push(neighbor);
 				}
 			}
 		}
 
-		// Construct the path after finising
+		// Construct the path
 		std::vector<Vector2f> path;
 		PathNode* current_node = goal_node;
 		while (current_node && current_node != start_node) {
-			path.push_back(current_node->index);
+			path.push_back(Vector2f(current_node->index.x, current_node->index.y));
 			current_node = current_node->parent;
 		}
-		if (current_node == start_node) {
-			path.push_back(start_node->index);
+
+		if (current_node == start_node) path.push_back(Vector2f(start_node->index.x, start_node->index.y));
+		else {
+			return {};
 		}
 
 		std::reverse(path.begin(), path.end());
-		return path;
 
+		return path;
 	}
+
 }	
