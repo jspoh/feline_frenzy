@@ -32,14 +32,14 @@
                     "Entity": {
                         "Components": {
                             "Pathfinding::Path": {
-                                "CurrentIndex": 1,
+                                "CurrentIndex": 0,
                                 "Path": null,
                                 "PathFound": false
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -896.0,
-                                    "y": -640.0
+                                    "x": -640.0,
+                                    "y": -384.0
                                 },
                                 "Zoom": 1.0
                             },
@@ -69,8 +69,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -896.0,
-                                    "y": -640.0
+                                    "x": -640.0,
+                                    "y": -384.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -90,16 +90,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Pathfinding::Path": {
-                                "CurrentIndex": 1,
-                                "Path": [
-                                    {
-                                        "x": 0.0,
-                                        "y": 0.0
-                                    }
-                                ],
-                                "PathFound": true
-                            },
                             "Render::Cam": {
                                 "Position": {
                                     "x": 0.0,

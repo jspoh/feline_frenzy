@@ -81,6 +81,19 @@ namespace NIKE {
 							enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(start_target, end_target);
 							enemy_pathfind.path_found = !enemy_pathfind.path.empty();
 
+							if (enemy_pathfind.path_found) {
+								//cout << "Following Path - Current Index: " << enemy_pathfind.current_index
+								//	<< " | Path Size: " << enemy_pathfind.path.size() << endl;
+
+								//if (enemy_pathfind.current_index < enemy_pathfind.path.size()) {
+								//	cout << "Moving towards: " << enemy_pathfind.path[enemy_pathfind.current_index].x
+								//		<< ", " << enemy_pathfind.path[enemy_pathfind.current_index].y << endl;
+								//}
+								//else {
+								//	cerr << "Error: Current index out of bounds!" << endl;
+								//}
+							}
+
 							//if (enemy_pathfind.path.empty()) {
 							//	cerr << "Pathfinding failed: No path found!" << endl;
 							//}
@@ -134,8 +147,23 @@ namespace NIKE {
 		if (path.path_found && path.current_index < path.path.size()) {
 			Vector2f& current_target = path.path[path.current_index];
 
-			Vector2f target_world_position = {current_target.x * NIKE_MAP_SERVICE->getCellSize().x,
-			current_target.y * NIKE_MAP_SERVICE->getCellSize().y};
+			Vector2i current_target_main = { static_cast<int>(current_target.x), static_cast<int>(current_target.y) };
+
+			Vector2f target_world_position{};
+
+			auto grid = NIKE_MAP_SERVICE->getGrid();
+
+			// Retrieve position based on current target index
+			if (current_target.x >= 0 && current_target.x < grid.size() &&
+				current_target.y >= 0 && current_target.y < grid[0].size()) {
+				target_world_position = grid[current_target_main.x][current_target_main.y].position;
+			}
+
+			// Check if the target position is blocked
+			if (grid[current_target_main.x][current_target_main.y].b_blocked) {
+				path.path_found = false;
+				return;
+			}
 
 			// Calculate direction
 			Vector2f direction = (target_world_position - transform.position).normalized();

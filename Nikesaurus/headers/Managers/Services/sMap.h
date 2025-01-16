@@ -25,8 +25,9 @@ namespace NIKE {
 		struct Cell {
 			bool b_blocked;
 			Vector2f position;
+			Vector2i index;
 
-			Cell() : b_blocked{ false } {}
+			Cell() : b_blocked{ false }, position{}, index{} {}
 		};
 
 		struct PathNode {
@@ -103,7 +104,12 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 
 			// Pathfinding
-			std::vector<Vector2f> findPath(Vector2f start, Vector2f goal);
+			std::vector<Vector2f> findPath(Vector2f const& start, Vector2f const& goal);
+
+			bool isPlayerSurrounded(Map::PathNode* goal);
+
+			// Checking if cell is valid before pusing into path vector
+			bool isValidCell(const Vector2i& index);
 		private:
 
 			//Internal cell pos update
@@ -126,6 +132,9 @@ namespace NIKE {
 
 			//Cursor position relative to game window
 			Vector2f cursor_pos;
+
+			// Init node map
+			std::map<Vector2i, PathNode> node_map;
 		};
 
 		//Re-enable DLL Export warning
