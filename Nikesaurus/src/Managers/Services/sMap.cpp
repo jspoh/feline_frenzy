@@ -216,7 +216,7 @@ namespace NIKE {
 				if (!(current == goal))
 				{
 					path.push_back(current);
-					current = grid[current.index.x][current.y];
+					current = grid[current.index.x][current.index.y];
 				}
 				path.push_back(start);
 				std::reverse(path.begin(), path.end());
@@ -268,6 +268,16 @@ namespace NIKE {
 	bool Map::Cell::operator==(const Cell& other) const
 	{
 		return position.x == other.position.x && position.y == other.position.y;
+	}
+
+	// TO BE DELETED
+	void Map::Service::PrintPath(const std::vector<Cell>& path)
+	{
+		for (const Cell& cell : path)
+		{
+			cout << "(" << cell.index.x << ", " << cell.index.y << ") ";
+		}
+		cout << endl;
 	}
 
 }

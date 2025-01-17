@@ -93,6 +93,9 @@ namespace NIKE {
 
 			// Pathfinding
 			std::vector<Cell> findPath(Cell const& start, Cell const& goal);
+
+			// Debug purposes
+			void PrintPath(const std::vector<Cell>& path);
 		private:
 
 			//Internal cell pos update

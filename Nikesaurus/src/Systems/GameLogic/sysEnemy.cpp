@@ -48,9 +48,11 @@ namespace NIKE {
 						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 						auto& enemy_transform = e_enemy_transform.value().get();
 
+						// Init cell
+						//Map::Cell target{5,2};
+						//enemy_pathfind.start.index = { 6,7 };
 
-
-						
+						//enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start, target);
 					}
 
 
@@ -90,60 +92,60 @@ namespace NIKE {
 	}
 }
 
-	void NIKE::Enemy::Manager::moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform)
-	{
-		if (path.path_found && path.current_index < path.path.size()) {
-			Vector2f& current_target = path.path[path.current_index];
+	//void NIKE::Enemy::Manager::moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform)
+	//{
+	//	if (path.path_found && path.current_index < path.path.size()) {
+	//		Vector2f& current_target = path.path[path.current_index];
 
-			Vector2i current_target_main = { static_cast<int>(current_target.x), static_cast<int>(current_target.y) };
+	//		Vector2i current_target_main = { static_cast<int>(current_target.x), static_cast<int>(current_target.y) };
 
-			Vector2f target_world_position{};
+	//		Vector2f target_world_position{};
 
-			auto grid = NIKE_MAP_SERVICE->getGrid();
+	//		auto grid = NIKE_MAP_SERVICE->getGrid();
 
-			// Retrieve position based on current target index
-			if (current_target.x >= 0 && current_target.x < grid.size() &&
-				current_target.y >= 0 && current_target.y < grid[0].size()) {
-				target_world_position = grid[current_target_main.x][current_target_main.y].position;
-			}
+	//		// Retrieve position based on current target index
+	//		if (current_target.x >= 0 && current_target.x < grid.size() &&
+	//			current_target.y >= 0 && current_target.y < grid[0].size()) {
+	//			target_world_position = grid[current_target_main.x][current_target_main.y].position;
+	//		}
 
-			// Check if the target position is blocked
-			if (grid[current_target_main.x][current_target_main.y].b_blocked) {
-				path.path_found = false;
-				return;
-			}
+	//		// Check if the target position is blocked
+	//		if (grid[current_target_main.x][current_target_main.y].b_blocked) {
+	//			path.path_found = false;
+	//			return;
+	//		}
 
-			// Calculate direction
-			Vector2f direction = (target_world_position - transform.position).normalized();
-			transform.position += direction * movement_speed * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+	//		// Calculate direction
+	//		Vector2f direction = (target_world_position - transform.position).normalized();
+	//		transform.position += direction * movement_speed * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
-			// Check if waypoint is reached
-			if ((transform.position - target_world_position).length() < waypoint_threshold) {
-				path.current_index++;
-				if (path.current_index >= path.path.size()) {
-					// Path traversal complete
-					path.path_found = false;
-				}
-			}
-		}
-	}
+	//		// Check if waypoint is reached
+	//		if ((transform.position - target_world_position).length() < waypoint_threshold) {
+	//			path.current_index++;
+	//			if (path.current_index >= path.path.size()) {
+	//				// Path traversal complete
+	//				path.path_found = false;
+	//			}
+	//		}
+	//	}
+	//}
 
 	bool Enemy::Manager::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
 		return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);
 	}
 
-	void Enemy::Manager::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
-	{
-		// Compute a path if not already found or if the target has moved significantly
-		if (!path.path_found || hasTargetMoved(player_target.position, path)) {
-			path.path = NIKE_MAP_SERVICE->findPath(enemy.position, player_target.position);
-			path.current_index = 0;
-			path.path_found = !path.path.empty();
-		}
+	//void Enemy::Manager::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
+	//{
+	//	// Compute a path if not already found or if the target has moved significantly
+	//	if (!path.path_found || hasTargetMoved(player_target.position, path)) {
+	//		path.path = NIKE_MAP_SERVICE->findPath(enemy.position, player_target.position);
+	//		path.current_index = 0;
+	//		path.path_found = !path.path.empty();
+	//	}
 
-		// Move along the path
-		moveAlongPath(path, enemy);
-	}
+	//	// Move along the path
+	//	moveAlongPath(path, enemy);
+	//}
 
 	bool Enemy::Manager::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform

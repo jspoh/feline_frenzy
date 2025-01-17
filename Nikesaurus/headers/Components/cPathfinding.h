@@ -18,8 +18,8 @@ namespace NIKE {
 	namespace Pathfinding {
         struct Path{
                 std::vector<NIKE::Math::Vector2f> path; // Path is a vector of waypoints
-                //int current_index;   // Index of current target waypoint in path
-                //bool path_found;   // Flag to indicate if path has been found
+                int current_index;   // Index of current target waypoint in path
+                bool path_found;   // Flag to indicate if path has been found
 
                 Path() = default;
         };

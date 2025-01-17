@@ -3594,7 +3594,20 @@ namespace NIKE {
 		//Update resource panel with file change events
 		while (!file_event_queue.empty()) {
 			//Execute event
-			file_event_queue.front()();
+			try
+			{
+				auto func = file_event_queue.front();
+				// Check if the callable is null
+				if (func)  
+				{
+					// Safe to call
+					func();
+				}
+			}
+			catch (const std::exception&)
+			{
+				NIKEE_CORE_ERROR("**THIS** nullptr");
+			}
 
 			//Pop from queue
 			file_event_queue.pop();
