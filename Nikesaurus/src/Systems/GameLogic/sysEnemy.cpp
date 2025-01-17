@@ -50,19 +50,13 @@ namespace NIKE {
 
 						Vector2f start_target = enemy_transform.position;
 
-						// Find the first entity with the Render::Cam component
+						// Find the first entity with the pathfind comp
 						Entity::Type target_entity = Entity::MAX;
 						for (auto& other_entity : entities) { 
-							if (other_entity != entity && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(other_entity)) {
+							if (other_entity != entity && NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::ILogic>(other_entity)) {
 								target_entity = other_entity;
 								break;
 							}
-						}
-
-						// Check if a valid target entity was found
-						if (target_entity == Entity::MAX) {
-							cerr << "No other entity with Render::Cam component found!" << endl;
-							return;
 						}
 
 						// Check if the target entity has a Transform component
