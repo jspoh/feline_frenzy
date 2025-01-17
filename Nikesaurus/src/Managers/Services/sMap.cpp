@@ -177,7 +177,7 @@ namespace NIKE {
 		for (const auto& row_json : data["Grid"]) {
 			std::vector<Cell> row;
 			for (const auto& cell_json : row_json) {
-				Cell cell;
+				Cell cell{};
 				cell.b_blocked = cell_json.at("Blocked").get<bool>();
 				cell.position.fromJson(cell_json.at("Position"));
 				row.push_back(cell);
@@ -188,108 +188,87 @@ namespace NIKE {
 		updateCells();
 	}
 
-	std::vector<Vector2f> Map::Service::findPath(const Vector2f& start, const Vector2f& goal) {
-		auto start_cell = getCellAtPosition(start);
-		auto goal_cell = getCellAtPosition(goal);
+	std::vector<NIKE::Map::Cell> Map::Service::findPath(const Cell& start, const Cell& goal) {
+		// Init directions, possible directions: left, right, up down
+		const int direction_x[] = { -1, 0, 1, 0 };
+		const int direction_y[] = { 0, 1, 0, -1 };
 
-		if (!start_cell.has_value() || !goal_cell.has_value()) {
-			return {};
-		}
+		// Change here when have more directions
+		int total_directions{ 4 };
 
-		PathNode* start_node = &node_map[start_cell.value().get().index];
-		PathNode* goal_node = &node_map[goal_cell.value().get().index];
-		Vector2i goal_index = goal_cell.value().get().index;
-		Vector2i start_index = start_cell.value().get().index;
-
-		// Initialize nodes
-		for (int y = 0; y < getGridSize().y; ++y) {
-			for (int x = 0; x < getGridSize().x; ++x) {
-				PathNode node;
-				node.index = Vector2i(x, y);
-				node.obstacle = grid[x][y].b_blocked;
-				node_map[{x, y}] = node;
-			}
-		}
-
-		// Set neighbors
-		for (auto& elem : node_map) {
-			int x = elem.first.x, y = elem.first.y;
-			std::vector<Vector2i> neighbors = { {x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1} };
-			for (const auto& neighbor : neighbors) {
-				if (neighbor.x >= 0 && neighbor.x < getGridSize().x &&
-					neighbor.y >= 0 && neighbor.y < getGridSize().y &&
-					!node_map[neighbor].obstacle) {
-					elem.second.neighbours.push_back(&node_map[neighbor]);
-				}
-			}
-		}
-
-		std::priority_queue<PathNode*, std::vector<PathNode*>, NIKE::Map::PathNode::PathNodeComparator> open_list;
-		start_node->dist_player = 0;
-		start_node->parent = start_node;
-		start_node->dist_enemy = static_cast<float>(abs(goal_index.x - start_index.x) + abs(goal_index.y - start_index.y));
-		open_list.push(start_node);
+		// Initialize the open and closed lists
+		std::priority_queue <Cell, std::vector<Cell>, std::greater<Cell>> open_list;
+		std::vector<std::vector<bool>> closed_list(grid.size(), std::vector<bool>(grid[0].size(), false));
+		
+		// Start Node
+		open_list.push(start);
 
 		while (!open_list.empty()) {
-			PathNode* current = open_list.top();
+			// Get cell with lowest f value
+			Cell current = open_list.top();
 			open_list.pop();
 
-			if (current == goal_node) break;
-			current->checked = true;
+			// Check if current is the goal node
+			if (current == goal)
+			{
+				// Reconstruct the path
+				std::vector<Cell> path;
+				if (!(current == goal))
+				{
+					path.push_back(current);
+					current = grid[current.index.x][current.y];
+				}
+				path.push_back(start);
+				std::reverse(path.begin(), path.end());
+				return path;
+			}
 
-			// Only consider left right up down paths
-			std::vector<Vector2i> directions = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
-			for (auto& direction : directions) {
-				Vector2i neighbor_index = current->index + direction;
-				if (isValidCell(neighbor_index) && !node_map[neighbor_index].checked && !node_map[neighbor_index].obstacle) {
-					float new_dist = current->dist_player + 1;
-					if (new_dist < node_map[neighbor_index].dist_player) {
-						node_map[neighbor_index].dist_player = new_dist;
-						node_map[neighbor_index].dist_enemy = static_cast<float>(abs(goal_index.x - neighbor_index.x) + abs(goal_index.y - neighbor_index.y));
-						node_map[neighbor_index].parent = current;
-						open_list.push(&node_map[neighbor_index]);
+			// Mark the current cell as closed
+			closed_list[current.index.x][current.index.y] = true;
+
+			for (size_t i{0}; i < total_directions; ++i)
+			{
+				int new_x = current.index.x + direction_x[i];
+				int new_y = current.index.y + direction_y[i];
+
+				// Check if neighbour valid
+				if (new_x >= 0 && new_x < grid.size() && new_y >= 0 && new_y < grid[0].size())
+				{
+					// Check if cell blocked
+					if (!grid[new_x][new_y].b_blocked && !closed_list[new_x][new_y])
+					{
+						Cell neighbor(new_x, new_y);
+						int new_g = current.g + 1;
+
+						// Check if the neighbor is not in the open list or has a lower g value
+						if (new_g < neighbor.g || !closed_list[new_x][new_y]) {
+							neighbor.g = new_g;
+							neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
+							neighbor.f = neighbor.g + neighbor.h;
+							// Update the parent of the neighbor
+							grid[new_x][new_y] = current;
+							// Add the neighbor to the open list
+							open_list.push(neighbor); 
+						}
 					}
 				}
 			}
+
 		}
 
-
-		// Construct the path
-		std::vector<Vector2f> path{};
-		PathNode* current_node = goal_node;
-		while (current_node) {
-			if (current_node->obstacle) break;
-			path.push_back(Vector2f(static_cast<float>(current_node->index.x), static_cast<float>(current_node->index.y)));
-			if (current_node == start_node) break;
-
-			current_node = current_node->parent;
-		}
-
-		std::reverse(path.begin(), path.end());
-
-		return path;
+		// No path found
+		return std::vector<Cell>();
 	}
 
-	bool Map::Service::isPlayerSurrounded(Map::PathNode* goal) {
-		bool surrounded = true;
-		for (Map::PathNode*& neighbor : goal->neighbours) {
-			if (!neighbor->obstacle) {
-				surrounded = false;
-				break;
-			}
-		}
-		return surrounded;
+	bool Map::Cell::operator>(const Cell& other) const
+	{
+		return f > other.f;
 	}
 
-
-	bool Map::Service::isValidCell(const Vector2i& index) {
-		// For checking bounds for x axis
-		return index.x >= 0 && index.x < grid_size.x &&
-			// For checking bounds for y axis
-			index.y >= 0 && index.y < grid_size.y &&
-			// Ensure it's not an obstacle
-			!node_map[index].obstacle; 
+	bool Map::Cell::operator==(const Cell& other) const
+	{
+		return position.x == other.position.x && position.y == other.position.y;
 	}
 
+}
 
-}	

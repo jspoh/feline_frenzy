@@ -27,33 +27,21 @@ namespace NIKE {
 			Vector2f position;
 			Vector2i index;
 
-			Cell() : b_blocked{ false }, position{}, index{} {}
-		};
+			// Values used by the A* algorithm
+			/////////////////////////////////////////////////////////////////////////////////
+			// G(cost from start) is the cost to reach a node from the start node
+			// H(Heuristic cost to goal) is an estimate cost from current node to the goal
+			// F(Total Cost) is the value used to prio nodes in prio queue
+			/////////////////////////////////////////////////////////////////////////////////
+			int f, g, h;
 
-		struct PathNode {
-			bool obstacle;
-			bool checked;
-			float dist_player;
-			float dist_enemy;
-			Vector2i index;
-			std::vector<PathNode*> neighbours;
-			PathNode* parent;
+			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{ _x, _y}, f {}, g{}, h{} {}
 
-			//Constructor
-			PathNode() : obstacle{ false }, checked{ false }, dist_player{ static_cast<float>(INFINITY) },
-				dist_enemy{ static_cast<float>(INFINITY) }, index{ 0, 0 }, parent{ nullptr } {}
+			Cell() = default;
 
-
-			//Destructor
-			~PathNode() {
-				neighbours.clear();
-			}
-
-			struct PathNodeComparator {
-				bool operator()(const PathNode* lhs, const PathNode* rhs) const {
-					return (lhs->dist_player + lhs->dist_enemy) > (rhs->dist_player + rhs->dist_enemy);
-				}
-			};
+			// Overload comparison operators for priority queue
+			bool operator>(const Cell& other) const;
+			bool operator==(const Cell& other) const;
 		};
 
 		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
@@ -104,12 +92,7 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 
 			// Pathfinding
-			std::vector<Vector2f> findPath(Vector2f const& start, Vector2f const& goal);
-
-			bool isPlayerSurrounded(Map::PathNode* goal);
-
-			// Checking if cell is valid before pusing into path vector
-			bool isValidCell(const Vector2i& index);
+			std::vector<Cell> findPath(Cell const& start, Cell const& goal);
 		private:
 
 			//Internal cell pos update
@@ -132,9 +115,6 @@ namespace NIKE {
 
 			//Cursor position relative to game window
 			Vector2f cursor_pos;
-
-			// Init node map
-			std::map<Vector2i, PathNode> node_map;
 		};
 
 		//Re-enable DLL Export warning

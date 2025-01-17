@@ -48,62 +48,9 @@ namespace NIKE {
 						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 						auto& enemy_transform = e_enemy_transform.value().get();
 
-						Vector2f start_target = enemy_transform.position;
-
-						// Find the first entity with the pathfind comp
-						Entity::Type target_entity = Entity::MAX;
-						for (auto& other_entity : entities) { 
-							if (other_entity != entity && NIKE_ECS_MANAGER->checkEntityComponent<GameLogic::ILogic>(other_entity)) {
-								target_entity = other_entity;
-								break;
-							}
-						}
-
-						// Check if the target entity has a Transform component
-						auto e_target_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(target_entity);
-
-						Vector2f end_target{};
-
-						try
-						{
-							auto& target_transform = e_target_transform.value().get();
-							end_target = target_transform.position;
-						}
-						catch (const std::exception&)
-						{
-							NIKEE_CORE_INFO("CRASH");
-						}
 
 
-
-						// Perform pathfinding if no path is currently found
-						if (!enemy_pathfind.path_found) {
-
-							enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(start_target, end_target);
-							enemy_pathfind.path_found = !enemy_pathfind.path.empty();
-
-							if (enemy_pathfind.path_found) {
-								//cout << "Following Path - Current Index: " << enemy_pathfind.current_index
-								//	<< " | Path Size: " << enemy_pathfind.path.size() << endl;
-
-								//if (enemy_pathfind.current_index < enemy_pathfind.path.size()) {
-								//	cout << "Moving towards: " << enemy_pathfind.path[enemy_pathfind.current_index].x
-								//		<< ", " << enemy_pathfind.path[enemy_pathfind.current_index].y << endl;
-								//}
-								//else {
-								//	cerr << "Error: Current index out of bounds!" << endl;
-								//}
-							}
-
-							//if (enemy_pathfind.path.empty()) {
-							//	cerr << "Pathfinding failed: No path found!" << endl;
-							//}
-						}
-
-						// Follow the path if found
-						if (enemy_pathfind.path_found) {
-							moveAlongPath(enemy_pathfind, enemy_transform);
-						}
+						
 					}
 
 
