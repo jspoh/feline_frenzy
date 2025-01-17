@@ -33,15 +33,37 @@
                         "Components": {
                             "Pathfinding::Path": {
                                 "CurrentIndex": 0,
-                                "Path": null,
-                                "PathFound": false
-                            },
-                            "Render::Cam": {
-                                "Position": {
-                                    "x": -640.0,
-                                    "y": -384.0
-                                },
-                                "Zoom": 1.0
+                                "Path": [
+                                    {
+                                        "x": 2.0,
+                                        "y": 2.0
+                                    },
+                                    {
+                                        "x": 3.0,
+                                        "y": 2.0
+                                    },
+                                    {
+                                        "x": 3.0,
+                                        "y": 3.0
+                                    },
+                                    {
+                                        "x": 4.0,
+                                        "y": 3.0
+                                    },
+                                    {
+                                        "x": 5.0,
+                                        "y": 3.0
+                                    },
+                                    {
+                                        "x": 5.0,
+                                        "y": 4.0
+                                    },
+                                    {
+                                        "x": 5.0,
+                                        "y": 5.0
+                                    }
+                                ],
+                                "PathFound": true
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -69,7 +91,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -640.0,
+                                    "x": -585.8346557617188,
                                     "y": -384.0
                                 },
                                 "Rotation": 0.0,
@@ -90,12 +112,15 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Cam": {
-                                "Position": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Zoom": 1.0
+                            "GameLogic::ILogic": {
+                                "Function": "",
+                                "Named_Args": {},
+                                "Script_ID": ""
+                            },
+                            "Pathfinding::Path": {
+                                "CurrentIndex": 0,
+                                "Path": null,
+                                "PathFound": false
                             },
                             "Render::Texture": {
                                 "B_Blend": true,
