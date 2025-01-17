@@ -18,41 +18,45 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Calculate relative velocity
+        // Step 1: Calculate relative velocity
         Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
+
+        // Step 2: Compute velocity along the collision normal
         float normal_vel = vel_rel.dot(info.collision_normal);
 
-        // Check if entities are already moving apart
-        if (normal_vel > 0) return;
+        // Step 3: Check if entities are separating
+        if (normal_vel > 0) return;  // No bounce needed if moving apart
 
-        // Calculate impulse magnitude based on collision response
-        float impulse_magnitude = -(1 + restitution) * normal_vel;
+        // Step 4: Compute restitution (average if both colliders have restitution)
+        float combined_restitution = (collider_a.restitution + collider_b.restitution) / 2.0f;
 
-        // Calculate the reflection vector for angular bounce
-        Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
+        // Step 5: Reflect velocity along the collision normal with restitution
+        Vector2f reflected_velocity = vel_rel - (1.0f + combined_restitution) * normal_vel * info.collision_normal;
 
-        if (collider_a.resolution == Physics::Resolution::NONE) {
-            // Transform back outside of collision
-            transform_b.position += info.mtv;
+        // Step 6: Separate tangential velocity and apply drag
+        Vector2f tangential_velocity = vel_rel - normal_vel * info.collision_normal;
+        tangential_velocity *= (1.0f - dynamics_a.drag);
 
-            // Apply impluse to velocity
-            dynamics_b.velocity -= impulse;
-        }
-        else if (collider_b.resolution == Physics::Resolution::NONE) {
-            // Transform back outside of collision
-            transform_a.position += info.mtv;
+        // Step 7: Update velocities
+        dynamics_a.velocity = reflected_velocity + tangential_velocity;
 
-            // Apply impluse to velocity
-            dynamics_a.velocity += impulse;
+        // Step 8: Correct position using MTV proportional to inverse mass
+        float total_mass = dynamics_a.mass + dynamics_b.mass;
+        if (total_mass > EPSILON) {
+            float ratio_a = dynamics_b.mass / total_mass;
+            float ratio_b = dynamics_a.mass / total_mass;
+
+            transform_a.position += info.mtv * ratio_a;
+            transform_b.position -= info.mtv * ratio_b;
         }
         else {
-            // Transform back outside of collision
-            transform_a.position += info.mtv.operator*(0.5f);
-            transform_b.position -= info.mtv.operator*(0.5f);
+            transform_a.position += info.mtv;
+        }
 
-            // Apply impulse to velocity based on mass
-            dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
-            dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
+        // Step 9: Handle dynamic behavior of the other entity
+        if (collider_b.resolution == Physics::Resolution::BOUNCE) {
+            Vector2f impulse = -normal_vel * info.collision_normal * dynamics_a.mass / dynamics_b.mass;
+            dynamics_b.velocity += impulse;
         }
     }
 
@@ -349,57 +353,47 @@ namespace NIKE {
         Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Notify systems of collision
+        // Dispatch collision event
         auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
         NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
 
         // Destroy Resolution
         if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
-            NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_a);
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
-
             return;
         }
 
         if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
-            NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_b);
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
-
             return;
         }
 
-        // Bounce Resolution
+        // Bounce Resolution (at least one entity has BOUNCE)
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
-            bounceResolution(transform_a, dynamics_b, collider_a, transform_b, dynamics_a, collider_b, info);
+            if (collider_a.resolution == Physics::Resolution::BOUNCE) {
+                bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+            }
+            else {
+                bounceResolution(transform_b, dynamics_b, collider_b, transform_a, dynamics_a, collider_a, info);
+            }
             return;
         }
 
-        // Slide To Slide Resolution
+        // Slide Resolution
         if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
-            transform_a.position += info.mtv.operator*(0.5f);
-            transform_b.position -= info.mtv.operator*(0.5f);
+            transform_a.position += info.mtv * 0.5f;
+            transform_b.position -= info.mtv * 0.5f;
             return;
         }
 
-        // Resolution::NONE currently makes movement object "bounce"
-        switch (collider_a.resolution) {
-        case Physics::Resolution::NONE:
-            break;
-        case Physics::Resolution::SLIDE:
+        // Default Resolutions
+        if (collider_a.resolution == Physics::Resolution::SLIDE) {
             transform_a.position += info.mtv;
-            break;
-        default:
-            break;
         }
 
-        switch (collider_b.resolution) {
-        case Physics::Resolution::NONE:
-            break;
-        case Physics::Resolution::SLIDE:
+        if (collider_b.resolution == Physics::Resolution::SLIDE) {
             transform_b.position -= info.mtv;
-            break;
-        default:
-            break;
         }
     }
+
 }
