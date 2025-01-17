@@ -895,7 +895,7 @@ namespace NIKE {
 						error_msg->assign("Editing grid now, unable to select entity.");
 						openPopUp("Error");
 						unselectEntity();
-						return;
+						break;
 					}
 
 					// Prepare for redo/undo if the entity selection changes
