@@ -5,7 +5,7 @@
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  *
  * \date   November 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
