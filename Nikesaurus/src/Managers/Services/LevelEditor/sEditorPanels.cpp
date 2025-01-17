@@ -3530,59 +3530,59 @@ namespace NIKE {
 		directories = NIKE_PATH_SERVICE->listDirectories(current_path);
 		files = NIKE_PATH_SERVICE->listFiles(current_path);
 
-		//Setup directory watching for 
-		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
+		////Setup directory watching for 
+		//NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [this](std::filesystem::path const& file, filewatch::Event event) {
 
-			//Enngine engine assets path
-			static auto engine_assets = NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/");
+		//	//Enngine engine assets path
+		//	static auto engine_assets = NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/");
 
-			//Skip directories
-			if (std::filesystem::is_directory(file) ||
-				!NIKE_ASSETS_SERVICE->isPathValid(file.string(), false) ||
-				file == engine_assets) {
-				return;
-			}
+		//	//Skip directories
+		//	if (std::filesystem::is_directory(file) ||
+		//		!NIKE_ASSETS_SERVICE->isPathValid(file.string(), false) ||
+		//		file == engine_assets) {
+		//		return;
+		//	}
 
-			// Handle file events
-			static std::unordered_map<std::string, std::chrono::steady_clock::time_point> last_modified_times;
-			auto now = std::chrono::steady_clock::now();
+		//	// Handle file events
+		//	static std::unordered_map<std::string, std::chrono::steady_clock::time_point> last_modified_times;
+		//	auto now = std::chrono::steady_clock::now();
 
-			//Watch for events
-			switch (event) {
-			case filewatch::Event::added: {
-				auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
-				if (!NIKE_ASSETS_SERVICE->isAssetRegistered(asset_id)) {
-					NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
-				}
-				break;
-			}
-			case filewatch::Event::removed: {
-				//Unregister assets
-				NIKE_ASSETS_SERVICE->unregisterAsset(NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false));
-				break;
-			}
-			case filewatch::Event::modified: {
+		//	//Watch for events
+		//	switch (event) {
+		//	case filewatch::Event::added: {
+		//		auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
+		//		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(asset_id)) {
+		//			NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
+		//		}
+		//		break;
+		//	}
+		//	case filewatch::Event::removed: {
+		//		//Unregister assets
+		//		NIKE_ASSETS_SERVICE->unregisterAsset(NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false));
+		//		break;
+		//	}
+		//	case filewatch::Event::modified: {
 
-				//Only recache assets that are already cached
-				auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
-				if (NIKE_ASSETS_SERVICE->isAssetCached(asset_id)) {
+		//		//Only recache assets that are already cached
+		//		auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
+		//		if (NIKE_ASSETS_SERVICE->isAssetCached(asset_id)) {
 
-					//Prevent multiple modifications
-					if (last_modified_times[file.string()] + std::chrono::milliseconds(1000) > now) {
-						return;
-					}
-					last_modified_times[file.string()] = now;
+		//			//Prevent multiple modifications
+		//			if (last_modified_times[file.string()] + std::chrono::milliseconds(1000) > now) {
+		//				return;
+		//			}
+		//			last_modified_times[file.string()] = now;
 
-					//Recache asset
-					NIKE_ASSETS_SERVICE->recacheAsset(asset_id);
-				}
-				break;
-			}
-			default: {
-				break;
-			}
-			}
-			});
+		//			//Recache asset
+		//			NIKE_ASSETS_SERVICE->recacheAsset(asset_id);
+		//		}
+		//		break;
+		//	}
+		//	default: {
+		//		break;
+		//	}
+		//	}
+		//	});
 	}
 
 	void LevelEditor::ResourcePanel::update() {

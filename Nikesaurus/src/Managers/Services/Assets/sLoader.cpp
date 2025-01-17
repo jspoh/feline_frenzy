@@ -274,6 +274,8 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
+		while (glGetError() != GL_NO_ERROR) {}
+
 		// !NOTE: n.loo
 		//glFinish();
 		//GLint maxVertexAttribs;

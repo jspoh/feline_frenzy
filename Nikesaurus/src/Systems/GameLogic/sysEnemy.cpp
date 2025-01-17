@@ -5,7 +5,7 @@
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  *
  * \date   November 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -61,13 +61,20 @@ namespace NIKE {
 
 						// Check if the target entity has a Transform component
 						auto e_target_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(target_entity);
-						if (!e_target_transform.has_value()) {
-							cerr << "Target entity does not have a Transform component!" << endl;
-							return;
+
+						Vector2f end_target{};
+
+						try
+						{
+							auto& target_transform = e_target_transform.value().get();
+							end_target = target_transform.position;
+						}
+						catch (const std::exception&)
+						{
+							NIKEE_CORE_INFO("CRASH");
 						}
 
-						auto& target_transform = e_target_transform.value().get();
-						Vector2f end_target = target_transform.position;
+
 
 						// Perform pathfinding if no path is currently found
 						if (!enemy_pathfind.path_found) {
