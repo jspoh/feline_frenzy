@@ -39,9 +39,6 @@ namespace NIKE {
 		class NIKE_API Service {
 		private:
 
-			// Mutex to protect the Lua state
-			std::mutex lua_mutex;
-
 			//Lua State
 			std::unique_ptr<sol::state> lua_state;
 

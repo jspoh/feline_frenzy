@@ -617,6 +617,9 @@ namespace NIKE {
 			//Files
 			std::vector<std::filesystem::path> files;
 
+			//File Watching Queue
+			std::queue<std::function<void()>> file_event_queue;
+
 			//Root Path
 			std::string root_path;
 

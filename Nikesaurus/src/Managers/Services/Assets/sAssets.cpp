@@ -150,9 +150,6 @@ namespace NIKE {
 
 	std::string Assets::Service::registerAsset(std::string const& path, bool b_virtual) {
 
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
-
 		if (b_virtual) {
 			if (!isPathValid(path)) {
 				NIKEE_CORE_WARN("Invalid path detected. Asset will not be registered.");
@@ -178,13 +175,14 @@ namespace NIKE {
 	}
 
 	void Assets::Service::unregisterAsset(std::string const& asset_id) {
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
 
 		//Check asset registry
 		auto register_it = asset_registry.find(asset_id);
 		if (register_it != asset_registry.end()) {
+			//Unregister
 			register_it = asset_registry.erase(register_it);
+			//Uncache
+			asset_cache.erase(asset_id);
 		}
 	}
 
@@ -193,16 +191,10 @@ namespace NIKE {
 			throw std::runtime_error("Loader already registered.");
 		}
 
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
-
 		asset_loader.emplace(asset_type, loader);
 	}
 
 	void Assets::Service::cacheAsset(std::string const& asset_id) {
-
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
 
 		//Check if asset is loadable
 		if (!isAssetLoadable(asset_id)) {
@@ -236,9 +228,6 @@ namespace NIKE {
 
 	void Assets::Service::uncacheAsset(std::string const& asset_id) {
 
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
-
 		//Check if asset is loadable
 		if (!isAssetLoadable(asset_id)) {
 			return;
@@ -266,9 +255,6 @@ namespace NIKE {
 	}
 
 	void Assets::Service::getExecutable(std::string const& asset_id) {
-
-		// Lock the mutex for thread safety
-		std::lock_guard<std::mutex> lock(asset_mutex);
 
 		//Check if asset is a executable asset type
 		if (!(asset_types[getAssetType(asset_id)].test(Modes::Executable))) {
