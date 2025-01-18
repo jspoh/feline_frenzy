@@ -47,16 +47,8 @@ namespace NIKE {
 
 						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 						auto& enemy_transform = e_enemy_transform.value().get();
-
-						// Init cell
-						//Map::Cell target{5,2};
-						//enemy_pathfind.start.index = { 6,7 };
-
-						//enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start, target);
 					}
 
-
-				
 
 
 				// Check for attack comp
@@ -130,9 +122,9 @@ namespace NIKE {
 	//	}
 	//}
 
-	bool Enemy::Manager::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
-		return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);
-	}
+	//bool Enemy::Manager::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
+	//	return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);
+	//}
 
 	//void Enemy::Manager::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
 	//{

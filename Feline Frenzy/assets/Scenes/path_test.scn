@@ -37,38 +37,35 @@
                                 "Script_ID": ""
                             },
                             "Pathfinding::Path": {
-                                "CurrentIndex": 0,
+                                "GoalCell": {
+                                    "Blocked": false,
+                                    "Index": [
+                                        0,
+                                        0
+                                    ],
+                                    "Position": {
+                                        "x": 0.0,
+                                        "y": 0.0
+                                    }
+                                },
                                 "Path": [
                                     {
-                                        "x": 2.0,
-                                        "y": 2.0
-                                    },
-                                    {
-                                        "x": 3.0,
-                                        "y": 2.0
-                                    },
-                                    {
-                                        "x": 3.0,
-                                        "y": 3.0
-                                    },
-                                    {
-                                        "x": 4.0,
-                                        "y": 3.0
-                                    },
-                                    {
-                                        "x": 5.0,
-                                        "y": 3.0
-                                    },
-                                    {
-                                        "x": 5.0,
-                                        "y": 4.0
-                                    },
-                                    {
-                                        "x": 5.0,
-                                        "y": 5.0
+                                        "x": 1,
+                                        "y": 2
                                     }
                                 ],
-                                "PathFound": true
+                                "PathFound": false,
+                                "StartCell": {
+                                    "Blocked": false,
+                                    "Index": [
+                                        0,
+                                        0
+                                    ],
+                                    "Position": {
+                                        "x": 0.0,
+                                        "y": 0.0
+                                    }
+                                }
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -173,40 +170,6 @@
                                 "Function": "",
                                 "Named_Args": {},
                                 "Script_ID": ""
-                            },
-                            "Pathfinding::Path": {
-                                "CurrentIndex": 0,
-                                "Path": [
-                                    {
-                                        "x": 2.0,
-                                        "y": 2.0
-                                    },
-                                    {
-                                        "x": 3.0,
-                                        "y": 2.0
-                                    },
-                                    {
-                                        "x": 3.0,
-                                        "y": 3.0
-                                    },
-                                    {
-                                        "x": 4.0,
-                                        "y": 3.0
-                                    },
-                                    {
-                                        "x": 5.0,
-                                        "y": 3.0
-                                    },
-                                    {
-                                        "x": 5.0,
-                                        "y": 4.0
-                                    },
-                                    {
-                                        "x": 5.0,
-                                        "y": 5.0
-                                    }
-                                ],
-                                "PathFound": true
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

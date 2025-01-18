@@ -57,12 +57,12 @@ inline Vector2<T>& Vector2<T>::operator/=(typename Vector2<T>::type rhs) {
 }
 
 template<typename T>
-inline bool Vector2<T>::operator==(const Vector2<T>& rhs) {
+inline bool Vector2<T>::operator==(const Vector2<T>& rhs) const {
 	return (this->x == rhs.x) && (this->y == rhs.y);
 }
 
 template<typename T>
-inline bool Vector2<T>::operator!=(const Vector2<T>& rhs) {
+inline bool Vector2<T>::operator!=(const Vector2<T>& rhs) const {
 	return (this->x != rhs.x) || (this->y != rhs.y);
 }
 

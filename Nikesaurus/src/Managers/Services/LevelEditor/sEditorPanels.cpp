@@ -3596,13 +3596,14 @@ namespace NIKE {
 			//Execute event
 			try
 			{
-				auto func = file_event_queue.front();
+				auto& func = file_event_queue.front();
 				// Check if the callable is null
-				if (func)  
+				if (!func)  
 				{
-					// Safe to call
-					func();
+					
+					
 				}
+				func();
 			}
 			catch (const std::exception&)
 			{
@@ -4865,6 +4866,11 @@ namespace NIKE {
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_thickness));
 			}
 		}
+
+		// Init cell
+		Map::Cell target{ 1,2 }; Map::Cell start{ 5,5 };
+		auto path = NIKE_MAP_SERVICE->findPath(start, target);
+		NIKE_MAP_SERVICE->PrintPath(path);
 
 		renderPopUps();
 

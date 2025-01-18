@@ -1,10 +1,10 @@
-/*****************************************************************//**
+﻿/*****************************************************************//**
  * \file   sMap.cpp
  * \brief  Map manager
  *
  * \author Bryan Soh, 2301238, z.soh@digipen.edu (100%)
  * \date   November 2024
- * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/sMap.h"
@@ -29,10 +29,11 @@ namespace NIKE {
 
 		//Update cells with correct position
 		float top = -(grid_scale.y / 2.0f);
-		for (size_t i = 0; i < grid_size.y; ++i) {
+		for (int i = 0; i < grid_size.y; ++i) {
 			float left = -(grid_scale.x / 2.0f);
-			for (size_t j = 0; j < grid_size.x; ++j) {
+			for (int j = 0; j < grid_size.x; ++j) {
 				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top + (cell_size.y / 2.0f) };
+				grid.at(i).at(j).index = { i,j };
 				left += cell_size.x;
 			}
 			top += cell_size.y;
@@ -118,7 +119,6 @@ namespace NIKE {
 			return std::nullopt;
 		}
 		else {
-			grid.at(cell_index.y).at(cell_index.x).index = cell_index;
 			return grid.at(cell_index.y).at(cell_index.x);
 		}
 	}
@@ -136,7 +136,6 @@ namespace NIKE {
 			return std::nullopt;
 		}
 		else {
-			grid.at(cell_index.y).at(cell_index.x).index = cell_index;
 			return grid.at(cell_index.y).at(cell_index.x);
 		}
 	}
@@ -159,7 +158,7 @@ namespace NIKE {
 			nlohmann::json row_json = nlohmann::json::array();
 			for (const auto& cell : row) {
 				nlohmann::json cell_json;
-				cell_json = { {"Blocked", cell.b_blocked}, {"Position", cell.position.toJson()} };
+				cell_json = { {"Blocked", cell.b_blocked}, {"Position", cell.position.toJson()}};
 				row_json.push_back(cell_json);
 			}
 			data["Grid"].push_back(row_json);
@@ -188,77 +187,77 @@ namespace NIKE {
 		updateCells();
 	}
 
-	std::vector<NIKE::Map::Cell> Map::Service::findPath(const Cell& start, const Cell& goal) {
-		// Init directions, possible directions: left, right, up down
+	std::vector<Map::Cell> Map::Service::findPath(const Cell& start, const Cell& goal) {
 		const int direction_x[] = { -1, 0, 1, 0 };
 		const int direction_y[] = { 0, 1, 0, -1 };
+		const int total_directions = 4;
 
-		// Change here when have more directions
-		int total_directions{ 4 };
-
-		// Initialize the open and closed lists
-		std::priority_queue <Cell, std::vector<Cell>, std::greater<Cell>> open_list;
+		std::priority_queue<Cell, std::vector<Cell>, std::greater<Cell>> open_list;
 		std::vector<std::vector<bool>> closed_list(grid.size(), std::vector<bool>(grid[0].size(), false));
-		
+		std::vector<std::vector<Cell>> cell_details(grid.size(), std::vector<Cell>(grid[0].size()));
+
+		// Initialize start
+		Cell start_cell = start;
+		start_cell.g = 0;
+		start_cell.h = abs(start.index.x - goal.index.x) + abs(start.index.y - goal.index.y);
+		start_cell.f = start_cell.g + start_cell.h;
 		// Start Node
-		open_list.push(start);
+		open_list.push(start_cell);
+		cell_details[start.index.x][start.index.y] = start_cell;
 
 		while (!open_list.empty()) {
 			// Get cell with lowest f value
 			Cell current = open_list.top();
 			open_list.pop();
 
+			int x = current.index.x;
+			int y = current.index.y;
+			closed_list[x][y] = true;
 			// Check if current is the goal node
-			if (current == goal)
-			{
+			if (current == goal) {
 				// Reconstruct the path
 				std::vector<Cell> path;
-				if (!(current == goal))
-				{
-					path.push_back(current);
-					current = grid[current.index.x][current.index.y];
+				while (!(x == y)) {
+					path.push_back(cell_details[x][y]);
+					int temp_x = cell_details[x][y].parent.x;
+					int temp_y = cell_details[x][y].parent.y;
+					x = temp_x;
+					y = temp_y;
 				}
 				path.push_back(start);
 				std::reverse(path.begin(), path.end());
 				return path;
 			}
 
-			// Mark the current cell as closed
-			closed_list[current.index.x][current.index.y] = true;
+			for (int i = 0; i < total_directions; ++i) {
+				int new_x = x + direction_x[i]; //not current here.
+				int new_y = y + direction_y[i];
 
-			for (size_t i{0}; i < total_directions; ++i)
-			{
-				int new_x = current.index.x + direction_x[i];
-				int new_y = current.index.y + direction_y[i];
+				if (new_x >= 0 && new_x < grid.size() &&
+					new_y >= 0 && new_y < grid[0].size() &&
+					!grid[new_x][new_y].b_blocked &&
+					!closed_list[new_x][new_y]) {
 
-				// Check if neighbour valid
-				if (new_x >= 0 && new_x < grid.size() && new_y >= 0 && new_y < grid[0].size())
-				{
-					// Check if cell blocked
-					if (!grid[new_x][new_y].b_blocked && !closed_list[new_x][new_y])
-					{
-						Cell neighbor(new_x, new_y);
-						int new_g = current.g + 1;
+					int new_g = current.g + 1;
+					Cell& neighbor = cell_details[new_x][new_y];
 
-						// Check if the neighbor is not in the open list or has a lower g value
-						if (new_g < neighbor.g || !closed_list[new_x][new_y]) {
-							neighbor.g = new_g;
-							neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
-							neighbor.f = neighbor.g + neighbor.h;
-							// Update the parent of the neighbor
-							grid[new_x][new_y] = current;
-							// Add the neighbor to the open list
-							open_list.push(neighbor); 
-						}
+					if (neighbor.parent.x == -1 || new_g < neighbor.g) {
+						neighbor.index.x = new_x;
+						neighbor.index.y = new_y;
+						neighbor.g = new_g;
+						neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.y);
+						neighbor.f = neighbor.g + neighbor.h;
+						neighbor.parent.x = x;
+						neighbor.parent.y = y;
+
+						open_list.push(neighbor);
 					}
 				}
 			}
-
 		}
-
-		// No path found
 		return std::vector<Cell>();
 	}
+
 
 	bool Map::Cell::operator>(const Cell& other) const
 	{
@@ -267,7 +266,7 @@ namespace NIKE {
 
 	bool Map::Cell::operator==(const Cell& other) const
 	{
-		return position.x == other.position.x && position.y == other.position.y;
+		return index.x == other.index.x && index.y == other.index.y;
 	}
 
 	// TO BE DELETED
@@ -279,6 +278,14 @@ namespace NIKE {
 		}
 		cout << endl;
 	}
+
+	//void Map::Service::resetPathfindComp(Pathfinding::Path& path)
+	//{
+	//	path.path.clear();
+	//	path.path_found = false;
+	//	path.start_cell = Cell{};
+	//	path.goal_cell = Cell{};
+	//}
 
 }
 

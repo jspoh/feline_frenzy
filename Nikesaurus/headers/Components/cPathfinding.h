@@ -12,14 +12,18 @@
 #define C_PATHFINDING_HPP
 
 #include "Core/stdafx.h"
-#include "Managers/Services/sEvents.h"
+#include "Managers/Services/sMap.h"
 
 namespace NIKE {
 	namespace Pathfinding {
         struct Path{
-                std::vector<NIKE::Math::Vector2f> path; // Path is a vector of waypoints
-                int current_index;   // Index of current target waypoint in path
-                bool path_found;   // Flag to indicate if path has been found
+                // Path to target
+                // To seri only the cell's indexes
+                std::vector<Map::Cell> path;
+                Map::Cell start_cell;
+                Map::Cell goal_cell;
+                // Flag to indicate if path has been found
+                bool path_found;   
 
                 Path() = default;
         };

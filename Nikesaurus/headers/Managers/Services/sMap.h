@@ -27,6 +27,8 @@ namespace NIKE {
 			Vector2f position;
 			Vector2i index;
 
+			Vector2i parent;
+
 			// Values used by the A* algorithm
 			/////////////////////////////////////////////////////////////////////////////////
 			// G(cost from start) is the cost to reach a node from the start node
@@ -35,9 +37,11 @@ namespace NIKE {
 			/////////////////////////////////////////////////////////////////////////////////
 			int f, g, h;
 
-			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{ _x, _y}, f {}, g{}, h{} {}
-
 			Cell() = default;
+
+			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{_x, _y}, parent{ -1, -1 }, f{0}, g{0}, h{0}
+			{
+			}
 
 			// Overload comparison operators for priority queue
 			bool operator>(const Cell& other) const;
@@ -96,6 +100,8 @@ namespace NIKE {
 
 			// Debug purposes
 			void PrintPath(const std::vector<Cell>& path);
+
+			//void resetPathfindComp(Pathfinding::Path& path);
 		private:
 
 			//Internal cell pos update

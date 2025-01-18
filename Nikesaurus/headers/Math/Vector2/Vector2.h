@@ -34,8 +34,8 @@ namespace NIKE {
 			Vector2& operator*=(type rhs);
 			Vector2& operator/=(type rhs);
 
-			bool operator==(const Vector2& rhs);
-			bool operator!=(const Vector2& rhs);
+			bool operator==(const Vector2& rhs) const;
+			bool operator!=(const Vector2& rhs) const; 
 			bool operator<(const Vector2& rhs) const;
 
 
@@ -59,5 +59,11 @@ namespace NIKE {
 		using Vector2u = Vector2<unsigned int>;
 		using Vector2f = Vector2<float>;
 		using Vector2d = Vector2<double>;
+
+		struct Vector2iHasher {
+			std::size_t operator()(const Vector2i& vec) const {
+				return std::hash<int>()(vec.x) ^ (std::hash<int>()(vec.y) << 1);
+			}
+		};
 	}
 }
