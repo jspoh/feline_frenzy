@@ -52,7 +52,7 @@ namespace NIKE {
 						Map::Cell start{ NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value() };
 						Map::Cell target{ 5,5 };
 						auto path = NIKE_MAP_SERVICE->findPath(start, target);
-						NIKE_MAP_SERVICE->PrintPath(path);
+						//NIKE_MAP_SERVICE->PrintPath(path);
 
 					}
 
