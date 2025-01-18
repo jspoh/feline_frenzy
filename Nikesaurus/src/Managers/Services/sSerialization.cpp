@@ -86,6 +86,8 @@ namespace NIKE {
 			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
+		data["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
+
 		return data;
 	}
 
@@ -107,6 +109,14 @@ namespace NIKE {
 			//Deserialize data into component
 			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 		}
+
+		if (!data.contains("Layer ID")) {
+			NIKEE_CORE_INFO("Entity does not contain a layer id, setting to default");
+			NIKE_ECS_MANAGER->setEntityLayerID(entity, 0);
+			return;
+		}
+		// Set layer ID
+		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
 	}
 
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
@@ -240,15 +250,15 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadSceneFromFile(std::string const& file_path) {
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
 		//Json Data
 		nlohmann::json data;
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::in);
-
-		//Return if there is no data
-		if (!std::filesystem::exists(file_path))
-			return;
 
 		//Read data from file
 		file >> data;

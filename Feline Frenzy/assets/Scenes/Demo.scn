@@ -64,7 +64,16 @@
                             "Prefab_ID": ""
                         }
                     }
-                },
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
                 {
                     "Entity": {
                         "Components": {
@@ -72,19 +81,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 9724,
+                                "Completed_Animations": 3,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -92,7 +101,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 }
                             },
                             "Audio::SFX": {
@@ -105,7 +114,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 1
+                                    "entity": 6
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -116,8 +125,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 85.84313201904297,
-                                    "y": -128.7656707763672
+                                    "x": -477.4199523925781,
+                                    "y": 5.109908580780029
                                 },
                                 "Resolution": 2,
                                 "Rotation": 0.0,
@@ -127,13 +136,13 @@
                                 }
                             },
                             "Physics::Dynamics": {
-                                "Drag": 1.0,
+                                "Drag": 10.0,
                                 "Force": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Mass": 2.0,
-                                "Max_Speed": 150.0,
+                                "Mass": 1.0,
+                                "Max_Speed": 2000.0,
                                 "Velocity": {
                                     "x": 0.0,
                                     "y": 0.0
@@ -153,8 +162,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -175,8 +184,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 85.84313201904297,
-                                    "y": -128.7656707763672
+                                    "x": -477.4199523925781,
+                                    "y": 5.109908580780029
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -185,7 +194,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "Player",
@@ -225,7 +234,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "LeftWall",
@@ -265,7 +274,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "RightWall",
@@ -305,7 +314,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "UpperWall",
@@ -345,7 +354,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "LowerWall",
@@ -426,7 +435,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "Elite",
@@ -507,7 +516,7 @@
                                 }
                             }
                         },
-                        "Layer ID": 0,
+                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "Box",
@@ -516,8 +525,8 @@
                     }
                 }
             ],
-            "ID": 0,
-            "Mask": 1
+            "ID": 1,
+            "Mask": 2
         }
     }
 ]
