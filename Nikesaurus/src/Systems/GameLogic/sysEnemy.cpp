@@ -47,6 +47,13 @@ namespace NIKE {
 
 						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 						auto& enemy_transform = e_enemy_transform.value().get();
+
+						// Init cell
+						Map::Cell start{ NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value() };
+						Map::Cell target{ 5,5 };
+						auto path = NIKE_MAP_SERVICE->findPath(start, target);
+						NIKE_MAP_SERVICE->PrintPath(path);
+
 					}
 
 

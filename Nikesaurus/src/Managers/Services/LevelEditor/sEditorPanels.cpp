@@ -4867,11 +4867,6 @@ namespace NIKE {
 			}
 		}
 
-		// Init cell
-		Map::Cell target{ 1,2 }; Map::Cell start{ 5,5 };
-		auto path = NIKE_MAP_SERVICE->findPath(start, target);
-		NIKE_MAP_SERVICE->PrintPath(path);
-
 		renderPopUps();
 
 		ImGui::End();

@@ -140,6 +140,22 @@ namespace NIKE {
 		}
 	}
 
+	std::optional<Vector2i> Map::Service::getCellIndexFromCords(Vector2f const& position)
+	{
+		//Translate position
+		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), position.y + (grid_scale.y / 2.0f) };
+
+		//Get index for cell
+		Vector2i cell_index{ static_cast<int>(translated_pos.x / cell_size.x), static_cast<int>(translated_pos.y / cell_size.y) };
+
+		//Check if index is valid
+		if (cell_index.x < 0 || cell_index.x >= grid_size.x || cell_index.y < 0 || cell_index.y >= grid_size.y) {
+			return std::nullopt;
+		}
+
+		return cell_index;
+	}
+
 	std::vector<std::vector<Map::Cell>>const& Map::Service::getGrid() const {
 		return grid;
 	}
@@ -230,7 +246,7 @@ namespace NIKE {
 			}
 
 			for (int i = 0; i < total_directions; ++i) {
-				int new_x = x + direction_x[i]; //not current here.
+				int new_x = x + direction_x[i]; 
 				int new_y = y + direction_y[i];
 
 				if (new_x >= 0 && new_x < grid.size() &&
@@ -245,7 +261,7 @@ namespace NIKE {
 						neighbor.index.x = new_x;
 						neighbor.index.y = new_y;
 						neighbor.g = new_g;
-						neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.y);
+						neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
 						neighbor.f = neighbor.g + neighbor.h;
 						neighbor.parent.x = x;
 						neighbor.parent.y = y;

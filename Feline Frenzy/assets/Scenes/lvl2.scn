@@ -255,14 +255,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 3809,
+                                "Completed_Animations": 24,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.03333333507180214
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 5,
+                                    "x": 2,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -288,7 +288,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 8
+                                    "entity": 9
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -302,7 +302,7 @@
                                     "x": -529.5100708007813,
                                     "y": -173.16526794433594
                                 },
-                                "Resolution": 1,
+                                "Resolution": 2,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 80.67974090576172,
@@ -322,6 +322,13 @@
                                     "y": 0.0
                                 }
                             },
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Zoom": 1.0
+                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -336,7 +343,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
+                                    "x": 2,
                                     "y": 1
                                 },
                                 "Frame_Size": {
@@ -460,7 +467,95 @@
     {
         "Layer": {
             "B_State": true,
-            "Entities": [],
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "Pop1.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "BulletSFX",
+                                "Pitch": 1.0,
+                                "Volume": 0.5
+                            },
+                            "Combat::Damage": {
+                                "Damage": 10.0
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -9367.8935546875,
+                                    "y": -5182.7626953125
+                                },
+                                "Resolution": 3,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 49.99999237060547,
+                                    "y": 49.99999237060547
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": -86.99751281738281,
+                                    "y": -49.3095588684082
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 800.0,
+                                "Velocity": {
+                                    "x": -695.9801025390625,
+                                    "y": -394.4764709472656
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_Bullet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -9367.8935546875,
+                                    "y": -5182.7626953125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 49.99999237060547,
+                                    "y": 49.99999237060547
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0000",
+                            "Prefab_ID": "bullet.prefab"
+                        }
+                    }
+                }
+            ],
             "ID": 1,
             "Mask": 2
         }

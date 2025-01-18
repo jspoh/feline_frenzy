@@ -43,6 +43,10 @@ namespace NIKE {
 			{
 			}
 
+			Cell(Vector2i input) : b_blocked{ false }, position{}, index{ input.x, input.y }, parent{ -1, -1 }, f{ 0 }, g{ 0 }, h{ 0 }
+			{
+			}
+
 			// Overload comparison operators for priority queue
 			bool operator>(const Cell& other) const;
 			bool operator==(const Cell& other) const;
@@ -85,6 +89,9 @@ namespace NIKE {
 
 			//Get cell based on position
 			std::optional<std::reference_wrapper<Map::Cell>> getCellAtPosition(Vector2f const& position);
+
+			//Get cell index based on world cords
+			std::optional<Vector2i> getCellIndexFromCords(Vector2f const& position);
 
 			//Get grid
 			std::vector<std::vector<Cell>>const& getGrid() const;

@@ -119,6 +119,32 @@
                                 "Named_Args": {},
                                 "Script_ID": ""
                             },
+                            "Pathfinding::Path": {
+                                "GoalCell": {
+                                    "Blocked": false,
+                                    "Index": [
+                                        0,
+                                        0
+                                    ],
+                                    "Position": {
+                                        "x": 0.0,
+                                        "y": 0.0
+                                    }
+                                },
+                                "Path": null,
+                                "PathFound": false,
+                                "StartCell": {
+                                    "Blocked": false,
+                                    "Index": [
+                                        0,
+                                        0
+                                    ],
+                                    "Position": {
+                                        "x": 0.0,
+                                        "y": 0.0
+                                    }
+                                }
+                            },
                             "Render::Texture": {
                                 "B_Blend": true,
                                 "B_Flip": {

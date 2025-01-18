@@ -15,7 +15,7 @@ namespace NIKE {
         // Register the Pathfinding component with the ECS manager
         NIKE_ECS_MANAGER->registerComponent<Pathfinding::Path>();
 
-        // Register PathfindingComponent for serialization
+        // Register Pathfinding component for serialization
         NIKE_SERIALIZE_SERVICE->registerComponent<Pathfinding::Path>(
             // Serialization
             [](Pathfinding::Path const& comp) -> nlohmann::json {
