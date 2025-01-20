@@ -8,6 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
+#include "Core/Engine.h"
 #include "Managers/Services/sMetaData.h"
 
 namespace NIKE {
@@ -28,18 +29,42 @@ namespace NIKE {
 		}
 
 		//Add new entities from the ECS that are not yet in the editor
+		int index = 0;
 		for (auto& entity : ecs_entities) {
 
-			if (entities.find(entity) == entities.end()) {
+			//Update entities ref
+			if (entities.at(entity).name.find("entity_") != std::string::npos) {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entities.size()));
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", index++);
+				entities.at(entity).name = entity_name;
+			}
+			else if(entities.find(entity) == entities.end()) {
+
+				//Create identifier for entity
+				char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), "entity_%04d", index++);
 
 				//Add entity to editor structures
-				entities.emplace(entity, EntityData(entity_name, *entity_types.begin(), *entity_categories.begin()));
+				entities.emplace(entity, EntityData(entity_name, "", ""));
 			}
 		}
+	}
+
+	void MetaData::Service::init() {
+
+		//Setup events listening
+		std::shared_ptr<MetaData::Service> metadata_service(this, [](MetaData::Service*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(metadata_service);
+	}
+
+	bool MetaData::Service::isTypeValid(std::string const& type) {
+		return entity_types.find(type) != entity_types.end();
+	}
+
+	bool MetaData::Service::isCategoryValid(std::string const& category) {
+		return entity_categories.find(category) != entity_categories.end();
 	}
 
 	void MetaData::Service::addEntityType(std::string const& type) {
@@ -76,10 +101,8 @@ namespace NIKE {
 
 	bool MetaData::Service::setEntityName(Entity::Type entity, std::string const& name) {
 		//Check if name has been taken
-		for (auto const& entity_data : entities) {
-			if (entity_data.second.name == name) {
-				return false;
-			}
+		if (isEntityNameTaken(name)) {
+			return false;
 		}
 
 		//Set name
@@ -107,11 +130,74 @@ namespace NIKE {
 		return true;
 	}
 
-	MetaData::EntityData MetaData::Service::getEntityData(Entity::Type entity) const {
+	bool MetaData::Service::isEntityNameTaken(std::string const& name) const {
+		//Check if name has been taken
+		for (auto const& entity_data : entities) {
+			if (entity_data.second.name == name) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	std::optional<Entity::Type> MetaData::Service::getEntityByName(std::string const& name) const {
+		//Check if name has been taken
+		for (auto const& entity_data : entities) {
+			if (entity_data.second.name == name) {
+				return std::make_optional<Entity::Type>(entity_data.first);
+			}
+		}
+
+		return std::nullopt;
+	}
+
+	std::set<Entity::Type> MetaData::Service::getEntitiesByType(std::string const& type) const {
+
+		//Set of entity
+		std::set<Entity::Type> type_entities;
+
+		//Check if name has been taken
+		for (auto const& entity_data : entities) {
+			if (entity_data.second.type == type) {
+				type_entities.insert(entity_data.first);
+			}
+		}
+
+		return type_entities;
+	}
+
+	std::set<Entity::Type> MetaData::Service::getEntitiesByCategory(std::string const& category) const {
+		//Set of entity
+		std::set<Entity::Type> category_entities;
+
+		//Check if name has been taken
+		for (auto const& entity_data : entities) {
+			if (entity_data.second.category == category) {
+				category_entities.insert(entity_data.first);
+			}
+		}
+
+		return category_entities;
+	}
+
+	void MetaData::Service::cloneEntityData(Entity::Type entity, Entity::Type clone) {
+		auto it_clone = entities.find(clone);
+
+		if (it_clone == entities.end()) {
+			return;
+		}
+
+		//Update with cloned meta data
+		entities.at(entity).type = it_clone->second.type;
+		entities.at(entity).category = it_clone->second.category;
+	}
+
+	MetaData::EntityData& MetaData::Service::getEntityData(Entity::Type entity) {
 		return entities.find(entity)->second;
 	}
 
-	std::map<Entity::Type, MetaData::EntityData, MetaData::Service::EntitySorter> MetaData::Service::getEntitiesData() const {
+	std::map<Entity::Type, MetaData::EntityData, MetaData::Service::EntitySorter>& MetaData::Service::getEntitiesData() {
 		return entities;
 	}
 }
