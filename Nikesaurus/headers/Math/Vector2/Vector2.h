@@ -65,5 +65,11 @@ namespace NIKE {
 				return std::hash<int>()(vec.x) ^ (std::hash<int>()(vec.y) << 1);
 			}
 		};
+
+		struct Vector2iEqual {
+			bool operator()(const Vector2i& lhs, const Vector2i& rhs) const {
+				return lhs.x == rhs.x && lhs.y == rhs.y;
+			}
+		};
 	}
 }

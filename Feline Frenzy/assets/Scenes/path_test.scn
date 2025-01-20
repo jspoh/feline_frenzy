@@ -40,30 +40,25 @@
                                 "GoalCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        0,
-                                        0
+                                        5,
+                                        5
                                     ],
                                     "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
+                                        "x": 384.0,
+                                        "y": 384.0
                                     }
                                 },
-                                "Path": [
-                                    {
-                                        "x": 1,
-                                        "y": 2
-                                    }
-                                ],
+                                "Path": null,
                                 "PathFound": false,
                                 "StartCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        0,
-                                        0
+                                        2,
+                                        1
                                     ],
                                     "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
+                                        "x": -384.0,
+                                        "y": -640.0
                                     }
                                 }
                             },
@@ -123,12 +118,12 @@
                                 "GoalCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        0,
-                                        0
+                                        5,
+                                        5
                                     ],
                                     "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
+                                        "x": 384.0,
+                                        "y": 384.0
                                     }
                                 },
                                 "Path": null,
@@ -136,12 +131,12 @@
                                 "StartCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        0,
-                                        0
+                                        2,
+                                        1
                                     ],
                                     "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
+                                        "x": -384.0,
+                                        "y": -640.0
                                     }
                                 }
                             },
@@ -196,6 +191,32 @@
                                 "Function": "",
                                 "Named_Args": {},
                                 "Script_ID": ""
+                            },
+                            "Pathfinding::Path": {
+                                "GoalCell": {
+                                    "Blocked": false,
+                                    "Index": [
+                                        0,
+                                        0
+                                    ],
+                                    "Position": {
+                                        "x": 0.0,
+                                        "y": 0.0
+                                    }
+                                },
+                                "Path": null,
+                                "PathFound": false,
+                                "StartCell": {
+                                    "Blocked": false,
+                                    "Index": [
+                                        0,
+                                        0
+                                    ],
+                                    "Position": {
+                                        "x": 0.0,
+                                        "y": 0.0
+                                    }
+                                }
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
