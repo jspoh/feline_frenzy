@@ -209,16 +209,16 @@ namespace NIKE {
 		//Init scene
 		NIKE_SCENES_SERVICE->init();
 
-#ifndef NDEBUG
-		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init();
-#endif
-
 		//Init UI
 		NIKE_UI_SERVICE->init();
 
 		//Init Lua
 		NIKE_LUA_SERVICE->init();
+
+#ifndef NDEBUG
+		//Init Level Editor
+		NIKE_LVLEDITOR_SERVICE->init();
+#endif
 
 		//Register Def Components
 		registerDefComponents();
