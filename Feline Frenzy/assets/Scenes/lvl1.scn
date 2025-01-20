@@ -74,6 +74,90 @@
                             "Prefab_ID": ""
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
+                            "Element::Entity": {
+                                "Element": 0
+                            },
+                            "Enemy::Attack": {
+                                "Cooldown": 10.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 10.016666412353516,
+                                "Layer": 0,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 10.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -153.0
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 100.0,
+                                    "y": 112.28070831298828
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Normal_Enemy_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -153.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 100.0,
+                                    "y": 112.28070831298828
+                                }
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "Prefab Master",
+                            "Prefab_ID": ""
+                        }
+                    }
                 }
             ],
             "ID": 0,
@@ -398,19 +482,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 38,
+                                "Completed_Animations": 39,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 4,
-                                    "y": 2
+                                    "x": 0,
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 2
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -418,7 +502,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 2
+                                    "y": 1
                                 }
                             },
                             "Audio::SFX": {
@@ -434,7 +518,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 11
+                                    "entity": 12
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -445,8 +529,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -439.33380126953125,
-                                    "y": -93.14314270019531
+                                    "x": -280.8720703125,
+                                    "y": -130.33526611328125
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -470,8 +554,8 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -439.33380126953125,
-                                    "y": -93.14314270019531
+                                    "x": -280.9478759765625,
+                                    "y": -130.41909790039063
                                 },
                                 "Zoom": 1.0
                             },
@@ -489,8 +573,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
-                                    "y": 2
+                                    "x": 0,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -511,8 +595,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -439.33380126953125,
-                                    "y": -93.14314270019531
+                                    "x": -280.8720703125,
+                                    "y": -130.33526611328125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -536,6 +620,9 @@
                                 "Health": 100.0,
                                 "InvulnerableFlag": false,
                                 "Lives": 1
+                            },
+                            "Element::Entity": {
+                                "Element": 0
                             },
                             "Enemy::Attack": {
                                 "Cooldown": 1.0,
@@ -674,6 +761,258 @@
                             "B_Locked": false,
                             "Entity_ID": "FireSrc",
                             "Prefab_ID": "ElementSrc.prefab"
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
+                            "Element::Entity": {
+                                "Element": 1
+                            },
+                            "Enemy::Attack": {
+                                "Cooldown": 1.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 1.0166664123535156,
+                                "Layer": 1,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 10.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -316.29998779296875
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -316.29998779296875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "FireEnemy",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
+                            "Element::Entity": {
+                                "Element": 2
+                            },
+                            "Enemy::Attack": {
+                                "Cooldown": 1.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 1.0166664123535156,
+                                "Layer": 1,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 10.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -473.3999938964844
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -473.3999938964844
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "WaterEnemy",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
+                            "Element::Entity": {
+                                "Element": 3
+                            },
+                            "Enemy::Attack": {
+                                "Cooldown": 1.0,
+                                "Function": "enemyBullet",
+                                "LastShotTime": 1.0166664123535156,
+                                "Layer": 1,
+                                "Offset": 100.0,
+                                "PrefabPath": "bullet.prefab",
+                                "Range": 10.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -641.2000122070313
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 437.8940124511719,
+                                    "y": -641.2000122070313
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 90.51508331298828,
+                                    "y": 120.0582046508789
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "GrassEnemy",
+                            "Prefab_ID": ""
                         }
                     }
                 }
