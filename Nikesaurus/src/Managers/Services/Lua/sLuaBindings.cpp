@@ -421,8 +421,23 @@ namespace NIKE {
 
         //Fire Bullet
         lua_state.set_function("FireBullet", [&](Entity::Type entity) {
+            std::string bulletArr[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
+
             Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
-            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+
+            // Player Element Type
+            auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+            if (player_element_comp.has_value()) {
+                // Shoot elemental bullet
+                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bulletArr[static_cast<int>(player_element_comp.value().get().element)]).string());
+            }
+            else {
+                // Shoot default bullet
+                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+            }
+
+            //Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
+            //NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 
             // Set/Teleport entity position
             lua_state.set_function("setPosition", [&](Entity::Type entity, float x, float y) {
