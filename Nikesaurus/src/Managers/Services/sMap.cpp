@@ -33,7 +33,10 @@ namespace NIKE {
 			float left = -(grid_scale.x / 2.0f);
 			for (int j = 0; j < grid_size.x; ++j) {
 				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top + (cell_size.y / 2.0f) };
-				grid.at(i).at(j).index = { j,i };
+				if (getCellIndexFromCords(grid.at(i).at(j).position).has_value())
+				{
+					grid.at(i).at(j).index = getCellIndexFromCords(grid.at(i).at(j).position).value();
+				}
 				left += cell_size.x;
 			}
 			top += cell_size.y;
@@ -193,12 +196,9 @@ namespace NIKE {
 			std::vector<Cell> row;
 			for (const auto& cell_json : row_json) {
 				Cell cell{};
+				// Note 1: Blocked boolean is properly seri and registered. suspect: somewhr might be interferring with the boolean?
 				cell.b_blocked = cell_json.at("Blocked").get<bool>();
 				cell.position.fromJson(cell_json.at("Position"));
-				if (getCellIndexFromCords(cell.position).has_value())
-				{
-					cell.index = getCellIndexFromCords(cell.position).value();
-				}
 				row.push_back(cell);
 			}
 			grid.push_back(row);
@@ -253,13 +253,15 @@ namespace NIKE {
 				Vector2i neighbor_index = { new_x, new_y };
 
 				if (new_x >= 0 && new_x < grid_size.x &&
-					new_y >= 0 && new_y < grid_size.y) {
+					new_y >= 0 && new_y < grid_size.y && 
+					!isCellBlocked(new_x, new_y) && 
+					!closed_list.count(neighbor_index)) {
 
 					// Skip iteration of blocked cells and closed cells that are already checked
-					if (grid[new_y][new_x].b_blocked ||
-						closed_list.count(neighbor_index)) {
-						continue;
-					}
+					//if (isCellBlocked(neighbor_index.x, neighbor_index.y) &&
+					//	closed_list.count(neighbor_index)) {
+					//	continue;
+					//}
 
 					Cell& neighbor = grid[new_y][new_x];
 					int new_g = current.g + 1;
