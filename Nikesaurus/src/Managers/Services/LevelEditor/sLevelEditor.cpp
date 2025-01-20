@@ -354,10 +354,10 @@ namespace NIKE {
 		panels.push_back(game_panel);
 		panels_map.emplace(game_panel->getName(), game_panel);
 
-		// Add layer management window panel
-		auto layer_panel = std::make_shared<ScenesPanel>();
-		panels.push_back(layer_panel);
-		panels_map.emplace(layer_panel->getName(), layer_panel);
+		// Add scenes management window panel
+		auto scenes_panel = std::make_shared<ScenesPanel>();
+		panels.push_back(scenes_panel);
+		panels_map.emplace(scenes_panel->getName(), scenes_panel);
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
