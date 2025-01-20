@@ -27,6 +27,9 @@ namespace NIKE {
 			//Map of file watchers
 			std::unordered_map<std::filesystem::path, std::unique_ptr<filewatch::FileWatch<std::string>>> dir_watchers;
 
+			//Map of last write times
+			std::unordered_map<std::filesystem::path, std::filesystem::file_time_type> file_write_times;
+
 			//Root directory path
 			std::filesystem::path root_path;
 		public:

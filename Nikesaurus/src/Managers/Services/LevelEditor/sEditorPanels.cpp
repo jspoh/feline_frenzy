@@ -3495,6 +3495,11 @@ namespace NIKE {
 			};
 	}
 
+	void LevelEditor::ResourcePanel::pushFileEvent(std::function<void()> callback) {
+		std::lock_guard<std::mutex> lock(file_event_mutex);
+		file_event_queue.push(std::move(callback));
+	}
+
 	void LevelEditor::ResourcePanel::init() {
 
 		//Setup events listening
@@ -3536,13 +3541,14 @@ namespace NIKE {
 		//Setup directory watching 
 		NIKE_PATH_SERVICE->watchDirectoryTree("Game_Assets:/", [weak_this](std::filesystem::path const& file, filewatch::Event event) {
 			if (auto shared_this = weak_this.lock()) { // Check if the object is still alive
+
 				//Engine engine assets path
 				static auto engine_assets = NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/");
 
-				//Skip directories
+				//Skip directories & invalid paths
 				if (std::filesystem::is_directory(file) ||
 					!NIKE_ASSETS_SERVICE->isPathValid(file.string(), false) ||
-					file == engine_assets) {
+					file.string().find(engine_assets.string()) != std::string::npos) {
 					return;
 				}
 
@@ -3550,8 +3556,10 @@ namespace NIKE {
 				switch (event) {
 				case filewatch::Event::added: {
 
+					cout << "ADD EVENT FOR PATH: " << file.string() << " " << file.extension().string() << endl;
+
 					//Push to file event queue
-					shared_this->file_event_queue.push([file]() {
+					shared_this->pushFileEvent([&, file]() {
 
 						//Register asset if needed
 						auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
@@ -3559,21 +3567,28 @@ namespace NIKE {
 							NIKE_ASSETS_SERVICE->registerAsset(file.string(), false);
 						}
 						});
+
 					break;
 				}
 				case filewatch::Event::removed: {
 
+					cout << "REMOVE EVENT FOR PATH: " << file.string() << " " << file.extension().string() << endl;
+
 					//Push to file event queue
-					shared_this->file_event_queue.push([file]() {
+					shared_this->pushFileEvent([&, file]() {
+
 						//Unregister asset if needed
 						NIKE_ASSETS_SERVICE->unregisterAsset(NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false));
 						});
+
 					break;
 				}
 				case filewatch::Event::modified: {
 
+					cout << "MODIFIED EVENT FOR PATH: " << file.string() << " " << file.extension().string() << endl;
+
 					//Push to file event queue
-					shared_this->file_event_queue.push([file]() {
+					shared_this->pushFileEvent([&, file]() {
 
 						//Only recache assets that are already cached
 						auto asset_id = NIKE_ASSETS_SERVICE->getIDFromPath(file.string(), false);
@@ -3597,18 +3612,16 @@ namespace NIKE {
 	void LevelEditor::ResourcePanel::update() {
 		//Update resource panel with file change events
 		while (!file_event_queue.empty()) {
-			//Execute event
-			try
-			{
-				auto& func = file_event_queue.front();
-				// Check if the callable is null
-				if (func) {
-					func();
+
+			try {
+				//Call callback function if valid
+				if (file_event_queue.front()) {
+					//Execute file event callback
+					file_event_queue.front()();
 				}
 			}
-			catch (const std::exception&)
-			{
-				NIKEE_CORE_ERROR("**THIS** nullptr");
+			catch (std::exception const&) {
+				NIKEE_CORE_WARN("Invalid Callback From FileWatcher Handled. Loop Continues.");
 			}
 
 			//Pop from queue

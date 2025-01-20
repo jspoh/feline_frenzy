@@ -620,6 +620,9 @@ namespace NIKE {
 			//File Watching Queue
 			std::queue<std::function<void()>> file_event_queue;
 
+			//Mutex for thread safety
+			std::mutex file_event_mutex;
+
 			//Root Path
 			std::string root_path;
 
@@ -708,6 +711,9 @@ namespace NIKE {
 			static std::string getStaticName() {
 				return "Resource Management";
 			}
+
+			//Thread safe insertion for file event queue
+			void pushFileEvent(std::function<void()> callback);
 
 			//Init
 			void init() override;
