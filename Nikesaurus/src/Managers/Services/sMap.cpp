@@ -195,6 +195,10 @@ namespace NIKE {
 				Cell cell{};
 				cell.b_blocked = cell_json.at("Blocked").get<bool>();
 				cell.position.fromJson(cell_json.at("Position"));
+				if (getCellIndexFromCords(cell.position).has_value())
+				{
+					cell.index = getCellIndexFromCords(cell.position).value();
+				}
 				row.push_back(cell);
 			}
 			grid.push_back(row);
@@ -220,20 +224,21 @@ namespace NIKE {
 		open_list.push(start_cell);
 
 		while (!open_list.empty()) {
-			// Get cell with lowest f value
+
+			// Get cell with lowest cost from open_list
+			// Implemented by std::priority queue
 			Cell current = open_list.top();
+
+			// Move the current cell to the closed list
+			closed_list.insert(current.index);
+			// Remove current cell from open list
 			open_list.pop();
 
-			// Add to closed list
-			closed_list.insert(current.index);
-
-			// Check if current is the goal node
 			if (current.index == goal.index) {
-				// Reconstruct the path
 				std::vector<Cell> path;
 				Vector2i trace = goal.index;
 				while (trace != start.index) {
-					path.push_back(grid[trace.y][trace.x]);  
+					path.push_back(grid[trace.y][trace.x]);
 					trace = grid[trace.y][trace.x].parent;
 				}
 				path.push_back(start);
@@ -241,33 +246,40 @@ namespace NIKE {
 				return path;
 			}
 
-			// Explore neighbors
+			// Check neighbours, total of 4 neighbors, up down left right
 			for (int i = 0; i < total_directions; ++i) {
 				int new_x = current.index.x + direction_x[i];
 				int new_y = current.index.y + direction_y[i];
 				Vector2i neighbor_index = { new_x, new_y };
 
-				if (new_x >= 0 && new_x < grid[0].size() &&
-					new_y >= 0 && new_y < grid.size() &&
-					!grid[new_y][new_x].b_blocked &&
-					!closed_list.count(neighbor_index)) {
+				if (new_x >= 0 && new_x < grid_size.x &&
+					new_y >= 0 && new_y < grid_size.y) {
+
+					// Skip iteration of blocked cells and closed cells that are already checked
+					if (grid[new_y][new_x].b_blocked ||
+						closed_list.count(neighbor_index)) {
+						continue;
+					}
 
 					Cell& neighbor = grid[new_y][new_x];
-
 					int new_g = current.g + 1;
-
-					if (neighbor.parent.x == -1 || new_g > neighbor.g) {
+					
+					if ((neighbor.parent.x == -1 && neighbor.parent.y == -1) || new_g > neighbor.g) {
 						neighbor.g = new_g;
 						neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
 						neighbor.f = neighbor.g + neighbor.h;
 						neighbor.parent = current.index;
+						neighbor.index = neighbor_index;
 
 						open_list.push(neighbor);
 					}
+					
 				}
 			}
 		}
-		return std::vector<Cell>(); // Return empty path if no path is found
+
+		// Return empty path
+		return std::vector<Cell>();
 	}
 
 
@@ -288,7 +300,7 @@ namespace NIKE {
 	{
 		for (const Cell& cell : path)
 		{
-			cout << "(" << cell.index.x << ", " << cell.index.y << ") ";
+			cout << "(" << cell.index.y << ", " << cell.index.x << ") ";
 		}
 		cout << endl;
 	}
