@@ -5516,9 +5516,15 @@ namespace NIKE {
 			auto& layer = layers[i];
 
 			// Visibility Toggle
-			bool is_visible = false;
+			bool is_visible = layer->getLayerState();
 			if (ImGui::Checkbox(("##Visibility" + std::to_string(i)).c_str(), &is_visible)) {
+				layer->setLayerState(is_visible);
+			}
 
+			if (ImGui::IsItemHovered()) {
+				ImGui::BeginTooltip();
+				ImGui::Text("Toggle visibility for Layer %u", i);
+				ImGui::EndTooltip();
 			}
 
 			ImGui::SameLine();
