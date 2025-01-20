@@ -15,7 +15,7 @@
 
 namespace NIKE {
 	namespace Element {
-		enum class Elements : int {
+		const enum class Elements : int {
 			NONE = 0,
 			FIRE,
 			WATER,
@@ -38,6 +38,8 @@ namespace NIKE {
 			Entity() : element(Elements::NONE) {};
 			Entity(int element)
 				: element{ element } {}
+
+			static const std::string bulletArr[4];	// Array of elemental bullets (For shooting)
 		};
 
 		struct Source {
@@ -47,6 +49,8 @@ namespace NIKE {
 			Source(int element)
 				: element{ element } {}
 		};
+
+		const std::string bulletArr[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
 
 		void registerComponents();
 	}

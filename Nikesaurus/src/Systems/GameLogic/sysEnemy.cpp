@@ -182,18 +182,24 @@ namespace NIKE {
 		const Vector2f& player_pos = p_transform_comp.value().get().position;
 
 		// Get enemy components
+		// Transform Comp
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
+
+		// Attack Comp
 		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
 		const auto& enemy_attack_comp = e_attack_comp.value().get();
-		const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
+		//const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
+
+		// Element comp
+		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
 
 		// Create entity for bullet
 		//Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
 		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::bulletArr[static_cast<int>(e_element_comp.value().get().element)]).string());
 
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
 		Vector2f direction = player_pos - enemy_pos;
