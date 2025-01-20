@@ -3627,13 +3627,13 @@ namespace NIKE {
 					//Execute file event callback
 					file_event_queue.front()();
 				}
+
+				//Pop from queue
+				file_event_queue.pop();
 			}
 			catch (std::exception const&) {
 				NIKEE_CORE_WARN("Invalid Callback From FileWatcher Handled. Loop Continues.");
 			}
-
-			//Pop from queue
-			file_event_queue.pop();
 		}
 	}
 

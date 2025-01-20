@@ -576,6 +576,7 @@ namespace NIKE {
 
 			// Selected channel
 			std::string selected_channel_name;
+
 			//Create entity popup
 			std::function<void()> createChannelPopUp(std::string const& popup_id);
 

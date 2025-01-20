@@ -128,6 +128,7 @@ namespace NIKE {
 #endif
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
+		provideService(std::make_shared<MetaData::Service>());
 
 		//Create console
 #ifndef NDEBUG
