@@ -860,6 +860,12 @@ namespace NIKE {
 		class ScenesPanel : public IPanel {
 		private:
 
+			//Error msg
+			std::shared_ptr<std::string> err_msg;
+
+			//Success msg
+			std::shared_ptr<std::string> success_msg;
+
 			// For storing editing layer mask id
 			unsigned int edit_mask_id;
 
@@ -870,12 +876,6 @@ namespace NIKE {
 
 			// For storing bit_position
 			unsigned int bit_position;
-
-			//Error msg
-			std::shared_ptr<std::string> err_msg;
-
-			//Success msg
-			std::shared_ptr<std::string> success_msg;
 
 			// To store layer names
 			std::vector<std::string> layer_names;
@@ -888,6 +888,9 @@ namespace NIKE {
 
 			//Delete scene popup
 			std::function<void()> deleteScenePopup(std::string const& popup_id);
+
+			//Edit Mask popup
+			std::function<void()> editBitMaskPopup(std::string const& popup_id);
 
 		public:
 			ScenesPanel() = default;
@@ -903,11 +906,11 @@ namespace NIKE {
 				return "Scenes Management";
 			}
 
-			//Set error message for popup
-			void setPopUpErrorMsg(std::string const& msg);
-
 			//Update layer names
 			void updateLayerNames();
+
+			//Set error message for popup
+			void setPopUpErrorMsg(std::string const& msg);
 
 			//Init
 			void init() override;

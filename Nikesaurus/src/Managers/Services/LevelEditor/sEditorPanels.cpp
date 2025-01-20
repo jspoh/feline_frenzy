@@ -5153,9 +5153,164 @@ namespace NIKE {
 			};
 	}
 
-	void LevelEditor::ScenesPanel::setPopUpErrorMsg(std::string const& msg)
-	{
-		err_msg->assign(msg);
+
+	std::function<void()> LevelEditor::ScenesPanel::editBitMaskPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			auto& layers = NIKE_SCENES_SERVICE->getLayers();
+
+			unsigned int layer_count = static_cast<unsigned int>(layers.size());
+
+			// Display bitmask grid
+			ImGui::Text("Bitmask Grid:");
+
+			if (ImGui::BeginTable("##BitmaskGrid", layer_count + 1, ImGuiTableFlags_Borders)) {
+				// Table header
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::Text("Layer\\Mask");
+				for (unsigned int i = 0; i < layer_count; ++i) {
+					ImGui::TableNextColumn();
+					ImGui::Text("Layer %u", i);
+				}
+
+				// Table body
+				for (unsigned int i = 0; i < layer_count; ++i) {
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					ImGui::Text("Layer %u", i);
+
+					for (unsigned int j = 0; j < layer_count; ++j) {
+						ImGui::TableNextColumn();
+
+						// Skip diagonal (layer can't mask itself)
+						if (i == j) {
+							ImGui::Text("X");
+							continue;
+						}
+
+						// Get current bit state
+						bool bit_state = layers[i]->getLayerMask().test(j);
+
+						// Display toggleable checkbox
+						if (ImGui::Checkbox(("##Bit" + std::to_string(i) + "_" + std::to_string(j)).c_str(), &bit_state)) {
+							Action set_layer_mask_action;
+
+							// Capture the previous bit state for both the row and column (symmetry)
+							bool prev_bit_state = layers[i]->getLayerMask().test(j);
+							bool prev_symmetric_bit_state = layers[j]->getLayerMask().test(i);  // The symmetric bit
+
+							// Do action: update both the row and column's bitmask (symmetric update)
+							set_layer_mask_action.do_action = [&, i, j, bit_state]() {
+								layers[i]->setLayerMask(j, bit_state);         // Update original cell
+								layers[j]->setLayerMask(i, bit_state);         // Update symmetric cell
+								};
+
+							// Undo action: revert both the row and column's bitmask (symmetric undo)
+							set_layer_mask_action.undo_action = [&, i, j, prev_bit_state, prev_symmetric_bit_state]() {
+								layers[i]->setLayerMask(j, prev_bit_state);    // Restore original cell
+								layers[j]->setLayerMask(i, prev_symmetric_bit_state); // Restore symmetric cell
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_layer_mask_action));
+						}
+					}
+				}
+
+				ImGui::EndTable();
+			}
+
+			//if (!layers.empty()) {
+			//	ImGui::Text("Edit Layer Bit Mask");
+			//	if (ImGui::BeginCombo("##Select Layer",
+			//		(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
+			//		for (unsigned int i = 0; i < layers.size(); ++i) {
+			//			const bool is_selected = (selected_layer_index == i);
+			//			if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
+
+			//				Action select_layer_action;
+
+			//				// Capture the previous and new layer indices
+			//				unsigned int prev_layer_index = selected_layer_index;
+			//				unsigned int new_layer_index = i;
+
+			//				// Do action
+			//				select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
+			//					selected_layer_index = new_layer_index;
+			//					// Reset bit position
+			//					bit_position = 0;
+			//					edit_mask_id = static_cast<unsigned int>(
+			//						layers[selected_layer_index]->getLayerMask().to_ulong());
+			//					};
+
+			//				// Undo action
+			//				select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
+			//					selected_layer_index = prev_layer_index;
+			//					// Reset bit position
+			//					bit_position = 0;
+			//					edit_mask_id = static_cast<unsigned int>(
+			//						layers[selected_layer_index]->getLayerMask().to_ulong());
+			//					};
+
+			//				// Execute the action
+			//				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
+			//			}
+			//			if (is_selected) ImGui::SetItemDefaultFocus();
+			//		}
+			//		ImGui::EndCombo();
+			//	}
+			//}
+			//else {
+			//	ImGui::Text("No layers available.");
+			//}
+
+
+			//// Show layer editing options
+			//if (selected_layer_index < layers.size()) {
+			//	ImGui::Text("Edit Layer Mask");
+
+			//	// Layer mask editing
+			//	if (layers.size() > 1) {
+
+			//		// For ensuring bit_position does not default to the newly created layer
+			//		if (bit_position >= layers.size() || bit_position == selected_layer_index) {
+			//			bit_position = (selected_layer_index == 0) ? 1 : 0;
+			//		}
+
+			//		if (ImGui::BeginCombo("##Select Mask Layer", layer_names[bit_position].c_str())) {
+			//			for (unsigned int i = 0; i < layers.size(); ++i) {
+			//				if (i == selected_layer_index) continue;
+
+			//				const bool mask_selected = (bit_position == i);
+			//				if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
+			//					bit_position = i;
+			//				}
+			//				if (mask_selected) ImGui::SetItemDefaultFocus();
+			//			}
+			//			ImGui::EndCombo();
+			//		}
+
+			//		bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
+			//		if (ImGui::Checkbox("Set Bit State", &bit_state)) {
+			//			layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
+			//		}
+			//	}
+			//	else {
+			//		ImGui::Text("No mask layers available.");
+			//	}
+			//}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Done Editing
+			if (ImGui::Button("Done")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
 	}
 
 	void LevelEditor::ScenesPanel::updateLayerNames() {
@@ -5165,14 +5320,20 @@ namespace NIKE {
 		}
 	}
 
+	void LevelEditor::ScenesPanel::setPopUpErrorMsg(std::string const& msg)
+	{
+		err_msg->assign(msg);
+	}
+
 	void LevelEditor::ScenesPanel::init()
 	{
-		err_msg = std::make_shared<std::string>("Layer Fault");
+		err_msg = std::make_shared<std::string>("Error");
 		success_msg = std::make_shared<std::string>("Success");
 		registerPopUp("Error", defPopUp("Error", err_msg));
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Scene", deleteScenePopup("Delete Scene"));
 		registerPopUp("Create Scene", createScenePopup("Create Scene"));
+		registerPopUp("Edit Layer Bit Mask", editBitMaskPopup("Edit Layer Bit Mask"));
 
 		// Weak ptr ref to tile panel
 		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
@@ -5251,9 +5412,9 @@ namespace NIKE {
 			}
 		}
 
-
-		//Add Separator
 		ImGui::Separator();
+
+		// Layer Management
 
 		// Get total layer count
 		unsigned int layer_count = NIKE_SCENES_SERVICE->getLayerCount();
@@ -5268,51 +5429,6 @@ namespace NIKE {
 
 		// Display layer count
 		ImGui::Text("Total Layers: %u", layer_count);
-
-		// Layer selection dropdown
-		if (!layers.empty()) {
-			ImGui::Text("Select Layer");
-			if (ImGui::BeginCombo("##Select Layer",
-				(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
-				for (unsigned int i = 0; i < layers.size(); ++i) {
-					const bool is_selected = (selected_layer_index == i);
-					if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
-
-						Action select_layer_action;
-
-						// Capture the previous and new layer indices
-						unsigned int prev_layer_index = selected_layer_index;
-						unsigned int new_layer_index = i;
-
-						// Do action
-						select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
-							selected_layer_index = new_layer_index;
-							// Reset bit position
-							bit_position = 0;
-							edit_mask_id = static_cast<unsigned int>(
-								layers[selected_layer_index]->getLayerMask().to_ulong());
-							};
-
-						// Undo action
-						select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
-							selected_layer_index = prev_layer_index;
-							// Reset bit position
-							bit_position = 0;
-							edit_mask_id = static_cast<unsigned int>(
-								layers[selected_layer_index]->getLayerMask().to_ulong());
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
-					}
-					if (is_selected) ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-		}
-		else {
-			ImGui::Text("No layers available.");
-		}
 
 		// Create layer button
 		if (ImGui::Button("Create Layer")) {
@@ -5379,42 +5495,32 @@ namespace NIKE {
 			}
 		}
 
-		ImGui::Separator();
+		// Scrollable list of layers with visibility toggles
+		ImGui::Text("Layer List:");
+		ImGui::BeginChild("##LayerList", ImVec2(0, 200), true);
 
-		// Show layer editing options
-		if (selected_layer_index < layers.size()) {
-			ImGui::Text("Edit Layer Mask");
+		for (unsigned int i = 0; i < layers.size(); ++i) {
+			auto& layer = layers[i];
 
-			// Layer mask editing
-			if (layers.size() > 1) {
+			// Visibility Toggle
+			bool is_visible = false;
+			if (ImGui::Checkbox(("##Visibility" + std::to_string(i)).c_str(), &is_visible)) {
 
-				// For ensuring bit_position does not default to the newly created layer
-				if (bit_position >= layers.size() || bit_position == selected_layer_index) {
-					bit_position = (selected_layer_index == 0) ? 1 : 0;
-				}
-
-				if (ImGui::BeginCombo("##Select Mask Layer", layer_names[bit_position].c_str())) {
-					for (unsigned int i = 0; i < layers.size(); ++i) {
-						if (i == selected_layer_index) continue;
-
-						const bool mask_selected = (bit_position == i);
-						if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
-							bit_position = i;
-						}
-						if (mask_selected) ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-				}
-
-				bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
-				if (ImGui::Checkbox("Set Bit State", &bit_state)) {
-					layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
-				}
 			}
-			else {
-				ImGui::Text("No mask layers available.");
-			}
+
+			ImGui::SameLine();
+			// Layer ID and Name
+			std::string layer_label = "Layer " + std::to_string(layer->getLayerID());
+			ImGui::Text("%s", layer_label.c_str());
+
 		}
+		ImGui::EndChild();
+
+		// Layer bit mask editor
+		if (ImGui::Button("Edit Layer Bit Mask")) {
+			openPopUp("Edit Layer Bit Mask");
+		}
+
 
 
 		//Render popups
