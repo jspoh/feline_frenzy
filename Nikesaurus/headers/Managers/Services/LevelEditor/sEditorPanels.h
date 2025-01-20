@@ -735,6 +735,9 @@ namespace NIKE {
 			//Entities panel for string reference
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
+			//Reference to game window panel
+			std::weak_ptr<GameWindowPanel> game_panel;
+
 			//Combo index for selecting camera
 			int combo_index;
 
