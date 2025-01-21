@@ -88,14 +88,15 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -638.6666870117188,
+                                    "x": -637.333984375,
                                     "y": -384.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 213.2299041748047,
                                     "y": 239.41604614257813
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
@@ -143,7 +144,8 @@
                                 "Scale": {
                                     "x": 600.0,
                                     "y": 150.0
-                                }
+                                },
+                                "Screen Position": true
                             }
                         },
                         "Layer ID": 1,

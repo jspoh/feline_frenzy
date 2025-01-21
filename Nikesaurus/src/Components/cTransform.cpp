@@ -23,6 +23,7 @@ namespace NIKE {
 			[](Transform const& comp) -> nlohmann::json {
 				return	{
 						{ "Position", comp.position.toJson() },
+						{ "Screen Position", comp.use_screen_pos },
 						{ "Scale", comp.scale.toJson() },
 						{ "Rotation", comp.rotation }
 				};
