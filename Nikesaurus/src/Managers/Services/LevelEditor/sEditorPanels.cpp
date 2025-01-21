@@ -874,6 +874,12 @@ namespace NIKE {
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
 					}
 				}
+
+				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
+					//Get mouse pos
+					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
+
+				}
 			
 			}
 
@@ -3296,7 +3302,7 @@ namespace NIKE {
 			static EditorState editor_state;
 			ImGui::Text("Editing: %s", it->first.c_str());
 			if (ImGui::InputTextMultiline("##editor", &it->second[0], it->second.capacity(),
-				ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y),
+				ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.95f),
 				ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CallbackAlways, TextCallback, &editor_state)) {
 				it->second.resize(strlen(it->second.c_str()));
 			}
@@ -3309,6 +3315,8 @@ namespace NIKE {
 				extractCurrentWord(it->second, editor_state.cursor_pos, current_word);
 				showLuaIntellisense(it->second, editor_state.cursor_pos, current_word);
 			}
+
+			ImGui::Spacing();
 
 			//Save file
 			if (ImGui::Button("Save##Save file") || (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) && ImGui::IsKeyPressed(ImGuiKey_S))) {
@@ -3984,6 +3992,9 @@ namespace NIKE {
 
 	void LevelEditor::CameraPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+		
+		//Game panel reference
+		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
 		//Setup free cam to be referenced as default camera in camera system
 		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
@@ -4101,7 +4112,7 @@ namespace NIKE {
 		// Used to check if mouse is over the viewport
 		ImGuiIO& io = ImGui::GetIO();
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
-
+		
 
 		//If free camera is active
 		if (it->first == UINT16_MAX) {
@@ -4154,9 +4165,43 @@ namespace NIKE {
 			ImGui::Spacing();
 		}
 
-		// Zoom Controls
+		// Camera Drag
+		static bool is_dragging = false;
+		static Vector2f last_mouse_pos{0.f, 0.f};
 
-		// Scroll To Zoom
+		if (game_window->isMouseInWindow() && ImGui::GetIO().MouseDown[ImGuiMouseButton_Middle]) {
+
+			// If dragging starts
+			if (!is_dragging) {
+				is_dragging = true;
+				last_mouse_pos =  game_panel.lock()->getWindowMousePos(); // Store initial position
+			}
+			else {
+				// Calculate mouse delta
+				Vector2f current_mouse_pos = game_panel.lock()->getWindowMousePos();
+
+				Vector2f mouse_delta = { current_mouse_pos.x - last_mouse_pos.x, current_mouse_pos.y - last_mouse_pos.y };
+
+				// Convert mouse delta to world space
+				Vector2f world_delta = { mouse_delta.x * active_cam.zoom, -mouse_delta.y * active_cam.zoom };
+
+				// Adjust camera position
+				active_cam.position.x -= world_delta.x;
+				active_cam.position.y -= world_delta.y;
+
+				// Update last mouse position
+				last_mouse_pos = current_mouse_pos;
+
+				// Mark the camera as changed for undo/redo
+				cameraChangeAction(active_cam, cam_before_change);
+			}
+		}
+		else {
+			// Reset dragging state when the middle mouse button is released
+			is_dragging = false;
+		}
+
+		// Zoom Controls (Scroll To Zoom)
 		if (!checkPopUpShowing() && game_window->isMouseInWindow()) {
 			active_cam.zoom -= io.MouseWheel * ImGui::GetIO().DeltaTime;
 			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);

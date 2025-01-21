@@ -56,7 +56,16 @@ namespace NIKE {
 		public:
 
 			//Default constructor
-			Service();
+			Service() = default;
+
+			//Init meta data manager
+			void init();
+
+			//Check if type is valid
+			bool isTypeValid(std::string const& type);
+
+			//Check if category is valid
+			bool isCategoryValid(std::string const& category);
 
 			//Add new entity type
 			void addEntityType(std::string const& type);
@@ -91,11 +100,26 @@ namespace NIKE {
 			//Modify Entity Category
 			bool setEntityCategory(Entity::Type entity, std::string const& category);
 
+			//Check Entity Name Taken
+			bool isEntityNameTaken(std::string const& name) const;
+
+			//Get entity by name
+			std::optional<Entity::Type> getEntityByName(std::string const& name) const;
+
+			//Get entities by type
+			std::set<Entity::Type> getEntitiesByType(std::string const& type) const;
+
+			//Get entities by category
+			std::set<Entity::Type> getEntitiesByCategory(std::string const& category) const;
+
+			//Clone MetaData except for name
+			void cloneEntityData(Entity::Type entity, Entity::Type clone);
+
 			//Get entity data
-			EntityData getEntityData(Entity::Type entity) const;
+			EntityData& getEntityData(Entity::Type entity);
 
 			//Get entities data
-			std::map<Entity::Type, EntityData, EntitySorter> getEntitiesData() const;
+			std::map<Entity::Type, EntityData, EntitySorter>& getEntitiesData();
 		};
 	}
 }
