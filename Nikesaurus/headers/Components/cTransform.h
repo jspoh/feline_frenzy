@@ -22,6 +22,7 @@ namespace NIKE {
 			Vector2f position;
 			Vector2f scale;
 			float rotation;
+			bool use_screen_pos = false;
 
 			Transform() : position(0.f, 0.f), scale(1.f, 1.f), rotation{ 0.0f } {}
 			Transform(Vector2f const& position, Vector2f const& scale, float rotation)

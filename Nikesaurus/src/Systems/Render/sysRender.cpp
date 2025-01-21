@@ -79,9 +79,16 @@ namespace NIKE {
 		Matrix_33RotDeg(rot_mat, obj.rotation);
 		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat
-			* (flip.x ? FLIP_X_MAT : Matrix_33::Identity())
-			* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity());
+		if (obj.use_screen_pos) {
+			result = trans_mat * rot_mat * scale_mat
+				* (flip.x ? FLIP_X_MAT : Matrix_33::Identity())
+				* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity());
+		}
+		else {
+			result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat
+				* (flip.x ? FLIP_X_MAT : Matrix_33::Identity())
+				* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity());
+		}
 
 		// OpenGL requires matrix in col maj so transpose
 		Matrix_33Transpose(x_form, result);

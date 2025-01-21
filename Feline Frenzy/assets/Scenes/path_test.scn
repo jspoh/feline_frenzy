@@ -53,12 +53,12 @@
                                 "StartCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        2,
-                                        1
+                                        1,
+                                        2
                                     ],
                                     "Position": {
-                                        "x": -384.0,
-                                        "y": -640.0
+                                        "x": -640.0,
+                                        "y": -384.0
                                     }
                                 }
                             },
@@ -88,7 +88,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -640.0,
+                                    "x": -638.6666870117188,
                                     "y": -384.0
                                 },
                                 "Rotation": 0.0,
@@ -114,7 +114,47 @@
     {
         "Layer": {
             "B_State": true,
-            "Entities": [],
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Font_ID": "Skranji-Bold.ttf",
+                                "Origin": 3,
+                                "Scale": 1.0,
+                                "Size": {
+                                    "x": 118.0,
+                                    "y": 39.0
+                                },
+                                "Text": "hello"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 790.0,
+                                    "y": 420.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 600.0,
+                                    "y": 150.0
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0001",
+                            "Prefab_ID": ""
+                        }
+                    }
+                }
+            ],
             "ID": 1,
             "Mask": 2
         }
