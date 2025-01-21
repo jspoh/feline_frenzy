@@ -88,7 +88,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -636.0018920898438,
+                                    "x": -634.67041015625,
                                     "y": -384.0
                                 },
                                 "Rotation": 0.0,
@@ -145,7 +145,7 @@
                                     "x": 600.0,
                                     "y": 150.0
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "Layer ID": 1,

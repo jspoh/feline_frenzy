@@ -166,7 +166,9 @@ namespace NIKE {
 			worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size, e_transform.use_screen_pos),
 			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size, e_transform.use_screen_pos),
 			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size, e_transform.use_screen_pos),
-			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size, e_transform.use_screen_pos), color, thickness / zoom * fullscreen_scale.x);
+			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size, e_transform.use_screen_pos), 
+			color, thickness / zoom * fullscreen_scale.x
+		);
 	}
 
 	void LevelEditor::IPanel::worldCircleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color) {
