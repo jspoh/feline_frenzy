@@ -150,7 +150,7 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 128.0,
                     "y": -384.0
@@ -208,7 +208,7 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 128.0,
                     "y": -128.0
@@ -245,14 +245,14 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -640.0,
                     "y": 128.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -384.0,
                     "y": 128.0

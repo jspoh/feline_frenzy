@@ -33,7 +33,10 @@ namespace NIKE {
 			float left = -(grid_scale.x / 2.0f);
 			for (int j = 0; j < grid_size.x; ++j) {
 				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top + (cell_size.y / 2.0f) };
-				grid.at(i).at(j).index = { i,j };
+				if (getCellIndexFromCords(grid.at(i).at(j).position).has_value())
+				{
+					grid.at(i).at(j).index = getCellIndexFromCords(grid.at(i).at(j).position).value();
+				}
 				left += cell_size.x;
 			}
 			top += cell_size.y;
@@ -193,6 +196,7 @@ namespace NIKE {
 			std::vector<Cell> row;
 			for (const auto& cell_json : row_json) {
 				Cell cell{};
+				// Note 1: Blocked boolean is properly seri and registered. suspect: somewhr might be interferring with the boolean?
 				cell.b_blocked = cell_json.at("Blocked").get<bool>();
 				cell.position.fromJson(cell_json.at("Position"));
 				row.push_back(cell);
@@ -209,71 +213,77 @@ namespace NIKE {
 		const int total_directions = 4;
 
 		std::priority_queue<Cell, std::vector<Cell>, std::greater<Cell>> open_list;
-		std::vector<std::vector<bool>> closed_list(grid.size(), std::vector<bool>(grid[0].size(), false));
-		std::vector<std::vector<Cell>> cell_details(grid.size(), std::vector<Cell>(grid[0].size()));
+		std::unordered_set<Vector2i, Vector2iHasher> closed_list;
 
-		// Initialize start
+		// Initialize start cell
 		Cell start_cell = start;
 		start_cell.g = 0;
 		start_cell.h = abs(start.index.x - goal.index.x) + abs(start.index.y - goal.index.y);
 		start_cell.f = start_cell.g + start_cell.h;
-		// Start Node
+		start_cell.parent = start.index;
 		open_list.push(start_cell);
-		cell_details[start.index.x][start.index.y] = start_cell;
 
 		while (!open_list.empty()) {
-			// Get cell with lowest f value
+
+			// Get cell with lowest cost from open_list
+			// Implemented by std::priority queue
 			Cell current = open_list.top();
+
+			// Move the current cell to the closed list
+			closed_list.insert(current.index);
+
+			// Remove current cell from open list
 			open_list.pop();
 
-			int x = current.index.x;
-			int y = current.index.y;
-			closed_list[x][y] = true;
-			// Check if current is the goal node
-			if (current == goal) {
-				// Reconstruct the path
+			if (current.index == goal.index) {
 				std::vector<Cell> path;
-				while (!(x == y)) {
-					path.push_back(cell_details[x][y]);
-					int temp_x = cell_details[x][y].parent.x;
-					int temp_y = cell_details[x][y].parent.y;
-					x = temp_x;
-					y = temp_y;
+				Vector2i trace = goal.index;
+				while (trace != start.index) {
+					path.push_back(grid[trace.y][trace.x]);
+					trace = grid[trace.y][trace.x].parent;
 				}
 				path.push_back(start);
 				std::reverse(path.begin(), path.end());
 				return path;
 			}
 
+			// Check neighbours, total of 4 neighbors, up down left right
 			for (int i = 0; i < total_directions; ++i) {
-				int new_x = x + direction_x[i]; 
-				int new_y = y + direction_y[i];
+				int new_x = current.index.x + direction_x[i];
+				int new_y = current.index.y + direction_y[i];
+				Vector2i neighbor_index = { new_x, new_y };
 
-				if (new_x >= 0 && new_x < grid.size() &&
-					new_y >= 0 && new_y < grid[0].size() &&
-					!grid[new_x][new_y].b_blocked &&
-					!closed_list[new_x][new_y]) {
+				if (new_x >= 0 && new_x < grid_size.x &&
+					new_y >= 0 && new_y < grid_size.y && 
+					!isCellBlocked(new_x, new_y) && 
+					!closed_list.count(neighbor_index)) {
 
+					// Skip iteration of blocked cells and closed cells that are already checked
+					//if (isCellBlocked(neighbor_index.x, neighbor_index.y) &&
+					//	closed_list.count(neighbor_index)) {
+					//	continue;
+					//}
+
+					Cell& neighbor = grid[new_y][new_x];
 					int new_g = current.g + 1;
-					Cell& neighbor = cell_details[new_x][new_y];
-
-					if (neighbor.parent.x == -1 || new_g < neighbor.g) {
-						neighbor.index.x = new_x;
-						neighbor.index.y = new_y;
+					
+					if ((neighbor.parent.x == -1 && neighbor.parent.y == -1) || new_g > neighbor.g) {
 						neighbor.g = new_g;
 						neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
 						neighbor.f = neighbor.g + neighbor.h;
-						neighbor.parent.x = x;
-						neighbor.parent.y = y;
+						neighbor.parent = current.index;
+						neighbor.index = neighbor_index;
 
 						open_list.push(neighbor);
 					}
+					
 				}
 			}
 		}
+
+		// Return empty path
 		return std::vector<Cell>();
 	}
-
 
 	bool Map::Cell::operator>(const Cell& other) const
 	{
@@ -290,7 +300,7 @@ namespace NIKE {
 	{
 		for (const Cell& cell : path)
 		{
-			cout << "(" << cell.index.x << ", " << cell.index.y << ") ";
+			cout << "(" << cell.index.y << ", " << cell.index.x << ") ";
 		}
 		cout << endl;
 	}

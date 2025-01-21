@@ -16,7 +16,7 @@ namespace NIKE {
 	void Enemy::Manager::init() {
 
 		// Init variables
-		movement_speed = 50.0f;
+		movement_speed = 100.0f;
 		waypoint_threshold = 1.0f;
 		target_threshold = 1.0f;
 
@@ -49,10 +49,20 @@ namespace NIKE {
 						auto& enemy_transform = e_enemy_transform.value().get();
 
 						// Init cell
-						Map::Cell start{ NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value() };
-						Map::Cell target{ 5,5 };
-						auto path = NIKE_MAP_SERVICE->findPath(start, target);
-						//NIKE_MAP_SERVICE->PrintPath(path);
+						// Vector2i start = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value();
+						// Get grid to take ref from cell using the index
+						auto grid = NIKE_MAP_SERVICE->getGrid();
+						// Syntax: grid[y][x]
+						enemy_pathfind.start_cell = grid[2][1];
+						enemy_pathfind.goal_cell = grid[5][5];
+						enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start_cell, enemy_pathfind.goal_cell);
+						enemy_pathfind.path_found = !enemy_pathfind.path.empty();
+
+						if (enemy_pathfind.path_found)
+						{
+							NIKE_MAP_SERVICE->PrintPath(enemy_pathfind.path);
+							moveAlongPath(enemy_pathfind, enemy_transform);
+						}
 
 					}
 
@@ -89,45 +99,60 @@ namespace NIKE {
 			}
 		}
 	}
+
 }
 
-	//void NIKE::Enemy::Manager::moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform)
-	//{
-	//	if (path.path_found && path.current_index < path.path.size()) {
-	//		Vector2f& current_target = path.path[path.current_index];
+	void NIKE::Enemy::Manager::moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform) {
+		if (!path.path_found || path.path.empty()) {
+			return;
+		}
 
-	//		Vector2i current_target_main = { static_cast<int>(current_target.x), static_cast<int>(current_target.y) };
+		// Use the first position in the path as the current target
+		Vector2i current_target_index = path.goal_cell.index;
 
-	//		Vector2f target_world_position{};
+		// Convert grid index to world position
+		auto grid = NIKE_MAP_SERVICE->getGrid();
+		if (current_target_index.x < 0 || current_target_index.x >= grid.size() ||
+			current_target_index.y < 0 || current_target_index.y >= grid[0].size()) {
+			path.path_found = false;
+			return;
+		}
 
-	//		auto grid = NIKE_MAP_SERVICE->getGrid();
+		Map::Cell& target_cell = grid[current_target_index.y][current_target_index.x];
+		if (target_cell.b_blocked) {
+			path.path_found = false;
+			return;
+		}
 
-	//		// Retrieve position based on current target index
-	//		if (current_target.x >= 0 && current_target.x < grid.size() &&
-	//			current_target.y >= 0 && current_target.y < grid[0].size()) {
-	//			target_world_position = grid[current_target_main.x][current_target_main.y].position;
-	//		}
+		Vector2f target_world_position = target_cell.position;
 
-	//		// Check if the target position is blocked
-	//		if (grid[current_target_main.x][current_target_main.y].b_blocked) {
-	//			path.path_found = false;
-	//			return;
-	//		}
+		// Calculate direction to the target position
+		Vector2f direction = (target_world_position - transform.position).normalized();
 
-	//		// Calculate direction
-	//		Vector2f direction = (target_world_position - transform.position).normalized();
-	//		transform.position += direction * movement_speed * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+		// Clamp direction to cardinal directions only
+		if (fabs(direction.x) > fabs(direction.y)) {
+			direction.y = 0;  
+		}
+		else {
+			direction.x = 0;  
+		}
 
-	//		// Check if waypoint is reached
-	//		if ((transform.position - target_world_position).length() < waypoint_threshold) {
-	//			path.current_index++;
-	//			if (path.current_index >= path.path.size()) {
-	//				// Path traversal complete
-	//				path.path_found = false;
-	//			}
-	//		}
-	//	}
-	//}
+		// Move the entity towards the target position
+		transform.position += direction * movement_speed * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+		// Check if the entity has reached the target position
+		if ((transform.position - target_world_position).length() <= waypoint_threshold) {
+			// Remove the current target from the path once reached
+			path.path.erase(path.path.begin());
+
+			if (path.path.empty()) {
+				// Completed the path traversal
+				path.path_found = false;
+			}
+		}
+	}
+
+
 
 	//bool Enemy::Manager::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
 	//	return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);

@@ -40,30 +40,25 @@
                                 "GoalCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        0,
-                                        0
+                                        5,
+                                        5
                                     ],
                                     "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
+                                        "x": 384.0,
+                                        "y": 384.0
                                     }
                                 },
-                                "Path": [
-                                    {
-                                        "x": 1,
-                                        "y": 2
-                                    }
-                                ],
+                                "Path": null,
                                 "PathFound": false,
                                 "StartCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        0,
-                                        0
+                                        2,
+                                        1
                                     ],
                                     "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
+                                        "x": -384.0,
+                                        "y": -640.0
                                     }
                                 }
                             },
@@ -107,136 +102,6 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "entity_0000",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "GameLogic::ILogic": {
-                                "Function": "",
-                                "Named_Args": {},
-                                "Script_ID": ""
-                            },
-                            "Pathfinding::Path": {
-                                "GoalCell": {
-                                    "Blocked": false,
-                                    "Index": [
-                                        0,
-                                        0
-                                    ],
-                                    "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
-                                    }
-                                },
-                                "Path": null,
-                                "PathFound": false,
-                                "StartCell": {
-                                    "Blocked": false,
-                                    "Index": [
-                                        0,
-                                        0
-                                    ],
-                                    "Position": {
-                                        "x": 0.0,
-                                        "y": 0.0
-                                    }
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": true,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Normal_Enemy_Idle_Front.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 384.0,
-                                    "y": 384.0
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 227.99998474121094,
-                                    "y": 256.0
-                                }
-                            }
-                        },
-                        "Layer ID": 0,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "entity_0001",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "GameLogic::ILogic": {
-                                "Function": "",
-                                "Named_Args": {},
-                                "Script_ID": ""
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Normal_Enemy_Idle_Front.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -640.0,
-                                    "y": 384.0
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 213.2299041748047,
-                                    "y": 239.41604614257813
-                                }
-                            }
-                        },
-                        "Layer ID": 0,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "test",
                             "Prefab_ID": ""
                         }
                     }
