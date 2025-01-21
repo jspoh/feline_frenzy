@@ -105,7 +105,7 @@ namespace NIKE {
 			};
 	}
 
-	ImVec2 LevelEditor::IPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size) {
+	ImVec2 LevelEditor::IPanel::worldToScreen(ImVec2 const& pos, ImVec2 const& render_size, bool use_screen_pos) {
 		//Get window position ( Relative to top left corner of the rendering point in window )
 		Vector2f window_pos = { ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
 
@@ -113,8 +113,16 @@ namespace NIKE {
 		Vector2f scale{ render_size.x / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x, render_size.y / NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y };
 
 		//Return screen coordinates
+		if (use_screen_pos) {
+			return {
+				window_pos.x + (render_size.x / 2.0f) + (pos.x * scale.x),
+				window_pos.y + (render_size.y / 2.0f) + (pos.y * scale.y)
+			};
+		}
 		return { window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),
-					window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+					window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom)
+
+		};
 	}
 
 	void LevelEditor::IPanel::worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding) {
@@ -154,10 +162,11 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Draw quad bounding box
-		draw_list->AddQuad(worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size),
-			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size),
-			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size),
-			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size), color, thickness / zoom * fullscreen_scale.x);
+		draw_list->AddQuad(
+			worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size, e_transform.use_screen_pos), color, thickness / zoom * fullscreen_scale.x);
 	}
 
 	void LevelEditor::IPanel::worldCircleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color) {
@@ -880,7 +889,7 @@ namespace NIKE {
 					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
 
 				}
-			
+
 			}
 
 			//Iterate through all entities to showcase active entities
@@ -935,7 +944,7 @@ namespace NIKE {
 						auto prev_entity = selected_entity;
 
 						// Define the do action for unselecting
-						unselect_entity_action.do_action = [&, prev_entity]() {	
+						unselect_entity_action.do_action = [&, prev_entity]() {
 							unselectEntity();
 							b_entity_changed = true;
 							};
@@ -3381,7 +3390,7 @@ namespace NIKE {
 				//Close popup
 				closePopUp(popup_id);
 			}
-		};
+			};
 	}
 
 	std::function<void()> LevelEditor::ResourcePanel::deleteDirectoryPopup(std::string const& popup_id) {
@@ -3614,7 +3623,7 @@ namespace NIKE {
 				}
 				}
 			}
-		});
+			});
 	}
 
 	void LevelEditor::ResourcePanel::update() {
@@ -3992,7 +4001,7 @@ namespace NIKE {
 
 	void LevelEditor::CameraPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
-		
+
 		//Game panel reference
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
@@ -4112,7 +4121,7 @@ namespace NIKE {
 		// Used to check if mouse is over the viewport
 		ImGuiIO& io = ImGui::GetIO();
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
-		
+
 
 		//If free camera is active
 		if (it->first == UINT16_MAX) {
@@ -4167,14 +4176,14 @@ namespace NIKE {
 
 		// Camera Drag
 		static bool is_dragging = false;
-		static Vector2f last_mouse_pos{0.f, 0.f};
+		static Vector2f last_mouse_pos{ 0.f, 0.f };
 
 		if (game_window->isMouseInWindow() && ImGui::GetIO().MouseDown[ImGuiMouseButton_Middle]) {
 
 			// If dragging starts
 			if (!is_dragging) {
 				is_dragging = true;
-				last_mouse_pos =  game_panel.lock()->getWindowMousePos(); // Store initial position
+				last_mouse_pos = game_panel.lock()->getWindowMousePos(); // Store initial position
 			}
 			else {
 				// Calculate mouse delta

@@ -82,7 +82,7 @@ namespace NIKE {
 
 			#ifdef NIKE_BUILD_DLL
 			//World to screen
-			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
+			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size, bool use_screen_pos=false);
 
 			//Render filled rectangle to draw list
 			void worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f);
