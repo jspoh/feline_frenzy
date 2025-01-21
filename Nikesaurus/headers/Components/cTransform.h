@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   cTransform.h
- * \brief  
+ * \brief
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (90%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (5%)
@@ -22,11 +22,14 @@ namespace NIKE {
 			Vector2f position;
 			Vector2f scale;
 			float rotation;
-			bool use_screen_pos = false;
+			bool use_screen_pos;
 
-			Transform() : position(0.f, 0.f), scale(1.f, 1.f), rotation{ 0.0f } {}
+			Transform() : position(0.f, 0.f), scale(1.f, 1.f), rotation{ 0.0f }, use_screen_pos{ false } {}
 			Transform(Vector2f const& position, Vector2f const& scale, float rotation)
-				: position{ position }, scale{ scale }, rotation{ rotation } {}
+				: position{ position }, scale{ scale }, rotation{ rotation }, use_screen_pos{ false } {}
+			Transform(Vector2f const& position, Vector2f const& scale, float rotation, bool use_screen_pos)
+				: position{ position }, scale{ scale }, rotation{ rotation }, use_screen_pos{ use_screen_pos } {
+			}
 		};
 
 		void registerComponents();

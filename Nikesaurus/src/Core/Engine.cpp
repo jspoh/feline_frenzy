@@ -241,7 +241,22 @@ namespace NIKE {
 		// !TODO: remove this, hardcoding for installer
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "path_test.scn"));
 
+		//NIKE::Render::Manager::addEntity();
+		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
+		//Entity::Type FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
+		//NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY, Transform::Transform({ 790.f, 420.f }, { 600.f, 150.f }, 0.f, true));
+		//NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", "20000000 FPS", {1.f, 1.f, 1.f, 1.f}, 1.0f));
+		
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+			static int frame_count = 0;
+			if (frame_count == 1) {
+				constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
+				Entity::Type FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
+				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY, Transform::Transform({ 790.f, 420.f }, { 600.f, 150.f }, 0.f, true));
+				NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", "20000000 FPS", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
+			}
+			frame_count++;
+
 			try {
 
 				// get delta time first
@@ -256,46 +271,46 @@ namespace NIKE {
 
 
 
-					//Clear buffer
-					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+				//Clear buffer
+				NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
-					//Update all audio pending actions
-					NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+				//Update all audio pending actions
+				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
-					//Update scenes manager
-					NIKE_SCENES_SERVICE->update();
+				//Update scenes manager
+				NIKE_SCENES_SERVICE->update();
 
-					//Escape Key
-					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-						NIKE_WINDOWS_SERVICE->getWindow()->terminate();
-					}
+				//Escape Key
+				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				}
 
-					//Toggle full screen
-					if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
-						NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
-					}
+				//Toggle full screen
+				if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+				}
 
-					//Update all systems
-					NIKE_ECS_MANAGER->updateSystems();
+				//Update all systems
+				NIKE_ECS_MANAGER->updateSystems();
 
 #ifndef NDEBUG
-					//Update Level Editor
-					NIKE_LVLEDITOR_SERVICE->update();
+				//Update Level Editor
+				NIKE_LVLEDITOR_SERVICE->update();
 
-					//Render Level Editor
-					NIKE_LVLEDITOR_SERVICE->render();
+				//Render Level Editor
+				NIKE_LVLEDITOR_SERVICE->render();
 
-					//update UI First
-					NIKE_UI_SERVICE->update();
+				//update UI First
+				NIKE_UI_SERVICE->update();
 #endif
 
-					//Swap Buffers
-					NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+				//Swap Buffers
+				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
-					GLenum err = glGetError();
-					if (err != GL_NO_ERROR) {
-						NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
-					}
+				GLenum err = glGetError();
+				if (err != GL_NO_ERROR) {
+					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+				}
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);

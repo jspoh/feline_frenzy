@@ -504,7 +504,7 @@ namespace NIKE {
 
 				//Do Action
 				create.do_action = [&, shared_id]() {
-					//Creat new entity 
+					//Create new entity 
 					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
 					//Save entity name into entities ref
@@ -5900,4 +5900,17 @@ namespace NIKE {
 
 		ImGui::End();
 	}
+}
+
+
+std::map<NIKE::Entity::Type, NIKE::LevelEditor::EntityMetaData, NIKE::LevelEditor::EntitiesPanel::EntitySorter>& NIKE::LevelEditor::EntitiesPanel::getEntityMap() {
+	return entities;
+}
+
+std::unordered_map<NIKE::Entity::Type, std::string>& NIKE::LevelEditor::EntitiesPanel::getEntityToNameMap() {
+	return entity_to_name;
+}
+
+std::unordered_map<std::string, NIKE::Entity::Type>& NIKE::LevelEditor::EntitiesPanel::getNameToEntityMap() {
+	return name_to_entity;
 }

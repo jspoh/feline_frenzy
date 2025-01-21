@@ -299,6 +299,11 @@ namespace NIKE {
 
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
+
+			// getters
+			std::map<Entity::Type, EntityMetaData, EntitySorter>& getEntityMap();
+			std::unordered_map<Entity::Type, std::string>& getEntityToNameMap();
+			std::unordered_map<std::string, Entity::Type>& getNameToEntityMap();
 		};
 
 		//Components Management Panel
