@@ -34,6 +34,7 @@ namespace NIKE {
 				comp.position.fromJson(data.at("Position"));
 				comp.scale.fromJson(data.at("Scale"));
 				comp.rotation = data.at("Rotation").get<float>();
+				comp.use_screen_pos = data.at("Screen Position").get<bool>();
 			}
 		);
 
