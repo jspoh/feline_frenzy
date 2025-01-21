@@ -65,7 +65,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Grass icon.png"
+            "Texture_ID": "GrassBullet_Player.png"
         },
         "Transform::Transform": {
             "Position": {

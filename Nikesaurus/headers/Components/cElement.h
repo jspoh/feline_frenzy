@@ -39,7 +39,8 @@ namespace NIKE {
 			Entity(int element)
 				: element{ element } {}
 
-			static const std::string bulletArr[4];	// Array of elemental bullets (For shooting)
+			static const std::string enemyBullet[4];	// Array of enemy elemental bullet
+			static const std::string playerBullet[4];	// Array of elemental bullets (For shooting)
 		};
 
 		struct Source {
@@ -50,7 +51,9 @@ namespace NIKE {
 				: element{ element } {}
 		};
 
-		const std::string bulletArr[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
+		const std::string playerBullet[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
+		const std::string enemyBullet[4] = { "bullet.prefab", "enemyFireBullet.prefab", "enemyWaterBullet.prefab", "enemyGrassBullet.prefab" };
+
 
 		void registerComponents();
 	}

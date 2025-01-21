@@ -65,7 +65,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "WaterBullet_Player.png"
+            "Texture_ID": "WaterBullet_Enemy.png"
         },
         "Transform::Transform": {
             "Position": {

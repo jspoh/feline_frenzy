@@ -482,7 +482,7 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 39,
+                                "Completed_Animations": 49,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.01666666753590107
@@ -518,7 +518,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 12
+                                    "entity": 10
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -529,8 +529,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -280.8720703125,
-                                    "y": -130.33526611328125
+                                    "x": -202.7327117919922,
+                                    "y": -137.33883666992188
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -554,8 +554,8 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -280.9478759765625,
-                                    "y": -130.41909790039063
+                                    "x": -202.7327117919922,
+                                    "y": -137.33883666992188
                                 },
                                 "Zoom": 1.0
                             },
@@ -595,8 +595,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -280.8720703125,
-                                    "y": -130.33526611328125
+                                    "x": -202.7327117919922,
+                                    "y": -137.33883666992188
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

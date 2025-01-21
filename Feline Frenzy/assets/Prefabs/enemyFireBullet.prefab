@@ -8,7 +8,7 @@
             "Volume": 0.5
         },
         "Element::Entity": {
-            "Element": 2
+            "Element": 1
         },
         "Combat::Damage": {
             "Damage": 10.0
@@ -65,7 +65,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "WaterBullet_Player.png"
+            "Texture_ID": "FireBullet_Enemy.png"
         },
         "Transform::Transform": {
             "Position": {

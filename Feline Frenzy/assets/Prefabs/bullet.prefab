@@ -65,7 +65,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Player_Bullet.png"
+            "Texture_ID": "NormalBullet_Player.png"
         },
         "Transform::Transform": {
             "Position": {

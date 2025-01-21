@@ -220,12 +220,20 @@ namespace NIKE {
 		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
 
 		// Create entity for bullet
-		//Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
-		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
+		// Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
+		// I don't think this layer number actually matters, since it depends on the prefab layer
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(1); 
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::bulletArr[static_cast<int>(e_element_comp.value().get().element)]).string());
-
+		if (e_element_comp.has_value()) {
+			// Shoot elemental bullet
+			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]).string());
+		}
+		else {
+			// Missing Element Comp
+			NIKEE_CORE_WARN("ENEMY missing Elemental Component");
+			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+		}
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
 		Vector2f direction = player_pos - enemy_pos;
 		direction.normalize();

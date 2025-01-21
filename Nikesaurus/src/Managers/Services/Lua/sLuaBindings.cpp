@@ -428,10 +428,11 @@ namespace NIKE {
             auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
             if (player_element_comp.has_value()) {
                 // Shoot elemental bullet
-                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::bulletArr[static_cast<int>(player_element_comp.value().get().element)]).string());
+                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::playerBullet[static_cast<int>(player_element_comp.value().get().element)]).string());
             }
             else {
-                // Shoot default bullet
+                // Missing Element Comp
+                NIKEE_CORE_WARN("PLAYER missing Elemental Component");
                 NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
             }
 

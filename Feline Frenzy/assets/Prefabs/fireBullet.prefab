@@ -65,7 +65,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Fire icon.png"
+            "Texture_ID": "FireBullet_Player.png"
         },
         "Transform::Transform": {
             "Position": {
