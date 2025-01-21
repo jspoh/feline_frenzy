@@ -231,6 +231,7 @@ namespace NIKE {
 
 			// Move the current cell to the closed list
 			closed_list.insert(current.index);
+
 			// Remove current cell from open list
 			open_list.pop();
 
@@ -283,9 +284,6 @@ namespace NIKE {
 		// Return empty path
 		return std::vector<Cell>();
 	}
-
-
-
 
 	bool Map::Cell::operator>(const Cell& other) const
 	{

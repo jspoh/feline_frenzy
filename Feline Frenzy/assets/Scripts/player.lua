@@ -167,6 +167,9 @@ function Player:Move(entity)
     -- Apply the combined force to the entity
     ApplyForce(entity, fx, fy)
 
+    -- Pathfinding Test
+    GoToCell(entity, 20, 20, 1000.0);
+
 end
 
 -- Player shoot function

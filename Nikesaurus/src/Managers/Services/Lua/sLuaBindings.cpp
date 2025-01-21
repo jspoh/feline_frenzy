@@ -535,5 +535,45 @@ namespace NIKE {
             }
             });
 
+        //Path finding
+        lua_state.set_function("GoToCell", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+
+            //Get transform of entity for position mapping
+            auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+            if (transform.has_value()) {
+
+                //Get index of entity as the starting position
+                auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(transform.value().get().position);
+
+                //Get cell to travel to
+                if (start) {
+
+                    //Get subsequent cells
+                    auto cells = NIKE_MAP_SERVICE->findPath(start.value(), Vector2i(x_index, y_index));
+
+                    //Check if there are cells to go to
+                    if (!cells.empty()) {
+
+                        //Get next cell
+                        auto const& next_cell = cells.front();
+
+                        //Check if cell has been reached
+                        if (next_cell.index != start) {
+
+                            //Direction of next cell
+                            float dir = atan2((next_cell.position.y - start.value().y), (next_cell.position.x - start.value().x));
+
+                            //Apply force to entity
+                            auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+                            if (dynamics.has_value()) {
+                                dynamics.value().get().force = { cos(dir) * speed, sin(dir) * speed };
+                            }
+                        }
+                    }
+                }
+            }
+
+            });
+
     }
 }
