@@ -392,8 +392,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -258.12042236328125,
-                                    "y": 127.98774719238281
+                                    "x": -257.61700439453125,
+                                    "y": 123.22161865234375
                                 },
                                 "Resolution": 0,
                                 "Rotation": 90.0,
@@ -417,8 +417,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -258.12042236328125,
-                                    "y": 127.98774719238281
+                                    "x": -257.61700439453125,
+                                    "y": 123.22161865234375
                                 },
                                 "Rotation": 90.0,
                                 "Scale": {
@@ -482,14 +482,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 49,
+                                "Completed_Animations": 37,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 3,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -518,7 +518,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 10
+                                    "entity": 9
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -529,8 +529,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -202.7327117919922,
-                                    "y": -137.33883666992188
+                                    "x": 127.9465103149414,
+                                    "y": -127.9490737915039
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -573,7 +573,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 3,
                                     "y": 1
                                 },
                                 "Frame_Size": {
@@ -595,8 +595,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -202.7327117919922,
-                                    "y": -137.33883666992188
+                                    "x": 127.9465103149414,
+                                    "y": -127.9490737915039
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

@@ -222,6 +222,26 @@ namespace NIKE {
 		std::priority_queue<Cell, std::vector<Cell>, std::greater<Cell>> open_list;
 		std::unordered_set<Vector2i, Vector2iHasher> closed_list;
 
+		// Add blocked cells to the closed list
+		for (int y = 0; y < grid_size.y; ++y) {
+			for (int x = 0; x < grid_size.x; ++x) {
+				if (isCellBlocked(x,y)) {
+					closed_list.insert({ x, y });
+				}
+			}
+		}
+
+		// Lim's debug
+		//if (!debug)
+		//{
+		//	for (auto& elems : closed_list)
+		//	{
+		//		cout << elems.y << ", " << elems.x << endl;
+		//	}
+		//	debug = true;
+		//}
+
+
 		// Initialize start cell
 		Cell start_cell = start;
 		start_cell.g = 0;
@@ -231,16 +251,12 @@ namespace NIKE {
 		open_list.push(start_cell);
 
 		while (!open_list.empty()) {
-
 			// Get cell with lowest cost from open_list
-			// Implemented by std::priority queue
 			Cell current = open_list.top();
+			open_list.pop();
 
 			// Move the current cell to the closed list
 			closed_list.insert(current.index);
-
-			// Remove current cell from open list
-			open_list.pop();
 
 			if (current.index == goal.index) {
 				std::vector<Cell> path;
@@ -254,43 +270,45 @@ namespace NIKE {
 				return path;
 			}
 
-			// Check neighbours, total of 4 neighbors, up down left right
+			// Check neighbors
 			for (int i = 0; i < total_directions; ++i) {
 				int new_x = current.index.x + direction_x[i];
 				int new_y = current.index.y + direction_y[i];
 				Vector2i neighbor_index = { new_x, new_y };
 
-				if (new_x >= 0 && new_x < grid_size.x &&
-					new_y >= 0 && new_y < grid_size.y && 
-					!isCellBlocked(new_x, new_y) && 
-					!closed_list.count(neighbor_index)) {
-
-					// Skip iteration of blocked cells and closed cells that are already checked
-					//if (isCellBlocked(neighbor_index.x, neighbor_index.y) &&
-					//	closed_list.count(neighbor_index)) {
-					//	continue;
-					//}
-
-					Cell& neighbor = grid[new_y][new_x];
-					int new_g = current.g + 1;
-					
-					if ((neighbor.parent.x == -1 && neighbor.parent.y == -1) || new_g > neighbor.g) {
-						neighbor.g = new_g;
-						neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
-						neighbor.f = neighbor.g + neighbor.h;
-						neighbor.parent = current.index;
-						neighbor.index = neighbor_index;
-
-						open_list.push(neighbor);
-					}
-					
+				// Skip if neighbor is out of bounds, blocked, or already processed
+				if (new_x < 0 || new_x >= grid_size.x ||
+					new_y < 0 || new_y >= grid_size.y ||
+					isCellBlocked(new_x, new_y) ||
+					closed_list.count(neighbor_index)) {
+					continue;
 				}
+
+				std::unordered_set<Vector2i, Vector2iHasher> in_open_list;
+
+				Cell& neighbor = grid[new_y][new_x];
+				int new_g = current.g + 1;
+
+				if (neighbor.parent.x == -1 && neighbor.parent.y == -1 || new_g < neighbor.g) {
+					neighbor.g = new_g;
+					neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
+					neighbor.f = neighbor.g + neighbor.h;
+					neighbor.parent = current.index;
+
+					// Only push to the open list if not already in it
+					if (!in_open_list.count(neighbor.index)) {
+						open_list.push(neighbor);
+						in_open_list.insert(neighbor.index);
+					}
+				}
+
 			}
 		}
 
-		// Return empty path
+		// Return empty path if no path found
 		return std::vector<Cell>();
 	}
+
 
 	bool Map::Cell::operator>(const Cell& other) const
 	{
@@ -305,11 +323,11 @@ namespace NIKE {
 	// TO BE DELETED
 	void Map::Service::PrintPath(const std::vector<Cell>& path)
 	{
-		//for (const Cell& cell : path)
-		//{
-		//	cout << "(" << cell.index.y << ", " << cell.index.x << ") ";
-		//}
-		//cout << endl;
+		for (const Cell& cell : path)
+		{
+			cout << cell.index.y << ", " << cell.index.x << endl;
+		}
+		cout << endl;
 	}
 
 	//void Map::Service::resetPathfindComp(Pathfinding::Path& path)
