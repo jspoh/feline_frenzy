@@ -88,8 +88,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -640.0,
-                                    "y": -384.0
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

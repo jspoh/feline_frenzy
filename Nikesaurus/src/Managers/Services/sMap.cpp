@@ -28,18 +28,21 @@ namespace NIKE {
 		grid_scale = { grid_size.x * cell_size.x, grid_size.y * cell_size.y };
 
 		//Update cells with correct position
-		float top = -(grid_scale.y / 2.0f);
+		float top = (grid_scale.y / 2.0f);
 		for (int i = 0; i < grid_size.y; ++i) {
 			float left = -(grid_scale.x / 2.0f);
 			for (int j = 0; j < grid_size.x; ++j) {
-				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top + (cell_size.y / 2.0f) };
-				if (getCellIndexFromCords(grid.at(i).at(j).position).has_value())
-				{
-					grid.at(i).at(j).index = getCellIndexFromCords(grid.at(i).at(j).position).value();
-				}
+				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top - (cell_size.y / 2.0f) };
+
+				grid.at(i).at(j).index = { j, i };
+
+				//if (getCellIndexFromCords(grid.at(i).at(j).position).has_value())
+				//{
+				//	grid.at(i).at(j).index = getCellIndexFromCords(grid.at(i).at(j).position).value();
+				//}
 				left += cell_size.x;
 			}
-			top += cell_size.y;
+			top -= cell_size.y;
 		}
 	}
 
@@ -112,13 +115,17 @@ namespace NIKE {
 
 	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCursorCell() {
 
-		Vector2f translated_cursor { cursor_pos.x + (grid_scale.x / 2.0f), cursor_pos.y + (grid_scale.y / 2.0f) };
+		Vector2f translated_cursor { cursor_pos.x + (grid_scale.x / 2.0f), -cursor_pos.y + (grid_scale.y / 2.0f) };
+
+		//cout << grid.at(0).at(7).position.x << " " << grid.at(0).at(0).position.y << endl;
+
+		grid.at(0).at(0).b_blocked = true;
 
 		//Get index for cell
 		Vector2i cell_index{ static_cast<int>(translated_cursor.x / cell_size.x), static_cast<int>(translated_cursor.y / cell_size.y) };
 
-		//Check if index is valid
-		if (cell_index.x < 0 || cell_index.x >= grid_size.x || cell_index.y < 0 || cell_index.y >= grid_size.y) {
+		//Check if index is valid & if translated cursor is positive
+		if (translated_cursor.x < 0 || translated_cursor.y < 0 || cell_index.x < 0 || cell_index.x >= grid_size.x || cell_index.y < 0 || cell_index.y >= grid_size.y) {
 			return std::nullopt;
 		}
 		else {
@@ -129,7 +136,7 @@ namespace NIKE {
 	std::optional<std::reference_wrapper<Map::Cell>> Map::Service::getCellAtPosition(Vector2f const& position) {
 
 		//Translate position
-		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), position.y + (grid_scale.y / 2.0f) };
+		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), -position.y + (grid_scale.y / 2.0f) };
 
 		//Get index for cell
 		Vector2i cell_index{ static_cast<int>(translated_pos.x / cell_size.x), static_cast<int>(translated_pos.y / cell_size.y) };
@@ -146,7 +153,7 @@ namespace NIKE {
 	std::optional<Vector2i> Map::Service::getCellIndexFromCords(Vector2f const& position)
 	{
 		//Translate position
-		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), position.y + (grid_scale.y / 2.0f) };
+		Vector2f translated_pos{ position.x + (grid_scale.x / 2.0f), -position.y + (grid_scale.y / 2.0f) };
 
 		//Get index for cell
 		Vector2i cell_index{ static_cast<int>(translated_pos.x / cell_size.x), static_cast<int>(translated_pos.y / cell_size.y) };
@@ -298,11 +305,11 @@ namespace NIKE {
 	// TO BE DELETED
 	void Map::Service::PrintPath(const std::vector<Cell>& path)
 	{
-		for (const Cell& cell : path)
-		{
-			cout << "(" << cell.index.y << ", " << cell.index.x << ") ";
-		}
-		cout << endl;
+		//for (const Cell& cell : path)
+		//{
+		//	cout << "(" << cell.index.y << ", " << cell.index.x << ") ";
+		//}
+		//cout << endl;
 	}
 
 	//void Map::Service::resetPathfindComp(Pathfinding::Path& path)
