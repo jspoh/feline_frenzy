@@ -109,8 +109,6 @@ namespace NIKE {
 
 			// Debug purposes
 			void PrintPath(const std::vector<Cell>& path);
-
-			//void resetPathfindComp(Pathfinding::Path& path);
 		private:
 
 			//Internal cell pos update

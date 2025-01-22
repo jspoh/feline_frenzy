@@ -357,13 +357,5 @@ namespace NIKE {
 		cout << endl;
 	}
 
-	//void Map::Service::resetPathfindComp(Pathfinding::Path& path)
-	//{
-	//	path.path.clear();
-	//	path.path_found = false;
-	//	path.start_cell = Cell{};
-	//	path.goal_cell = Cell{};
-	//}
-
 }
 
