@@ -18,12 +18,18 @@ namespace NIKE {
 
 		//Data Type
 		struct EntityData {
-			std::string name;
-			std::string type;
-			std::string category;
 
-			EntityData(std::string const& name, std::string const& type, std::string const& category) 
-				: name{ name }, type{ type }, category{ category } {}
+			//Name
+			std::string name;
+
+			//Dynamic tagging
+			std::set<std::string> tags;
+
+			//Boolean for checking if entity is active
+			bool b_isactive;
+
+			EntityData(std::string const& name) 
+				: name{ name }, b_isactive{ true } {}
 		};
 
 		//Meta Data Management
@@ -34,11 +40,11 @@ namespace NIKE {
 			Service(Service const& copy) = delete;
 			void operator=(Service const& copy) = delete;
 
-			//Entity Types
-			std::set<std::string> entity_types;
+			//Entities name
+			std::set<std::string> entity_names;
 
-			//Entity Categories
-			std::set<std::string> entity_categories;
+			//Entity Types
+			std::set<std::string> entity_tags;
 
 			//Sort entities
 			struct EntitySorter {
@@ -62,55 +68,34 @@ namespace NIKE {
 			void init();
 
 			//Check if type is valid
-			bool isTypeValid(std::string const& type);
-
-			//Check if category is valid
-			bool isCategoryValid(std::string const& category);
+			bool isTagValid(std::string const& tag);
 
 			//Add new entity type
-			void addEntityType(std::string const& type);
+			void registerTag(std::string const& tag);
 
 			//Remove entity type
-			void removeEntityType(std::string const& type);
-
-			//Check entity type
-			bool checkEntityType(std::string const& type) const;
+			void unregisterTag(std::string const& tag);
 
 			//Get entity types
-			std::set<std::string> getEntityTypes() const;
-
-			//Add new entity category
-			void addEntityCategory(std::string const& category);
-
-			//Remove entity category
-			void removeEntityCategory(std::string const& category);
-
-			//Check entity category
-			bool checkEntityCategory(std::string const& type) const;
-
-			//Get entity categories
-			std::set<std::string> getEntityCategories() const;
-
-			//Modify Entity Name
-			bool setEntityName(Entity::Type entity, std::string const& name);
-
-			//Modify Entity Type
-			bool setEntityType(Entity::Type entity, std::string const& type);
-
-			//Modify Entity Category
-			bool setEntityCategory(Entity::Type entity, std::string const& category);
+			std::set<std::string> getRegisteredTag() const;
 
 			//Check Entity Name Taken
-			bool isEntityNameTaken(std::string const& name) const;
+			bool isNameValid(std::string const& name) const;
 
-			//Get entity by name
-			std::optional<Entity::Type> getEntityByName(std::string const& name) const;
+			//Set Entity Name
+			bool setEntityName(Entity::Type entity, std::string const& name);
+
+			//Add Entity Tag
+			bool addEntityTag(Entity::Type entity, std::string const& tag);
+
+			//Get Entity Tags
+			std::set<std::string> getEntityTags(Entity::Type entity);
 
 			//Get entities by type
-			std::set<Entity::Type> getEntitiesByType(std::string const& type) const;
+			std::set<Entity::Type> getEntitiesByTag(std::string const& tag) const;
 
-			//Get entities by category
-			std::set<Entity::Type> getEntitiesByCategory(std::string const& category) const;
+			//Set Entity State
+			void setEntityActive(Entity::Type entity, bool b_active);
 
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);

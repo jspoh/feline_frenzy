@@ -47,7 +47,7 @@ namespace NIKE {
 				snprintf(entity_name, sizeof(entity_name), "entity_%04d", index++);
 
 				//Add entity to editor structures
-				entities.emplace(entity, EntityData(entity_name, "", ""));
+				entities.emplace(entity, EntityData(entity_name));
 			}
 		}
 	}
@@ -59,49 +59,29 @@ namespace NIKE {
 		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(metadata_service);
 	}
 
-	bool MetaData::Service::isTypeValid(std::string const& type) {
-		return entity_types.find(type) != entity_types.end();
+	bool MetaData::Service::isTagValid(std::string const& tag) {
+		return entity_tags.find(tag) != entity_tags.end();
 	}
 
-	bool MetaData::Service::isCategoryValid(std::string const& category) {
-		return entity_categories.find(category) != entity_categories.end();
+	void MetaData::Service::registerTag(std::string const& tag) {
+		entity_tags.insert(tag);
 	}
 
-	void MetaData::Service::addEntityType(std::string const& type) {
-		entity_types.insert(type);
+	void MetaData::Service::unregisterTag(std::string const& tag) {
+		entity_tags.erase(tag);
 	}
 
-	void MetaData::Service::removeEntityType(std::string const& type) {
-		entity_types.erase(type);
+	std::set<std::string> MetaData::Service::getRegisteredTag() const {
+		return entity_tags;
 	}
 
-	bool MetaData::Service::checkEntityType(std::string const& type) const {
-		return entity_types.find(type) != entity_types.end();
-	}
-
-	std::set<std::string> MetaData::Service::getEntityTypes() const {
-		return entity_types;
-	}
-
-	void MetaData::Service::addEntityCategory(std::string const& category) {
-		entity_types.insert(category);
-	}
-
-	void MetaData::Service::removeEntityCategory(std::string const& category) {
-		entity_types.erase(category);
-	}
-
-	bool MetaData::Service::checkEntityCategory(std::string const& category) const {
-		return entity_categories.find(category) != entity_categories.end();
-	}
-
-	std::set<std::string> MetaData::Service::getEntityCategories() const {
-		return entity_categories;
+	bool MetaData::Service::isNameValid(std::string const& name) const {
+		return entity_names.find(name) == entity_names.end();
 	}
 
 	bool MetaData::Service::setEntityName(Entity::Type entity, std::string const& name) {
 		//Check if name has been taken
-		if (isEntityNameTaken(name)) {
+		if (!isNameValid(name)) {
 			return false;
 		}
 
@@ -110,75 +90,38 @@ namespace NIKE {
 		return true;
 	}
 
-	bool MetaData::Service::setEntityType(Entity::Type entity, std::string const& type) {
-		//Check if type has been registered with meta data service
-		if (entity_types.find(type) == entity_types.end()) {
+	bool MetaData::Service::addEntityTag(Entity::Type entity, std::string const& tag) {
+		//Check if tag has been registered
+		if (!isTagValid(tag)) {
 			return false;
 		}
 
-		entities.at(entity).type = type;
+		//Set tag
+		entities.at(entity).tags.insert(tag);
 		return true;
 	}
 
-	bool MetaData::Service::setEntityCategory(Entity::Type entity, std::string const& category) {
-		//Check if category has been registered with meta data service
-		if (entity_categories.find(category) == entity_categories.end()) {
-			return false;
-		}
-
-		entities.at(entity).category = category;
-		return true;
+	void MetaData::Service::setEntityActive(Entity::Type entity, bool b_active) {
+		entities.at(entity).b_isactive = b_active;
 	}
 
-	bool MetaData::Service::isEntityNameTaken(std::string const& name) const {
-		//Check if name has been taken
-		for (auto const& entity_data : entities) {
-			if (entity_data.second.name == name) {
-				return false;
-			}
-		}
-
-		return true;
+	std::set<std::string> MetaData::Service::getEntityTags(Entity::Type entity) {
+		return entities.at(entity).tags;
 	}
 
-	std::optional<Entity::Type> MetaData::Service::getEntityByName(std::string const& name) const {
-		//Check if name has been taken
-		for (auto const& entity_data : entities) {
-			if (entity_data.second.name == name) {
-				return std::make_optional<Entity::Type>(entity_data.first);
-			}
-		}
-
-		return std::nullopt;
-	}
-
-	std::set<Entity::Type> MetaData::Service::getEntitiesByType(std::string const& type) const {
+	std::set<Entity::Type> MetaData::Service::getEntitiesByTag(std::string const& tag) const {
 
 		//Set of entity
 		std::set<Entity::Type> type_entities;
 
-		//Check if name has been taken
+		//Check if tag is present within entity
 		for (auto const& entity_data : entities) {
-			if (entity_data.second.type == type) {
+			if (entity_data.second.tags.find(tag) != entity_data.second.tags.end()) {
 				type_entities.insert(entity_data.first);
 			}
 		}
 
 		return type_entities;
-	}
-
-	std::set<Entity::Type> MetaData::Service::getEntitiesByCategory(std::string const& category) const {
-		//Set of entity
-		std::set<Entity::Type> category_entities;
-
-		//Check if name has been taken
-		for (auto const& entity_data : entities) {
-			if (entity_data.second.category == category) {
-				category_entities.insert(entity_data.first);
-			}
-		}
-
-		return category_entities;
 	}
 
 	void MetaData::Service::cloneEntityData(Entity::Type entity, Entity::Type clone) {
@@ -189,8 +132,8 @@ namespace NIKE {
 		}
 
 		//Update with cloned meta data
-		entities.at(entity).type = it_clone->second.type;
-		entities.at(entity).category = it_clone->second.category;
+		entities.at(entity).tags = it_clone->second.tags;
+		entities.at(entity).b_isactive = it_clone->second.b_isactive;
 	}
 
 	MetaData::EntityData& MetaData::Service::getEntityData(Entity::Type entity) {
