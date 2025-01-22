@@ -5605,18 +5605,18 @@ namespace NIKE {
 			Vector2f render_pos;
 			if (tile_map_panel.lock()->checkGridSnapping()) {
 				//Get snapped to cell position
-				auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(Vector2f(world_mouse_pos.x, -world_mouse_pos.y));
+				auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(Vector2f(world_mouse_pos.x, world_mouse_pos.y));
 				if (cursor_cell.has_value()) {
 
 					//Snap to cell
 					render_pos = cursor_cell.value().get().position;
 				}
 				else {
-					render_pos = { world_mouse_pos.x, -world_mouse_pos.y };
+					render_pos = { world_mouse_pos.x, world_mouse_pos.y };
 				}
 			}
 			else {
-				render_pos = { world_mouse_pos.x, -world_mouse_pos.y };
+				render_pos = { world_mouse_pos.x, world_mouse_pos.y };
 			}
 
 			//Texture file payload
@@ -5736,7 +5736,7 @@ namespace NIKE {
 					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 					//Add transform
-					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(Vector2f(local_world_mouse_pos.x, -local_world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(Vector2f(local_world_mouse_pos.x, local_world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
 
 					//Add texture
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(*entity_id, Render::Text(asset_id, place_holder, color, 1.0f));
