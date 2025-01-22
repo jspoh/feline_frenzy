@@ -44,10 +44,10 @@ namespace NIKE {
         }
 
         void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {
-            auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
-            auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
-            auto attacker_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(attacker);
-            auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
+            const auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
+            const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
+            const auto attacker_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(attacker);
+            const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
             if (!(attacker_damage_comp && target_health_comp)) {
@@ -67,8 +67,8 @@ namespace NIKE {
 
             // Apply elemental damage multiplier
             if (attacker_element_comp && target_element_comp) {
-                auto attacker_element = attacker_element_comp.value().get().element;
-                auto target_element = target_element_comp.value().get().element;
+                const auto attacker_element = attacker_element_comp.value().get().element;
+                const auto target_element = target_element_comp.value().get().element;
 
                 multiplier = getElementMultiplier(attacker_element, target_element);
             }
@@ -80,8 +80,17 @@ namespace NIKE {
 
             // Check if target health drops to zero or below
             if (target_health.health <= 0) {
-                NIKE_ECS_MANAGER->markEntityForDeletion(target);
-                NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
+                if (target_health.lives <= 1) {
+                    // Target only has 1 life left
+                    NIKE_ECS_MANAGER->markEntityForDeletion(target);
+                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
+                }
+                else {
+                    // Target has more than 1 life
+                    --target_health.lives;
+                    target_health.health = 100;
+                    NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+                }
             }
         }
 
