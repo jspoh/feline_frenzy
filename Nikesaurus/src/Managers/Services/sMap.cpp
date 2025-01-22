@@ -221,7 +221,7 @@ namespace NIKE {
 		// Add blocked cells to the closed list
 		for (int y = 0; y < grid_size.y; ++y) {
 			for (int x = 0; x < grid_size.x; ++x) {
-				if (isCellBlocked(x,y)) {
+				if (isCellBlocked(x, y)) {
 					closed_list.insert({ x, y });
 				}
 			}
@@ -301,8 +301,39 @@ namespace NIKE {
 			}
 		}
 
-		// Return empty path if no path found
-		return std::vector<Cell>();
+		// If no path found, return shortest path exists
+		std::vector<Cell> shortest_path;
+
+		// Default max value
+		int shortest_f = INT_MAX;
+
+		// Check for shortest path from closed list
+		for (const auto& cell : closed_list) {
+			Cell& current = grid[cell.y][cell.x];
+			if (current.f < shortest_f) {
+				shortest_f = current.f;
+				shortest_path = { current };
+			}
+		}
+
+		// Trace back the shortest path if available
+		if (!shortest_path.empty()) {
+			Vector2i trace = shortest_path.front().index;
+			while (trace != start.index) {
+				if (trace.x >= 0 && trace.x < grid_size.x && trace.y >= 0 && trace.y < grid_size.y) {
+					shortest_path.push_back(grid[trace.y][trace.x]);
+					trace = grid[trace.y][trace.x].parent;
+				}
+				else {
+					// Avoid out-of-bounds access (if not will be thrown)
+					break; 
+				}
+			}
+			std::reverse(shortest_path.begin(), shortest_path.end());
+		}
+
+		return shortest_path;
+		
 	}
 
 
@@ -321,7 +352,7 @@ namespace NIKE {
 	{
 		for (const Cell& cell : path)
 		{
-			cout << cell.index.y << ", " << cell.index.x << endl;
+			cout << "( " << cell.index.y << ", " << cell.index.x << " )";
 		}
 		cout << endl;
 	}
