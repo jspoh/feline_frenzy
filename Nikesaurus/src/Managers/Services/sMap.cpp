@@ -117,10 +117,6 @@ namespace NIKE {
 
 		Vector2f translated_cursor { cursor_pos.x + (grid_scale.x / 2.0f), -cursor_pos.y + (grid_scale.y / 2.0f) };
 
-		//cout << grid.at(0).at(7).position.x << " " << grid.at(0).at(0).position.y << endl;
-
-		grid.at(0).at(0).b_blocked = true;
-
 		//Get index for cell
 		Vector2i cell_index{ static_cast<int>(translated_cursor.x / cell_size.x), static_cast<int>(translated_cursor.y / cell_size.y) };
 
