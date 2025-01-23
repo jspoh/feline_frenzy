@@ -218,7 +218,7 @@ namespace NIKE {
 
 #ifndef NDEBUG
 		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init();
+		NIKE_LVLEDITOR_SERVICE->init(json_config);
 #endif
 
 		//Register Def Components
@@ -254,48 +254,46 @@ namespace NIKE {
 				//Poll system events
 				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
+				//Clear buffer
+				NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
 
+				//Update all audio pending actions
+				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
-					//Clear buffer
-					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+				//Update scenes manager
+				NIKE_SCENES_SERVICE->update();
 
-					//Update all audio pending actions
-					NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+				//Escape Key
+				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				}
 
-					//Update scenes manager
-					NIKE_SCENES_SERVICE->update();
+				//Toggle full screen
+				if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+				}
 
-					//Escape Key
-					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-						NIKE_WINDOWS_SERVICE->getWindow()->terminate();
-					}
-
-					//Toggle full screen
-					if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
-						NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
-					}
-
-					//Update all systems
-					NIKE_ECS_MANAGER->updateSystems();
+				//Update all systems
+				NIKE_ECS_MANAGER->updateSystems();
 
 #ifndef NDEBUG
-					//Update Level Editor
-					NIKE_LVLEDITOR_SERVICE->update();
+				//Update Level Editor
+				NIKE_LVLEDITOR_SERVICE->update();
 
-					//Render Level Editor
-					NIKE_LVLEDITOR_SERVICE->render();
+				//Render Level Editor
+				NIKE_LVLEDITOR_SERVICE->render();
 
-					//update UI First
-					NIKE_UI_SERVICE->update();
+				//update UI First
+				NIKE_UI_SERVICE->update();
 #endif
 
-					//Swap Buffers
-					NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+				//Swap Buffers
+				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
-					GLenum err = glGetError();
-					if (err != GL_NO_ERROR) {
-						NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
-					}
+				GLenum err = glGetError();
+				if (err != GL_NO_ERROR) {
+					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+				}
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);

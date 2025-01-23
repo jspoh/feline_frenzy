@@ -157,6 +157,9 @@ namespace NIKE {
 			//Public get gizmo state
 			bool getGizmoState() const;
 
+			//Deserialize config
+			void deserializeConfig(nlohmann::json const& config);
+
 			//Init
 			void init() override;
 
@@ -729,9 +732,6 @@ namespace NIKE {
 		//Camera Management Panel
 		class CameraPanel : public IPanel {
 		private:
-			//List of camera entities
-			std::unordered_map<Entity::Type, std::string> cam_entities;
-
 			//Entities panel for string reference
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
@@ -741,10 +741,14 @@ namespace NIKE {
 			//Combo index for selecting camera
 			int combo_index;
 
+			int last_dispatched_index;
+
 			//Free camera
 			std::shared_ptr<Render::Cam> free_cam;
+
+
 		public:
-			CameraPanel() : combo_index{ 0 } {}
+			CameraPanel() : combo_index{ 0 }, last_dispatched_index {0} {}
 			~CameraPanel() = default;
 
 			//Panel Name
@@ -759,6 +763,8 @@ namespace NIKE {
 
 			//Camera change action
 			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
+
+			void dispatchCameraChange(Entity::Type cam, const std::string& name);
 
 			//Init
 			void init() override;

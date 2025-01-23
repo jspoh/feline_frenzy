@@ -1,6 +1,6 @@
 /*****************************************************************//**
- * \file   sysCamera.cpp
- * \brief  Implementation of camera system
+ * \file   sCamera.cpp
+ * \brief  Implementation of camera service
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
  * \date   September 2024
@@ -28,7 +28,6 @@ namespace NIKE {
 	}
 
 	void Camera::Service::init(nlohmann::json const& config) {
-		// !TODO set height as a constant from the config
 		float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
 
 		up = Vector2(-sin(angleDisp), cos(angleDisp));
@@ -56,6 +55,14 @@ namespace NIKE {
 
 	Entity::Type Camera::Service::getCamId() const {
 		return cam_id;
+	}
+
+	std::string Camera::Service::getActiveCamName() const{
+		return cam_name;
+	}
+
+	void Camera::Service::setActiveCamName(std::string active_cam) {
+		cam_name = active_cam;
 	}
 
 	Matrix_33 Camera::Service::getWorldToNDCXform() const
@@ -145,13 +152,13 @@ namespace NIKE {
 		Render::Cam cam;
 		//Check if camera entity exists
 		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
+		//Check if camera attached to entity has a transform
+		auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id);
 		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value()) {
 
-			//Check if camera attached to entity has a transform
-			auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id);
-
 			//Apply transformation to camera position
-			if (e_transform_comp.has_value()) e_cam_comp.value().get().position = e_transform_comp.value().get().position;
+			if (e_transform_comp.has_value()) 
+				e_cam_comp.value().get().position = e_transform_comp.value().get().position;
 
 			//Set camera value
 			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).value();
@@ -169,5 +176,32 @@ namespace NIKE {
 
 	float Camera::Service::getCameraHeight() const {
 		return cam_height;
+	}
+
+	const std::unordered_map<Entity::Type, std::string>& Camera::Service::getCameraEntities() const {
+		return cam_entities;
+	}
+
+	void Camera::Service::clearCameraEntities() {
+		cam_entities.clear();
+	}
+
+	void  Camera::Service::emplaceCameraEntity(Entity::Type entity, const std::string& name) {
+		cam_entities.emplace(entity, name);  // This will add the entity or update its name if it already exists
+	}
+
+
+	nlohmann::json Camera::Service::serializeCamera() const{
+		nlohmann::json camera_data;
+
+		camera_data["Active Cam ID"] = getActiveCamName();
+
+		return camera_data;
+	}
+
+	void Camera::Service::deserializeCamera(nlohmann::json const& data) {
+
+		setActiveCamName(data["Active Cam ID"].get<std::string>());
+
 	}
 }

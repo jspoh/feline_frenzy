@@ -87,6 +87,9 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->setActiveCamName("Free Cam");
+
 		//Clear layers
 		layers.clear();
 
