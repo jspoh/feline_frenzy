@@ -64,7 +64,10 @@ namespace NIKE {
 			bool operator>(Cell const& other) const;
 		};
 
-		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
+		class NIKE_API Service 
+			:	public Events::IEventListener<Input::MouseMovedEvent>,
+				public Events::IEventListener<Coordinator::EntitiesChanged>
+		{
 		public:
 			Service();
 			~Service() = default;
@@ -115,17 +118,29 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 
 			// Pathfinding
-			std::vector<Cell> findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal = false);
+			void findPath(Entity::Type entity, Vector2i const& start, Vector2i const& goal, bool b_diagonal = false);
+
+			// Get entity path
+			std::deque<Cell>& getPath(Entity::Type entity);
+
+			//Check entity path
+			bool checkPath(Entity::Type entity) const;
 
 			// Debug purposes
 			void printPath(const std::vector<Cell>& path);
 		private:
+
+			//On entities changed event
+			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 
 			//Internal cell pos update
 			void updateCells();
 
 			//On mouse move event
 			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
+
+			//Pathfinding paths
+			std::unordered_map<Entity::Type, std::deque<Cell>> paths;
 
 			//Grid vector
 			std::vector<std::vector<Cell>> grid;

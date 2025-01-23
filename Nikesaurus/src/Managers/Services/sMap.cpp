@@ -23,6 +23,20 @@ namespace NIKE {
 		updateCells();
 	}
 
+
+	void Map::Service::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
+
+		//Update entity paths
+		for (auto it = paths.begin(); it != paths.end();) {
+			if (event->entities.find(it->first) == event->entities.end()) {
+				it = paths.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+	}
+
 	void Map::Service::updateCells() {
 
 		grid_scale = { grid_size.x * cell_size.x, grid_size.y * cell_size.y };
@@ -33,13 +47,7 @@ namespace NIKE {
 			float left = -(grid_scale.x / 2.0f);
 			for (int j = 0; j < grid_size.x; ++j) {
 				grid.at(i).at(j).position = { left + (cell_size.x / 2.0f), top - (cell_size.y / 2.0f) };
-
 				grid.at(i).at(j).index = { j, i };
-
-				//if (getCellIndexFromCords(grid.at(i).at(j).position).has_value())
-				//{
-				//	grid.at(i).at(j).index = getCellIndexFromCords(grid.at(i).at(j).position).value();
-				//}
 				left += cell_size.x;
 			}
 			top -= cell_size.y;
@@ -313,11 +321,7 @@ namespace NIKE {
 	//	
 	//}
 
-	
-	/************************
-	* AH HO VERSION
-	***********************/
-	std::vector<Map::Cell> Map::Service::findPath(const Vector2i& start, const Vector2i& goal, [[maybe_unused]] bool b_diagonal) {
+	void Map::Service::findPath(Entity::Type entity, const Vector2i& start, const Vector2i& goal, bool b_diagonal) {
 
 		//Custom comparator
 		struct CostComparator {
@@ -445,13 +449,27 @@ namespace NIKE {
 		}
 
 		//Trace back path
-		std::vector<Cell> path;
+		std::deque<Cell> path;
 		while (head->index != start) {
-			path.push_back(grid.at(head->index.y).at(head->index.x));
+			path.push_front(grid.at(head->index.y).at(head->index.x));
 			head = grid.at(head->index.y).at(head->index.x).parent;
 		}
-		std::reverse(path.begin(), path.end());
-		return path;
+
+		//Update entity path
+		paths[entity] = path;
+	}
+
+	std::deque<Map::Cell>& Map::Service::getPath(Entity::Type entity) {
+		if (paths.find(entity) != paths.end()) {
+			return paths.at(entity);
+		}
+
+		throw std::runtime_error("Path for entity does not exist. Unable to retrieve path");
+	}
+
+	bool Map::Service::checkPath(Entity::Type entity) const {
+
+		return paths.find(entity) != paths.end();
 	}
 
 	bool Map::Cell::operator<(Map::Cell const& other) const {
