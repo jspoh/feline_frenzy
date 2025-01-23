@@ -239,7 +239,7 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "path_test.scn"));
 
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 			try {

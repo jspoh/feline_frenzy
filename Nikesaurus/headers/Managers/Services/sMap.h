@@ -27,7 +27,7 @@ namespace NIKE {
 			Vector2f position;
 			Vector2i index;
 
-			Vector2i parent;
+			Cell* parent;
 
 			// Values used by the A* algorithm
 			/////////////////////////////////////////////////////////////////////////////////
@@ -37,21 +37,27 @@ namespace NIKE {
 			/////////////////////////////////////////////////////////////////////////////////
 			int f, g, h;
 
-			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{_x, _y}, parent{ -1, -1 }, f{0}, g{0}, h{0}
+			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{_x, _y}, f{0}, g{0}, h{0}
 			{
 			}
 
-			Cell(Vector2i input) : b_blocked{ false }, position{}, index{ input.x, input.y }, parent{ -1, -1 }, f{ 0 }, g{ 0 }, h{ 0 }
+			Cell(Vector2i input) : b_blocked{ false }, position{}, index{ input.x, input.y }, f{ 0 }, g{ 0 }, h{ 0 }
 			{
 			}
 
-			Cell() : b_blocked{ false }, position{}, index{}, parent{ -1, -1 }, f{ 0 }, g{ 0 }, h{ 0 }
+			Cell() : b_blocked{ false }, position{}, index{}, f{ 0 }, g{ 0 }, h{ 0 }
 			{
 			}
 
-			// Overload comparison operators for priority queue
-			bool operator>(const Cell& other) const;
-			bool operator==(const Cell& other) const;
+			//// Overload comparison operators for priority queue
+			//bool operator>(const Cell& other) const;
+			//bool operator==(const Cell& other) const;
+
+			//Lesser Than Comparison
+			bool operator<(Cell const& other) const;
+
+			//Greater Than Comparison
+			bool operator>(Cell const& other) const;
 		};
 
 		class NIKE_API Service : public Events::IEventListener<Input::MouseMovedEvent> {
@@ -105,7 +111,7 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 
 			// Pathfinding
-			std::vector<Cell> findPath(Cell const& start, Cell const& goal);
+			std::vector<Cell> findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal = true);
 
 			// Debug purposes
 			void PrintPath(const std::vector<Cell>& path);
