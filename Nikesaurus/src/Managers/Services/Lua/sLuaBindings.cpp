@@ -554,33 +554,45 @@ namespace NIKE {
             auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (transform.has_value()) {
 
+                //Entity transform
+                auto const& e_transform = transform.value().get();
+
                 //Get index of entity as the starting position
-                auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(transform.value().get().position);
+                auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(e_transform.position);
 
                 //Get cell to travel to
-                if (start) {
+                if (start.has_value()) {
 
-                    //Get subsequent cells
-                    auto cells = NIKE_MAP_SERVICE->findPath(start.value(), Vector2i(x_index, y_index));
-                    // NIKE_MAP_SERVICE->PrintPath(cells);
+                    //Check if current cell is the same as goal
+                    if (start.value() == Vector2i(x_index, y_index))  return;
 
-                    //Check if there are cells to go to
-                    if (!cells.empty()) {
+                    //Check if path has been generated or if destination cell has changed
+                    if (!NIKE_MAP_SERVICE->checkPath(entity) || (!NIKE_MAP_SERVICE->getPath(entity).empty() && NIKE_MAP_SERVICE->getPath(entity).back().index != Vector2i(x_index, y_index))) {
+                        NIKE_MAP_SERVICE->findPath(entity, start.value(), Vector2i(x_index, y_index));
+                    }
+
+                    //Get path 
+                    auto& path = NIKE_MAP_SERVICE->getPath(entity);
+
+                    //Check if there are cells left in path
+                    if (!path.empty()) {
 
                         //Get next cell
-                        auto const& next_cell = cells.front();
+                        auto const& next_cell = path.front();
 
-                        //Check if cell has been reached
-                        if (next_cell.index != start) {
-
+                        //Check if entity has arrived near destination
+                        if ((next_cell.position - e_transform.position).length() > NIKE_MAP_SERVICE->getCellSize().x / 2.0f) {
                             //Direction of next cell
-                            float dir = atan2((next_cell.position.y - start.value().y), (next_cell.position.x - start.value().x));
+                            float dir = atan2((next_cell.position.y - transform.value().get().position.y), (next_cell.position.x - transform.value().get().position.x));
 
                             //Apply force to entity
                             auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
                             if (dynamics.has_value()) {
                                 dynamics.value().get().force = { cos(dir) * speed, sin(dir) * speed };
                             }
+                        }
+                        else {
+                            path.pop_front();
                         }
                     }
                 }

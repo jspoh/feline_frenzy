@@ -4730,6 +4730,10 @@ namespace NIKE {
 			//Set cell to blocked
 			auto& cell = wrapped_cell.value().get();
 			cell.b_blocked = !cell.b_blocked;
+
+			cout << cell.index.x << " " << cell.index.y << endl;
+
+			cout << cell.position.x << " " << cell.position.y << endl;
 		}
 	}
 
