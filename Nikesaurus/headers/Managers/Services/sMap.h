@@ -4,7 +4,7 @@
  *
  * \author Bryan Soh, 2301238, z.soh@digipen.edu (100%)
  * \date   November 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #pragma once
 
@@ -115,7 +115,7 @@ namespace NIKE {
 			void deserialize(nlohmann::json const& data);
 
 			// Pathfinding
-			std::vector<Cell> findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal = true);
+			std::vector<Cell> findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal = false);
 
 			// Debug purposes
 			void printPath(const std::vector<Cell>& path);

@@ -317,7 +317,7 @@ namespace NIKE {
 	/************************
 	* AH HO VERSION
 	***********************/
-	std::vector<Map::Cell> Map::Service::findPath(const Vector2i& start, const Vector2i& goal, bool b_diagonal) {
+	std::vector<Map::Cell> Map::Service::findPath(const Vector2i& start, const Vector2i& goal, [[maybe_unused]] bool b_diagonal) {
 
 		//Custom comparator
 		struct CostComparator {
@@ -375,7 +375,7 @@ namespace NIKE {
 		//Calculate h for all cells
 		for (size_t i{ 0 }; i < grid.size(); i++) {
 			for (size_t j{ 0 }; j < grid.at(i).size(); j++) {
-				grid.at(i).at(j).h = h_calculator(Vector2i(j, i), goal);
+				grid.at(i).at(j).h = h_calculator(Vector2i(static_cast<int>(j), static_cast<int>(i)), goal);
 				grid.at(i).at(j).g = 0;
 				grid.at(i).at(j).f = 0;
 				grid.at(i).at(j).parent = nullptr;
@@ -468,10 +468,10 @@ namespace NIKE {
 	//	return f > other.f;
 	//}
 
-	bool Map::Cell::operator==(const Cell& other) const
-	{
-		return index.x == other.index.x && index.y == other.index.y;
-	}
+	//bool Map::Cell::operator==(const Cell& other) const
+	//{
+	//	return index.x == other.index.x && index.y == other.index.y;
+	//}
 
 	//// TO BE DELETED
 	//void Map::Service::printPath(const std::vector<Cell>& path)
@@ -482,7 +482,6 @@ namespace NIKE {
 	//	}
 	//	cout << endl;
 	//}
-
 
 }
 
