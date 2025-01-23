@@ -558,11 +558,10 @@ namespace NIKE {
                 auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(transform.value().get().position);
 
                 //Get cell to travel to
-                if (start) {
+                if (start.has_value()) {
 
                     //Get subsequent cells
                     auto cells = NIKE_MAP_SERVICE->findPath(start.value(), Vector2i(x_index, y_index));
-                    // NIKE_MAP_SERVICE->PrintPath(cells);
 
                     //Check if there are cells to go to
                     if (!cells.empty()) {
@@ -571,10 +570,10 @@ namespace NIKE {
                         auto const& next_cell = cells.front();
 
                         //Check if cell has been reached
-                        if (next_cell.index != start) {
+                        if (next_cell.index != start.value()) {
 
                             //Direction of next cell
-                            float dir = atan2((next_cell.position.y - start.value().y), (next_cell.position.x - start.value().x));
+                            float dir = atan2((next_cell.position.y - transform.value().get().position.y), (next_cell.position.x - transform.value().get().position.x));
 
                             //Apply force to entity
                             auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
