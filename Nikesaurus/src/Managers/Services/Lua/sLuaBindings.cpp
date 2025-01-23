@@ -562,7 +562,6 @@ namespace NIKE {
 
                     //Get subsequent cells
                     auto cells = NIKE_MAP_SERVICE->findPath(start.value(), Vector2i(x_index, y_index));
-                    NIKE_MAP_SERVICE->printPath(cells);
 
                     //Check if there are cells to go to
                     if (!cells.empty()) {

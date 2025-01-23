@@ -468,10 +468,10 @@ namespace NIKE {
 	//	return f > other.f;
 	//}
 
-	bool Map::Cell::operator==(const Cell& other) const
-	{
-		return index.x == other.index.x && index.y == other.index.y;
-	}
+	//bool Map::Cell::operator==(const Cell& other) const
+	//{
+	//	return index.x == other.index.x && index.y == other.index.y;
+	//}
 
 	//// TO BE DELETED
 	//void Map::Service::printPath(const std::vector<Cell>& path)
@@ -482,7 +482,6 @@ namespace NIKE {
 	//	}
 	//	cout << endl;
 	//}
-
 
 }
 
