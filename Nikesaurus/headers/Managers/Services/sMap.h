@@ -27,7 +27,11 @@ namespace NIKE {
 			Vector2f position;
 			Vector2i index;
 
-			Cell* parent;
+			// Ah ho uses Cell* as parent
+			// Ah lim uses Vectori as parent
+			//Vector2i parent;
+
+			Cell* parent = nullptr;
 
 			// Values used by the A* algorithm
 			/////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +55,7 @@ namespace NIKE {
 
 			//// Overload comparison operators for priority queue
 			//bool operator>(const Cell& other) const;
-			//bool operator==(const Cell& other) const;
+			bool operator==(const Cell& other) const;
 
 			//Lesser Than Comparison
 			bool operator<(Cell const& other) const;
@@ -114,7 +118,7 @@ namespace NIKE {
 			std::vector<Cell> findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal = true);
 
 			// Debug purposes
-			void PrintPath(const std::vector<Cell>& path);
+			void printPath(const std::vector<Cell>& path);
 		private:
 
 			//Internal cell pos update

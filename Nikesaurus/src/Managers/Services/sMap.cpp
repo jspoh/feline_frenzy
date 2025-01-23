@@ -210,13 +210,26 @@ namespace NIKE {
 		updateCells();
 	}
 
-	//std::vector<Map::Cell> Map::Service::findPath1(const Cell& start, const Cell& goal) {
+	/************************
+	* AH LIM VERSION
+	***********************/
+	//std::vector<Map::Cell> Map::Service::findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal) {
 	//	const int direction_x[] = { -1, 0, 1, 0 };
 	//	const int direction_y[] = { 0, 1, 0, -1 };
 	//	const int total_directions = 4;
 
 	//	std::priority_queue<Cell, std::vector<Cell>, std::greater<Cell>> open_list;
 	//	std::unordered_set<Vector2i, Vector2iHasher> closed_list;
+
+	//	// Initialize cells
+	//	for (int y = 0; y < grid_size.y; ++y) {
+	//		for (int x = 0; x < grid_size.x; ++x) {
+	//			grid[y][x].g = INT_MAX;
+	//			grid[y][x].h = INT_MAX;
+	//			grid[y][x].f = INT_MAX;
+	//			grid[y][x].parent = { -1, -1 };
+	//		}
+	//	}
 
 	//	// Add blocked cells to the closed list
 	//	for (int y = 0; y < grid_size.y; ++y) {
@@ -227,23 +240,17 @@ namespace NIKE {
 	//		}
 	//	}
 
-	//	// Lim's debug
-	//	//if (!debug)
-	//	//{
-	//	//	for (auto& elems : closed_list)
-	//	//	{
-	//	//		cout << elems.y << ", " << elems.x << endl;
-	//	//	}
-	//	//	debug = true;
-	//	//}
-
 
 	//	// Initialize start cell
-	//	Cell start_cell = start;
+	//	Cell& start_cell = grid[start.y][start.x];
+	//	// Initialize start cell
 	//	start_cell.g = 0;
-	//	start_cell.h = abs(start.index.x - goal.index.x) + abs(start.index.y - goal.index.y);
+	//	start_cell.h = abs(start.x - goal.x) + abs(start.y - goal.y);
 	//	start_cell.f = start_cell.g + start_cell.h;
-	//	start_cell.parent = start.index;
+	//	start_cell.parent = start;
+	//	open_list.push(start_cell);
+
+	//	// Start node
 	//	open_list.push(start_cell);
 
 	//	while (!open_list.empty()) {
@@ -251,20 +258,22 @@ namespace NIKE {
 	//		Cell current = open_list.top();
 	//		open_list.pop();
 
-	//		// Move the current cell to the closed list
+	//		// Mark the current cell as closed
 	//		closed_list.insert(current.index);
 
-	//		if (current.index == goal.index) {
+	//		if (current.index == goal) {
 	//			std::vector<Cell> path;
-	//			Vector2i trace = goal.index;
-	//			while (trace != start.index) {
+	//			Vector2i trace = current.index;
+	//			while (trace != start) {
 	//				path.push_back(grid[trace.y][trace.x]);
 	//				trace = grid[trace.y][trace.x].parent;
 	//			}
-	//			path.push_back(start);
+	//			//path.push_back(grid[start.y][start.x]);
 	//			std::reverse(path.begin(), path.end());
 	//			return path;
 	//		}
+
+
 
 	//		// Check neighbors
 	//		for (int i = 0; i < total_directions; ++i) {
@@ -280,62 +289,34 @@ namespace NIKE {
 	//				continue;
 	//			}
 
-	//			std::unordered_set<Vector2i, Vector2iHasher> in_open_list;
 
 	//			Cell& neighbor = grid[new_y][new_x];
 	//			int new_g = current.g + 1;
-
-	//			if (neighbor.parent.x == -1 && neighbor.parent.y == -1 || new_g < neighbor.g) {
+	//			if (new_g < neighbor.g) {
 	//				neighbor.g = new_g;
-	//				neighbor.h = abs(new_x - goal.index.x) + abs(new_y - goal.index.y);
+	//				neighbor.h = abs(new_x - goal.x) + abs(new_y - goal.y);
 	//				neighbor.f = neighbor.g + neighbor.h;
 	//				neighbor.parent = current.index;
 
 	//				// Only push to the open list if not already in it
-	//				if (!in_open_list.count(neighbor.index)) {
+	//				if (closed_list.count(neighbor.index) == 0) {
 	//					open_list.push(neighbor);
-	//					in_open_list.insert(neighbor.index);
 	//				}
-	//			}
 
+	//			}
 	//		}
 	//	}
 
-	//	// If no path found, return shortest path exists
-	//	std::vector<Cell> shortest_path;
-
-	//	// Default max value
-	//	int shortest_f = INT_MAX;
-
-	//	// Check for shortest path from closed list
-	//	for (const auto& cell : closed_list) {
-	//		Cell& current = grid[cell.y][cell.x];
-	//		if (current.f < shortest_f) {
-	//			shortest_f = current.f;
-	//			shortest_path = { current };
-	//		}
-	//	}
-
-	//	// Trace back the shortest path if available
-	//	if (!shortest_path.empty()) {
-	//		Vector2i trace = shortest_path.front().index;
-	//		while (trace != start.index) {
-	//			if (trace.x >= 0 && trace.x < grid_size.x && trace.y >= 0 && trace.y < grid_size.y) {
-	//				shortest_path.push_back(grid[trace.y][trace.x]);
-	//				trace = grid[trace.y][trace.x].parent;
-	//			}
-	//			else {
-	//				// Avoid out-of-bounds access (if not will be thrown)
-	//				break; 
-	//			}
-	//		}
-	//		std::reverse(shortest_path.begin(), shortest_path.end());
-	//	}
-
-	//	return shortest_path;
+	//		// Return empty path when no path found
+	//		return {};
+	//	
 	//	
 	//}
 
+	
+	/************************
+	* AH HO VERSION
+	***********************/
 	std::vector<Map::Cell> Map::Service::findPath(const Vector2i& start, const Vector2i& goal, bool b_diagonal) {
 
 		//Custom comparator
@@ -487,13 +468,13 @@ namespace NIKE {
 	//	return f > other.f;
 	//}
 
-	//bool Map::Cell::operator==(const Cell& other) const
-	//{
-	//	return index.x == other.index.x && index.y == other.index.y;
-	//}
+	bool Map::Cell::operator==(const Cell& other) const
+	{
+		return index.x == other.index.x && index.y == other.index.y;
+	}
 
 	//// TO BE DELETED
-	//void Map::Service::PrintPath(const std::vector<Cell>& path)
+	//void Map::Service::printPath(const std::vector<Cell>& path)
 	//{
 	//	for (const Cell& cell : path)
 	//	{
@@ -501,6 +482,7 @@ namespace NIKE {
 	//	}
 	//	cout << endl;
 	//}
+
 
 }
 
