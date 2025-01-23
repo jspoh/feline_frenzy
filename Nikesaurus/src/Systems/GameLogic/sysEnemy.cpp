@@ -42,27 +42,27 @@ namespace NIKE {
 
 					// Check for pathfinding comp
 					if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity)) {
-						auto e_enemy_pathfind = NIKE_ECS_MANAGER->getEntityComponent<Pathfinding::Path>(entity);
-						auto& enemy_pathfind = e_enemy_pathfind.value().get();
+						//auto e_enemy_pathfind = NIKE_ECS_MANAGER->getEntityComponent<Pathfinding::Path>(entity);
+						//auto& enemy_pathfind = e_enemy_pathfind.value().get();
 
-						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-						auto& enemy_transform = e_enemy_transform.value().get();
+						//auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+						//auto& enemy_transform = e_enemy_transform.value().get();
 
-						// Init cell
-						// Vector2i start = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value();
-						// Get grid to take ref from cell using the index
-						auto grid = NIKE_MAP_SERVICE->getGrid();
-						// Syntax: grid[y][x]
-						enemy_pathfind.start_cell = grid[2][1];
-						enemy_pathfind.goal_cell = grid[5][5];
-						enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start_cell, enemy_pathfind.goal_cell);
-						enemy_pathfind.path_found = !enemy_pathfind.path.empty();
+						//// Init cell
+						//// Vector2i start = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value();
+						//// Get grid to take ref from cell using the index
+						//auto grid = NIKE_MAP_SERVICE->getGrid();
+						//// Syntax: grid[y][x]
+						//enemy_pathfind.start_cell = grid[2][1];
+						//enemy_pathfind.goal_cell = grid[5][5];
+						//enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start_cell, enemy_pathfind.goal_cell);
+						//enemy_pathfind.path_found = !enemy_pathfind.path.empty();
 
-						if (enemy_pathfind.path_found)
-						{
-							NIKE_MAP_SERVICE->PrintPath(enemy_pathfind.path);
-							moveAlongPath(enemy_pathfind, enemy_transform);
-						}
+						//if (enemy_pathfind.path_found)
+						//{
+						//	NIKE_MAP_SERVICE->PrintPath(enemy_pathfind.path);
+						//	//moveAlongPath(enemy_pathfind, enemy_transform);
+						//}
 
 					}
 

@@ -45,7 +45,7 @@
                                     ],
                                     "Position": {
                                         "x": 384.0,
-                                        "y": 384.0
+                                        "y": -384.0
                                     }
                                 },
                                 "Path": null,
@@ -53,12 +53,12 @@
                                 "StartCell": {
                                     "Blocked": false,
                                     "Index": [
-                                        2,
-                                        1
+                                        1,
+                                        2
                                     ],
                                     "Position": {
-                                        "x": -384.0,
-                                        "y": -640.0
+                                        "x": -640.0,
+                                        "y": 384.0
                                     }
                                 }
                             },
@@ -88,8 +88,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": -640.0,
+                                    "y": -384.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

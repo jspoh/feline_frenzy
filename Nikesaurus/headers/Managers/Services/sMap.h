@@ -37,13 +37,15 @@ namespace NIKE {
 			/////////////////////////////////////////////////////////////////////////////////
 			int f, g, h;
 
-			Cell() = default;
-
 			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{_x, _y}, parent{ -1, -1 }, f{0}, g{0}, h{0}
 			{
 			}
 
 			Cell(Vector2i input) : b_blocked{ false }, position{}, index{ input.x, input.y }, parent{ -1, -1 }, f{ 0 }, g{ 0 }, h{ 0 }
+			{
+			}
+
+			Cell() : b_blocked{ false }, position{}, index{}, parent{ -1, -1 }, f{ 0 }, g{ 0 }, h{ 0 }
 			{
 			}
 
@@ -107,8 +109,6 @@ namespace NIKE {
 
 			// Debug purposes
 			void PrintPath(const std::vector<Cell>& path);
-
-			//void resetPathfindComp(Pathfinding::Path& path);
 		private:
 
 			//Internal cell pos update
@@ -131,6 +131,9 @@ namespace NIKE {
 
 			//Cursor position relative to game window
 			Vector2f cursor_pos;
+
+			// For me - lim
+			bool debug = false;
 		};
 
 		//Re-enable DLL Export warning
