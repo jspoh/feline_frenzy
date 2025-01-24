@@ -548,7 +548,10 @@ namespace NIKE {
             });
 
         //Path finding
-        lua_state.set_function("GoToCell", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+        lua_state.set_function("PathFind", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+
+            //Acceptable offset per cell
+            const float cell_offset = 10.0f;
 
             //Acceptable offset per cell
             const float cell_offset = 10.0f;
