@@ -17,6 +17,11 @@
         "Grid ID": "main_menu.grid"
     },
     {
+        "Camera": {
+            "Active Cam ID": "Free Cam"
+        }
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -134,7 +139,7 @@
                             "Script": {
                                 "Function": "Change",
                                 "Named_Args": {
-                                    "scene": "Demo.scn"
+                                    "scene": "lvl1.scn"
                                 },
                                 "Script_ID": "ChangeScene.lua"
                             }

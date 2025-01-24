@@ -12,7 +12,7 @@ Player = {}
 
 -- Constants
 local PlayerConfig = {
-    forces = { up = 1000, down = -1000, left = -1000, right = 1000 },
+    forces = { up = 3000, down = -3000, left = -3000, right = 3000 },
 }
 
 -- Cheat mode state

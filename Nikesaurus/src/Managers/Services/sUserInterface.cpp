@@ -70,7 +70,7 @@ namespace NIKE {
 
 		//Reset all release events upon new event
 		for (auto& input : input_checks) {
-			input.second.second.released = false;
+			input.second.second.triggered = false;
 		}
 
 		//Handle event states
