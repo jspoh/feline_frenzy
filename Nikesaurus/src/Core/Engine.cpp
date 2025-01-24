@@ -302,6 +302,9 @@ namespace NIKE {
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
 				// update rendered fps
+				static std::unordered_map<std::string, std::shared_ptr<void>> comps;
+				static Render::Text* comp = nullptr;
+
 				if (frame_count == 0) {
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 					FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
@@ -310,20 +313,19 @@ namespace NIKE {
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", ss.str(), { 1.f, 1.f, 1.f, 1.f }, 1.0f));
 					ss.str("");
 					ss.clear();
-					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
-					auto comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+
+					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
+					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					comp->origin = Render::TextOrigin::LEFT;
 				}
 
 				else if (frame_count > 0) {
-					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
-					auto fps_text_comps = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
+					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					ss << "FPS: " << std::round(NIKE_WINDOWS_SERVICE->getCurrentFPS());
-					fps_text_comps->text = ss.str();
+					comp->text = ss.str();
 					ss.str("");
 					ss.clear();
-
-					fps_text_comps = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 				}
 
 				GLenum err = glGetError();
