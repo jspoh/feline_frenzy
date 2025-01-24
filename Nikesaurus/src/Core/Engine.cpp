@@ -250,6 +250,9 @@ namespace NIKE {
 		std::stringstream ss;
 		Entity::Type FPS_DISPLAY;
 		int frame_count = 0;
+		std::vector<float> fps_history;
+		fps_history.reserve(300);		// unlikely to exceed 300fps
+		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 			try {
 
@@ -301,37 +304,49 @@ namespace NIKE {
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
+				GLenum err = glGetError();
+				if (err != GL_NO_ERROR) {
+					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+				}
+
+
 				// update rendered fps
 				static std::unordered_map<std::string, std::shared_ptr<void>> comps;
 				static Render::Text* comp = nullptr;
 
-				if (frame_count == 0) {
+				elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+				if (frame_count > 0) {
+					fps_history.push_back(NIKE_WINDOWS_SERVICE->getCurrentFPS());
+					if (elapsed_time < 1.f) {		// only update fps with average every n second
+						continue;			// CONTINUE CALL HERE. SO IF ANYTHING IS ADDED AFTER THIS, THIS MUST BE EDITED
+					}
+
+					elapsed_time = 0.f;
+					float sum_fps = 0;
+					std::for_each(fps_history.begin(), fps_history.end(), [&sum_fps](float& fps) { sum_fps += fps; });
+					const float avg_fps = sum_fps / fps_history.size();
+					fps_history.clear();
+
+					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
+					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					ss << "FPS: " << std::round(avg_fps);
+					comp->text = ss.str();
+					ss.str("");
+					ss.clear();
+				}
+				else {
+					// initialization of fps text
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 					FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
-					ss << "FPS: " << std::round(NIKE_WINDOWS_SERVICE->getCurrentFPS());
-					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", ss.str(), { 1.f, 1.f, 1.f, 1.f }, 1.0f));
-					ss.str("");
-					ss.clear();
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", "FPS:", {1.f, 1.f, 1.f, 1.f}, 1.0f));
 
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					comp->origin = Render::TextOrigin::LEFT;
 				}
 
-				else if (frame_count > 0) {
-					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
-					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
-					ss << "FPS: " << std::round(NIKE_WINDOWS_SERVICE->getCurrentFPS());
-					comp->text = ss.str();
-					ss.str("");
-					ss.clear();
-				}
-
-				GLenum err = glGetError();
-				if (err != GL_NO_ERROR) {
-					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
-				}
 				frame_count++;
 			}
 			catch (std::runtime_error const& e) {
