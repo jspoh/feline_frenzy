@@ -334,7 +334,7 @@ namespace NIKE {
 					comp->text = ss.str();
 					ss.str("");
 					ss.clear();
-				}	
+				}
 				else {
 					// initialization of fps text
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
@@ -343,7 +343,7 @@ namespace NIKE {
 #ifndef NDEBUG
 					std::shared_ptr<LevelEditor::EntitiesPanel> entities_panel = std::dynamic_pointer_cast<LevelEditor::EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(NIKE::LevelEditor::EntitiesPanel::getStaticName()));
 					if (!entities_panel) {
-						NIKEE_CORE_ERROR("Entities Panel not found for FPS DISPLAY");
+						NIKEE_CORE_ERROR("Entities Panel not found");
 						throw;
 					}
 					auto& entity_map = entities_panel->getEntityMap();
@@ -357,7 +357,9 @@ namespace NIKE {
 #endif
 
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
-					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", {1.f, 1.f, 1.f, 1.f}, 1.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY, { true });
+					NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { true });
 
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
