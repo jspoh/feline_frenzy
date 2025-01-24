@@ -79,9 +79,9 @@ namespace NIKE {
 		Matrix_33RotDeg(rot_mat, obj.rotation);
 		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
 		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-			result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat
-				* (flip.x ? FLIP_X_MAT : Matrix_33::Identity())
-				* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity());
+		result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat
+			* (flip.x ? FLIP_X_MAT : Matrix_33::Identity())
+			* (flip.y ? FLIP_Y_MAT : Matrix_33::Identity());
 
 		// OpenGL requires matrix in col maj so transpose
 		Matrix_33Transpose(x_form, result);
@@ -738,6 +738,10 @@ namespace NIKE {
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
 					continue;
 
+				// skip entity if is hidden
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
+					continue;
+
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 #ifndef NDEBUG
 					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
@@ -758,6 +762,9 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
+				// skip entity if is hidden
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
+					continue;
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
 					transformAndRenderText(entity);
 				}
@@ -788,7 +795,7 @@ namespace NIKE {
 
 		// Specify the texture size
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		
+
 		// Set texture parameters for filtering and wrapping
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

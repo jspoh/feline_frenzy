@@ -120,7 +120,7 @@ namespace NIKE {
 		 */
 		struct BuiltIn {
 			bool b_built_in;
-			BuiltIn() : b_built_in{ false } {}
+			BuiltIn() : b_built_in{ true } {}
 			BuiltIn(bool b_built_in) : b_built_in{ b_built_in } {}
 		};
 
