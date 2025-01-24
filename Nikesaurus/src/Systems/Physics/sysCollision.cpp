@@ -38,6 +38,14 @@ namespace NIKE {
         if (normal_vel < 0.0f) {
             dynamics_a.velocity.x -= 2.0f * normal_vel * collision_normal.x;
             dynamics_a.velocity.y -= 2.0f * normal_vel * collision_normal.y;
+
+            // Add a small nudge to prevent sticking when velocity becomes too small
+            if (std::abs(collision_normal.x) > 0.9f && std::abs(dynamics_a.velocity.x) < EPSILON) {
+                dynamics_a.velocity.x = (collision_normal.x > 0 ? EPSILON : -EPSILON);
+            }
+            if (std::abs(collision_normal.y) > 0.9f && std::abs(dynamics_a.velocity.y) < EPSILON) {
+                dynamics_a.velocity.y = (collision_normal.y > 0 ? EPSILON : -EPSILON);
+            }
         }
 
         // Step 3: Reflect the force of entity A (if forces are used)
@@ -56,8 +64,15 @@ namespace NIKE {
         if (collider_a.resolution != Physics::Resolution::NONE) {
             transform_a.position.x += info.mtv.x;
             transform_a.position.y += info.mtv.y;
+
+            // Step 6: Apply an additional small offset to fully resolve overlap
+            const float small_offset = 0.01f; // Tiny offset to move entity fully out of collision bounds
+            transform_a.position.x += collision_normal.x * small_offset;
+            transform_a.position.y += collision_normal.y * small_offset;
         }
     }
+
+
 
     void Collision::System::setRestitution(float val) {
         restitution = val;
