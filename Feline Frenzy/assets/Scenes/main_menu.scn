@@ -61,7 +61,8 @@
                                 "Scale": {
                                     "x": 1600.0,
                                     "y": 900.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
@@ -109,10 +110,10 @@
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 0.9025271534919739,
+                                "Scale": 0.9025270342826843,
                                 "Size": {
-                                    "x": 250.00003051757813,
-                                    "y": 35.19855880737305
+                                    "x": 249.99996948242188,
+                                    "y": 35.19855499267578
                                 },
                                 "Text": "START GAME"
                             },
@@ -125,7 +126,8 @@
                                 "Scale": {
                                     "x": 500.0,
                                     "y": 90.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -191,7 +193,8 @@
                                 "Scale": {
                                     "x": 574.0999755859375,
                                     "y": 90.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -255,7 +258,8 @@
                                 "Scale": {
                                     "x": 572.6699829101563,
                                     "y": 72.5
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,

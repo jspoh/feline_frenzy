@@ -23,6 +23,7 @@ namespace NIKE {
 			[](Transform const& comp) -> nlohmann::json {
 				return	{
 						{ "Position", comp.position.toJson() },
+						{ "Screen Position", comp.use_screen_pos },
 						{ "Scale", comp.scale.toJson() },
 						{ "Rotation", comp.rotation }
 				};
@@ -33,6 +34,7 @@ namespace NIKE {
 				comp.position.fromJson(data.at("Position"));
 				comp.scale.fromJson(data.at("Scale"));
 				comp.rotation = data.at("Rotation").get<float>();
+				comp.use_screen_pos = data.value("Screen Position", false);
 			}
 		);
 
@@ -87,6 +89,8 @@ namespace NIKE {
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pos));
 					}
+
+					ImGui::Checkbox("Screen Position", &comp.use_screen_pos);
 				}
 
 				//Edit Scale

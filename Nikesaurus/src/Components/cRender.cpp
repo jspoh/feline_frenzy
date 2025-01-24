@@ -20,6 +20,8 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
+		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
 
 		//Register cam for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Cam>(
