@@ -213,8 +213,8 @@ namespace NIKE {
 		if (io.WantCaptureMouse) {
 
 			//Update scroll offset
-			io.MouseWheelH += static_cast<float>(event->offset.x);
-			io.MouseWheel += static_cast<float>(event->offset.y);
+			io.MouseWheelH = static_cast<float>(event->offset.x);
+			io.MouseWheel = static_cast<float>(event->offset.y);
 
 			//Mark event as processed
 			event->setEventProcessed(true);

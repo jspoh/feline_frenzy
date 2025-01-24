@@ -4223,7 +4223,7 @@ namespace NIKE {
 		}
 
 		// Zoom Controls (Scroll To Zoom)
-		if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow()) {
+		if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && ImGui::GetIO().MouseWheel != 0) {
 			active_cam.zoom -= ImGui::GetIO().MouseWheel * ImGui::GetIO().DeltaTime;
 			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
 		}

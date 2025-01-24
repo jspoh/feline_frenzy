@@ -24,6 +24,7 @@ namespace NIKE {
 
 		struct Cell {
 			bool b_blocked;
+			bool b_blocked_prev;
 			Vector2f position;
 			Vector2i index;
 
@@ -41,27 +42,31 @@ namespace NIKE {
 			/////////////////////////////////////////////////////////////////////////////////
 			int f, g, h;
 
-			Cell(int _x, int _y) : b_blocked{ false }, position{}, index{_x, _y}, f{0}, g{0}, h{0}
+			Cell(int _x, int _y) : b_blocked{ false }, b_blocked_prev{ false }, position {}, index{ _x, _y }, f{ 0 }, g{ 0 }, h{ 0 }
 			{
 			}
 
-			Cell(Vector2i input) : b_blocked{ false }, position{}, index{ input.x, input.y }, f{ 0 }, g{ 0 }, h{ 0 }
+			Cell(Vector2i input) : b_blocked{ false }, b_blocked_prev{ false }, position{}, index{ input.x, input.y }, f{ 0 }, g{ 0 }, h{ 0 }
 			{
 			}
 
-			Cell() : b_blocked{ false }, position{}, index{}, f{ 0 }, g{ 0 }, h{ 0 }
+			Cell() : b_blocked{ false }, b_blocked_prev{ false }, position{}, index{}, f{ 0 }, g{ 0 }, h{ 0 }
 			{
 			}
-
-			//// Overload comparison operators for priority queue
-			//bool operator>(const Cell& other) const;
-			bool operator==(const Cell& other) const;
 
 			//Lesser Than Comparison
 			bool operator<(Cell const& other) const;
 
 			//Greater Than Comparison
 			bool operator>(Cell const& other) const;
+		};
+
+		//Path data object
+		struct Path {
+			std::deque<Cell> path;
+			Cell end;
+			Cell goal;
+			bool b_finished;
 		};
 
 		class NIKE_API Service 
@@ -111,23 +116,26 @@ namespace NIKE {
 			//Get grid
 			std::vector<std::vector<Cell>>const& getGrid() const;
 
+			//Cell state checking
+			void gridUpdate();
+
+			//Check grid changed
+			bool checkGridChanged() const;
+
 			//Serialize map
 			nlohmann::json serialize() const;
 
 			//Deserialize map
 			void deserialize(nlohmann::json const& data);
 
-			// Pathfinding
+			//Pathfinding
 			void findPath(Entity::Type entity, Vector2i const& start, Vector2i const& goal, bool b_diagonal = false);
 
-			// Get entity path
-			std::deque<Cell>& getPath(Entity::Type entity);
+			//Get entity path
+			Path& getPath(Entity::Type entity);
 
 			//Check entity path
 			bool checkPath(Entity::Type entity) const;
-
-			// Debug purposes
-			void printPath(const std::vector<Cell>& path);
 		private:
 
 			//On entities changed event
@@ -140,7 +148,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Input::MouseMovedEvent> event) override;
 
 			//Pathfinding paths
-			std::unordered_map<Entity::Type, std::deque<Cell>> paths;
+			std::unordered_map<Entity::Type, Path> paths;
 
 			//Grid vector
 			std::vector<std::vector<Cell>> grid;
@@ -156,6 +164,9 @@ namespace NIKE {
 
 			//Cursor position relative to game window
 			Vector2f cursor_pos;
+
+			//Boolean to signal a change in cell states within grid
+			bool b_cell_changed;
 		};
 
 		//Re-enable DLL Export warning
