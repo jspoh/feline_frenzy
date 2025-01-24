@@ -23,7 +23,8 @@ namespace NIKE {
 				return	{
 						{ "Lives", comp.lives },
 						{ "Health", comp.health },
-						{ "InvulnerableFlag", comp.invulnerableFlag }
+						{ "InvulnerableFlag", comp.invulnerableFlag },
+						{ "HealthBarActive", comp.healthBarActive}
 				};
 			},
 
@@ -32,6 +33,7 @@ namespace NIKE {
 				comp.lives = data.at("Lives").get<int>();
 				comp.health = data.at("Health").get<float>();
 				comp.invulnerableFlag = data.value("InvulnerableFlag", false);
+				comp.healthBarActive = data.at("HealthBarActive").get<bool>();
 			}
 		);
 
