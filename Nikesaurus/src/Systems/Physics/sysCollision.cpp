@@ -18,48 +18,46 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Step 1: Calculate relative velocity
-        Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
+        // Step 1: Validate and normalize the collision normal
+        float normal_magnitude = std::sqrt(info.collision_normal.x * info.collision_normal.x +
+            info.collision_normal.y * info.collision_normal.y);
 
-        // Step 2: Compute velocity along the collision normal
-        float normal_vel = vel_rel.dot(info.collision_normal);
+        // Skip if the normal's magnitude is too small (invalid)
+        if (normal_magnitude < EPSILON) return;
 
-        // Step 3: Check if entities are separating
-        if (normal_vel > 0) return;  // No bounce needed if moving apart
+        // Normalize the collision normal
+        Vector2f collision_normal = {
+            info.collision_normal.x / normal_magnitude,
+            info.collision_normal.y / normal_magnitude
+        };
 
-        // Step 4: Compute restitution (average if both colliders have restitution)
-        float combined_restitution = (collider_a.restitution + collider_b.restitution) / 2.0f;
+        // Step 2: Reflect the velocity of entity A
+        float normal_vel = dynamics_a.velocity.x * collision_normal.x + dynamics_a.velocity.y * collision_normal.y;
 
-        // Step 5: Reflect velocity along the collision normal with restitution
-        Vector2f reflected_velocity = vel_rel - (1.0f + combined_restitution) * normal_vel * info.collision_normal;
-
-        // Step 6: Separate tangential velocity and apply drag
-        Vector2f tangential_velocity = vel_rel - normal_vel * info.collision_normal;
-        tangential_velocity *= (1.0f - dynamics_a.drag);
-
-        // Step 7: Update velocities
-        dynamics_a.velocity = reflected_velocity + tangential_velocity;
-
-        // Step 8: Correct position using MTV proportional to inverse mass
-        float total_mass = dynamics_a.mass + dynamics_b.mass;
-        if (total_mass > EPSILON) {
-            float ratio_a = dynamics_b.mass / total_mass;
-            float ratio_b = dynamics_a.mass / total_mass;
-
-            transform_a.position += info.mtv * ratio_a;
-            transform_b.position -= info.mtv * ratio_b;
-        }
-        else {
-            transform_a.position += info.mtv;
+        // Reflect velocity only if it's moving toward the collision normal
+        if (normal_vel < 0.0f) {
+            dynamics_a.velocity.x -= 2.0f * normal_vel * collision_normal.x;
+            dynamics_a.velocity.y -= 2.0f * normal_vel * collision_normal.y;
         }
 
-        // Step 9: Handle dynamic behavior of the other entity
-        if (collider_b.resolution == Physics::Resolution::BOUNCE) {
-            Vector2f impulse = -normal_vel * info.collision_normal * dynamics_a.mass / dynamics_b.mass;
-            dynamics_b.velocity += impulse;
+        // Step 3: Reflect the force of entity A (if forces are used)
+        float normal_force = dynamics_a.force.x * collision_normal.x + dynamics_a.force.y * collision_normal.y;
+
+        if (normal_force < 0.0f) {
+            dynamics_a.force.x -= 2.0f * normal_force * collision_normal.x;
+            dynamics_a.force.y -= 2.0f * normal_force * collision_normal.y;
+        }
+
+        // Step 4: Clamp velocity components to max speed
+        dynamics_a.velocity.x = std::clamp(dynamics_a.velocity.x, -dynamics_a.max_speed, dynamics_a.max_speed);
+        dynamics_a.velocity.y = std::clamp(dynamics_a.velocity.y, -dynamics_a.max_speed, dynamics_a.max_speed);
+
+        // Step 5: Adjust position based on MTV
+        if (collider_a.resolution != Physics::Resolution::NONE) {
+            transform_a.position.x += info.mtv.x;
+            transform_a.position.y += info.mtv.y;
         }
     }
-
 
     void Collision::System::setRestitution(float val) {
         restitution = val;
@@ -353,47 +351,53 @@ namespace NIKE {
         Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Dispatch collision event
-        auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
-        NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
-
-        // Destroy Resolution
-        if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
+        // Step 1: Handle DESTROY resolution
+        // If either entity is set to be destroyed upon collision, mark it for deletion
+        if (collider_a.resolution == Physics::Resolution::DESTROY) {
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
             return;
         }
-
-        if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
+        if (collider_b.resolution == Physics::Resolution::DESTROY) {
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
             return;
         }
 
-        // Bounce Resolution (at least one entity has BOUNCE)
+        // Step 2: Handle BOUNCE resolution
+        // If either entity has BOUNCE resolution, apply bounce logic
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             if (collider_a.resolution == Physics::Resolution::BOUNCE) {
+                // Bounce entity A off entity B
                 bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
             }
             else {
+                // Bounce entity B off entity A
                 bounceResolution(transform_b, dynamics_b, collider_b, transform_a, dynamics_a, collider_a, info);
             }
             return;
         }
 
-        // Slide Resolution
-        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
-            transform_a.position += info.mtv * 0.5f;
-            transform_b.position -= info.mtv * 0.5f;
-            return;
-        }
+        // Step 3: Skip NONE resolution adjustments
+        // If both entities have NONE resolution, no physics adjustments are applied
+        if (collider_a.resolution == Physics::Resolution::NONE && collider_b.resolution == Physics::Resolution::NONE) return;
 
-        // Default Resolutions
+        // Step 4: Handle SLIDE resolution for entity A
         if (collider_a.resolution == Physics::Resolution::SLIDE) {
+            // Remove the velocity component along the collision normal (sliding effect)
+            dynamics_a.velocity -= dynamics_a.velocity.dot(info.collision_normal) * info.collision_normal;
+
+            // Adjust position based on the minimum translation vector (MTV)
             transform_a.position += info.mtv;
         }
 
+        // Step 5: Handle SLIDE resolution for entity B
         if (collider_b.resolution == Physics::Resolution::SLIDE) {
+            // Remove the velocity component along the collision normal (sliding effect)
+            dynamics_b.velocity -= dynamics_b.velocity.dot(info.collision_normal) * info.collision_normal;
+
+            // Adjust position based on the minimum translation vector (MTV)
             transform_b.position -= info.mtv;
         }
     }
+
 
 }
