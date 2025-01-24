@@ -80,7 +80,7 @@ namespace NIKE {
 			~Service() = default;
 
 			//Init Editor
-			void init();
+			void init(nlohmann::json const& config);
 
 			//Update Editor
 			void update();

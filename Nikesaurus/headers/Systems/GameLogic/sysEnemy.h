@@ -27,9 +27,9 @@ namespace NIKE {
 			void operator=(Manager const& copy) = delete;
 
 
-			enum class EnemyBehavior {
-				Chasing = 0,
-				Idle,
+			enum class ENEMY_BEHAVIOR {
+				IDLE = 0,
+				CHASE,
 				Attack,
 			};
 

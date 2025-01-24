@@ -120,23 +120,21 @@ namespace NIKE {
 			};
 		}
 		return { window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),
-					window_pos.y + (render_size.y / 2.0f) + ((NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom)
-
-		};
+					window_pos.y + (render_size.y / 2.0f) - ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.y + pos.y) * scale.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
 	}
 
 	void LevelEditor::IPanel::worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding) {
 
 		//Draw filled rect
-		draw_list->AddRectFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+		draw_list->AddRectFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
 			color, rounding);
 	}
 
 	void LevelEditor::IPanel::worldRect(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding, float thickness) {
 		//Draw filled rect
-		draw_list->AddRect(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+		draw_list->AddRect(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
 			color, rounding, 0, thickness);
 	}
 
@@ -179,7 +177,7 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Render filled circle
-		draw_list->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), render_size),
+		draw_list->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y), render_size),
 			(e_transform.scale.x * scale.x) / 2.0f / zoom, color);
 	}
 
@@ -194,7 +192,7 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Render filled circle
-		draw_list->AddCircle(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y), render_size),
+		draw_list->AddCircle(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y), render_size),
 			(e_transform.scale.x * scale.x) / 2.0f / zoom, color, 0, thickness / zoom * fullscreen_scale.x);
 	}
 
@@ -203,37 +201,37 @@ namespace NIKE {
 		//Render filled triangle based on direction
 		switch (dir) {
 		case ImGuiDir::ImGuiDir_Up: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
 				color);
 			break;
 		}
 		case ImGuiDir::ImGuiDir_Down: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
 				color);
 			break;
 		}
 		case ImGuiDir::ImGuiDir_Right: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
 				color);
 			break;
 		}
 		case ImGuiDir::ImGuiDir_Left: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
 				color);
 			break;
 		}
 		default: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, -e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
 				color);
 			break;
 		}
@@ -249,7 +247,7 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Draw line of rotation
-		draw_list->AddLine(worldToScreen(ImVec2(point1.x, -point1.y), render_size), worldToScreen(ImVec2(point2.x, -point2.y), render_size), color, thickness / zoom * fullscreen_scale.x);
+		draw_list->AddLine(worldToScreen(ImVec2(point1.x, point1.y), render_size), worldToScreen(ImVec2(point2.x, point2.y), render_size), color, thickness / zoom * fullscreen_scale.x);
 	}
 
 	/*****************************************************************//**
@@ -300,6 +298,7 @@ namespace NIKE {
 		window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
 	}
 
 	void LevelEditor::MainPanel::update() {
@@ -448,6 +447,24 @@ namespace NIKE {
 		//End Frame
 		ImGui::End();
 	}
+
+	void LevelEditor::MainPanel::deserializeConfig(nlohmann::json const& config) {
+		try {
+			auto const& data = config.at("EditorConfig");
+			b_debug_mode = data.at("Debug_Mode").get<bool>();
+			b_game_state = data.at("Game_State").get<bool>(); // Game state does not work due to systems not running yet
+			b_gizmo_state = data.at("Gizmo_State").get<bool>();
+			b_grid_state = data.at("Grid_State").get<bool>();
+
+		}
+		catch (const nlohmann::json::exception& e) {
+			NIKEE_CORE_WARN(e.what());
+			NIKEE_CORE_WARN("Editor config invalid!");
+			
+		}
+	}
+
+
 
 	/*****************************************************************//**
 	* Entities Panel
@@ -1174,7 +1191,7 @@ namespace NIKE {
 				}
 
 				//Apply transformation
-				e_transform.position = { world_mouse.x - (gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom),  -world_mouse.y - (gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom) };
+				e_transform.position = { world_mouse.x - (gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom),  world_mouse.y - (gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom) };
 			}
 
 			//Add gizmo up
@@ -1197,8 +1214,6 @@ namespace NIKE {
 				static float initial_mouse_y = 0.0f;
 				static float initial_position_y = 0.0f;
 
-
-
 				//Initialize on mouse click
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 					initial_mouse_y = world_mouse.y;
@@ -1209,7 +1224,7 @@ namespace NIKE {
 				}
 
 				//Calculate the Y-axis delta
-				float delta_y = -(world_mouse.y - initial_mouse_y) * gizmo.sensitivity;
+				float delta_y = (world_mouse.y - initial_mouse_y) * gizmo.sensitivity;
 
 				//Apply the delta to the position
 				e_transform.position.y = initial_position_y + delta_y;
@@ -1330,7 +1345,7 @@ namespace NIKE {
 				float scale_sensitivity = gizmo.sensitivity / (initial_scale_y + EPSILON);
 
 				//Calculate the Y-axis movement relative to the initial position
-				float delta_y = -(world_mouse.y - initial_mouse_y);
+				float delta_y = (world_mouse.y - initial_mouse_y);
 
 				//Calculate scale factor
 				float scale_factor = (1.0f + delta_y * scale_sensitivity) < EPSILON ? EPSILON : (1.0f + delta_y * scale_sensitivity);
@@ -1431,7 +1446,7 @@ namespace NIKE {
 				float prev_angle = e_transform.rotation;
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2(-(world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2((world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x + gizmo.objects["Rot Circle"].first.position.x);
 
 				//Wrap angle
 				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
@@ -1481,7 +1496,7 @@ namespace NIKE {
 				}
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2(-(world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x - gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2((world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x + gizmo.objects["Rot Circle"].first.position.x);
 
 				//Wrap angle
 				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
@@ -2165,10 +2180,10 @@ namespace NIKE {
 		//Render gizmo text
 		if (gizmo.mode == GizmoMode::Rotate) {
 			auto const& rotation_circle = gizmo.objects["Rot Circle"].first;
-			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), -rotation_circle.position.y + (rotation_circle.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), rotation_circle.position.y - (rotation_circle.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 		else {
-			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), -e_transform.position.y + (e_transform.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 	}
 
@@ -3973,6 +3988,7 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Camera Management Panel
 	*********************************************************************/
+	
 	void LevelEditor::CameraPanel::cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change) {
 
 		if (ImGui::IsItemActivated()) {
@@ -4001,6 +4017,17 @@ namespace NIKE {
 		}
 	}
 
+	void LevelEditor::CameraPanel::dispatchCameraChange(Entity::Type cam, const std::string& name) {
+		if (cam == UINT16_MAX) {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
+		}
+		else {
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
+		}
+
+		NIKE_CAMERA_SERVICE->setActiveCamName(name);
+	}
+
 	void LevelEditor::CameraPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
@@ -4009,21 +4036,47 @@ namespace NIKE {
 
 		//Setup free cam to be referenced as default camera in camera system
 		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
+
+		combo_index = 0;
+		last_dispatched_index = 0;
+
+		NIKE_CAMERA_SERVICE->serializeCamera();
 	}
 
 	void LevelEditor::CameraPanel::update() {
+		const std::unordered_map<Entity::Type, std::string> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
+		static auto previous_scene = NIKE_SCENES_SERVICE->getPrevSceneID();
+
 
 		//Update list of camera entities
-		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
-			cam_entities.clear();
-			cam_entities.emplace(UINT16_MAX, "Free Cam");
+		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1 ||
+			previous_scene != NIKE_SCENES_SERVICE->getCurrSceneID() ) {
+			previous_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
+			NIKE_CAMERA_SERVICE->clearCameraEntities();
+			NIKE_CAMERA_SERVICE->emplaceCameraEntity(UINT16_MAX, "Free Cam");
+			combo_index = 0;
+			last_dispatched_index = 0;
+			int index = 0;
 			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
-				cam_entities.emplace(entity, entities_panel.lock()->getEntityName(entity));
+				auto cam_name = entities_panel.lock()->getEntityName(entity);
+				NIKE_CAMERA_SERVICE->emplaceCameraEntity(entity, cam_name);
+
+				index++;
+				if (cam_name == NIKE_CAMERA_SERVICE->getActiveCamName()) {
+					dispatchCameraChange(entity, cam_name);
+					combo_index = index;
+					last_dispatched_index = index;
+				}
+
+
 			}
+			
 		}
+
 	}
 
 	void LevelEditor::CameraPanel::render() {
+		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
 
 		ImGui::Begin(getName().c_str());
 
@@ -4032,37 +4085,21 @@ namespace NIKE {
 
 		//Static for tracking last dispatched index & dispatching of new camera
 		static bool dispatch = true;
-		static int last_dispatched_index = 0;
 
-		//Lamda for retrieving camera name
-		auto cam_name = [](void* data, int idx, const char** out_text) -> bool {
-			const auto& names = *static_cast<std::unordered_map<Entity::Type, std::string>*> (data);
-			if (idx < 0 || idx >= names.size()) return false;
-			auto it = names.begin();
-			std::advance(it, idx);
-
-			//Retrieve the entity name and assign it to out_text
-			*out_text = it->second.c_str();
-			return true;
-			};
+		// Convert unordered_map to vector of strings (camera names)
+		std::vector<const char*> cam_names;
+		for (const auto& entry : cam_entities) {
+			cam_names.push_back(entry.second.c_str());
+		}
 
 		// Use the lambda with ImGui::Combo
-		if (ImGui::Combo("##CameraSelector", &combo_index, cam_name, &cam_entities, static_cast<int>(cam_entities.size()))) {
+		if (ImGui::Combo("##CameraSelector", &combo_index, cam_names.data(), static_cast<int>(cam_names.size()))) {
 			dispatch = true;
 		}
 
-		// Ensure combo_index is valid
-		if (combo_index < 0 || combo_index >= cam_entities.size()) {
-			combo_index = 0;
-
-		}
-
-		// Ensure last_dispatched_index is valid
-		if (last_dispatched_index < 0 || last_dispatched_index >= cam_entities.size()) {
-			last_dispatched_index = 0;
-
-		}
-
+		// Validate indices
+		combo_index = std::clamp(combo_index, 0, static_cast<int>(cam_entities.size()) - 1);
+		last_dispatched_index = std::clamp(last_dispatched_index, 0, static_cast<int>(cam_entities.size()) - 1);
 
 		//If dispatch is actived
 		if (dispatch) {
@@ -4076,30 +4113,18 @@ namespace NIKE {
 			Action change_cam_action;
 
 			//Change cam do action
-			change_cam_action.do_action = [&, cam = it->first, index = combo_index]() {
-				if (cam == UINT16_MAX) {
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
-				}
-				else {
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
-				}
-
+			change_cam_action.do_action = [&, cam = it->first, name = it->second, index = combo_index]() {
+				dispatchCameraChange(cam, name);
 				combo_index = index;
 				last_dispatched_index = index;
-				};
+			};
 
 			//Change cam undo action
-			change_cam_action.undo_action = [&, cam = before_it->first, index = last_dispatched_index]() {
-				if (cam == UINT16_MAX) {
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
-				}
-				else {
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
-				}
-
+			change_cam_action.undo_action = [&, cam = before_it->first, name = before_it->second, index = last_dispatched_index]() {
+				dispatchCameraChange(cam, name);
 				combo_index = index;
 				last_dispatched_index = index;
-				};
+			};
 
 			//Execute action
 			NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cam_action));
@@ -4114,23 +4139,17 @@ namespace NIKE {
 		auto it = cam_entities.begin();
 		std::advance(it, combo_index);
 		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(it->first);
-		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(it->first) && e_cam_comp.has_value())
-			? e_cam_comp.value().get() : *free_cam;
+		Render::Cam& active_cam = (NIKE_ECS_MANAGER->checkEntity(it->first) && e_cam_comp.has_value()) ? e_cam_comp.value().get() : *free_cam;
 
 		//Static camera variables for undo/redo
 		static Render::Cam cam_before_change = active_cam;
-
-		// Used to check if mouse is over the viewport
-		ImGuiIO& io = ImGui::GetIO();
-		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
-
 
 		//If free camera is active
 		if (it->first == UINT16_MAX) {
 			// Position Controls
 			ImGui::Text("Position:");
 
-			if (ImGui::Button("Up") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_UP)) {
+			if (ImGui::Button("Up") || ImGui::IsItemActive() || !checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_UP)) {
 				// Move camera position up
 				active_cam.position.y += 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4139,7 +4158,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Down") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_DOWN)) {
+			if (ImGui::Button("Down") || ImGui::IsItemActive() || !checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_DOWN)) {
 				// Move camera position down
 				active_cam.position.y -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4148,7 +4167,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Left") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT)) {
+			if (ImGui::Button("Left") || ImGui::IsItemActive() || !checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT)) {
 				// Move camera position left
 				active_cam.position.x -= 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4157,7 +4176,7 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Right") || ImGui::IsItemActive() || !checkPopUpShowing() && game_window->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_RIGHT)) {
+			if (ImGui::Button("Right") || ImGui::IsItemActive() || !checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_RIGHT)) {
 				// Move camera position right
 				active_cam.position.x += 500.0f * ImGui::GetIO().DeltaTime;
 			}
@@ -4180,7 +4199,7 @@ namespace NIKE {
 		static bool is_dragging = false;
 		static Vector2f last_mouse_pos{ 0.f, 0.f };
 
-		if (game_window->isMouseInWindow() && ImGui::GetIO().MouseDown[ImGuiMouseButton_Middle]) {
+		if (game_panel.lock()->isMouseInWindow() && ImGui::GetIO().MouseDown[ImGuiMouseButton_Middle]) {
 
 			// If dragging starts
 			if (!is_dragging) {
@@ -4213,8 +4232,8 @@ namespace NIKE {
 		}
 
 		// Zoom Controls (Scroll To Zoom)
-		if (!checkPopUpShowing() && game_window->isMouseInWindow()) {
-			active_cam.zoom -= io.MouseWheel * ImGui::GetIO().DeltaTime;
+		if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && ImGui::GetIO().MouseWheel != 0) {
+			active_cam.zoom -= ImGui::GetIO().MouseWheel * ImGui::GetIO().DeltaTime;
 			active_cam.zoom = std::clamp(active_cam.zoom, EPSILON, (float)UINT16_MAX);
 		}
 
@@ -4714,8 +4733,16 @@ namespace NIKE {
 
 		//Clicking to set map cells to blocked
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
-		if (!checkPopUpShowing() && b_grid_edit && game_window->isMouseInWindow() && NIKE_MAP_SERVICE->getCursorCell().has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-			NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked = !NIKE_MAP_SERVICE->getCursorCell().value().get().b_blocked;
+		auto wrapped_cell = NIKE_MAP_SERVICE->getCursorCell();
+		if (!checkPopUpShowing() && b_grid_edit && game_window->isMouseInWindow() && wrapped_cell.has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+
+			//Set cell to blocked
+			auto& cell = wrapped_cell.value().get();
+			cell.b_blocked = !cell.b_blocked;
+
+			cout << cell.index.x << " " << cell.index.y << endl;
+
+			cout << cell.position.x << " " << cell.position.y << endl;
 		}
 	}
 
@@ -5614,18 +5641,18 @@ namespace NIKE {
 			Vector2f render_pos;
 			if (tile_map_panel.lock()->checkGridSnapping()) {
 				//Get snapped to cell position
-				auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(Vector2f(world_mouse_pos.x, -world_mouse_pos.y));
+				auto cursor_cell = NIKE_MAP_SERVICE->getCellAtPosition(Vector2f(world_mouse_pos.x, world_mouse_pos.y));
 				if (cursor_cell.has_value()) {
 
 					//Snap to cell
 					render_pos = cursor_cell.value().get().position;
 				}
 				else {
-					render_pos = { world_mouse_pos.x, -world_mouse_pos.y };
+					render_pos = { world_mouse_pos.x, world_mouse_pos.y };
 				}
 			}
 			else {
-				render_pos = { world_mouse_pos.x, -world_mouse_pos.y };
+				render_pos = { world_mouse_pos.x, world_mouse_pos.y };
 			}
 
 			//Texture file payload
@@ -5745,7 +5772,7 @@ namespace NIKE {
 					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 					//Add transform
-					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(Vector2f(local_world_mouse_pos.x, -local_world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(Vector2f(local_world_mouse_pos.x, local_world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));
 
 					//Add texture
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(*entity_id, Render::Text(asset_id, place_holder, color, 1.0f));
@@ -5857,7 +5884,7 @@ namespace NIKE {
 		//Calculate world mouse position
 		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x, (io.MousePos.y - window_pos.y) * scale.y };
 		world_mouse_pos.x = world_mouse_pos.x - ((viewport_width * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
-		world_mouse_pos.y = world_mouse_pos.y - ((viewport_height * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y;
+		world_mouse_pos.y = -(world_mouse_pos.y - ((viewport_height * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y);
 
 		//Fixed window scale factor
 		scale = { win_size.x / viewport_width, win_size.y / viewport_height };

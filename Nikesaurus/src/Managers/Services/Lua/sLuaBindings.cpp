@@ -421,8 +421,20 @@ namespace NIKE {
 
         //Fire Bullet
         lua_state.set_function("FireBullet", [&](Entity::Type entity) {
+
             Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity();
-            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+
+            // Player Element Type
+            auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+            if (player_element_comp.has_value()) {
+                // Shoot elemental bullet
+                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::playerBullet[static_cast<int>(player_element_comp.value().get().element)]).string());
+            }
+            else {
+                // Missing Element Comp
+                NIKEE_CORE_WARN("PLAYER missing Elemental Component");
+                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+            }
 
             // Set/Teleport entity position
             lua_state.set_function("setPosition", [&](Entity::Type entity, float x, float y) {
@@ -448,7 +460,7 @@ namespace NIKE {
             auto const& player_transform = player_transform_comp.value().get();
 
             //Calculate direction vector (mouse - player)
-            float direction = atan2((NIKE_INPUT_SERVICE->getMouseWorldPos().y + player_transform.position.y), (NIKE_INPUT_SERVICE->getMouseWorldPos().x - player_transform.position.x));
+            float direction = atan2((-(NIKE_INPUT_SERVICE->getMouseWorldPos().y) + player_transform.position.y), (NIKE_INPUT_SERVICE->getMouseWorldPos().x - player_transform.position.x));
             Vector2f bull_direction = { cosf(direction), -sinf(direction) };
 
             //Normalize direction
@@ -536,32 +548,64 @@ namespace NIKE {
             });
 
         //Path finding
-        lua_state.set_function("GoToCell", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+        lua_state.set_function("PathFind", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+
+            //Acceptable offset per cell
+            const float cell_offset = 10.0f;
 
             //Get transform of entity for position mapping
             auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (transform.has_value()) {
 
+                //Entity transform
+                auto& e_transform = transform.value().get();
+
                 //Get index of entity as the starting position
-                auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(transform.value().get().position);
+                auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(e_transform.position);
 
                 //Get cell to travel to
-                if (start) {
+                if (start.has_value()) {
 
-                    //Get subsequent cells
-                    auto cells = NIKE_MAP_SERVICE->findPath(start.value(), Vector2i(x_index, y_index));
+                    //Get start index
+                    auto start_index = start.value();
 
-                    //Check if there are cells to go to
-                    if (!cells.empty()) {
+                    //Check if path has been generated or if destination cell has changed
+                    if (!NIKE_MAP_SERVICE->checkPath(entity) ||
+
+                        //Condition if changes to grid blocked has been made
+                        NIKE_MAP_SERVICE->checkGridChanged() ||
+
+                        //Check if target got shifted
+                        (NIKE_MAP_SERVICE->getPath(entity).goal.index != Vector2i(x_index, y_index)) ||
+
+                        //Check if entity got shifted
+                        (!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
+                            (std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start_index.x) > 1 ||
+                                std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start_index.y) > 1)) ||
+
+                        //Check if path is finished & entity got shifted
+                        (NIKE_MAP_SERVICE->getPath(entity).b_finished && start_index != NIKE_MAP_SERVICE->getPath(entity).end.index)
+
+                        ) {
+
+                        //Search for path
+                        NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
+                    }
+
+                    //Get path 
+                    auto& path = NIKE_MAP_SERVICE->getPath(entity);
+
+                    //Check if there are cells left in path
+                    if (!path.path.empty()) {
 
                         //Get next cell
-                        auto const& next_cell = cells.front();
+                        auto const& next_cell = path.path.front();
 
-                        //Check if cell has been reached
-                        if (next_cell.index != start) {
+                        //Check if entity has arrived near destination
+                        if ((next_cell.position - e_transform.position).length() > cell_offset) {
 
                             //Direction of next cell
-                            float dir = atan2((next_cell.position.y - start.value().y), (next_cell.position.x - start.value().x));
+                            float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
 
                             //Apply force to entity
                             auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
@@ -569,10 +613,17 @@ namespace NIKE {
                                 dynamics.value().get().force = { cos(dir) * speed, sin(dir) * speed };
                             }
                         }
+                        else {
+                            path.path.pop_front();
+                        }
+                    }
+                    else {
+
+                        //Marked path as finished
+                        path.b_finished = true;
                     }
                 }
             }
-
             });
 
     }

@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   sysCamera.h
+ * \file   sCamera.h
  * \brief  
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
@@ -29,6 +29,11 @@ namespace NIKE {
 
 			// Return active Cam id
 			Entity::Type getCamId() const;
+			
+			void setActiveCamName(std::string active_cam);
+
+			// Return active Cam name
+			std::string getActiveCamName() const;
 
 			//Get matrix
 			Matrix_33 getWorldToNDCXform() const;
@@ -47,6 +52,22 @@ namespace NIKE {
 
 			//Get camera height
 			float getCameraHeight() const;
+			
+			//Get camera entities
+			const std::unordered_map<Entity::Type, std::string>& getCameraEntities() const;
+
+			// Emplace new entity or update existing camera entity
+			void emplaceCameraEntity(Entity::Type entity, const std::string& name);
+
+			// Clears the cam_entities map
+			void clearCameraEntities();
+
+			// Serialize
+			nlohmann::json serializeCamera() const;
+
+			// Deserialize
+			void deserializeCamera(nlohmann::json const& data);
+
 		private:
 			//Targets
 			Vector2f target;
@@ -54,6 +75,7 @@ namespace NIKE {
 
 			//Active cam id
 			Entity::Type cam_id;
+			std::string cam_name;
 
 			//Default Camera
 			std::shared_ptr<Render::Cam> def_cam;
@@ -63,6 +85,9 @@ namespace NIKE {
 
 			//On change camera event
 			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
+
+			//List of camera entities
+			std::unordered_map<Entity::Type, std::string> cam_entities;
 		};
 	}
 }

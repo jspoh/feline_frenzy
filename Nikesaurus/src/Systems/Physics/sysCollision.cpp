@@ -18,47 +18,60 @@ namespace NIKE {
         Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Step 1: Calculate relative velocity
-        Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
+        // Step 1: Validate and normalize the collision normal
+        float normal_magnitude = std::sqrt(info.collision_normal.x * info.collision_normal.x +
+            info.collision_normal.y * info.collision_normal.y);
 
-        // Step 2: Compute velocity along the collision normal
-        float normal_vel = vel_rel.dot(info.collision_normal);
+        // Skip if the normal's magnitude is too small (invalid)
+        if (normal_magnitude < EPSILON) return;
 
-        // Step 3: Check if entities are separating
-        if (normal_vel > 0) return;  // No bounce needed if moving apart
+        // Normalize the collision normal
+        Vector2f collision_normal = {
+            info.collision_normal.x / normal_magnitude,
+            info.collision_normal.y / normal_magnitude
+        };
 
-        // Step 4: Compute restitution (average if both colliders have restitution)
-        float combined_restitution = (collider_a.restitution + collider_b.restitution) / 2.0f;
+        // Step 2: Reflect the velocity of entity A
+        float normal_vel = dynamics_a.velocity.x * collision_normal.x + dynamics_a.velocity.y * collision_normal.y;
 
-        // Step 5: Reflect velocity along the collision normal with restitution
-        Vector2f reflected_velocity = vel_rel - (1.0f + combined_restitution) * normal_vel * info.collision_normal;
+        // Reflect velocity only if it's moving toward the collision normal
+        if (normal_vel < 0.0f) {
+            dynamics_a.velocity.x -= 2.0f * normal_vel * collision_normal.x;
+            dynamics_a.velocity.y -= 2.0f * normal_vel * collision_normal.y;
 
-        // Step 6: Separate tangential velocity and apply drag
-        Vector2f tangential_velocity = vel_rel - normal_vel * info.collision_normal;
-        tangential_velocity *= (1.0f - dynamics_a.drag);
-
-        // Step 7: Update velocities
-        dynamics_a.velocity = reflected_velocity + tangential_velocity;
-
-        // Step 8: Correct position using MTV proportional to inverse mass
-        float total_mass = dynamics_a.mass + dynamics_b.mass;
-        if (total_mass > EPSILON) {
-            float ratio_a = dynamics_b.mass / total_mass;
-            float ratio_b = dynamics_a.mass / total_mass;
-
-            transform_a.position += info.mtv * ratio_a;
-            transform_b.position -= info.mtv * ratio_b;
-        }
-        else {
-            transform_a.position += info.mtv;
+            // Add a small nudge to prevent sticking when velocity becomes too small
+            if (std::abs(collision_normal.x) > 0.9f && std::abs(dynamics_a.velocity.x) < EPSILON) {
+                dynamics_a.velocity.x = (collision_normal.x > 0 ? EPSILON : -EPSILON);
+            }
+            if (std::abs(collision_normal.y) > 0.9f && std::abs(dynamics_a.velocity.y) < EPSILON) {
+                dynamics_a.velocity.y = (collision_normal.y > 0 ? EPSILON : -EPSILON);
+            }
         }
 
-        // Step 9: Handle dynamic behavior of the other entity
-        if (collider_b.resolution == Physics::Resolution::BOUNCE) {
-            Vector2f impulse = -normal_vel * info.collision_normal * dynamics_a.mass / dynamics_b.mass;
-            dynamics_b.velocity += impulse;
+        // Step 3: Reflect the force of entity A (if forces are used)
+        float normal_force = dynamics_a.force.x * collision_normal.x + dynamics_a.force.y * collision_normal.y;
+
+        if (normal_force < 0.0f) {
+            dynamics_a.force.x -= 2.0f * normal_force * collision_normal.x;
+            dynamics_a.force.y -= 2.0f * normal_force * collision_normal.y;
+        }
+
+        // Step 4: Clamp velocity components to max speed
+        dynamics_a.velocity.x = std::clamp(dynamics_a.velocity.x, -dynamics_a.max_speed, dynamics_a.max_speed);
+        dynamics_a.velocity.y = std::clamp(dynamics_a.velocity.y, -dynamics_a.max_speed, dynamics_a.max_speed);
+
+        // Step 5: Adjust position based on MTV
+        if (collider_a.resolution != Physics::Resolution::NONE) {
+            transform_a.position.x += info.mtv.x;
+            transform_a.position.y += info.mtv.y;
+
+            // Step 6: Apply an additional small offset to fully resolve overlap
+            const float small_offset = 0.01f; // Tiny offset to move entity fully out of collision bounds
+            transform_a.position.x += collision_normal.x * small_offset;
+            transform_a.position.y += collision_normal.y * small_offset;
         }
     }
+
 
 
     void Collision::System::setRestitution(float val) {
@@ -395,5 +408,4 @@ namespace NIKE {
             transform_b.position -= info.mtv;
         }
     }
-
 }

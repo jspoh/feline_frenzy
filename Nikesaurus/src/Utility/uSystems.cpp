@@ -36,7 +36,7 @@ namespace NIKE {
 	std::vector<Vector2f> Utility::convertTransformToVert(Transform::Transform const& e_transform) {
 
 		//Calculate angle in radians
-		float angle_rad = -e_transform.rotation * ((float)M_PI / 180.0f);
+		float angle_rad = e_transform.rotation * ((float)M_PI / 180.0f);
 		float s = sin(angle_rad);
 		float c = cos(angle_rad);
 
@@ -45,16 +45,16 @@ namespace NIKE {
 
 		//Get corners before rotation
 		std::vector<Vector2f> corners = {
-			{ -half_scale.x, -half_scale.y },
+			{ -half_scale.x, half_scale.y },
+			{  half_scale.x, half_scale.y },
 			{  half_scale.x, -half_scale.y },
-			{  half_scale.x,  half_scale.y },
-			{ -half_scale.x,  half_scale.y }
+			{ -half_scale.x, -half_scale.y }
 		};
 
 		//Rotate vertices
 		for (int i = 0; i < corners.size(); ++i) {
 			float rotated_x = corners[i].x * c - corners[i].y * s + e_transform.position.x;
-			float rotated_y = corners[i].x * s + corners[i].y * c - e_transform.position.y;
+			float rotated_y = corners[i].x * s + corners[i].y * c + e_transform.position.y;
 			corners[i] = { rotated_x, rotated_y };
 		}
 

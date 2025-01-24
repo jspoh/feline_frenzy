@@ -1,17 +1,7 @@
 {
     "Components": {
-        "Audio::SFX": {
-            "Audio_ID": "Pop1.wav",
-            "B_Play_SFX": false,
-            "Channel_Group_ID": "BulletSFX",
-            "Pitch": 1.0,
-            "Volume": 0.5
-        },
-        "Element::Entity": {
-            "Element": 0
-        },
-        "Combat::Damage": {
-            "Damage": 10.0
+        "Element::Source": {
+            "Element": 1
         },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
@@ -23,24 +13,11 @@
                 "x": 0.0,
                 "y": 0.0
             },
-            "Resolution": 3,
+            "Resolution": 0,
             "Rotation": 0.0,
             "Scale": {
-                "x": 49.99999237060547,
-                "y": 49.99999237060547
-            }
-        },
-        "Physics::Dynamics": {
-            "Drag": 0.0,
-            "Force": {
-                "x": 0.0,
-                "y": 0.0
-            },
-            "Mass": 9.999999747378752e-05,
-            "Max_Speed": 800.0,
-            "Velocity": {
-                "x": 0.0,
-                "y": 0.0
+                "x": 255.99996948242188,
+                "y": 255.99996948242188
             }
         },
         "Render::Texture": {
@@ -65,7 +42,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "NormalBullet_Player.png"
+            "Texture_ID": "Fire icon.png"
         },
         "Transform::Transform": {
             "Position": {
@@ -74,10 +51,10 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 49.99999237060547,
-                "y": 49.99999237060547
+                "x": 255.99996948242188,
+                "y": 255.99996948242188
             }
         }
     },
-    "Layer ID": 1
+    "Layer ID": 0
 }

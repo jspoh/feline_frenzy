@@ -15,6 +15,11 @@
         "Grid ID": "level1.grid"
     },
     {
+        "Camera": {
+            "Active Cam ID": "Player"
+        }
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -47,8 +52,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -128.0,
-                                    "y": -128.0
+                                    "x": -94.87247467041016,
+                                    "y": -134.41253662109375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1476,19 +1481,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 3,
+                                "Completed_Animations": 43,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.01666666753590107
+                                "Timer": 0.03333333507180214
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 5,
-                                    "y": 1
+                                    "x": 7,
+                                    "y": 4
                                 },
                                 "End_Index": {
-                                    "x": 5,
-                                    "y": 1
+                                    "x": 9,
+                                    "y": 4
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -1496,7 +1501,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 1
+                                    "y": 4
                                 }
                             },
                             "Audio::SFX": {
@@ -1509,7 +1514,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 37
+                                    "entity": 137
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -1520,8 +1525,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -73.49088287353516,
-                                    "y": -150.60934448242188
+                                    "x": 138.7797393798828,
+                                    "y": -207.4127960205078
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -1533,20 +1538,27 @@
                             "Physics::Dynamics": {
                                 "Drag": 1.0,
                                 "Force": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 71.6922607421875,
+                                    "y": -997.4268188476563
                                 },
                                 "Mass": 0.5,
                                 "Max_Speed": 150.0,
                                 "Velocity": {
-                                    "x": -0.20643797516822815,
-                                    "y": -2.503148800961959e-22
+                                    "x": 10.753833770751953,
+                                    "y": -149.614013671875
                                 }
+                            },
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 138.7797393798828,
+                                    "y": -207.4127960205078
+                                },
+                                "Zoom": 0.8884735107421875
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": true,
+                                    "x": false,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -1557,8 +1569,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 5,
-                                    "y": 1
+                                    "x": 7,
+                                    "y": 4
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -1579,8 +1591,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -73.49088287353516,
-                                    "y": -150.60934448242188
+                                    "x": 138.7797393798828,
+                                    "y": -207.4127960205078
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

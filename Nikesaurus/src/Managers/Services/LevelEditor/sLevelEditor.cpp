@@ -213,8 +213,8 @@ namespace NIKE {
 		if (io.WantCaptureMouse) {
 
 			//Update scroll offset
-			io.MouseWheelH += static_cast<float>(event->offset.x);
-			io.MouseWheel += static_cast<float>(event->offset.y);
+			io.MouseWheelH = static_cast<float>(event->offset.x);
+			io.MouseWheel = static_cast<float>(event->offset.y);
 
 			//Mark event as processed
 			event->setEventProcessed(true);
@@ -281,7 +281,7 @@ namespace NIKE {
 		}
 	}
 
-	void LevelEditor::Service::init() {
+	void LevelEditor::Service::init(nlohmann::json const& config) {
 
 		//Init Imgui
 		IMGUI_CHECKVERSION();
@@ -361,6 +361,7 @@ namespace NIKE {
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
+		main_panel->deserializeConfig(config);
 	}
 
 	void LevelEditor::Service::update() {

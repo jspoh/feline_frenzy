@@ -42,27 +42,27 @@ namespace NIKE {
 
 					// Check for pathfinding comp
 					if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity)) {
-						auto e_enemy_pathfind = NIKE_ECS_MANAGER->getEntityComponent<Pathfinding::Path>(entity);
-						auto& enemy_pathfind = e_enemy_pathfind.value().get();
+						//auto e_enemy_pathfind = NIKE_ECS_MANAGER->getEntityComponent<Pathfinding::Path>(entity);
+						//auto& enemy_pathfind = e_enemy_pathfind.value().get();
 
-						auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-						auto& enemy_transform = e_enemy_transform.value().get();
+						//auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+						//auto& enemy_transform = e_enemy_transform.value().get();
 
-						// Init cell
-						// Vector2i start = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value();
-						// Get grid to take ref from cell using the index
-						auto grid = NIKE_MAP_SERVICE->getGrid();
-						// Syntax: grid[y][x]
-						enemy_pathfind.start_cell = grid[2][1];
-						enemy_pathfind.goal_cell = grid[5][5];
-						enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start_cell, enemy_pathfind.goal_cell);
-						enemy_pathfind.path_found = !enemy_pathfind.path.empty();
+						//// Init cell
+						//// Vector2i start = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value();
+						//// Get grid to take ref from cell using the index
+						//auto grid = NIKE_MAP_SERVICE->getGrid();
+						//// Syntax: grid[y][x]
+						//enemy_pathfind.start_cell = grid[2][1];
+						//enemy_pathfind.goal_cell = grid[5][5];
+						//enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start_cell, enemy_pathfind.goal_cell);
+						//enemy_pathfind.path_found = !enemy_pathfind.path.empty();
 
-						if (enemy_pathfind.path_found)
-						{
-							NIKE_MAP_SERVICE->PrintPath(enemy_pathfind.path);
-							moveAlongPath(enemy_pathfind, enemy_transform);
-						}
+						//if (enemy_pathfind.path_found)
+						//{
+						//	NIKE_MAP_SERVICE->PrintPath(enemy_pathfind.path);
+						//	//moveAlongPath(enemy_pathfind, enemy_transform);
+						//}
 
 					}
 
@@ -207,19 +207,33 @@ namespace NIKE {
 		const Vector2f& player_pos = p_transform_comp.value().get().position;
 
 		// Get enemy components
+		// Transform Comp
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
+
+		// Attack Comp
 		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
 		const auto& enemy_attack_comp = e_attack_comp.value().get();
-		const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
+		//const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
+
+		// Element comp
+		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
 
 		// Create entity for bullet
-		//Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
-		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
+		// Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
+		// I don't think this layer number actually matters, since it depends on the prefab layer
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(1); 
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(bullet_prefab).string());
-
+		if (e_element_comp.has_value()) {
+			// Shoot elemental bullet
+			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]).string());
+		}
+		else {
+			// Missing Element Comp
+			NIKEE_CORE_WARN("ENEMY missing Elemental Component");
+			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+		}
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
 		Vector2f direction = player_pos - enemy_pos;
 		direction.normalize();

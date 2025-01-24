@@ -1,5 +1,25 @@
 {
     "Components": {
+        "Combat::Health": {
+            "Health": 100.0,
+            "InvulnerableFlag": false,
+            "Lives": 1
+        },
+        "Element::Entity": {
+            "Element": 1
+        },
+        "Enemy::Attack": {
+            "Cooldown": 10.0,
+            "Function": "enemyBullet",
+            "LastShotTime": 10.016666412353516,
+            "Layer": 0,
+            "Offset": 100.0,
+            "PrefabPath": "bullet.prefab",
+            "Range": 10.0,
+            "ScriptID": "",
+            "ScriptLoaded": false,
+            "ScriptPath": "assets/Scripts/enemyBullet.lua"
+        },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
             "Pos_Offset": {
@@ -8,7 +28,7 @@
             },
             "Position": {
                 "x": 437.8940124511719,
-                "y": -153.0
+                "y": -323.79998779296875
             },
             "Resolution": 0,
             "Rotation": 0.0,
@@ -44,7 +64,7 @@
         "Transform::Transform": {
             "Position": {
                 "x": 437.8940124511719,
-                "y": -153.0
+                "y": -323.79998779296875
             },
             "Rotation": 0.0,
             "Scale": {

@@ -32,7 +32,7 @@ namespace NIKE {
 					continue;
 
 				//Check for player logic comp
-				auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
+				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
 
