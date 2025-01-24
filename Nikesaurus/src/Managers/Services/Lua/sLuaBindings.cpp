@@ -553,9 +553,6 @@ namespace NIKE {
             //Acceptable offset per cell
             const float cell_offset = 10.0f;
 
-            //Acceptable offset per cell
-            const float cell_offset = 10.0f;
-
             //Get transform of entity for position mapping
             auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (transform.has_value()) {

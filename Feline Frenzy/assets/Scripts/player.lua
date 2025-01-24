@@ -168,7 +168,7 @@ function Player:Move(entity)
     ApplyForce(entity, fx, fy)
 
     -- Pathfinding Test
-    PathFind(entity, 0, 1, 1000.0);
+    --PathFind(entity, 0, 1, 1000.0);
 
 end
 
