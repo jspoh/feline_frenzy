@@ -156,9 +156,6 @@ namespace NIKE {
 
 			//Cursor position relative to game window
 			Vector2f cursor_pos;
-
-			// For me - lim
-			bool debug = false;
 		};
 
 		//Re-enable DLL Export warning

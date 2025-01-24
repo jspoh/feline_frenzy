@@ -129,6 +129,7 @@ namespace NIKE {
 		provideService(std::make_shared<Lua::Service>());
 		provideService(std::make_shared<Path::Service>());
 		provideService(std::make_shared<MetaData::Service>());
+		provideService(std::make_shared<StateMachine::Service>());
 
 		//Create console
 #ifndef NDEBUG
@@ -221,6 +222,9 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->init(json_config);
 #endif
 
+		// Init FSM
+		NIKE_FSM_SERVICE->init();
+
 		//Register Def Components
 		registerDefComponents();
 
@@ -286,6 +290,8 @@ namespace NIKE {
 				//update UI First
 				NIKE_UI_SERVICE->update();
 #endif
+
+				NIKE_FSM_SERVICE->update();
 
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
