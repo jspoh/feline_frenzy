@@ -287,6 +287,9 @@ namespace NIKE {
 				NIKE_UI_SERVICE->update();
 #endif
 
+				//Update map grid
+				NIKE_MAP_SERVICE->gridUpdate();
+
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 

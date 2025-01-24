@@ -548,14 +548,17 @@ namespace NIKE {
             });
 
         //Path finding
-        lua_state.set_function("GoToCell", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+        lua_state.set_function("PathFind", [&](Entity::Type entity, int x_index, int y_index, float speed) {
+
+            //Acceptable offset per cell
+            const float cell_offset = 10.0f;
 
             //Get transform of entity for position mapping
             auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (transform.has_value()) {
 
                 //Entity transform
-                auto const& e_transform = transform.value().get();
+                auto& e_transform = transform.value().get();
 
                 //Get index of entity as the starting position
                 auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(e_transform.position);
@@ -563,27 +566,46 @@ namespace NIKE {
                 //Get cell to travel to
                 if (start.has_value()) {
 
-                    //Check if current cell is the same as goal
-                    if (start.value() == Vector2i(x_index, y_index))  return;
+                    //Get start index
+                    auto start_index = start.value();
 
                     //Check if path has been generated or if destination cell has changed
-                    if (!NIKE_MAP_SERVICE->checkPath(entity) || (!NIKE_MAP_SERVICE->getPath(entity).empty() && NIKE_MAP_SERVICE->getPath(entity).back().index != Vector2i(x_index, y_index))) {
-                        NIKE_MAP_SERVICE->findPath(entity, start.value(), Vector2i(x_index, y_index));
+                    if (!NIKE_MAP_SERVICE->checkPath(entity) ||
+
+                        //Condition if changes to grid blocked has been made
+                        NIKE_MAP_SERVICE->checkGridChanged() ||
+
+                        //Check if target got shifted
+                        (NIKE_MAP_SERVICE->getPath(entity).goal.index != Vector2i(x_index, y_index)) ||
+
+                        //Check if entity got shifted
+                        (!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
+                            (std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start_index.x) > 1 ||
+                                std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start_index.y) > 1)) ||
+
+                        //Check if path is finished & entity got shifted
+                        (NIKE_MAP_SERVICE->getPath(entity).b_finished && start_index != NIKE_MAP_SERVICE->getPath(entity).end.index)
+
+                        ) {
+
+                        //Search for path
+                        NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
                     }
 
                     //Get path 
                     auto& path = NIKE_MAP_SERVICE->getPath(entity);
 
                     //Check if there are cells left in path
-                    if (!path.empty()) {
+                    if (!path.path.empty()) {
 
                         //Get next cell
-                        auto const& next_cell = path.front();
+                        auto const& next_cell = path.path.front();
 
                         //Check if entity has arrived near destination
-                        if ((next_cell.position - e_transform.position).length() > NIKE_MAP_SERVICE->getCellSize().x / 2.0f) {
+                        if ((next_cell.position - e_transform.position).length() > cell_offset) {
+
                             //Direction of next cell
-                            float dir = atan2((next_cell.position.y - transform.value().get().position.y), (next_cell.position.x - transform.value().get().position.x));
+                            float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
 
                             //Apply force to entity
                             auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
@@ -592,12 +614,16 @@ namespace NIKE {
                             }
                         }
                         else {
-                            path.pop_front();
+                            path.path.pop_front();
                         }
+                    }
+                    else {
+
+                        //Marked path as finished
+                        path.b_finished = true;
                     }
                 }
             }
-
             });
 
     }
