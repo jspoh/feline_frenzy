@@ -12,7 +12,7 @@
 namespace NIKE {
 
 	Map::Service::Service() 
-		: grid_size{ DEFAULT_GRID_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f } {
+		: grid_size{ DEFAULT_GRID_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f }, b_cell_changed{ false } {
 
 		//Initialize grid
 		grid.resize(grid_size.y);
@@ -172,6 +172,26 @@ namespace NIKE {
 
 	std::vector<std::vector<Map::Cell>>const& Map::Service::getGrid() const {
 		return grid;
+	}
+
+	void Map::Service::gridUpdate() {
+
+		//Reset cell changed
+		b_cell_changed = false;
+
+		//Iterate through grid
+		for (auto& row : grid) {
+			for (auto& cell : row) {
+				if (cell.b_blocked_prev != cell.b_blocked) {
+					cell.b_blocked_prev = cell.b_blocked;
+					b_cell_changed = true;
+				}
+			}
+		}
+	}
+
+	bool Map::Service::checkGridChanged() const {
+		return b_cell_changed;
 	}
 
 	nlohmann::json Map::Service::serialize() const {
@@ -456,10 +476,15 @@ namespace NIKE {
 		}
 
 		//Update entity path
-		paths[entity] = path;
+		paths[entity].path = path;
+		paths[entity].b_finished = false;
+		paths[entity].goal = grid.at(goal.y).at(goal.x);
+		if (!paths[entity].path.empty()) {
+			paths[entity].end = paths[entity].path.back();
+		}
 	}
 
-	std::deque<Map::Cell>& Map::Service::getPath(Entity::Type entity) {
+	Map::Path& Map::Service::getPath(Entity::Type entity) {
 		if (paths.find(entity) != paths.end()) {
 			return paths.at(entity);
 		}
@@ -479,27 +504,5 @@ namespace NIKE {
 	bool Map::Cell::operator>(Map::Cell const& other) const {
 		return (f != other.f) ? (f > other.f) : (h != other.h) ? h > other.h : g > other.g;
 	}
-
-
-	//bool Map::Cell::operator>(const Cell& other) const
-	//{
-	//	return f > other.f;
-	//}
-
-	//bool Map::Cell::operator==(const Cell& other) const
-	//{
-	//	return index.x == other.index.x && index.y == other.index.y;
-	//}
-
-	//// TO BE DELETED
-	//void Map::Service::printPath(const std::vector<Cell>& path)
-	//{
-	//	for (const Cell& cell : path)
-	//	{
-	//		cout << "( " << cell.index.y << ", " << cell.index.x << " )";
-	//	}
-	//	cout << endl;
-	//}
-
 }
 
