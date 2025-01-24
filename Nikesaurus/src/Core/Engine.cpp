@@ -243,6 +243,18 @@ namespace NIKE {
 		// !TODO: remove this, hardcoding for installer
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 
+		//NIKE::Render::Manager::addEntity();
+		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
+		//Entity::Type FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
+		//NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 790.f, 420.f }, { 600.f, 150.f }, 0.f, true));
+		//NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "20000000 FPS", {1.f, 1.f, 1.f, 1.f}, 1.0f));
+
+		std::stringstream ss;
+		Entity::Type FPS_DISPLAY_ENTITY{};
+		int frame_count = 0;
+		std::vector<float> fps_history;
+		fps_history.reserve(300);		// unlikely to exceed 300fps
+		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 			try {
 
@@ -299,6 +311,76 @@ namespace NIKE {
 				if (err != GL_NO_ERROR) {
 					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 				}
+
+
+				// update rendered fps
+				static std::unordered_map<std::string, std::shared_ptr<void>> comps;
+				static Render::Text* comp = nullptr;
+
+				elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+				if (frame_count > 0) {
+					// toggle fps display
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1)) {
+						if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY)) {
+							NIKE_ECS_MANAGER->removeEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY);
+						}
+						else {
+							NIKE_ECS_MANAGER->addEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY, {});
+						}
+					}
+
+					// calculatee fps
+					fps_history.push_back(NIKE_WINDOWS_SERVICE->getCurrentFPS());
+					if (elapsed_time < 1.f) {		// only update fps with average every n second
+						continue;			// CONTINUE CALL HERE. SO IF ANYTHING IS ADDED AFTER THIS, THIS MUST BE EDITED
+					}
+
+					elapsed_time = 0.f;
+					float sum_fps = 0;
+					std::for_each(fps_history.begin(), fps_history.end(), [&sum_fps](float& fps) { sum_fps += fps; });
+					const float avg_fps = sum_fps / fps_history.size();
+					fps_history.clear();
+
+					// update fps text
+					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					ss << "FPS: " << std::round(avg_fps);
+					comp->text = ss.str();
+					ss.str("");
+					ss.clear();
+				}
+				else {
+					// initialization of fps text
+					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
+					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
+
+#ifndef NDEBUG
+					std::shared_ptr<LevelEditor::EntitiesPanel> entities_panel = std::dynamic_pointer_cast<LevelEditor::EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(NIKE::LevelEditor::EntitiesPanel::getStaticName()));
+					if (!entities_panel) {
+						NIKEE_CORE_ERROR("Entities Panel not found");
+						throw;
+					}
+					auto& entity_map = entities_panel->getEntityMap();
+					auto& entity_to_name_map = entities_panel->getEntityToNameMap();
+					auto& name_to_entity_map = entities_panel->getNameToEntityMap();
+
+					entity_map[FPS_DISPLAY_ENTITY] = LevelEditor::EntityMetaData(FPS_DISPLAY_NAME, "", false);
+					name_to_entity_map.erase(entity_to_name_map[FPS_DISPLAY_ENTITY]);
+					name_to_entity_map[FPS_DISPLAY_NAME] = FPS_DISPLAY_ENTITY;
+					entity_to_name_map[FPS_DISPLAY_ENTITY] = FPS_DISPLAY_NAME;
+#endif
+
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
+					NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { });
+
+					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					comp->origin = Render::TextOrigin::LEFT;
+				}
+
+				frame_count++;
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);

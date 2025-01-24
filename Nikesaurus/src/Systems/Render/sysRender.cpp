@@ -594,12 +594,15 @@ namespace NIKE {
 		//Matrix used for rendering
 		Matrix_33 matrix;
 
-		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
-
 		//Get transform
 		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value()) return; //Handling no value scenarios
 		auto& e_transform = e_transform_comp.value().get();
+
+		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
+		if (e_transform.use_screen_pos) {
+			cam_ndcx = NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform();
+		}
 
 		//Check If Texture
 		if (auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);  e_texture_comp.has_value()) {
@@ -735,6 +738,10 @@ namespace NIKE {
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
 					continue;
 
+				// skip entity if is hidden
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
+					continue;
+
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 #ifndef NDEBUG
 					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
@@ -755,6 +762,9 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 			for (auto& entity : entities) {
+				// skip entity if is hidden
+				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
+					continue;
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
 					transformAndRenderText(entity);
 				}
@@ -785,7 +795,7 @@ namespace NIKE {
 
 		// Specify the texture size
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		
+
 		// Set texture parameters for filtering and wrapping
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

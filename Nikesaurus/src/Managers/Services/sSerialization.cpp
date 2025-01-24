@@ -219,6 +219,14 @@ namespace NIKE {
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
 
+				// skip 'built in' fps display entity
+				const auto entity_components = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+				const auto it = entity_components.find("Render::BuiltIn");
+				if (it != entity_components.end()) {
+					// is built in component, do not savee to scene
+					continue;
+				}
+
 				//Entity data
 				nlohmann::json e_data;
 
