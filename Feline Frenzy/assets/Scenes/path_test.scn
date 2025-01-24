@@ -88,7 +88,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -634.67041015625,
+                                    "x": -632.0093994140625,
                                     "y": -384.0
                                 },
                                 "Rotation": 0.0,
@@ -115,48 +115,7 @@
     {
         "Layer": {
             "B_State": true,
-            "Entities": [
-                {
-                    "Entity": {
-                        "Components": {
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Font_ID": "Skranji-Bold.ttf",
-                                "Origin": 3,
-                                "Scale": 1.0,
-                                "Size": {
-                                    "x": 118.0,
-                                    "y": 39.0
-                                },
-                                "Text": "hello"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 790.0,
-                                    "y": 420.0
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 600.0,
-                                    "y": 150.0
-                                },
-                                "Screen Position": true
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "entity_0001",
-                            "Prefab_ID": ""
-                        }
-                    }
-                }
-            ],
+            "Entities": [],
             "ID": 1,
             "Mask": 2
         }

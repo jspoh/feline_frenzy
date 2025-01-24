@@ -246,17 +246,11 @@ namespace NIKE {
 		//Entity::Type FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
 		//NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY, Transform::Transform({ 790.f, 420.f }, { 600.f, 150.f }, 0.f, true));
 		//NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", "20000000 FPS", {1.f, 1.f, 1.f, 1.f}, 1.0f));
-		
-		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
-			static int frame_count = 0;
-			if (frame_count == 1) {
-				constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
-				Entity::Type FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
-				NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY, Transform::Transform({ 790.f, 420.f }, { 600.f, 150.f }, 0.f, true));
-				NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", "20000000 FPS", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
-			}
-			frame_count++;
 
+		std::stringstream ss;
+		Entity::Type FPS_DISPLAY;
+		int frame_count = 0;
+		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 			try {
 
 				// get delta time first
@@ -307,10 +301,36 @@ namespace NIKE {
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
+				// update rendered fps
+				if (frame_count == 0) {
+					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
+					FPS_DISPLAY = NIKE_ECS_MANAGER->createEntity(0);
+					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
+					ss << "FPS: " << std::round(NIKE_WINDOWS_SERVICE->getCurrentFPS());
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY, Render::Text("Skranji-Bold.ttf", ss.str(), { 1.f, 1.f, 1.f, 1.f }, 1.0f));
+					ss.str("");
+					ss.clear();
+					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
+					auto comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					comp->origin = Render::TextOrigin::LEFT;
+				}
+
+				else if (frame_count > 0) {
+					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY);
+					auto fps_text_comps = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					ss << "FPS: " << std::round(NIKE_WINDOWS_SERVICE->getCurrentFPS());
+					fps_text_comps->text = ss.str();
+					ss.str("");
+					ss.clear();
+
+					fps_text_comps = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+				}
+
 				GLenum err = glGetError();
 				if (err != GL_NO_ERROR) {
 					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 				}
+				frame_count++;
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
