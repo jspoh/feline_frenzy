@@ -248,7 +248,7 @@ namespace NIKE {
 		//NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "20000000 FPS", {1.f, 1.f, 1.f, 1.f}, 1.0f));
 
 		std::stringstream ss;
-		Entity::Type FPS_DISPLAY_ENTITY;
+		Entity::Type FPS_DISPLAY_ENTITY{};
 		int frame_count = 0;
 		std::vector<float> fps_history;
 		fps_history.reserve(300);		// unlikely to exceed 300fps
@@ -317,6 +317,17 @@ namespace NIKE {
 				elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 
 				if (frame_count > 0) {
+					// toggle fps display
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1)) {
+						if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY)) {
+							NIKE_ECS_MANAGER->removeEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY);
+						}
+						else {
+							NIKE_ECS_MANAGER->addEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY, {});
+						}
+					}
+
+					// calculatee fps
 					fps_history.push_back(NIKE_WINDOWS_SERVICE->getCurrentFPS());
 					if (elapsed_time < 1.f) {		// only update fps with average every n second
 						continue;			// CONTINUE CALL HERE. SO IF ANYTHING IS ADDED AFTER THIS, THIS MUST BE EDITED
@@ -328,6 +339,7 @@ namespace NIKE {
 					const float avg_fps = sum_fps / fps_history.size();
 					fps_history.clear();
 
+					// update fps text
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					ss << "FPS: " << std::round(avg_fps);
@@ -358,8 +370,7 @@ namespace NIKE {
 
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
-					//NIKE_ECS_MANAGER->addEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY, { true });
-					NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { true });
+					NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { });
 
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
