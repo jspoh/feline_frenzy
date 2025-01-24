@@ -13,6 +13,8 @@
 namespace NIKE {
 
 	void GameLogic::Manager::init() {
+
+		NIKE_FSM_SERVICE->init();
 	}
 
 	void GameLogic::Manager::update() {

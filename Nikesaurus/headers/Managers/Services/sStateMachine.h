@@ -57,8 +57,13 @@ namespace NIKE {
 
             void removeState(Istate* state);
 
+            /***************************
+            * FSM Entity Management
+            ****************************/
+            void initEntityFSM(Entity::Type entity);
+
             /***********************
-            * State Managements
+            * Transition Managements
             **************************/
             void addTransition(Itransition* transition);
 

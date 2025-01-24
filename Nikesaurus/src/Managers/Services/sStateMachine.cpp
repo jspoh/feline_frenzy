@@ -36,6 +36,11 @@ namespace NIKE {
 			state_list.erase(std::remove(state_list.begin(), state_list.end(), state), state_list.end());
 		}
 
+		void Service::initEntityFSM([[maybe_unused]] Entity::Type entity)
+		{
+			
+		}	
+
 		void Service::addTransition(Itransition* transition)
 		{
 			transition_list.push_back(transition);
