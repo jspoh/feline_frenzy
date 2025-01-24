@@ -366,53 +366,46 @@ namespace NIKE {
         Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Step 1: Handle DESTROY resolution
-        // If either entity is set to be destroyed upon collision, mark it for deletion
-        if (collider_a.resolution == Physics::Resolution::DESTROY) {
+        // Dispatch collision event
+        auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
+        NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
+
+        // Destroy Resolution
+        if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
             return;
         }
-        if (collider_b.resolution == Physics::Resolution::DESTROY) {
+
+        if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
             return;
         }
 
-        // Step 2: Handle BOUNCE resolution
-        // If either entity has BOUNCE resolution, apply bounce logic
+        // Bounce Resolution (at least one entity has BOUNCE)
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
             if (collider_a.resolution == Physics::Resolution::BOUNCE) {
-                // Bounce entity A off entity B
                 bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
             }
             else {
-                // Bounce entity B off entity A
                 bounceResolution(transform_b, dynamics_b, collider_b, transform_a, dynamics_a, collider_a, info);
             }
             return;
         }
 
-        // Step 3: Skip NONE resolution adjustments
-        // If both entities have NONE resolution, no physics adjustments are applied
-        if (collider_a.resolution == Physics::Resolution::NONE && collider_b.resolution == Physics::Resolution::NONE) return;
+        // Slide Resolution
+        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
+            transform_a.position += info.mtv * 0.5f;
+            transform_b.position -= info.mtv * 0.5f;
+            return;
+        }
 
-        // Step 4: Handle SLIDE resolution for entity A
+        // Default Resolutions
         if (collider_a.resolution == Physics::Resolution::SLIDE) {
-            // Remove the velocity component along the collision normal (sliding effect)
-            dynamics_a.velocity -= dynamics_a.velocity.dot(info.collision_normal) * info.collision_normal;
-
-            // Adjust position based on the minimum translation vector (MTV)
             transform_a.position += info.mtv;
         }
 
-        // Step 5: Handle SLIDE resolution for entity B
         if (collider_b.resolution == Physics::Resolution::SLIDE) {
-            // Remove the velocity component along the collision normal (sliding effect)
-            dynamics_b.velocity -= dynamics_b.velocity.dot(info.collision_normal) * info.collision_normal;
-
-            // Adjust position based on the minimum translation vector (MTV)
             transform_b.position -= info.mtv;
         }
     }
-
-
 }
