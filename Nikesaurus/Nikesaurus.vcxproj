@@ -52,7 +52,7 @@
     <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
-    <ClCompile Include="src\Components\cFSM.cpp" />
+    <ClCompile Include="src\Components\cState.cpp" />
     <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Components\cPhysics.cpp" />
@@ -141,7 +141,7 @@
     <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
-    <ClInclude Include="headers\Components\cFSM.h" />
+    <ClInclude Include="headers\Components\cState.h" />
     <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />

@@ -41,7 +41,7 @@
 #include "Components/cElement.h"
 #include "Components/cEnemy.h"
 #include "Components/cCombat.h"
-#include "Components/cFSM.h"
+#include "Components/cState.h"
 
 //ECS manager for internal usage
 #ifdef NIKE_BUILD_DLL

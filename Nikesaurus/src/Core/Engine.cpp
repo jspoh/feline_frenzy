@@ -60,6 +60,9 @@ namespace NIKE {
 
 		//Register Combat components
 		Combat::registerComponents();
+
+		// Regiser state component
+		State::registerComponents();
 	}
 
 	void Core::Engine::registerDefSystems() {
@@ -351,7 +354,7 @@ namespace NIKE {
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					ss << "FPS: " << std::round(avg_fps);
-					comp->text = ss.str();
+					//comp->text = ss.str();
 					ss.str("");
 					ss.clear();
 				}

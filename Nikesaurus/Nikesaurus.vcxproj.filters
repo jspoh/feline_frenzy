@@ -60,7 +60,7 @@
     <ClCompile Include="src\Components\cCombat.cpp" />
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
     <ClCompile Include="src\Managers\Services\sStateMachine.cpp" />
-    <ClCompile Include="src\Components\cFSM.cpp" />
+    <ClCompile Include="src\Components\cState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -133,7 +133,7 @@
     <ClInclude Include="headers\Components\cCombat.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
     <ClInclude Include="headers\Managers\Services\sStateMachine.h" />
-    <ClInclude Include="headers\Components\cFSM.h" />
+    <ClInclude Include="headers\Components\cState.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
