@@ -30,6 +30,8 @@ namespace NIKE {
 				// Deserialize
 				[](State& comp, nlohmann::json const& data) {
 					comp.state_id = data.at("State").get<std::string>();
+					// Assign pointer based on state_id
+					comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
 
 				}
 
@@ -68,12 +70,36 @@ namespace NIKE {
 								// Save action
 								LevelEditor::Action save_state;
 								save_state.do_action = [&, state = new_state]() {
+									auto prev_state_ptr = comp.current_state.lock();
+									if (prev_state_ptr) {
+										// Exit previous state
+										prev_state_ptr->onExit(); 
+									}
 									comp.state_id = state;
+									comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
+
+									auto new_state_ptr = comp.current_state.lock();
+									if (new_state_ptr) {
+										// Initialize the new state
+										new_state_ptr->onEnter();  
+									}
 									};
 
 								// Undo action
 								save_state.undo_action = [&, state = before_select_state]() {
+									auto prev_state_ptr = comp.current_state.lock();
+									if (prev_state_ptr) {
+										// Exit previous state
+										prev_state_ptr->onExit();
+									}
 									comp.state_id = state;
+									comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
+
+									auto new_state_ptr = comp.current_state.lock();
+									if (new_state_ptr) {
+										// Initialize the new state
+										new_state_ptr->onEnter();
+									}
 									};
 
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_state));
@@ -83,6 +109,7 @@ namespace NIKE {
 
 								// Apply the new state
 								comp.state_id = new_state;
+								comp.current_state = NIKE_FSM_SERVICE->getStateByID(new_state);
 							}
 						}
 					}

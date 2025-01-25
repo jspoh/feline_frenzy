@@ -11,6 +11,7 @@
 #ifndef C_FSM_H
 #define C_FSM_H
 
+#include "Core/Engine.h"
 #include "Managers/Services/sStateMachine.h"
 
 namespace NIKE{
@@ -18,7 +19,7 @@ namespace NIKE{
 
 		struct State
 		{
-			NIKE::StateMachine::Istate* curent_state = nullptr;
+			std::weak_ptr<NIKE::StateMachine::Istate> current_state;
 			std::string state_id;
 		};
 

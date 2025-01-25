@@ -307,8 +307,6 @@ namespace NIKE {
 				//update UI First
 				NIKE_UI_SERVICE->update();
 #endif
-
-				NIKE_FSM_SERVICE->update();
 				//Update map grid
 				NIKE_MAP_SERVICE->gridUpdate();
 

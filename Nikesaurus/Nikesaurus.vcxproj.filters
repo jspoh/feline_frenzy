@@ -61,6 +61,8 @@
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
     <ClCompile Include="src\Managers\Services\sStateMachine.cpp" />
     <ClCompile Include="src\Components\cState.cpp" />
+    <ClCompile Include="src\Managers\States\enemyStates.cpp" />
+    <ClCompile Include="src\Managers\Transitions\enemyTransitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -134,6 +136,8 @@
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
     <ClInclude Include="headers\Managers\Services\sStateMachine.h" />
     <ClInclude Include="headers\Components\cState.h" />
+    <ClInclude Include="headers\Managers\States\enemyStates.h" />
+    <ClInclude Include="headers\Managers\Transitions\enemyTransitions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />
