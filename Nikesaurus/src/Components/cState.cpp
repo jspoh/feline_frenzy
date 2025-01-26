@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   cFSM.cpp
+ * \file   cState.cpp
  * \brief  State Machine components
  *
  * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
@@ -71,36 +71,28 @@ namespace NIKE {
 								LevelEditor::Action save_state;
 								save_state.do_action = [&, state = new_state]() {
 									auto prev_state_ptr = comp.current_state.lock();
-									if (prev_state_ptr) {
-										// Exit previous state
-										prev_state_ptr->onExit(); 
-									}
-									comp.state_id = state;
-									comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
-
-									auto new_state_ptr = comp.current_state.lock();
+									auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
 									if (new_state_ptr) {
-										// Initialize the new state
-										new_state_ptr->onEnter();  
+										NIKE_FSM_SERVICE->changeState(new_state_ptr);
+
+										// Update the component's state information
+										comp.state_id = new_state;
+										comp.current_state = NIKE_FSM_SERVICE->getStateByID(new_state);
 									}
-									};
+								};
 
 								// Undo action
 								save_state.undo_action = [&, state = before_select_state]() {
 									auto prev_state_ptr = comp.current_state.lock();
-									if (prev_state_ptr) {
-										// Exit previous state
-										prev_state_ptr->onExit();
-									}
-									comp.state_id = state;
-									comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
-
-									auto new_state_ptr = comp.current_state.lock();
+									auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
 									if (new_state_ptr) {
-										// Initialize the new state
-										new_state_ptr->onEnter();
+										NIKE_FSM_SERVICE->changeState(new_state_ptr);
+
+										// Update the component's state information
+										comp.state_id = new_state;
+										comp.current_state = NIKE_FSM_SERVICE->getStateByID(new_state);
 									}
-									};
+								};
 
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_state));
 
