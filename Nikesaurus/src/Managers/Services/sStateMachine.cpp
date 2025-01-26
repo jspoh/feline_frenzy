@@ -11,12 +11,12 @@
 #include "Managers/Services/sStateMachine.h"
 #include "Core/Engine.h"
 
-// States
+ // States
 #include "Managers/States/enemyStates.h"
 
 namespace NIKE {
 	namespace StateMachine {
-		void Service::changeState(std::shared_ptr<Istate> new_state)
+		void Service::changeState(std::shared_ptr<Istate> new_state, Entity::Type& entity)
 		{
 
 			if (!new_state) {
@@ -29,14 +29,14 @@ namespace NIKE {
 			}
 
 			if (current_state) {
-				current_state->onExit();
+				current_state->onExit(entity);
 			}
 
 			// Change to the new state
 			current_state = new_state;
 
 			// Enter the new state
-			current_state->onEnter();
+			current_state->onEnter(entity);
 		}
 
 		void Service::registerState(const std::string& state_id, std::shared_ptr<Istate> state)
@@ -74,33 +74,35 @@ namespace NIKE {
 
 			// A note to add here: entity is already passed in from the main for loop iteration from 
 			// game logic system
-
-			auto state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
-
-			if (state_comp.has_value()) {
+			auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
+			if (e_state_comp.has_value()) {
+				// Assign entity ref to the comp
+				auto& state_comp = e_state_comp.value().get();
+				state_comp.entity_ref = &entity;
 				// Lock the weak pointer to the current state
-				current_state = state_comp.value().get().current_state.lock();
+				current_state = state_comp.current_state.lock();
 				if (current_state)
 				{
-					current_state->onUpdate();
+					current_state->onUpdate(entity);
 				}
 				else {
 					NIKEE_CORE_WARN("State invalid");
 				}
 
-					for (auto& transition : transitions_map) {
-					if (transition.second->isValid()) {
-						std::shared_ptr<Istate> next_state = transition.second->getNextState();
-						// Transition to the next state
-						if (next_state)
-						{
-							changeState(next_state);
-						}
-					}
-				}
+
+				// Planning to include transition logic within states
+				// Ill leave this here first in case we want to separate transition logic
+				//for (auto& transition : transitions_map) {
+				//	if (transition.second->isValid()) {
+				//		std::shared_ptr<Istate> next_state = transition.second->getNextState();
+				//		// Transition to the next state
+				//		if (next_state)
+				//		{
+				//			changeState(next_state, entity);
+				//		}
+				//	}
+				//}
 			}
-
-
 		}
 	}
 }

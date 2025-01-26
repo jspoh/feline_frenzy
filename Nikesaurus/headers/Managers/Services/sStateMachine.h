@@ -20,11 +20,11 @@ namespace NIKE {
         {
             virtual ~Istate() = default;
 
-            virtual void onEnter() = 0;
+            virtual void onEnter(Entity::Type& entity) = 0;
 
-            virtual void onUpdate() = 0;
+            virtual void onUpdate(Entity::Type& entity) = 0;
 
-            virtual void onExit() = 0;
+            virtual void onExit(Entity::Type& entity) = 0;
         };
 
         // Base transition class
@@ -51,7 +51,7 @@ namespace NIKE {
             /***********************
             * State Managements
             **************************/
-            void changeState(std::shared_ptr<Istate> new_state);
+            void changeState(std::shared_ptr<Istate> new_state, Entity::Type& entity);
 
             void registerState(const std::string& state_id, std::shared_ptr<Istate> state);
 

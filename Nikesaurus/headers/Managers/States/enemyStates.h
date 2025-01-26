@@ -18,12 +18,9 @@ namespace NIKE {
 		public:
 			IdleState() = default;
 
-			void onEnter();
-			void onUpdate();
-			void onExit();
-
-			// Check if player is within range
-			bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
+			void onEnter(Entity::Type& entity) override;
+			void onUpdate(Entity::Type& entity) override;
+			void onExit(Entity::Type& entity) override;
 
 		private:
 
@@ -34,12 +31,9 @@ namespace NIKE {
 		public:
 			AttackState() = default;
 
-			void onEnter();
-			void onUpdate();
-			void onExit();
-
-			// Shoot bullet
-			void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
+			void onEnter(Entity::Type& entity) override;
+			void onUpdate(Entity::Type& entity) override;
+			void onExit(Entity::Type& entity) override;
 
 		private:
 
@@ -50,9 +44,9 @@ namespace NIKE {
 		public:
 			ChaseState() = default;
 
-			void onEnter();
-			void onUpdate();
-			void onExit();
+			void onEnter(Entity::Type& entity) override;
+			void onUpdate(Entity::Type& entity) override;
+			void onExit(Entity::Type& entity) override;
 
 		private:
 
