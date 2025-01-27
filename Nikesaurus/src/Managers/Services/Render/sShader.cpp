@@ -1,5 +1,5 @@
-/*****************************************************************//**
- * \file   sysShader.cpp
+﻿/*****************************************************************//**
+ * \file   sShader.cpp
  * \brief
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu(70%)
@@ -9,12 +9,12 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Systems/Render/sysShader.h"
 #include "Core/Engine.h"
+#include "Managers/Services/Render/sShader.h"
+
 
 namespace NIKE {
-
-	void Shader::Manager::compileShader(std::string const& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+	void Shader::ShaderManager::compileShader(std::string const& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
 		// read and compile vertex shader
 		std::ifstream vtx_file{ vtx_path };
 		if (!vtx_file.is_open()) {
@@ -60,7 +60,7 @@ namespace NIKE {
 		// link shaders
 		unsigned int shader_handle = glCreateProgram();
 		if (!shader_handle) {
-			cerr << "Failed to create shader program "<< shader_ref << endl;
+			cerr << "Failed to create shader program " << shader_ref << endl;
 			throw std::exception();
 		}
 
@@ -88,7 +88,7 @@ namespace NIKE {
 		shaders[shader_ref] = shader_handle;
 	}
 
-	void Shader::Manager::init() {
+	void Shader::ShaderManager::init() {
 		//Load all shaders
 		compileShader("base", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base.frag").string());
 		compileShader("batched_base", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_base.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_base.frag").string());
@@ -97,20 +97,20 @@ namespace NIKE {
 		compileShader("text", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.frag").string());
 	}
 
-	void Shader::Manager::useShader(const std::string& shader_ref) {
+	void Shader::ShaderManager::useShader(const std::string& shader_ref) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
 		glUseProgram(shaders.at(shader_ref));
 	}
 
-	void Shader::Manager::unuseShader() {
+	void Shader::ShaderManager::unuseShader() {
 		glUseProgram(0);
 	}
 
 	// Uniform setters
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, int value) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
@@ -123,7 +123,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, float value) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
@@ -136,7 +136,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Matrix_33& value) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Matrix_33& value) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
@@ -149,7 +149,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Vector3f& value) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
@@ -162,7 +162,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector2f& value) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Vector2f& value) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
@@ -175,7 +175,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const Vector4f& value) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const Vector4f& value) {
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
@@ -188,7 +188,7 @@ namespace NIKE {
 		}
 	}
 
-	void Shader::Manager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals) {
+	void Shader::ShaderManager::setUniform(const std::string& shader_ref, const std::string& name, const std::vector<unsigned int>& vals) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at start of {0}: {1}", __FUNCTION__, err);
@@ -222,4 +222,10 @@ namespace NIKE {
 		}
 	}
 
+	Shader::ShaderManager::~ShaderManager() {
+		//Clear shaders
+		for (auto& shader : shaders) {
+			glDeleteProgram(shader.second);
+		}
+	}
 }

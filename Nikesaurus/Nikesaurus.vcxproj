@@ -74,6 +74,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
+    <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
     <ClCompile Include="src\Managers\Services\sDebug.cpp" />
@@ -82,6 +83,7 @@
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
     <ClCompile Include="src\Managers\Services\sPath.cpp" />
+    <ClCompile Include="src\Managers\Services\Render\sRender.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
     <ClCompile Include="src\Managers\Services\sStateMachine.cpp" />
     <ClCompile Include="src\Managers\States\enemyStates.cpp" />
@@ -97,7 +99,6 @@
     <ClCompile Include="src\Systems\Physics\sysPhysics.cpp" />
     <ClCompile Include="src\Managers\Services\sCamera.cpp" />
     <ClCompile Include="src\Systems\Render\sysRender.cpp" />
-    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
     <ClCompile Include="src\Utility\uLogger.cpp" />
     <ClCompile Include="src\Managers\Services\sWindows.cpp" />
     <ClCompile Include="src\Math\Mtx33.cpp" />
@@ -163,12 +164,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
+    <ClInclude Include="headers\Managers\Services\Render\sShader.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
     <ClInclude Include="headers\Managers\Services\sInput.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
+    <ClInclude Include="headers\Managers\Services\Render\sRender.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sStateMachine.h" />
     <ClInclude Include="headers\Managers\States\enemyStates.h" />
@@ -184,7 +187,6 @@
     <ClInclude Include="headers\Systems\Physics\sysPhysics.h" />
     <ClInclude Include="headers\Managers\Services\sCamera.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
-    <ClInclude Include="headers\Systems\Render\sysShader.h" />
     <ClInclude Include="headers\Utility\uLogger.h" />
     <ClInclude Include="headers\Nikesaurus.h" />
     <ClInclude Include="headers\Managers\Services\sDebug.h" />

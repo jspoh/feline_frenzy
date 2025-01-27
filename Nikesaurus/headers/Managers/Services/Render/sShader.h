@@ -1,21 +1,21 @@
-﻿/*****************************************************************//**
- * \file   sysShader.h
- * \brief
+/*****************************************************************//**
+ * \file   sShader.h
+ * \brief Shader manger
  *
  * \author Sean Gwee, g.boonxuensean@digipen.edu (70%)
  * \co-author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (30%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
 
-#ifndef SHADER_MANAGER_HPP
-#define SHADER_MANAGER_HPP
+#ifndef SHADER_SERVICE_HPP
+#define SHADER_SERVICE_HPP
 
 namespace NIKE {
 	namespace Shader {
-		class Manager {
+		class ShaderManager {
 		private:
 
 			std::unordered_map<std::string, unsigned int> shaders;
@@ -30,13 +30,8 @@ namespace NIKE {
 
 			void compileShader(std::string const& shader_ref, const std::string& vtx_path, const std::string& frag_path);
 		public:
-			Manager() = default;
-			~Manager() {
-				//Clear shaders
-				for (auto& shader : shaders) {
-					glDeleteProgram(shader.second);
-				}
-			}
+			ShaderManager() = default;
+			~ShaderManager();
 
 			//Initialize shaders
 			void init();
@@ -60,4 +55,4 @@ namespace NIKE {
 	}
 }
 
-#endif // !SHADER_MANAGER_HPP
+#endif // !SHADER_SERVICE_HPP
