@@ -237,7 +237,7 @@ namespace NIKE {
 
 				//Serialize entity editor meta data
 				#ifndef NDEBUG
-				e_data["Entity"]["MetaData"] = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(entity).serialize();
+				//e_data["Entity"]["MetaData"] = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(entity).serialize();
 				#endif
 
 				//If entity is a UI Entity
@@ -329,9 +329,9 @@ namespace NIKE {
 					// Wrapped for Release to build!
 					//Deserialize entity metadata
 					#ifndef NDEBUG
-					LevelEditor::EntityMetaData meta_data;
-					meta_data.deserialize(e_data.at("Entity").at("MetaData"));
-					NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
+					//LevelEditor::EntityMetaData meta_data;
+					//meta_data.deserialize(e_data.at("Entity").at("MetaData"));
+					//NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
 					#endif				
 
 					//Check if entity is a UI entity

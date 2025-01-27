@@ -222,13 +222,16 @@ namespace NIKE {
 		//Init Lua
 		NIKE_LUA_SERVICE->init();
 
+		//Init metadata service
+		NIKE_METADATA_SERVICE->init();
+
+		// Init FSM
+		NIKE_FSM_SERVICE->init();
+
 #ifndef NDEBUG
 		//Init Level Editor
 		NIKE_LVLEDITOR_SERVICE->init(json_config);
 #endif
-
-		// Init FSM
-		NIKE_FSM_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();
@@ -263,7 +266,10 @@ namespace NIKE {
 		fps_history.reserve(300);		// unlikely to exceed 300fps
 		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
+
+#ifdef DEBUG
 			try {
+#endif
 
 				// get delta time first
 				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
@@ -361,22 +367,7 @@ namespace NIKE {
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
 
-#ifndef NDEBUG
-					std::shared_ptr<LevelEditor::EntitiesPanel> entities_panel = std::dynamic_pointer_cast<LevelEditor::EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(NIKE::LevelEditor::EntitiesPanel::getStaticName()));
-					if (!entities_panel) {
-						NIKEE_CORE_ERROR("Entities Panel not found");
-						throw;
-					}
-					auto& entity_map = entities_panel->getEntityMap();
-					auto& entity_to_name_map = entities_panel->getEntityToNameMap();
-					auto& name_to_entity_map = entities_panel->getNameToEntityMap();
-
-					entity_map[FPS_DISPLAY_ENTITY] = LevelEditor::EntityMetaData(FPS_DISPLAY_NAME, "", false);
-					name_to_entity_map.erase(entity_to_name_map[FPS_DISPLAY_ENTITY]);
-					name_to_entity_map[FPS_DISPLAY_NAME] = FPS_DISPLAY_ENTITY;
-					entity_to_name_map[FPS_DISPLAY_ENTITY] = FPS_DISPLAY_NAME;
-#endif
-
+					NIKE_METADATA_SERVICE->setEntityName(FPS_DISPLAY_ENTITY, FPS_DISPLAY_NAME);
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { });
@@ -387,11 +378,14 @@ namespace NIKE {
 				}
 
 				frame_count++;
+
+#ifdef NDEBUG
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
 				throw e;
 			}
+#endif
 		}
 
 		//Stop watching all directories

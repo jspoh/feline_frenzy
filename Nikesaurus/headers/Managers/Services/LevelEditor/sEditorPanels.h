@@ -170,42 +170,11 @@ namespace NIKE {
 			void render() override;
 		};
 
-		//Entities management structure
-		struct EntityMetaData {
-			std::string entity_id;
-			std::string prefab_id;
-			bool b_locked;
-
-			EntityMetaData() : entity_id{ "" }, prefab_id{ "" }, b_locked{ false } {}
-			EntityMetaData(std::string const& entity_id, std::string const& prefab_id, bool b_locked)
-				: entity_id{ entity_id }, b_locked{ b_locked }, prefab_id{ prefab_id } {}
-
-			//Serialization
-			nlohmann::json serialize() const;
-
-			//Deserialization
-			void deserialize(nlohmann::json const& data);
-		};
-
 		//Entities Management Panel
 		class EntitiesPanel :
-			public IPanel,
-			public Events::IEventListener<Coordinator::EntitiesChanged>
+			public IPanel
 		{
 		private:
-			//Sort entities
-			struct EntitySorter{
-				bool operator()(Entity::Type const& e1, Entity::Type const& e2) const {
-					return e1 < e2;
-				}
-			};
-
-			//Set of active entities
-			std::map<Entity::Type, EntityMetaData, EntitySorter> entities;
-
-			//BI-Mapping of entity type to string * vice versa
-			std::unordered_map<Entity::Type, std::string> entity_to_name;
-			std::unordered_map<std::string, Entity::Type> name_to_entity;
 
 			//Selected entity
 			Entity::Type selected_entity;
@@ -225,8 +194,6 @@ namespace NIKE {
 			//Error msg
 			std::shared_ptr<std::string> error_msg;
 
-			std::set<unsigned int> reusable_indices;
-
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 
@@ -236,8 +203,6 @@ namespace NIKE {
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
 
-			//On entities changed event
-			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
 			~EntitiesPanel() = default;
@@ -261,52 +226,17 @@ namespace NIKE {
 			//Render
 			void render() override;
 
-			//Get entity name
-			std::string getEntityName(Entity::Type entity);
-
 			//Get selected entity
 			Entity::Type getSelectedEntity() const;
-			
-			//Get selected entity name
-			std::optional<std::string> getSelectedEntityName() const;
 
 			//Unselect entity
 			void unselectEntity();
 
-			//Set entity metadata
-			void setEntityMetaData(Entity::Type entity, EntityMetaData data);
-
-			//Get entity metadata
-			EntityMetaData getEntityMetaData(Entity::Type entity) const;
-
-			//Get selected entity editor variables
-			std::optional<std::reference_wrapper<LevelEditor::EntityMetaData>> getSelectedEntityMetaData();
-
-			//Lock entity
-			void lockEntity(Entity::Type entity);
-
-			//Lock all entities
-			void lockAllEntities();
-
-			//Unlock entity
-			void unlockEntity(Entity::Type entity);
-
-			//Unlock all entities
-			void unlockAllEntities();
-
 			//Check entity changed
 			bool isEntityChanged() const;
 
-			//Update entities list
-			void updateEntities(std::set<Entity::Type> ecs_entities);
-
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
-
-			// getters
-			std::map<Entity::Type, EntityMetaData, EntitySorter>& getEntityMap();
-			std::unordered_map<Entity::Type, std::string>& getEntityToNameMap();
-			std::unordered_map<std::string, Entity::Type>& getNameToEntityMap();
 		};
 
 		//Components Management Panel
@@ -737,8 +667,6 @@ namespace NIKE {
 		//Camera Management Panel
 		class CameraPanel : public IPanel {
 		private:
-			//Entities panel for string reference
-			std::weak_ptr<EntitiesPanel> entities_panel;
 
 			//Reference to game window panel
 			std::weak_ptr<GameWindowPanel> game_panel;

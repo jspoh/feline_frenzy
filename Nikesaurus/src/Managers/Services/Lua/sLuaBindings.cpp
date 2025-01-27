@@ -445,9 +445,9 @@ namespace NIKE {
                 });
 
 #ifndef NDEBUG
-            auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
-            data.prefab_id = "bullet.prefab";
-            NIKE_LVLEDITOR_SERVICE->setEntityMetaData(bullet_entity, data);
+            //auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
+            //data.prefab_id = "bullet.prefab";
+            //NIKE_LVLEDITOR_SERVICE->setEntityMetaData(bullet_entity, data);
 #endif
 
             //Player position
