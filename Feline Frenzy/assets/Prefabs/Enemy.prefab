@@ -3,7 +3,7 @@
         "Combat::Health": {
             "Health": 100.0,
             "InvulnerableFlag": false,
-            "Lives": 1
+            "Lives": 1,
         },
         "Element::Entity": {
             "Element": 1

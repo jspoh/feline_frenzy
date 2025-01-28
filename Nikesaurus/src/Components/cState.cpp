@@ -73,7 +73,7 @@ namespace NIKE {
 									auto prev_state_ptr = comp.current_state.lock();
 									auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
 									if (new_state_ptr) {
-										NIKE_FSM_SERVICE->changeState(new_state_ptr, *comp.entity_ref);
+										NIKE_FSM_SERVICE->changeState(new_state_ptr, comp.entity_ref);
 
 										// Update the component's state information
 										comp.state_id = new_state;
@@ -87,7 +87,7 @@ namespace NIKE {
 									auto prev_state_ptr = comp.current_state.lock();
 									auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
 									if (new_state_ptr) {
-										NIKE_FSM_SERVICE->changeState(new_state_ptr, *comp.entity_ref);
+										NIKE_FSM_SERVICE->changeState(new_state_ptr, comp.entity_ref);
 
 										// Update the component's state information
 										comp.state_id = new_state;

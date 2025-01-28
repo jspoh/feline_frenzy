@@ -21,7 +21,7 @@ namespace NIKE{
 		{
 			std::weak_ptr<NIKE::StateMachine::Istate> current_state;
 			std::string state_id;
-			Entity::Type* entity_ref = nullptr;
+			Entity::Type entity_ref;
 		};
 
 		void registerComponents();

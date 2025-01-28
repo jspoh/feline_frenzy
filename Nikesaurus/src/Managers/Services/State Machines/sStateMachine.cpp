@@ -84,7 +84,7 @@ namespace NIKE {
 			if (e_state_comp.has_value()) {
 				// Assign entity ref to the comp
 				auto& state_comp = e_state_comp.value().get();
-				state_comp.entity_ref = &entity;
+				state_comp.entity_ref = entity;
 				// Lock the weak pointer to the current state
 				current_state = state_comp.current_state.lock();
 				if (current_state)

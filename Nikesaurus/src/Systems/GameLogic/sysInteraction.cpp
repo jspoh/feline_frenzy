@@ -76,9 +76,9 @@ namespace NIKE {
         void Manager::handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Player Element Swapping
             // Check for E key pressed
-            if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
+            //if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
                 changeElement(entity_a, entity_b);
-            }
+            //}
 
             // Collision between damage and health
             applyDamage(entity_a, entity_b);

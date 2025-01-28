@@ -27,7 +27,7 @@ namespace NIKE {
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "enter idle state" << endl;
+		//cout << "enter idle state" << endl;
 	}
 
 	void State::IdleState::onUpdate([[maybe_unused]] Entity::Type& entity)
@@ -37,7 +37,7 @@ namespace NIKE {
 
 	void State::IdleState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "exit idle state" << endl;
+		//cout << "exit idle state" << endl;
 	}
 
 	/*******************************
@@ -46,7 +46,7 @@ namespace NIKE {
 
 	void NIKE::State::AttackState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "enter attack state" << endl;
+		//cout << "enter attack state" << endl;
 	}
 
 	void NIKE::State::AttackState::onUpdate([[maybe_unused]] Entity::Type& entity)
@@ -58,7 +58,7 @@ namespace NIKE {
 
 	void NIKE::State::AttackState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "exit attack state" << endl;
+		//cout << "exit attack state" << endl;
 	}
 
 	/*******************************
