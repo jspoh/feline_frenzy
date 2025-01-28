@@ -327,7 +327,9 @@ namespace NIKE {
 
 				elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 
-				if (frame_count > 0) {
+				comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+				comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+				if (comp) {
 					// toggle fps display
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1)) {
 						if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY)) {
@@ -354,7 +356,7 @@ namespace NIKE {
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					ss << "FPS: " << std::round(avg_fps);
-					//comp->text = ss.str();
+					comp->text = ss.str();
 					ss.str("");
 					ss.clear();
 				}
