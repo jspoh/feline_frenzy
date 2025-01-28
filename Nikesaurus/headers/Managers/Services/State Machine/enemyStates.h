@@ -17,7 +17,7 @@ namespace NIKE {
 		class IdleState : public StateMachine::Istate
 		{
 		public:
-			IdleState() = default;
+			IdleState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;

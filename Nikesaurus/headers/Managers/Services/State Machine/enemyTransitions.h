@@ -14,12 +14,12 @@
 
 namespace NIKE {
 	namespace Transition {
-		class IdleToAttack : StateMachine::Itransition {
+		class IdleToAttack : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
-			bool isValid();
+			bool isValid(Entity::Type& entity) const override;
 
 			// Returns the state that should be transitioned to, if valid.
-			std::shared_ptr<StateMachine::Istate> getNextState();
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 	}
 }

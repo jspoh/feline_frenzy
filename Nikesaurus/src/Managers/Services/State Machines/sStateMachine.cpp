@@ -16,6 +16,17 @@
 
 namespace NIKE {
 	namespace StateMachine {
+
+		std::unordered_map<std::string, std::shared_ptr<Itransition>> const& Istate::getTransitions()
+		{
+			return transitions;
+		}
+
+		void Istate::addTransition(const std::string& transition_id, std::shared_ptr<Itransition> transition)
+		{
+			transitions[transition_id] = std::move(transition);
+		}
+
 		void Service::changeState(std::shared_ptr<Istate> new_state, Entity::Type& entity)
 		{
 
@@ -49,11 +60,6 @@ namespace NIKE {
 			state_map.erase(state_id);
 		}
 
-		void Service::addTransition(const std::string& transition_id, std::shared_ptr<Itransition> transition)
-		{
-			transitions_map[transition_id] = transition;
-		}
-
 		std::shared_ptr<Istate> Service::getStateByID(const std::string& state_id) const
 		{
 			auto it = state_map.find(state_id);
@@ -84,24 +90,25 @@ namespace NIKE {
 				if (current_state)
 				{
 					current_state->onUpdate(entity);
+					// Iterate current state's transitions
+					for (auto& transition : current_state->getTransitions())
+					{
+						if (transition.second->isValid(entity)) {
+							std::shared_ptr<Istate> next_state = transition.second->getNextState();
+							// Transition to the next state
+							if (next_state)
+							{
+								// Change state
+								changeState(next_state, entity);
+								// Break after changing state
+								break;
+							}
+						}
+					}
 				}
 				else {
 					NIKEE_CORE_WARN("State invalid");
 				}
-
-
-				// Planning to include transition logic within states
-				// Ill leave this here first in case we want to separate transition logic
-				//for (auto& transition : transitions_map) {
-				//	if (transition.second->isValid()) {
-				//		std::shared_ptr<Istate> next_state = transition.second->getNextState();
-				//		// Transition to the next state
-				//		if (next_state)
-				//		{
-				//			changeState(next_state, entity);
-				//		}
-				//	}
-				//}
 			}
 		}
 	}
