@@ -4,7 +4,6 @@
             "Health": 100.0,
             "InvulnerableFlag": false,
             "Lives": 1,
-            "HealthBarActive": false
         },
         "Element::Entity": {
             "Element": 1
