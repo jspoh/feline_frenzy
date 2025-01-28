@@ -58,10 +58,10 @@
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cCombat.cpp" />
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
-    <ClCompile Include="src\Managers\Services\sStateMachine.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\sStateMachine.cpp" />
     <ClCompile Include="src\Components\cState.cpp" />
-    <ClCompile Include="src\Managers\States\enemyStates.cpp" />
-    <ClCompile Include="src\Managers\Transitions\enemyTransitions.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\enemyStates.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\enemyTransitions.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sRender.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
   </ItemGroup>
@@ -134,10 +134,10 @@
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cCombat.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
-    <ClInclude Include="headers\Managers\Services\sStateMachine.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\sStateMachine.h" />
     <ClInclude Include="headers\Components\cState.h" />
-    <ClInclude Include="headers\Managers\States\enemyStates.h" />
-    <ClInclude Include="headers\Managers\Transitions\enemyTransitions.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\enemyStates.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\enemyTransitions.h" />
     <ClInclude Include="headers\Managers\Services\Render\sRender.h" />
     <ClInclude Include="headers\Managers\Services\Render\sShader.h" />
   </ItemGroup>

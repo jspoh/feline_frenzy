@@ -10,7 +10,8 @@
 #ifndef ENEMY_STATES
 #define ENEMY_STATES
 
-#include "Managers/Services/sStateMachine.h"
+#include "Managers/Services/State Machine/sStateMachine.h"
+
 namespace NIKE {
 	namespace State {
 		class IdleState : public StateMachine::Istate

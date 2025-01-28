@@ -10,7 +10,7 @@
 #ifndef ENEMY_TRANSITION
 #define ENEMY_TRANSITION
 
-#include "Managers/Services/sStateMachine.h"
+#include "Managers/Services/State Machine/sStateMachine.h"
 
 namespace NIKE {
 	namespace Transition {

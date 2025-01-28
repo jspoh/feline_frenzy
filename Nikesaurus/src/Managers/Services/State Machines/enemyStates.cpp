@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/States/enemyStates.h"
+#include "Managers/Services/State Machine/enemyStates.h"
 #include "Systems/GameLogic/sysEnemy.h"
 #include "Core/Engine.h"
 
@@ -20,7 +20,7 @@ namespace NIKE {
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "enter idle state" << endl;
+		//cout << "enter idle state" << endl;
 
 	}
 
@@ -35,7 +35,6 @@ namespace NIKE {
 			{
 				auto attack_state = NIKE_FSM_SERVICE->getStateByID("Attack");
 				NIKE_FSM_SERVICE->changeState(attack_state, entity);
-				cout << "attack change" << endl;
 			}
 
 		}
@@ -43,7 +42,7 @@ namespace NIKE {
 
 	void State::IdleState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "exit idle state" << endl;
+		//cout << "exit idle state" << endl;
 	}
 
 	/*******************************
@@ -52,7 +51,7 @@ namespace NIKE {
 
 	void NIKE::State::AttackState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "enter attack state" << endl;
+		//cout << "enter attack state" << endl;
 	}
 
 	void NIKE::State::AttackState::onUpdate([[maybe_unused]] Entity::Type& entity)
@@ -64,7 +63,7 @@ namespace NIKE {
 
 	void NIKE::State::AttackState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "exit attack state" << endl;
+		//cout << "exit attack state" << endl;
 	}
 
 	/*******************************
@@ -72,7 +71,7 @@ namespace NIKE {
 	*****************************/
 	void NIKE::State::ChaseState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "enter chase state" << endl;
+		//cout << "enter chase state" << endl;
 	}
 
 	void NIKE::State::ChaseState::onUpdate([[maybe_unused]] Entity::Type& entity)
@@ -82,6 +81,6 @@ namespace NIKE {
 
 	void NIKE::State::ChaseState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
-		cout << "exit chase state" << endl;
+		//cout << "exit chase state" << endl;
 	}
 }

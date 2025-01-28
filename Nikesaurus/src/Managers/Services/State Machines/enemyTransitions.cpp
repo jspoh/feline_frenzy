@@ -10,8 +10,8 @@
 #include "Core/Engine.h"
 
 // States and transitions
-#include "Managers/Transitions/enemyTransitions.h"
-#include "Managers/States/enemyStates.h"
+#include "Managers/Services/State Machine/enemyTransitions.h"
+#include "Managers/Services/State Machine/enemyStates.h"
 
 
 namespace NIKE {

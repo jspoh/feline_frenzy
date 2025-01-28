@@ -8,11 +8,11 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/sStateMachine.h"
+#include "Managers/Services/State Machine/sStateMachine.h"
 #include "Core/Engine.h"
 
  // States
-#include "Managers/States/enemyStates.h"
+#include "Managers/Services/State Machine/enemyStates.h"
 
 namespace NIKE {
 	namespace StateMachine {
