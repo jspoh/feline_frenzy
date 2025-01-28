@@ -13,6 +13,18 @@
 
 namespace NIKE {
 	namespace State {
+
+		State::State()
+		{
+			// Default init of entity's state to idle
+			auto const& idle_state = NIKE_FSM_SERVICE->getStateByID("Idle");
+			if (idle_state)
+			{
+				current_state = idle_state;
+				state_id = "Idle";
+			}
+		}
+
 		void registerComponents()
 		{
 			// Register components

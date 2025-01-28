@@ -27,6 +27,17 @@ namespace NIKE {
 			transitions[transition_id] = std::move(transition);
 		}
 
+		void Istate::removeTransition(const std::string& transition_id)
+		{
+			transitions.erase(transition_id);
+		}
+
+		bool Istate::checkTransitionExist(const std::string& transition_id)
+		{
+			// Check if transition exist
+			return (transitions.find(transition_id) != transitions.end());
+		}
+
 		void Service::changeState(std::shared_ptr<Istate> new_state, Entity::Type& entity)
 		{
 
@@ -45,6 +56,12 @@ namespace NIKE {
 
 			// Change to the new state
 			current_state = new_state;
+			// Change entity's state component as well
+			auto const& e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
+			if (e_state_comp.has_value())
+			{
+				e_state_comp.value().get().current_state = new_state;
+			}
 
 			// Enter the new state
 			current_state->onEnter(entity);

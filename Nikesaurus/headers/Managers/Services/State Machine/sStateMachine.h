@@ -46,6 +46,8 @@ namespace NIKE {
             ************************/
             std::unordered_map<std::string, std::shared_ptr<Itransition>> const& getTransitions();
             void addTransition(const std::string& transition_id, std::shared_ptr<Itransition> transition);
+            void removeTransition(const std::string& transition_id);
+            bool checkTransitionExist(const std::string& transition_id);
 
 
         private:

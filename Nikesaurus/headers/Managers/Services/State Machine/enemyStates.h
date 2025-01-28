@@ -30,7 +30,7 @@ namespace NIKE {
 		class AttackState : public StateMachine::Istate
 		{
 		public:
-			AttackState() = default;
+			AttackState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
