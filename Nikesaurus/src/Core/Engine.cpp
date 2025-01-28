@@ -123,6 +123,7 @@ namespace NIKE {
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Serialization::Service>());
+		provideService(std::make_shared<Render::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
