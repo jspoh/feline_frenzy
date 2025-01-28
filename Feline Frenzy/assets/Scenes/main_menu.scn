@@ -207,7 +207,9 @@
                             "Input_State": 1,
                             "Script": {
                                 "Function": "Change",
-                                "Named_Args": {},
+                              "Named_Args": {
+                                "scene": "how_to_play.scn"
+                              },
                                 "Script_ID": "ChangeScene.lua"
                             }
                         },
