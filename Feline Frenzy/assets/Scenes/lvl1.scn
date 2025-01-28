@@ -410,19 +410,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 82,
+                                "Completed_Animations": 3,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.01666666753590107
+                                "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 5,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 1
+                                    "y": 0
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -430,7 +430,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 1
+                                    "y": 0
                                 }
                             },
                             "Audio::SFX": {
@@ -446,7 +446,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 13
+                                    "entity": 8
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -457,8 +457,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -117.28313446044922,
-                                    "y": 578.3223266601563
+                                    "x": 491.0498046875,
+                                    "y": 428.32177734375
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -482,10 +482,10 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -117.28313446044922,
-                                    "y": 578.3223266601563
+                                    "x": 491.0498046875,
+                                    "y": 428.32177734375
                                 },
-                                "Zoom": 2.888092041015625
+                                "Zoom": 0.7794040441513062
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -501,8 +501,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 5,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -523,8 +523,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -117.28313446044922,
-                                    "y": 578.3223266601563
+                                    "x": 491.0498046875,
+                                    "y": 428.32177734375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -546,7 +546,7 @@
                     "Entity": {
                         "Components": {
                             "Combat::Health": {
-                                "Health": 70.0,
+                                "Health": 100.0,
                                 "InvulnerableFlag": false,
                                 "Lives": 1
                             },
@@ -578,8 +578,8 @@
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 100.0,
-                                    "y": 112.28070831298828
+                                    "x": 94.74921417236328,
+                                    "y": 116.74456787109375
                                 }
                             },
                             "Render::Texture": {
@@ -597,14 +597,14 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 4
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Normal_Enemy_Idle_Front.png"
+                                "Texture_ID": "Normal_Enemy_SpriteSheet.png"
                             },
                             "State::State": {
                                 "State": "Idle"
@@ -616,8 +616,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 100.0,
-                                    "y": 112.28070831298828
+                                    "x": 94.74921417236328,
+                                    "y": 116.74456787109375
                                 },
                                 "Screen Position": false
                             }
@@ -734,8 +734,8 @@
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
+                                    "x": 91.9847640991211,
+                                    "y": 118.93572235107422
                                 }
                             },
                             "Render::Texture": {
@@ -753,14 +753,14 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 4
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                                "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -769,8 +769,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
+                                    "x": 91.9847640991211,
+                                    "y": 118.93572235107422
                                 },
                                 "Screen Position": false
                             }
@@ -819,8 +819,8 @@
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
+                                    "x": 91.9847640991211,
+                                    "y": 118.93572235107422
                                 }
                             },
                             "Render::Texture": {
@@ -838,14 +838,14 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 4
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                                "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -854,8 +854,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
+                                    "x": 91.9847640991211,
+                                    "y": 118.93572235107422
                                 },
                                 "Screen Position": false
                             }
@@ -904,8 +904,8 @@
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
+                                    "x": 91.9847640991211,
+                                    "y": 118.93572235107422
                                 }
                             },
                             "Render::Texture": {
@@ -923,14 +923,14 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 4
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Elite_Mob_Idle_Front.png"
+                                "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -939,8 +939,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
+                                    "x": 91.9847640991211,
+                                    "y": 118.93572235107422
                                 },
                                 "Screen Position": false
                             }
