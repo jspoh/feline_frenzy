@@ -194,6 +194,12 @@ namespace NIKE {
 			//Error msg
 			std::shared_ptr<std::string> error_msg;
 
+			//Add tag popup
+			std::function<void()> addTagPopUp(std::string const& popup_id);
+
+			//Remove tag popup
+			std::function<void()> removeTagPopUp(std::string const& popup_id);
+
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
 

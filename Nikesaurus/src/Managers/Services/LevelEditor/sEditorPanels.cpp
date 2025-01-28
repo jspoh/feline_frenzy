@@ -482,6 +482,118 @@ namespace NIKE {
 	* Entities Panel
 	*********************************************************************/
 
+	std::function<void()> LevelEditor::EntitiesPanel::addTagPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string tag_name;
+
+			//Get entity text
+			ImGui::Text("Enter a name for the new tag:");
+			if (ImGui::InputText("##Tag Name", tag_name.data(), tag_name.capacity() + 1)) {
+				tag_name.resize(strlen(tag_name.c_str()));
+			}
+
+			//If enter or ok button is pressed
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+
+				//Temporary create action
+				Action create;
+
+				//Create a shared id for do & undo functions
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(tag_name);
+
+				//Do Action
+				create.do_action = [&, shared_id]() {
+					NIKE_METADATA_SERVICE->registerTag(*shared_id);
+					};
+
+				//Undo Action
+				create.undo_action = [&, shared_id]() {
+					NIKE_METADATA_SERVICE->unregisterTag(*shared_id);
+					};
+
+				//Execute create entity action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
+
+				//Reset tag name
+				tag_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel creating new entity
+			if (ImGui::Button("Cancel")) {
+
+				//Reset tag name
+				tag_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+
+	}
+
+	std::function<void()> LevelEditor::EntitiesPanel::removeTagPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			////Static entity name input buffer
+			//static std::string tag_name;
+
+			////Get entity text
+			//ImGui::Text("Enter a name for the new tag:");
+			//if (ImGui::InputText("##Tag Name", tag_name.data(), tag_name.capacity() + 1)) {
+			//	tag_name.resize(strlen(tag_name.c_str()));
+			//}
+
+			////If enter or ok button is pressed
+			//if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+
+			//	//Temporary create action
+			//	Action remove;
+
+			//	//Create a shared id for do & undo functions
+			//	std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(tag_name);
+
+			//	//Do Action
+			//	remove.do_action = [&, shared_id]() {
+			//		NIKE_METADATA_SERVICE->registerTag(*shared_id);
+			//		};
+
+			//	//Undo Action
+			//	remove.undo_action = [&, shared_id]() {
+			//		NIKE_METADATA_SERVICE->unregisterTag(*shared_id);
+			//		};
+
+			//	//Execute create entity action
+			//	NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove));
+
+			//	//Reset tag name
+			//	tag_name.clear();
+
+			//	//Close popup
+			//	closePopUp(popup_id);
+			//}
+
+			//ImGui::SameLine();
+
+			////Cancel creating new entity
+			//if (ImGui::Button("Cancel")) {
+
+			//	//Reset tag name
+			//	tag_name.clear();
+
+			//	//Close popup
+			//	closePopUp(popup_id);
+			//}
+			};
+
+	}
+
 	std::function<void()> LevelEditor::EntitiesPanel::createEntityPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -720,6 +832,8 @@ namespace NIKE {
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Register popups
+		registerPopUp("Add Tag", addTagPopUp("Add Tag"));
+		registerPopUp("Remove Tag", removeTagPopUp("Remove Tag"));
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
 		registerPopUp("Clone Entity", cloneEntityPopUp("Clone Entity"));
@@ -743,211 +857,278 @@ namespace NIKE {
 	void LevelEditor::EntitiesPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-		// Button to create an entity, which triggers the popup
-		if (ImGui::Button("Create")) {
-			openPopUp("Create Entity");
+		//Create entity tags
+		if (ImGui::CollapsingHeader("Entity Tags")) {
+
+			//Selected index
+			static std::string selected_tag = "";
+
+			//Get all tags
+			auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
+
+			// Button to create an entity, which triggers the popup
+			if (ImGui::Button("Add Tag")) {
+				openPopUp("Add Tag");
+			}
+
+			//Buttons Same Line
+			ImGui::SameLine();
+
+			// Button to remove an entity, which triggers the popup
+			if (ImGui::Button("Remove Tag")) {
+				openPopUp("Remove Tag");
+			}
+
+			//Iterate through all tags
+			if (!tags.empty()) {
+				for (auto const& tag : tags) {
+
+					//Display tag for selection
+					if (ImGui::Selectable(tag.c_str(), selected_tag == tag)) {
+						selected_tag = tag;
+					}
+
+					//If tag is selected
+					if (selected_tag == tag) {
+						//Start drag-and-drop source
+						if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+							//Set drag payload with asset tag
+							ImGui::SetDragDropPayload(std::string("Entity Tag").c_str(), tag.c_str(), tag.size() + 1);
+							ImGui::Text(std::string("Entity Tag: " + tag).c_str());
+							ImGui::EndDragDropSource();
+						}
+					}
+				}
+			}
+			else {
+				ImGui::Text("No Tags Exists.");
+			}
 		}
 
-		//Buttons Same Line
-		ImGui::SameLine();
-
-		// Button to remove an entity, which triggers the popup
-		if ((ImGui::Button("Remove") || ImGui::GetIO().KeysDown[ImGuiKey_Delete]) && NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
-			openPopUp("Remove Entity");
-		}
-
-		//Buttons Same Line
-		ImGui::SameLine();
-
-		// Button to clone an entity, which triggers the popup
-		if (ImGui::Button("Clone") && NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
-			openPopUp("Clone Entity");
-		}
-
-		//Add Spacing
 		ImGui::Spacing();
 
-		//Show number of entities in the level
-		ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
+		//Create entity tags
+		if (ImGui::CollapsingHeader("Entities")) {
 
-		//Add Spacing
-		ImGui::Spacing();
+			// Button to create an entity, which triggers the popup
+			if (ImGui::Button("Create")) {
+				openPopUp("Create Entity");
+			}
 
-		//Reset entity changed
-		b_entity_changed = false;
+			//Buttons Same Line
+			ImGui::SameLine();
 
-		//Check if there are entities present
-		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
-			// Get entities marked for deletion
-			auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+			// Button to remove an entity, which triggers the popup
+			if ((ImGui::Button("Remove") || ImGui::GetIO().KeysDown[ImGuiKey_Delete]) && NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
+				openPopUp("Remove Entity");
+			}
 
-			//Check for disable entity interaction flag
-			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
-				//Reverse Iterate through layers to check for entity being clicked
-				static bool entity_clicked = false;
-				entity_clicked = false;
+			//Buttons Same Line
+			ImGui::SameLine();
 
-				//Iterate through entities from top layer down
-				for (auto layer = NIKE_SCENES_SERVICE->getLayers().rbegin();
-					!entity_clicked && layer != NIKE_SCENES_SERVICE->getLayers().rend();
-					layer++) {
+			// Button to clone an entity, which triggers the popup
+			if (ImGui::Button("Clone") && NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
+				openPopUp("Clone Entity");
+			}
 
-					//SKip inactive layer
-					if (!layer->get()->getLayerState())
-						continue;
+			//Add Spacing
+			ImGui::Spacing();
 
-					//Iterate through all entities
-					for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			//Show number of entities in the level
+			ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
 
-						//Skip entities not on curr layer
-						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Reset entity changed
+			b_entity_changed = false;
+
+			//Check if there are entities present
+			if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
+				// Get entities marked for deletion
+				auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+
+				//Check for disable entity interaction flag
+				if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
+					//Reverse Iterate through layers to check for entity being clicked
+					static bool entity_clicked = false;
+					entity_clicked = false;
+
+					//Iterate through entities from top layer down
+					for (auto layer = NIKE_SCENES_SERVICE->getLayers().rbegin();
+						!entity_clicked && layer != NIKE_SCENES_SERVICE->getLayers().rend();
+						layer++) {
+
+						//SKip inactive layer
+						if (!layer->get()->getLayerState())
 							continue;
 
-						// Check for entity clicking
-						if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-							// Only act if the entity changes
-							if (selected_entity != entity) {
+						//Iterate through all entities
+						for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
 
-								LevelEditor::Action select_entity_action;
+							//Skip entities not on curr layer
+							if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+								continue;
 
-								// Capture current and previous selected entities
-								auto prev_entity = selected_entity;
-								auto new_entity = entity;
+							// Check for entity clicking
+							if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+								// Only act if the entity changes
+								if (selected_entity != entity) {
 
-								// Define the do action for selecting the new entity
-								select_entity_action.do_action = [&, prev_entity, new_entity]() {
-									selected_entity = new_entity;
-									b_entity_changed = true;
-									entity_clicked = true;
-									};
+									LevelEditor::Action select_entity_action;
 
-								// Define the undo action for reverting to the previous entity
-								select_entity_action.undo_action = [&, prev_entity, new_entity]() {
-									selected_entity = prev_entity;
-									b_entity_changed = true;
-									entity_clicked = true;
-									};
+									// Capture current and previous selected entities
+									auto prev_entity = selected_entity;
+									auto new_entity = entity;
 
-								// Execute the action
-								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+									// Define the do action for selecting the new entity
+									select_entity_action.do_action = [&, prev_entity, new_entity]() {
+										selected_entity = new_entity;
+										b_entity_changed = true;
+										entity_clicked = true;
+										};
+
+									// Define the undo action for reverting to the previous entity
+									select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+										selected_entity = prev_entity;
+										b_entity_changed = true;
+										entity_clicked = true;
+										};
+
+									// Execute the action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+								}
+
+								// Set the selected entity
+								selected_entity = entity;
+
+								// Signal entity changed
+								b_entity_changed = true;
+
+								// Signal that an entity has been clicked
+								entity_clicked = true;
+								break;
 							}
 
-							// Set the selected entity
-							selected_entity = entity;
+						}
+					}
 
-							// Signal entity changed
-							b_entity_changed = true;
+					if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
 
-							// Signal that an entity has been clicked
-							entity_clicked = true;
+						// If selected entity is not invalid
+						if (selected_entity != UINT16_MAX) {
+
+							LevelEditor::Action unselect_entity_action;
+
+							// Capture the current selected entity
+							auto prev_entity = selected_entity;
+
+							// Define the do action for unselecting
+							unselect_entity_action.do_action = [&, prev_entity]() {
+								unselectEntity();
+								b_entity_changed = true;
+								};
+
+							// Define the undo action for reselecting the previous entity
+							unselect_entity_action.undo_action = [&, prev_entity]() {
+								selected_entity = prev_entity;
+								b_entity_changed = true;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+						}
+					}
+
+					if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
+						//Get mouse pos
+						Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
+					}
+				}
+
+				//Iterate through all entities to showcase active entities
+				for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+					//// Skip through "Prefab Master" entity
+					//if (entity.second.entity_id.find("Prefab Master") != std::string::npos) {
+					//	continue;
+					//}
+
+					//Check if entity is selected
+					bool selected = NIKE_ECS_MANAGER->checkEntity(selected_entity) && entity == selected_entity;
+
+					//Entity data
+					auto entity_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+					if (!entity_data.has_value() || entity_data.value().get().name == "") continue;
+
+					// Show selectable
+					if (ImGui::Selectable(entity_data.value().get().name.c_str(), selected)) {
+						// Check if currently editing grid
+						if (tilemap_panel.lock()->checkGridEditing()) {
+							error_msg->assign("Editing grid now, unable to select entity.");
+							openPopUp("Error");
+							unselectEntity();
 							break;
 						}
 
-					}
-				}
+						// Prepare for redo/undo if the entity selection changes
+						if (selected_entity != entity) {
+							LevelEditor::Action select_entity_action;
 
-				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+							// Capture current and previous selected entities
+							auto prev_entity = selected_entity;
+							auto new_entity = entity;
 
-					// If selected entity is not invalid
-					if (selected_entity != UINT16_MAX) {
+							// Define the do action for selecting the new entity
+							select_entity_action.do_action = [&, prev_entity, new_entity]() {
+								selected_entity = new_entity;
+								b_entity_changed = true;
+								};
 
-						LevelEditor::Action unselect_entity_action;
+							// Define the undo action for reverting to the previous entity
+							select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+								selected_entity = prev_entity;
+								b_entity_changed = true;
+								};
 
-						// Capture the current selected entity
-						auto prev_entity = selected_entity;
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+						}
+						// Unselect the entity
+						else {
+							LevelEditor::Action unselect_entity_action;
 
-						// Define the do action for unselecting
-						unselect_entity_action.do_action = [&, prev_entity]() {
-							unselectEntity();
-							b_entity_changed = true;
-							};
+							// Capture the current selected entity
+							auto prev_entity = selected_entity;
 
-						// Define the undo action for reselecting the previous entity
-						unselect_entity_action.undo_action = [&, prev_entity]() {
-							selected_entity = prev_entity;
-							b_entity_changed = true;
-							};
+							// Define the do action for unselecting
+							unselect_entity_action.do_action = [&, prev_entity]() {
+								unselectEntity();
+								b_entity_changed = true;
+								};
 
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
-					}
-				}
+							// Define the undo action for reselecting the previous entity
+							unselect_entity_action.undo_action = [&, prev_entity]() {
+								selected_entity = prev_entity;
+								b_entity_changed = true;
+								};
 
-				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
-					//Get mouse pos
-					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
-				}
-			}
-
-			//Iterate through all entities to showcase active entities
-			for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-
-				//// Skip through "Prefab Master" entity
-				//if (entity.second.entity_id.find("Prefab Master") != std::string::npos) {
-				//	continue;
-				//}
-
-				//Check if entity is selected
-				bool selected = NIKE_ECS_MANAGER->checkEntity(selected_entity) && entity == selected_entity;
-
-				//Entity data
-				auto entity_data = NIKE_METADATA_SERVICE->getEntityData(entity);
-				if (!entity_data.has_value() || entity_data.value().get().name == "") continue;
-
-				// Show selectable
-				if (ImGui::Selectable(entity_data.value().get().name.c_str(), selected)) {
-					// Check if currently editing grid
-					if (tilemap_panel.lock()->checkGridEditing()) {
-						error_msg->assign("Editing grid now, unable to select entity.");
-						openPopUp("Error");
-						unselectEntity();
-						break;
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+						}
 					}
 
-					// Prepare for redo/undo if the entity selection changes
-					if (selected_entity != entity) {
-						LevelEditor::Action select_entity_action;
+					//Drop Entity tag payload
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string("Entity Tag").c_str())) {
+							//Get entity tag
+							std::string tag(static_cast<const char*>(payload->Data));
 
-						// Capture current and previous selected entities
-						auto prev_entity = selected_entity;
-						auto new_entity = entity;
-
-						// Define the do action for selecting the new entity
-						select_entity_action.do_action = [&, prev_entity, new_entity]() {
-							selected_entity = new_entity;
-							b_entity_changed = true;
-							};
-
-						// Define the undo action for reverting to the previous entity
-						select_entity_action.undo_action = [&, prev_entity, new_entity]() {
-							selected_entity = prev_entity;
-							b_entity_changed = true;
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
-					}
-					// Unselect the entity
-					else {
-						LevelEditor::Action unselect_entity_action;
-
-						// Capture the current selected entity
-						auto prev_entity = selected_entity;
-
-						// Define the do action for unselecting
-						unselect_entity_action.do_action = [&, prev_entity]() {
-							unselectEntity();
-							b_entity_changed = true;
-							};
-
-						// Define the undo action for reselecting the previous entity
-						unselect_entity_action.undo_action = [&, prev_entity]() {
-							selected_entity = prev_entity;
-							b_entity_changed = true;
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+							//Add tag for entity
+							NIKE_METADATA_SERVICE->addEntityTag(entity, tag);
+						}
+						ImGui::EndDragDropTarget();
 					}
 				}
 			}

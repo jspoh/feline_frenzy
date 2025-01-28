@@ -100,7 +100,7 @@ namespace NIKE {
 			void unregisterTag(std::string const& tag);
 
 			//Get entity types
-			std::set<std::string> getRegisteredTag() const;
+			std::set<std::string> getRegisteredTags() const;
 
 			//Check Entity Name Taken
 			bool isNameValid(std::string const& name) const;

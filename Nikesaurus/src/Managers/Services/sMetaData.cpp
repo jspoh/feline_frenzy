@@ -109,7 +109,7 @@ namespace NIKE {
 		entity_tags.erase(tag);
 	}
 
-	std::set<std::string> MetaData::Service::getRegisteredTag() const {
+	std::set<std::string> MetaData::Service::getRegisteredTags() const {
 		return entity_tags;
 	}
 
