@@ -102,63 +102,90 @@ namespace NIKE {
 
 }
 
-	void NIKE::Enemy::Manager::moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform) {
-		if (!path.path_found || path.path.empty()) {
-			return;
-		}
+	void NIKE::Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed) {
+		//Acceptable offset per cell
+		const float cell_offset = 10.0f;
 
-		// Use the first position in the path as the current target
-		Vector2i current_target_index = path.goal_cell.index;
+		//Get transform of entity for position mapping
+		auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (transform.has_value()) {
 
-		// Convert grid index to world position
-		auto grid = NIKE_MAP_SERVICE->getGrid();
-		if (current_target_index.x < 0 || current_target_index.x >= grid.size() ||
-			current_target_index.y < 0 || current_target_index.y >= grid[0].size()) {
-			path.path_found = false;
-			return;
-		}
+			//Entity transform
+			auto& e_transform = transform.value().get();
 
-		Map::Cell& target_cell = grid[current_target_index.y][current_target_index.x];
-		if (target_cell.b_blocked) {
-			path.path_found = false;
-			return;
-		}
+			//Get index of entity as the starting position
+			auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(e_transform.position);
 
-		Vector2f target_world_position = target_cell.position;
+			//Get cell to travel to
+			if (start.has_value()) {
 
-		// Calculate direction to the target position
-		Vector2f direction = (target_world_position - transform.position).normalized();
+				//Get start index
+				auto start_index = start.value();
 
-		// Clamp direction to cardinal directions only
-		if (fabs(direction.x) > fabs(direction.y)) {
-			direction.y = 0;  
-		}
-		else {
-			direction.x = 0;  
-		}
+				//Check if path has been generated or if destination cell has changed
+				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
 
-		// Move the entity towards the target position
-		transform.position += direction * movement_speed * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					//Condition if changes to grid blocked has been made
+					NIKE_MAP_SERVICE->checkGridChanged() ||
 
-		// Check if the entity has reached the target position
-		if ((transform.position - target_world_position).length() <= waypoint_threshold) {
-			// Remove the current target from the path once reached
-			path.path.erase(path.path.begin());
+					//Check if target got shifted
+					(NIKE_MAP_SERVICE->getPath(entity).goal.index != Vector2i(x_index, y_index)) ||
 
-			if (path.path.empty()) {
-				// Completed the path traversal
-				path.path_found = false;
+					//Check if entity got shifted
+					(!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
+						(std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start_index.x) > 1 ||
+							std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start_index.y) > 1)) ||
+
+					//Check if path is finished & entity got shifted
+					(NIKE_MAP_SERVICE->getPath(entity).b_finished && start_index != NIKE_MAP_SERVICE->getPath(entity).end.index)
+
+					) {
+
+					//Search for path
+					NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
+				}
+
+				//Get path 
+				auto& path = NIKE_MAP_SERVICE->getPath(entity);
+
+				//Check if there are cells left in path
+				if (!path.path.empty()) {
+
+					//Get next cell
+					auto const& next_cell = path.path.front();
+
+					//Check if entity has arrived near destination
+					if ((next_cell.position - e_transform.position).length() > cell_offset) {
+
+						//Direction of next cell
+						float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+
+						//Apply force to entity
+						auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+						if (dynamics.has_value()) {
+							dynamics.value().get().force = { cos(dir) * speed, sin(dir) * speed };
+						}
+					}
+					else {
+						path.path.pop_front();
+					}
+				}
+				else {
+
+					//Marked path as finished
+					path.b_finished = true;
+				}
 			}
 		}
 	}
 
 
 
-	//bool Enemy::Manager::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
+	//bool Enemy::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
 	//	return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);
 	//}
 
-	//void Enemy::Manager::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
+	//void Enemy::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
 	//{
 	//	// Compute a path if not already found or if the target has moved significantly
 	//	if (!path.path_found || hasTargetMoved(player_target.position, path)) {
@@ -171,7 +198,7 @@ namespace NIKE {
 	//	moveAlongPath(path, enemy);
 	//}
 
-	bool Enemy::Manager::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
+	bool Enemy::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
 		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		Vector2f player_pos = player_transform_comp.value().get().position;
@@ -201,7 +228,7 @@ namespace NIKE {
 		return distance < enemy_range;
 	}
 
-	void Enemy::Manager::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
+	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform component
 		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		const Vector2f& player_pos = p_transform_comp.value().get().position;

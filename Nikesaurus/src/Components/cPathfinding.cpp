@@ -35,7 +35,7 @@ namespace NIKE {
                         { "Blocked", comp.goal_cell.b_blocked },
                         { "Position", comp.goal_cell.position.toJson() }
                     }},
-                    { "PathFound", comp.path_found }
+                    { "PathFinished", comp.b_finished }
                 };
             },
 
@@ -62,7 +62,7 @@ namespace NIKE {
                 comp.goal_cell.position.fromJson(goal_data.at("Position"));
 
                 // Deserialize path_found
-                comp.path_found = data.at("PathFound").get<bool>();
+                comp.b_finished = data.at("PathFinished").get<bool>();
             }
         );
     }
