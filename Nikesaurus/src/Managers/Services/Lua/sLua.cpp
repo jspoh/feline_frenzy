@@ -22,8 +22,8 @@ namespace NIKE {
     }
 
     void Lua::Script::deserialize(nlohmann::json const& data) {
-        script_id = data["Script_ID"].get<std::string>();
-        function = data["Function"].get<std::string>();
+        script_id = data.value("Script_ID", "");
+        function = data.value("Function", "");
 
         if (data.contains("Named_Args")) {
             for (const auto& [key, value] : data.at("Named_Args").items()) {

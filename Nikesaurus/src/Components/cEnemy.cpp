@@ -36,16 +36,16 @@ namespace NIKE {
 
 			// Deserialize
 			[](Attack& comp, nlohmann::json const& data) {
-				comp.range = data.at("Range").get<float>();
-				comp.cooldown = data.at("Cooldown").get<float>();
-				comp.last_shot_time = data.at("LastShotTime").get<float>();
-				comp.offset = data.at("Offset").get<float>();
-				comp.layer = data.at("Layer").get<int>();
-				comp.prefab_path = data.at("PrefabPath").get<std::string>();
-				comp.script.script_id = data.at("ScriptID").get<std::string>();
-				comp.script.script_path = data.at("ScriptPath").get<std::string>();
-				comp.script.function = data.at("Function").get<std::string>();
-				comp.script.b_loaded = data.at("ScriptLoaded").get<bool>();
+				comp.range = data.value("Range", 10.f);
+				comp.cooldown = data.value("Cooldown", 10.f);
+				comp.last_shot_time = data.value("LastShotTime", 10.f);
+				comp.offset = data.value("Offset", 100.0f);
+				comp.layer = data.value("Layer", 0);
+				comp.prefab_path = data.value("PrefabPath", "");
+				comp.script.script_id = data.value("ScriptID", "");
+				comp.script.script_path = data.value("ScriptPath", "");
+				comp.script.function = data.value("Function", "");
+				comp.script.b_loaded = data.value("ScriptLoaded", false);
 			}
 		);
 

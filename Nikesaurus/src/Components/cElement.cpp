@@ -28,7 +28,7 @@ namespace NIKE {
 
 			// Deserialize
 			[](Entity& comp, nlohmann::json const& data) {
-				comp.element = data.at("Element").get<Elements>();
+				comp.element = data.value("Element", Elements::NONE);
 			}
 		);
 
@@ -84,7 +84,7 @@ namespace NIKE {
 
 			// Deserialize
 			[](Source& comp, nlohmann::json const& data) {
-				comp.element = data.at("Element").get<Elements>();
+				comp.element = data.value("Element", Elements::NONE);
 			}
 		);
 		

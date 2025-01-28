@@ -28,8 +28,8 @@ namespace NIKE {
 
 			// Deserialize
 			[](Lifetime& comp, nlohmann::json const& data) {
-				comp.current_lifetime = data.at("CurrentLifetime").get<float>();
-				comp.max_lifetime = data.at("MaxLifetime").get<float>();
+				comp.current_lifetime = data.value("CurrentLifetime", 0.0f);
+				comp.max_lifetime = data.value("MaxLifetime", 10.0f);
 			}
 		);
 

@@ -32,11 +32,11 @@ namespace NIKE {
 
 			//Deserialize
 			[](Audio::SFX& comp, nlohmann::json const& data) {
-				comp.b_play_sfx = data.at("B_Play_SFX").get<bool>();
-				comp.audio_id = data.at("Audio_ID").get<std::string>();
-				comp.channel_group_id = data.at("Channel_Group_ID").get<std::string>();
-				comp.volume = data.at("Volume").get<float>();
-				comp.pitch = data.at("Pitch").get<float>();
+				comp.b_play_sfx = data.value("B_Play_SFX", false);
+				comp.audio_id = data.value("Audio_ID", "");
+				comp.channel_group_id = data.value("Channel_Group_ID", "");
+				comp.volume = data.value("Volume", 1.0f);
+				comp.pitch = data.value("Pitch", 1.0f);
 			}
 		);
 

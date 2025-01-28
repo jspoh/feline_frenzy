@@ -29,8 +29,8 @@ namespace NIKE {
 
 			// Deserialize
 			[](Health& comp, nlohmann::json const& data) {
-				comp.lives = data.at("Lives").get<int>();
-				comp.health = data.at("Health").get<float>();
+				comp.lives = data.value("Lives", 1);
+				comp.health = data.value("Health", 100.0f);
 				comp.invulnerableFlag = data.value("InvulnerableFlag", false);
 			}
 		);
@@ -140,7 +140,7 @@ namespace NIKE {
 
 			//Deserialize
 			[](Damage& comp, nlohmann::json const& data) {
-				comp.damage = data.at("Damage").get<float>();
+				comp.damage = data.value("Damage", 1.0f);
 			}
 		);
 

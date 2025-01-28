@@ -26,17 +26,6 @@ namespace NIKE {
 			std::unordered_map<std::string, std::function<bool()>> transitions; // Use Lua functions as conditions
 		};
 
-		//Script data
-		//struct Script {
-		//	std::string script_id;
-		//	std::string script_path;
-		//	std::string function;
-		//	bool b_loaded;
-
-		//	Script() : script_id{ "" }, script_path{ "" }, function{ "" }, b_loaded{ false } {}
-		//	Script(std::string const& script) : script_id{ "" }, script_path{ script }, function{ "" }, b_loaded{ false } {}
-		//};
-
 		//Movement logic component
 		struct ILogic {
 			Lua::Script script;

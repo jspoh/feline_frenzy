@@ -688,7 +688,7 @@ namespace NIKE {
 				}
 				}
 			}
-			catch (std::exception const& e) {
+			catch ([[maybe_unused]]std::exception const& e) {
 				NIKEE_CORE_WARN("Unable to reserialize asset. Deleting asset.");
 				std::filesystem::remove(asset_data.second.primary_path);
 			}
