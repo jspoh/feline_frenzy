@@ -20,18 +20,26 @@
 
 namespace NIKE {
 	namespace Enemy {
+		// Enemey logic functions
+		// Check if player is within range
+		bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
+
+		// Shoot bullet
+		void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
+
+		// Standard enemy moving function
+		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed);
+
+		// Standard enemy moving function
+		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
+
+		//bool hasTargetMoved(const Vector2f& target_pos, const Pathfinding::Path& path) const;
+
 		class Manager : public System::ISystem {
 		private:
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete; 
 			void operator=(Manager const& copy) = delete;
-
-
-			enum class ENEMY_BEHAVIOR {
-				IDLE = 0,
-				CHASE,
-				Attack,
-			};
 
 			// Enemy movement stuff
 			float movement_speed;  
@@ -45,20 +53,6 @@ namespace NIKE {
 
 			//Internal script management
 			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
-
-			// Check if player is within range
-			bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
-
-			// Shoot bullet
-			void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
-
-			// Standard enemy moving function
-			void moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform);
-
-			// Standard enemy moving function
-			void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
-
-			bool hasTargetMoved(const Vector2f& target_pos, const Pathfinding::Path& path) const;
 
 		public:
 			//Default Constructor

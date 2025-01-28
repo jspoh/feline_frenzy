@@ -28,7 +28,7 @@
 #include "Managers/Services/LevelEditor/sLevelEditor.h"
 #include "Managers/Services/sPath.h"
 #include "Managers/Services/sMetaData.h"
-#include "Managers/Services/sStateMachine.h"
+#include "Managers/Services/State Machine/sStateMachine.h"
 
 //Include all components here
 #include "Components/cAudio.h"

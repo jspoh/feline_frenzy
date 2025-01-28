@@ -16,17 +16,17 @@
 
 namespace NIKE {
 	namespace Pathfinding {
-        struct Path{
-                // Path to target
-                // To seri only the cell's indexes
-                std::vector<Map::Cell> path;
-                Map::Cell start_cell;
-                Map::Cell goal_cell;
-                // Flag to indicate if path has been found
-                bool path_found;   
+		struct Path {
+			// Path to target
+			// To seri only the cell's indexes
+			std::deque<Map::Cell> path;
+			Map::Cell start_cell;
+			Map::Cell goal_cell;
+			// Flag to indicate if path has been found
+			bool b_finished;
 
-                Path() = default;
-        };
+			Path() = default;
+		};
 
         // Register the Pathfinding component
         void registerComponents();
