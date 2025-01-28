@@ -201,7 +201,7 @@ namespace NIKE {
 
 	void Camera::Service::deserializeCamera(nlohmann::json const& data) {
 
-		setActiveCamName(data["Active Cam ID"].get<std::string>());
+		setActiveCamName(data.value("Active Cam ID",""));
 
 	}
 }

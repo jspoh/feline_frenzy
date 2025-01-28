@@ -218,21 +218,23 @@ namespace NIKE {
 	}
 
 	void Map::Service::deserialize(nlohmann::json const& data) {
-		grid_size.fromJson(data.at("Grid_Size"));
-		cell_size.fromJson(data.at("Cell_Size"));
+		grid_size.fromJson(data.value("Grid_Size", Vector2i::def_json));
+		cell_size.fromJson(data.value("Cell_Size", Vector2i::def_json));
 
 		//Deserialize grid
 		grid.clear();
-		for (const auto& row_json : data["Grid"]) {
-			std::vector<Cell> row;
-			for (const auto& cell_json : row_json) {
-				Cell cell{};
-				// Note 1: Blocked boolean is properly seri and registered. suspect: somewhr might be interferring with the boolean?
-				cell.b_blocked = cell_json.at("Blocked").get<bool>();
-				cell.position.fromJson(cell_json.at("Position"));
-				row.push_back(cell);
+		if (data.contains("Grid")) {
+			for (const auto& row_json : data["Grid"]) {
+				std::vector<Cell> row;
+				for (const auto& cell_json : row_json) {
+					Cell cell{};
+					// Note 1: Blocked boolean is properly seri and registered. suspect: somewhr might be interferring with the boolean?
+					cell.b_blocked = cell_json.value("Blocked", false);
+					cell.position.fromJson(cell_json.value("Position", Vector2f::def_json));
+					row.push_back(cell);
+				}
+				grid.push_back(row);
 			}
-			grid.push_back(row);
 		}
 
 		updateCells();

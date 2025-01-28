@@ -295,7 +295,7 @@ namespace NIKE {
 
 			//Load map grid if a map file path is specified
 			if (l_data.contains("Grid ID")) {
-				std::string grid_id = l_data.at("Grid ID").get<std::string>();
+				std::string grid_id = l_data.value("Grid ID", "");
 				std::string full_grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
 
 				if (std::filesystem::exists(full_grid_path)) {
@@ -309,7 +309,7 @@ namespace NIKE {
 			}
 
 			//If data contains layer
-			if (l_data.contains("Layer")) {
+			if (l_data.contains("Layer") && l_data.at("Layer").contains("ID") && l_data.at("Layer").contains("Entities")) {
 				//Deserialize layer
 				if (!NIKE_SCENES_SERVICE->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
 					auto layer = NIKE_SCENES_SERVICE->createLayer();
@@ -322,24 +322,28 @@ namespace NIKE {
 				//Iterate through all entities within layer
 				for (const auto& e_data : l_data["Layer"]["Entities"]) {
 
-					//Deserialize all entities
-					Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").at("Layer ID").get<unsigned int>());
-					deserializeEntity(entity, e_data.at("Entity"));
-
-					//Deserialize entity metadata
-					auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
-					if (meta_data.has_value()) {
-						meta_data.value().get().deserialize(e_data);
-					}
-
 					//Check if entity is a UI entity
-					if (e_data.at("Entity").contains("UI ID")) {
+					if (e_data.contains("Entity")) {
 
-						UI::UIBtn btn;
-						btn.deserialize(e_data.at("Entity").at("UI Btn"));
-						btn.entity_id = entity;
-						btn.b_hovered = false;
-						NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
+						//Deserialize all entities
+						Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").value("Layer ID", 0));
+						deserializeEntity(entity, e_data.at("Entity"));
+
+						//Deserialize entity metadata
+						auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+						if (meta_data.has_value()) {
+							meta_data.value().get().deserialize(e_data);
+						}
+
+						//Check if entity is a UI entity
+						if (e_data.at("Entity").contains("UI ID")) {
+
+							UI::UIBtn btn;
+							btn.deserialize(e_data.at("Entity").at("UI Btn"));
+							btn.entity_id = entity;
+							btn.b_hovered = false;
+							NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
+						}
 					}
 				}
 			}
