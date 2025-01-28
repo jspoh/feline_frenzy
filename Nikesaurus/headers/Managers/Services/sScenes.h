@@ -110,9 +110,6 @@ namespace NIKE {
 
 			//Go To Previous scene
 			void previousScene();
-
-			//Reset scene
-			void resetScene();
 		public:
 			Service() = default;
 			~Service() = default;
@@ -149,6 +146,9 @@ namespace NIKE {
 
 			//Get prev scene id
 			std::string getPrevSceneID() const;
+
+			//Reset scene
+			void resetScene();
 
 			//Init scene service
 			void init();

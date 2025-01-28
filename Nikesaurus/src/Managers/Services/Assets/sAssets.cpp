@@ -639,9 +639,6 @@ namespace NIKE {
 
 	void Assets::Service::reserializeAllAssets() {
 
-		//Remember the previous sccene
-		std::string curr_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
-
 		//Reserialize all assets
 		for (auto const& asset_data : asset_registry) {
 			try {
@@ -660,11 +657,17 @@ namespace NIKE {
 					break;
 				}
 				case Assets::Types::Scene: {
+					//Clear scene here
+					NIKE_SCENES_SERVICE->resetScene();
+
 					//Deserialize
 					NIKE_SERIALIZE_SERVICE->loadSceneFromFile(asset_data.second.primary_path.string());
 
 					//Serialize
 					NIKE_SERIALIZE_SERVICE->saveSceneToFile(asset_data.second.primary_path.string());
+
+					//Clear scene here
+					NIKE_SCENES_SERVICE->resetScene();
 
 					break;
 				}
@@ -695,9 +698,9 @@ namespace NIKE {
 				NIKEE_CORE_WARN("Unable to reserialize asset. Deleting asset.");
 				std::filesystem::remove(asset_data.second.primary_path);
 			}
-
-			//Back to original state
-			NIKE_SERIALIZE_SERVICE->loadSceneFromFile(NIKE_ASSETS_SERVICE->getAssetPath(curr_scene).string());
 		}
+
+		//Back to original state
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
 	}
 }
