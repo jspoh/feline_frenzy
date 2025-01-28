@@ -337,11 +337,17 @@ namespace NIKE {
 		glClearColor(0, 0, 0, 1);
 
 #ifndef NDEBUG
-		//Render to frame buffer if imgui is active
+		// render to framebuffer if imgui is active
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+			//cout << "Rendering to frame buffer" << endl;
+		}
+		else {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//cout << "Rendering to screen" << endl;
 		}
 #endif
+
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {

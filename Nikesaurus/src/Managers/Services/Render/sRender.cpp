@@ -524,11 +524,11 @@ namespace NIKE {
 		glDrawElementsInstanced(model.primitive_type, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(render_instances_texture.size()));
 
 		// check framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			NIKEE_CORE_ERROR("Incomplete framebuffer in {0} with status: {1}", __FUNCTION__, status);
-		}
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		//if (status != GL_FRAMEBUFFER_COMPLETE) {
+		//	NIKEE_CORE_ERROR("Incomplete framebuffer in {0} with status: {1}", __FUNCTION__, status);
+		//}
 
 		// cleanup
 		glBindVertexArray(0);
