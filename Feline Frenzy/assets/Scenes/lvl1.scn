@@ -69,12 +69,13 @@
                                 "Scale": {
                                     "x": 3071.99951171875,
                                     "y": 2559.999755859375
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Entity_ID": "Background",
                             "Prefab_ID": ""
                         }
@@ -145,7 +146,8 @@
                                 "Scale": {
                                     "x": 255.99996948242188,
                                     "y": 255.99996948242188
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -212,7 +214,8 @@
                                 "Scale": {
                                     "x": 255.99996948242188,
                                     "y": 255.99996948242188
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -252,7 +255,8 @@
                                 "Scale": {
                                     "x": 256.0,
                                     "y": 1536.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -292,7 +296,8 @@
                                 "Scale": {
                                     "x": 256.0,
                                     "y": 1536.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -345,7 +350,8 @@
                                 "Scale": {
                                     "x": 256.0,
                                     "y": 2048.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -385,7 +391,8 @@
                                 "Scale": {
                                     "x": 256.0,
                                     "y": 2048.0
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -403,19 +410,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 9,
+                                "Completed_Animations": 82,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 4,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -423,7 +430,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 }
                             },
                             "Audio::SFX": {
@@ -439,7 +446,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 8
+                                    "entity": 13
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -450,8 +457,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -117.28177642822266,
-                                    "y": 578.3386840820313
+                                    "x": -117.28313446044922,
+                                    "y": 578.3223266601563
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -461,24 +468,24 @@
                                 }
                             },
                             "Physics::Dynamics": {
-                                "Drag": 1.0,
+                                "Drag": 10.0,
                                 "Force": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
                                 "Mass": 0.5,
-                                "Max_Speed": 150.0,
+                                "Max_Speed": 3000.0,
                                 "Velocity": {
-                                    "x": -0.0015479963039979339,
-                                    "y": -0.019099416211247444
+                                    "x": 0.0,
+                                    "y": 0.0
                                 }
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -117.28177642822266,
-                                    "y": 578.3386840820313
+                                    "x": -117.28313446044922,
+                                    "y": 578.3223266601563
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 2.888092041015625
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -494,8 +501,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -516,14 +523,15 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -117.28177642822266,
-                                    "y": 578.3386840820313
+                                    "x": -117.28313446044922,
+                                    "y": 578.3223266601563
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 80.67974090576172,
                                     "y": 116.1510009765625
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -599,6 +607,9 @@
                                 "Intensity": 0.0,
                                 "Texture_ID": "Normal_Enemy_Idle_Front.png"
                             },
+                            "State::State": {
+                                "State": "Idle"
+                            },
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 875.716796875,
@@ -608,7 +619,8 @@
                                 "Scale": {
                                     "x": 100.0,
                                     "y": 112.28070831298828
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -675,7 +687,8 @@
                                 "Scale": {
                                     "x": 255.99996948242188,
                                     "y": 255.99996948242188
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -760,7 +773,8 @@
                                 "Scale": {
                                     "x": 90.51508331298828,
                                     "y": 120.0582046508789
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -845,7 +859,8 @@
                                 "Scale": {
                                     "x": 90.51508331298828,
                                     "y": 120.0582046508789
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
@@ -930,7 +945,8 @@
                                 "Scale": {
                                     "x": 90.51508331298828,
                                     "y": 120.0582046508789
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,

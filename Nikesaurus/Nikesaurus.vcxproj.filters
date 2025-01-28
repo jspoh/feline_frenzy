@@ -26,7 +26,6 @@
     <ClCompile Include="dependencies\include\ImGui\src\imgui_impl_opengl3.cpp" />
     <ClCompile Include="dependencies\include\ImGui\src\imgui_tables.cpp" />
     <ClCompile Include="dependencies\include\ImGui\src\imgui_widgets.cpp" />
-    <ClCompile Include="src\Systems\Render\sysShader.cpp" />
     <ClCompile Include="src\Managers\Services\Assets\sLoader.cpp" />
     <ClCompile Include="src\Managers\Services\sCamera.cpp" />
     <ClCompile Include="src\Systems\Render\sysRender.cpp" />
@@ -59,6 +58,12 @@
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cCombat.cpp" />
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
+    <ClCompile Include="src\Managers\Services\sStateMachine.cpp" />
+    <ClCompile Include="src\Components\cState.cpp" />
+    <ClCompile Include="src\Managers\States\enemyStates.cpp" />
+    <ClCompile Include="src\Managers\Transitions\enemyTransitions.cpp" />
+    <ClCompile Include="src\Managers\Services\Render\sRender.cpp" />
+    <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -101,7 +106,6 @@
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_rectpack.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_textedit.h" />
     <ClInclude Include="dependencies\include\ImGui\headers\imstb_truetype.h" />
-    <ClInclude Include="headers\Systems\Render\sysShader.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sLoader.h" />
     <ClInclude Include="headers\Managers\Services\sCamera.h" />
     <ClInclude Include="headers\Systems\Render\sysRender.h" />
@@ -130,6 +134,12 @@
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cCombat.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
+    <ClInclude Include="headers\Managers\Services\sStateMachine.h" />
+    <ClInclude Include="headers\Components\cState.h" />
+    <ClInclude Include="headers\Managers\States\enemyStates.h" />
+    <ClInclude Include="headers\Managers\Transitions\enemyTransitions.h" />
+    <ClInclude Include="headers\Managers\Services\Render\sRender.h" />
+    <ClInclude Include="headers\Managers\Services\Render\sShader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

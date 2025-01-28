@@ -82,7 +82,7 @@ namespace NIKE {
 
 			#ifdef NIKE_BUILD_DLL
 			//World to screen
-			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
+			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size, bool use_screen_pos=false);
 
 			//Render filled rectangle to draw list
 			void worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f);
@@ -302,6 +302,11 @@ namespace NIKE {
 
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
+
+			// getters
+			std::map<Entity::Type, EntityMetaData, EntitySorter>& getEntityMap();
+			std::unordered_map<Entity::Type, std::string>& getEntityToNameMap();
+			std::unordered_map<std::string, Entity::Type>& getNameToEntityMap();
 		};
 
 		//Components Management Panel

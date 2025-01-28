@@ -13,6 +13,8 @@
 namespace NIKE {
 
 	void GameLogic::Manager::init() {
+
+		NIKE_FSM_SERVICE->init();
 	}
 
 	void GameLogic::Manager::update() {
@@ -61,6 +63,8 @@ namespace NIKE {
 				//	}
 
 				//}
+				// Update of FSM will be called here
+				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 
 				// Destroy all entities that are marked for deletion
 				NIKE_ECS_MANAGER->destroyMarkedEntities();

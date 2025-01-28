@@ -12,7 +12,7 @@
 namespace NIKE {
 
 	Map::Service::Service() 
-		: grid_size{ DEFAULT_GRID_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f } {
+		: grid_size{ DEFAULT_GRID_SIZE }, cell_size{ DEFAULT_CELL_SIZE }, cursor_pos{ 0.0f, 0.0f }, b_cell_changed{ false } {
 
 		//Initialize grid
 		grid.resize(grid_size.y);
@@ -174,6 +174,26 @@ namespace NIKE {
 		return grid;
 	}
 
+	void Map::Service::gridUpdate() {
+
+		//Reset cell changed
+		b_cell_changed = false;
+
+		//Iterate through grid
+		for (auto& row : grid) {
+			for (auto& cell : row) {
+				if (cell.b_blocked_prev != cell.b_blocked) {
+					cell.b_blocked_prev = cell.b_blocked;
+					b_cell_changed = true;
+				}
+			}
+		}
+	}
+
+	bool Map::Service::checkGridChanged() const {
+		return b_cell_changed;
+	}
+
 	nlohmann::json Map::Service::serialize() const {
 		nlohmann::json data;
 
@@ -221,105 +241,103 @@ namespace NIKE {
 	/************************
 	* AH LIM VERSION
 	***********************/
-	//std::vector<Map::Cell> Map::Service::findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal) {
-	//	const int direction_x[] = { -1, 0, 1, 0 };
-	//	const int direction_y[] = { 0, 1, 0, -1 };
-	//	const int total_directions = 4;
+	/*std::vector<Map::Cell> Map::Service::findPath(Vector2i const& start, Vector2i const& goal, bool b_diagonal) {
+		const int direction_x[] = { -1, 0, 1, 0 };
+		const int direction_y[] = { 0, 1, 0, -1 };
+		const int total_directions = 4;
 
-	//	std::priority_queue<Cell, std::vector<Cell>, std::greater<Cell>> open_list;
-	//	std::unordered_set<Vector2i, Vector2iHasher> closed_list;
+		std::priority_queue<Cell, std::vector<Cell>, std::greater<Cell>> open_list;
+		std::unordered_set<Vector2i, Vector2iHasher> closed_list;
 
-	//	// Initialize cells
-	//	for (int y = 0; y < grid_size.y; ++y) {
-	//		for (int x = 0; x < grid_size.x; ++x) {
-	//			grid[y][x].g = INT_MAX;
-	//			grid[y][x].h = INT_MAX;
-	//			grid[y][x].f = INT_MAX;
-	//			grid[y][x].parent = { -1, -1 };
-	//		}
-	//	}
+		// Initialize cells
+		for (int y = 0; y < grid_size.y; ++y) {
+			for (int x = 0; x < grid_size.x; ++x) {
+				grid[y][x].g = INT_MAX;
+				grid[y][x].h = INT_MAX;
+				grid[y][x].f = INT_MAX;
+				grid[y][x].parent = { -1, -1 };
+			}
+		}
 
-	//	// Add blocked cells to the closed list
-	//	for (int y = 0; y < grid_size.y; ++y) {
-	//		for (int x = 0; x < grid_size.x; ++x) {
-	//			if (isCellBlocked(x, y)) {
-	//				closed_list.insert({ x, y });
-	//			}
-	//		}
-	//	}
-
-
-	//	// Initialize start cell
-	//	Cell& start_cell = grid[start.y][start.x];
-	//	// Initialize start cell
-	//	start_cell.g = 0;
-	//	start_cell.h = abs(start.x - goal.x) + abs(start.y - goal.y);
-	//	start_cell.f = start_cell.g + start_cell.h;
-	//	start_cell.parent = start;
-	//	open_list.push(start_cell);
-
-	//	// Start node
-	//	open_list.push(start_cell);
-
-	//	while (!open_list.empty()) {
-	//		// Get cell with lowest cost from open_list
-	//		Cell current = open_list.top();
-	//		open_list.pop();
-
-	//		// Mark the current cell as closed
-	//		closed_list.insert(current.index);
-
-	//		if (current.index == goal) {
-	//			std::vector<Cell> path;
-	//			Vector2i trace = current.index;
-	//			while (trace != start) {
-	//				path.push_back(grid[trace.y][trace.x]);
-	//				trace = grid[trace.y][trace.x].parent;
-	//			}
-	//			//path.push_back(grid[start.y][start.x]);
-	//			std::reverse(path.begin(), path.end());
-	//			return path;
-	//		}
+		// Add blocked cells to the closed list
+		for (int y = 0; y < grid_size.y; ++y) {
+			for (int x = 0; x < grid_size.x; ++x) {
+				if (isCellBlocked(x, y)) {
+					closed_list.insert({ x, y });
+				}
+			}
+		}
 
 
+		// Initialize start cell
+		Cell& start_cell = grid[start.y][start.x];
+		// Initialize start cell
+		start_cell.g = 0;
+		start_cell.h = abs(start.x - goal.x) + abs(start.y - goal.y);
+		start_cell.f = start_cell.g + start_cell.h;
+		start_cell.parent = start;
+		open_list.push(start_cell);
 
-	//		// Check neighbors
-	//		for (int i = 0; i < total_directions; ++i) {
-	//			int new_x = current.index.x + direction_x[i];
-	//			int new_y = current.index.y + direction_y[i];
-	//			Vector2i neighbor_index = { new_x, new_y };
+		// Start node
+		open_list.push(start_cell);
 
-	//			// Skip if neighbor is out of bounds, blocked, or already processed
-	//			if (new_x < 0 || new_x >= grid_size.x ||
-	//				new_y < 0 || new_y >= grid_size.y ||
-	//				isCellBlocked(new_x, new_y) ||
-	//				closed_list.count(neighbor_index)) {
-	//				continue;
-	//			}
+		while (!open_list.empty()) {
+			// Get cell with lowest cost from open_list
+			Cell current = open_list.top();
+			open_list.pop();
+
+			// Mark the current cell as closed
+			closed_list.insert(current.index);
+
+			if (current.index == goal) {
+				std::vector<Cell> path;
+				Vector2i trace = current.index;
+				while (trace != start) {
+					path.push_back(grid[trace.y][trace.x]);
+					trace = grid[trace.y][trace.x].parent;
+				}
+				//path.push_back(grid[start.y][start.x]);
+				std::reverse(path.begin(), path.end());
+				return path;
+			}
 
 
-	//			Cell& neighbor = grid[new_y][new_x];
-	//			int new_g = current.g + 1;
-	//			if (new_g < neighbor.g) {
-	//				neighbor.g = new_g;
-	//				neighbor.h = abs(new_x - goal.x) + abs(new_y - goal.y);
-	//				neighbor.f = neighbor.g + neighbor.h;
-	//				neighbor.parent = current.index;
 
-	//				// Only push to the open list if not already in it
-	//				if (closed_list.count(neighbor.index) == 0) {
-	//					open_list.push(neighbor);
-	//				}
+			// Check neighbors
+			for (int i = 0; i < total_directions; ++i) {
+				int new_x = current.index.x + direction_x[i];
+				int new_y = current.index.y + direction_y[i];
+				Vector2i neighbor_index = { new_x, new_y };
 
-	//			}
-	//		}
-	//	}
+				// Skip if neighbor is out of bounds, blocked, or already processed
+				if (new_x < 0 || new_x >= grid_size.x ||
+					new_y < 0 || new_y >= grid_size.y ||
+					isCellBlocked(new_x, new_y) ||
+					closed_list.count(neighbor_index)) {
+					continue;
+				}
 
-	//		// Return empty path when no path found
-	//		return {};
-	//	
-	//	
-	//}
+
+				Cell& neighbor = grid[new_y][new_x];
+				int new_g = current.g + 1;
+				if (new_g < neighbor.g) {
+					neighbor.g = new_g;
+					neighbor.h = abs(new_x - goal.x) + abs(new_y - goal.y);
+					neighbor.f = neighbor.g + neighbor.h;
+					neighbor.parent = current.index;
+
+					// Only push to the open list if not already in it
+					if (closed_list.count(neighbor.index) == 0) {
+						open_list.push(neighbor);
+					}
+
+				}
+			}
+		}
+
+			// Return empty path when no path found
+			return {};
+	}*/
 
 	void Map::Service::findPath(Entity::Type entity, const Vector2i& start, const Vector2i& goal, bool b_diagonal) {
 
@@ -456,10 +474,15 @@ namespace NIKE {
 		}
 
 		//Update entity path
-		paths[entity] = path;
+		paths[entity].path = path;
+		paths[entity].b_finished = false;
+		paths[entity].goal = grid.at(goal.y).at(goal.x);
+		if (!paths[entity].path.empty()) {
+			paths[entity].end = paths[entity].path.back();
+		}
 	}
 
-	std::deque<Map::Cell>& Map::Service::getPath(Entity::Type entity) {
+	Map::Path& Map::Service::getPath(Entity::Type entity) {
 		if (paths.find(entity) != paths.end()) {
 			return paths.at(entity);
 		}
@@ -479,27 +502,5 @@ namespace NIKE {
 	bool Map::Cell::operator>(Map::Cell const& other) const {
 		return (f != other.f) ? (f > other.f) : (h != other.h) ? h > other.h : g > other.g;
 	}
-
-
-	//bool Map::Cell::operator>(const Cell& other) const
-	//{
-	//	return f > other.f;
-	//}
-
-	//bool Map::Cell::operator==(const Cell& other) const
-	//{
-	//	return index.x == other.index.x && index.y == other.index.y;
-	//}
-
-	//// TO BE DELETED
-	//void Map::Service::printPath(const std::vector<Cell>& path)
-	//{
-	//	for (const Cell& cell : path)
-	//	{
-	//		cout << "( " << cell.index.y << ", " << cell.index.x << " )";
-	//	}
-	//	cout << endl;
-	//}
-
 }
 

@@ -15,7 +15,7 @@ namespace NIKE {
 
     void Collision::System::bounceResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
-        Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
+        [[maybe_unused]] Transform::Transform& transform_b, [[maybe_unused]] Physics::Dynamics& dynamics_b, [[maybe_unused]] Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
         // Step 1: Validate and normalize the collision normal
