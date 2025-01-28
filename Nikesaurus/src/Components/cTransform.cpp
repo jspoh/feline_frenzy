@@ -31,9 +31,9 @@ namespace NIKE {
 
 			//Deserialize
 			[](Transform& comp, nlohmann::json const& data) {
-				comp.position.fromJson(data.at("Position"));
-				comp.scale.fromJson(data.at("Scale"));
-				comp.rotation = data.at("Rotation").get<float>();
+				comp.position.fromJson(data.value("Position", Vector2f::def_json));
+				comp.scale.fromJson(data.value("Scale", Vector2f::def_json));
+				comp.rotation = data.value("Rotation", 0.0f);
 				comp.use_screen_pos = data.value("Screen Position", false);
 			}
 		);

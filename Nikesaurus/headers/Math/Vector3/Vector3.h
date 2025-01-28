@@ -62,6 +62,7 @@ namespace NIKE {
 		using Vector3d = Vector3<double>;
 
 		//Default data for vector2 json
-		nlohmann::json Vector3f::def_json = nlohmann::json({ {"x", 0}, { "y", 0 }, {"z", 0} });
+		template <typename T>
+		nlohmann::json Vector3<T>::def_json = nlohmann::json({ {"x", 0}, { "y", 0 }, {"z", 0} });
 	}
 }

@@ -33,11 +33,11 @@ namespace NIKE {
 
 			//Deserialize
 			[](Physics::Dynamics& comp, nlohmann::json const& data) {
-				comp.max_speed = data.at("Max_Speed").get<float>();
-				comp.drag = data.at("Drag").get<float>();
-				comp.mass = data.at("Mass").get<float>();
-				comp.velocity.fromJson(data.at("Velocity"));
-				comp.force.fromJson(data.at("Force"));
+				comp.max_speed = data.value("Max_Speed", 0.0f);
+				comp.drag = data.value("Drag", 0.0f);
+				comp.mass = data.value("Mass", EPSILON);
+				comp.velocity.fromJson(data.value("Velocity", Vector2f::def_json));
+				comp.force.fromJson(data.value("Force", Vector2f::def_json));
 			}
 		);
 
@@ -228,12 +228,12 @@ namespace NIKE {
 
 			//Deserialize
 			[](Physics::Collider& comp, nlohmann::json const& data) {
-				comp.b_bind_to_entity = data.at("B_Bind_To_Entity").get<bool>();
-				comp.transform.position.fromJson(data.at("Position"));
-				comp.transform.scale.fromJson(data.at("Scale"));
-				comp.transform.rotation = data.at("Rotation").get<float>();
-				comp.pos_offset.fromJson(data.at("Pos_Offset"));
-				comp.resolution = static_cast<Resolution>(data.at("Resolution").get<int>());
+				comp.b_bind_to_entity = data.value("B_Bind_To_Entity", true);
+				comp.transform.position.fromJson(data.value("Position", Vector2f::def_json));
+				comp.transform.scale.fromJson(data.value("Scale", Vector2f::def_json));
+				comp.transform.rotation = data.value("Rotation", 0.0f);
+				comp.pos_offset.fromJson(data.value("Pos_Offset", Vector2f::def_json));
+				comp.resolution = data.value("Resolution", Resolution::NONE);
 			}
 		);
 

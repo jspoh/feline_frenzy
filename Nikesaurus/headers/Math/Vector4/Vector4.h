@@ -68,6 +68,7 @@ namespace NIKE {
 #pragma warning(pop) // Re-enable the warning after this block
 
 		//Default data for vector4 json
-		nlohmann::json Vector4f::def_json = nlohmann::json({ {"x", 0}, { "y", 0 }, {"z", 0}, {"w", 0} });
+		template <typename T>
+		nlohmann::json Vector4<T>::def_json = nlohmann::json({ {"x", 0}, { "y", 0 }, {"z", 0}, {"w", 0} });
 	}
 }

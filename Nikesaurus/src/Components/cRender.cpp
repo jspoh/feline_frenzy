@@ -35,8 +35,8 @@ namespace NIKE {
 
 			//Deserialize
 			[](Render::Cam& comp, nlohmann::json const& data) {
-				comp.position.fromJson(data.at("Position"));
-				comp.zoom = data.at("Zoom").get<float>();
+				comp.position.fromJson(data.value("Position", Vector2f::def_json));
+				comp.zoom = data.value("Zoom", 1.0f);
 			}
 		);
 
@@ -96,12 +96,12 @@ namespace NIKE {
 
 			//Deserialize
 			[](Render::Text& comp, nlohmann::json const& data) {
-				comp.font_id = data.at("Font_ID").get<std::string>();
-				comp.text = data.at("Text").get<std::string>();
-				comp.color.fromJson(data.at("Color"));
-				comp.scale = data.at("Scale").get<float>();
-				comp.size.fromJson(data.at("Size"));
-				comp.origin = static_cast<TextOrigin>(data.at("Origin").get<int>());
+				comp.font_id = data.value("Font_ID", "");
+				comp.text = data.value("Text", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+				comp.scale = data.value("Scale", 1.0f);
+				comp.size.fromJson(data.value("Size", Vector2f::def_json));
+				comp.origin = data.value("Origin", TextOrigin::CENTER);
 			}
 		);
 
@@ -329,8 +329,8 @@ namespace NIKE {
 
 			//Deserialize
 			[](Render::Shape& comp, nlohmann::json const& data) {
-				comp.model_id = data.at("Model_ID").get<std::string>();
-				comp.color.fromJson(data.at("Color"));
+				comp.model_id = data.value("Model_ID", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
 			}
 		);
 
@@ -454,14 +454,14 @@ namespace NIKE {
 
 			//Deserialize
 			[](Render::Texture& comp, nlohmann::json const& data) {
-				comp.texture_id = data.at("Texture_ID").get<std::string>();
-				comp.color.fromJson(data.at("Color"));
-				comp.frame_size.fromJson(data.at("Frame_Size"));
-				comp.frame_index.fromJson(data.at("Frame_Index"));
-				comp.b_blend = data.at("B_Blend").get<bool>();
-				comp.intensity = data.at("Intensity").get<float>();
-				comp.b_stretch = data.at("B_Stretch").get<bool>();
-				comp.b_flip.fromJson(data.at("B_Flip"));
+				comp.texture_id = data.value("Texture_ID", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+				comp.frame_size.fromJson(data.value("Frame_Size", Vector2i::def_json));
+				comp.frame_index.fromJson(data.value("Frame_Index", Vector2i::def_json));
+				comp.b_blend = data.value("B_Blend", false);
+				comp.intensity = data.value("Intensity", 0.5f);
+				comp.b_stretch = data.value("B_Stretch", false);
+				comp.b_flip.fromJson(data.value("B_Flip", Vector2b::def_json));
 			}
 		);
 
