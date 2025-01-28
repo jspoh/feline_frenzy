@@ -22,9 +22,6 @@ namespace NIKE {
 			//Name
 			std::string name;
 
-			//Dynamic tagging
-			std::set<std::string> tags;
-
 			//Prefab tag
 			std::string prefab_id;
 
@@ -34,9 +31,19 @@ namespace NIKE {
 			//Boolean for checking if entity is active
 			bool b_isactive;
 
+			//Dynamic tagging
+			std::set<std::string> tags;
+
+			//Constructors
 			EntityData() : name{ "entity" }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
 			EntityData(std::string const& name)
 				: name{ name }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
+
+			//Serialize data
+			nlohmann::json serialize() const;
+
+			//Deserialize data
+			void deserialize(nlohmann::json const& data);
 		};
 
 		//Meta Data Management

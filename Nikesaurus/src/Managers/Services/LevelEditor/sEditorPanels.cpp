@@ -436,6 +436,18 @@ namespace NIKE {
 				}
 			}
 
+			ImGui::Spacing();
+
+			//Reserialize All Data
+			{
+				ImGui::Text("Reserialize Data:");
+				if (ImGui::Button("Reserialize")) {
+
+					//Restart scene
+					NIKE_ASSETS_SERVICE->reserializeAllAssets();
+				}
+			}
+
 			//End of menu bar
 			ImGui::EndMenuBar();
 		}
@@ -878,8 +890,12 @@ namespace NIKE {
 				//Check if entity is selected
 				bool selected = NIKE_ECS_MANAGER->checkEntity(selected_entity) && entity == selected_entity;
 
+				//Entity data
+				auto entity_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+				if (!entity_data.has_value() || entity_data.value().get().name == "") continue;
+
 				// Show selectable
-				if (ImGui::Selectable(NIKE_METADATA_SERVICE->getEntityData(entity).value().get().name.c_str(), selected)) {
+				if (ImGui::Selectable(entity_data.value().get().name.c_str(), selected)) {
 					// Check if currently editing grid
 					if (tilemap_panel.lock()->checkGridEditing()) {
 						error_msg->assign("Editing grid now, unable to select entity.");
@@ -934,7 +950,6 @@ namespace NIKE {
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
 					}
 				}
-
 			}
 		}
 

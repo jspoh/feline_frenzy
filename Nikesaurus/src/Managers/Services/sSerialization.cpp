@@ -232,13 +232,13 @@ namespace NIKE {
 
 				//Serialize entity
 				e_data["Entity"] = serializeEntity(entity);
-				//e_data["Entity"]["Entity Name"] = NIKE_LVLEDITOR_SERVICE->getEntityByType(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
-				//Serialize entity editor meta data
-				#ifndef NDEBUG
-				//e_data["Entity"]["MetaData"] = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(entity).serialize();
-				#endif
+				//Serialize entity meta data
+				auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+				if (meta_data.has_value()) {
+					e_data["Entity"]["MetaData"] = meta_data.value().get().serialize();
+				}
 
 				//If entity is a UI Entity
 				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
@@ -326,13 +326,11 @@ namespace NIKE {
 					Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").at("Layer ID").get<unsigned int>());
 					deserializeEntity(entity, e_data.at("Entity"));
 
-					// Wrapped for Release to build!
 					//Deserialize entity metadata
-					#ifndef NDEBUG
-					//LevelEditor::EntityMetaData meta_data;
-					//meta_data.deserialize(e_data.at("Entity").at("MetaData"));
-					//NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
-					#endif				
+					auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+					if (meta_data.has_value()) {
+						meta_data.value().get().deserialize(e_data);
+					}
 
 					//Check if entity is a UI entity
 					if (e_data.at("Entity").contains("UI ID")) {

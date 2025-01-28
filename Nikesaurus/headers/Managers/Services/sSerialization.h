@@ -96,7 +96,6 @@ namespace NIKE {
 
 			//Load json file path
 			nlohmann::json loadJsonFile(std::string const& file_path);
-
 		};
 
 		//Re-enable DLL Export warning

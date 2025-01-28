@@ -13,6 +13,36 @@
 
 namespace NIKE {
 
+	nlohmann::json MetaData::EntityData::serialize() const {
+		return {
+			{"Name", name},
+			{"Prefab ID", prefab_id},
+			{"B_Locked", b_locked},
+			{"B_Is_Active", b_isactive},
+			{"Tags", tags}
+		};
+	}
+
+	void MetaData::EntityData::deserialize(nlohmann::json const& data) {
+
+		//If there is a name present
+		if (data.contains("name")) {
+			name = data["Name"].get<std::string>();
+		}
+
+		//Get default values
+		prefab_id = data.value("Prefab ID", "");
+		b_locked = data.value("B_Locked", false);
+		b_isactive = data.value("B_Is_Active", true);
+
+		//Get tags
+		if (data.contains("Tags")) {
+			for (const auto& tag : data.at("Tags").items()) {
+				tags.insert(tag.value());
+			}
+		}
+	}
+
 	void MetaData::Service::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
 
 		//Get entities

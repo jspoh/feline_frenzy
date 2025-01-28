@@ -36,13 +36,13 @@ namespace NIKE {
 
 			//Deserialize
 			[](Animation::Base& comp, nlohmann::json const& data) {
-				comp.animation_mode = static_cast<Mode>(data.at("Mode").get<int>());
-				comp.animations_to_complete = data.at("Animation_Count").get<int>();
-				comp.completed_animations = data.at("Completed_Animations").get<int>();
-				comp.b_pingpong = data.at("B_PingPong").get<bool>();
-				comp.b_reverse = data.at("B_Reverse").get<bool>();
-				comp.frame_duration = data.at("Frame_Duration").get<float>();
-				comp.timer = data.at("Timer").get<float>();
+				comp.animation_mode = static_cast<Mode>(data.value("Mode", 0));
+				comp.animations_to_complete = data.value("Animation_Count", 0);
+				comp.completed_animations = data.value("Completed_Animations", 0);
+				comp.b_pingpong = data.value("B_PingPong", false);
+				comp.b_reverse = data.value("B_Reverse", false);
+				comp.frame_duration = data.value("Frame_Duration", 0.0f);
+				comp.timer = data.value("Timer", 0.0f);
 			}
 		);
 
@@ -201,10 +201,10 @@ namespace NIKE {
 
 			//Deserialize
 			[](Animation::Sprite& comp, nlohmann::json const& data) {
-				comp.sheet_size.fromJson(data.at("Sheet_Size"));
-				comp.start_index.fromJson(data.at("Start_Index"));
-				comp.end_index.fromJson(data.at("End_Index"));
-				comp.curr_index.fromJson(data.at("Curr_Index"));
+				comp.sheet_size.fromJson(data.value("Sheet_Size", Vector2f::def_json));
+				comp.start_index.fromJson(data.value("Start_Index", Vector2f::def_json));
+				comp.end_index.fromJson(data.value("End_Index", Vector2f::def_json));
+				comp.curr_index.fromJson(data.value("Curr_Index", Vector2f::def_json));
 			}
 		);
 

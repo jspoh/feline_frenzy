@@ -636,4 +636,62 @@ namespace NIKE {
 			asset_registry[id] = MetaData(static_cast<Types>(meta_data["Type"].get<int>()), meta_data["Primary_Path"].get<std::string>());
 		}
 	}
+
+	void Assets::Service::reserializeAllAssets() {
+
+		//Reserialize all assets
+		for (auto const& asset_data : asset_registry) {
+			try {
+				switch (asset_data.second.type) {
+				case Assets::Types::Prefab: {
+
+					//Create tempe entity
+					auto temp = NIKE_ECS_MANAGER->createEntity();
+
+					//Deserialize
+					NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp, asset_data.second.primary_path.string());
+
+					//Serialize
+					NIKE_SERIALIZE_SERVICE->saveEntityToFile(temp, asset_data.second.primary_path.string());
+
+					break;
+				}
+				case Assets::Types::Scene: {
+					//Deserialize
+					NIKE_SERIALIZE_SERVICE->loadSceneFromFile(asset_data.second.primary_path.string());
+
+					//Serialize
+					NIKE_SERIALIZE_SERVICE->saveSceneToFile(asset_data.second.primary_path.string());
+
+					break;
+				}
+				case Assets::Types::Grid: {
+					//Json Data
+					nlohmann::json data;
+
+					//Open file stream
+					std::fstream in_file(asset_data.second.primary_path, std::ios::in);
+
+					//Read data from file
+					in_file >> data;
+
+					//Deserialize
+					NIKE_MAP_SERVICE->deserialize(data);
+
+					//Open file stream
+					std::fstream out_file(asset_data.second.primary_path, std::ios::out | std::ios::trunc);
+
+					//Store data
+					out_file << NIKE_MAP_SERVICE->serialize().dump(4);
+
+					break;
+				}
+				}
+			}
+			catch (std::exception const& e) {
+				NIKEE_CORE_WARN("Unable to reserialize asset. Deleting asset.");
+				std::filesystem::remove(asset_data.second.primary_path);
+			}
+		}
+	}
 }

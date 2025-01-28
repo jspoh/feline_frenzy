@@ -244,6 +244,8 @@ namespace NIKE {
 			//Deserialize asset registry
 			void deserialize(nlohmann::json const& data);
 
+			//Reserialize data
+			void reserializeAllAssets();
 		};
 
 		//Re-enable DLL Export warning
