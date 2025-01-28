@@ -94,7 +94,7 @@ namespace NIKE {
 			std::string prev_scene;
 
 			//Scene event queue
-			std::shared_ptr<Scenes::SceneEvent> event_queue;
+			std::queue<Scenes::SceneEvent> event_queue;
 
 			//Layers within scene
 			std::vector<std::shared_ptr<Layer>> layers;
@@ -136,7 +136,7 @@ namespace NIKE {
 			std::vector<std::shared_ptr<Layer>>& getLayers();
 
 			//Queue scene event
-			void queueSceneEvent(Scenes::SceneEvent const& event);
+			void queueSceneEvent(Scenes::SceneEvent&& event);
 
 			//Set curr scene id
 			void setCurrSceneID(std::string const& new_scene_id);

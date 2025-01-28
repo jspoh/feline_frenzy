@@ -5011,22 +5011,39 @@ namespace NIKE {
 			if (ImGui::Button("Ok") && !scn_id.empty() && (scn_id.find(".scn") == scn_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(scn_id)) {
 
 				//Craft file path from name
-				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
+				std::filesystem::path scenes_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
 
-				if (!std::filesystem::exists(path)) {
-					std::filesystem::create_directories(path); // Create the directory if it doesn't exist
+				if (!std::filesystem::exists(scenes_path)) {
+					std::filesystem::create_directories(scenes_path); // Create the directory if it doesn't exist
 				}
 
-				path /= std::string(scn_id + ".scn");
+				//Craft file path from name
+				std::filesystem::path grids_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
+
+				if (!std::filesystem::exists(grids_path)) {
+					std::filesystem::create_directories(grids_path); // Create the directory if it doesn't exist
+				}
+
+				//Scn path
+				std::filesystem::path scn_path = scenes_path / std::string(scn_id + ".scn");
+
+				//Grid path
+				std::filesystem::path grid_path = grids_path / std::string(scn_id + ".grid");
 
 				//Reset scene
-				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESET, ""));
+				NIKE_SCENES_SERVICE->resetScene();
 
 				//When user click save/create scene, grid is saved together
 				tile_panel.lock()->saveGrid(scn_id);
 
 				//Serialize new empty scene
-				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
+				NIKE_SERIALIZE_SERVICE->saveSceneToFile(scn_path.string());
+
+				//Register grid
+				NIKE_ASSETS_SERVICE->registerAsset(grid_path.string(), false);
+
+				//Register scn
+				NIKE_ASSETS_SERVICE->registerAsset(scn_path.string(), false);
 
 				//Queue new scene
 				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, std::string(scn_id + ".scn")));
@@ -5097,7 +5114,6 @@ namespace NIKE {
 			}
 			};
 	}
-
 
 	std::function<void()> LevelEditor::ScenesPanel::editBitMaskPopup(std::string const& popup_id) {
 		return [this, popup_id]() {
@@ -5472,8 +5488,6 @@ namespace NIKE {
 			openPopUp("Edit Layer Bit Mask");
 		}
 
-
-
 		//Render popups
 		renderPopUps();
 
@@ -5542,8 +5556,6 @@ namespace NIKE {
 
 				// Execute the action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(drag_drop_action));
-
-
 			}
 
 			//Model file payload

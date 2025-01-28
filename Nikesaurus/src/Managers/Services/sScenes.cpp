@@ -101,7 +101,9 @@ namespace NIKE {
 
 		//Check if scene exists
 		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
-			throw std::runtime_error("Error scene file does not exist");
+
+			//Attempt to register asset here
+			NIKE_ASSETS_SERVICE->registerAsset((NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes") / curr_scene).string(), false);
 		}
 
 		//Run scene
@@ -267,13 +269,8 @@ namespace NIKE {
 		return layers;
 	}
 
-	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent const& new_event) {
-		if (!event_queue) {
-			event_queue = std::make_shared<Scenes::SceneEvent>(new_event);
-		}
-		else {
-			NIKEE_CORE_INFO("Multiple new scene event. First scene event will be used");
-		}
+	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent&& new_event) {
+		event_queue.push(std::move(new_event));
 	}
 
 	void Scenes::Service::setCurrSceneID(std::string const& new_scene_id) {
@@ -303,10 +300,15 @@ namespace NIKE {
 		}
 
 		//Execute new scene queue
-		if (event_queue) {
-			switch (event_queue->scene_action) {
+		while (!event_queue.empty()) {
+
+			//Get front of the queue and pop
+			auto& action = event_queue.front();
+
+			//Execute action
+			switch (action.scene_action) {
 			case Scenes::Actions::CHANGE:
-				changeScene(event_queue->next_scene_id);
+				changeScene(action.next_scene_id);
 				break;
 			case Scenes::Actions::PREVIOUS:
 				previousScene();
@@ -324,8 +326,7 @@ namespace NIKE {
 				break;
 			}
 
-			//Reset queue
-			event_queue.reset();
+			event_queue.pop();
 		}
 	}
 }

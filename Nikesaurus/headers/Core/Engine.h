@@ -82,6 +82,7 @@ namespace NIKE {
 			 *
 			 * \return instance
 			 */
+
 			static Engine& getInstance() {
 				static Core::Engine instance;
 				return instance;
