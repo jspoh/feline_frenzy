@@ -12,24 +12,65 @@
 // States and transitions
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/enemyStates.h"
+#include "Systems/GameLogic/sysEnemy.h"
 
 
 namespace NIKE {
 
-	bool Transition::IdleToAttack::isValid()
+	/*******************************
+	* Idle To Attack transition functions
+	*****************************/
+
+	bool Transition::IdleToAttack::isValid(Entity::Type& entity) const
 	{
-		auto idle_state = NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
-		if (idle_state) {
-			// Checks if within range to transition
-			//return idle_state->withinRange(enemy, player); 
+		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
+		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			// Somehow e_player_comp is getting nullptr
+			if (e_player_comp.has_value())
+			{
+				// If entity has the gamelogic::ilogic component, and within range of enemy
+				if (Enemy::withinRange(entity, other_entity)){
+					return true;
+				}
+			}
+
 		}
 
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::IdleToAttack::getNextState()
+	std::shared_ptr<StateMachine::Istate> Transition::IdleToAttack::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Attack");
+		return NIKE_FSM_SERVICE->getStateByID<State::AttackState>("Attack");
+	}
+
+	/*******************************
+	* Attack To Idle transition functions
+	*****************************/
+
+	bool Transition::AttackToIdle::isValid(Entity::Type& entity) const
+	{
+		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
+		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			// Somehow e_player_comp is getting nullptr
+			if (e_player_comp.has_value())
+			{
+				// If entity has the gamelogic::ilogic component, and not within range of enemy
+				if (!Enemy::withinRange(entity, other_entity)) {
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	std::shared_ptr<StateMachine::Istate> Transition::AttackToIdle::getNextState() const
+	{
+		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
 	}
 }
 

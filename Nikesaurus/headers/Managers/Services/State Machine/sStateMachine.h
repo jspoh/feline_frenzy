@@ -15,9 +15,24 @@ namespace NIKE {
         //Temporary Disable DLL Export Warning
         #pragma warning(disable: 4251)
 
+        // Forward declaration to fix errors
+        class Istate;
+
+
+        // Base transition class
+        class Itransition {
+        public:
+            // Determines if the transition to the next state is valid
+            virtual bool isValid(Entity::Type& entity) const = 0;
+
+            // Returns the state that should be transitioned to.
+            virtual std::shared_ptr<Istate> getNextState() const = 0;
+        };
+
         // Base state class
-        struct Istate
+        class Istate
         {
+        public:
             virtual ~Istate() = default;
 
             virtual void onEnter(Entity::Type& entity) = 0;
@@ -25,18 +40,19 @@ namespace NIKE {
             virtual void onUpdate(Entity::Type& entity) = 0;
 
             virtual void onExit(Entity::Type& entity) = 0;
-        };
 
-        // Base transition class
-        class Itransition {
-        public:
-            virtual ~Itransition() = default;
+            /***********************
+            * Transitions handling
+            ************************/
+            std::unordered_map<std::string, std::shared_ptr<Itransition>> const& getTransitions();
+            void addTransition(const std::string& transition_id, std::shared_ptr<Itransition> transition);
+            void removeTransition(const std::string& transition_id);
+            bool checkTransitionExist(const std::string& transition_id);
 
-            // Determines if the transition to the next state is valid
-            virtual bool isValid() const = 0;
 
-            // Returns the state that should be transitioned to.
-            virtual std::shared_ptr<Istate> getNextState() const = 0;
+        private:
+            // List of transitions
+            std::unordered_map<std::string, std::shared_ptr<Itransition>> transitions;
         };
 
         class NIKE_API Service {
@@ -56,11 +72,6 @@ namespace NIKE {
             void registerState(const std::string& state_id, std::shared_ptr<Istate> state);
 
             void removeState(const std::string& state_id);
-
-            /***********************
-            * Transition Managements
-            **************************/
-            void addTransition(const std::string& transition_id, std::shared_ptr<Itransition> transition);
 
 
             /***********************
@@ -88,8 +99,6 @@ namespace NIKE {
             std::shared_ptr<Istate> current_state;
             // List of states map
             std::unordered_map<std::string, std::shared_ptr<Istate>> state_map;
-            // List of states map
-            std::unordered_map<std::string, std::shared_ptr<Itransition>> transitions_map;
         };
 
         //Re-enable DLL Export warning
