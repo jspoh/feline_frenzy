@@ -30,26 +30,48 @@ namespace NIKE {
 			float blend_intensity{};
 		};
 
-		class Service {
+		struct FramebufferTexture {
+			unsigned int frame_buffer{};
+			unsigned int texture_color_buffer{};
+
+			int width{};
+			int height{};
+		};
+
+		struct TextBuffer {
+			unsigned int vao{}; // Vertex Array Object
+			unsigned int vbo{}; // Vertex Buffer Object
+		};
+
+		class Service : public Events::IEventListener<Windows::WindowResized> {
 			private:
 
 				//Delete Copy Constructor & Copy Assignment
 				Service(Service const& copy) = delete;
 				void operator=(Service const& copy) = delete;
 
+				//On windows resized event (Ensures game viewport's aspect ratio remains the same)
+				void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
+
 				//Shader system
 				std::unique_ptr<Shader::ShaderManager> shader_manager;
-
+				TextBuffer text_buffer;
 
 			public:
-				static constexpr bool BATCHED_RENDERING = true;
-				static constexpr unsigned int MAX_INSTANCES = 1000;
+				const bool BATCHED_RENDERING = true;
+				static constexpr unsigned int MAX_INSTANCES = 500;
 				static constexpr int MAX_UNIQUE_TEX_HDLS = 32;
 				static constexpr int NUM_INDICES_FOR_QUAD = 6;
 				static constexpr int NUM_VERTICES_IN_MODEL = 4;
 
 				Service() = default;
 				~Service() = default;
+				
+				FramebufferTexture framebuffer_tex;
+
+				/*****************************************************************//**
+				* INITIALIZATION
+				*********************************************************************/
 
 				void init();
 
@@ -76,6 +98,9 @@ namespace NIKE {
 				//Render Bounding Box
 				void renderBoundingBox(Matrix_33 const& x_form, Vector4f const& e_color);
 
+				//Render text
+				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
+
 				/*****************************************************************//**
 				* BATCH RENDERING
 				*********************************************************************/
@@ -86,9 +111,11 @@ namespace NIKE {
 				// Shapes render instance
 				std::vector<RenderInstance> render_instances_quad;
 
-				std::vector<RenderInstance> render_instances_bounding_box;
 				// Textures render instance
 				std::vector<RenderInstance> render_instances_texture;
+
+				// Bounding box render instance
+				std::vector<RenderInstance> render_instances_bounding_box;
 
 				// batch render shape (uses renderObject)
 				void batchRenderObject();
