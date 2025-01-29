@@ -545,7 +545,7 @@ namespace NIKE {
 			ImGui::Text("Are you sure you want to remove %s tag?", selected_tag.c_str());
 
 			//If enter or ok button is pressed
-			if (!selected_tag.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
 
 				//Temporary create action
 				Action remove;
@@ -860,7 +860,7 @@ namespace NIKE {
 			ImGui::SameLine();
 
 			// Button to remove an entity, which triggers the popup
-			if (ImGui::Button("Remove##EntityTags")) {
+			if (!selected_tag.empty() && ImGui::Button("Remove##EntityTags")) {
 				openPopUp("Remove Tag");
 			}
 
@@ -897,7 +897,7 @@ namespace NIKE {
 
 							// Define the do action for unselecting
 							unselect_tag_action.do_action = [&]() {
-								selected_tag = "";
+								selected_tag.clear();
 								};
 
 							// Define the undo action for reselecting the previous entity
@@ -918,6 +918,14 @@ namespace NIKE {
 						ImGui::Text(std::string("Entity Tag: " + tag).c_str());
 						ImGui::EndDragDropSource();
 					}
+					else {
+						//Hover item
+						if (ImGui::IsItemHovered()) {
+							ImGui::BeginTooltip();
+							ImGui::Text("Drag tag to entity under entity inspector to add tag.");
+							ImGui::EndTooltip();
+						}
+					}
 				}
 			}
 			else {
@@ -933,6 +941,75 @@ namespace NIKE {
 			auto entity_data = NIKE_METADATA_SERVICE->getEntityData(selected_entity);
 			if (entity_data.has_value() && ImGui::CollapsingHeader((entity_data.value().get().name + "##SelectedEntity").c_str())) {
 
+				//Get reference to entity data
+				auto& e_data = entity_data.value().get();
+
+				//Lock entity
+				ImGui::SeparatorText("Lock Entity");
+				if (ImGui::Button(e_data.b_locked ? "Locked" : "Unlocked")) {
+					e_data.b_locked = !e_data.b_locked;
+				}
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				ImGui::SeparatorText("Select Prefab");
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				//Select prefab
+				static int select_prefab = 0;
+
+				//Prefab ref container
+				auto const& prefabs_ref = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
+
+				//Select prefab ID
+				if (ImGui::Combo("##PrefabIDSetter", &select_prefab, prefabs_ref.data(), static_cast<int>(prefabs_ref.size()))) {
+					if (select_prefab > 0 && select_prefab < static_cast<int>(prefabs_ref.size())) {
+						e_data.prefab_id = prefabs_ref[select_prefab];
+					}
+					else {
+						e_data.prefab_id = "";
+					}
+				}
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				ImGui::SeparatorText("Entity Tags");
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				//Show number of entities in the level
+				ImGui::Text("Number of tags: %d", e_data.tags.size());
+				auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
+				if (!tags.empty()) {
+					for (auto const& tag : tags) {
+
+						//Boolean
+						bool checked = e_data.tags.find(tag) != e_data.tags.end();
+
+						//Checkbox for checking tag
+						if (ImGui::Checkbox(("##EntityTag" + tag).c_str(), &checked)) {
+							if (checked) {
+								e_data.tags.insert(tag);
+							}
+							else {
+								e_data.tags.erase(tag);
+							}
+						}
+
+						ImGui::SameLine();
+
+						//Tag name
+						ImGui::Text(tag.c_str());
+					}
+				}
+				else {
+					ImGui::Text("No Tags Exists.");
+				}
 			}
 		}
 
@@ -949,7 +1026,10 @@ namespace NIKE {
 			ImGui::Spacing();
 
 			//Tag filtering
-			ImGui::Text("Tag Filter:");
+			ImGui::SeparatorText("Tag Filtering");
+
+			//Add Spacing
+			ImGui::Spacing();
 
 			//Static selected index
 			static int selected_tag_filter = 0;
@@ -976,6 +1056,12 @@ namespace NIKE {
 			//Add Spacing
 			ImGui::Spacing();
 
+			//Tag filtering
+			ImGui::SeparatorText("Entities Inspector");
+
+			//Add Spacing
+			ImGui::Spacing();
+
 			// Button to create an entity, which triggers the popup
 			if (ImGui::Button("Create##Entity")) {
 				openPopUp("Create Entity");
@@ -985,7 +1071,7 @@ namespace NIKE {
 			ImGui::SameLine();
 
 			// Button to remove an entity, which triggers the popup
-			if ((ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete]) && NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
+			if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
 				openPopUp("Remove Entity");
 			}
 
@@ -993,7 +1079,7 @@ namespace NIKE {
 			ImGui::SameLine();
 
 			// Button to clone an entity, which triggers the popup
-			if (ImGui::Button("Clone##Entity") && NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
+			if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::Button("Clone##Entity")) {
 				openPopUp("Clone Entity");
 			}
 
@@ -1005,106 +1091,6 @@ namespace NIKE {
 
 			//Check if there are entities present
 			if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
-				// Get entities marked for deletion
-				auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
-
-				//Check for disable entity interaction flag
-				if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
-					//Reverse Iterate through layers to check for entity being clicked
-					static bool entity_clicked = false;
-					entity_clicked = false;
-
-					//Iterate through entities from top layer down
-					for (auto layer = NIKE_SCENES_SERVICE->getLayers().rbegin();
-						!entity_clicked && layer != NIKE_SCENES_SERVICE->getLayers().rend();
-						layer++) {
-
-						//SKip inactive layer
-						if (!layer->get()->getLayerState())
-							continue;
-
-						//Iterate through all entities
-						for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-
-							//Skip entities not on curr layer
-							if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-								continue;
-
-							// Check for entity clicking
-							if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-								// Only act if the entity changes
-								if (selected_entity != entity) {
-
-									LevelEditor::Action select_entity_action;
-
-									// Capture current and previous selected entities
-									auto prev_entity = selected_entity;
-									auto new_entity = entity;
-
-									// Define the do action for selecting the new entity
-									select_entity_action.do_action = [&, prev_entity, new_entity]() {
-										selected_entity = new_entity;
-										b_entity_changed = true;
-										entity_clicked = true;
-										};
-
-									// Define the undo action for reverting to the previous entity
-									select_entity_action.undo_action = [&, prev_entity, new_entity]() {
-										selected_entity = prev_entity;
-										b_entity_changed = true;
-										entity_clicked = true;
-										};
-
-									// Execute the action
-									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
-								}
-
-								// Set the selected entity
-								selected_entity = entity;
-
-								// Signal entity changed
-								b_entity_changed = true;
-
-								// Signal that an entity has been clicked
-								entity_clicked = true;
-								break;
-							}
-
-						}
-					}
-
-					if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
-
-						// If selected entity is not invalid
-						if (selected_entity != UINT16_MAX) {
-
-							LevelEditor::Action unselect_entity_action;
-
-							// Capture the current selected entity
-							auto prev_entity = selected_entity;
-
-							// Define the do action for unselecting
-							unselect_entity_action.do_action = [&, prev_entity]() {
-								unselectEntity();
-								b_entity_changed = true;
-								};
-
-							// Define the undo action for reselecting the previous entity
-							unselect_entity_action.undo_action = [&, prev_entity]() {
-								selected_entity = prev_entity;
-								b_entity_changed = true;
-								};
-
-							// Execute the action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
-						}
-					}
-
-					if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
-						//Get mouse pos
-						Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
-					}
-				}
 
 				//Iterate through all entities to showcase active entities
 				for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
@@ -1185,6 +1171,108 @@ namespace NIKE {
 						}
 						ImGui::EndDragDropTarget();
 					}
+				}
+			}
+		}
+
+		//Check for entity interaction
+		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
+
+			//Check for disable entity interaction flag
+			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
+				//Reverse Iterate through layers to check for entity being clicked
+				static bool entity_clicked = false;
+				entity_clicked = false;
+
+				//Iterate through entities from top layer down
+				for (auto layer = NIKE_SCENES_SERVICE->getLayers().rbegin();
+					!entity_clicked && layer != NIKE_SCENES_SERVICE->getLayers().rend();
+					layer++) {
+
+					//SKip inactive layer
+					if (!layer->get()->getLayerState())
+						continue;
+
+					//Iterate through all entities
+					for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+						//Skip entities not on curr layer
+						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+							continue;
+
+						// Check for entity clicking
+						if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+							// Only act if the entity changes
+							if (selected_entity != entity) {
+
+								LevelEditor::Action select_entity_action;
+
+								// Capture current and previous selected entities
+								auto prev_entity = selected_entity;
+								auto new_entity = entity;
+
+								// Define the do action for selecting the new entity
+								select_entity_action.do_action = [&, prev_entity, new_entity]() {
+									selected_entity = new_entity;
+									b_entity_changed = true;
+									entity_clicked = true;
+									};
+
+								// Define the undo action for reverting to the previous entity
+								select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+									selected_entity = prev_entity;
+									b_entity_changed = true;
+									entity_clicked = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+							}
+
+							// Set the selected entity
+							selected_entity = entity;
+
+							// Signal entity changed
+							b_entity_changed = true;
+
+							// Signal that an entity has been clicked
+							entity_clicked = true;
+							break;
+						}
+
+					}
+				}
+
+				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+
+					// If selected entity is not invalid
+					if (selected_entity != UINT16_MAX) {
+
+						LevelEditor::Action unselect_entity_action;
+
+						// Capture the current selected entity
+						auto prev_entity = selected_entity;
+
+						// Define the do action for unselecting
+						unselect_entity_action.do_action = [&, prev_entity]() {
+							unselectEntity();
+							b_entity_changed = true;
+							};
+
+						// Define the undo action for reselecting the previous entity
+						unselect_entity_action.undo_action = [&, prev_entity]() {
+							selected_entity = prev_entity;
+							b_entity_changed = true;
+							};
+
+						// Execute the action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+					}
+				}
+
+				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
+					//Get mouse pos
+					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
 				}
 			}
 		}
@@ -1859,20 +1947,13 @@ namespace NIKE {
 				//Print out selected entity layer id
 				ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity()));
 
-				//Entity locking
-				{
-					//Lock entity
-					ImGui::Text("Lock Entity: ");
-					ImGui::SameLine();
-					if (ImGui::SmallButton(entity_data.b_locked ? "Locked" : "Unlocked")) {
-						entity_data.b_locked = !entity_data.b_locked;
-					}
+				//Return if entity is locked
+				if (entity_data.b_locked) {
+					//Render popups
+					renderPopUps();
 
-					//Return if entity is locked
-					if (entity_data.b_locked) {
-						ImGui::End();
-						return;
-					}
+					ImGui::End();
+					return;
 				}
 			}
 			else {

@@ -357,7 +357,7 @@ namespace NIKE {
 	}
 
 	std::vector<const char*> Assets::Service::getAssetRefs(Assets::Types type) const {
-		std::vector<const char*> asset_refs;
+		std::vector<const char*> asset_refs = {""};
 		for (auto it = asset_registry.begin(); it != asset_registry.end(); ++it) {
 
 			//Check if the asset contains any invalid keys

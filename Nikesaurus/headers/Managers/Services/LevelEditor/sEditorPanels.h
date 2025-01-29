@@ -213,7 +213,7 @@ namespace NIKE {
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
 
 		public:
-			EntitiesPanel() : selected_entity{ UINT16_MAX }, selected_tag{ "" }, b_entity_changed { false } {}
+			EntitiesPanel() : selected_entity{ UINT16_MAX }, selected_tag{}, b_entity_changed { false } {}
 			~EntitiesPanel() = default;
 
 			//Panel Name
