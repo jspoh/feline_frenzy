@@ -192,6 +192,11 @@ namespace NIKE {
 		cam_data["Camera"] = NIKE_CAMERA_SERVICE->serializeCamera();
 		data.push_back(cam_data);
 
+		// Camera Component Data
+		nlohmann::json mt_data;
+		mt_data["MetaData"] = NIKE_METADATA_SERVICE->serialize();
+		data.push_back(mt_data);
+
 		//UI Entities
 		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
 		std::unordered_map<Entity::Type, std::string> ui_entity_to_ref;
@@ -283,14 +288,18 @@ namespace NIKE {
 			return;
 
 
-		//Iterate through all layer data
+		//Iterate through all data
 		for (const auto& l_data : data) {
 
+			//Deserialize servies
 			if (l_data.contains("Channels")) {
 				NIKE_AUDIO_SERVICE->deserializeAudioChannels(l_data["Channels"]);
 			}
 			if (l_data.contains("Camera")) {
 				NIKE_CAMERA_SERVICE->deserializeCamera(l_data["Camera"]);
+			}
+			if (l_data.contains("MetaData")) {
+				NIKE_METADATA_SERVICE->deserialize(l_data["MetaData"]);
 			}
 
 			//Load map grid if a map file path is specified

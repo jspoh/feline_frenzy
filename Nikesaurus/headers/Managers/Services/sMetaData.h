@@ -35,7 +35,7 @@ namespace NIKE {
 			std::set<std::string> tags;
 
 			//Constructors
-			EntityData() : name{ "entity" }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
+			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
 			EntityData(std::string const& name)
 				: name{ name }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
 
@@ -100,7 +100,7 @@ namespace NIKE {
 			void unregisterTag(std::string const& tag);
 
 			//Get entity types
-			std::set<std::string> getRegisteredTags() const;
+			std::set<std::string>const& getRegisteredTags() const;
 
 			//Check Entity Name Taken
 			bool isNameValid(std::string const& name) const;
@@ -152,6 +152,15 @@ namespace NIKE {
 
 			//Get entities data
 			std::map<Entity::Type, EntityData, EntitySorter>& getEntitiesData();
+
+			//Reset manager
+			void reset();
+
+			//Serialize data
+			nlohmann::json serialize() const;
+
+			//Deserialize data
+			void deserialize(nlohmann::json const& data);
 		};
 	}
 }

@@ -179,6 +179,9 @@ namespace NIKE {
 			//Selected entity
 			Entity::Type selected_entity;
 
+			//Selected tag
+			std::string selected_tag;
+
 			//Entity changed event boolean
 			bool b_entity_changed;
 
@@ -210,7 +213,7 @@ namespace NIKE {
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
 
 		public:
-			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
+			EntitiesPanel() : selected_entity{ UINT16_MAX }, selected_tag{ "" }, b_entity_changed { false } {}
 			~EntitiesPanel() = default;
 
 			//Panel Name

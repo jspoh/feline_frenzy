@@ -90,21 +90,17 @@ namespace NIKE {
 		//Reset Camera
 		NIKE_CAMERA_SERVICE->setActiveCamName("Free Cam");
 
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//Clear layers
 		layers.clear();
 
 		//Create the first layer
 		createLayer();
-
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
-
-		//Check if scene exists
-		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
-
-			//Attempt to register asset here
-			NIKE_ASSETS_SERVICE->registerAsset((NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes") / curr_scene).string(), false);
-		}
 
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
@@ -125,14 +121,17 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//Clear layers
 		layers.clear();
 
 		//Create the first layer
 		createLayer();
-
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
 
 		//ReRun scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
@@ -158,6 +157,12 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//Clear layers
 		layers.clear();
 
@@ -169,16 +174,11 @@ namespace NIKE {
 			throw std::runtime_error("Error scene file does not exist");
 		}
 
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
-
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 	}
 
 	void Scenes::Service::resetScene() {
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
 
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
@@ -188,6 +188,12 @@ namespace NIKE {
 
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
 
 		//Clear layers
 		layers.clear();

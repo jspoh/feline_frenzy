@@ -109,7 +109,7 @@ namespace NIKE {
 		entity_tags.erase(tag);
 	}
 
-	std::set<std::string> MetaData::Service::getRegisteredTags() const {
+	std::set<std::string> const& MetaData::Service::getRegisteredTags() const {
 		return entity_tags;
 	}
 
@@ -286,5 +286,23 @@ namespace NIKE {
 
 	std::map<Entity::Type, MetaData::EntityData, MetaData::Service::EntitySorter>& MetaData::Service::getEntitiesData() {
 		return entities;
+	}
+
+	void MetaData::Service::reset() {
+		entity_tags.clear();
+	}
+
+	nlohmann::json MetaData::Service::serialize() const {
+		return {
+		{"Entity_Tags", entity_tags}
+		};
+	}
+
+	void MetaData::Service::deserialize(nlohmann::json const& data) {
+		if (data.contains("Entity_Tags")) {
+			for (const auto& tag : data.at("Entity_Tags").items()) {
+				entity_tags.insert(tag.value());
+			}
+		}
 	}
 }
