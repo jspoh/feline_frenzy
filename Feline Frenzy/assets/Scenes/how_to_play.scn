@@ -94,9 +94,9 @@
                                 "B_Stretch": false,
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
+                                    "x": 0.43877553939819336,
+                                    "y": 0.2731153964996338,
+                                    "z": 0.2731153964996338
                                 },
                                 "Frame_Index": {
                                     "x": 0,
@@ -112,12 +112,12 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 0.0,
-                                    "y": 39.759033203125
+                                    "y": 12.650634765625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1920.0,
-                                    "y": 1080.0
+                                    "x": 2183.107177734375,
+                                    "y": 1227.9976806640625
                                 },
                                 "Screen Position": false
                             }
@@ -160,12 +160,12 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 0.0,
-                                    "y": 0.0
+                                    "y": 9.0361328125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1920.0,
-                                    "y": 1080.0
+                                    "x": 2163.261962890625,
+                                    "y": 1216.8348388671875
                                 },
                                 "Screen Position": false
                             }
@@ -176,6 +176,55 @@
                             "Entity_ID": "entity_0001",
                             "Prefab_ID": ""
                         }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.5803921818733215,
+                                    "y": 0.5490196347236633,
+                                    "z": 0.8509804010391235
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 1.3225961923599243,
+                                "Size": {
+                                    "x": 137.5500030517578,
+                                    "y": 50.2586555480957
+                                },
+                                "Text": "Back"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -14.744592666625977,
+                                    "y": -356.0240478515625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 275.1000061035156,
+                                    "y": 117.4000015258789
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "back_btn",
+                            "Prefab_ID": ""
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Function": "Previous",
+                                "Named_Args": {},
+                                "Script_ID": "ChangeScene.lua"
+                            }
+                        },
+                        "UI ID": "back_btn"
                     }
                 }
             ],
