@@ -15,6 +15,10 @@ namespace NIKE {
 	void GameLogic::Manager::init() {
 
 		NIKE_FSM_SERVICE->init();
+
+		// Initializing static variables for Spawner comp
+		NIKE::Enemy::Spawner::enemyLimit = 5;      // Set the max enemies allowed (adjust as needed)
+		NIKE::Enemy::Spawner::enemiesSpawned = 0;  // Reset the spawn count at game start
 	}
 
 	void GameLogic::Manager::update() {
@@ -49,6 +53,13 @@ namespace NIKE {
 					NIKE_LUA_SERVICE->executeScript(e_logic.script);
 				}
 
+				// Check for Spawner comp
+				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
+				if (e_spawner_comp.has_value()) {
+					auto& e_spawner = e_spawner_comp.value().get();
+
+				}
+
 				//Check for health comp
 				//const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 				//if (e_health_comp.has_value()) {
@@ -70,6 +81,19 @@ namespace NIKE {
 				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}
+	}
+
+	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
+		// Get spawner position
+		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(spawner);
+		const Vector2f& spawner_pos = e_transform_comp.value().get().position;
+
+		// Create enemy entity
+		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity(1);
+
+		// Load entity from prefab
+		//const std::string enemyArr[4] = { "" };
+		//NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, );
 	}
 
 	//void GameLogic::Manager::spawnHealthBar(const Entity::Type& entity) {

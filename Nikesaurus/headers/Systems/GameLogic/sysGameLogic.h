@@ -29,7 +29,10 @@ namespace NIKE {
 			//void shootCursor(const Entity::Type& player_entity);
 
 			// Spawn Health Bar
-			void spawnHealthBar(const Entity::Type& entity);
+			//void spawnHealthBar(const Entity::Type& entity);
+
+			// Spawn Enemy
+			void spawnEnemy(const Entity::Type& spawner);
 
 	    public:
 		    //Default constructor

@@ -200,27 +200,39 @@ namespace NIKE {
 
 	bool Enemy::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
-		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		Vector2f player_pos = player_transform_comp.value().get().position;
-		Vector2f player_scale = player_transform_comp.value().get().scale;
+		const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		if (!player_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("withinRange: PLAYER missing TRANSFORM component!");
+			return false;
+		}
+		const Vector2f player_pos = player_transform_comp.value().get().position;
+		const Vector2f player_scale = player_transform_comp.value().get().scale;
 
 		// Get enemy transform
-		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
-		Vector2f enemy_pos = enemy_transform_comp.value().get().position;
-		Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
+		const auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		if (!enemy_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("withinRange: ENEMY missing TRANSFORM component!");
+			return false;
+		}
+		const Vector2f enemy_pos = enemy_transform_comp.value().get().position;
+		const Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
 
 		// Get enemy range
-		auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
-		float enemy_range = enemy_attack_comp.value().get().range;
+		const auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		if (!enemy_attack_comp.has_value()) {
+			NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
+			return false;
+		}
+		const float enemy_range = enemy_attack_comp.value().get().range;
 
 		// Calculations
-		float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
-		float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
+		const float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
+		const float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
 
-		float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
-		float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
+		const float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
+		const float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
 
-		float distance = (dist_x * dist_x) + (dist_y * dist_y);
+		const float distance = (dist_x * dist_x) + (dist_y * dist_y);
 
 		//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
 
@@ -231,15 +243,27 @@ namespace NIKE {
 	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform component
 		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		if (!p_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: PLAYER missing TRANSFORM component!");
+			return;
+		}
 		const Vector2f& player_pos = p_transform_comp.value().get().position;
 
 		// Get enemy components
 		// Transform Comp
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing TRANSFORM component!");
+			return;
+		}
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
 
 		// Attack Comp
 		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		if (!e_attack_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing ATTACK component!");
+			return;
+		}
 		const auto& enemy_attack_comp = e_attack_comp.value().get();
 		//const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
 
@@ -258,7 +282,7 @@ namespace NIKE {
 		}
 		else {
 			// Missing Element Comp
-			NIKEE_CORE_WARN("ENEMY missing Elemental Component");
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing Elemental Component");
 			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 		}
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
@@ -267,7 +291,7 @@ namespace NIKE {
 
 		// Offset spawn position of bullet
 		const float& offset = enemy_attack_comp.offset;
-		Vector2f bullet_pos = enemy_pos + (direction * offset);
+		const Vector2f bullet_pos = enemy_pos + (direction * offset);
 
 		// Set bullet's position
 		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);

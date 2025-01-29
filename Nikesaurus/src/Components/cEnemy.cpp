@@ -12,9 +12,15 @@
 #include "Components/cEnemy.h"
 
 namespace NIKE {
+	int Enemy::Spawner::enemyLimit = 0;
+	int Enemy::Spawner::enemiesSpawned = 0;
+
 	void Enemy::registerComponents() {
 		// Register attack components
 		NIKE_ECS_MANAGER->registerComponent<Attack>();
+
+		// Register spawner component
+		NIKE_ECS_MANAGER->registerComponent <Spawner>();
 
 		// Register attack for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Attack>(
