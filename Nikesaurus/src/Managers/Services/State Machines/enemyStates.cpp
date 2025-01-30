@@ -23,6 +23,7 @@ namespace NIKE {
 	{
 		// Add transitions here
 		addTransition("IdleToAttack", std::make_shared<Transition::IdleToAttack>());
+		addTransition("IdleToChase", std::make_shared<Transition::IdleToChase>());
 	}
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -52,7 +53,8 @@ namespace NIKE {
 	State::AttackState::AttackState()
 	{
 		// Add transitions here
-		addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
+		//addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
+		addTransition("AttackToChase", std::make_shared<Transition::AttackToChase>());
 	}
 
 	void NIKE::State::AttackState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -107,6 +109,14 @@ namespace NIKE {
 	/*******************************
 	* Chase State functions
 	*****************************/
+
+	State::ChaseState::ChaseState() : cell_offset{ 10.0f }, enemy_speed{ 1000.0f }
+	{
+		// Add transitions here
+		addTransition("ChaseToAttack", std::make_shared<Transition::ChaseToAttack>());
+		addTransition("ChaseToIdle", std::make_shared<Transition::ChaseToIdle>());
+	}
+
 	void NIKE::State::ChaseState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
 		//cout << "enter chase state" << endl;
@@ -114,7 +124,42 @@ namespace NIKE {
 
 	void NIKE::State::ChaseState::onUpdate([[maybe_unused]] Entity::Type& entity)
 	{
+
 		// cout << "update chase state" << endl;
+		auto& path = NIKE_MAP_SERVICE->getPath(entity);
+		auto e_transform_enemy = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+
+		if (!path.path.empty())
+		{
+			if (e_transform_enemy.has_value())
+			{
+				//Get next cell
+				auto const& next_cell = path.path.front();
+				auto& e_transform = e_transform_enemy.value().get();
+
+				//Check if entity has arrived near destination
+				if ((next_cell.position - e_transform.position).length() > cell_offset) {
+
+					//Direction of next cell
+					float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+
+					//Apply force to entity
+					auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+					if (dynamics.has_value()) {
+						dynamics.value().get().force = { cos(dir) * enemy_speed, sin(dir) * enemy_speed };
+					}
+				}
+				else {
+					path.path.pop_front();
+				}
+			}
+		}
+		else {
+
+			//Marked path as finished
+			path.b_finished = true;
+		}
+
 	}
 
 	void NIKE::State::ChaseState::onExit([[maybe_unused]] Entity::Type& entity)

@@ -73,10 +73,7 @@ namespace NIKE {
 
             void removeState(const std::string& state_id);
 
-
-            /***********************
-            * FSM Managements
-            **************************/
+            std::string getStateID(std::shared_ptr<Istate> state) const;
 
             template <typename T>
             std::shared_ptr<T> getStateByID(const std::string& state_id) const {
@@ -90,12 +87,17 @@ namespace NIKE {
 
             std::shared_ptr<Istate> getStateByID(const std::string& state_id) const;
 
+
+            /***********************
+            * FSM Managements
+            **************************/
             void init();
             void update(Entity::Type& entity);
 
         private:
             // Shared pointer to current state
-            // FSM class will hold ownsership of the entity's current state
+            // FSM class will hold ownsership of the entity's current state (might not need alr
+            // use entity's state comp to hold ownership)
             std::shared_ptr<Istate> current_state;
             // List of states map
             std::unordered_map<std::string, std::shared_ptr<Istate>> state_map;
