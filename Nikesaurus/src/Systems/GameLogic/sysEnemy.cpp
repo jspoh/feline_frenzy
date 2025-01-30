@@ -174,23 +174,6 @@ namespace NIKE {
 			bullet_physics_comp.value().get().force = { direction.x, direction.y };
 		}
 	}
-
-	//bool Enemy::hasTargetMoved(Vector2f const& target_pos, const Pathfinding::Path& path) const {
-//	return (path.path.empty() || (target_pos - path.path.back()).length() > target_threshold);
-//}
-
-//void Enemy::chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player_target)
-//{
-//	// Compute a path if not already found or if the target has moved significantly
-//	if (!path.path_found || hasTargetMoved(player_target.position, path)) {
-//		path.path = NIKE_MAP_SERVICE->findPath(enemy.position, player_target.position);
-//		path.current_index = 0;
-//		path.path_found = !path.path.empty();
-//	}
-
-//	// Move along the path
-//	moveAlongPath(path, enemy);
-//}
 }
 
 
