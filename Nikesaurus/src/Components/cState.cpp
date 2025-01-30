@@ -120,8 +120,9 @@ namespace NIKE {
 					}
 				}
 			);
-		}
 #endif
+		}
+
 	}
 
 }

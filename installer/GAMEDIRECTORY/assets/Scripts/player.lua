@@ -12,7 +12,7 @@ Player = {}
 
 -- Constants
 local PlayerConfig = {
-    forces = { up = 1000, down = -1000, left = -1000, right = 1000 },
+    forces = { up = 3000, down = -3000, left = -3000, right = 3000 },
 }
 
 -- Cheat mode state
@@ -31,7 +31,7 @@ function Player:Animate(entity, args)
     -- Get speed
     local speed = NetVelocity(entity)
     
-    if speed < 1.0 then
+    if speed < 100 then
         -- Idle Animation: Use last direction for idle
         if lastDirection == 0 then
             -- Idle facing right
@@ -166,6 +166,9 @@ function Player:Move(entity)
 
     -- Apply the combined force to the entity
     ApplyForce(entity, fx, fy)
+
+    -- Pathfinding Test
+    --PathFind(entity, 0, 1, 1000.0);
 
 end
 

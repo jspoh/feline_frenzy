@@ -11,7 +11,6 @@
 #include "Core/Engine.h"
 
 namespace NIKE {
-	Camera::Service::Service() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, cam_height{ 0.0f } { }
 
 	void Camera::Service::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(event->entity_id)) {
@@ -32,6 +31,8 @@ namespace NIKE {
 
 		up = Vector2(-sin(angleDisp), cos(angleDisp));
 		target = Vector2(cos(angleDisp), sin(angleDisp));
+		cam_id = 0;
+		cam_name = "Free Cam";
 
 		//Setup events listening
 		std::shared_ptr<Camera::Service> cam_sys_wrapped(this, [](Camera::Service*){});

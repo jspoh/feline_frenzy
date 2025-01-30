@@ -1,24 +1,17 @@
 {
     "Components": {
-        "Combat::Health": {
-            "Health": 100.0,
-            "InvulnerableFlag": false,
-            "Lives": 1,
+        "Audio::SFX": {
+            "Audio_ID": "Pop1.wav",
+            "B_Play_SFX": false,
+            "Channel_Group_ID": "BulletSFX",
+            "Pitch": 1.0,
+            "Volume": 0.5
         },
         "Element::Entity": {
-            "Element": 1
+            "Element": 3
         },
-        "Enemy::Attack": {
-            "Cooldown": 10.0,
-            "Function": "enemyBullet",
-            "LastShotTime": 10.016666412353516,
-            "Layer": 0,
-            "Offset": 100.0,
-            "PrefabPath": "bullet.prefab",
-            "Range": 10.0,
-            "ScriptID": "",
-            "ScriptLoaded": false,
-            "ScriptPath": "assets/Scripts/enemyBullet.lua"
+        "Combat::Damage": {
+            "Damage": 10.0
         },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
@@ -27,14 +20,27 @@
                 "y": 0.0
             },
             "Position": {
-                "x": 437.8940124511719,
-                "y": -323.79998779296875
+                "x": 0.0,
+                "y": 0.0
             },
-            "Resolution": 0,
+            "Resolution": 3,
             "Rotation": 0.0,
             "Scale": {
-                "x": 100.0,
-                "y": 112.28070831298828
+                "x": 49.99999237060547,
+                "y": 49.99999237060547
+            }
+        },
+        "Physics::Dynamics": {
+            "Drag": 0.0,
+            "Force": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Mass": 9.999999747378752e-05,
+            "Max_Speed": 800.0,
+            "Velocity": {
+                "x": 0.0,
+                "y": 0.0
             }
         },
         "Render::Texture": {
@@ -59,19 +65,19 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Normal_Enemy_Idle_Front.png"
+            "Texture_ID": "GrassBullet_Player.png"
         },
         "Transform::Transform": {
             "Position": {
-                "x": 437.8940124511719,
-                "y": -323.79998779296875
+                "x": 0.0,
+                "y": 0.0
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 100.0,
-                "y": 112.28070831298828
+                "x": 49.99999237060547,
+                "y": 49.99999237060547
             }
         }
     },
-    "Layer ID": 0
+    "Layer ID": 1
 }

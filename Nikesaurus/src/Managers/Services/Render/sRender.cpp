@@ -14,10 +14,6 @@
 
 namespace NIKE {
 
-	/*****************************************************************//**
-	* INITIALIZATION
-	*********************************************************************/
-
 	void Render::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
 
 		if (framebuffer_tex.width == event->frame_buffer.x &&
@@ -64,6 +60,54 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
+	/*****************************************************************//**
+	* INITIALIZATION
+	*********************************************************************/
+
+	void Render::FramebufferTexture::init() {
+		// Generate and bind the framebuffer
+		glGenFramebuffers(1, &frame_buffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
+		// Create a color attachment texture
+		glGenTextures(1, &texture_color_buffer);
+		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
+
+		// Specify the texture size
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+		// Set texture parameters for filtering and wrapping
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		// Attach the texture to the framebuffer
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
+
+		// Check if framebuffer is complete
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+
+		// Unbind
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void Render::TextBuffer::init() {
+		//Create text buffer
+		glGenVertexArrays(1, &vao);
+		glGenBuffers(1, &vbo);
+
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+
 	void Render::Service::init() {
 
 		if (BATCHED_RENDERING) {
@@ -88,49 +132,13 @@ namespace NIKE {
 
 		shader_manager->init();
 
-		// Generate and bind the framebuffer
-		glGenFramebuffers(1, &framebuffer_tex.frame_buffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_tex.frame_buffer);
-
-		// Create a color attachment texture
-		glGenTextures(1, &framebuffer_tex.texture_color_buffer);
-		glBindTexture(GL_TEXTURE_2D, framebuffer_tex.texture_color_buffer);
-
-		// Specify the texture size
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-		// Set texture parameters for filtering and wrapping
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		// Attach the texture to the framebuffer
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_tex.texture_color_buffer, 0);
-
-		// Check if framebuffer is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-
-		// Unbind
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		framebuffer_tex.init();
+		
+		text_buffer.init();
 
 		//Setup event listening for frame buffer resize
 		std::shared_ptr<Render::Service> render_sys_wrapped(this, [](Render::Service*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(render_sys_wrapped);
-
-		//Create text buffer
-		glGenVertexArrays(1, &text_buffer.vao);
-		glGenBuffers(1, &text_buffer.vbo);
-
-		glBindVertexArray(text_buffer.vao);
-		glBindBuffer(GL_ARRAY_BUFFER, text_buffer.vbo);
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 	}
 
 	/*****************************************************************//**

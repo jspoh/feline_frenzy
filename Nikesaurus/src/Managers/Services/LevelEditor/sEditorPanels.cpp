@@ -4040,7 +4040,6 @@ namespace NIKE {
 		combo_index = 0;
 		last_dispatched_index = 0;
 
-		NIKE_CAMERA_SERVICE->serializeCamera();
 	}
 
 	void LevelEditor::CameraPanel::update() {
@@ -4051,7 +4050,7 @@ namespace NIKE {
 		//Update list of camera entities
 		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1 ||
 			previous_scene != NIKE_SCENES_SERVICE->getCurrSceneID() ) {
-			previous_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
+
 			NIKE_CAMERA_SERVICE->clearCameraEntities();
 			NIKE_CAMERA_SERVICE->emplaceCameraEntity(UINT16_MAX, "Free Cam");
 			combo_index = 0;

@@ -12,12 +12,22 @@
         }
     },
     {
-        "Grid ID": "Demo.grid"
+        "Grid ID": "lvl2.grid"
     },
     {
         "Layer": {
             "B_State": true,
             "Entities": [
+                {
+                    "Entity": {
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "Prefab Master",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
                 {
                     "Entity": {
                         "Components": {
@@ -42,25 +52,25 @@
                                     "x": 1,
                                     "y": 1
                                 },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Environment_Mock-up.png"
+                                "Intensity": 0.0,
+                                "Texture_ID": "room2.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -20.50262451171875,
-                                    "y": 73.56509399414063
+                                    "x": -254.551025390625,
+                                    "y": -768.7398681640625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1920.0,
-                                    "y": 1080.0
+                                    "x": 3542.1767578125,
+                                    "y": 3036.1513671875
                                 }
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0000",
+                            "Entity_ID": "Background",
                             "Prefab_ID": ""
                         }
                     }
@@ -77,18 +87,191 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -1663.772216796875,
+                                    "y": -771.5665893554688
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2048.0
+                                }
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -1663.772216796875,
+                                    "y": -771.5665893554688
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2048.0
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "LeftWall",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 1157.503173828125,
+                                    "y": -770.7130126953125
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2048.0
+                                }
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 1157.503173828125,
+                                    "y": -770.7130126953125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2048.0
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "RightWall",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -258.12042236328125,
+                                    "y": 380.11175537109375
+                                },
+                                "Resolution": 0,
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2560.0
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 1.0,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -258.12042236328125,
+                                    "y": 380.11175537109375
+                                },
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2560.0
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "TopWall",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -257.3184814453125,
+                                    "y": -1923.7877197265625
+                                },
+                                "Resolution": 0,
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2560.0
+                                }
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -257.3184814453125,
+                                    "y": -1923.7877197265625
+                                },
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2560.0
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "BottomWall",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
                             "Animation::Base": {
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 137,
+                                "Completed_Animations": 184,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.01666666753590107
+                                "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 0,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -114,7 +297,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 33
+                                    "entity": 7
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -125,8 +308,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -477.4199523925781,
-                                    "y": 5.109908580780029
+                                    "x": -529.5100708007813,
+                                    "y": -173.16526794433594
                                 },
                                 "Resolution": 2,
                                 "Rotation": 0.0,
@@ -136,17 +319,24 @@
                                 }
                             },
                             "Physics::Dynamics": {
-                                "Drag": 10.0,
+                                "Drag": 1.0,
                                 "Force": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Mass": 1.0,
-                                "Max_Speed": 2000.0,
+                                "Mass": 0.5,
+                                "Max_Speed": 150.0,
                                 "Velocity": {
                                     "x": 0.0,
                                     "y": 0.0
                                 }
+                            },
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -162,7 +352,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 0,
                                     "y": 1
                                 },
                                 "Frame_Size": {
@@ -184,8 +374,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -477.4199523925781,
-                                    "y": 5.109908580780029
+                                    "x": -529.5100708007813,
+                                    "y": -173.16526794433594
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -205,179 +395,19 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": -871.0999755859375,
-                                    "y": -24.899999618530273
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 200.0,
-                                    "y": 850.0
-                                }
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -871.0999755859375,
-                                    "y": -24.899999618530273
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 200.0,
-                                    "y": 850.0
-                                }
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "LeftWall",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": 1077.800048828125,
-                                    "y": -24.899999618530273
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 250.0,
-                                    "y": 850.0
-                                }
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 1077.800048828125,
-                                    "y": -24.899999618530273
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 250.0,
-                                    "y": 850.0
-                                }
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "RightWall",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": 86.69999694824219,
-                                    "y": 511.1000061035156
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 1650.0,
-                                    "y": 250.0
-                                }
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 86.69999694824219,
-                                    "y": 511.1000061035156
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 1650.0,
-                                    "y": 250.0
-                                }
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "UpperWall",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": 86.69999694824219,
-                                    "y": -616.0
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 1650.0,
-                                    "y": 250.0
-                                }
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 86.69999694824219,
-                                    "y": -616.0
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 1650.0,
-                                    "y": 250.0
-                                }
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "LowerWall",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
                             "Combat::Health": {
-                                "Health": 40.0,
+                                "Health": 100.0,
                                 "InvulnerableFlag": false,
                                 "Lives": 1
                             },
                             "Enemy::Attack": {
-                                "Cooldown": 2.0,
+                                "Cooldown": 1.0,
                                 "Function": "enemyBullet",
-                                "LastShotTime": 2.016665458679199,
-                                "Layer": 0,
+                                "LastShotTime": 1.0166664123535156,
+                                "Layer": 1,
                                 "Offset": 100.0,
                                 "PrefabPath": "bullet.prefab",
-                                "Range": 15.0,
+                                "Range": 10.0,
                                 "ScriptID": "",
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/enemyBullet.lua"
@@ -389,8 +419,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 555.749755859375,
-                                    "y": -200.40484619140625
+                                    "x": 437.8940124511719,
+                                    "y": -153.0
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -425,8 +455,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 555.749755859375,
-                                    "y": -200.40484619140625
+                                    "x": 437.8940124511719,
+                                    "y": -153.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -438,89 +468,8 @@
                         "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "Elite",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Combat::Health": {
-                                "Health": 100.0,
-                                "InvulnerableFlag": false,
-                                "Lives": 1
-                            },
-                            "Enemy::Attack": {
-                                "Cooldown": 2.0,
-                                "Function": "enemyBullet",
-                                "LastShotTime": 2.016665458679199,
-                                "Layer": 0,
-                                "Offset": 100.0,
-                                "PrefabPath": "bullet.prefab",
-                                "Range": 15.0,
-                                "ScriptID": "",
-                                "ScriptLoaded": false,
-                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": 384.49468994140625,
-                                    "y": 300.6073303222656
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Elite_Mob_Idle_Front.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 384.49468994140625,
-                                    "y": 300.6073303222656
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 90.51508331298828,
-                                    "y": 120.0582046508789
-                                }
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "Box",
-                            "Prefab_ID": ""
+                            "Entity_ID": "Enemy",
+                            "Prefab_ID": "Enemy.prefab"
                         }
                     }
                 }

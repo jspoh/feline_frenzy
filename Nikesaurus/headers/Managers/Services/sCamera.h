@@ -21,8 +21,29 @@ namespace NIKE {
 		class Service
 			: public Events::IEventListener<Render::ChangeCamEvent>
 		{
+		private:
+			//Targets
+			Vector2f target;
+			Vector2f up;
+
+			//Active cam id
+			Entity::Type cam_id;
+			std::string cam_name;
+
+			//Default Camera
+			std::shared_ptr<Render::Cam> def_cam;
+
+			//Camera height
+			float cam_height;
+
+			//On change camera event
+			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
+
+			//List of camera entities
+			std::unordered_map<Entity::Type, std::string> cam_entities;
+
 		public:
-			Service();
+			Service() = default;
 
 			//Init camera
 			void init(nlohmann::json const& config);
@@ -30,6 +51,7 @@ namespace NIKE {
 			// Return active Cam id
 			Entity::Type getCamId() const;
 			
+			// Set active cam name
 			void setActiveCamName(std::string active_cam);
 
 			// Return active Cam name
@@ -68,26 +90,6 @@ namespace NIKE {
 			// Deserialize
 			void deserializeCamera(nlohmann::json const& data);
 
-		private:
-			//Targets
-			Vector2f target;
-			Vector2f up;
-
-			//Active cam id
-			Entity::Type cam_id;
-			std::string cam_name;
-
-			//Default Camera
-			std::shared_ptr<Render::Cam> def_cam;
-
-			//Camera height
-			float cam_height;
-
-			//On change camera event
-			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
-
-			//List of camera entities
-			std::unordered_map<Entity::Type, std::string> cam_entities;
 		};
 	}
 }

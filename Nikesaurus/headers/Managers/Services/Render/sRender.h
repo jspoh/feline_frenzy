@@ -30,17 +30,23 @@ namespace NIKE {
 			float blend_intensity{};
 		};
 
-		struct FramebufferTexture {
-			unsigned int frame_buffer{};
-			unsigned int texture_color_buffer{};
+		class FramebufferTexture {
+			public:
+				unsigned int frame_buffer{};
+				unsigned int texture_color_buffer{};
 
-			int width{};
-			int height{};
+				int width{};
+				int height{};
+
+				void init();
 		};
 
-		struct TextBuffer {
-			unsigned int vao{}; // Vertex Array Object
-			unsigned int vbo{}; // Vertex Buffer Object
+		class TextBuffer {
+			public:
+				unsigned int vao{}; // Vertex Array Object
+				unsigned int vbo{}; // Vertex Buffer Object
+
+				void init();
 		};
 
 		class Service : public Events::IEventListener<Windows::WindowResized> {
