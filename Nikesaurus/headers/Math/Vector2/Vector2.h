@@ -34,8 +34,10 @@ namespace NIKE {
 			Vector2& operator*=(type rhs);
 			Vector2& operator/=(type rhs);
 
-			bool operator==(const Vector2& rhs);
-			bool operator!=(const Vector2& rhs);
+			bool operator==(const Vector2& rhs) const;
+			bool operator!=(const Vector2& rhs) const; 
+			bool operator<(const Vector2& rhs) const;
+
 
 			type dot(const Vector2& rhs) const;
 			type lengthSq() const;
@@ -57,5 +59,17 @@ namespace NIKE {
 		using Vector2u = Vector2<unsigned int>;
 		using Vector2f = Vector2<float>;
 		using Vector2d = Vector2<double>;
+
+		struct Vector2iHasher {
+			std::size_t operator()(const Vector2i& vec) const {
+				return std::hash<int>()(vec.x) ^ (std::hash<int>()(vec.y) << 1);
+			}
+		};
+
+		struct Vector2iEqual {
+			bool operator()(const Vector2i& lhs, const Vector2i& rhs) const {
+				return lhs.x == rhs.x && lhs.y == rhs.y;
+			}
+		};
 	}
 }

@@ -15,46 +15,63 @@ namespace NIKE {
 
     void Collision::System::bounceResolution(
         Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
-        Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
+        [[maybe_unused]] Transform::Transform& transform_b, [[maybe_unused]] Physics::Dynamics& dynamics_b, [[maybe_unused]] Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Calculate relative velocity
-        Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
-        float normal_vel = vel_rel.dot(info.collision_normal);
+        // Step 1: Validate and normalize the collision normal
+        float normal_magnitude = std::sqrt(info.collision_normal.x * info.collision_normal.x +
+            info.collision_normal.y * info.collision_normal.y);
 
-        // Check if entities are already moving apart
-        if (normal_vel > 0) return;
+        // Skip if the normal's magnitude is too small (invalid)
+        if (normal_magnitude < EPSILON) return;
 
-        // Calculate impulse magnitude based on collision response
-        float impulse_magnitude = -(1 + restitution) * normal_vel;
+        // Normalize the collision normal
+        Vector2f collision_normal = {
+            info.collision_normal.x / normal_magnitude,
+            info.collision_normal.y / normal_magnitude
+        };
 
-        // Calculate the reflection vector for angular bounce
-        Vector2f impulse = info.collision_normal.operator*(impulse_magnitude);
+        // Step 2: Reflect the velocity of entity A
+        float normal_vel = dynamics_a.velocity.x * collision_normal.x + dynamics_a.velocity.y * collision_normal.y;
 
-        if (collider_a.resolution == Physics::Resolution::NONE) {
-            // Transform back outside of collision
-            transform_b.position += info.mtv;
+        // Reflect velocity only if it's moving toward the collision normal
+        if (normal_vel < 0.0f) {
+            dynamics_a.velocity.x -= 2.0f * normal_vel * collision_normal.x;
+            dynamics_a.velocity.y -= 2.0f * normal_vel * collision_normal.y;
 
-            // Apply impluse to velocity
-            dynamics_b.velocity -= impulse;
+            // Add a small nudge to prevent sticking when velocity becomes too small
+            if (std::abs(collision_normal.x) > 0.9f && std::abs(dynamics_a.velocity.x) < EPSILON) {
+                dynamics_a.velocity.x = (collision_normal.x > 0 ? EPSILON : -EPSILON);
+            }
+            if (std::abs(collision_normal.y) > 0.9f && std::abs(dynamics_a.velocity.y) < EPSILON) {
+                dynamics_a.velocity.y = (collision_normal.y > 0 ? EPSILON : -EPSILON);
+            }
         }
-        else if (collider_b.resolution == Physics::Resolution::NONE) {
-            // Transform back outside of collision
-            transform_a.position += info.mtv;
 
-            // Apply impluse to velocity
-            dynamics_a.velocity += impulse;
+        // Step 3: Reflect the force of entity A (if forces are used)
+        float normal_force = dynamics_a.force.x * collision_normal.x + dynamics_a.force.y * collision_normal.y;
+
+        if (normal_force < 0.0f) {
+            dynamics_a.force.x -= 2.0f * normal_force * collision_normal.x;
+            dynamics_a.force.y -= 2.0f * normal_force * collision_normal.y;
         }
-        else {
-            // Transform back outside of collision
-            transform_a.position += info.mtv.operator*(0.5f);
-            transform_b.position -= info.mtv.operator*(0.5f);
 
-            // Apply impulse to velocity based on mass
-            dynamics_a.velocity += impulse.operator*(dynamics_b.mass / (dynamics_a.mass + dynamics_b.mass));
-            dynamics_b.velocity -= impulse.operator*(dynamics_a.mass / (dynamics_a.mass + dynamics_b.mass));
+        // Step 4: Clamp velocity components to max speed
+        dynamics_a.velocity.x = std::clamp(dynamics_a.velocity.x, -dynamics_a.max_speed, dynamics_a.max_speed);
+        dynamics_a.velocity.y = std::clamp(dynamics_a.velocity.y, -dynamics_a.max_speed, dynamics_a.max_speed);
+
+        // Step 5: Adjust position based on MTV
+        if (collider_a.resolution != Physics::Resolution::NONE) {
+            transform_a.position.x += info.mtv.x;
+            transform_a.position.y += info.mtv.y;
+
+            // Step 6: Apply an additional small offset to fully resolve overlap
+            const float small_offset = 0.01f; // Tiny offset to move entity fully out of collision bounds
+            transform_a.position.x += collision_normal.x * small_offset;
+            transform_a.position.y += collision_normal.y * small_offset;
         }
     }
+
 
 
     void Collision::System::setRestitution(float val) {
@@ -349,57 +366,46 @@ namespace NIKE {
         Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
-        // Notify systems of collision
+        // Dispatch collision event
         auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
         NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
 
         // Destroy Resolution
         if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
-            NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_a);
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
-
             return;
         }
 
         if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
-            NIKEE_CORE_INFO("Entity marked for deletion: {}", entity_b);
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
-
             return;
         }
 
-        // Bounce Resolution
+        // Bounce Resolution (at least one entity has BOUNCE)
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
-            bounceResolution(transform_a, dynamics_b, collider_a, transform_b, dynamics_a, collider_b, info);
+            if (collider_a.resolution == Physics::Resolution::BOUNCE) {
+                bounceResolution(transform_a, dynamics_a, collider_a, transform_b, dynamics_b, collider_b, info);
+            }
+            else {
+                bounceResolution(transform_b, dynamics_b, collider_b, transform_a, dynamics_a, collider_a, info);
+            }
             return;
         }
 
-        // Slide To Slide Resolution
+        // Slide Resolution
         if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
-            transform_a.position += info.mtv.operator*(0.5f);
-            transform_b.position -= info.mtv.operator*(0.5f);
+            transform_a.position += info.mtv * 0.5f;
+            transform_b.position -= info.mtv * 0.5f;
             return;
         }
 
-        // Resolution::NONE currently makes movement object "bounce"
-        switch (collider_a.resolution) {
-        case Physics::Resolution::NONE:
-            break;
-        case Physics::Resolution::SLIDE:
+        // Default Resolutions
+        if (collider_a.resolution == Physics::Resolution::SLIDE) {
             transform_a.position += info.mtv;
-            break;
-        default:
-            break;
         }
 
-        switch (collider_b.resolution) {
-        case Physics::Resolution::NONE:
-            break;
-        case Physics::Resolution::SLIDE:
+        if (collider_b.resolution == Physics::Resolution::SLIDE) {
             transform_b.position -= info.mtv;
-            break;
-        default:
-            break;
         }
     }
 }

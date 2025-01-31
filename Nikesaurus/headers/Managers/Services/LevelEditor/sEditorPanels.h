@@ -82,7 +82,7 @@ namespace NIKE {
 
 			#ifdef NIKE_BUILD_DLL
 			//World to screen
-			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size);
+			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size, bool use_screen_pos=false);
 
 			//Render filled rectangle to draw list
 			void worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding = 0.0f);
@@ -156,6 +156,9 @@ namespace NIKE {
 
 			//Public get gizmo state
 			bool getGizmoState() const;
+
+			//Deserialize config
+			void deserializeConfig(nlohmann::json const& config);
 
 			//Init
 			void init() override;
@@ -299,6 +302,11 @@ namespace NIKE {
 
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
+
+			// getters
+			std::map<Entity::Type, EntityMetaData, EntitySorter>& getEntityMap();
+			std::unordered_map<Entity::Type, std::string>& getEntityToNameMap();
+			std::unordered_map<std::string, Entity::Type>& getNameToEntityMap();
 		};
 
 		//Components Management Panel
@@ -576,6 +584,7 @@ namespace NIKE {
 
 			// Selected channel
 			std::string selected_channel_name;
+
 			//Create entity popup
 			std::function<void()> createChannelPopUp(std::string const& popup_id);
 
@@ -616,6 +625,12 @@ namespace NIKE {
 
 			//Files
 			std::vector<std::filesystem::path> files;
+
+			//File Watching Queue
+			std::queue<std::function<void()>> file_event_queue;
+
+			//Mutex for thread safety
+			std::mutex file_event_mutex;
 
 			//Root Path
 			std::string root_path;
@@ -706,6 +721,9 @@ namespace NIKE {
 				return "Resource Management";
 			}
 
+			//Thread safe insertion for file event queue
+			void pushFileEvent(std::function<void()> callback);
+
 			//Init
 			void init() override;
 
@@ -719,19 +737,23 @@ namespace NIKE {
 		//Camera Management Panel
 		class CameraPanel : public IPanel {
 		private:
-			//List of camera entities
-			std::unordered_map<Entity::Type, std::string> cam_entities;
-
 			//Entities panel for string reference
 			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			//Reference to game window panel
+			std::weak_ptr<GameWindowPanel> game_panel;
 
 			//Combo index for selecting camera
 			int combo_index;
 
+			int last_dispatched_index;
+
 			//Free camera
 			std::shared_ptr<Render::Cam> free_cam;
+
+
 		public:
-			CameraPanel() : combo_index{ 0 } {}
+			CameraPanel() : combo_index{ 0 }, last_dispatched_index {0} {}
 			~CameraPanel() = default;
 
 			//Panel Name
@@ -746,6 +768,8 @@ namespace NIKE {
 
 			//Camera change action
 			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
+
+			void dispatchCameraChange(Entity::Type cam, const std::string& name);
 
 			//Init
 			void init() override;
@@ -857,6 +881,12 @@ namespace NIKE {
 		class ScenesPanel : public IPanel {
 		private:
 
+			//Error msg
+			std::shared_ptr<std::string> err_msg;
+
+			//Success msg
+			std::shared_ptr<std::string> success_msg;
+
 			// For storing editing layer mask id
 			unsigned int edit_mask_id;
 
@@ -867,12 +897,6 @@ namespace NIKE {
 
 			// For storing bit_position
 			unsigned int bit_position;
-
-			//Error msg
-			std::shared_ptr<std::string> err_msg;
-
-			//Success msg
-			std::shared_ptr<std::string> success_msg;
 
 			// To store layer names
 			std::vector<std::string> layer_names;
@@ -885,6 +909,9 @@ namespace NIKE {
 
 			//Delete scene popup
 			std::function<void()> deleteScenePopup(std::string const& popup_id);
+
+			//Edit Mask popup
+			std::function<void()> editBitMaskPopup(std::string const& popup_id);
 
 		public:
 			ScenesPanel() = default;
@@ -900,11 +927,11 @@ namespace NIKE {
 				return "Scenes Management";
 			}
 
-			//Set error message for popup
-			void setPopUpErrorMsg(std::string const& msg);
-
 			//Update layer names
 			void updateLayerNames();
+
+			//Set error message for popup
+			void setPopUpErrorMsg(std::string const& msg);
 
 			//Init
 			void init() override;

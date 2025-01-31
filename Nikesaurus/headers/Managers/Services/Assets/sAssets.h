@@ -67,9 +67,6 @@ namespace NIKE {
 					: type{ type }, primary_path{ primary_path } {}
 			};
 
-			//Mutex for thread safe asset registering and loading
-			std::mutex asset_mutex;
-
 			//Loader function
 			using LoaderFunc = std::function<std::shared_ptr<void>(std::filesystem::path const&)>;
 
@@ -137,9 +134,6 @@ namespace NIKE {
 				if (!(asset_types[getAssetType(asset_id)].test(Modes::Loadable))) {
 					return nullptr;
 				}
-
-				// Lock the mutex for thread safety
-				std::lock_guard<std::mutex> lock(asset_mutex);
 
 				//Check asset cache
 				auto cache_it = asset_cache.find(asset_id);

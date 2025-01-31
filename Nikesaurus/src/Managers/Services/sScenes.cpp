@@ -87,11 +87,17 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->setActiveCamName("Free Cam");
+
 		//Clear layers
 		layers.clear();
 
 		//Create the first layer
 		createLayer();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
 
 		//Check if scene exists
 		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
@@ -123,8 +129,12 @@ namespace NIKE {
 		//Create the first layer
 		createLayer();
 
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//ReRun scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+
 	}
 
 	void Scenes::Service::previousScene() {
@@ -157,8 +167,31 @@ namespace NIKE {
 			throw std::runtime_error("Error scene file does not exist");
 		}
 
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+	}
+
+	void Scenes::Service::resetScene() {
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
+		//Clear entities
+		NIKE_ECS_MANAGER->destroyAllEntities();
+
+		//Clear UI Entities
+		NIKE_UI_SERVICE->destroyAllButtons();
+
+		//Stop all audios
+		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
+		//Clear layers
+		layers.clear();
+
+		//Create the first layer
+		createLayer();
 	}
 
 	std::shared_ptr<Scenes::Layer> Scenes::Service::createLayer(int index) {
@@ -185,6 +218,10 @@ namespace NIKE {
 		}
 
 		return layers.at(layer_id);
+	}
+
+	void Scenes::Service::clearLayers() {
+		layers.clear();
 	}
 
 	void Scenes::Service::removeLayer(unsigned int layer_id) {
@@ -276,6 +313,9 @@ namespace NIKE {
 				break;
 			case Scenes::Actions::RESTART:
 				restartScene();
+				break;
+			case Scenes::Actions::RESET:
+				resetScene();
 				break;
 			case Scenes::Actions::CLOSE:
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();

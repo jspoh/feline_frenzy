@@ -167,7 +167,7 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 
 		// bind vbo and ebo to vao
-		constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int VBO_BINDING_INDEX = 10;
 		static constexpr int VERTEX_SIZE = sizeof(Vertex);
 		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
@@ -175,13 +175,13 @@ namespace NIKE {
 
 		// allocate space for vbo
 		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
-		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
+		static const int MAX_VBO_SIZE = NIKE_RENDER_SERVICE->MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
 		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		// allocate space for ebo
 		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
 		static constexpr int INDEX_SIZE = sizeof(unsigned int);
-		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
+		static const int MAX_EBO_SIZE = NIKE_RENDER_SERVICE->MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
 		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		// set vertex array attributes
@@ -274,6 +274,24 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
+		while (glGetError() != GL_NO_ERROR) {}
+
+		// !NOTE: n.loo
+		//glFinish();
+		//GLint maxVertexAttribs;
+
+		//glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
+		//if (13 >= maxVertexAttribs) {  // 13 might be too high
+		//	NIKEE_CORE_ERROR("Attribute index {0} exceeds maximum supported attributes: {1}",
+		//		13, maxVertexAttribs);
+		//	return;
+		//}
+
+		//GLint previousVAO, previousVBO;
+		//glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &previousVAO);
+		//glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &previousVBO);
+
+
 		// create vao
 		glCreateVertexArrays(1, &model.vaoid);
 
@@ -284,7 +302,7 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 
 		// bind vbo and ebo to vao
-		constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int VBO_BINDING_INDEX = 10;
 		static constexpr int VERTEX_SIZE = sizeof(Vertex);
 		glVertexArrayVertexBuffer(model.vaoid, VBO_BINDING_INDEX, model.vboid, 0, VERTEX_SIZE);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
@@ -292,13 +310,13 @@ namespace NIKE {
 
 		// allocate space for vbo
 		static constexpr int NUM_VERTEX_PER_INSTANCE = 4;
-		static constexpr int MAX_VBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
+		static const int MAX_VBO_SIZE = NIKE_RENDER_SERVICE->MAX_INSTANCES * NUM_VERTEX_PER_INSTANCE * VERTEX_SIZE;
 		glNamedBufferStorage(model.vboid, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		// allocate space for ebo
 		static constexpr int NUM_INDICES_PER_INSTANCE = 6;
 		static constexpr int INDEX_SIZE = sizeof(unsigned int);
-		static constexpr int MAX_EBO_SIZE = NIKE::Render::Manager::MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
+		static const int MAX_EBO_SIZE = NIKE_RENDER_SERVICE->MAX_INSTANCES * NUM_INDICES_PER_INSTANCE * INDEX_SIZE;
 		glNamedBufferStorage(model.eboid, MAX_EBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		// set vertex array attributes
@@ -479,6 +497,10 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
+
+		// !NOTE: n.loo
+		//glBindVertexArray(previousVAO);
+		//glBindBuffer(GL_ARRAY_BUFFER, previousVBO);
 	}
 
 	void Assets::RenderLoader::createTextureBuffers(const std::vector<Vector2f>& vertices, const std::vector<unsigned int>& indices, const std::vector<Vector2f>& tex_coords, Assets::Model& model) {
@@ -525,7 +547,7 @@ namespace NIKE {
 	unsigned char* Assets::RenderLoader::prepareImageData(const std::string& path_to_texture, int& width, int& height, int& tex_size, bool& is_tex_or_png_ext) {
 		// find file type
 		std::string filetype = path_to_texture.substr(path_to_texture.find_last_of('.') + 1);
-		const std::set<std::string> valid_tex_ext = { "png", "jpg", "jpeg", "ico"}; // accepted file types
+		const std::set<std::string> valid_tex_ext = { "png", "jpg", "jpeg", "ico" }; // accepted file types
 
 		// Transform each character in string ext to lowercase
 		for (char& c : filetype) {
@@ -606,11 +628,13 @@ namespace NIKE {
 
 			return img_data;
 		}
-			
+
 		// If the file type is unsupported (not .tex, .png, .jpg, or .jpeg)
 		is_tex_or_png_ext = false;
 		NIKEE_CORE_ERROR("Unsupported file format: {}", path_to_texture);
+		//glFinish();
 		return nullptr;
+
 	}
 
 	void Assets::RenderLoader::freeImageData(unsigned char* img_data) {

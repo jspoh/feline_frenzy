@@ -86,6 +86,8 @@ namespace NIKE {
 			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
+		data["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
+
 		return data;
 	}
 
@@ -102,11 +104,27 @@ namespace NIKE {
 			//Check if component is already present, if not add component
 			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
 				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+
+			}
+
+			//Change camera to active cam
+			if (comp_name == "Render::Cam") {
+				if (NIKE_CAMERA_SERVICE->getActiveCamName() == data.at("MetaData").at("Entity_ID").get<std::string>()) {
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(entity));
+				}
 			}
 
 			//Deserialize data into component
 			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 		}
+
+		if (!data.contains("Layer ID")) {
+			NIKEE_CORE_INFO("Entity does not contain a layer id, setting to default");
+			NIKE_ECS_MANAGER->setEntityLayerID(entity, 0);
+			return;
+		}
+		// Set layer ID
+		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
 	}
 
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
@@ -160,20 +178,26 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+		//Audio Data
 		nlohmann::json channels_data;
 		channels_data["Channels"] = NIKE_AUDIO_SERVICE->serializeAudioChannels();
 		data.push_back(channels_data);
-
+		
+		// Grid Data
 		// Extract grid_id from the scene file name
 		std::string grid_id = Utility::extractFileName(file_path) + ".grid";
 
 		// Check if the "Grids" folder contains the .grid file
 		//if (std::filesystem::exists(grid_path)) {
 			// Add grid ID data only if the file exists
-			nlohmann::json m_data;
-			m_data["Grid ID"] = grid_id;
-			data.push_back(m_data);
-		//}
+		nlohmann::json m_data;
+		m_data["Grid ID"] = grid_id;
+		data.push_back(m_data);
+
+		// Camera Component Data
+		nlohmann::json cam_data;
+		cam_data["Camera"] = NIKE_CAMERA_SERVICE->serializeCamera();
+		data.push_back(cam_data);
 
 		//UI Entities
 		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
@@ -201,6 +225,14 @@ namespace NIKE {
 				//Skip entities not present in layer
 				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 					continue;
+
+				// skip 'built in' fps display entity
+				const auto entity_components = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+				const auto it = entity_components.find("Render::BuiltIn");
+				if (it != entity_components.end()) {
+					// is built in component, do not savee to scene
+					continue;
+				}
 
 				//Entity data
 				nlohmann::json e_data;
@@ -240,15 +272,15 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadSceneFromFile(std::string const& file_path) {
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
 		//Json Data
 		nlohmann::json data;
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::in);
-
-		//Return if there is no data
-		if (!std::filesystem::exists(file_path))
-			return;
 
 		//Read data from file
 		file >> data;
@@ -257,12 +289,15 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
-		
+
 		//Iterate through all layer data
 		for (const auto& l_data : data) {
 
 			if (l_data.contains("Channels")) {
 				NIKE_AUDIO_SERVICE->deserializeAudioChannels(l_data["Channels"]);
+			}
+			if (l_data.contains("Camera")) {
+				NIKE_CAMERA_SERVICE->deserializeCamera(l_data["Camera"]);
 			}
 
 			//Load map grid if a map file path is specified
@@ -304,7 +339,7 @@ namespace NIKE {
 					LevelEditor::EntityMetaData meta_data;
 					meta_data.deserialize(e_data.at("Entity").at("MetaData"));
 					NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
-					#endif
+					#endif				
 
 					//Check if entity is a UI entity
 					if (e_data.at("Entity").contains("UI ID")) {

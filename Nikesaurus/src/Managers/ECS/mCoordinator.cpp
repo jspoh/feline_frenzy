@@ -26,6 +26,7 @@ namespace NIKE {
 
 		//Dispatch event
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
+		entity_manager->setLayerID(entity, layer_id);
 
 		return entity;
 	}

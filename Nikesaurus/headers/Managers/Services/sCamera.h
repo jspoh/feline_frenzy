@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   sysCamera.h
+ * \file   sCamera.h
  * \brief  
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
@@ -21,14 +21,41 @@ namespace NIKE {
 		class Service
 			: public Events::IEventListener<Render::ChangeCamEvent>
 		{
+		private:
+			//Targets
+			Vector2f target;
+			Vector2f up;
+
+			//Active cam id
+			Entity::Type cam_id;
+			std::string cam_name;
+
+			//Default Camera
+			std::shared_ptr<Render::Cam> def_cam;
+
+			//Camera height
+			float cam_height;
+
+			//On change camera event
+			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
+
+			//List of camera entities
+			std::unordered_map<Entity::Type, std::string> cam_entities;
+
 		public:
-			Service();
+			Service() = default;
 
 			//Init camera
 			void init(nlohmann::json const& config);
 
 			// Return active Cam id
 			Entity::Type getCamId() const;
+			
+			// Set active cam name
+			void setActiveCamName(std::string active_cam);
+
+			// Return active Cam name
+			std::string getActiveCamName() const;
 
 			//Get matrix
 			Matrix_33 getWorldToNDCXform() const;
@@ -47,22 +74,22 @@ namespace NIKE {
 
 			//Get camera height
 			float getCameraHeight() const;
-		private:
-			//Targets
-			Vector2f target;
-			Vector2f up;
+			
+			//Get camera entities
+			const std::unordered_map<Entity::Type, std::string>& getCameraEntities() const;
 
-			//Active cam id
-			Entity::Type cam_id;
+			// Emplace new entity or update existing camera entity
+			void emplaceCameraEntity(Entity::Type entity, const std::string& name);
 
-			//Default Camera
-			std::shared_ptr<Render::Cam> def_cam;
+			// Clears the cam_entities map
+			void clearCameraEntities();
 
-			//Camera height
-			float cam_height;
+			// Serialize
+			nlohmann::json serializeCamera() const;
 
-			//On change camera event
-			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
+			// Deserialize
+			void deserializeCamera(nlohmann::json const& data);
+
 		};
 	}
 }

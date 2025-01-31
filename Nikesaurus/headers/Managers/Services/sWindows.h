@@ -156,6 +156,9 @@ namespace NIKE {
 
 			//Configure Window
 			void configWindow();
+
+			//Warm up GPU
+			void warmupGPU();
 		public:
 
 			NIKEWindow(Vector2i window_size, std::string window_title);
@@ -285,12 +288,17 @@ namespace NIKE {
 			//Get interpolation factor
 			float getInterpolationFactor() const;
 
+			//Get window focus
 			bool getWindowFocus() const;
 
+			//Set window focus
 			void setWindowFocus(bool focus);
 
 			//Calculate Delta Time
 			void calculateDeltaTime();
+
+			//Reset opengl state
+			void resetOpenGL();
 		};
 
 		//Re-enable DLL Export warning

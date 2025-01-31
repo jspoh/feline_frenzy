@@ -16,49 +16,66 @@
 #include "Components/cPhysics.h"
 #include "Components/cEnemy.h"
 #include "Managers/Services/Lua/sLua.h"
+#include "Components/cPathfinding.h"
 
 namespace NIKE {
 	namespace Enemy {
-		class Manager : public System::ISystem {
-		private:
-			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete;
-			void operator=(Manager const& copy) = delete;
+		// Enemey logic functions
+		// Check if player is within range
+		bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
 
-			//Internal lua system
-			//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
+		// Shoot bullet
+		void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
 
-			//Internal script management
-			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+		// Standard enemy moving function
+		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed);
 
-			// Check if player is within range
-			bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
+		// Standard enemy moving function
+		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
 
-			// Shoot bullet
-			void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
+		//bool hasTargetMoved(const Vector2f& target_pos, const Pathfinding::Path& path) const;
 
-		public:
-			//Default Constructor
-			Manager() = default;
+		//class Manager : public System::ISystem {
+		//private:
+		//	//Delete Copy Constructor & Copy Assignment
+		//	Manager(Manager const& copy) = delete; 
+		//	void operator=(Manager const& copy) = delete;
 
-			//Default Destructor
-			~Manager() = default;
+		//	// Enemy movement stuff
+		//	float movement_speed;  
+		//	// Distance threshold for waypoint
+		//	float waypoint_threshold;  
+		//	// Significant target movement threshold
+		//	float target_threshold;    
 
-			//Init
-			void init() override;
+		//	//Internal lua system
+		//	//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
 
-			//System name
-			std::string getSysName() override
-			{
-				return "Enemy System";
-			}
+		//	//Internal script management
+		//	//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
-			//Register systems for lua
-			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+		//public:
+		//	//Default Constructor
+		//	Manager() = default;
 
-			//Update
-			void update() override;
-		};
+		//	//Default Destructor
+		//	~Manager() = default;
+
+		//	//Init
+		//	void init() override;
+
+		//	//System name
+		//	std::string getSysName() override
+		//	{
+		//		return "Enemy System";
+		//	}
+
+		//	//Register systems for lua
+		//	//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+
+		//	//Update
+		//	void update() override;
+		//};
 	}
 }
 #endif //!ENEMY_HPP

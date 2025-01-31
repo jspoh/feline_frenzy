@@ -1,0 +1,273 @@
+[
+    {
+        "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Menu_v1.wav"
+                ]
+            },
+            "BulletSFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "PlayerSFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            }
+        }
+    },
+    {
+        "Grid ID": "path_test.grid"
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Completed_Animations": 43,
+                                "Frame_Duration": 0.054999999701976776,
+                                "Mode": 0,
+                                "Timer": 0.05000000447034836
+                            },
+                            "Animation::Sprite": {
+                                "Curr_Index": {
+                                    "x": 5,
+                                    "y": 1
+                                },
+                                "End_Index": {
+                                    "x": 5,
+                                    "y": 1
+                                },
+                                "Sheet_Size": {
+                                    "x": 10,
+                                    "y": 16
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 1
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "WalkingNature.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "PlayerSFX",
+                                "Pitch": 1.0,
+                                "Volume": 0.5
+                            },
+                            "Element::Entity": {
+                                "Element": 0
+                            },
+                            "GameLogic::ILogic": {
+                                "Function": "update",
+                                "Named_Args": {
+                                    "entity": 2
+                                },
+                                "Script_ID": "player.lua"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 146.3565673828125,
+                                    "y": -130.23193359375
+                                },
+                                "Resolution": 2,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 80.67974090576172,
+                                    "y": 116.1510009765625
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 1.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 0.5,
+                                "Max_Speed": 150.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Zoom": 1.0
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 5,
+                                    "y": 1
+                                },
+                                "Frame_Size": {
+                                    "x": 10,
+                                    "y": 16
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_animation_sprite.png"
+                            },
+                            "Shooting::Shooting": {
+                                "Cooldown": 0.5,
+                                "Function": "createBullet",
+                                "LastShotTime": 0.5,
+                                "Layer": 0,
+                                "Offset": 150.0,
+                                "ScriptID": "",
+                                "ScriptLoaded": false,
+                                "ScriptPath": "assets/Scripts/createBullet.lua"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 146.3565673828125,
+                                    "y": -130.23193359375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 80.67974090576172,
+                                    "y": 116.1510009765625
+                                }
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "Player",
+                            "Prefab_ID": "playerfix.prefab"
+                        }
+                    }
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "Pop1.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "BulletSFX",
+                                "Pitch": 1.0,
+                                "Volume": 0.5
+                            },
+                            "Combat::Damage": {
+                                "Damage": 10.0
+                            },
+                            "Element::Entity": {
+                                "Element": 0
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -3720.372314453125,
+                                    "y": 1541.7645263671875
+                                },
+                                "Resolution": 3,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 49.99999237060547,
+                                    "y": 49.99999237060547
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": -91.78651428222656,
+                                    "y": 39.68923568725586
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 800.0,
+                                "Velocity": {
+                                    "x": -734.2921142578125,
+                                    "y": 317.5138854980469
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "NormalBullet_Player.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -3720.372314453125,
+                                    "y": 1541.7645263671875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 49.99999237060547,
+                                    "y": 49.99999237060547
+                                }
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0000",
+                            "Prefab_ID": "bullet.prefab"
+                        }
+                    }
+                }
+            ],
+            "ID": 1,
+            "Mask": 2
+        }
+    }
+]

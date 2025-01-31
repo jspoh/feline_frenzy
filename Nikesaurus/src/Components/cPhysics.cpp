@@ -5,7 +5,7 @@
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \date   October 2024
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -205,6 +205,9 @@ namespace NIKE {
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_mass));
 					}
 				}
+
+				// Show last direction (TO BE MOVED)
+				ImGui::Text("Last Direction %d", comp.last_direction);
 			}
 		);
 #endif

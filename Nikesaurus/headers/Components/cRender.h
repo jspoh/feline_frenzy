@@ -109,6 +109,15 @@ namespace NIKE {
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
 
+		struct Hidden {
+		};
+
+		/**
+		 * built in components will not be saved to scene files.
+		 */
+		struct BuiltIn {
+		};
+
 		void registerComponents();
 	}
 }

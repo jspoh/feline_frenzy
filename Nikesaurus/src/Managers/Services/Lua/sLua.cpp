@@ -101,9 +101,6 @@ namespace NIKE {
             throw std::runtime_error("Invalid file extension");
         }
 
-        // Lock the mutex for thread safety
-        std::lock_guard<std::mutex> lock(lua_mutex);
-
         //Load script
         sol::load_result script = lua_state->load_file(path.string());
             
@@ -131,9 +128,6 @@ namespace NIKE {
         if (std::filesystem::file_size(path) == 0) {
             throw std::runtime_error("File is empty");
         }
-
-        // Lock the mutex for thread safety
-        std::lock_guard<std::mutex> lock(lua_mutex);
 
         //Load script
         sol::load_result script = lua_state->load_file(path.string());

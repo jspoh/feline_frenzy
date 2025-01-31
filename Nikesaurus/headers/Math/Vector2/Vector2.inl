@@ -1,3 +1,4 @@
+#include "Vector2.h"
 /*****************************************************************//**
  * \file   Vector2.cpp
  * \brief
@@ -56,13 +57,22 @@ inline Vector2<T>& Vector2<T>::operator/=(typename Vector2<T>::type rhs) {
 }
 
 template<typename T>
-inline bool Vector2<T>::operator==(const Vector2<T>& rhs) {
+inline bool Vector2<T>::operator==(const Vector2<T>& rhs) const {
 	return (this->x == rhs.x) && (this->y == rhs.y);
 }
 
 template<typename T>
-inline bool Vector2<T>::operator!=(const Vector2<T>& rhs) {
+inline bool Vector2<T>::operator!=(const Vector2<T>& rhs) const {
 	return (this->x != rhs.x) || (this->y != rhs.y);
+}
+
+template<typename T>
+inline bool NIKE::Math::Vector2<T>::operator<(const Vector2& rhs) const
+{
+	if (x != rhs.x) {
+		return x < rhs.x;
+	}
+	return y < rhs.y;
 }
 
 template<typename T>

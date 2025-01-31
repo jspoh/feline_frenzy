@@ -20,6 +20,8 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
+		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
 
 		//Register cam for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Cam>(
@@ -564,11 +566,11 @@ namespace NIKE {
 						// Before change
 						static Vector2i frame_index_before_change;
 
-						//Change rotation
-						if (ImGui::DragInt2("Frame Index", &comp.frame_index.x, 1, 1, 100))
+						//Change frame index
+						if (ImGui::DragInt2("Frame Index", &comp.frame_index.x, 1, 0, 100))
 						{
-							comp.frame_index.x = max(comp.frame_index.x, 1);
-							comp.frame_index.y = max(comp.frame_index.y, 1);
+							comp.frame_index.x = std::clamp(comp.frame_index.x, 0, comp.frame_size.x);
+							comp.frame_index.y = std::clamp(comp.frame_index.y, 0, comp.frame_size.y);
 						}
 
 						//Check if begun editing
@@ -581,7 +583,7 @@ namespace NIKE {
 							LevelEditor::Action change_frame_index;
 
 							//Change do action
-							change_frame_index.do_action = [&, frame_index = comp.frame_size]() {
+							change_frame_index.do_action = [&, frame_index = comp.frame_index]() {
 								comp.frame_index = frame_index;
 								};
 

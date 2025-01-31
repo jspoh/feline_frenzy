@@ -241,10 +241,30 @@ namespace NIKE {
 			throw std::runtime_error("Path does not exist or is not a directory: " + actual_path.string());
 		}
 
+		//Initialize last write times for all files in the directory
+		for (const auto& file : std::filesystem::recursive_directory_iterator(actual_path)) {
+			if (file.is_regular_file()) {
+				file_write_times[file.path()] = std::filesystem::last_write_time(file);
+			}
+		}
+
 		//Add watcher for the directory
 		dir_watchers.emplace(actual_path,
 			std::make_unique<filewatch::FileWatch<std::string>>(actual_path.string(),
-			[actual_path, callback](std::string const& file, filewatch::Event event) {
+			[actual_path, callback, this](std::string const& file, filewatch::Event event) {
+
+				//Get file updated write time
+				auto w_time = std::filesystem::last_write_time(actual_path / file);
+
+				//Invalidate access events ( If prev last write time is the same as new write time )
+				if (event == filewatch::Event::modified && w_time == file_write_times[actual_path / file]) {
+					return;
+				}
+
+				//Update with new write time
+				file_write_times[actual_path / file] = w_time;
+
+				//Call callback
 				callback(actual_path / file, event);
 			}));
 	}
@@ -265,10 +285,13 @@ namespace NIKE {
 		//Function to add watcher for a directory
 		auto addWatcher = [this, alias, callback](std::filesystem::path const& dir_path) {
 			watchDirectory(convertToVirtualPath(alias, dir_path.string()), callback);
+			NIKEE_CORE_INFO("New Directory Watched: " + dir_path.string());
 			};
 		
 		//Add watcher for child directories
 		for (const auto& dir : std::filesystem::recursive_directory_iterator(actual_path)) {
+
+			//Register directory
 			if (dir.is_directory()) {
 				addWatcher(dir.path());
 			}
@@ -277,9 +300,10 @@ namespace NIKE {
 		//Watch the root directory and dynamically add watchers for new directories
 		watchDirectory(virtual_path, [this, callback, addWatcher](std::filesystem::path const& path, filewatch::Event event) {
 
+			//Add a watcher for the new directory
 			if (event == filewatch::Event::added && std::filesystem::is_directory(path)) {
-				//Add a watcher for the new directory
 				addWatcher(path);
+				return;
 			}
 
 			//Pass the event to the callback

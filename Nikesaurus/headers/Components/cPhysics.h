@@ -33,10 +33,11 @@ namespace NIKE {
             Vector2f velocity;
             Vector2f force; //Depricated to be removed
             std::vector<Force> forces; //Future implementation!!!
+            int last_direction; // COMPONENT TO BE MOVED ELSE WHERE
 
-            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ EPSILON }, velocity(), force() {}
+            Dynamics() : max_speed{ 0.0f }, drag{ 0.0f }, mass{ EPSILON }, velocity(), force(), last_direction() {}
             Dynamics(float max_speed, float drag, float mass)
-                : max_speed{ max_speed }, drag{ drag }, mass{ mass }, velocity(), force() {}
+                : max_speed{ max_speed }, drag{ drag }, mass{ mass }, velocity(), force(), last_direction() {}
         };
 
         enum class Resolution {
@@ -47,26 +48,20 @@ namespace NIKE {
         };
 
         struct Collider {
-
-            //Shape type
             enum class ShapeType {
                 AABB,
                 Circle,
                 Polygon
             };
 
-            // Collider properties
-            ShapeType shape_type;          // Type of collider shape
-            std::vector<Vector2f> vertices; // Vertices for polygon shapes
-
-            // Collider transform
+            ShapeType shape_type;
+            std::vector<Vector2f> vertices;
             bool b_bind_to_entity;
             Transform::Transform transform;
             Vector2f pos_offset;
-
-            // Collision flags
-            bool b_collided;               // Collision flag
-            Resolution resolution;         // Collision resolution type (NONE, SLIDE, BOUNCE)
+            bool b_collided;
+            Resolution resolution;
+            float restitution; // Entity-specific restitution (elasticity)
 
             Collider()
                 : shape_type{ ShapeType::AABB },
@@ -74,8 +69,10 @@ namespace NIKE {
                 pos_offset{ 0.0f, 0.0f },
                 b_bind_to_entity{ true },
                 b_collided{ false },
-                resolution{ Resolution::NONE } {}
+                resolution{ Resolution::NONE },
+                restitution{ 1.0f } {} // Default to perfectly elastic
         };
+
 
         //Change physics world variables
         struct ChangePhysicsEvent : public Events::IEvent {

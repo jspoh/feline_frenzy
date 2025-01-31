@@ -85,10 +85,11 @@ namespace NIKE {
 		glfwMakeContextCurrent(ptr_window);
 		if (!glfwGetCurrentContext()) {
 			NIKEE_CORE_ERROR("No valid OpenGL context available");
+			throw std::exception("Context creation failed.");
 		}
 
 		// clear glErrors
-		while (glGetError() != GL_NO_ERROR) { }
+		while (glGetError() != GL_NO_ERROR) {}
 
 		err = glewInit();
 		if (err != GLEW_OK) {
@@ -104,16 +105,19 @@ namespace NIKE {
 		//Engine Init Successful
 		NIKEE_CORE_INFO("GL init success");
 
+		//Warm up GPU
+		warmupGPU();
+
 		// enable debug logging
-		#ifndef NDEBUG
-		// !TODO: re-enable this
+#ifndef NDEBUG
+// !TODO: re-enable this
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
 			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
 			}, nullptr);
-		#endif
+#endif
 
 		// set window icon
 		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
@@ -157,6 +161,31 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
+	}
+
+	void Windows::NIKEWindow::warmupGPU() {
+		NIKEE_CORE_INFO("Warming up GPU...");
+
+		// Create a dummy VAO and VBO for warm-up
+		GLuint vao, vbo;
+		glGenVertexArrays(1, &vao);
+		glGenBuffers(1, &vbo);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, nullptr, GL_STATIC_DRAW);
+
+		// Dummy draw call
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		// Clean up warm-up objects
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glDeleteBuffers(1, &vbo);
+		glDeleteVertexArrays(1, &vao);
+
+		glFlush();  // Ensure all GPU commands are executed
+		NIKEE_CORE_INFO("GPU warm-up complete.");
 	}
 
 	void Windows::NIKEWindow::calculateViewport() {
@@ -270,6 +299,9 @@ namespace NIKE {
 			}
 		}
 
+		// !NOTE: n.loo
+		//glFinish(); //  NICHOLAS SOLUTION 1
+
 		glfwSwapBuffers(ptr_window);
 
 		err = glGetError();
@@ -369,6 +401,11 @@ namespace NIKE {
 
 		//Set viewport
 		glViewport(x_offset, y_offset, static_cast<GLsizei>(viewport_size.x), static_cast<GLsizei>(viewport_size.y));
+
+		//Ensure context
+		if (!glfwGetCurrentContext()) {
+			glfwMakeContextCurrent(ptr_window);
+		}
 	}
 
 	void Windows::NIKEWindow::onEvent(std::shared_ptr<WindowFocusEvent> event) {
@@ -395,10 +432,17 @@ namespace NIKE {
 			glfwGetFramebufferSize(ptr_window, &width, &height);
 			glViewport(0, 0, width, height);
 
-			// just in case
-			glfwMakeContextCurrent(ptr_window);
+			//Ensure context
+			if (!glfwGetCurrentContext()) {
+				glfwMakeContextCurrent(ptr_window);
+			}
 
-			NIKE_AUDIO_SERVICE->resumeAllChannels();
+#ifndef NDEBUG
+			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
+				NIKE_AUDIO_SERVICE->resumeAllChannels();
+			}
+#endif
+
 		}
 		else {
 			// lost focus
@@ -505,5 +549,15 @@ namespace NIKE {
 
 	void Windows::Service::setWindowFocus(bool focus) {
 		window_is_focused = focus;
+	}
+
+	void Windows::Service::resetOpenGL() {
+		glUseProgram(0);  // Unbind ImGui shader program
+		glBindVertexArray(0);  // Unbind VAO
+		glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind VBO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind EBO
+		glEnable(GL_DEPTH_TEST);  // Re-enable depth testing for 3D scene rendering
+		glEnable(GL_CULL_FACE);  // Re-enable face culling if used
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
 	}
 }
