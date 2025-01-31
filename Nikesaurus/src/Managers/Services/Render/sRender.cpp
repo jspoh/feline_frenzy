@@ -484,14 +484,21 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		shader_manager->useShader(ref + "_particle");
+		const std::string shader_name = ref + "_particle";
 
-		shader_manager->setUniform(ref + "_particle", "iTime", (float)glfwGetTime());
-		shader_manager->setUniform(ref + "_particle", "iMouse", NIKE_INPUT_SERVICE->getMouseWindowPos());
-		shader_manager->setUniform(ref + "_particle", "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() });
+		shader_manager->useShader(shader_name);
+
+		//shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
+		shader_manager->setUniform(shader_name, "iMouse", NIKE_INPUT_SERVICE->getMouseWindowPos());
+		//shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() });
+
+		static unsigned int vao;
+		glCreateVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+		glBindVertexArray(0);
 		shader_manager->unuseShader();
 
 		err = glGetError();
