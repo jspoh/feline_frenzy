@@ -169,7 +169,7 @@ namespace NIKE {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
-			
+
 			for (auto& entity : entities) {
 
 				// Skip entities marked for deletion
@@ -213,6 +213,11 @@ namespace NIKE {
 					continue;
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
 					transformAndRenderText(entity);
+
+					//Vector2f screen_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get().position;
+					//Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+					//NIKE_RENDER_SERVICE->renderParticleSystem("base", screen_pos);
 				}
 			}
 		}
@@ -222,6 +227,7 @@ namespace NIKE {
 		Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
 
 		NIKE_RENDER_SERVICE->renderParticleSystem("base", mouse_particle_pos);
+		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
 
 #ifndef NDEBUG
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
