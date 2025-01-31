@@ -11,6 +11,7 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
 #include "Systems/Render/sysRender.h"
+#include "./Systems/sysParticle.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"
@@ -147,6 +148,128 @@ namespace NIKE {
 		glCreateBuffers(1, &model.eboid);
 		glNamedBufferStorage(model.eboid, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_STORAGE_BIT);
 		glVertexArrayElementBuffer(model.vaoid, model.eboid);
+	}
+
+	void Assets::RenderLoader::createClusterParticleBuffers(unsigned int& vao, unsigned int& vbo) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		glCreateVertexArrays(1, &vao);
+		glCreateBuffers(1, &vbo);
+
+		// bind vbo to vao
+		static constexpr int VBO_BINDING_INDEX = 10;
+		static constexpr int PARTICLE_SIZE = sizeof(NIKE::SysParticle::Particle);
+		glVertexArrayVertexBuffer(vao, VBO_BINDING_INDEX, vbo, 0, PARTICLE_SIZE);
+
+		// allocate space for vbo
+		static constexpr int MAX_VBO_SIZE = NIKE::SysParticle::MAX_GLOBAL_ACTIVE_PARTICLES * PARTICLE_SIZE;
+		glNamedBufferStorage(vbo, MAX_VBO_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+		// set vertex array attributes
+
+		// a_particle_alive
+		glEnableVertexArrayAttrib(vao, 0);
+		glVertexArrayAttribFormat(
+			vao,
+			0,		// attrib idx
+			1,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, is_alive)
+		);
+		glVertexArrayAttribBinding(vao, 0, VBO_BINDING_INDEX);
+
+		// a_particle_position
+		glEnableVertexArrayAttrib(vao, 1);
+		glVertexArrayAttribFormat(
+			vao,
+			1,		// attrib idx
+			2,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, pos)
+		);
+		glVertexArrayAttribBinding(vao, 1, VBO_BINDING_INDEX);
+
+		// a_particle_color
+		glEnableVertexArrayAttrib(vao, 2);
+		glVertexArrayAttribFormat(
+			vao,
+			2,		// attrib idx
+			4,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, color)
+		);
+		glVertexArrayAttribBinding(vao, 2, VBO_BINDING_INDEX);
+
+		// a_particle_size
+		glEnableVertexArrayAttrib(vao, 3);
+		glVertexArrayAttribFormat(
+			vao,
+			3,		// attrib idx
+			1,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, size)
+		);
+		glVertexArrayAttribBinding(vao, 3, VBO_BINDING_INDEX);
+
+		// a_particle_velocity
+		glEnableVertexArrayAttrib(vao, 4);
+		glVertexArrayAttribFormat(
+			vao,
+			4,		// attrib idx
+			1,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, velocity)
+		);
+		glVertexArrayAttribBinding(vao, 4, VBO_BINDING_INDEX);
+
+		// a_particle_timealive
+		glEnableVertexArrayAttrib(vao, 5);
+		glVertexArrayAttribFormat(
+			vao,
+			5,		// attrib idx
+			1,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, time_alive)
+		);
+		glVertexArrayAttribBinding(vao, 5, VBO_BINDING_INDEX);
+
+		// a_particle_lifespan
+		glEnableVertexArrayAttrib(vao, 6);
+		glVertexArrayAttribFormat(
+			vao,
+			6,		// attrib idx
+			1,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, lifespan)
+		);
+		glVertexArrayAttribBinding(vao, 6, VBO_BINDING_INDEX);
+
+		// a_particle_rotation
+		glEnableVertexArrayAttrib(vao, 7);
+		glVertexArrayAttribFormat(
+			vao,
+			7,		// attrib idx
+			1,		// size
+			GL_FLOAT,
+			false,
+			offsetof(NIKE::SysParticle::Particle, rotation)
+		);
+		glVertexArrayAttribBinding(vao, 7, VBO_BINDING_INDEX);
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model) {

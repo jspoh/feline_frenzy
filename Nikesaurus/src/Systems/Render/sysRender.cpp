@@ -15,6 +15,7 @@
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 
@@ -228,6 +229,19 @@ namespace NIKE {
 
 		NIKE_RENDER_SERVICE->renderParticleSystem("base", mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
+
+		using namespace NIKE::SysParticle;
+		auto& PM = NIKE::SysParticle::Manager::getInstance();
+		static constexpr ParticlePresets preset = ParticlePresets::CLUSTER;
+		for (auto& ps : PM.getActiveParticleSystems(preset)) {
+			const unsigned int vao = PM.getVAO(preset);
+			const unsigned int VBO = PM.getVBO(preset);
+
+			glNamedBufferSubData(vao, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
+			
+			// !TODO: jspoh use vao, shader, and render
+		}
+
 
 #ifndef NDEBUG
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {

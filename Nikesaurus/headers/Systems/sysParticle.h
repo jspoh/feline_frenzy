@@ -18,40 +18,37 @@
 // !TODO: probably should implement lua for particles too on top of the presets
 
 namespace NIKE {
-	namespace ParticleSystem {
-		constexpr int MAX_GLOBAL_ACTIVE_PARTICLES = 10000	;
+	namespace SysParticle {
+		constexpr int MAX_GLOBAL_ACTIVE_PARTICLES = 10000;
 		constexpr int MAX_ACTIVE_PARTICLE_SYSTEMS = 10;
 		constexpr int MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES = MAX_GLOBAL_ACTIVE_PARTICLES / MAX_ACTIVE_PARTICLE_SYSTEMS;
 
 		enum class ParticlePresets {
-			BASIC = 0,
-			EXPLOSION,
-			SMOKE,
-			FIRE,
-			XP_DROP,
+			BASE = 0,
+			CLUSTER,
 			NUM_PARTICLE_PRESETS
 		};
 
 		struct Particle {
 			std::shared_ptr<Assets::Model> model = nullptr;
 
-			ParticlePresets preset{ ParticlePresets::BASIC };
+			ParticlePresets preset{ ParticlePresets::BASE };
+
+			bool is_alive{ true };
 
 			Vector2f pos{};
+			Vector4f color{};				// in range [0,1]
+			Vector2f size{};
 			Vector2f velocity{};			// per second
 			Vector2f acceleration{};		// per second
 			float time_alive{};				// in seconds
 			float lifespan{};				// in seconds. -1 for infinite (-1 means particle death not dependent on time)
-			Vector2f size{};
-			Vector4f color{};				// in range [0,1]
 			float rotation{};				// in degrees, anticlockwise
-
-			bool is_alive{ true };
 
 		};
 
 		struct ParticleSystem {
-			Vector2f start_pos{};
+			Vector2f origin{};
 			ParticlePresets preset{};
 			std::vector<Particle> particles{};
 			
@@ -63,7 +60,10 @@ namespace NIKE {
 		class Manager {
 		private:
 
-			std::vector<ParticleSystem> active_particle_systems;
+			std::unordered_map<ParticlePresets, std::vector<ParticleSystem>> active_particle_systems;
+
+			std::unordered_map<ParticlePresets, unsigned int> vao_map;
+			std::unordered_map<ParticlePresets, unsigned int> vbo_map;
 
 			Manager();
 			~Manager();
@@ -80,6 +80,13 @@ namespace NIKE {
 			bool addActiveParticleSystem(ParticlePresets preset, const Vector2f& start_pos);
 
 			void update();
+
+			std::vector<ParticleSystem> getActiveParticleSystems(ParticlePresets preset) const;
+
+			unsigned int getVAO(ParticlePresets preset) const;
+			unsigned int getVBO(ParticlePresets preset) const;
 		};
 	}
+
+
 }
