@@ -217,6 +217,8 @@ namespace NIKE {
 			}
 		}
 
+		NIKE_RENDER_SERVICE->renderParticleSystem("base");
+
 #ifndef NDEBUG
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
 			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(NIKE_RENDER_SERVICE->framebuffer_tex.texture_color_buffer));

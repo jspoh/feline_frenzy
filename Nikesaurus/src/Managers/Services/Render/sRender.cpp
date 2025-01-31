@@ -133,7 +133,7 @@ namespace NIKE {
 		shader_manager->init();
 
 		framebuffer_tex.init();
-		
+
 		text_buffer.init();
 
 		//Setup event listening for frame buffer resize
@@ -478,6 +478,28 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	void Render::Service::renderParticleSystem(const std::string& ref) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		shader_manager->useShader(ref + "_particle");
+
+		shader_manager->setUniform(ref + "_particle", "iTime", (float)glfwGetTime());
+		shader_manager->setUniform(ref + "_particle", "iMouse", NIKE_INPUT_SERVICE->getMouseWindowPos());
+		shader_manager->setUniform(ref + "_particle", "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() });
+
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		shader_manager->unuseShader();
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
 	/*****************************************************************//**
 	* BATCH RENDERING
 	*********************************************************************/
@@ -522,7 +544,7 @@ namespace NIKE {
 		std::vector<unsigned int> indices;
 
 		indices.reserve(render_instances_quad.size() * NUM_INDICES_FOR_QUAD); // Adjust based on expected batch size
-		
+
 		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
 		for (size_t i{}; i < render_instances_quad.size(); i++) {
 			unsigned int baseOffset = static_cast<unsigned int>(i * NUM_VERTICES_IN_MODEL);

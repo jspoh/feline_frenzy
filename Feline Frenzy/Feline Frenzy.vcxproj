@@ -154,6 +154,18 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <Text Include="assets\Models\triangle.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\Engine\Shaders\base.frag" />
+    <None Include="assets\Engine\Shaders\base.vert" />
+    <None Include="assets\Engine\Shaders\base_particle.frag" />
+    <None Include="assets\Engine\Shaders\base_particle.vert" />
+    <None Include="assets\Engine\Shaders\batched_base.frag" />
+    <None Include="assets\Engine\Shaders\batched_base.vert" />
+    <None Include="assets\Engine\Shaders\batched_texture.frag" />
+    <None Include="assets\Engine\Shaders\batched_texture.vert" />
+    <None Include="assets\Engine\Shaders\text.frag" />
+    <None Include="assets\Engine\Shaders\text.vert" />
+    <None Include="assets\Engine\Shaders\texture.frag" />
+    <None Include="assets\Engine\Shaders\texture.vert" />
     <None Include="assets\Scripts\createBullet.lua" />
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\enemyBullet.lua" />
