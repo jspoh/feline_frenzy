@@ -217,7 +217,11 @@ namespace NIKE {
 			}
 		}
 
-		NIKE_RENDER_SERVICE->renderParticleSystem("base");
+		Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
+		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
+
+		NIKE_RENDER_SERVICE->renderParticleSystem("base", mouse_particle_pos);
 
 #ifndef NDEBUG
 		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {

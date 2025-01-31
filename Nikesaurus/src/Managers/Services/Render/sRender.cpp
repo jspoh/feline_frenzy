@@ -478,7 +478,7 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(const std::string& ref) {
+	void Render::Service::renderParticleSystem(const std::string& ref, const Vector2f& origin) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -488,9 +488,9 @@ namespace NIKE {
 
 		shader_manager->useShader(shader_name);
 
-		//shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
-		shader_manager->setUniform(shader_name, "iMouse", NIKE_INPUT_SERVICE->getMouseWindowPos());
-		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() });
+		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
+		shader_manager->setUniform(shader_name, "particleOrigin", origin);
+		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
 
 		static unsigned int vao;
 		glCreateVertexArrays(1, &vao);

@@ -14,17 +14,21 @@ layout(location=0) out vec4 f_color;
 
 uniform vec2 iResolution;   // Viewport resolution (in pixels)
 uniform float iTime;        // Shader playback time (in seconds)
-uniform vec2 iMouse;
+uniform vec2 particleOrigin;
 
 
 void main() {
   vec2 uv = gl_FragCoord.xy;    // current uv coords
-  vec2 mouse = vec2(iMouse.x, iResolution.y - iMouse.y);  // flip y axis
 
   float particle_radius = 5.0;
 
-  // distance between current pixel and mouse pos
-  float distance = length(uv - mouse);
+  // make spinning lol
+  vec2 particle_pos = particleOrigin;
+  particle_pos.x += 50.0 * sin(iTime * 3);
+  particle_pos.y += 50.0 * cos(iTime * 3);
+
+  // distance between current pixel and particle pos
+  float distance = length(uv - particle_pos);
 
   // skip some computations if not needed. for now just using double the radius
   if (distance > 2 * particle_radius) {
