@@ -490,7 +490,7 @@ namespace NIKE {
 
 		//shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
 		shader_manager->setUniform(shader_name, "iMouse", NIKE_INPUT_SERVICE->getMouseWindowPos());
-		//shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() });
+		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() });
 
 		static unsigned int vao;
 		glCreateVertexArrays(1, &vao);
