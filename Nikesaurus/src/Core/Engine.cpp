@@ -259,7 +259,7 @@ namespace NIKE {
 		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
 		using namespace NIKE::SysParticle;
-		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(ParticlePresets::CLUSTER, { window_size.x / 2.f, window_size.y / 2.f });
+		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("ps1", Data::ParticlePresets::CLUSTER, {window_size.x / 2.f, window_size.y / 2.f});
 
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";

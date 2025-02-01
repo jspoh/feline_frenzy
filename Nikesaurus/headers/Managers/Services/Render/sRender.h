@@ -13,6 +13,7 @@
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
+#include "Systems/sysParticle.h"
 
 #ifndef RENDER_SERVICE_HPP
 #define RENDER_SERVICE_HPP
@@ -114,7 +115,7 @@ namespace NIKE {
 				 * 
 				 * \param ref
 				 */
-				void renderParticleSystem(const std::string& ref, const Vector2f& origin, unsigned int vao = -1, int draw_count = 1);
+				void renderParticleSystem(int preset, const Vector2f& origin, unsigned int vao = -1, int draw_count = 1);
 
 				/*****************************************************************//**
 				* BATCH RENDERING

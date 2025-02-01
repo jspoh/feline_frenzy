@@ -10,12 +10,15 @@
 
 #pragma once
 
+#ifndef PARTICLE_HPP
+#define PARTICLE_HPP
+
 
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
 #include "Core/Engine.h"
 
-// !TODO: probably should implement lua for particles too on top of the presets
+ // !TODO: probably should implement lua for particles too on top of the presets
 
 namespace NIKE {
 	namespace SysParticle {
@@ -23,16 +26,28 @@ namespace NIKE {
 		constexpr int MAX_ACTIVE_PARTICLE_SYSTEMS = 10;
 		constexpr int MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES = MAX_GLOBAL_ACTIVE_PARTICLES / MAX_ACTIVE_PARTICLE_SYSTEMS;
 
-		enum class ParticlePresets {
-			BASE = 0,
-			CLUSTER,
-			NUM_PARTICLE_PRESETS
+		class Data {
+		private:
+			Data() = default;
+			~Data() = default;
+		public:
+			enum class ParticlePresets {
+				BASE = 0,
+				CLUSTER,
+				NUM_PARTICLE_PRESETS
+			};
+
+			static inline std::unordered_map<ParticlePresets, std::string> particle_preset_map{
+				{ ParticlePresets::BASE, "base" },
+				{ ParticlePresets::CLUSTER, "cluster" }
+			};
 		};
+
 
 		struct Particle {
 			std::shared_ptr<Assets::Model> model = nullptr;
 
-			ParticlePresets preset{ ParticlePresets::BASE };
+			Data::ParticlePresets preset{ Data::ParticlePresets::BASE };
 
 			bool is_alive{ true };
 
@@ -49,9 +64,9 @@ namespace NIKE {
 
 		struct ParticleSystem {
 			Vector2f origin{};
-			ParticlePresets preset{};
+			Data::ParticlePresets preset{};
 			std::vector<Particle> particles{};
-			
+
 			float duration{};		// in seconds. -1 for infinite. how long particle system should last
 			float time_alive{};		// in seconds. how long particle system has been alive
 			bool is_alive{};
@@ -60,10 +75,10 @@ namespace NIKE {
 		class Manager {
 		private:
 
-			std::unordered_map<ParticlePresets, std::vector<ParticleSystem>> active_particle_systems;
+			std::unordered_map<std::string, ParticleSystem>  active_particle_systems;
 
-			std::unordered_map<ParticlePresets, unsigned int> vao_map;
-			std::unordered_map<ParticlePresets, unsigned int> vbo_map;
+			std::unordered_map<Data::ParticlePresets, unsigned int> vao_map;
+			std::unordered_map<Data::ParticlePresets, unsigned int> vbo_map;
 
 			Manager();
 			~Manager();
@@ -73,20 +88,22 @@ namespace NIKE {
 
 			/**
 			 * .
-			 * 
+			 *
 			 * \param preset
 			 * \return if particle system was successfully added
 			 */
-			bool addActiveParticleSystem(ParticlePresets preset, const Vector2f& start_pos, float duration=-1.f);
+			bool addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& start_pos, float duration = -1.f);
 
 			void update();
 
-			std::vector<ParticleSystem> getActiveParticleSystems(ParticlePresets preset) const;
+			std::vector<ParticleSystem> getActiveParticleSystems() const;
 
-			unsigned int getVAO(ParticlePresets preset) const;
-			unsigned int getVBO(ParticlePresets preset) const;
+			unsigned int getVAO(Data::ParticlePresets preset) const;
+			unsigned int getVBO(Data::ParticlePresets preset) const;
 		};
 	}
 
 
 }
+
+#endif // !PARTICLE_HPP

@@ -227,20 +227,19 @@ namespace NIKE {
 		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 		Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
 
-		NIKE_RENDER_SERVICE->renderParticleSystem("base", mouse_particle_pos);
+		using namespace NIKE::SysParticle;
+		NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
 
-		using namespace NIKE::SysParticle;
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
-		const ParticlePresets preset = ParticlePresets::CLUSTER;
-		auto temp_cnt = PM.getActiveParticleSystems(preset).size();
-		for (auto& ps : PM.getActiveParticleSystems(preset)) {
+		const Data::ParticlePresets preset = Data::ParticlePresets::CLUSTER;
+		for (const auto& ps : PM.getActiveParticleSystems()) {
 			const unsigned int vao = PM.getVAO(preset);
 			const unsigned int vbo = PM.getVBO(preset);
 
 			glNamedBufferSubData(vbo, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
 
-			NIKE_RENDER_SERVICE->renderParticleSystem("cluster", ps.origin, vao, static_cast<int>(ps.particles.size()));
+			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, vao, static_cast<int>(ps.particles.size()));
 		}
 		NIKE::SysParticle::Manager::getInstance().update();
 
