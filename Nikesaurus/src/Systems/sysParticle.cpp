@@ -160,6 +160,7 @@ void NSPM::update() {
 		}
 	}
 
+	// !TODO: jspoh restore this
 	// remove dead particle systems
 	//active_particle_systems.erase(std::remove_if(active_particle_systems.begin(), active_particle_systems.end(), [](const auto& pair) { return pair.second.is_alive; }), active_particle_systems.end());
 }
