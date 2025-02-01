@@ -43,4 +43,13 @@ void main() {
 
   gl_Position = vec4(vertices[gl_VertexID], 0.0, 1.0);
   // gl_Position = vec4(a_position, 0.0, 1.0);
+
+  f_particle_alive = a_particle_alive;
+  f_particle_position = a_particle_position;
+  f_particle_color = a_particle_color;
+  f_particle_size = a_particle_size;
+  f_particle_velocity = a_particle_velocity;
+  f_particle_timealive = a_particle_timealive;
+  f_particle_lifespan = a_particle_lifespan;
+  f_rotation = a_rotation;
 }
