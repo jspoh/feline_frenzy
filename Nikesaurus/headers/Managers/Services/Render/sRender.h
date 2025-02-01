@@ -114,7 +114,7 @@ namespace NIKE {
 				 * 
 				 * \param ref
 				 */
-				void renderParticleSystem(const std::string& ref, const Vector2f& origin, unsigned int vao = -1, int draw_count = 4);
+				void renderParticleSystem(const std::string& ref, const Vector2f& origin, unsigned int vao = -1, int draw_count = 1);
 
 				/*****************************************************************//**
 				* BATCH RENDERING

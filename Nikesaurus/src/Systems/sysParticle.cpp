@@ -97,9 +97,15 @@ void NSPM::update() {
 
 				// spawn new particles
 
-				if (ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-					constexpr int NEW_PARTICLES_PER_SECOND = 10;
+				constexpr int NEW_PARTICLES_PER_SECOND = 1;
+				static float time_since_last_spawn = 0.f;
+				time_since_last_spawn += dt;
+
+				if (time_since_last_spawn >= 1.f && ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+					time_since_last_spawn = 0.f;
+					
 					const Vector2f PARTICLE_VELOCITY_RANGE = { 5.f, 10.f };
+
 
 					for (int _{}; _ < NEW_PARTICLES_PER_SECOND; _++) {
 						Particle new_particle;
@@ -113,7 +119,6 @@ void NSPM::update() {
 						new_particle.velocity.y = rand() % 2 ? new_particle.velocity.y : -new_particle.velocity.y;
 						new_particle.acceleration = { 0.f, 0.f };
 						new_particle.lifespan = 5.f;
-						new_particle.size = { 1.f, 1.f };
 						new_particle.color = {
 							rand() % 255 / 255.f,
 							rand() % 255 / 255.f,

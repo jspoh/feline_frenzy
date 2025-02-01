@@ -131,7 +131,7 @@ namespace NIKE {
 			glUniform1i(location, value);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -144,7 +144,7 @@ namespace NIKE {
 			glUniform1f(location, value);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -157,7 +157,7 @@ namespace NIKE {
 			glUniformMatrix3fv(location, 1, GL_FALSE, &value(0, 0));
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -170,7 +170,7 @@ namespace NIKE {
 			glUniform3fv(location, 1, &value.x);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -183,7 +183,7 @@ namespace NIKE {
 			glUniform2f(location, value.x, value.y);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -196,7 +196,7 @@ namespace NIKE {
 			glUniform4f(location, value.x, value.y, value.z, value.w);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 

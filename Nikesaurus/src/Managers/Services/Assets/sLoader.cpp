@@ -170,101 +170,53 @@ namespace NIKE {
 
 		// set vertex array attributes
 
-		// a_particle_alive
+		// a_particle_position
 		glEnableVertexArrayAttrib(vao, 0);
 		glVertexArrayAttribFormat(
 			vao,
 			0,		// attrib idx
-			1,		// size
-			GL_FLOAT,
-			false,
-			offsetof(NIKE::SysParticle::Particle, is_alive)
-		);
-		glVertexArrayAttribBinding(vao, 0, VBO_BINDING_INDEX);
-
-		// a_particle_position
-		glEnableVertexArrayAttrib(vao, 1);
-		glVertexArrayAttribFormat(
-			vao,
-			1,		// attrib idx
 			2,		// size
 			GL_FLOAT,
 			false,
 			offsetof(NIKE::SysParticle::Particle, pos)
 		);
-		glVertexArrayAttribBinding(vao, 1, VBO_BINDING_INDEX);
+		glVertexArrayAttribBinding(vao, 0, VBO_BINDING_INDEX);
 
 		// a_particle_color
-		glEnableVertexArrayAttrib(vao, 2);
+		glEnableVertexArrayAttrib(vao, 1);
 		glVertexArrayAttribFormat(
 			vao,
-			2,		// attrib idx
+			1,		// attrib idx
 			4,		// size
 			GL_FLOAT,
 			false,
 			offsetof(NIKE::SysParticle::Particle, color)
 		);
-		glVertexArrayAttribBinding(vao, 2, VBO_BINDING_INDEX);
+		glVertexArrayAttribBinding(vao, 1, VBO_BINDING_INDEX);
 
 		// a_particle_size
-		glEnableVertexArrayAttrib(vao, 3);
+		glEnableVertexArrayAttrib(vao, 2);
 		glVertexArrayAttribFormat(
 			vao,
-			3,		// attrib idx
+			2,		// attrib idx
 			2,		// size
 			GL_FLOAT,
 			false,
 			offsetof(NIKE::SysParticle::Particle, size)
 		);
-		glVertexArrayAttribBinding(vao, 3, VBO_BINDING_INDEX);
-
-		// a_particle_velocity
-		glEnableVertexArrayAttrib(vao, 4);
-		glVertexArrayAttribFormat(
-			vao,
-			4,		// attrib idx
-			2,		// size
-			GL_FLOAT,
-			false,
-			offsetof(NIKE::SysParticle::Particle, velocity)
-		);
-		glVertexArrayAttribBinding(vao, 4, VBO_BINDING_INDEX);
-
-		// a_particle_timealive
-		glEnableVertexArrayAttrib(vao, 5);
-		glVertexArrayAttribFormat(
-			vao,
-			5,		// attrib idx
-			1,		// size
-			GL_FLOAT,
-			false,
-			offsetof(NIKE::SysParticle::Particle, time_alive)
-		);
-		glVertexArrayAttribBinding(vao, 5, VBO_BINDING_INDEX);
-
-		// a_particle_lifespan
-		glEnableVertexArrayAttrib(vao, 6);
-		glVertexArrayAttribFormat(
-			vao,
-			6,		// attrib idx
-			1,		// size
-			GL_FLOAT,
-			false,
-			offsetof(NIKE::SysParticle::Particle, lifespan)
-		);
-		glVertexArrayAttribBinding(vao, 6, VBO_BINDING_INDEX);
+		glVertexArrayAttribBinding(vao, 2, VBO_BINDING_INDEX);
 
 		// a_particle_rotation
-		glEnableVertexArrayAttrib(vao, 7);
+		glEnableVertexArrayAttrib(vao, 3);
 		glVertexArrayAttribFormat(
 			vao,
-			7,		// attrib idx
+			3,		// attrib idx
 			1,		// size
 			GL_FLOAT,
 			false,
 			offsetof(NIKE::SysParticle::Particle, rotation)
 		);
-		glVertexArrayAttribBinding(vao, 7, VBO_BINDING_INDEX);
+		glVertexArrayAttribBinding(vao, 3, VBO_BINDING_INDEX);
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
