@@ -241,6 +241,9 @@ namespace NIKE {
 
 			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, vao, static_cast<int>(ps.particles.size()));
 		}
+
+		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("ps1", mouse_particle_pos);
+
 		NIKE::SysParticle::Manager::getInstance().update();
 
 

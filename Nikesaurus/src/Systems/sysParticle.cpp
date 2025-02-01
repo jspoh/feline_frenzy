@@ -54,6 +54,8 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 
 
 void NSPM::update() {
+	// !TODO: jspoh reorg update system
+
 	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
 	for (auto& [ref, ps] : active_particle_systems) {
@@ -70,6 +72,11 @@ void NSPM::update() {
 			break;
 		}
 		case Data::ParticlePresets::CLUSTER: {
+			static constexpr float LIFESPAN = 5.f;
+			static const Vector2f ACCELERATION = { 0.f, 0.f };
+			constexpr int NEW_PARTICLES_PER_SECOND = 10;
+			const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+
 			for (auto& p : ps.particles) {
 				// Update particle
 				p.pos += p.velocity * dt;
@@ -106,17 +113,21 @@ void NSPM::update() {
 
 			// spawn new particles
 
-			constexpr int NEW_PARTICLES_PER_SECOND = 10;
 			static float time_since_last_spawn = 0.f;
 			time_since_last_spawn += dt;
 
-			if (time_since_last_spawn >= 1.f && ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+			int particles_to_spawn = static_cast<int>(time_since_last_spawn * NEW_PARTICLES_PER_SECOND);
+
+			if (ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+				particles_to_spawn = 0;
+				time_since_last_spawn = 0.f;
+			}
+
+			if (particles_to_spawn > 0) {
+				// reset state
 				time_since_last_spawn = 0.f;
 
-				const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-
-
-				for (int _{}; _ < NEW_PARTICLES_PER_SECOND; _++) {
+				for (int _{}; _ < particles_to_spawn; _++) {
 					Particle new_particle;
 					new_particle.preset = Data::ParticlePresets::CLUSTER;
 					new_particle.pos = ps.origin;
@@ -126,8 +137,8 @@ void NSPM::update() {
 					};
 					new_particle.velocity.x = rand() % 2 ? new_particle.velocity.x : -new_particle.velocity.x;
 					new_particle.velocity.y = rand() % 2 ? new_particle.velocity.y : -new_particle.velocity.y;
-					new_particle.acceleration = { 0.f, 0.f };
-					new_particle.lifespan = 5.f;
+					new_particle.acceleration = ACCELERATION;
+					new_particle.lifespan = LIFESPAN;
 					new_particle.color = {
 						rand() % 255 / 255.f,
 						rand() % 255 / 255.f,
@@ -140,6 +151,8 @@ void NSPM::update() {
 
 					ps.particles.push_back(new_particle);
 				}
+			
+
 			}
 			break;
 		}
@@ -157,6 +170,10 @@ std::vector<ParticleSystem>NSPM::getActiveParticleSystems() const {
 		v.push_back(ps);
 	}
 	return v;
+}
+
+void NSPM::setParticleSystemOrigin(const std::string& ref, const Vector2f& origin) {
+	active_particle_systems.at(ref).origin = origin;
 }
 
 unsigned int NSPM::getVAO(Data::ParticlePresets preset) const {

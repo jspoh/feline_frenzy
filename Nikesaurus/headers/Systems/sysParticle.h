@@ -98,6 +98,8 @@ namespace NIKE {
 
 			std::vector<ParticleSystem> getActiveParticleSystems() const;
 
+			void setParticleSystemOrigin(const std::string& ref, const Vector2f& origin);
+
 			unsigned int getVAO(Data::ParticlePresets preset) const;
 			unsigned int getVBO(Data::ParticlePresets preset) const;
 		};
