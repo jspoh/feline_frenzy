@@ -104,8 +104,7 @@ namespace NIKE {
 				// If path exist, transition to chase
 				// Check conditions that would trigger transition to Chase state
 				// Find path for player
-				NIKE_MAP_SERVICE->findPath(entity, start.value(), end.value());
-				if (NIKE_MAP_SERVICE->checkPath(entity) ||
+				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
 
 					//Condition if changes to grid blocked has been made
 					NIKE_MAP_SERVICE->checkGridChanged() ||
@@ -122,7 +121,12 @@ namespace NIKE {
 					(NIKE_MAP_SERVICE->getPath(entity).b_finished && start.value() != NIKE_MAP_SERVICE->getPath(entity).end.index)
 
 					) {
+					NIKE_MAP_SERVICE->findPath(entity, start.value(), end.value());
+				}
 
+				// Transition happens when path is not empty
+				auto& path = NIKE_MAP_SERVICE->getPath(entity);
+				if (!path.path.empty()) {
 					return true;
 				}
 			}

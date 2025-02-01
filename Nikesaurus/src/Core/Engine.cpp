@@ -268,7 +268,7 @@ namespace NIKE {
 		fps_history.reserve(300);		// unlikely to exceed 300fps
 		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
-			try {
+			//try {
 
 				// get delta time first
 				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
@@ -395,11 +395,11 @@ namespace NIKE {
 
 				frame_count++;
 			}
-			catch (std::runtime_error const& e) {
-				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-				throw e;
-			}
-		}
+			//catch (std::runtime_error const& e) {
+			//	NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
+			//	throw e;
+			//}
+		//}
 
 		//Stop watching all directories
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();

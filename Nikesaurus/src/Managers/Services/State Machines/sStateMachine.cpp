@@ -122,6 +122,7 @@ namespace NIKE {
 				current_state = state_comp.current_state.lock();
 				if (current_state)
 				{
+					// Update here is causing the throw
 					current_state->onUpdate(entity);
 					// Iterate current state's transitions
 					for (auto& transition : current_state->getTransitions())

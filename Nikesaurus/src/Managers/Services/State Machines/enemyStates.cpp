@@ -53,7 +53,7 @@ namespace NIKE {
 	State::AttackState::AttackState()
 	{
 		// Add transitions here
-		//addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
+		addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
 		addTransition("AttackToChase", std::make_shared<Transition::AttackToChase>());
 	}
 
@@ -129,31 +129,29 @@ namespace NIKE {
 		auto& path = NIKE_MAP_SERVICE->getPath(entity);
 		auto e_transform_enemy = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
-		if (!path.path.empty())
+		if (e_transform_enemy.has_value() && !path.path.empty())
 		{
-			if (e_transform_enemy.has_value())
-			{
-				//Get next cell
-				auto const& next_cell = path.path.front();
-				auto& e_transform = e_transform_enemy.value().get();
+			//Get next cell
+			auto const& next_cell = path.path.front();
+			auto& e_transform = e_transform_enemy.value().get();
 
-				//Check if entity has arrived near destination
-				if ((next_cell.position - e_transform.position).length() > cell_offset) {
+			//Check if entity has arrived near destination
+			if ((next_cell.position - e_transform.position).length() > cell_offset) {
 
-					//Direction of next cell
-					float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+				//Direction of next cell
+				float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
 
-					//Apply force to entity
-					auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-					if (dynamics.has_value()) {
-						dynamics.value().get().force = { cos(dir) * enemy_speed, sin(dir) * enemy_speed };
-					}
-				}
-				else {
-					path.path.pop_front();
+				//Apply force to entity
+				auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+				if (dynamics.has_value()) {
+					dynamics.value().get().force = { cos(dir) * enemy_speed, sin(dir) * enemy_speed };
 				}
 			}
+			else {
+				path.path.pop_front();
+			}
 		}
+
 		else {
 
 			//Marked path as finished
