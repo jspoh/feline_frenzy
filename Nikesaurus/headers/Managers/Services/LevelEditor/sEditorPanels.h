@@ -427,6 +427,9 @@ namespace NIKE {
 			// Msg for pop up
 			std::shared_ptr<std::string> msg;
 
+			//Editing prefab components
+			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
+
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
 

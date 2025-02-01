@@ -242,7 +242,7 @@ namespace NIKE {
 				//Serialize entity meta data
 				auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
 				if (meta_data.has_value()) {
-					e_data["Entity"]["MetaData"] = meta_data.value().get().serialize();
+					e_data["Entity"]["MetaData"] = meta_data.value().serialize();
 				}
 
 				//If entity is a UI Entity
@@ -341,7 +341,7 @@ namespace NIKE {
 						//Deserialize entity metadata
 						auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
 						if (meta_data.has_value()) {
-							meta_data.value().get().deserialize(e_data);
+							meta_data.value().deserialize(e_data);
 						}
 
 						//Check if entity is a UI entity

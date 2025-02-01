@@ -108,20 +108,23 @@ namespace NIKE {
 			//Set Entity Name
 			void setEntityName(Entity::Type entity, std::string const& name);
 
+			//Get Entity name
+			std::string getEntityName(Entity::Type entity) const;
+
 			//Get Entity By Name
 			std::optional<Entity::Type> getEntityByName(std::string const& name) const;
 
 			//Set Entity Master prefab
 			void setEntityPrefabID(Entity::Type entity, std::string const& prefab_id);
 
+			//Get Entity Master prefab
+			std::string getEntityPrefabID(Entity::Type entity) const;
+
 			//Add Entity Tag
 			void addEntityTag(Entity::Type entity, std::string const& tag);
 
 			//Get Entity Tags
 			std::set<std::string> getEntityTags(Entity::Type entity);
-
-			//Get entities by type
-			std::set<Entity::Type> getEntitiesByTag(std::string const& tag) const;
 
 			//Set Entity active State
 			void setEntityActive(Entity::Type entity, bool b_active);
@@ -144,14 +147,17 @@ namespace NIKE {
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);
 
-			//Get entity data
-			std::optional<std::reference_wrapper<MetaData::EntityData>> getEntityData(Entity::Type entity);
-
 			//Get first entity in list
 			Entity::Type getFirstEntity() const;
 
+			//Get entities by type
+			std::set<Entity::Type> getEntitiesByTag(std::string const& tag) const;
+
+			//Get entity metadata
+			std::optional<EntityData> getEntityData(Entity::Type entity) const;
+
 			//Get entities data
-			std::map<Entity::Type, EntityData, EntitySorter>& getEntitiesData();
+			std::map<Entity::Type, EntityData, EntitySorter> getEntitiesData() const;
 
 			//Reset manager
 			void reset();

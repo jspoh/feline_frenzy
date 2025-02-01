@@ -137,6 +137,16 @@ namespace NIKE {
 		entity_names[entities[entity].name] = entity;
 	}
 
+	std::string MetaData::Service::getEntityName(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return "";
+		}
+
+		return entities.at(entity).name;
+	}
+
 	std::optional<Entity::Type> MetaData::Service::getEntityByName(std::string const& name) const {
 		if (entity_names.find(name) == entity_names.end()) {
 			NIKEE_CORE_WARN("Fetching invalid name");
@@ -162,6 +172,19 @@ namespace NIKE {
 
 		//Set prefab master id
 		entities.at(entity).prefab_id = prefab_id;
+
+		//Load entity with prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+	}
+
+	std::string MetaData::Service::getEntityPrefabID(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return "";
+		}
+
+		return entities.at(entity).prefab_id;
 	}
 
 	void MetaData::Service::addEntityTag(Entity::Type entity, std::string const& tag) {
@@ -269,22 +292,21 @@ namespace NIKE {
 		entities.at(entity).b_isactive = it_clone->second.b_isactive;
 	}
 
-	std::optional<std::reference_wrapper<MetaData::EntityData>> MetaData::Service::getEntityData(Entity::Type entity) {
+	Entity::Type MetaData::Service::getFirstEntity() const {
+		return entities.begin()->first;
+	}
 
+	std::optional<MetaData::EntityData> MetaData::Service::getEntityData(Entity::Type entity) const {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
 			NIKEE_CORE_WARN("Entity does not exist");
 			return std::nullopt;
 		}
 
-		return entities.find(entity)->second;
+		return entities.at(entity);
 	}
 
-	Entity::Type MetaData::Service::getFirstEntity() const {
-		return entities.begin()->first;
-	}
-
-	std::map<Entity::Type, MetaData::EntityData, MetaData::Service::EntitySorter>& MetaData::Service::getEntitiesData() {
+	std::map<Entity::Type, MetaData::EntityData, MetaData::Service::EntitySorter> MetaData::Service::getEntitiesData() const {
 		return entities;
 	}
 
