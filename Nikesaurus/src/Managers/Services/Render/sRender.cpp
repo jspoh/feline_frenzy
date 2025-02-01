@@ -497,7 +497,7 @@ namespace NIKE {
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("2 {0}: {1}", __FUNCTION__, err);
+			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
 		bool temp_vao = false;
