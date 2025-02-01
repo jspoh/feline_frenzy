@@ -61,6 +61,8 @@ namespace NIKE {
 			if (e_state_comp.has_value())
 			{
 				e_state_comp.value().get().current_state = new_state;
+				// Change state id string as well
+				e_state_comp.value().get().state_id = getStateID(new_state);
 			}
 
 			// Enter the new state
@@ -75,6 +77,20 @@ namespace NIKE {
 		void Service::removeState(const std::string& state_id)
 		{
 			state_map.erase(state_id);
+		}
+
+		std::string Service::getStateID(std::shared_ptr<Istate> state) const
+		{
+			for (const auto& elem : state_map)
+			{
+				if (elem.second == state)
+				{
+					return elem.first;
+				}
+			}
+
+			// If state not found, return empty string
+			return "";
 		}
 
 		std::shared_ptr<Istate> Service::getStateByID(const std::string& state_id) const
@@ -106,6 +122,7 @@ namespace NIKE {
 				current_state = state_comp.current_state.lock();
 				if (current_state)
 				{
+					// Update here is causing the throw
 					current_state->onUpdate(entity);
 					// Iterate current state's transitions
 					for (auto& transition : current_state->getTransitions())

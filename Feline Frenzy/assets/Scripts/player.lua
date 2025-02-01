@@ -31,7 +31,7 @@ function Player:Animate(entity, args)
     -- Get speed
     local speed = NetVelocity(entity)
     
-    if speed < 1.0 then
+    if speed < 100 then
         -- Idle Animation: Use last direction for idle
         if lastDirection == 0 then
             -- Idle facing right

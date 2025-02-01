@@ -43,14 +43,16 @@ namespace NIKE {
 		class ChaseState : public StateMachine::Istate
 		{
 		public:
-			ChaseState() = default;
+			ChaseState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
 
 		private:
-
+			//Acceptable offset per cell
+			float cell_offset;
+			float enemy_speed;
 		};
 	}
 }

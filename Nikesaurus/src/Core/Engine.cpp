@@ -74,6 +74,9 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<State::State>());
+		// Yes i know it shldnt be here, but we make do first
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 
 		//Register physics manager
 		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
@@ -168,7 +171,7 @@ namespace NIKE {
 
 		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
-
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_RENDER_SERVICE);
 		//Add event listeners for key event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
 
