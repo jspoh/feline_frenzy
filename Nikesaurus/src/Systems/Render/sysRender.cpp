@@ -238,10 +238,18 @@ namespace NIKE {
 			const unsigned int vao = PM.getVAO(preset);
 			const unsigned int vbo = PM.getVBO(preset);
 
-			glNamedBufferSubData(vbo, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
-			
-			// !TODO: jspoh use vao, shader, and render
-			NIKE_RENDER_SERVICE->renderParticleSystem("cluster", ps.origin, vao, static_cast<int>(ps.particles.size())); 
+			// !TODO: jspoh quick fix for testing
+
+			std::vector<Particle> render_particles;
+			for (auto& p : ps.particles) {
+				for (int _{}; _ < 4; _++) {
+					render_particles.push_back(p);
+				}
+			}
+
+			glNamedBufferSubData(vbo, 0, render_particles.size() * sizeof(Particle), render_particles.data());
+
+			NIKE_RENDER_SERVICE->renderParticleSystem("cluster", ps.origin, vao, static_cast<int>(ps.particles.size()));
 		}
 		NIKE::SysParticle::Manager::getInstance().update();
 
