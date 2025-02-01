@@ -10,6 +10,10 @@
 #include "Core/stdafx.h"
 #include "Systems/sysParticle.h"
 
+// !TODO: jspoh use world pos, create imgui component ParticleEmitter, add more particle types
+// !NOTE: jspoh. future - add texture support for particles
+// !NOTE: jspoh. future - add lua support for particles
+
 
 using namespace NIKE::SysParticle;
 using NSPM = NIKE::SysParticle::Manager;

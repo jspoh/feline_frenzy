@@ -204,7 +204,7 @@ namespace NIKE {
 			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
 		}
 
-		// render text last
+		// render text
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
@@ -223,12 +223,16 @@ namespace NIKE {
 			}
 		}
 
+		// render particles
+
+		// !TODO: jspoh move this update function
+		NIKE::SysParticle::Manager::getInstance().update();
+
 		Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
 		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 		Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
 
 		using namespace NIKE::SysParticle;
-		NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
 
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
@@ -244,7 +248,7 @@ namespace NIKE {
 
 		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("ps1", mouse_particle_pos);
 
-		NIKE::SysParticle::Manager::getInstance().update();
+		NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 
 
 #ifndef NDEBUG
