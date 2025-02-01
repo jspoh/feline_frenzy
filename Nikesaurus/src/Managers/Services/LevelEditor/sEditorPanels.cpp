@@ -4043,33 +4043,28 @@ namespace NIKE {
 	}
 
 	void LevelEditor::CameraPanel::update() {
-		const std::unordered_map<Entity::Type, std::string> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
-		static auto previous_scene = NIKE_SCENES_SERVICE->getPrevSceneID();
+		const std::vector<std::pair<Entity::Type, std::string>> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
 
-
-		//Update list of camera entities
-		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1 ||
-			previous_scene != NIKE_SCENES_SERVICE->getCurrSceneID() ) {
+		//Update list of camera entities (On scene change and when list of entities get updated)
+		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
 
 			NIKE_CAMERA_SERVICE->clearCameraEntities();
 			NIKE_CAMERA_SERVICE->emplaceCameraEntity(UINT16_MAX, "Free Cam");
 			combo_index = 0;
 			last_dispatched_index = 0;
+
 			int index = 0;
+
 			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
 				auto cam_name = entities_panel.lock()->getEntityName(entity);
 				NIKE_CAMERA_SERVICE->emplaceCameraEntity(entity, cam_name);
 
 				index++;
 				if (cam_name == NIKE_CAMERA_SERVICE->getActiveCamName()) {
-					dispatchCameraChange(entity, cam_name);
 					combo_index = index;
 					last_dispatched_index = index;
 				}
-
-
 			}
-			
 		}
 
 	}
@@ -4083,7 +4078,7 @@ namespace NIKE {
 		ImGui::Text("Select Camera:");
 
 		//Static for tracking last dispatched index & dispatching of new camera
-		static bool dispatch = true;
+		static bool dispatch = false;
 
 		// Convert unordered_map to vector of strings (camera names)
 		std::vector<const char*> cam_names;

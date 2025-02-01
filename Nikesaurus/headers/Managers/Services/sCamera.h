@@ -40,22 +40,22 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
 
 			//List of camera entities
-			std::unordered_map<Entity::Type, std::string> cam_entities;
+			std::vector<std::pair<Entity::Type, std::string>> cam_entities;
 
 		public:
 			Service() = default;
 
+			/*****************************************************************//**
+			* INITIALIZATION
+			*********************************************************************/
+
+
 			//Init camera
 			void init(nlohmann::json const& config);
 
-			// Return active Cam id
-			Entity::Type getCamId() const;
-			
-			// Set active cam name
-			void setActiveCamName(std::string active_cam);
-
-			// Return active Cam name
-			std::string getActiveCamName() const;
+			/*****************************************************************//**
+			* TRANSFORMS
+			*********************************************************************/
 
 			//Get matrix
 			Matrix_33 getWorldToNDCXform() const;
@@ -66,6 +66,19 @@ namespace NIKE {
 			// Get Pos to World coordinates
 			const Vector3f getPosToWorld(const Vector2f& pos) const;
 
+			/*****************************************************************//**
+			* CAMERA
+			*********************************************************************/
+
+			// Return active Cam id
+			Entity::Type getActiveCamId() const;
+
+			// Set active cam name
+			void setActiveCamName(std::string active_cam);
+
+			// Return active Cam name
+			std::string getActiveCamName() const;
+
 			//Get active camera
 			Render::Cam getActiveCamera() const;
 
@@ -75,14 +88,23 @@ namespace NIKE {
 			//Get camera height
 			float getCameraHeight() const;
 			
+
+			/*****************************************************************//**
+			* CAMERA ENTITIES
+			*********************************************************************/
+
 			//Get camera entities
-			const std::unordered_map<Entity::Type, std::string>& getCameraEntities() const;
+			const std::vector<std::pair<Entity::Type, std::string>>& getCameraEntities() const;
 
 			// Emplace new entity or update existing camera entity
 			void emplaceCameraEntity(Entity::Type entity, const std::string& name);
 
 			// Clears the cam_entities map
 			void clearCameraEntities();
+
+			/*****************************************************************//**
+			* SERIALISATION
+			*********************************************************************/
 
 			// Serialize
 			nlohmann::json serializeCamera() const;

@@ -50,7 +50,7 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
-	* Scene maanger
+	* Scene manager
 	*********************************************************************/
 	void Scenes::Service::initScene(std::string const& scene_id) {
 
@@ -88,7 +88,7 @@ namespace NIKE {
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
 		//Reset Camera
-		NIKE_CAMERA_SERVICE->setActiveCamName("Free Cam");
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
 		//Clear layers
 		layers.clear();
@@ -123,6 +123,9 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
+
 		//Clear layers
 		layers.clear();
 
@@ -156,6 +159,9 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
+
 		//Clear layers
 		layers.clear();
 
@@ -186,6 +192,9 @@ namespace NIKE {
 
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
 		//Clear layers
 		layers.clear();

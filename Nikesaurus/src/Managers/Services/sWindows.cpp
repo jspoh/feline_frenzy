@@ -523,13 +523,32 @@ namespace NIKE {
 	}
 
 	void Windows::Service::calculateDeltaTime() {
+		// Cap at 50ms (prevents big jumps)
+		constexpr float MAX_DELTA_TIME = 0.05f; // For smoother gameplay higher (0.1), For responsive gameplay lower (0.05)
+
 		//Static prev time
 		static double prev_time = glfwGetTime();
+		static bool was_unfocused = false;
+
+		curr_time = glfwGetTime();
+
+		// If window was unfocused, reset prev_time to prevent large delta time
+		if (!getWindowFocus()) {
+			was_unfocused = true;
+		}
+		else if (was_unfocused) {
+			was_unfocused = false;
+			delta_time = 1.0f / target_fps; // Instead of 0, use a stable frame step
+			prev_time = curr_time - delta_time; // Simulate a normal frame step
+		}
+		else {
+			// Normal delta time calculation
+			delta_time = static_cast<float>(curr_time - prev_time);
+		}
 
 		//Calculate delta time
-		curr_time = glfwGetTime();
-		delta_time = static_cast<float>(curr_time - prev_time);
-		actual_fps = 1.0f / delta_time;
+		delta_time = min(delta_time, MAX_DELTA_TIME); // Prevents large jumps
+		actual_fps = (delta_time > 0) ? (1.0f / delta_time) : 0.0f;
 		prev_time = curr_time;
 
 		//Reset curr num of steps
@@ -537,8 +556,8 @@ namespace NIKE {
 
 		//control frame rate
 		accumulated_time += delta_time;
-		while (accumulated_time >= (static_cast<double>(1) / target_fps)) {
-			accumulated_time -= (static_cast<double>(1) / target_fps);
+		while (accumulated_time >= (1.0 / target_fps)) {
+			accumulated_time -= (1.0 / target_fps);
 			curr_num_steps++;
 		}
 	}

@@ -410,7 +410,7 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 8,
+                                "Completed_Animations": 4,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.05000000447034836
@@ -418,11 +418,11 @@
                             "Animation::Sprite": {
                                 "Curr_Index": {
                                     "x": 4,
-                                    "y": 3
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 3
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -430,7 +430,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 3
+                                    "y": 1
                                 }
                             },
                             "Audio::SFX": {
@@ -457,8 +457,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 399.38226318359375,
-                                    "y": 153.3217315673828
+                                    "x": 184.65652465820313,
+                                    "y": 78.32178497314453
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -482,15 +482,15 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": 399.38226318359375,
-                                    "y": 153.3217315673828
+                                    "x": 184.65652465820313,
+                                    "y": 78.32178497314453
                                 },
                                 "Zoom": 1.354567527770996
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": false,
+                                    "x": true,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -502,7 +502,7 @@
                                 },
                                 "Frame_Index": {
                                     "x": 4,
-                                    "y": 3
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -523,8 +523,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 399.38226318359375,
-                                    "y": 153.3217315673828
+                                    "x": 184.65652465820313,
+                                    "y": 78.32178497314453
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -546,7 +546,7 @@
                     "Entity": {
                         "Components": {
                             "Combat::Health": {
-                                "Health": 100.0,
+                                "Health": 70.0,
                                 "InvulnerableFlag": false,
                                 "Lives": 1
                             },
@@ -556,7 +556,7 @@
                             "Enemy::Attack": {
                                 "Cooldown": 1.0,
                                 "Function": "enemyBullet",
-                                "LastShotTime": 0.6000000834465027,
+                                "LastShotTime": 0.41666680574417114,
                                 "Layer": 1,
                                 "Offset": 100.0,
                                 "PrefabPath": "bullet.prefab",
@@ -572,14 +572,27 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 875.716796875,
-                                    "y": 540.2196044921875
+                                    "x": 217.94058227539063,
+                                    "y": 532.713623046875
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 94.74921417236328,
                                     "y": 116.74456787109375
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": -517.5066528320313,
+                                    "y": -855.6791381835938
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 100.0,
+                                "Velocity": {
+                                    "x": -51.750667572021484,
+                                    "y": -85.56791687011719
                                 }
                             },
                             "Render::Texture": {
@@ -611,8 +624,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 875.716796875,
-                                    "y": 540.2196044921875
+                                    "x": 217.94058227539063,
+                                    "y": 532.713623046875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -731,11 +744,24 @@
                                     "x": 871.156494140625,
                                     "y": 390.60162353515625
                                 },
-                                "Resolution": 0,
+                                "Resolution": 1,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 91.9847640991211,
                                     "y": 118.93572235107422
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 100.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
                                 }
                             },
                             "Render::Texture": {
@@ -819,11 +845,24 @@
                                     "x": 884.83837890625,
                                     "y": 178.77383422851563
                                 },
-                                "Resolution": 0,
+                                "Resolution": 1,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 91.9847640991211,
                                     "y": 118.93572235107422
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 100.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
                                 }
                             },
                             "Render::Texture": {
@@ -855,7 +894,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 884.83837890625,
+                                    "x": 877.4942626953125,
                                     "y": 178.77383422851563
                                 },
                                 "Rotation": 0.0,
@@ -907,11 +946,24 @@
                                     "x": 884.83837890625,
                                     "y": -52.8753662109375
                                 },
-                                "Resolution": 0,
+                                "Resolution": 1,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 91.9847640991211,
                                     "y": 118.93572235107422
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 9.999999747378752e-05,
+                                "Max_Speed": 100.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
                                 }
                             },
                             "Render::Texture": {

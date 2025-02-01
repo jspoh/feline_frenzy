@@ -270,18 +270,18 @@ namespace NIKE {
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 			try {
 
-				// get delta time first
-				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-					//Calculate Delta Time
-					NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-				}
-
 				// have to poll events regardless of focus
 				//Poll system events
 				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-				//Clear buffer
-				NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+				if (!NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+					// Skip updates when unfocused, but continue polling events
+					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+
+					continue;
+				}
+				//Calculate Delta Time
+				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
 				//Update all audio pending actions
 				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
