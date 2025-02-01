@@ -504,8 +504,8 @@ namespace NIKE {
 		}
 		glBindVertexArray(vao);
 
-		static constexpr int NUM_VERTICES = 4;		// defined in vertex shader
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, NUM_VERTICES * draw_count);
+		static constexpr int NUM_VERTICES = 6;		// defined in vertex shader
+		glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES * draw_count);
 
 		glBindVertexArray(0);
 		shader_manager->unuseShader();

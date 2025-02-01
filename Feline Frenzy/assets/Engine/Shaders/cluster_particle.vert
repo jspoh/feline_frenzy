@@ -30,11 +30,13 @@ uniform vec2 particleOrigin;
 
 
 void main() {
-    vec2 vertices[4] = vec2[4](
-      vec2(-1.0, -1.0),   // bottom-left
-      vec2(-1.0,  1.0),  // top-left
+    vec2 vertices[6] = vec2[6](
       vec2( 1.0, -1.0),  // bottom-right
-      vec2( 1.0,  1.0)  // top-right
+      vec2( 1.0,  1.0),  // top-right
+      vec2(-1.0,  1.0),  // top-left
+      vec2(-1.0,  1.0),  // top-left
+      vec2(-1.0, -1.0),   // bottom-left
+      vec2( 1.0, -1.0)  // bottom-right
     );
 
    // Convert particle position (pixels) to NDC [-1, 1]
@@ -44,7 +46,7 @@ void main() {
     vec2 ndcSize = a_particle_size / iResolution;
 
     // Scale vertex by size and translate to position
-    vec2 vertexPos = vertices[gl_VertexID % 4] * ndcSize + ndcPos;
+    vec2 vertexPos = vertices[gl_VertexID % 6] * ndcSize + ndcPos;
 
     gl_Position = vec4(vertexPos, 0.0, 1.0);
   // gl_Position = vec4(a_position, 0.0, 1.0);

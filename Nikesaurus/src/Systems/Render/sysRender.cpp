@@ -242,7 +242,7 @@ namespace NIKE {
 
 			std::vector<Particle> render_particles;
 			for (auto& p : ps.particles) {
-				for (int _{}; _ < 4; _++) {
+				for (int _{}; _ < 6; _++) {
 					render_particles.push_back(p);
 				}
 			}
