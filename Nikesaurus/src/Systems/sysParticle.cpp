@@ -18,6 +18,7 @@ namespace {
 NSPM::Manager() {
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
 
+	// create vao and vbo for CLUSTER particle preset
 	vao_map[ParticlePresets::CLUSTER] = -1;
 	vbo_map[ParticlePresets::CLUSTER] = -1;
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[ParticlePresets::CLUSTER], vbo_map[ParticlePresets::CLUSTER]);
@@ -123,11 +124,15 @@ void NSPM::update() {
 		}
 
 		// remove dead particle systems
-		active_particle_systems.erase(std::remove_if(active_particle_systems.begin(), active_particle_systems.end(), [](const ParticleSystem& ps) { return !ps.is_alive; }), active_particle_systems.end());
+		pss.erase(std::remove_if(pss.begin(), pss.end(), [](const ParticleSystem& ps) { return !ps.is_alive; }), pss.end());
 	}
 }
 
 std::vector<NIKE::SysParticle::ParticleSystem>NSPM::getActiveParticleSystems(ParticlePresets preset) const {
+	if (active_particle_systems.find(preset) == active_particle_systems.end()) {
+		return {};
+	}
+
 	return active_particle_systems.at(preset);
 }
 

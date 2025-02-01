@@ -76,7 +76,7 @@ namespace NIKE {
 			char info_log[512];
 			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
 			cerr << "Failed to link shader program " << ": " << info_log << endl;
-			//throw std::exception();
+			throw std::exception();
 		}
 
 		// cleanup shaders
@@ -100,10 +100,20 @@ namespace NIKE {
 	}
 
 	void Shader::ShaderManager::useShader(const std::string& shader_ref) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
 		glUseProgram(shaders.at(shader_ref));
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Shader::ShaderManager::unuseShader() {

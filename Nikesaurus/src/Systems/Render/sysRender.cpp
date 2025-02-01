@@ -232,14 +232,15 @@ namespace NIKE {
 
 		using namespace NIKE::SysParticle;
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
-		static constexpr ParticlePresets preset = ParticlePresets::CLUSTER;
+		const ParticlePresets preset = ParticlePresets::CLUSTER;
 		for (auto& ps : PM.getActiveParticleSystems(preset)) {
 			const unsigned int vao = PM.getVAO(preset);
-			const unsigned int VBO = PM.getVBO(preset);
+			const unsigned int vbo = PM.getVBO(preset);
 
 			glNamedBufferSubData(vao, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
 			
 			// !TODO: jspoh use vao, shader, and render
+			NIKE_RENDER_SERVICE->renderParticleSystem("cluster", ps.origin, vao, static_cast<int>(ps.particles.size())); 
 		}
 
 

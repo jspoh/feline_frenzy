@@ -478,29 +478,51 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(const std::string& ref, const Vector2f& origin, Matrix_33 transform) {
+	void Render::Service::renderParticleSystem(const std::string& ref, const Vector2f& origin, unsigned int vao, int draw_count) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("0 {0}: {1}", __FUNCTION__, err);
 		}
 
 		const std::string shader_name = ref + "_particle";
 
 		shader_manager->useShader(shader_name);
 
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("1 {0}: {1}", __FUNCTION__, err);
+		}
+
 		//shader_manager->setUniform(shader_name, "u_transform", transform);
 		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
 		shader_manager->setUniform(shader_name, "particleOrigin", origin);
 		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
 
-		static unsigned int vao;
-		glCreateVertexArrays(1, &vao);
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("2 {0}: {1}", __FUNCTION__, err);
+		}
+
+		bool temp_vao = false;
+		if (vao == -1) {
+			temp_vao = true;
+			glCreateVertexArrays(1, &vao);
+		}
 		glBindVertexArray(vao);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, draw_count);
 
 		glBindVertexArray(0);
 		shader_manager->unuseShader();
+
+		if (temp_vao) {
+			glDeleteVertexArrays(1, &vao);
+		}
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {

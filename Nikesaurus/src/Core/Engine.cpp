@@ -18,6 +18,7 @@
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Systems/GameLogic/sysEnemy.h"
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 
@@ -254,6 +255,9 @@ namespace NIKE {
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1.scn"));
+
+		using namespace NIKE::SysParticle;
+		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(ParticlePresets::CLUSTER, { 0.f, 0.f });
 
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
