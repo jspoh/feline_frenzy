@@ -54,8 +54,9 @@ namespace NIKE {
 			Vector2f pos{};
 			Vector4f color{};				// in range [0,1]
 			Vector2f size{};
-			Vector2f velocity{};			// per second
-			Vector2f acceleration{};		// per second
+			float velocity{};			// per second
+			Vector2f vector{};
+			float acceleration{};		// per second
 			float time_alive{};				// in seconds
 			float lifespan{};				// in seconds. -1 for infinite (-1 means particle death not dependent on time)
 			float rotation{};				// in degrees, anticlockwise

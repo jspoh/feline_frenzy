@@ -73,13 +73,13 @@ void NSPM::update() {
 		}
 		case Data::ParticlePresets::CLUSTER: {
 			static constexpr float LIFESPAN = 5.f;
-			static const Vector2f ACCELERATION = { 0.f, 0.f };
-			constexpr int NEW_PARTICLES_PER_SECOND = 10;
+			static constexpr float ACCELERATION = 0.f;
+			constexpr int NEW_PARTICLES_PER_SECOND = 50;
 			const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
 
 			for (auto& p : ps.particles) {
 				// Update particle
-				p.pos += p.velocity * dt;
+				p.pos += p.vector * p.velocity * dt;
 				p.velocity += p.acceleration * dt;
 				p.time_alive += dt;
 
@@ -131,12 +131,9 @@ void NSPM::update() {
 					Particle new_particle;
 					new_particle.preset = Data::ParticlePresets::CLUSTER;
 					new_particle.pos = ps.origin;
-					new_particle.velocity = {
-						rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x,
-						rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x
-					};
-					new_particle.velocity.x = rand() % 2 ? new_particle.velocity.x : -new_particle.velocity.x;
-					new_particle.velocity.y = rand() % 2 ? new_particle.velocity.y : -new_particle.velocity.y;
+					new_particle.vector = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
+					new_particle.vector.normalize();
+					new_particle.velocity = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
 					new_particle.acceleration = ACCELERATION;
 					new_particle.lifespan = LIFESPAN;
 					new_particle.color = {
