@@ -49,6 +49,15 @@ namespace NIKE {
             void removeTransition(const std::string& transition_id);
             bool checkTransitionExist(const std::string& transition_id);
 
+            /***********************
+            * Animation handling
+            ************************/
+            void animationStart(Entity::Type& entity, int start_x, int start_y);
+            void animationEnd(Entity::Type& entity, int end_x, int end_y);
+            void flipX(Entity::Type& entity, bool yes_or_no);
+            void flipY(Entity::Type& entity, bool yes_or_no);
+            void setLastDirection(Entity::Type& entity, int dir);
+            int getLastDirection(Entity::Type& entity);
 
         private:
             // List of transitions

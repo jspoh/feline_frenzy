@@ -110,7 +110,7 @@ namespace NIKE {
 	* Chase State functions
 	*****************************/
 
-	State::ChaseState::ChaseState() : cell_offset{ 10.0f }, enemy_speed{ 1000.0f }
+	State::ChaseState::ChaseState() : cell_offset{ 15.0f }, enemy_speed{ 1000.0f }
 	{
 		// Add transitions here
 		addTransition("ChaseToAttack", std::make_shared<Transition::ChaseToAttack>());
@@ -145,9 +145,73 @@ namespace NIKE {
 				auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 				if (dynamics.has_value()) {
 					dynamics.value().get().force = { cos(dir) * enemy_speed, sin(dir) * enemy_speed };
+					// cout << "force added" << endl;
+				}
+
+				if (dir >= -M_PI / 8 && dir < M_PI / 8) {
+					// Moving right
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, false);
+					setLastDirection(entity, 0);
+				}
+				else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
+					// Moving up-right (diagonal)
+					animationStart(entity, 0, 2);
+					animationEnd(entity, 9, 2);
+					// No flip for up-right
+					flipX(entity, false);   
+					setLastDirection(entity, 1);
+				}
+				else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
+					// Moving up
+					animationStart(entity, 0, 3);
+					animationEnd(entity, 9, 3);
+					// No flip for up
+					flipX(entity, false);
+					setLastDirection(entity, 2);
+				}
+				else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+					// Moving up-left (diagonal)
+					animationStart(entity, 0, 2);
+					animationEnd(entity, 9, 2);
+					// Flip for up-left
+					flipX(entity, true);
+					setLastDirection(entity, 3);
+				}
+				else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+					// Moving down-right (diagonal)
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					// No flip for down-right
+					flipX(entity, false);
+					setLastDirection(entity, 4);
+				}
+				else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
+					// Moving down
+					animationStart(entity, 0, 0);
+					animationEnd(entity, 9, 0);
+					// No flip for down
+					flipX(entity, false);
+					setLastDirection(entity, 5);
+				}
+				else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+					// Moving down-left (diagonal)
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, true);
+					setLastDirection(entity, 6);
+				}
+				else {
+					// Moving left
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, true);
+					setLastDirection(entity, 7);
 				}
 			}
 			else {
+				// cout << "force added, path popped front" << endl;
 				path.path.pop_front();
 			}
 		}
@@ -155,6 +219,7 @@ namespace NIKE {
 		else {
 
 			//Marked path as finished
+			// cout << "force added, path finished" << endl;
 			path.b_finished = true;
 		}
 
