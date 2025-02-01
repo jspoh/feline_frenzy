@@ -34,7 +34,7 @@ NSPM& NSPM::getInstance() {
 	return instance;
 }
 
-bool NSPM::addActiveParticleSystem(ParticlePresets preset, const Vector2f& origin) {
+bool NSPM::addActiveParticleSystem(ParticlePresets preset, const Vector2f& origin, float duration) {
 	if (active_particle_systems.size() >= MAX_ACTIVE_PARTICLE_SYSTEMS) {
 		return false;
 	}
@@ -44,6 +44,8 @@ bool NSPM::addActiveParticleSystem(ParticlePresets preset, const Vector2f& origi
 	new_particle_system.preset = preset;
 	new_particle_system.origin = origin;
 	new_particle_system.is_alive = true;
+	new_particle_system.duration = duration;
+	new_particle_system.time_alive = 0.f;
 
 	active_particle_systems[preset].push_back(new_particle_system);
 
@@ -84,6 +86,10 @@ void NSPM::update() {
 					if (p.color.a <= 0) {
 						p.is_alive = false;
 					}
+
+					if (p.lifespan != -1 && p.time_alive > p.lifespan) {
+						p.is_alive = false;
+					}
 				}
 
 				// remove dead particles
@@ -92,8 +98,8 @@ void NSPM::update() {
 				// spawn new particles
 
 				if (ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-					constexpr int NEW_PARTICLES_PER_SECOND = 1000;
-					const Vector2f PARTICLE_VELOCITY_RANGE = { 10.f, 20.f };
+					constexpr int NEW_PARTICLES_PER_SECOND = 10;
+					const Vector2f PARTICLE_VELOCITY_RANGE = { 5.f, 10.f };
 
 					for (int _{}; _ < NEW_PARTICLES_PER_SECOND; _++) {
 						Particle new_particle;
@@ -104,7 +110,7 @@ void NSPM::update() {
 							rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x
 						};
 						new_particle.acceleration = { 0.f, 0.f };
-						new_particle.lifespan = -1;		// particle death not time dependent
+						new_particle.lifespan = 5.f;
 						new_particle.size = { 1.f, 1.f };
 						new_particle.color = {
 							rand() % 255 / 255.f,

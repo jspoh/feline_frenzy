@@ -256,8 +256,10 @@ namespace NIKE {
 		// !TODO: remove this, hardcoding for installer
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1.scn"));
 
+		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
 		using namespace NIKE::SysParticle;
-		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(ParticlePresets::CLUSTER, { 0.f, 0.f });
+		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(ParticlePresets::CLUSTER, { window_size.x / 2.f, window_size.y / 2.f });
 
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";

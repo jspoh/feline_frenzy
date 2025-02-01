@@ -42,4 +42,6 @@ void main() {
   vec4 particle_color = f_particle_color;
   particle_color.a *= alpha;
   f_color = vec4(particle_color);
+
+  f_color = vec4(1.0, 0.0, 0.0, 1.0);
 }

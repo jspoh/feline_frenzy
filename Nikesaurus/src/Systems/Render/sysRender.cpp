@@ -233,6 +233,7 @@ namespace NIKE {
 		using namespace NIKE::SysParticle;
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
 		const ParticlePresets preset = ParticlePresets::CLUSTER;
+		auto temp_cnt = PM.getActiveParticleSystems(preset).size();
 		for (auto& ps : PM.getActiveParticleSystems(preset)) {
 			const unsigned int vao = PM.getVAO(preset);
 			const unsigned int vbo = PM.getVBO(preset);
@@ -242,6 +243,7 @@ namespace NIKE {
 			// !TODO: jspoh use vao, shader, and render
 			NIKE_RENDER_SERVICE->renderParticleSystem("cluster", ps.origin, vao, static_cast<int>(ps.particles.size())); 
 		}
+		NIKE::SysParticle::Manager::getInstance().update();
 
 
 #ifndef NDEBUG

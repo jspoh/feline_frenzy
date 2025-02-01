@@ -484,21 +484,10 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("0 {0}: {1}", __FUNCTION__, err);
-		}
-
 		const std::string shader_name = ref + "_particle";
 
 		shader_manager->useShader(shader_name);
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("1 {0}: {1}", __FUNCTION__, err);
-		}
-
-		//shader_manager->setUniform(shader_name, "u_transform", transform);
 		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
 		shader_manager->setUniform(shader_name, "particleOrigin", origin);
 		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
