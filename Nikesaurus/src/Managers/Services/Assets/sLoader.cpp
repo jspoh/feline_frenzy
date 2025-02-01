@@ -211,7 +211,7 @@ namespace NIKE {
 		glVertexArrayAttribFormat(
 			vao,
 			3,		// attrib idx
-			1,		// size
+			2,		// size
 			GL_FLOAT,
 			false,
 			offsetof(NIKE::SysParticle::Particle, size)
@@ -223,7 +223,7 @@ namespace NIKE {
 		glVertexArrayAttribFormat(
 			vao,
 			4,		// attrib idx
-			1,		// size
+			2,		// size
 			GL_FLOAT,
 			false,
 			offsetof(NIKE::SysParticle::Particle, velocity)
@@ -270,7 +270,7 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
-	}
+	} 
 
 	void Assets::RenderLoader::createBatchedBaseBuffers(Model& model) {
 		// only handles drwaing quads

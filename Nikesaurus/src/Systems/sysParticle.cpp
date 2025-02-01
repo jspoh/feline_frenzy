@@ -109,6 +109,8 @@ void NSPM::update() {
 							rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x,
 							rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x) + PARTICLE_VELOCITY_RANGE.x
 						};
+						new_particle.velocity.x = rand() % 2 ? new_particle.velocity.x : -new_particle.velocity.x;
+						new_particle.velocity.y = rand() % 2 ? new_particle.velocity.y : -new_particle.velocity.y;
 						new_particle.acceleration = { 0.f, 0.f };
 						new_particle.lifespan = 5.f;
 						new_particle.size = { 1.f, 1.f };
@@ -120,6 +122,7 @@ void NSPM::update() {
 						};
 						new_particle.rotation = 0.f;
 						new_particle.is_alive = true;
+						new_particle.size = { 10.f, 10.f };
 
 						ps.particles.push_back(new_particle);
 					}

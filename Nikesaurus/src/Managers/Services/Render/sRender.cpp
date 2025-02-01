@@ -478,7 +478,7 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(const std::string& ref, const Vector2f& origin, unsigned int vao, int draw_count) {
+	void Render::Service::renderParticleSystem(const std::string& ref, const Vector2f& origin, unsigned int vao, int draw_count) { 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -504,7 +504,8 @@ namespace NIKE {
 		}
 		glBindVertexArray(vao);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, draw_count);
+		static constexpr int NUM_VERTICES = 4;		// defined in vertex shader
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, NUM_VERTICES, draw_count);
 
 		glBindVertexArray(0);
 		shader_manager->unuseShader();
