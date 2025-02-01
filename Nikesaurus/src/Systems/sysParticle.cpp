@@ -77,6 +77,16 @@ void NSPM::update() {
 					p.velocity += p.acceleration * dt;
 					p.time_alive += dt;
 
+					if (p.lifespan != -1.f) {
+						// fade out
+						p.color.a -= dt / p.lifespan;
+
+						// darken
+						p.color.r -= dt / p.lifespan;
+						p.color.g -= dt / p.lifespan;
+						p.color.b -= dt / p.lifespan;
+					}
+
 					// particle death
 
 					if (p.size.x <= 0 || p.size.y <= 0) {
@@ -97,14 +107,14 @@ void NSPM::update() {
 
 				// spawn new particles
 
-				constexpr int NEW_PARTICLES_PER_SECOND = 1;
+				constexpr int NEW_PARTICLES_PER_SECOND = 10;
 				static float time_since_last_spawn = 0.f;
 				time_since_last_spawn += dt;
 
 				if (time_since_last_spawn >= 1.f && ps.particles.size() < MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
 					time_since_last_spawn = 0.f;
 					
-					const Vector2f PARTICLE_VELOCITY_RANGE = { 5.f, 10.f };
+					const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
 
 
 					for (int _{}; _ < NEW_PARTICLES_PER_SECOND; _++) {
@@ -127,7 +137,7 @@ void NSPM::update() {
 						};
 						new_particle.rotation = 0.f;
 						new_particle.is_alive = true;
-						new_particle.size = { 10.f, 10.f };
+						new_particle.size = { 5.f, 5.f };
 
 						ps.particles.push_back(new_particle);
 					}

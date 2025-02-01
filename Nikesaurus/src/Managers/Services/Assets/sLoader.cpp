@@ -218,6 +218,9 @@ namespace NIKE {
 		);
 		glVertexArrayAttribBinding(vao, 3, VBO_BINDING_INDEX);
 
+		// for instanced rendering
+		glVertexArrayBindingDivisor(vao, VBO_BINDING_INDEX, 1);
+
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
