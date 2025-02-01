@@ -40,9 +40,10 @@ namespace NIKE {
 				},
 
 				// Deserialize
-				[](State& comp, [[maybe_unsued]] nlohmann::json const& data) {
+				[](State& comp, nlohmann::json const& data) {
+					UNREFERENCED_PARAMETER(data);
 					// Default deserialize to idle
-					comp.state_id = "Idle";
+					comp.state_id = data.at("State").get<std::string>();
 					// Assign pointer based on state_id
 					comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
 

@@ -57,7 +57,7 @@ namespace NIKE {
 				}
 
 				//Get path 
-				auto& path = NIKE_MAP_SERVICE->getPath(entity);
+				auto path = NIKE_MAP_SERVICE->getPath(entity);
 
 				//Check if there are cells left in path
 				if (!path.path.empty()) {

@@ -126,7 +126,7 @@ namespace NIKE {
 	{
 
 		// cout << "update chase state" << endl;
-		auto& path = NIKE_MAP_SERVICE->getPath(entity);
+		auto path = NIKE_MAP_SERVICE->getPath(entity);
 		auto e_transform_enemy = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
 		if (e_transform_enemy.has_value() && !path.path.empty())

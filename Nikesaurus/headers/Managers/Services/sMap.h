@@ -132,7 +132,7 @@ namespace NIKE {
 			void findPath(Entity::Type entity, Vector2i const& start, Vector2i const& goal, bool b_diagonal = false);
 
 			//Get entity path
-			Path& getPath(Entity::Type entity);
+			Path getPath(Entity::Type entity);
 
 			//Check entity path
 			bool checkPath(Entity::Type entity) const;
