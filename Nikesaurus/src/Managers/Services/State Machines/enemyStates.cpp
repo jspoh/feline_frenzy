@@ -127,31 +127,33 @@ namespace NIKE {
 		//cout << "enter chase state" << endl;
 	}
 
-	void NIKE::State::ChaseState::onUpdate([[maybe_unused]] Entity::Type& entity)
+	void State::ChaseState::onUpdate(Entity::Type& entity)
 	{
-
-		// cout << "update chase state" << endl;
-		auto path = NIKE_MAP_SERVICE->getPath(entity);
-		auto e_transform_enemy = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-
-		if (e_transform_enemy.has_value() && !path.path.empty())
+		for (const auto& other_entity : NIKE_ECS_MANAGER->getAllEntities())
 		{
-			//Get next cell
-			auto const& next_cell = path.path.front();
-			auto& e_transform = e_transform_enemy.value().get();
+			// Getting components from player and enemy entities
+			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
 
-			//Check if entity has arrived near destination
-			if ((next_cell.position - e_transform.position).length() > cell_offset) {
+			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+			auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+			if (e_enemy_transform.has_value() && e_player_game_logic.has_value() && e_player_transform.has_value() && e_enemy_dyna.has_value())
+			{
+				auto& enemy_dyna = e_enemy_dyna.value().get();
+				auto& player_transform = e_player_transform.value().get();
 
-				//Direction of next cell
-				float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+				// Get enemy position as starting cell
+				auto end = NIKE_MAP_SERVICE->getCellIndexFromCords(player_transform.position);
+				if (!end.has_value()) return;
 
-				//Apply force to entity
-				auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-				if (dynamics.has_value()) {
-					dynamics.value().get().force = { cos(dir) * enemy_speed, sin(dir) * enemy_speed };
-					// cout << "force added" << endl;
-				}
+				// Move the entity along the computed path
+				Enemy::moveAlongPath(entity, end.value().x, end.value().y, enemy_speed);
+			}
+
+
+			// Update animation based on movement direction
+			if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
+				float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
 
 				if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 					// Moving right
@@ -164,15 +166,13 @@ namespace NIKE {
 					// Moving up-right (diagonal)
 					animationStart(entity, 0, 2);
 					animationEnd(entity, 9, 2);
-					// No flip for up-right
-					flipX(entity, false);   
+					flipX(entity, false);
 					setLastDirection(entity, 1);
 				}
 				else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 					// Moving up
-					animationStart(entity, 0, 3);
-					animationEnd(entity, 9, 3);
-					// No flip for up
+					animationStart(entity, 0, 0);
+					animationEnd(entity, 9, 0);
 					flipX(entity, false);
 					setLastDirection(entity, 2);
 				}
@@ -180,7 +180,6 @@ namespace NIKE {
 					// Moving up-left (diagonal)
 					animationStart(entity, 0, 2);
 					animationEnd(entity, 9, 2);
-					// Flip for up-left
 					flipX(entity, true);
 					setLastDirection(entity, 3);
 				}
@@ -188,7 +187,6 @@ namespace NIKE {
 					// Moving down-right (diagonal)
 					animationStart(entity, 0, 1);
 					animationEnd(entity, 9, 1);
-					// No flip for down-right
 					flipX(entity, false);
 					setLastDirection(entity, 4);
 				}
@@ -196,7 +194,6 @@ namespace NIKE {
 					// Moving down
 					animationStart(entity, 0, 0);
 					animationEnd(entity, 9, 0);
-					// No flip for down
 					flipX(entity, false);
 					setLastDirection(entity, 5);
 				}
@@ -215,20 +212,10 @@ namespace NIKE {
 					setLastDirection(entity, 7);
 				}
 			}
-			else {
-				// cout << "force added, path popped front" << endl;
-				path.path.pop_front();
-			}
+
 		}
-
-		else {
-
-			//Marked path as finished
-			// cout << "force added, path finished" << endl;
-			path.b_finished = true;
-		}
-
 	}
+
 
 	void NIKE::State::ChaseState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
