@@ -260,7 +260,7 @@ namespace NIKE {
 		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 
 
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl_1.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1.scn"));
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
 #endif
@@ -406,7 +406,8 @@ namespace NIKE {
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-				throw e;
+				NIKEE_CORE_ERROR("Error caught: {}", e.what());
+				break;
 			}
 		}
 

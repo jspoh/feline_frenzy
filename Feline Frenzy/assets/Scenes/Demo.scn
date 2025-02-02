@@ -1,6 +1,12 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
@@ -88,15 +94,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 324,
+                                "Completed_Animations": 325,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Timer": 0.23333333432674408
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -125,8 +131,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -163,15 +169,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 324,
+                                "Completed_Animations": 325,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Timer": 0.23333333432674408
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -200,8 +206,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -238,15 +244,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 324,
+                                "Completed_Animations": 325,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Timer": 0.23333333432674408
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -275,8 +281,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -313,15 +319,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 324,
+                                "Completed_Animations": 325,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Timer": 0.23333333432674408
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -350,8 +356,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -712,7 +718,7 @@
                         "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0014",
+                            "Entity_ID": "entity_0010",
                             "Prefab_ID": ""
                         }
                     }
@@ -746,7 +752,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -64.0,
+                                    "x": 320.0,
                                     "y": 576.0
                                 },
                                 "Rotation": 0.0,
@@ -760,7 +766,7 @@
                         "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0015",
+                            "Entity_ID": "entity_0011",
                             "Prefab_ID": ""
                         }
                     }
@@ -808,7 +814,7 @@
                         "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0016",
+                            "Entity_ID": "entity_0012",
                             "Prefab_ID": ""
                         }
                     }
@@ -856,7 +862,295 @@
                         "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
+                            "Entity_ID": "entity_0013",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Pavement_1.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 64.0,
+                                    "y": 704.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0014",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Pavement_1.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -192.0,
+                                    "y": 448.0
+                                },
+                                "Rotation": 270.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0015",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Pavement_1.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -448.0,
+                                    "y": 448.0
+                                },
+                                "Rotation": 270.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0016",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Pavement_1.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -704.0,
+                                    "y": 448.0
+                                },
+                                "Rotation": 270.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
                             "Entity_ID": "entity_0017",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Pavement_1.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -929.4561157226563,
+                                    "y": 448.0
+                                },
+                                "Rotation": 270.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0018",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Pavement_Corner.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 64.0,
+                                    "y": 448.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 0,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0019",
                             "Prefab_ID": ""
                         }
                     }
@@ -1054,14 +1348,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 2,
+                                "Completed_Animations": 3,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.03333333507180214
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -1090,7 +1384,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 640
+                                    "entity": 41
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -1101,8 +1395,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 66.92552947998047,
-                                    "y": -68.42076873779297
+                                    "x": 64.0,
+                                    "y": -64.0
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -1126,10 +1420,10 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": 66.92552947998047,
-                                    "y": -68.42076873779297
+                                    "x": 64.0,
+                                    "y": -64.0
                                 },
-                                "Zoom": 1.227560043334961
+                                "Zoom": 1.0948237180709839
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1167,8 +1461,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 66.92552947998047,
-                                    "y": -68.42076873779297
+                                    "x": 64.0,
+                                    "y": -64.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1193,14 +1487,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
+                                "Completed_Animations": 2,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.05000000447034836
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 4,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -1243,8 +1537,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -959.9998779296875,
-                                    "y": 492.33111572265625
+                                    "x": -960.0,
+                                    "y": 667.3328857421875
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -1256,13 +1550,13 @@
                             "Physics::Dynamics": {
                                 "Drag": 0.0,
                                 "Force": {
-                                    "x": -0.0026663157623261213,
+                                    "x": -4.371138857095502e-05,
                                     "y": -1000.0
                                 },
                                 "Mass": 9.999999747378752e-05,
                                 "Max_Speed": 100.0,
                                 "Velocity": {
-                                    "x": -0.00026662443997338414,
+                                    "x": -4.371139311842853e-06,
                                     "y": -100.0
                                 }
                             },
@@ -1280,7 +1574,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -1296,7 +1590,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -960.0,
-                                    "y": 704.0
+                                    "y": 667.3328857421875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1357,8 +1651,8 @@
                             "Physics::Dynamics": {
                                 "Drag": 0.0,
                                 "Force": {
-                                    "x": -922.4813842773438,
-                                    "y": -386.0416259765625
+                                    "x": 213.23443603515625,
+                                    "y": -977.0010986328125
                                 },
                                 "Mass": 9.999999747378752e-05,
                                 "Max_Speed": 0.0,
@@ -1370,7 +1664,7 @@
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": true,
+                                    "x": false,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -1820,6 +2114,54 @@
                             "Prefab_ID": ""
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Gate_front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 64.0,
+                                    "y": 832.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0020",
+                            "Prefab_ID": ""
+                        }
+                    }
                 }
             ],
             "ID": 1,
@@ -1890,7 +2232,7 @@
                         "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0010",
+                            "Entity_ID": "entity_0021",
                             "Prefab_ID": ""
                         }
                     }
@@ -1955,7 +2297,7 @@
                         "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0011",
+                            "Entity_ID": "entity_0022",
                             "Prefab_ID": ""
                         }
                     }
@@ -1971,7 +2313,7 @@
                                 },
                                 "Position": {
                                     "x": -448.0,
-                                    "y": 96.0
+                                    "y": 224.0
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -2020,7 +2362,7 @@
                         "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0012",
+                            "Entity_ID": "entity_0023",
                             "Prefab_ID": ""
                         }
                     }
@@ -2036,7 +2378,7 @@
                                 },
                                 "Position": {
                                     "x": 448.0,
-                                    "y": 96.0
+                                    "y": 224.0
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -2085,7 +2427,120 @@
                         "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
-                            "Entity_ID": "entity_0013",
+                            "Entity_ID": "entity_0024",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": false,
+                                "Pos_Offset": {
+                                    "x": 8.5,
+                                    "y": -100.0
+                                },
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 160.0,
+                                    "y": 32.0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Barrel.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -448.0,
+                                    "y": 704.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 2,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0025",
+                            "Prefab_ID": ""
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Gate_side.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -1060.232666015625,
+                                    "y": 448.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "Layer ID": 2,
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Entity_ID": "entity_0026",
                             "Prefab_ID": ""
                         }
                     }
