@@ -229,7 +229,7 @@ namespace NIKE {
 
 #ifndef NDEBUG
 		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init(json_config);
+		NIKE_LVLEDITOR_SERVICE->init();
 #endif
 
 		// Init FSM
@@ -240,6 +240,10 @@ namespace NIKE {
 
 		//Register Def Managers
 		registerDefSystems();
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->deserializeConfig(json_config);
+#endif
 
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
