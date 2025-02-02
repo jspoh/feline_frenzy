@@ -38,6 +38,48 @@ namespace NIKE {
 				comp.mass = data.value("Mass", EPSILON);
 				comp.velocity.fromJson(data.value("Velocity", Vector2f::def_json));
 				comp.force.fromJson(data.value("Force", Vector2f::def_json));
+			},
+
+			// Override Serialize
+			[](Physics::Dynamics const& comp, Physics::Dynamics const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.max_speed != other_comp.max_speed) {
+					delta["Max_Speed"] = comp.max_speed;
+				}
+				if (comp.drag != other_comp.drag) {
+					delta["Drag"] = comp.drag;
+				}
+				if (comp.mass != other_comp.mass) {
+					delta["Mass"] = comp.mass;
+				}
+				if (comp.velocity != other_comp.velocity) {
+					delta["Velocity"] = comp.velocity.toJson();
+				}
+				if (comp.force != other_comp.force) {
+					delta["Force"] = comp.force.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Physics::Dynamics& comp, nlohmann::json const& delta) {
+				if (delta.contains("Max_Speed")) {
+					comp.max_speed = delta["Max_Speed"];
+				}
+				if (delta.contains("Drag")) {
+					comp.drag = delta["Drag"];
+				}
+				if (delta.contains("Mass")) {
+					comp.mass = delta["Mass"];
+				}
+				if (delta.contains("Velocity")) {
+					comp.velocity.fromJson(delta["Velocity"]);
+				}
+				if (delta.contains("Force")) {
+					comp.force.fromJson(delta["Force"]);
+				}
 			}
 		);
 
@@ -210,6 +252,8 @@ namespace NIKE {
 				ImGui::Text("Last Direction %d", comp.last_direction);
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Dynamics>();
 #endif
 
 		//Register Collider for serializarion
@@ -234,6 +278,54 @@ namespace NIKE {
 				comp.transform.rotation = data.value("Rotation", 0.0f);
 				comp.pos_offset.fromJson(data.value("Pos_Offset", Vector2f::def_json));
 				comp.resolution = data.value("Resolution", Resolution::NONE);
+			},
+
+			// Override Serialize
+			[](Physics::Collider const& comp, Physics::Collider const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.b_bind_to_entity != other_comp.b_bind_to_entity) {
+					delta["B_Bind_To_Entity"] = comp.b_bind_to_entity;
+				}
+				if (comp.transform.position != other_comp.transform.position) {
+					delta["Position"] = comp.transform.position.toJson();
+				}
+				if (comp.transform.scale != other_comp.transform.scale) {
+					delta["Scale"] = comp.transform.scale.toJson();
+				}
+				if (comp.transform.rotation != other_comp.transform.rotation) {
+					delta["Rotation"] = comp.transform.rotation;
+				}
+				if (comp.pos_offset != other_comp.pos_offset) {
+					delta["Pos_Offset"] = comp.pos_offset.toJson();
+				}
+				if (comp.resolution != other_comp.resolution) {
+					delta["Resolution"] = static_cast<int>(comp.resolution);
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Physics::Collider& comp, nlohmann::json const& delta) {
+				if (delta.contains("B_Bind_To_Entity")) {
+					comp.b_bind_to_entity = delta["B_Bind_To_Entity"];
+				}
+				if (delta.contains("Position")) {
+					comp.transform.position.fromJson(delta["Position"]);
+				}
+				if (delta.contains("Scale")) {
+					comp.transform.scale.fromJson(delta["Scale"]);
+				}
+				if (delta.contains("Rotation")) {
+					comp.transform.rotation = delta["Rotation"];
+				}
+				if (delta.contains("Pos_Offset")) {
+					comp.pos_offset.fromJson(delta["Pos_Offset"]);
+				}
+				if (delta.contains("Resolution")) {
+					comp.resolution = static_cast<Resolution>(delta["Resolution"]);
+				}
 			}
 		);
 
@@ -415,6 +507,8 @@ namespace NIKE {
 					}
 				}
 			});
+
+			NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Collider>();
 #endif
 	}
 }

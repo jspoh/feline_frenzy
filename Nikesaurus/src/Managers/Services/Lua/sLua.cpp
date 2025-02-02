@@ -32,6 +32,38 @@ namespace NIKE {
         }
     }
 
+    nlohmann::json Lua::Script::overrideSerialize(Script const& other_script) const {
+        nlohmann::json delta;
+
+        if (script_id != other_script.script_id) {
+            delta["Script_ID"] = script_id;
+        }
+        if (function != other_script.function) {
+            delta["Function"] = function;
+        }
+        if (named_args != other_script.named_args) {
+            delta["Named_Args"] = named_args;
+        }
+
+        return delta;
+    }
+
+    void Lua::Script::overrideDeserialize(nlohmann::json const& data) {
+        if (data.contains("Script_ID")) {
+            script_id = data["Script_ID"];
+        }
+
+        if (data.contains("Function")) {
+            script_id = data["Function"];
+        }
+
+        if (data.contains("Named_Args")) {
+            for (const auto& [key, value] : data.at("Named_Args").items()) {
+                named_args[key] = value.get<LuaValue>();
+            }
+        }
+    }
+
     std::shared_ptr<sol::load_result> Lua::Service::getLuaAssset(std::string const& script_id) const {
         //Get script table from asset service
        return NIKE_ASSETS_SERVICE->getAsset<sol::load_result>(script_id);

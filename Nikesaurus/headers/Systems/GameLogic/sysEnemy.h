@@ -16,7 +16,6 @@
 #include "Components/cPhysics.h"
 #include "Components/cEnemy.h"
 #include "Managers/Services/Lua/sLua.h"
-#include "Components/cPathfinding.h"
 
 namespace NIKE {
 	namespace Enemy {
@@ -51,14 +50,6 @@ namespace NIKE {
 
 			// Shoot bullet
 			void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
-
-			// Standard enemy moving function
-			void moveAlongPath(Pathfinding::Path& path, Transform::Transform& transform);
-
-			// Standard enemy moving function
-			void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
-
-			bool hasTargetMoved(const Vector2f& target_pos, const Pathfinding::Path& path) const;
 
 		public:
 			//Default Constructor

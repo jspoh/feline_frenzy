@@ -43,6 +43,60 @@ namespace NIKE {
 				comp.b_reverse = data.value("B_Reverse", false);
 				comp.frame_duration = data.value("Frame_Duration", 0.0f);
 				comp.timer = data.value("Timer", 0.0f);
+			},
+
+			// Override Serialize
+			[](Animation::Base const& comp, Animation::Base const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.animation_mode != other_comp.animation_mode) {
+					delta["Mode"] = static_cast<int>(comp.animation_mode);
+				}
+				if (comp.animations_to_complete != other_comp.animations_to_complete) {
+					delta["Animation_Count"] = comp.animations_to_complete;
+				}
+				if (comp.completed_animations != other_comp.completed_animations) {
+					delta["Completed_Animations"] = comp.completed_animations;
+				}
+				if (comp.b_pingpong != other_comp.b_pingpong) {
+					delta["B_PingPong"] = comp.b_pingpong;
+				}
+				if (comp.b_reverse != other_comp.b_reverse) {
+					delta["B_Reverse"] = comp.b_reverse;
+				}
+				if (comp.frame_duration != other_comp.frame_duration) {
+					delta["Frame_Duration"] = comp.frame_duration;
+				}
+				if (comp.timer != other_comp.timer) {
+					delta["Timer"] = comp.timer;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Animation::Base& comp, nlohmann::json const& delta) {
+				if (delta.contains("Mode")) {
+					comp.animation_mode = static_cast<Mode>(delta["Mode"]);
+				}
+				if (delta.contains("Animation_Count")) {
+					comp.animations_to_complete = delta["Animation_Count"];
+				}
+				if (delta.contains("Completed_Animations")) {
+					comp.completed_animations = delta["Completed_Animations"];
+				}
+				if (delta.contains("B_PingPong")) {
+					comp.b_pingpong = delta["B_PingPong"];
+				}
+				if (delta.contains("B_Reverse")) {
+					comp.b_reverse = delta["B_Reverse"];
+				}
+				if (delta.contains("Frame_Duration")) {
+					comp.frame_duration = delta["Frame_Duration"];
+				}
+				if (delta.contains("Timer")) {
+					comp.timer = delta["Timer"];
+				}
 			}
 		);
 
@@ -185,6 +239,9 @@ namespace NIKE {
 				}
 			}
 		);
+
+		//Animation Base Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Animation::Base>();
 #endif
 
 		//Register Sprite For Serialization
@@ -205,6 +262,42 @@ namespace NIKE {
 				comp.start_index.fromJson(data.value("Start_Index", Vector2f::def_json));
 				comp.end_index.fromJson(data.value("End_Index", Vector2f::def_json));
 				comp.curr_index.fromJson(data.value("Curr_Index", Vector2f::def_json));
+			}, 
+
+			// Override Serialize
+			[](Animation::Sprite const& comp, Animation::Sprite const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.sheet_size != other_comp.sheet_size) {
+					delta["Sheet_Size"] = comp.sheet_size.toJson();
+				}
+				if (comp.start_index != other_comp.start_index) {
+					delta["Start_Index"] = comp.start_index.toJson();
+				}
+				if (comp.end_index != other_comp.end_index) {
+					delta["End_Index"] = comp.end_index.toJson();
+				}
+				if (comp.curr_index != other_comp.curr_index) {
+					delta["Curr_Index"] = comp.curr_index.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Animation::Sprite& comp, nlohmann::json const& delta) {
+				if (delta.contains("Sheet_Size")) {
+					comp.sheet_size.fromJson(delta["Sheet_Size"]);
+				}
+				if (delta.contains("Start_Index")) {
+					comp.start_index.fromJson(delta["Start_Index"]);
+				}
+				if (delta.contains("End_Index")) {
+					comp.end_index.fromJson(delta["End_Index"]);
+				}
+				if (delta.contains("Curr_Index")) {
+					comp.curr_index.fromJson(delta["Curr_Index"]);
+				}
 			}
 		);
 
@@ -282,6 +375,9 @@ namespace NIKE {
 				ImGui::BulletText("Y = %d", comp.curr_index.y);
 			}
 		);
+
+		//Animation Sprite Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Animation::Sprite>();
 #endif
 	}
 }

@@ -53,11 +53,9 @@
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
     <ClCompile Include="src\Components\cState.cpp" />
-    <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
     <ClCompile Include="src\Components\cPhysics.cpp" />
     <ClCompile Include="src\Components\cRender.cpp" />
-    <ClCompile Include="src\Components\cShooting.cpp" />
     <ClCompile Include="src\Components\cTransform.cpp" />
     <ClCompile Include="src\Data\db.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
@@ -144,11 +142,9 @@
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
     <ClInclude Include="headers\Components\cState.h" />
-    <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Components\cPhysics.h" />
     <ClInclude Include="headers\Components\cAnimation.h" />
-    <ClInclude Include="headers\Components\cShooting.h" />
     <ClInclude Include="headers\Core\Core.h" />
     <ClInclude Include="headers\Managers\ECS\mCoordinator.h" />
     <ClInclude Include="headers\Managers\Services\Assets\sAssets.h" />

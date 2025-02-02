@@ -38,6 +38,16 @@ namespace NIKE {
 			//Deserialize
 			[](GameLogic::ILogic& comp, nlohmann::json const& data) {
 				ScriptDeserialize(comp, data);
+			},
+
+			// Override Serialize
+			[](GameLogic::ILogic const& comp, GameLogic::ILogic const& other_comp) -> nlohmann::json {
+				return comp.script.overrideSerialize(other_comp.script);
+			},
+
+			// Override Deserialize
+			[](GameLogic::ILogic& comp, nlohmann::json const& delta) {
+				comp.script.overrideDeserialize(delta);
 			}
 		);
 
@@ -241,6 +251,8 @@ namespace NIKE {
 				}
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<GameLogic::ILogic>();
 #endif
 	}
 }

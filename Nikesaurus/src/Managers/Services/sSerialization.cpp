@@ -22,6 +22,14 @@ namespace NIKE {
 		return deserializers.at(comp_name)(comp, data);
 	}
 
+	nlohmann::json Serialization::CompSerializer::serializeOverrideComponent(std::string const& comp_name, const void* comp, const void* other_comp) const {
+		return override_serializers.at(comp_name)(comp, other_comp);
+	}
+
+	void Serialization::CompSerializer::deserializeOverrideComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const {
+		return override_deserializers.at(comp_name)(comp, data);
+	}
+
 	/*****************************************************************//**
 	* Serialization Services
 	*********************************************************************/
@@ -119,6 +127,82 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
 	}
 
+	nlohmann::json Serialization::Service::serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id) {
+
+		//Create new data
+		nlohmann::json data;
+
+		////Iterate through all comp
+		//for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+		//	data["Components"][comp.first] = comp_registry->serializeOverrideComponent(comp.first, comp.second.get());
+		//}
+
+		return data;
+	}
+
+	void Serialization::Service::deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data) {
+
+	}
+
+	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path) {
+
+		//Create new data
+		nlohmann::json data;
+
+		//Iterate through all comp
+		for (auto const& comp : comps) {
+			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
+		}
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::out);
+
+		//Store data
+		file << data.dump(4);
+
+		//Close file
+		file.close();
+	}
+
+	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>& comp_funcs, std::string const& file_path) {
+
+		//Json Data
+		nlohmann::json data;
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::in);
+
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
+		//Read data from file
+		file >> data;
+
+		//Return if there is no data
+		if (data.empty())
+			return;
+
+		//If there are no components
+		if (!data.contains("Components"))
+			return;
+
+		//Iterate through all components stored within data
+		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+
+			//Check for comp functions validity
+			if (comp_funcs.find(comp_name) != comp_funcs.end()) {
+				comps[comp_name] = comp_funcs[comp_name]();
+
+				//Deserialize data into component
+				comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
+			}
+		}
+
+		//Close file
+		file.close();
+	}
+
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
 		//Json Data
 		nlohmann::json data = serializeEntity(entity);
@@ -158,6 +242,49 @@ namespace NIKE {
 		file.close();
 	}
 
+	void Serialization::Service::loadEntityFromPrefab(Entity::Type entity, std::string const& prefab_id) {
+		//Json Data
+		nlohmann::json data;
+
+		//Get file path
+		auto file_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_id);
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::in);
+
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
+		//Read data from file
+		file >> data;
+
+		//Return if there is no data
+		if (data.empty())
+			return;
+
+		//If there are no components
+		if (!data.contains("Components"))
+			return;
+
+		//Iterate through all components stored within data
+		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+
+			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+			//Check if component is already present, if not add component
+			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+			}
+
+			//Deserialize data into component
+			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+		}
+
+		//Close file
+		file.close();
+	}
+
 	/*****************************************************************//**
 	* Scenes
 	*********************************************************************/
@@ -181,7 +308,7 @@ namespace NIKE {
 
 		// Check if the "Grids" folder contains the .grid file
 		//if (std::filesystem::exists(grid_path)) {
-			// Add grid ID data only if the file exists
+		// Add grid ID data only if the file exists
 		nlohmann::json m_data;
 		m_data["Grid ID"] = grid_id;
 		data.push_back(m_data);
@@ -236,13 +363,20 @@ namespace NIKE {
 				nlohmann::json e_data;
 
 				//Serialize entity
-				e_data["Entity"] = serializeEntity(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
 				//Serialize entity meta data
 				auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
 				if (meta_data.has_value()) {
 					e_data["Entity"]["MetaData"] = meta_data.value().serialize();
+
+					//Check if empty
+					if (!meta_data.value().prefab_id.empty()) {
+						e_data["Entity"]["Overrides"] = serializePrefabOverrides(entity, meta_data.value().prefab_id);
+					}
+					else {
+						e_data["Entity"] = serializeEntity(entity);
+					}
 				}
 
 				//If entity is a UI Entity
@@ -336,12 +470,22 @@ namespace NIKE {
 
 						//Deserialize all entities
 						Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").value("Layer ID", 0));
-						deserializeEntity(entity, e_data.at("Entity"));
 
 						//Deserialize entity metadata
 						auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
 						if (meta_data.has_value()) {
 							meta_data.value().deserialize(e_data);
+
+							//Check if prefab id is present
+							if (!meta_data.value().prefab_id.empty()) {
+								loadEntityFromPrefab(entity, meta_data.value().prefab_id);
+
+								//Apply overrides
+								deserializePrefabOverrides(entity, e_data);
+							}
+							else {
+								deserializeEntity(entity, e_data.at("Entity"));
+							}
 						}
 
 						//Check if entity is a UI entity

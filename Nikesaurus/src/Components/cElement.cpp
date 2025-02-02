@@ -29,6 +29,24 @@ namespace NIKE {
 			// Deserialize
 			[](Entity& comp, nlohmann::json const& data) {
 				comp.element = data.value("Element", Elements::NONE);
+			},
+
+			// Override Serialize
+			[](Entity const& comp, Entity const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.element != other_comp.element) {
+					delta["Element"] = comp.element;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Entity& comp, nlohmann::json const& delta) {
+				if (delta.contains("Element")) {
+					comp.element = delta["Element"];
+				}
 			}
 		);
 
@@ -71,6 +89,9 @@ namespace NIKE {
 				}
 			}
 		);
+
+		//Entity Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Entity>();
 #endif
 
 		// Register for Source serialization
@@ -85,6 +106,24 @@ namespace NIKE {
 			// Deserialize
 			[](Source& comp, nlohmann::json const& data) {
 				comp.element = data.value("Element", Elements::NONE);
+			},
+
+			// Override Serialize
+			[](Source const& comp, Source const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.element != other_comp.element) {
+					delta["Element"] = comp.element;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Source& comp, nlohmann::json const& delta) {
+				if (delta.contains("Element")) {
+					comp.element = delta["Element"];
+				}
 			}
 		);
 		
@@ -127,6 +166,8 @@ namespace NIKE {
 				}
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Source>();
 #endif
 	}
 }

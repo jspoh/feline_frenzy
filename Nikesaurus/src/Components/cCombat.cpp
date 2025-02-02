@@ -32,6 +32,36 @@ namespace NIKE {
 				comp.lives = data.value("Lives", 1);
 				comp.health = data.value("Health", 100.0f);
 				comp.invulnerableFlag = data.value("InvulnerableFlag", false);
+			},
+
+			// Override Serialize
+			[](Health const& comp, Health const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.lives != other_comp.lives) {
+					delta["Lives"] = comp.lives;
+				}
+				if (comp.health != other_comp.health) {
+					delta["Health"] = comp.health;
+				}
+				if (comp.invulnerableFlag != other_comp.invulnerableFlag) {
+					delta["InvulnerableFlag"] = comp.invulnerableFlag;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Health& comp, nlohmann::json const& delta) {
+				if (delta.contains("Lives")) {
+					comp.lives = delta["Lives"];
+				}
+				if (delta.contains("Health")) {
+					comp.health = delta["Health"];
+				}
+				if (delta.contains("InvulnerableFlag")) {
+					comp.invulnerableFlag = delta["InvulnerableFlag"];
+				}
 			}
 		);
 
@@ -124,6 +154,9 @@ namespace NIKE {
 				}
 			}
 		);
+
+		//Health Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Health>();
 #endif
 	
 		//Register damage components
@@ -141,6 +174,24 @@ namespace NIKE {
 			//Deserialize
 			[](Damage& comp, nlohmann::json const& data) {
 				comp.damage = data.value("Damage", 1.0f);
+			},
+
+			// Override Serialize
+			[](Damage const& comp, Damage const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.damage != other_comp.damage) {
+					delta["Damage"] = comp.damage;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize for Damage
+			[](Damage& comp, nlohmann::json const& delta) {
+				if (delta.contains("Damage")) {
+					comp.damage = delta["Damage"];
+				}
 			}
 		);
 
@@ -181,6 +232,9 @@ namespace NIKE {
 				}
 			}
 		);
+
+		//Damage Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Damage>();
 #endif
 	}
 }

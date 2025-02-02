@@ -33,6 +33,12 @@ namespace NIKE {
 
 			//Deserialize script comp
 			void deserialize(nlohmann::json const& data);
+
+			//Override Serialization
+			nlohmann::json overrideSerialize(Script const& other_script) const;
+
+			//Override Deserialize
+			void overrideDeserialize(nlohmann::json const& data);
 		};
 
 		//Lua Service

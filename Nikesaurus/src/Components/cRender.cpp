@@ -37,6 +37,30 @@ namespace NIKE {
 			[](Render::Cam& comp, nlohmann::json const& data) {
 				comp.position.fromJson(data.value("Position", Vector2f::def_json));
 				comp.zoom = data.value("Zoom", 1.0f);
+			},
+
+			// Override Serialize
+			[](Render::Cam const& comp, Render::Cam const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.position != other_comp.position) {
+					delta["Position"] = comp.position.toJson();
+				}
+				if (comp.zoom != other_comp.zoom) {
+					delta["Zoom"] = comp.zoom;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Cam& comp, nlohmann::json const& delta) {
+				if (delta.contains("Position")) {
+					comp.position.fromJson(delta["Position"]);
+				}
+				if (delta.contains("Zoom")) {
+					comp.zoom = delta["Zoom"];
+				}
 			}
 		);
 
@@ -78,6 +102,8 @@ namespace NIKE {
 				}
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Cam>();
 #endif
 
 		//Register text for serialization
@@ -102,6 +128,54 @@ namespace NIKE {
 				comp.scale = data.value("Scale", 1.0f);
 				comp.size.fromJson(data.value("Size", Vector2f::def_json));
 				comp.origin = data.value("Origin", TextOrigin::CENTER);
+			},
+
+			// Override Serialize
+			[](Render::Text const& comp, Render::Text const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.font_id != other_comp.font_id) {
+					delta["Font_ID"] = comp.font_id;
+				}
+				if (comp.text != other_comp.text) {
+					delta["Text"] = comp.text;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+				if (comp.scale != other_comp.scale) {
+					delta["Scale"] = comp.scale;
+				}
+				if (comp.size != other_comp.size) {
+					delta["Size"] = comp.size.toJson();
+				}
+				if (comp.origin != other_comp.origin) {
+					delta["Origin"] = static_cast<int>(comp.origin);
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Text& comp, nlohmann::json const& delta) {
+				if (delta.contains("Font_ID")) {
+					comp.font_id = delta["Font_ID"];
+				}
+				if (delta.contains("Text")) {
+					comp.text = delta["Text"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+				if (delta.contains("Scale")) {
+					comp.scale = delta["Scale"];
+				}
+				if (delta.contains("Size")) {
+					comp.size.fromJson(delta["Size"]);
+				}
+				if (delta.contains("Origin")) {
+					comp.origin = static_cast<TextOrigin>(delta["Origin"]);
+				}
 			}
 		);
 
@@ -315,6 +389,8 @@ namespace NIKE {
 				
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Text>();
 #endif
 
 		//Register shape for serialization
@@ -331,6 +407,30 @@ namespace NIKE {
 			[](Render::Shape& comp, nlohmann::json const& data) {
 				comp.model_id = data.value("Model_ID", "");
 				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+			},
+
+			// Override Serialize
+			[](Render::Shape const& comp, Render::Shape const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.model_id != other_comp.model_id) {
+					delta["Model_ID"] = comp.model_id;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Shape& comp, nlohmann::json const& delta) {
+				if (delta.contains("Model_ID")) {
+					comp.model_id = delta["Model_ID"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
 			}
 		);
 
@@ -431,8 +531,9 @@ namespace NIKE {
 
 				}
 			}
-				
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Shape>();
 #endif
 
 
@@ -462,6 +563,66 @@ namespace NIKE {
 				comp.intensity = data.value("Intensity", 0.5f);
 				comp.b_stretch = data.value("B_Stretch", false);
 				comp.b_flip.fromJson(data.value("B_Flip", Vector2b::def_json));
+			},
+
+			// Override Serialize
+			[](Render::Texture const& comp, Render::Texture const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.texture_id != other_comp.texture_id) {
+					delta["Texture_ID"] = comp.texture_id;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+				if (comp.frame_size != other_comp.frame_size) {
+					delta["Frame_Size"] = comp.frame_size.toJson();
+				}
+				if (comp.frame_index != other_comp.frame_index) {
+					delta["Frame_Index"] = comp.frame_index.toJson();
+				}
+				if (comp.b_blend != other_comp.b_blend) {
+					delta["B_Blend"] = comp.b_blend;
+				}
+				if (comp.intensity != other_comp.intensity) {
+					delta["Intensity"] = comp.intensity;
+				}
+				if (comp.b_stretch != other_comp.b_stretch) {
+					delta["B_Stretch"] = comp.b_stretch;
+				}
+				if (comp.b_flip != other_comp.b_flip) {
+					delta["B_Flip"] = comp.b_flip.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Texture& comp, nlohmann::json const& delta) {
+				if (delta.contains("Texture_ID")) {
+					comp.texture_id = delta["Texture_ID"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+				if (delta.contains("Frame_Size")) {
+					comp.frame_size.fromJson(delta["Frame_Size"]);
+				}
+				if (delta.contains("Frame_Index")) {
+					comp.frame_index.fromJson(delta["Frame_Index"]);
+				}
+				if (delta.contains("B_Blend")) {
+					comp.b_blend = delta["B_Blend"];
+				}
+				if (delta.contains("Intensity")) {
+					comp.intensity = delta["Intensity"];
+				}
+				if (delta.contains("B_Stretch")) {
+					comp.b_stretch = delta["B_Stretch"];
+				}
+				if (delta.contains("B_Flip")) {
+					comp.b_flip.fromJson(delta["B_Flip"]);
+				}
 			}
 		);
 
@@ -787,6 +948,8 @@ namespace NIKE {
 
 			}
 		);
+
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Texture>();
 #endif
 	}
 }

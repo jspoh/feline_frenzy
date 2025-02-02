@@ -41,7 +41,6 @@
     <ClCompile Include="src\Components\cRender.cpp" />
     <ClCompile Include="src\Components\cTransform.cpp" />
     <ClCompile Include="src\Managers\Services\sMap.cpp" />
-    <ClCompile Include="src\Components\cPathfinding.cpp" />
     <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLua.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
@@ -49,7 +48,6 @@
     <ClCompile Include="src\Managers\Services\LevelEditor\sLevelEditor.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp" />
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorPanels.cpp" />
-    <ClCompile Include="src\Components\cShooting.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
     <ClCompile Include="src\Managers\Services\sPath.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
@@ -115,13 +113,11 @@
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
     <ClInclude Include="headers\Managers\Services\sMap.h" />
-    <ClInclude Include="headers\Components\cPathfinding.h" />
     <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLua.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorEvents.h" />
-    <ClInclude Include="headers\Components\cShooting.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />

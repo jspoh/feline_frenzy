@@ -27,7 +27,7 @@ namespace NIKE {
 						{ "Channel_Group_ID", comp.channel_group_id },
 						{ "Volume", comp.volume },
 						{ "Pitch", comp.pitch }
-						};
+				};
 			},
 
 			//Deserialize
@@ -37,6 +37,48 @@ namespace NIKE {
 				comp.channel_group_id = data.value("Channel_Group_ID", "");
 				comp.volume = data.value("Volume", 1.0f);
 				comp.pitch = data.value("Pitch", 1.0f);
+			},
+
+			// Override Serialize
+			[](Audio::SFX const& comp, Audio::SFX const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.b_play_sfx != other_comp.b_play_sfx) {
+					delta["B_Play_SFX"] = comp.b_play_sfx;
+				}
+				if (comp.audio_id != other_comp.audio_id) {
+					delta["Audio_ID"] = comp.audio_id;
+				}
+				if (comp.channel_group_id != other_comp.channel_group_id) {
+					delta["Channel_Group_ID"] = comp.channel_group_id;
+				}
+				if (comp.volume != other_comp.volume) {
+					delta["Volume"] = comp.volume;
+				}
+				if (comp.pitch != other_comp.pitch) {
+					delta["Pitch"] = comp.pitch;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Audio::SFX& comp, nlohmann::json const& delta) {
+				if (delta.contains("B_Play_SFX")) {
+					comp.b_play_sfx = delta["B_Play_SFX"];
+				}
+				if (delta.contains("Audio_ID")) {
+					comp.audio_id = delta["Audio_ID"];
+				}
+				if (delta.contains("Channel_Group_ID")) {
+					comp.channel_group_id = delta["Channel_Group_ID"];
+				}
+				if (delta.contains("Volume")) {
+					comp.volume = delta["Volume"];
+				}
+				if (delta.contains("Pitch")) {
+					comp.pitch = delta["Pitch"];
+				}
 			}
 		);
 
@@ -228,9 +270,12 @@ namespace NIKE {
 						}
 					}
 				}
-				
+
 			}
 		);
+
+		//Audio Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Audio::SFX>();
 #endif
 	}
 }

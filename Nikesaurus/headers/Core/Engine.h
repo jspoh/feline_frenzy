@@ -36,7 +36,6 @@
 #include "Components/cPhysics.h"
 #include "Components/cAnimation.h"
 #include "Components/cGameLogic.h"
-#include "Components/cShooting.h"
 #include "Components/cDespawn.h"
 #include "Components/cElement.h"
 #include "Components/cEnemy.h"

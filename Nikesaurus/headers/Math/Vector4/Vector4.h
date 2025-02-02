@@ -41,6 +41,9 @@ namespace NIKE {
 			Vector4& operator*=(type rhs);
 			Vector4& operator/=(type rhs);
 
+			bool operator==(const Vector4& rhs) const;
+			bool operator!=(const Vector4& rhs) const;
+
 			type dot(const Vector4& rhs) const;
 			type lengthSq() const;
 			type length() const;

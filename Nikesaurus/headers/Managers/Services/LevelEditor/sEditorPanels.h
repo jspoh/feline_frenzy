@@ -409,16 +409,11 @@ namespace NIKE {
 		//Prefabs Management panel
 		class PrefabsPanel : public IPanel {
 		private:
-			//For prefab temp entity
-			Entity::Type prefab_display;
 
 			//Prefab ID
-			std::filesystem::path prefab_path;
+			std::string prefab_id;
 
-			//Boolean for checking if prefab editing is active
-			bool b_editing_prefab;
-
-			//Count of entities using the same prefab
+			//Prefab copy count
 			size_t copy_count;
 
 			//For comp management
@@ -427,14 +422,17 @@ namespace NIKE {
 			// Msg for pop up
 			std::shared_ptr<std::string> msg;
 
-			//Editing prefab components
-			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
-
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
 
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			//Comp adding functions
+			std::unordered_map<std::string, std::function<std::shared_ptr<void>()>> comp_funcs;
+
+			//Map to array of component type
+			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
 			//Add component popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
@@ -455,7 +453,7 @@ namespace NIKE {
 			void savePrefab();
 
 		public:
-			PrefabsPanel() : prefab_display{ UINT16_MAX }, b_editing_prefab{ false }, copy_count{ 0 } {}
+			PrefabsPanel() : copy_count{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name
@@ -483,14 +481,14 @@ namespace NIKE {
 			// For component stuff
 			void renderPrefabComponents();
 
-			// Utility functions for managing prefab entity
-			void createDisplayPrefab(const std::string& file_path);
+			template<typename T>
+			void registerPrefabComp() {
 
-			//Destroy display prefab
-			void destroyDisplayPrefab();
-
-			//Get prefab editing state
-			bool isPrefabEditing() const;
+				//Create a default component of type T adding function
+				comp_funcs[Utility::convertTypeString(typeid(T).name())] = []() -> std::shared_ptr<void> {
+					return std::make_shared<T>();
+					};
+			}
 		};
 
 		//Debug Management Panel

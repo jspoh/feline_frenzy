@@ -33,8 +33,27 @@ namespace NIKE {
 					// Assign pointer based on state_id
 					comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
 
-				}
+				},
 
+				// Override Serialize
+				[](State const& comp, State const& other_comp) -> nlohmann::json {
+					nlohmann::json delta;
+
+					if (comp.state_id != other_comp.state_id) {
+						delta["State"] = comp.state_id;
+					}
+
+					return delta;
+				},
+
+				// Override Deserialize
+				[](State& comp, nlohmann::json const& delta) {
+					if (delta.contains("State")) {
+						comp.state_id = delta["State"].get<std::string>();
+						// Reassign the current state based on the new state_id
+						comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
+					}
+				}
 			);
 
 
@@ -115,6 +134,8 @@ namespace NIKE {
 					}
 				}
 			);
+
+			NIKE_LVLEDITOR_SERVICE->registerPrefabComp<State>();
 		}
 #endif
 	}

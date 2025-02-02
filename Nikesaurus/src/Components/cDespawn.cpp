@@ -30,7 +30,32 @@ namespace NIKE {
 			[](Lifetime& comp, nlohmann::json const& data) {
 				comp.current_lifetime = data.value("CurrentLifetime", 0.0f);
 				comp.max_lifetime = data.value("MaxLifetime", 10.0f);
+			},
+
+			// Override Serialize
+			[](Lifetime const& comp, Lifetime const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.current_lifetime != other_comp.current_lifetime) {
+					delta["CurrentLifetime"] = comp.current_lifetime;
+				}
+				if (comp.max_lifetime != other_comp.max_lifetime) {
+					delta["MaxLifetime"] = comp.max_lifetime;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize for Lifetime
+			[](Lifetime& comp, nlohmann::json const& delta) {
+				if (delta.contains("CurrentLifetime")) {
+					comp.current_lifetime = delta["CurrentLifetime"];
+				}
+				if (delta.contains("MaxLifetime")) {
+					comp.max_lifetime = delta["MaxLifetime"];
+				}
 			}
+
 		);
 
 #ifndef NDEBUG
@@ -101,6 +126,9 @@ namespace NIKE {
 				}
 			}
 		);
+
+		//Lifetime Prefab Comp
+		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Lifetime>();
 #endif
 	}
 }
