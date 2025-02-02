@@ -294,6 +294,9 @@ namespace NIKE {
 			//Unlock all entities
 			void unlockAllEntities();
 
+			//Get lock status of entity
+			bool isEntityLocked(Entity::Type entity) const;
+
 			//Check entity changed
 			bool isEntityChanged() const;
 
