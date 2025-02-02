@@ -250,12 +250,13 @@ namespace NIKE {
 		//Toggle Level Editor On & Off ( Use Global NIKE input to toggle on and off )
 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
 			b_editor_active = !b_editor_active;
+			io.ClearEventsQueue(); // Clear all inputs done while editor is not active
 		}
 
 		//Return if editor is not active
 		if (!b_editor_active)
 			return;
-		
+
 		//Undo
 		static bool z_triggered = false;
 		if (io.KeyCtrl && io.KeysDown[ImGuiKey_Z]) {
@@ -377,10 +378,6 @@ namespace NIKE {
 
 		//Return when imgui is not active
 		if (!b_editor_active) {
-			io.WantCaptureKeyboard = false;
-			io.WantCaptureMouse = false;
-			io.WantCaptureMouseUnlessPopupClose = false;
-			io.WantSetMousePos = false;
 			return;
 		}
 

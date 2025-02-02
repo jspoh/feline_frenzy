@@ -602,7 +602,7 @@
                                     "x": 130.15054321289063,
                                     "y": 278.99456787109375
                                 },
-                                "Resolution": 0,
+                                "Resolution": 1,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 94.74921417236328,
@@ -647,7 +647,7 @@
                                 "Texture_ID": "Normal_Enemy_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -843,7 +843,7 @@
                                 "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -971,7 +971,7 @@
                                 "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1099,7 +1099,7 @@
                                 "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {

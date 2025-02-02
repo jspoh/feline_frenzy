@@ -1151,7 +1151,7 @@
                 }
             ],
             "ID": 0,
-            "Mask": 3
+            "Mask": 1
         }
     },
     {
@@ -1453,6 +1453,9 @@
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/createBullet.lua"
                             },
+                            "State::State": {
+                                "State": "Idle"
+                            },
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 64.0,
@@ -1579,7 +1582,7 @@
                                 "Texture_ID": "Normal_Enemy_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1680,7 +1683,7 @@
                                 "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1781,7 +1784,7 @@
                                 "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1882,7 +1885,7 @@
                                 "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -2159,7 +2162,7 @@
                 }
             ],
             "ID": 1,
-            "Mask": 3
+            "Mask": 6
         }
     },
     {
@@ -2541,7 +2544,7 @@
                 }
             ],
             "ID": 2,
-            "Mask": 8
+            "Mask": 2
         }
     },
     {

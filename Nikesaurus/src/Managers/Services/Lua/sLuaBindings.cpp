@@ -289,6 +289,7 @@ namespace NIKE {
     }
 
     void Lua::luaGameBinds(sol::state& lua_state) {
+
         //Apply force to entities
         lua_state.set_function("ApplyForce", [&](Entity::Type entity, float x, float y) {
             auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
@@ -335,6 +336,17 @@ namespace NIKE {
                         e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
                     }
                 }
+            }
+            });
+
+        //Get Last Direction (COMPONENT TO BE MOVED ELSE WHERE)
+        lua_state.set_function("AnimationCompleted", [&](Entity::Type entity) -> sol::optional<int> {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent < Animation::Base > (entity);
+            if (e_animate_comp.has_value()) {
+                return e_animate_comp.value().get().completed_animations;
+            }
+            else {
+                return sol::optional<int>();
             }
             });
 
@@ -393,6 +405,24 @@ namespace NIKE {
                 return sol::optional<int>();
             }
             });
+
+        lua_state.set_function("SetState", [&](Entity::Type entity, std::string state) {
+            auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
+            if (e_state_comp.has_value()) {
+                e_state_comp.value().get().state_id = state;
+            }
+            });
+
+        lua_state.set_function("State", [&](Entity::Type entity) -> sol::optional<std::string> {
+            auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
+            if (e_state_comp.has_value()) {
+                return e_state_comp.value().get().state_id;
+            }
+            else {
+                return sol::optional<std::string>();
+            }
+            });
+
         //Get SFX
         lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
             auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);

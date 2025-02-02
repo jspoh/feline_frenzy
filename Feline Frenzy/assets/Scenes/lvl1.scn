@@ -485,7 +485,7 @@
                                     "x": 31.615283966064453,
                                     "y": -224.44717407226563
                                 },
-                                "Zoom": 2.0740139484405518
+                                "Zoom": 1.941298007965088
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -520,6 +520,9 @@
                                 "ScriptID": "",
                                 "ScriptLoaded": false,
                                 "ScriptPath": "assets/Scripts/createBullet.lua"
+                            },
+                            "State::State": {
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
