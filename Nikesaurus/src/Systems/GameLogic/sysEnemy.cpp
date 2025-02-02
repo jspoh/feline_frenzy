@@ -165,7 +165,7 @@ namespace NIKE {
 		// Create entity for bullet
 		// Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
 		// I don't think this layer number actually matters, since it depends on the prefab layer
-		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(1);
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
 
 		// Load entity from prefab
 		if (e_element_comp.has_value()) {

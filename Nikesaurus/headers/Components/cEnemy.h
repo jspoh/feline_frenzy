@@ -42,10 +42,13 @@ namespace NIKE {
 		};
 
 		struct Spawner {
-			static int enemyLimit;		// Max amount of limit that can be spawned
-			static int enemiesSpawned;	// Number of enemies that have already been spawned (all spawners)
-			
-			Spawner() {};
+			static int enemy_limit;		// Max amount of limit that can be spawned
+			static int enemies_spawned;	// Number of enemies that have already been spawned (all spawners)
+			float cooldown;				// Cooldown time for spawning enemies
+			float last_spawn_time;		// Last time spawned
+
+			Spawner() : cooldown(0.f), last_spawn_time(cooldown) {};
+			Spawner(float const& cooldown, float const& last_spawn_time) : cooldown{ cooldown }, last_spawn_time{ last_spawn_time } {};
 		};
 
 		void registerComponents();

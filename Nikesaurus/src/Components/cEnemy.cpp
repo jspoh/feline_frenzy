@@ -12,8 +12,8 @@
 #include "Components/cEnemy.h"
 
 namespace NIKE {
-	int Enemy::Spawner::enemyLimit = 0;
-	int Enemy::Spawner::enemiesSpawned = 0;
+	int Enemy::Spawner::enemy_limit = 0;
+	int Enemy::Spawner::enemies_spawned = 0;
 
 	void Enemy::registerComponents() {
 		// Register attack components
@@ -191,5 +191,25 @@ namespace NIKE {
 			}
 		);
 #endif
+
+		// Register spawner for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Spawner>(
+			// Serialize
+			[](Spawner const& comp) -> nlohmann::json {
+				return {
+					{ "Cooldown", comp.cooldown },
+					{ "LastSpawnTime", comp.last_spawn_time }
+				};
+			},
+
+			// Deserialize
+			[](Spawner& comp, nlohmann::json const& data) {
+				comp.cooldown = data.at("Cooldown").get<float>();
+				comp.last_spawn_time = data.at("LastSpawnTime").get<float>();
+			}
+		);
+
+		// !TODO: Add UI Registration for Spawner component
+
 	}
 }

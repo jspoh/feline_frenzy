@@ -16,9 +16,11 @@ namespace NIKE {
 
 		NIKE_FSM_SERVICE->init();
 
+		//std::mt19937 gen(std::random_device{}());
+
 		// Initializing static variables for Spawner comp
-		NIKE::Enemy::Spawner::enemyLimit = 5;      // Set the max enemies allowed (adjust as needed)
-		NIKE::Enemy::Spawner::enemiesSpawned = 0;  // Reset the spawn count at game start
+		NIKE::Enemy::Spawner::enemy_limit = 5;      // Set the max enemies allowed (adjust as needed)
+		NIKE::Enemy::Spawner::enemies_spawned = 0;  // Reset the spawn count at game start
 	}
 
 	void GameLogic::Manager::update() {
@@ -57,7 +59,20 @@ namespace NIKE {
 				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 				if (e_spawner_comp.has_value()) {
 					auto& e_spawner = e_spawner_comp.value().get();
-
+					
+					if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
+						// !TODO: Add cooldown timer
+						// If shot on cooldown
+		//				if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
+		//					// Accumulate time since last shot
+		//					enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+		//				}
+		//				else {
+						spawnEnemy(entity);
+		//				// Reset last time spawned
+		//				enemy_comp.last_shot_time = 0.f;
+		//				}
+					}
 				}
 
 				//Check for health comp
@@ -76,24 +91,36 @@ namespace NIKE {
 				//}
 				// Update of FSM will be called here
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
-
-				// Destroy all entities that are marked for deletion
-				NIKE_ECS_MANAGER->destroyMarkedEntities();
 			}
 		}
+
+		// Destroy all entities that are marked for deletion
+		NIKE_ECS_MANAGER->destroyMarkedEntities();
 	}
 
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
 		// Get spawner position
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(spawner);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("spawnEnemy: SPAWNER missing Transform Component, enemy not spawned");
+			return;
+		}
+
 		const Vector2f& spawner_pos = e_transform_comp.value().get().position;
 
 		// Create enemy entity
-		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity(1);
+		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity(0);
 
 		// Load entity from prefab
-		//const std::string enemyArr[4] = { "" };
-		//NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, );
+		const std::string enemyArr[4] = { "enemy.prefab", "fireEnemy.prefab", "waterEnemy.prefab", "grassEnemy.prefab" };
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(enemyArr[getRandomNumber(0,3)]).string());
+
+		// Set Enemy Position
+		// !TODO: Randomly offset from spawner position
+		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy_entity);
+		if (enemy_transform_comp.has_value()) {
+			enemy_transform_comp.value().get().position = e_transform_comp.value().get().position;
+		}
 	}
 
 	//void GameLogic::Manager::spawnHealthBar(const Entity::Type& entity) {
