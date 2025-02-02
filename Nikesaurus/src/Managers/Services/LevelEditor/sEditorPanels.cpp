@@ -829,6 +829,9 @@ namespace NIKE {
 						//Skip entities not on curr layer
 						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
 							continue;
+						// Skip locked entities so they don't block clicks!
+						if (isEntityLocked(entity.first))
+							continue;
 
 						// Check for entity clicking
 						if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
@@ -1087,6 +1090,17 @@ namespace NIKE {
 		for (auto& entity : entities) {
 			entity.second.b_locked = false;
 		}
+	}
+
+	bool LevelEditor::EntitiesPanel::isEntityLocked(Entity::Type entity) const {
+		//Get selected entity data
+		auto it = entities.find(entity);
+
+		if (it == entities.end()) {
+			throw std::runtime_error("Entity does not exist!");
+		}
+
+		return entities.at(entity).b_locked;
 	}
 
 	bool LevelEditor::EntitiesPanel::isEntityChanged() const {

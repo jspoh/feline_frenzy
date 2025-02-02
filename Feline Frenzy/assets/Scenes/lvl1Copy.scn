@@ -12,7 +12,7 @@
         }
     },
     {
-        "Grid ID": "Demo.grid"
+        "Grid ID": "lvl1Copy.grid"
     },
     {
         "Camera": {
@@ -1151,7 +1151,7 @@
                 }
             ],
             "ID": 0,
-            "Mask": 1
+            "Mask": 3
         }
     },
     {
@@ -1541,19 +1541,6 @@
                                     "y": 127.99994659423828
                                 }
                             },
-                            "Physics::Dynamics": {
-                                "Drag": 0.0,
-                                "Force": {
-                                    "x": -4.371138857095502e-05,
-                                    "y": -1000.0
-                                },
-                                "Mass": 9.999999747378752e-05,
-                                "Max_Speed": 100.0,
-                                "Velocity": {
-                                    "x": -4.371139311842853e-06,
-                                    "y": -100.0
-                                }
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -1584,7 +1571,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -957.8150634765625,
-                                    "y": 710.74853515625
+                                    "y": 707.966796875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -2159,7 +2146,7 @@
                 }
             ],
             "ID": 1,
-            "Mask": 6
+            "Mask": 3
         }
     },
     {
@@ -2541,7 +2528,23 @@
                 }
             ],
             "ID": 2,
-            "Mask": 6
+            "Mask": 8
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
+            "ID": 3,
+            "Mask": 8
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
+            "ID": 4,
+            "Mask": 16
         }
     }
 ]
