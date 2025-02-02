@@ -64,7 +64,6 @@ namespace NIKE {
 					if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
 						// If spawn on not cooldown
 						if(e_spawner.last_spawn_time >= e_spawner.cooldown) {
-							NIKEE_CORE_ERROR("ATTEMPTING TO SPAWN ENEMY");
 							// Spawn enemy
 							spawnEnemy(entity);
 
@@ -113,14 +112,14 @@ namespace NIKE {
 		// Load entity from prefab
 		const std::string enemyArr[4] = { "enemy.prefab", "fireEnemy.prefab", "waterEnemy.prefab", "grassEnemy.prefab" };
 		std::string chosenEnemy = enemyArr[getRandomNumber(0, 3)];
-		NIKEE_CORE_ERROR("Attempting to spawn {}", chosenEnemy);
+
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosenEnemy).string());
 
 		// Set Enemy Position
 
 		// Randomly offset from spawner position
-		float offset_x = static_cast<float>(getRandomNumber(-10, 10));
-		float offset_y = static_cast<float>(getRandomNumber(-10, 10));
+		float offset_x = static_cast<float>(getRandomNumber(-20, 20));
+		float offset_y = static_cast<float>(getRandomNumber(-20, 20));
 
 		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy_entity);
 		if (enemy_transform_comp.has_value()) {
