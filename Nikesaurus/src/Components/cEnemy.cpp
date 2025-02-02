@@ -12,8 +12,8 @@
 #include "Components/cEnemy.h"
 
 namespace NIKE {
-	int Enemy::Spawner::enemy_limit = 0;
-	int Enemy::Spawner::enemies_spawned = 0;
+	//int Enemy::Spawner::enemy_limit = 0;
+	//int Enemy::Spawner::enemies_spawned = 0;
 
 	void Enemy::registerComponents() {
 		// Register attack components
@@ -197,6 +197,8 @@ namespace NIKE {
 			// Serialize
 			[](Spawner const& comp) -> nlohmann::json {
 				return {
+					{ "EnemyLimit", comp.enemy_limit},
+					{ "EnemiesSpawned", comp.enemies_spawned},
 					{ "Cooldown", comp.cooldown },
 					{ "LastSpawnTime", comp.last_spawn_time }
 				};
@@ -204,12 +206,115 @@ namespace NIKE {
 
 			// Deserialize
 			[](Spawner& comp, nlohmann::json const& data) {
+				comp.enemy_limit = data.at("EnemyLimit").get<int>();
+				comp.enemies_spawned = data.at("EnemiesSpawned").get<int>();
 				comp.cooldown = data.at("Cooldown").get<float>();
 				comp.last_spawn_time = data.at("LastSpawnTime").get<float>();
 			}
 		);
 
 		// !TODO: Add UI Registration for Spawner component
+#ifndef NDEBUG
+// Level Editor UI registration
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Spawner>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Spawner& comp) {
 
+				ImGui::Text("Edit Spawner Variables:");
+
+				// For Enemy Limit
+				{
+					static int before_change_limit;
+
+					ImGui::DragInt("Enemy Limit", &comp.enemy_limit, 1);
+
+					// Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_limit = comp.enemy_limit;
+					}
+
+					// Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_limit;
+
+						// Change do action
+						change_limit.do_action = [&, enemy_limit = comp.enemy_limit]() {
+							comp.enemy_limit = enemy_limit;
+							};
+
+						// Change undo action
+						change_limit.undo_action = [&, enemy_limit = before_change_limit]() {
+							comp.enemy_limit = enemy_limit;
+							};
+
+						// Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_limit));
+					}
+				}
+
+				// For Enemies Spawned
+				{
+					static int before_change_spawned;
+
+					ImGui::DragInt("Enemies Spawned", &comp.enemies_spawned, 1);
+
+					// Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_spawned = comp.enemies_spawned;
+					}
+
+					// Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_spawned;
+
+						// Change do action
+						change_spawned.do_action = [&, enemies_spawned = comp.enemies_spawned]() {
+							comp.enemies_spawned = enemies_spawned;
+							};
+
+						// Change undo action
+						change_spawned.undo_action = [&, enemies_spawned = before_change_spawned]() {
+							comp.enemies_spawned = enemies_spawned;
+							};
+
+						// Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_spawned));
+					}
+				}
+
+				// Spawning Cooldopwn
+				{
+					static float before_change_spawn_cooldown;
+
+					ImGui::DragFloat("Spawn Cooldown", &comp.cooldown, 0.1f);
+
+					// Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_spawn_cooldown = comp.cooldown;
+					}
+
+					// Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_spawn_cooldown;
+
+						// Change do action
+						change_spawn_cooldown.do_action = [&, cooldown = comp.cooldown]() {
+							comp.cooldown = cooldown;
+							};
+
+						// Change undo action
+						change_spawn_cooldown.undo_action = [&, cooldown = before_change_spawn_cooldown]() {
+							comp.cooldown = cooldown;
+							};
+
+						// Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_spawn_cooldown));
+					}
+				}
+
+				// Last Spawn Time
+				ImGui::Text("Last Spawn Time: %f", comp.last_spawn_time);
+			}
+		);
+#endif
 	}
 }

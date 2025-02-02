@@ -146,6 +146,8 @@ namespace NIKE {
 
                 // Set player element to source element
                 player_element = source_element;
+
+                // !TODO: Play element change animation here
             }
         }
 

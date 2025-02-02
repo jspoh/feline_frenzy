@@ -15,12 +15,6 @@ namespace NIKE {
 	void GameLogic::Manager::init() {
 
 		NIKE_FSM_SERVICE->init();
-
-		//std::mt19937 gen(std::random_device{}());
-
-		// Initializing static variables for Spawner comp
-		NIKE::Enemy::Spawner::enemy_limit = 5;      // Set the max enemies allowed (adjust as needed)
-		NIKE::Enemy::Spawner::enemies_spawned = 0;  // Reset the spawn count at game start
 	}
 
 	void GameLogic::Manager::update() {
@@ -59,19 +53,23 @@ namespace NIKE {
 				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 				if (e_spawner_comp.has_value()) {
 					auto& e_spawner = e_spawner_comp.value().get();
+
+					// If spawn on cooldown
+					if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
+						// Accumulate time since last shot
+						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					}
 					
+					// If enemies spawned less than spawn limit
 					if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
-						// !TODO: Add cooldown timer
-						// If shot on cooldown
-		//				if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
-		//					// Accumulate time since last shot
-		//					enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-		//				}
-		//				else {
-						spawnEnemy(entity);
-		//				// Reset last time spawned
-		//				enemy_comp.last_shot_time = 0.f;
-		//				}
+						// If spawn on not cooldown
+						if(e_spawner.last_spawn_time >= e_spawner.cooldown) {
+							// Spawn enemy
+							spawnEnemy(entity);
+
+							// Reset last time spawned
+							e_spawner.last_spawn_time = 0.f;
+						}
 					}
 				}
 
@@ -116,11 +114,19 @@ namespace NIKE {
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(enemyArr[getRandomNumber(0,3)]).string());
 
 		// Set Enemy Position
-		// !TODO: Randomly offset from spawner position
+		
+		// Randomly offset from spawner position
+		float offset_x = getRandomNumber(-10, 10);
+		float offset_y = getRandomNumber(-10, 10);
+
 		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy_entity);
 		if (enemy_transform_comp.has_value()) {
-			enemy_transform_comp.value().get().position = e_transform_comp.value().get().position;
+			enemy_transform_comp.value().get().position = { spawner_pos.x + offset_x, spawner_pos.y + offset_y };
 		}
+
+		// Increment Enemies Spawned
+		++NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(spawner).value().get().enemies_spawned;
+		//++e_enemies_spawned;
 	}
 
 	//void GameLogic::Manager::spawnHealthBar(const Entity::Type& entity) {
