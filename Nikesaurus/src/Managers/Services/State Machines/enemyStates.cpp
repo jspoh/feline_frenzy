@@ -70,9 +70,11 @@ namespace NIKE {
 	{
 		// Check for attack comp
 		auto e_enemy_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(entity);
-		if (e_enemy_comp.has_value()) {
+		auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		if (e_enemy_comp.has_value() && e_enemy_dyna.has_value()) {
 
 			auto& enemy_comp = e_enemy_comp.value().get();
+			auto& dyna_comp = e_enemy_dyna.value().get();
 
 			// If shot on cooldown
 			if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
@@ -88,6 +90,9 @@ namespace NIKE {
 				if (e_player_comp.has_value()) {
 					// Check if player is within range & shot not on cooldown
 					if (enemy_comp.last_shot_time >= enemy_comp.cooldown) {
+						// Stop enemy when they shooting
+						dyna_comp.force = { 0,0 };
+						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
 

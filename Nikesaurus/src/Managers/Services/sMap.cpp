@@ -488,7 +488,7 @@ namespace NIKE {
 		}
 
 		// If not path found, return empty path obj
-		throw Path();
+		return Path();
 	}
 
 	bool Map::Service::checkPath(Entity::Type entity) const {
