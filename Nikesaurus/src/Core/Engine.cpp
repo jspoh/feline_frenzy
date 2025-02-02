@@ -257,8 +257,12 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1.scn"));
 
+
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl_1.scn"));
+#ifdef NDEBUG
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
+#endif
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 		//Entity::Type FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);

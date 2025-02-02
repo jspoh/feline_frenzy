@@ -4035,11 +4035,12 @@ namespace NIKE {
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
 		//Setup free cam to be referenced as default camera in camera system
-		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
+		free_cam = NIKE_CAMERA_SERVICE->getDefaultCamera();
 
 		combo_index = 0;
 		last_dispatched_index = 0;
 
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(UINT16_MAX, free_cam));
 	}
 
 	void LevelEditor::CameraPanel::update() {
