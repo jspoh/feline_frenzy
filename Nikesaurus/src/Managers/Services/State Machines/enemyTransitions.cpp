@@ -221,7 +221,7 @@ namespace NIKE {
 
 				// Transition happens when path is not empty
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
-				if (!path.path.empty()) {
+				if (!path.path.empty() && !Enemy::withinRange(entity, other_entity)) {
 					return true;
 				}
 			}

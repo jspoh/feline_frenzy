@@ -28,7 +28,7 @@ namespace NIKE {
 		void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
 
 		// Standard enemy moving function
-		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed);
+		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset);
 
 		// Standard enemy moving function
 		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);

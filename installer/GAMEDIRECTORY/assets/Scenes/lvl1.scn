@@ -410,14 +410,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
+                                "Completed_Animations": 0,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.05000000447034836
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 6,
                                     "y": 5
                                 },
                                 "End_Index": {
@@ -446,7 +446,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 13
+                                    "entity": 351
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -457,8 +457,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -126.40782928466797,
-                                    "y": 24.50568962097168
+                                    "x": 31.615283966064453,
+                                    "y": -224.44717407226563
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -476,21 +476,21 @@
                                 "Mass": 0.5,
                                 "Max_Speed": 3000.0,
                                 "Velocity": {
-                                    "x": -67.22806549072266,
-                                    "y": -154.2068328857422
+                                    "x": 136.49490356445313,
+                                    "y": -166.77285766601563
                                 }
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -126.40782928466797,
-                                    "y": 24.50568962097168
+                                    "x": 31.615283966064453,
+                                    "y": -224.44717407226563
                                 },
-                                "Zoom": 1.5393040180206299
+                                "Zoom": 2.0740139484405518
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": true,
+                                    "x": false,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -501,7 +501,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 6,
                                     "y": 5
                                 },
                                 "Frame_Size": {
@@ -523,8 +523,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -126.40782928466797,
-                                    "y": 24.50568962097168
+                                    "x": 31.615283966064453,
+                                    "y": -224.44717407226563
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -549,14 +549,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
+                                "Completed_Animations": 2,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.05000000447034836
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 8,
+                                    "x": 9,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -599,8 +599,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 131.26611328125,
-                                    "y": 360.10211181640625
+                                    "x": 130.15054321289063,
+                                    "y": 278.99456787109375
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -612,14 +612,14 @@
                             "Physics::Dynamics": {
                                 "Drag": 0.0,
                                 "Force": {
-                                    "x": -14.07044792175293,
-                                    "y": -999.9010009765625
+                                    "x": -14.241138458251953,
+                                    "y": -999.8986206054688
                                 },
                                 "Mass": 9.999999747378752e-05,
                                 "Max_Speed": 100.0,
                                 "Velocity": {
-                                    "x": -1.4070450067520142,
-                                    "y": -99.99010467529297
+                                    "x": -1.4241138696670532,
+                                    "y": -99.98986053466797
                                 }
                             },
                             "Render::Texture": {
@@ -636,7 +636,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 7,
+                                    "x": 9,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -647,12 +647,12 @@
                                 "Texture_ID": "Normal_Enemy_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Idle"
+                                "State": "Chase"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 131.26611328125,
-                                    "y": 357.32025146484375
+                                    "x": 130.15054321289063,
+                                    "y": 278.99456787109375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -745,23 +745,23 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 0,
+                                "Completed_Animations": 1,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.03333333507180214
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 9,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Start_Index": {
                                     "x": 0,
@@ -832,8 +832,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 4
+                                    "x": 1,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -843,7 +843,7 @@
                                 "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Idle"
+                                "State": "Chase"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -873,27 +873,27 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 0,
+                                "Completed_Animations": 1,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.03333333507180214
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 1,
+                                    "y": 1
                                 },
                                 "End_Index": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 9,
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 }
                             },
                             "Combat::Health": {
@@ -960,8 +960,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 4
+                                    "x": 1,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -971,7 +971,7 @@
                                 "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Idle"
+                                "State": "Chase"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1004,24 +1004,24 @@
                                 "Completed_Animations": 0,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.03333333507180214
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 7,
+                                    "y": 1
                                 },
                                 "End_Index": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 9,
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 }
                             },
                             "Combat::Health": {
@@ -1064,8 +1064,8 @@
                             "Physics::Dynamics": {
                                 "Drag": 0.0,
                                 "Force": {
-                                    "x": 61.591793060302734,
-                                    "y": 998.1014404296875
+                                    "x": -956.0094604492188,
+                                    "y": -293.3359069824219
                                 },
                                 "Mass": 9.999999747378752e-05,
                                 "Max_Speed": 0.0,
@@ -1077,7 +1077,7 @@
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": false,
+                                    "x": true,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -1088,8 +1088,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 4
+                                    "x": 7,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -1099,7 +1099,7 @@
                                 "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Idle"
+                                "State": "Chase"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1118,97 +1118,6 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Entity_ID": "GrassEnemy",
-                            "Prefab_ID": ""
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Audio::SFX": {
-                                "Audio_ID": "Pop1.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "BulletSFX",
-                                "Pitch": 1.0,
-                                "Volume": 0.5
-                            },
-                            "Combat::Damage": {
-                                "Damage": 10.0
-                            },
-                            "Element::Entity": {
-                                "Element": 0
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": 3.7515668869018555,
-                                    "y": 14.94143009185791
-                                },
-                                "Resolution": 3,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 49.99999237060547,
-                                    "y": 49.99999237060547
-                                }
-                            },
-                            "Physics::Dynamics": {
-                                "Drag": 0.0,
-                                "Force": {
-                                    "x": -0.3285485506057739,
-                                    "y": -0.9444870352745056
-                                },
-                                "Mass": 9.999999747378752e-05,
-                                "Max_Speed": 800.0,
-                                "Velocity": {
-                                    "x": -262.8388977050781,
-                                    "y": -755.5896606445313
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "NormalBullet_Player.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 3.7515668869018555,
-                                    "y": 14.94143009185791
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 49.99999237060547,
-                                    "y": 49.99999237060547
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "Layer ID": 1,
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Entity_ID": "entity_0000",
                             "Prefab_ID": ""
                         }
                     }

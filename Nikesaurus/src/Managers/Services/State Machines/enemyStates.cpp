@@ -139,7 +139,6 @@ namespace NIKE {
 			auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 			if (e_enemy_transform.has_value() && e_player_game_logic.has_value() && e_player_transform.has_value() && e_enemy_dyna.has_value())
 			{
-				auto& enemy_dyna = e_enemy_dyna.value().get();
 				auto& player_transform = e_player_transform.value().get();
 
 				// Get enemy position as starting cell
@@ -147,7 +146,7 @@ namespace NIKE {
 				if (!end.has_value()) return;
 
 				// Move the entity along the computed path
-				Enemy::moveAlongPath(entity, end.value().x, end.value().y, enemy_speed);
+				Enemy::moveAlongPath(entity, end.value().x, end.value().y, enemy_speed, cell_offset);
 			}
 
 

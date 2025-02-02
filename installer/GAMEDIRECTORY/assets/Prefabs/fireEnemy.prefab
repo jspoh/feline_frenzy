@@ -6,7 +6,7 @@
             "Lives": 1
         },
         "Element::Entity": {
-            "Element": 0
+            "Element": 1
         },
         "Enemy::Attack": {
             "Cooldown": 1.0,
@@ -33,8 +33,8 @@
             "Resolution": 0,
             "Rotation": 0.0,
             "Scale": {
-                "x": 94.74974060058594,
-                "y": 116.74520874023438
+                "x": 91.98487091064453,
+                "y": 118.93585968017578
             }
         },
         "Render::Texture": {
@@ -59,7 +59,7 @@
                 "y": 16
             },
             "Intensity": 0.0,
-            "Texture_ID": "Normal_Enemy_SpriteSheet.png"
+            "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
         },
         "State::State": {
             "State": "Idle"
@@ -71,8 +71,8 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 94.74974060058594,
-                "y": 116.74520874023438
+                "x": 91.98487091064453,
+                "y": 118.93585968017578
             },
             "Screen Position": false
         }

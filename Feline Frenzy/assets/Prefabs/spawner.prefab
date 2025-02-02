@@ -2,9 +2,9 @@
     "Components": {
         "Enemy::Spawner": {
             "Cooldown": 5.0,
-            "EnemiesSpawned": 0,
+            "EnemiesSpawned": 2,
             "EnemyLimit": 5,
-            "LastSpawnTime": 10.000019073486328
+            "LastSpawnTime": 1.7166657447814941
         },
         "Transform::Transform": {
             "Position": {
