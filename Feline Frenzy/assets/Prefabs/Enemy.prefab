@@ -3,16 +3,16 @@
         "Combat::Health": {
             "Health": 100.0,
             "InvulnerableFlag": false,
-            "Lives": 1,
+            "Lives": 1
         },
         "Element::Entity": {
-            "Element": 1
+            "Element": 0
         },
         "Enemy::Attack": {
-            "Cooldown": 10.0,
+            "Cooldown": 1.0,
             "Function": "enemyBullet",
-            "LastShotTime": 10.016666412353516,
-            "Layer": 0,
+            "LastShotTime": 0.43333348631858826,
+            "Layer": 1,
             "Offset": 100.0,
             "PrefabPath": "bullet.prefab",
             "Range": 10.0,
@@ -33,8 +33,8 @@
             "Resolution": 0,
             "Rotation": 0.0,
             "Scale": {
-                "x": 100.0,
-                "y": 112.28070831298828
+                "x": 94.74974060058594,
+                "y": 116.74520874023438
             }
         },
         "Render::Texture": {
@@ -52,14 +52,17 @@
             },
             "Frame_Index": {
                 "x": 0,
-                "y": 0
+                "y": 4
             },
             "Frame_Size": {
-                "x": 1,
-                "y": 1
+                "x": 10,
+                "y": 16
             },
             "Intensity": 0.0,
-            "Texture_ID": "Normal_Enemy_Idle_Front.png"
+            "Texture_ID": "Normal_Enemy_SpriteSheet.png"
+        },
+        "State::State": {
+            "State": "Idle"
         },
         "Transform::Transform": {
             "Position": {
@@ -68,10 +71,11 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 100.0,
-                "y": 112.28070831298828
-            }
+                "x": 94.74974060058594,
+                "y": 116.74520874023438
+            },
+            "Screen Position": false
         }
     },
-    "Layer ID": 0
+    "Layer ID": 1
 }

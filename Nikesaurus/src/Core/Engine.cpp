@@ -229,7 +229,7 @@ namespace NIKE {
 
 #ifndef NDEBUG
 		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init(json_config);
+		NIKE_LVLEDITOR_SERVICE->init();
 #endif
 
 		// Init FSM
@@ -240,6 +240,10 @@ namespace NIKE {
 
 		//Register Def Managers
 		registerDefSystems();
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->deserializeConfig(json_config);
+#endif
 
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
@@ -253,8 +257,13 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 
+
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1.scn"));
+#ifdef NDEBUG
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
+#endif
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 		//Entity::Type FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
@@ -397,7 +406,8 @@ namespace NIKE {
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-				throw e;
+				NIKEE_CORE_ERROR("Error caught: {}", e.what());
+				break;
 			}
 		}
 

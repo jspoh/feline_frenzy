@@ -298,7 +298,6 @@ namespace NIKE {
 		window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
 	}
 
 	void LevelEditor::MainPanel::update() {
@@ -451,11 +450,12 @@ namespace NIKE {
 	void LevelEditor::MainPanel::deserializeConfig(nlohmann::json const& config) {
 		try {
 			auto const& data = config.at("EditorConfig");
+
 			b_debug_mode = data.at("Debug_Mode").get<bool>();
-			b_game_state = data.at("Game_State").get<bool>(); // Game state does not work due to systems not running yet
 			b_gizmo_state = data.at("Gizmo_State").get<bool>();
 			b_grid_state = data.at("Grid_State").get<bool>();
 
+			setGameState(data.at("Game_State").get<bool>());
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -4035,11 +4035,12 @@ namespace NIKE {
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
 		//Setup free cam to be referenced as default camera in camera system
-		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
+		free_cam = NIKE_CAMERA_SERVICE->getDefaultCamera();
 
 		combo_index = 0;
 		last_dispatched_index = 0;
 
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(UINT16_MAX, free_cam));
 	}
 
 	void LevelEditor::CameraPanel::update() {

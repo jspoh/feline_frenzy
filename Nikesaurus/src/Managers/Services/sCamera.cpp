@@ -184,6 +184,10 @@ namespace NIKE {
 		return cam;
 	}
 
+	std::shared_ptr<Render::Cam> Camera::Service::getDefaultCamera() const {
+		return def_cam;
+	}
+
 	void Camera::Service::setCameraHeight(float height) {
 		cam_height = height;
 	}

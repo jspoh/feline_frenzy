@@ -49,7 +49,6 @@ namespace NIKE {
 			* INITIALIZATION
 			*********************************************************************/
 
-
 			//Init camera
 			void init(nlohmann::json const& config);
 
@@ -81,6 +80,9 @@ namespace NIKE {
 
 			//Get active camera
 			Render::Cam getActiveCamera() const;
+
+			// Get reference to the default camera
+			std::shared_ptr<Render::Cam> getDefaultCamera() const;
 
 			//Set camera height
 			void setCameraHeight(float height);

@@ -281,12 +281,13 @@ namespace NIKE {
 		}
 	}
 
-	void LevelEditor::Service::init(nlohmann::json const& config) {
+	void LevelEditor::Service::init() {
 
 		//Init Imgui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
 		// Enable Docking
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -294,6 +295,8 @@ namespace NIKE {
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOpenGL(std::static_pointer_cast<Windows::NIKEWindow>(NIKE_WINDOWS_SERVICE->getWindow())->getWindowPtr(), true);
 		ImGui_ImplOpenGL3_Init("#version 450");
+
+		// Load imgui settings
 		ImGui::LoadIniSettingsFromDisk(io.IniFilename);
 
 		//Init editor action manager
@@ -361,7 +364,6 @@ namespace NIKE {
 
 		//Init all level editor panels
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
-		main_panel->deserializeConfig(config);
 	}
 
 	void LevelEditor::Service::update() {
@@ -477,5 +479,20 @@ namespace NIKE {
 
 	void LevelEditor::Service::executeAction(Action&& action) {
 		action_manager->executeAction(std::move(action));
+	}
+
+	void LevelEditor::Service::deserializeConfig(nlohmann::json const& config) {
+		try {
+			// Set editor active state
+			b_editor_active = config.at("EditorConfig").at("Editor_State").get<bool>();
+
+			// Deserialize editor config
+			std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->deserializeConfig(config);
+
+		}
+		catch (const std::exception& e) {
+			NIKEE_CORE_WARN(e.what());
+			NIKEE_CORE_WARN("Error during config deserialization");
+		}
 	}
 }
