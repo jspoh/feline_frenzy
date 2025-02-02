@@ -222,16 +222,33 @@ namespace NIKE {
 					// Skip if the indexes are invalid
 					continue;
 				}
-
-				// Find path for player
-				NIKE_MAP_SERVICE->findPath(entity, start.value(), end.value());
+				
 				// If path exist, transition to chase
 				// Check conditions that would trigger transition to Chase state
-				if (!NIKE_MAP_SERVICE->checkPath(entity) ||     // No valid path
-					NIKE_MAP_SERVICE->checkGridChanged() ||     // Grid structure changed
-					(NIKE_MAP_SERVICE->getPath(entity).goal.index != end.value()) || // Target moved
-					(NIKE_MAP_SERVICE->getPath(entity).b_finished)) // Path completed, no movement
-				{
+				// Find path for player
+				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
+
+					//Condition if changes to grid blocked has been made
+					NIKE_MAP_SERVICE->checkGridChanged() ||
+
+					//Check if target got shifted
+					(NIKE_MAP_SERVICE->getPath(entity).goal.index != end.value()) ||
+
+					//Check if entity got shifted
+					(!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
+						(std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start.value().x) > 1 ||
+							std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start.value().y) > 1)) ||
+
+					//Check if path is finished & entity got shifted
+					(NIKE_MAP_SERVICE->getPath(entity).b_finished && start.value() != NIKE_MAP_SERVICE->getPath(entity).end.index)
+
+					) {
+					NIKE_MAP_SERVICE->findPath(entity, start.value(), end.value());
+				}
+
+				// Transition happens when path is not empty
+				auto path = NIKE_MAP_SERVICE->getPath(entity);
+				if (path.path.empty()) {
 					return true;
 				}
 			}
