@@ -83,7 +83,7 @@ namespace NIKE {
             const auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_b);
 
 
-            if (a_damage_comp.has_value() || b_damage_comp.has_value()) {
+            if (a_damage_comp.has_value() && b_damage_comp.has_value()) {
                 const auto a_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
                 const auto b_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
 

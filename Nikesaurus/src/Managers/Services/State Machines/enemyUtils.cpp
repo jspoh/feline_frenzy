@@ -117,43 +117,34 @@ namespace NIKE {
 	bool Enemy::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
 		const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		if (!player_transform_comp.has_value()) {
-			NIKEE_CORE_WARN("withinRange: PLAYER missing TRANSFORM component!");
-			return false;
-		}
-		const Vector2f player_pos = player_transform_comp.value().get().position;
-		const Vector2f player_scale = player_transform_comp.value().get().scale;
-
 		// Get enemy transform
 		const auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
-		if (!enemy_transform_comp.has_value()) {
-			NIKEE_CORE_WARN("withinRange: ENEMY missing TRANSFORM component!");
-			return false;
-		}
-		const Vector2f enemy_pos = enemy_transform_comp.value().get().position;
-		const Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
-
 		// Get enemy range
 		const auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
-		if (!enemy_attack_comp.has_value()) {
-			//NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
-			return false;
+		if (player_transform_comp.has_value() && enemy_transform_comp.has_value() && enemy_attack_comp.has_value()) {
+			const Vector2f player_pos = player_transform_comp.value().get().position;
+			const Vector2f player_scale = player_transform_comp.value().get().scale;
+
+			const Vector2f enemy_pos = enemy_transform_comp.value().get().position;
+			const Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
+
+			const float enemy_range = enemy_attack_comp.value().get().range;
+
+			// Calculations
+			const float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
+			const float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
+
+			const float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
+			const float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
+
+			const float distance = (dist_x * dist_x) + (dist_y * dist_y);
+
+			//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
+
+			// It is recommended to use enemy_range^2, but it's probably easier this way
+			return distance < enemy_range;
 		}
-		const float enemy_range = enemy_attack_comp.value().get().range;
-
-		// Calculations
-		const float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
-		const float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
-
-		const float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
-		const float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
-
-		const float distance = (dist_x * dist_x) + (dist_y * dist_y);
-
-		//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
-
-		// It is recommended to use enemy_range^2, but it's probably easier this way
-		return distance < enemy_range;
+		return false;
 	}
 
 	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {

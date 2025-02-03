@@ -26,6 +26,7 @@
     {
         "MetaData": {
             "Entity_Tags": [
+                "enemy",
                 "objects",
                 "player"
             ]
@@ -144,15 +145,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1075,
+                                "Completed_Animations": 1128,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.06666667014360428
+                                "Timer": 0.0833333358168602
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -182,7 +183,7 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -222,14 +223,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1134,
+                                "Completed_Animations": 1220,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.10000000149011612
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -259,7 +260,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -300,14 +301,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1134,
+                                "Completed_Animations": 1220,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.10000000149011612
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -337,7 +338,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -364,7 +365,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0006",
+                            "Name": "entity_0004",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -378,14 +379,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1100,
+                                "Completed_Animations": 1186,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.25
+                                "Timer": 0.2666666805744171
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -415,7 +416,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -442,7 +443,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0007",
+                            "Name": "entity_0005",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -456,15 +457,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1075,
+                                "Completed_Animations": 1128,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.06666667014360428
+                                "Timer": 0.0833333358168602
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -494,7 +495,7 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -520,7 +521,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0008",
+                            "Name": "entity_0006",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -534,15 +535,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1075,
+                                "Completed_Animations": 1128,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.06666667014360428
+                                "Timer": 0.0833333358168602
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -572,7 +573,7 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -598,7 +599,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0009",
+                            "Name": "entity_0007",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -612,15 +613,15 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1075,
+                                "Completed_Animations": 1128,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.06666667014360428
+                                "Timer": 0.0833333358168602
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 3,
@@ -650,7 +651,7 @@
                                 },
                                 "Frame_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -676,7 +677,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0010",
+                            "Name": "entity_0008",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -692,6 +693,92 @@
         "Layer": {
             "B_State": true,
             "Entities": [
+                {
+                    "Entity": {
+                        "Layer ID": 1,
+                        "MetaData": {
+                            "B_Is_Active": true,
+                            "B_Locked": false,
+                            "Name": "enemy_1",
+                            "Prefab_ID": "Enemy.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Completed_Animations": 53,
+                                        "Timer": 0.05000000447034836
+                                    },
+                                    "Animation::Sprite": {
+                                        "Curr_Index": {
+                                            "x": 0,
+                                            "y": 2
+                                        },
+                                        "End_Index": {
+                                            "x": 9,
+                                            "y": 2
+                                        },
+                                        "Start_Index": {
+                                            "x": 0,
+                                            "y": 2
+                                        }
+                                    },
+                                    "Combat::Faction": null,
+                                    "Combat::Health": null,
+                                    "Element::Entity": null,
+                                    "Enemy::Attack": {
+                                        "LastShotTime": 0.5333334803581238
+                                    },
+                                    "Enemy::Spawner": {
+                                        "LastSpawnTime": 10.016666412353516
+                                    },
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": 357.5060119628906,
+                                            "y": -79.95215606689453
+                                        }
+                                    },
+                                    "Physics::Dynamics": {
+                                        "Force": {
+                                            "x": 0.0,
+                                            "y": 0.0
+                                        },
+                                        "Velocity": {
+                                            "x": 0.0,
+                                            "y": 0.0
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 0,
+                                            "y": 2
+                                        }
+                                    },
+                                    "State::State": {
+                                        "State": "Attack"
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 357.5060119628906,
+                                            "y": -79.95215606689453
+                                        },
+                                        "Scale": {
+                                            "x": 94.74974060058594,
+                                            "y": 116.74520874023438
+                                        }
+                                    }
+                                }
+                            },
+                            "Tags": [
+                                "enemy"
+                            ]
+                        }
+                    }
+                },
                 {
                     "Entity": {
                         "Components": {
@@ -729,7 +816,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0012",
+                            "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -773,7 +860,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0013",
+                            "Name": "entity_0011",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -830,7 +917,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0014",
+                            "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -874,7 +961,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0015",
+                            "Name": "entity_0013",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -888,14 +975,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 18,
+                                "Completed_Animations": 188,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 4,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -924,7 +1011,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 53
+                                    "entity": 13
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -935,8 +1022,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 89.4599838256836,
-                                    "y": -112.65782165527344
+                                    "x": 239.45477294921875,
+                                    "y": 204.20970153808594
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -979,7 +1066,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -994,8 +1081,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 89.4599838256836,
-                                    "y": -112.65782165527344
+                                    "x": 239.45477294921875,
+                                    "y": 204.20970153808594
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1072,7 +1159,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0017",
+                            "Name": "entity_0015",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1133,7 +1220,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0018",
+                            "Name": "entity_0016",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1161,7 +1248,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 2.382207389352189e-44,
+                                    "w": 1.401298464324817e-45,
                                     "x": 0.17211580276489258,
                                     "y": 0.8877550959587097,
                                     "z": 0.0
@@ -1194,7 +1281,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0019",
+                            "Name": "entity_0017",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1245,7 +1332,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0020",
+                            "Name": "entity_0018",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1753,7 +1840,7 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0031",
+                            "Name": "entity_0032",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1792,14 +1879,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1128,
+                                "Completed_Animations": 1214,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Timer": 0.18333333730697632
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -1846,7 +1933,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -1889,14 +1976,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1135,
+                                "Completed_Animations": 1221,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.21666666865348816
+                                "Timer": 0.23333333432674408
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 2,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -1943,7 +2030,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
