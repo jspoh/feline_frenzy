@@ -2572,12 +2572,12 @@ namespace NIKE {
 				//Create new entity
 				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
-				////Load entity from path
-				//NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_path.string());
-
 				//Add metadata to entity
 				NIKE_METADATA_SERVICE->setEntityName(new_id, entity_name.c_str());
 				NIKE_METADATA_SERVICE->setEntityPrefabID(new_id, prefab_id);
+
+				//Load entity from path
+				NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(new_id, prefab_id);
 
 				//Reset layer id
 				layer_id = 0;
@@ -2609,6 +2609,20 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::savePrefab() {
 		//Save prefab to file
 		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+
+		//Iterate through all entities and check their metadata
+		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+			//Apply prefab to all entities
+			if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
+
+				//Apply prefab changes to entity
+				NIKE_SERIALIZE_SERVICE->applyPrefabChangesToEntity(entity, prefab_id);
+			}
+		}
+
+		//Open success popup
+		msg->assign("Prefab Saved!");
 		openPopUp("Success");
 	}
 
@@ -2632,12 +2646,6 @@ namespace NIKE {
 	}
 
 	void LevelEditor::PrefabsPanel::update() {
-		copy_count = 0;
-		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-			if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
-				copy_count++;
-			}
-		}
 	}
 
 	void LevelEditor::PrefabsPanel::render() {
@@ -2654,6 +2662,14 @@ namespace NIKE {
 		//Check if prefab display is valid
 		if (!prefab_id.empty()) {
 
+			//Update with accuarate copy count
+			copy_count = 0;
+			for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+				if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
+					copy_count++;
+				}
+			}
+
 			//Display prefab ID
 			ImGui::Text("Editing Prefab ID: %s", prefab_id.c_str());
 			ImGui::Text("Prefab's Copies: %i", copy_count);
@@ -2668,10 +2684,6 @@ namespace NIKE {
 			//Save prefab template
 			if (ImGui::Button("Save Prefab")) {
 				savePrefab();
-
-				//Open success popup
-				msg->assign("Prefab Saved!");
-				openPopUp("Success");
 			}
 
 			ImGui::SameLine();
@@ -2701,42 +2713,6 @@ namespace NIKE {
 			if (ImGui::Button("Create Entity")) {
 				savePrefab();
 				openPopUp("Create Entity");
-			}
-
-			ImGui::SameLine();
-
-			//Add component
-			if (ImGui::Button("Apply To Entities")) {
-
-				//Save prefab
-				savePrefab();
-
-				//Iterate through all entities and check their metadata
-				for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-
-					//Apply prefab to all entities
-					if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
-
-						//Check for transform
-						auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-						if (e_trans_comp.has_value()) {
-
-							//Save old position
-							auto& e_transform = e_trans_comp.value().get();
-							Vector2f prev_pos = e_transform.position;
-
-							////Load entity
-							//NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, prefab_path.string());
-
-							//Apply old position back
-							e_transform.position = prev_pos;
-						}
-						else {
-							////Load entity
-							//NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, prefab_path.string());
-						}
-					}
-				}
 			}
 
 			ImGui::Spacing();
@@ -2777,6 +2753,15 @@ namespace NIKE {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Prefab_FILE")) {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				//Set prefab ID
+				prefab_id = asset_id;
+
+				//Clear prefab comps
+				prefab_comps.clear();
+
+				//Load prefab comps
+				NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 				//createDisplayPrefab(asset_id);
 			}

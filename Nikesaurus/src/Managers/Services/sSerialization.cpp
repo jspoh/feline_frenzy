@@ -130,18 +130,37 @@ namespace NIKE {
 		//Create new data
 		nlohmann::json data;
 
+		//Map to array of component type
+		std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
+		//Load prefab into prefab comps
+		loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
-		////Iterate through all comp
-		//for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
-		//	data["Components"][comp.first] = comp_registry->serializeOverrideComponent(comp.first, comp.second.get());
-		//}
+		//Iterate through all comp
+		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+			data["Components"][comp.first] = comp_registry->serializeOverrideComponent(comp.first, comp.second.get(), prefab_comps.at(comp.first).get());
+		}
 
 		return data;
 	}
 
 	void Serialization::Service::deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data) {
+		//If there are no components
+		if (!data.contains("Components"))
+			return;
 
+		//Iterate through all components stored within data
+		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+			//Check if component is already present, if not add component
+			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+			}
+
+			//Deserialize data into component
+			comp_registry->deserializeOverrideComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+		}
 	}
 
 	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path) {
@@ -201,6 +220,17 @@ namespace NIKE {
 
 		//Close file
 		file.close();
+	}
+
+	void Serialization::Service::applyPrefabChangesToEntity(Entity::Type entity, std::string const& prefab_id) {
+		//Store override data
+		auto override_data = NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity, prefab_id);
+
+		//Apply prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+
+		//Deserialize override data
+		NIKE_SERIALIZE_SERVICE->deserializePrefabOverrides(entity, override_data);
 	}
 
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
@@ -526,84 +556,5 @@ namespace NIKE {
 		//Return loaded json data
 		return data;
 	}
-
-
-	//void Serialization::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
-	//	// Open Scene file
-	//	std::ifstream ifs{ file, std::ios::in };
-	//	if (!ifs) {
-	//		throw std::runtime_error("Failed to open mesh file: " + file);
-	//	}
-
-	//	// Read grid width and height
-	//	int width, height;
-	//	ifs >> width >> height;
-	//	if (!ifs) {
-	//		throw std::runtime_error("Failed to read grid dimensions from file: " + file);
-	//	}
-
-	//	// Create a grid to store tile information
-	//	grid.resize(height, std::vector<int>(width));
-
-	//	// Save each tile ID into the grid
-	//	for (int row = 0; row < height; ++row) {
-	//		for (int col = 0; col < width; ++col) {
-	//			if (!(ifs >> grid[row][col])) {
-	//				throw std::runtime_error("Failed to read tile data at row " + std::to_string(row) + ", column " + std::to_string(col));
-	//			}
-	//		}
-	//	}
-
-	//	// Calculate offset to center the grid
-	//	float tile_size = 100.0f;
-	//	float offset_x = (width * tile_size) / 2.0f - center.x;
-	//	float offset_y = (height * tile_size) / 2.0f - center.y;
-
-	//	// Create entities from grid info
-	//	for (int row = 0; row < height; ++row) {
-	//		for (int col = 0; col < width; ++col) {
-	//			// Create tile
-	//			createTile(grid[row][col], row, col, tile_size, offset_x, offset_y, width, height, background_layer, player_layer);
-	//		}
-	//	}
-	//}
-
-	//void Serialization::Service::createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
-	//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-	//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer) {
-	//	bool flip{ false };
-	//	bool collide{ false };
-	//	std::string texture_name{};
-
-	//	switch (tileID) {
-	//	case 1: texture_name = "wallTopCorner"; collide = true; break;
-	//	case 2: texture_name = "wallTopMiddle"; collide = true; break;
-	//	case 3: texture_name = "wallLeft"; collide = true; break;
-	//	case 4: texture_name = "grass"; break;
-	//	case 5: texture_name = "wallBottomCorner"; collide = true; break;
-	//	case 6: texture_name = "wallBottomMiddle"; collide = true; break;
-	//	case 7: texture_name = "wallTopCorner"; flip = true; collide = true; break;
-	//	case 8: texture_name = "wallLeft"; flip = true; collide = true; break;
-	//	case 9: texture_name = "wallBottomCorner"; flip = true; collide = true; break;
-	//	default: texture_name = "grass"; break;
-	//	}
-
-	//	// Set layer to background if not collidable
-	//	unsigned int layer = (collide) ? player_layer->getLayerID() : background_layer->getLayerID();
-	//	NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity(layer);
-
-	//	NIKE_IMGUI_SERVICE->addEntityRef("tile_" + std::to_string(row) + "_" + std::to_string(col), tile_entity);
-	//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity,
-	//		NIKE::Transform::Transform({ col * tile_size - offset_x, (height - 1 - row) * tile_size - offset_y },
-	//			{ 100.0f, 100.0f }, 0.0f));
-
-	//	if (collide) {
-	//		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
-	//		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
-	//	}
-
-	//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name,
-	//		{ 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { flip, false }));
-	//}
 }
 

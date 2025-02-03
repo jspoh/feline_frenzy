@@ -128,6 +128,9 @@ namespace NIKE {
 			//Deserialize Prefab
 			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path);
 
+			//Apply prefab change to entity
+			void applyPrefabChangesToEntity(Entity::Type entity, std::string const& prefab_id);
+
 			//Serialize Entity into file path
 			void saveEntityToFile(Entity::Type entity, std::string const& file_path);
 
