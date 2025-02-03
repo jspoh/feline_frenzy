@@ -336,8 +336,14 @@ namespace NIKE {
 					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 				}
 
+				//Update map grid
+				NIKE_MAP_SERVICE->gridUpdate();
+
 				//Update all systems
 				NIKE_ECS_MANAGER->updateSystems();
+
+				//Update meta data
+				NIKE_METADATA_SERVICE->update();
 
 #ifndef NDEBUG
 				//Update & Render Level Editor
@@ -346,8 +352,6 @@ namespace NIKE {
 				//update UI First
 				NIKE_UI_SERVICE->update();
 #endif
-				//Update map grid
-				NIKE_MAP_SERVICE->gridUpdate();
 
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();

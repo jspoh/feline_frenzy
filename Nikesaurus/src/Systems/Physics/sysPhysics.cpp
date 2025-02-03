@@ -33,9 +33,6 @@ namespace NIKE {
         //Delta time
         float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
-        // Get entities marked for deletion
-        auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
-
         //Iteration every fixed step for fixed delta time
         for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
 

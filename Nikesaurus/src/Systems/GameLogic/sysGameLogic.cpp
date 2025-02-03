@@ -77,9 +77,6 @@ namespace NIKE {
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}
 		}
-
-		// Destroy all entities that are marked for deletion
-		NIKE_ECS_MANAGER->destroyMarkedEntities();
 	}
 
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {

@@ -383,11 +383,11 @@ namespace NIKE {
         bool destroy_b = (collider_b.resolution == Physics::Resolution::DESTROY);
 
         if (destroy_a && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
-            NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
+            NIKE_METADATA_SERVICE->destroyEntity(entity_a);
         }
 
         if (destroy_b && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
-            NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
+            NIKE_METADATA_SERVICE->destroyEntity(entity_b);
         }
 
         // Exit if either entity was marked for deletion

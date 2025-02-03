@@ -19,7 +19,7 @@ namespace NIKE {
 			{"Prefab_ID", prefab_id},
 			{"Prefab_Override", prefab_override},
 			{"B_Locked", b_locked},
-			{"B_Is_Active", b_isactive},
+			{"Layer_ID", layer_id},
 			{"Tags", tags}
 		};
 	}
@@ -35,7 +35,7 @@ namespace NIKE {
 		prefab_id = data.value("Prefab_ID", "");
 		prefab_override = data.value("Prefab_Override", nlohmann::json());
 		b_locked = data.value("B_Locked", false);
-		b_isactive = data.value("B_Is_Active", true);
+		layer_id = data.value("Layer_ID", static_cast<unsigned int>(0));
 
 		//Get tags
 		if (data.contains("Tags") && data["Tags"].is_array()) {
@@ -95,6 +95,17 @@ namespace NIKE {
 		//Setup events listening
 		std::shared_ptr<MetaData::Service> metadata_service(this, [](MetaData::Service*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(metadata_service);
+	}
+
+	void MetaData::Service::update() {
+
+		//Empty destroy entities queue
+		if (!entities_to_destroy.empty()) {
+			while (!entities_to_destroy.empty()) {
+				NIKE_ECS_MANAGER->destroyEntity(entities_to_destroy.front());
+				entities_to_destroy.pop();
+			}
+		}
 	}
 
 	bool MetaData::Service::isTagValid(std::string const& tag) {
@@ -246,29 +257,21 @@ namespace NIKE {
 		entities.at(entity).tags.erase(tag);
 	}
 
-	void MetaData::Service::setEntityActive(Entity::Type entity, bool b_active) {
+	void MetaData::Service::destroyEntity(Entity::Type entity) {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
 			NIKEE_CORE_WARN("Entity does not exist");
 			return;
 		}
 
-		entities.at(entity).b_isactive = b_active;
+		//Check if entity is active
+		entities_to_destroy.push(entity);
 	}
 
-	void MetaData::Service::setEntitiesActive(bool b_active) {
+	void MetaData::Service::destroyAllEntities() {
 		for (auto& e_data : entities) {
-			e_data.second.b_isactive = b_active;
+			entities_to_destroy.push(e_data.first);
 		}
-	}
-
-	bool MetaData::Service::checkEntityActive(Entity::Type entity) const {
-		//Check if entity exists
-		if (entities.find(entity) == entities.end()) {
-			return false;
-		}
-
-		return entities.at(entity).b_isactive;
 	}
 
 	void MetaData::Service::setEntityLocked(Entity::Type entity, bool b_locked) {
@@ -294,6 +297,28 @@ namespace NIKE {
 		}
 
 		return entities.at(entity).b_locked;
+	}
+
+	void MetaData::Service::setEntityLayerID(Entity::Type entity, unsigned int layer_id) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Set layer ID
+		entities.at(entity).layer_id = layer_id;
+	}
+
+	unsigned int MetaData::Service::getEntityLayerID(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return 0;
+		}
+
+		//Return layer ID
+		return entities.at(entity).layer_id;
 	}
 
 	std::set<std::string> MetaData::Service::getEntityTags(Entity::Type entity) {
@@ -330,7 +355,10 @@ namespace NIKE {
 
 		//Update with cloned meta data
 		entities.at(entity).tags = it_clone->second.tags;
-		entities.at(entity).b_isactive = it_clone->second.b_isactive;
+		entities.at(entity).b_locked = it_clone->second.b_locked;
+		entities.at(entity).prefab_id = it_clone->second.prefab_id;
+		entities.at(entity).prefab_override = it_clone->second.prefab_override;
+		entities.at(entity).layer_id = it_clone->second.layer_id;
 	}
 
 	nlohmann::json MetaData::Service::serializeEntityData(Entity::Type entity) const {

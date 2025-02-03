@@ -268,7 +268,7 @@ namespace NIKE {
 			static float dt = 0.0f;
 			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 			if (dt >= 0.5f) { 
-				NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+				NIKE_METADATA_SERVICE->destroyEntity(entity);
 				// Reset delta time
 				dt = 0.f;
 			}

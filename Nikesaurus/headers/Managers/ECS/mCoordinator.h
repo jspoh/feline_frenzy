@@ -33,9 +33,6 @@ namespace NIKE {
 			std::unique_ptr<Component::Manager> component_manager;
 			std::unique_ptr<System::Manager> system_manager;
 
-			// Vector to store entities that are marked for deletion
-			std::vector<Entity::Type> entities_to_destroy;
-
 		public:
 
 			//Default constructor
@@ -73,15 +70,6 @@ namespace NIKE {
 
 			//Get entity layer id
 			unsigned int getEntityLayerID(Entity::Type entity) const;
-
-			//Mark entity for deletion
-			void markEntityForDeletion(Entity::Type entity);
-
-			//Destroy entities that are marked for deletion
-			void destroyMarkedEntities();
-
-			//Get entities marked for deletion
-			std::vector<Entity::Type> getEntitiesToDestroy() const;
 
 			/*****************************************************************//**
 			* Component Methods
