@@ -409,7 +409,9 @@ namespace NIKE {
         lua_state.set_function("SetState", [&](Entity::Type entity, std::string state) {
             auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
             if (e_state_comp.has_value()) {
-                e_state_comp.value().get().state_id = state;
+                // e_state_comp.value().get().state_id = state;
+                auto state_ptr = NIKE_FSM_SERVICE->getStateByID(state);
+                NIKE_FSM_SERVICE->changeState(state_ptr, entity);
             }
             });
 

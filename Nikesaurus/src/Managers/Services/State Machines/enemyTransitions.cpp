@@ -2,7 +2,7 @@
  * \file   enemyTransitions.cpp
  * \brief  Enemy transitions
  *
- * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
+ * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
  *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -46,33 +46,6 @@ namespace NIKE {
 	}
 
 	/*******************************
-	* Attack To Idle transition functions
-	*****************************/
-
-	bool Transition::AttackToIdle::isValid(Entity::Type& entity) const
-	{
-		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-			if (e_player_comp.has_value())
-			{
-				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (!Enemy::withinRange(entity, other_entity)) {
-					return true;
-				}
-			}
-
-		}
-
-		return false;
-	}
-
-	std::shared_ptr<StateMachine::Istate> Transition::AttackToIdle::getNextState() const
-	{
-		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
-	}
-
-	/*******************************
 	* Idle To Chase transition functions
 	*****************************/
 
@@ -98,7 +71,7 @@ namespace NIKE {
 				// Prevent throw
 				if (!start.has_value() || !end.has_value()) {
 					// Skip if the indexes are invalid
-					continue; 
+					continue;
 				}
 
 				// If path exist, transition to chase
@@ -141,10 +114,24 @@ namespace NIKE {
 	}
 
 	/*******************************
-	* Chase To Attack transition functions
+	* Idle To Death transition functions
 	*****************************/
 
-	bool Transition::ChaseToAttack::isValid(Entity::Type& entity) const
+	bool Transition::IdleToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
+	{
+		return false;
+	}
+
+	std::shared_ptr<StateMachine::Istate> Transition::IdleToDeath::getNextState() const
+	{
+		return NIKE_FSM_SERVICE->getStateByID<State::DeathState>("Death");
+	}
+
+	/*******************************
+	* Attack To Idle transition functions
+	*****************************/
+
+	bool Transition::AttackToIdle::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
@@ -152,7 +139,7 @@ namespace NIKE {
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (Enemy::withinRange(entity, other_entity)) {
+				if (!Enemy::withinRange(entity, other_entity)) {
 					return true;
 				}
 			}
@@ -162,9 +149,9 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::ChaseToAttack::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::AttackToIdle::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::AttackState>("Attack");
+		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
 	}
 
 	/*******************************
@@ -236,6 +223,47 @@ namespace NIKE {
 	}
 
 	/*******************************
+	* Attack To Death transition functions
+	*****************************/
+
+	bool Transition::AttackToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
+	{
+		return false;
+	}
+
+	std::shared_ptr<StateMachine::Istate> Transition::AttackToDeath::getNextState() const
+	{
+		return NIKE_FSM_SERVICE->getStateByID<State::DeathState>("Death");
+	}
+
+	/*******************************
+	* Chase To Attack transition functions
+	*****************************/
+
+	bool Transition::ChaseToAttack::isValid(Entity::Type& entity) const
+	{
+		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
+		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			if (e_player_comp.has_value())
+			{
+				// If entity has the gamelogic::ilogic component, and not within range of enemy
+				if (Enemy::withinRange(entity, other_entity)) {
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	std::shared_ptr<StateMachine::Istate> Transition::ChaseToAttack::getNextState() const
+	{
+		return NIKE_FSM_SERVICE->getStateByID<State::AttackState>("Attack");
+	}
+
+	/*******************************
 	* Chase To Idle transition functions
 	*****************************/
 
@@ -264,6 +292,18 @@ namespace NIKE {
 	{
 		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
 	}
+
+	/*******************************
+	* Chase To Death transition functions
+	*****************************/
+
+	bool Transition::ChaseToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
+	{
+		return false;
+	}
+
+	std::shared_ptr<StateMachine::Istate> Transition::ChaseToDeath::getNextState() const
+	{
+		return NIKE_FSM_SERVICE->getStateByID<State::DeathState>("Death");
+	}
 }
-
-
