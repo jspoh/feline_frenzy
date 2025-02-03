@@ -940,8 +940,28 @@ namespace NIKE {
 		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
 			ImGui::Spacing();
 
+			//Static entity name input buffer
+			static std::string entity_name;
+
 			//Display selected entity info
 			if (ImGui::CollapsingHeader((NIKE_METADATA_SERVICE->getEntityName(selected_entity) + "##SelectedEntity").c_str())) {
+
+				//Get entity text
+				if (ImGui::InputText("##Entity Name", entity_name.data(), entity_name.capacity() + 1)) {
+					entity_name.resize(strlen(entity_name.c_str()));
+				}
+
+				ImGui::SameLine();
+
+				//Save new name
+				if (ImGui::SmallButton("Save")) {
+					if(NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
+						NIKE_METADATA_SERVICE->setEntityName(selected_entity, entity_name);
+					}
+					else {
+						entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+					}
+				}
 
 				//Lock entity
 				ImGui::SeparatorText("Lock Entity");
@@ -1021,6 +1041,9 @@ namespace NIKE {
 				else {
 					ImGui::Text("No Tags Exists.");
 				}
+			}
+			else {
+				entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
 			}
 		}
 
