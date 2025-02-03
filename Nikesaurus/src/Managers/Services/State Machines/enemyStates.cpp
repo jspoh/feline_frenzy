@@ -10,7 +10,7 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/State Machine/enemyStates.h"
 #include "Managers/Services/State Machine/enemyTransitions.h"
-#include "Systems/GameLogic/sysEnemy.h"
+#include "Managers/Services/State Machine/enemyUtils.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
@@ -58,6 +58,10 @@ namespace NIKE {
 		addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
 		addTransition("AttackToChase", std::make_shared<Transition::AttackToChase>());
 		addTransition("AttackToDeath", std::make_shared<Transition::AttackToDeath>());
+
+		// Register the Manager as a listener for collision events
+		std::shared_ptr<AttackState> attack_state_wrapped(this, [](AttackState*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(attack_state_wrapped);
 	}
 
 	void NIKE::State::AttackState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -99,9 +103,6 @@ namespace NIKE {
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
 
-						// Apply damage when enemy shoot at player
-						Interaction::applyDamage(entity, other_entity);
-
 						// Reset the last shot time after shooting
 						enemy_comp.last_shot_time = 0.f;
 					}
@@ -115,6 +116,14 @@ namespace NIKE {
 	{
 		// cout << "exit attack state" << endl;
 		// removeTransition("AttackToIdle");
+	}
+
+	void State::AttackState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
+	{
+		// Ensure entities exist and handle the collision
+		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
+			Interaction::handleCollision(event->entity_a, event->entity_b);
+		}
 	}
 
 	/*******************************
@@ -160,63 +169,7 @@ namespace NIKE {
 			// Update animation based on movement direction
 			if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
 				float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
-
-				if (dir >= -M_PI / 8 && dir < M_PI / 8) {
-					// Moving right
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, false);
-					setLastDirection(entity, 0);
-				}
-				else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
-					// Moving up-right (diagonal)
-					animationStart(entity, 0, 2);
-					animationEnd(entity, 9, 2);
-					flipX(entity, false);
-					setLastDirection(entity, 1);
-				}
-				else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
-					// Moving up
-					animationStart(entity, 0, 0);
-					animationEnd(entity, 9, 0);
-					flipX(entity, false);
-					setLastDirection(entity, 2);
-				}
-				else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
-					// Moving up-left (diagonal)
-					animationStart(entity, 0, 2);
-					animationEnd(entity, 9, 2);
-					flipX(entity, true);
-					setLastDirection(entity, 3);
-				}
-				else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
-					// Moving down-right (diagonal)
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, false);
-					setLastDirection(entity, 4);
-				}
-				else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
-					// Moving down
-					animationStart(entity, 0, 0);
-					animationEnd(entity, 9, 0);
-					flipX(entity, false);
-					setLastDirection(entity, 5);
-				}
-				else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
-					// Moving down-left (diagonal)
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, true);
-					setLastDirection(entity, 6);
-				}
-				else {
-					// Moving left
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, true);
-					setLastDirection(entity, 7);
-				}
+				updateChaseAnimation(entity, dir);
 			}
 
 		}
@@ -228,12 +181,77 @@ namespace NIKE {
 		//cout << "exit chase state" << endl;
 	}
 
+	void State::ChaseState::updateChaseAnimation(Entity::Type& entity, float& dir)
+	{
+		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
+			// Moving right
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, false);
+			setLastDirection(entity, 0);
+		}
+		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
+			// Moving up-right (diagonal)
+			animationStart(entity, 0, 2);
+			animationEnd(entity, 9, 2);
+			flipX(entity, false);
+			setLastDirection(entity, 1);
+		}
+		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
+			// Moving up
+			animationStart(entity, 0, 0);
+			animationEnd(entity, 9, 0);
+			flipX(entity, false);
+			setLastDirection(entity, 2);
+		}
+		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+			// Moving up-left (diagonal)
+			animationStart(entity, 0, 2);
+			animationEnd(entity, 9, 2);
+			flipX(entity, true);
+			setLastDirection(entity, 3);
+		}
+		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+			// Moving down-right (diagonal)
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, false);
+			setLastDirection(entity, 4);
+		}
+		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
+			// Moving down
+			animationStart(entity, 0, 0);
+			animationEnd(entity, 9, 0);
+			flipX(entity, false);
+			setLastDirection(entity, 5);
+		}
+		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+			// Moving down-left (diagonal)
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, true);
+			setLastDirection(entity, 6);
+		}
+		else {
+			// Moving left
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, true);
+			setLastDirection(entity, 7);
+		}
+	}
+
 	/*******************************
 	* Death State functions
 	*****************************/
 
 	State::DeathState::DeathState()
 	{
+		// Add transitions here
+
+		// Register the Manager as a listener for collision events
+		std::shared_ptr<DeathState> death_state_wrapped(this, [](DeathState*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(death_state_wrapped);
 	}
 
 	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
@@ -244,6 +262,13 @@ namespace NIKE {
 	}
 	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
 
+	}
+	void State::DeathState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
+	{
+		// Ensure entities exist and handle the collision
+		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
+			Interaction::handleCollision(event->entity_a, event->entity_b);
+		}
 	}
 }
 

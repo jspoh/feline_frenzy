@@ -15,9 +15,7 @@ namespace NIKE {
     namespace Interaction {
 
         void Manager::init() {
-            // Register the Manager as a listener for collision events
-            std::shared_ptr<Manager> interaction_sys_wrapped(this, [](Manager*) {});
-            NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(interaction_sys_wrapped);
+          
         }
 
         void Manager::update() {
@@ -63,13 +61,6 @@ namespace NIKE {
                         
                     }
                 }
-            }
-        }
-
-        void Manager::onEvent(std::shared_ptr<Physics::CollisionEvent> event) {
-            // Ensure entities exist and handle the collision
-            if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
-                handleCollision(event->entity_a, event->entity_b);
             }
         }
 

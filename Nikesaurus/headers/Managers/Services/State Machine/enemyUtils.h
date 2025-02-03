@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   sysEnemy.h
+ * \file   enemyUtils.h
  * \brief  Enemy system for engine
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
@@ -33,48 +33,6 @@ namespace NIKE {
 		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
 
 		//bool hasTargetMoved(const Vector2f& target_pos, const Pathfinding::Path& path) const;
-
-		//class Manager : public System::ISystem {
-		//private:
-		//	//Delete Copy Constructor & Copy Assignment
-		//	Manager(Manager const& copy) = delete; 
-		//	void operator=(Manager const& copy) = delete;
-
-		//	// Enemy movement stuff
-		//	float movement_speed;  
-		//	// Distance threshold for waypoint
-		//	float waypoint_threshold;  
-		//	// Significant target movement threshold
-		//	float target_threshold;    
-
-		//	//Internal lua system
-		//	//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
-
-		//	//Internal script management
-		//	//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
-
-		//public:
-		//	//Default Constructor
-		//	Manager() = default;
-
-		//	//Default Destructor
-		//	~Manager() = default;
-
-		//	//Init
-		//	void init() override;
-
-		//	//System name
-		//	std::string getSysName() override
-		//	{
-		//		return "Enemy System";
-		//	}
-
-		//	//Register systems for lua
-		//	//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
-
-		//	//Update
-		//	void update() override;
-		//};
 	}
 }
 #endif //!ENEMY_HPP

@@ -21,7 +21,9 @@
     },
     {
         "MetaData": {
-            "Entity_Tags": []
+            "Entity_Tags": [
+                "player"
+            ]
         }
     },
     {
@@ -560,10 +562,12 @@
                         "MetaData": {
                             "B_Is_Active": true,
                             "B_Locked": false,
-                            "Name": "entity_0008",
+                            "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
-                            "Tags": []
+                            "Tags": [
+                                "player"
+                            ]
                         }
                     }
                 },

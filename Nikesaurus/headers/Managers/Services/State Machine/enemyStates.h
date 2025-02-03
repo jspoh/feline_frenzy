@@ -11,6 +11,9 @@
 #define ENEMY_STATES
 
 #include "Managers/Services/State Machine/sStateMachine.h"
+#include "Managers/ECS/mEntity.h"
+#include "Managers/ECS/mSystem.h"
+#include "Components/cPhysics.h"
 
 namespace NIKE {
 	namespace State {
@@ -27,7 +30,7 @@ namespace NIKE {
 
 		};
 
-		class AttackState : public StateMachine::Istate
+		class AttackState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
 		{
 		public:
 			AttackState();
@@ -35,6 +38,10 @@ namespace NIKE {
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
+
+
+			// Event handling for collisions
+			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
 
@@ -53,9 +60,11 @@ namespace NIKE {
 			//Acceptable offset per cell
 			float cell_offset;
 			float enemy_speed;
+
+			void updateChaseAnimation(Entity::Type& entity, float& dir);
 		};
 
-		class DeathState : public StateMachine::Istate
+		class DeathState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
 		{
 		public:
 			DeathState();
@@ -63,6 +72,9 @@ namespace NIKE {
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
+
+			// Event handling for collisions
+			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
 		};

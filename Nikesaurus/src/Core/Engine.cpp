@@ -17,7 +17,7 @@
 #include "Systems/sysAudio.h"
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
-#include "Systems/GameLogic/sysEnemy.h"
+#include "Managers/Services/State Machine/enemyUtils.h"
 
 namespace NIKE {
 
@@ -257,9 +257,6 @@ namespace NIKE {
 
 		//Init metadata service
 		NIKE_METADATA_SERVICE->init();
-
-		//Init FSM
-		NIKE_FSM_SERVICE->init();
 
 		//Register Def Components
 		registerDefComponents();

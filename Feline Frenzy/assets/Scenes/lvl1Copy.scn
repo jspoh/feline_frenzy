@@ -21,7 +21,9 @@
     },
     {
         "MetaData": {
-            "Entity_Tags": []
+            "Entity_Tags": [
+                "player"
+            ]
         }
     },
     {
@@ -1174,7 +1176,9 @@
                             "Name": "entity_0017",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
-                            "Tags": []
+                            "Tags": [
+                                "player"
+                            ]
                         }
                     }
                 },

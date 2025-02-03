@@ -50,7 +50,7 @@
     <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
     <ClCompile Include="src\Managers\Services\sPath.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
-    <ClCompile Include="src\Systems\GameLogic\sysEnemy.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\enemyUtils.cpp" />
     <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
@@ -121,7 +121,7 @@
     <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
     <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
-    <ClInclude Include="headers\Systems\GameLogic\sysEnemy.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\enemyUtils.h" />
     <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />

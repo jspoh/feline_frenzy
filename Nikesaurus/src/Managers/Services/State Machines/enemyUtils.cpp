@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   sysEnemy.cpp
+ * \file   enemyUtils.cpp
  * \brief  Enemy system for engine
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (70%)
@@ -11,7 +11,7 @@
 
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
-#include "Systems/GameLogic/sysEnemy.h"
+#include "Managers/Services/State Machine/enemyUtils.h"
 
 namespace NIKE {
 	void Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset) {
@@ -223,91 +223,3 @@ namespace NIKE {
 		}
 	}
 }
-
-
-//void Enemy::Manager::init() {
-
-//	// Init variables
-//	movement_speed = 100.0f;
-//	waypoint_threshold = 1.0f;
-//	target_threshold = 1.0f;
-
-//}
-
-//void Enemy::Manager::update() {
-//	//Get layers
-//	auto& layers = NIKE_SCENES_SERVICE->getLayers();
-
-//	//Reverse Iterate through layers
-//	for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
-
-//		//Skip inactive layer
-//		if (!(*layer)->getLayerState())
-//			continue;
-
-//		//Iterate through all entities
-//		for (auto& entity : entities) {
-//			if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-
-//				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-//					continue;
-
-//				// Check for pathfinding comp
-//				if (NIKE_ECS_MANAGER->checkEntityComponent<Pathfinding::Path>(entity)) {
-//					//auto e_enemy_pathfind = NIKE_ECS_MANAGER->getEntityComponent<Pathfinding::Path>(entity);
-//					//auto& enemy_pathfind = e_enemy_pathfind.value().get();
-
-//					//auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-//					//auto& enemy_transform = e_enemy_transform.value().get();
-
-//					//// Init cell
-//					//// Vector2i start = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_transform.position).value();
-//					//// Get grid to take ref from cell using the index
-//					//auto grid = NIKE_MAP_SERVICE->getGrid();
-//					//// Syntax: grid[y][x]
-//					//enemy_pathfind.start_cell = grid[2][1];
-//					//enemy_pathfind.goal_cell = grid[5][5];
-//					//enemy_pathfind.path = NIKE_MAP_SERVICE->findPath(enemy_pathfind.start_cell, enemy_pathfind.goal_cell);
-//					//enemy_pathfind.path_found = !enemy_pathfind.path.empty();
-
-//					//if (enemy_pathfind.path_found)
-//					//{
-//					//	NIKE_MAP_SERVICE->PrintPath(enemy_pathfind.path);
-//					//	//moveAlongPath(enemy_pathfind, enemy_transform);
-//					//}
-
-//				}
-
-
-
-//			// Check for attack comp
-//			auto e_enemy_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(entity);
-//			if (e_enemy_comp.has_value()) {
-
-//				auto& enemy_comp = e_enemy_comp.value().get();
-
-//				// If shot on cooldown
-//				if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
-//					// Accumulate time since last shot
-//					enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-//				}
-
-//				// Look for entity w player component
-//				for (auto& other_entity : entities) {
-//					auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-//					// If player entity exists
-//					if (e_player_comp.has_value()) {
-//						// Check if player is within range & shot not on cooldown
-//						if (enemy_comp.last_shot_time >= enemy_comp.cooldown && withinRange(entity, other_entity)) {
-//							// Shoot bullet towards player pos from enemy pos
-//							shootBullet(entity, other_entity);
-
-//							// Reset the last shot time after shooting
-//							enemy_comp.last_shot_time = 0.f;
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-//}

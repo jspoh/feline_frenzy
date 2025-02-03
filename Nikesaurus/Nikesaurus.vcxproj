@@ -89,7 +89,7 @@
     <ClCompile Include="src\Managers\Services\State Machines\enemyTransitions.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
-    <ClCompile Include="src\Systems\GameLogic\sysEnemy.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\enemyUtils.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysGameLogic.cpp" />
     <ClCompile Include="src\Systems\GameLogic\sysInteraction.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLua.cpp" />
@@ -175,7 +175,7 @@
     <ClInclude Include="headers\Managers\Services\State Machine\enemyTransitions.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />
-    <ClInclude Include="headers\Systems\GameLogic\sysEnemy.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\enemyUtils.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysGameLogic.h" />
     <ClInclude Include="headers\Systems\GameLogic\sysInteraction.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLua.h" />

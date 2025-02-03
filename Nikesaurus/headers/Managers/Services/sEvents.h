@@ -118,7 +118,11 @@ namespace NIKE {
 					if (new_event->getEventProcessed())
 						break;
 
-					listener->execute(new_event);
+					if (new_event)
+					{
+						listener->execute(new_event);
+					}
+
 				}
 			}
 		};

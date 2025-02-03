@@ -12,7 +12,7 @@
 // States and transitions
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/enemyStates.h"
-#include "Systems/GameLogic/sysEnemy.h"
+#include "Managers/Services/State Machine/enemyUtils.h"
 
 
 namespace NIKE {
