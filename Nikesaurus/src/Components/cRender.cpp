@@ -11,6 +11,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Components/cRender.h"
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	void Render::registerComponents() {
@@ -335,7 +336,69 @@ namespace NIKE {
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::ParticleEmitter>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::ParticleEmitter& comp) {
-				ImGui::Text("Edit Particle Emitter variables");
+				{
+					// Before change
+					static int before_change_preset;
+					static Vector2f before_change_offset;
+
+					// Preset
+					ImGui::Text("Particle Preset:");
+
+					std::string preset_options{};
+					for (const auto& [preset, preset_ref] : SysParticle::Data::particle_preset_map) {
+						preset_options += preset_ref + '\0';
+					}
+					preset_options += '\0';
+
+					int selected_preset = static_cast<int>(comp.preset);
+					static int previous_preset = selected_preset;
+					if (ImGui::Combo("##Preset", &selected_preset, preset_options.c_str())) {
+						// If the value changed, process the change
+						if (selected_preset != previous_preset) {
+							previous_preset = selected_preset;
+
+							LevelEditor::Action change_preset;
+
+							// Store the value before the change
+							change_preset.do_action = [&, preset = selected_preset]() {
+								comp.preset = preset;
+								};
+
+							// Store the undo action
+							change_preset.undo_action = [&, preset = previous_preset]() {
+								comp.preset = preset;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_preset));
+						}
+					}
+
+					// Offset
+					ImGui::Text("Particle Offset:");
+					ImGui::DragFloat2("##Offset", &comp.offset.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_offset = comp.offset;
+					}
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_offset;
+						//Change pos do action
+						change_offset.do_action = [&, offset = comp.offset]() {
+							comp.offset = offset;
+							};
+						//Change pos undo action
+						change_offset.undo_action = [&, offset = before_change_offset]() {
+							comp.offset = offset;
+							};
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
+					}
+					// Duration
+					ImGui::Text("Particle Duration:");
+					ImGui::DragFloat("##Duration", &comp.duration, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+				}
 			}
 		);
 

@@ -41,6 +41,16 @@ namespace NIKE {
 				{ ParticlePresets::BASE, "base" },
 				{ ParticlePresets::CLUSTER, "cluster" }
 			};
+
+			static ParticlePresets getParticlePreset(const std::string& ref) {
+				for (const auto& [preset, preset_ref] : particle_preset_map) {
+					if (preset_ref == ref) {
+						return preset;
+					}
+				}
+
+				throw std::runtime_error("Invalid particle preset ref");
+			}
 		};
 
 
