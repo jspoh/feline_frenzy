@@ -300,9 +300,6 @@ namespace NIKE {
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	}
 
-	void LevelEditor::MainPanel::update() {
-	}
-
 	void LevelEditor::MainPanel::render() {
 		//Get ImGui IO
 		ImGuiIO& io = ImGui::GetIO();
@@ -475,8 +472,6 @@ namespace NIKE {
 			
 		}
 	}
-
-
 
 	/*****************************************************************//**
 	* Entities Panel
@@ -839,10 +834,6 @@ namespace NIKE {
 
 		//Components panel reference
 		comp_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
-	}
-
-	void LevelEditor::EntitiesPanel::update() {
-
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
@@ -1940,8 +1931,12 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 	}
 
-	void LevelEditor::ComponentsPanel::update() {
+	void LevelEditor::ComponentsPanel::setCompStringRef(std::string const& to_set)
+	{
+		comp_string_ref = to_set;
+	}
 
+	void LevelEditor::ComponentsPanel::render() {
 		//Update components list
 		if (comps.size() != NIKE_ECS_MANAGER->getComponentsCount()) {
 
@@ -1955,14 +1950,8 @@ namespace NIKE {
 				}
 				});
 		}
-	}
 
-	void LevelEditor::ComponentsPanel::setCompStringRef(std::string const& to_set)
-	{
-		comp_string_ref = to_set;
-	}
-
-	void LevelEditor::ComponentsPanel::render() {
+		//Begin render
 		ImGui::Begin(getName().c_str());
 
 		//Reset gizmo interaction
@@ -2697,9 +2686,6 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", msg));
 	}
 
-	void LevelEditor::PrefabsPanel::update() {
-	}
-
 	void LevelEditor::PrefabsPanel::render() {
 		ImGui::Begin(getName().c_str());
 
@@ -2847,10 +2833,6 @@ namespace NIKE {
 	* Debugging Tools Panel
 	*********************************************************************/
 	void LevelEditor::DebugPanel::init() {
-
-	}
-
-	void LevelEditor::DebugPanel::update() {
 
 	}
 
@@ -3078,10 +3060,6 @@ namespace NIKE {
 	void LevelEditor::AudioPanel::init() {
 		registerPopUp("Add New Channel", createChannelPopUp("Add New Channel"));
 		registerPopUp("Delete Channel", deleteChannelPopUp("Delete Channel"));
-	}
-
-	void LevelEditor::AudioPanel::update() {
-
 	}
 
 	void LevelEditor::AudioPanel::render() {
@@ -3801,7 +3779,8 @@ namespace NIKE {
 			});
 	}
 
-	void LevelEditor::ResourcePanel::update() {
+	void LevelEditor::ResourcePanel::render() {
+		
 		//Update resource panel with file change events
 		while (!file_event_queue.empty()) {
 
@@ -3819,9 +3798,7 @@ namespace NIKE {
 				NIKEE_CORE_WARN("Invalid Callback From FileWatcher Handled. Loop Continues.");
 			}
 		}
-	}
 
-	void LevelEditor::ResourcePanel::render() {
 		if (ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
 
 			ImGui::BeginMenuBar();
@@ -4198,11 +4175,10 @@ namespace NIKE {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>("Free Cam", free_cam));
 	}
 
-	void LevelEditor::CameraPanel::update() {
-		const std::vector<std::pair<Entity::Type, std::string>> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
+	void LevelEditor::CameraPanel::render() {
 
 		//Update list of camera entities (On scene change and when list of entities get updated)
-		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
+		if (NIKE_CAMERA_SERVICE->getCameraEntities().size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
 
 			NIKE_CAMERA_SERVICE->clearCameraEntities();
 			NIKE_CAMERA_SERVICE->emplaceCameraEntity(UINT16_MAX, "Free Cam");
@@ -4223,12 +4199,11 @@ namespace NIKE {
 			}
 		}
 
-	}
-
-	void LevelEditor::CameraPanel::render() {
-		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
-
+		//Begin camera panel
 		ImGui::Begin(getName().c_str());
+
+		//Get cam entities
+		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
 
 		//Select camera
 		ImGui::Text("Select Camera:");
@@ -4625,10 +4600,6 @@ namespace NIKE {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 	}
 
-	void LevelEditor::UIPanel::update() {
-
-	}
-
 	void LevelEditor::UIPanel::render() {
 		ImGui::Begin(getName().c_str());
 
@@ -4873,8 +4844,7 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 	}
 
-	void LevelEditor::TileMapPanel::update() {
-
+	void LevelEditor::TileMapPanel::render() {
 		//Clicking to set map cells to blocked
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 		auto wrapped_cell = NIKE_MAP_SERVICE->getCursorCell();
@@ -4883,14 +4853,9 @@ namespace NIKE {
 			//Set cell to blocked
 			auto& cell = wrapped_cell.value().get();
 			cell.b_blocked = !cell.b_blocked;
-
-			cout << cell.index.x << " " << cell.index.y << endl;
-
-			cout << cell.position.x << " " << cell.position.y << endl;
 		}
-	}
 
-	void LevelEditor::TileMapPanel::render() {
+		//Begin Render
 		ImGui::Begin(getName().c_str());
 
 		ImGui::Spacing();
@@ -5595,11 +5560,6 @@ namespace NIKE {
 		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
 	}
 
-	void LevelEditor::ScenesPanel::update()
-	{
-		// Empty for now, nothing to update
-	}
-
 	void LevelEditor::ScenesPanel::render()
 	{
 		ImGui::Begin(getName().c_str());
@@ -6044,9 +6004,6 @@ namespace NIKE {
 
 		//Components panel reference
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
-	}
-
-	void LevelEditor::GameWindowPanel::update() {
 	}
 
 	void LevelEditor::GameWindowPanel::render()

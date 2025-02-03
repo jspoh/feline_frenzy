@@ -367,7 +367,7 @@ namespace NIKE {
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
 	}
 
-	void LevelEditor::Service::update() {
+	void LevelEditor::Service::updateAndRender() {
 
 		//Update imgui with proper delta time
 		ImGuiIO& io = ImGui::GetIO();
@@ -376,21 +376,6 @@ namespace NIKE {
 		//Update shortcuts
 		updateShortCuts();
 
-		//Return when imgui is not active
-		if (!b_editor_active) {
-			return;
-		}
-
-		//Update all panels
-		for (auto& panel : panels) {
-			panel->update();
-		}
-
-		//Save imgui layouts
-		ImGui::SaveIniSettingsToDisk(io.IniFilename);
-	}
-
-	void LevelEditor::Service::render() {
 		//Return when imgui is not active
 		if (!b_editor_active) {
 			return;
@@ -406,6 +391,9 @@ namespace NIKE {
 
 		//End render frame
 		endFrame();
+
+		//Save imgui layouts
+		ImGui::SaveIniSettingsToDisk(io.IniFilename);
 	}
 
 	void LevelEditor::Service::cleanUp() {

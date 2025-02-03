@@ -53,9 +53,6 @@ namespace NIKE {
 			//Init
 			virtual void init();
 
-			//Update
-			virtual void update() = 0;
-
 			//Render
 			virtual void render() = 0;
 
@@ -163,9 +160,6 @@ namespace NIKE {
 			//Init
 			void init() override;
 
-			//Update
-			void update() override;
-
 			//Render
 			void render() override;
 		};
@@ -228,9 +222,6 @@ namespace NIKE {
 
 			//Init
 			void init() override;
-
-			//Update
-			void update() override;
 
 			//Render
 			void render() override;
@@ -356,9 +347,6 @@ namespace NIKE {
 			//Init
 			void init() override;
 
-			//Update
-			void update() override;
-
 			//Set comp removal string reference
 			void setCompStringRef(std::string const& to_set);
 
@@ -466,9 +454,6 @@ namespace NIKE {
 			//Init
 			void init() override;
 
-			//Update
-			void update() override;
-
 			//Render
 			void render() override;
 
@@ -498,9 +483,6 @@ namespace NIKE {
 
 			//Init
 			void init() override;
-
-			//Update
-			void update() override;
 
 			//Render
 			void render() override;
@@ -536,9 +518,6 @@ namespace NIKE {
 
 			//Init
 			void init() override;
-
-			//Update
-			void update() override;
 
 			//Render
 			void render() override;
@@ -655,9 +634,6 @@ namespace NIKE {
 			//Init
 			void init() override;
 
-			//Update
-			void update() override;
-
 			//Render
 			void render() override;
 		};
@@ -699,9 +675,6 @@ namespace NIKE {
 			//Init
 			void init() override;
 
-			//Update
-			void update() override;
-
 			//Render
 			void render() override;
 		};
@@ -730,9 +703,6 @@ namespace NIKE {
 
 			//Init
 			void init() override;
-
-			//Update
-			void update() override;
 
 			//Render
 			void render() override;
@@ -779,9 +749,6 @@ namespace NIKE {
 			//Init
 			void init() override;
 
-			//Update
-			void update() override;
-
 			//Render
 			void render() override;
 
@@ -815,7 +782,7 @@ namespace NIKE {
 			// For storing editing layer mask id
 			unsigned int edit_mask_id;
 
-			bool bit_state = false;
+			bool bit_state;
 
 			// For storing selected layer index
 			unsigned int selected_layer_index;
@@ -839,7 +806,7 @@ namespace NIKE {
 			std::function<void()> editBitMaskPopup(std::string const& popup_id);
 
 		public:
-			ScenesPanel() = default;
+			ScenesPanel() : edit_mask_id{ 0 }, selected_layer_index{ 0 }, bit_position{ 0 }, bit_state{ false } {}
 			~ScenesPanel() = default;
 
 			//Panel Name
@@ -860,9 +827,6 @@ namespace NIKE {
 
 			//Init
 			void init() override;
-
-			//Update
-			void update() override;
 
 			//Render
 			void render() override;
@@ -920,9 +884,6 @@ namespace NIKE {
 
 			//Init
 			void init() override;
-
-			//Update
-			void update() override;
 
 			//Render
 			void render() override;

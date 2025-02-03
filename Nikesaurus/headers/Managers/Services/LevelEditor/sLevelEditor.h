@@ -83,10 +83,7 @@ namespace NIKE {
 			void init();
 
 			//Update Editor
-			void update();
-
-			//Render Editor
-			void render();
+			void updateAndRender();
 
 			//Clean up Editor
 			void cleanUp();

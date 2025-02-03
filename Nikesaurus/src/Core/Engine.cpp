@@ -343,11 +343,8 @@ namespace NIKE {
 				NIKE_ECS_MANAGER->updateSystems();
 
 #ifndef NDEBUG
-				//Update Level Editor
-				NIKE_LVLEDITOR_SERVICE->update();
-
-				//Render Level Editor
-				NIKE_LVLEDITOR_SERVICE->render();
+				//Update & Render Level Editor
+				NIKE_LVLEDITOR_SERVICE->updateAndRender();
 
 				//update UI First
 				NIKE_UI_SERVICE->update();
