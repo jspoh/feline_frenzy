@@ -815,6 +815,62 @@ namespace NIKE {
 			};
 	}
 
+	std::function<void()> LevelEditor::EntitiesPanel::saveEntityAsPrefabPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string entity_prefab_id;
+
+			//Get prefab ID
+			ImGui::Text("Enter a name for the prefab without .prefab:");
+			if (ImGui::InputText("##prefab Name", entity_prefab_id.data(), entity_prefab_id.capacity() + 1)) {
+				entity_prefab_id.resize(strlen(entity_prefab_id.c_str()));
+			}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Ok") && !entity_prefab_id.empty() && (entity_prefab_id.find(".prefab") == entity_prefab_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(std::string(entity_prefab_id + ".prefab"))) {
+
+				//Craft file path from name
+				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Prefabs");
+				if (std::filesystem::exists(path)) {
+					path /= std::string(entity_prefab_id + ".prefab");
+				}
+				else {
+					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
+					path /= std::string(entity_prefab_id + ".prefab");
+				}
+
+				//Normalize prefab path
+				auto prefab_path = NIKE_PATH_SERVICE->normalizePath(path);
+
+				//Save empty prefab to path
+				NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity), prefab_path.string());
+
+				//Reset prefab id buffer
+				entity_prefab_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Reset scene id buffer
+				entity_prefab_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::EntitiesPanel::init() {
 
 		//Register popups
@@ -823,6 +879,7 @@ namespace NIKE {
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
 		registerPopUp("Clone Entity", cloneEntityPopUp("Clone Entity"));
+		registerPopUp("Save Entity As Prefab", saveEntityAsPrefabPopUp("Save Entity As Prefab"));
 		error_msg = std::make_shared<std::string>("Error");
 		registerPopUp("Error", defPopUp("Error", error_msg));
 
@@ -945,7 +1002,7 @@ namespace NIKE {
 				ImGui::SameLine();
 
 				//Save new name
-				if (ImGui::SmallButton("Save")) {
+				if (ImGui::SmallButton("Save##SaveNewEntityName")) {
 					if(NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
 						NIKE_METADATA_SERVICE->setEntityName(selected_entity, entity_name);
 					}
@@ -993,6 +1050,18 @@ namespace NIKE {
 					else {
 						NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, "");
 					}
+				}
+
+				ImGui::Spacing();
+
+				ImGui::SeparatorText("Save Entity As Prefab");
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				//Make entity into prefab
+				if (ImGui::Button("Save## Save Entity As Prefab")) {
+					openPopUp("Save Entity As Prefab");
 				}
 
 				//Add Spacing

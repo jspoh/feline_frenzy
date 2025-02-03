@@ -206,6 +206,9 @@ namespace NIKE {
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
 
+			//Save entity as prefab popup
+			std::function<void()> saveEntityAsPrefabPopUp(std::string const& popup_id);
+
 		public:
 			EntitiesPanel() : selected_entity{ UINT16_MAX }, selected_tag{}, b_entity_changed { false } {}
 			~EntitiesPanel() = default;
