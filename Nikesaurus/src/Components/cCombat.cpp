@@ -107,6 +107,45 @@ namespace NIKE {
 
 		//Damage Comp Adding
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Damage>();
+
+		// Register faction components
+		NIKE_ECS_MANAGER->registerComponent<Faction>();
+
+		// Register faction for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Faction>(
+			// Serialize
+			[](Faction const& comp) -> nlohmann::json {
+				return {
+					{ "Faction", comp.faction }
+				};
+			},
+
+			// Deserialize
+			[](Faction& comp, nlohmann::json const& data) {
+				comp.faction = data.value("Faction", Factions::NEUTRAL);
+			},
+
+			// Override Serialize (for delta updates)
+			[](Faction const& comp, Faction const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.faction != other_comp.faction) {
+					delta["Faction"] = comp.faction;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize (for delta updates)
+			[](Faction& comp, nlohmann::json const& delta) {
+				if (delta.contains("Faction")) {
+					comp.faction = delta["Faction"];
+				}
+			}
+		);
+
+		// Faction Component Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Faction>();
 	}
 
 	void Combat::registerEditorComponents() {
@@ -239,44 +278,6 @@ namespace NIKE {
 			}
 		);
 #endif
-		// Register faction components
-		NIKE_ECS_MANAGER->registerComponent<Faction>();
-
-		// Register faction for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Faction>(
-			// 🔹 Serialize
-			[](Faction const& comp) -> nlohmann::json {
-				return {
-					{ "Faction", comp.faction }
-				};
-			},
-
-			// 🔹 Deserialize
-			[](Faction& comp, nlohmann::json const& data) {
-				comp.faction = data.value("Faction", Factions::NEUTRAL);
-			},
-
-			// 🔹 Override Serialize (for delta updates)
-			[](Faction const& comp, Faction const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-
-				if (comp.faction != other_comp.faction) {
-					delta["Faction"] = comp.faction;
-				}
-
-				return delta;
-			},
-
-			// 🔹 Override Deserialize (for delta updates)
-			[](Faction& comp, nlohmann::json const& delta) {
-				if (delta.contains("Faction")) {
-					comp.faction = delta["Faction"];
-				}
-			}
-		);
-
-		// Faction Component Adding
-		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Faction>();
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Faction>(
@@ -315,7 +316,5 @@ namespace NIKE {
 			}
 		);
 #endif
-
-
 	}
 }

@@ -30,6 +30,11 @@
         }
     },
     {
+        "MetaData": {
+            "Entity_Tags": []
+        }
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -71,14 +76,18 @@
                                 "Scale": {
                                     "x": 104.19999694824219,
                                     "y": 874.81298828125
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "shape_1",
-                            "Prefab_ID": ""
+                            "Name": "entity_0000",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -120,14 +129,18 @@
                                 "Scale": {
                                     "x": 104.19999694824219,
                                     "y": 874.81298828125
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "shape_2",
-                            "Prefab_ID": ""
+                            "Name": "entity_0001",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -229,16 +242,6 @@
                                 "Intensity": 0.0,
                                 "Texture_ID": "Player_animation_sprite.png"
                             },
-                            "Shooting::Shooting": {
-                                "Cooldown": 0.5,
-                                "Function": "createBullet",
-                                "LastShotTime": 0.5,
-                                "Layer": 0,
-                                "Offset": 150.0,
-                                "ScriptID": "",
-                                "ScriptLoaded": false,
-                                "ScriptPath": "assets/Scripts/createBullet.lua"
-                            },
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -236.67591857910156,
@@ -248,14 +251,18 @@
                                 "Scale": {
                                     "x": 80.67974090576172,
                                     "y": 116.1510009765625
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "test_player",
-                            "Prefab_ID": "playerfix.prefab"
+                            "Name": "entity_0002",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -297,14 +304,18 @@
                                 "Scale": {
                                     "x": 104.19999694824219,
                                     "y": 874.81298828125
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "shape_3",
-                            "Prefab_ID": ""
+                            "Name": "entity_0003",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -346,14 +357,18 @@
                                 "Scale": {
                                     "x": 104.19999694824219,
                                     "y": 874.81298828125
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "shape_4",
-                            "Prefab_ID": ""
+                            "Name": "entity_0004",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -423,14 +438,18 @@
                                 "Scale": {
                                     "x": 204.702880859375,
                                     "y": 204.702880859375
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "ball_1",
-                            "Prefab_ID": ""
+                            "Name": "entity_0005",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 }
@@ -522,14 +541,18 @@
                                 "Scale": {
                                     "x": 49.99999237060547,
                                     "y": 49.99999237060547
-                                }
+                                },
+                                "Screen Position": false
                             }
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "entity_0000",
-                            "Prefab_ID": "bullet.prefab"
+                            "Name": "entity_0006",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 }

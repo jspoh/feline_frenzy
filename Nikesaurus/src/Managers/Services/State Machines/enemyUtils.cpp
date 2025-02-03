@@ -33,7 +33,7 @@ namespace NIKE {
 				auto start_index = start.value();
 
 				static float path_recalc_timer = 0.0f;
-				path_recalc_timer += NIKE_WINDOWS_SERVICE->getDeltaTime();
+				path_recalc_timer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 				static int path_stick_threshold = 5; // How many frames to stick to a path
 				static int path_follow_counter = 0;
 

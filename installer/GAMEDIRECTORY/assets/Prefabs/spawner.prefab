@@ -1,8 +1,8 @@
 {
     "Components": {
         "Enemy::Spawner": {
-            "Cooldown": 5.0,
-            "EnemiesSpawned": 2,
+            "Cooldown": 2.0,
+            "EnemiesSpawned": 0,
             "EnemyLimit": 5,
             "LastSpawnTime": 1.7166657447814941
         },
@@ -18,6 +18,5 @@
             },
             "Screen Position": false
         }
-    },
-    "Layer ID": 0
+    }
 }

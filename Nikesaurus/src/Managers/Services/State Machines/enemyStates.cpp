@@ -255,13 +255,27 @@ namespace NIKE {
 	}
 
 	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
-
+		// Play death animation
+		animationStart(entity, 0, 8);
+		animationEnd(entity, 2, 8);
+		flipX(entity, false);
 	}
 	void State::DeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
-
+		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (animation_comp.has_value())
+		{
+			// Use delta time to let animation play before deleting entity
+			static float dt = 0.0f;
+			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			if (dt >= 0.5f) { 
+				NIKE_ECS_MANAGER->markEntityForDeletion(entity);
+				// Reset delta time
+				dt = 0.f;
+			}
+		}
 	}
 	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
-
+		
 	}
 	void State::DeathState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
 	{

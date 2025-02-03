@@ -112,7 +112,7 @@ namespace NIKE {
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if (!(attacker_damage_comp && target_health_comp)) {
+            if (!(attacker_damage_comp.has_value() && target_health_comp.has_value())) {
                 return;
             }
 
@@ -140,20 +140,13 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
 
-            // Check if target health drops to zero or below
-            if (target_health.health <= 0) {
-                if (target_health.lives == 0) {
-                    // Target only has 1 life left
-                    NIKE_ECS_MANAGER->markEntityForDeletion(target);
-                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
-                }
-                else {
-                    // Target has more than 1 life
-                    --target_health.lives;
-                    target_health.health = 100;
-                    NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
-                }
-            }
+			// Check if target health drops to zero or below
+			if (target_health.health > 0) {
+				// Target has more than 1 life
+				--target_health.lives;
+				target_health.health = ENEMY_HEALTH;
+				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+			}
         }
 
         void changeElement(Entity::Type player, Entity::Type source) {
@@ -166,7 +159,7 @@ namespace NIKE {
                 return;
             }
 
-            if (player_element_comp && source_element_comp) {
+            if (player_element_comp.has_value() && source_element_comp.has_value()) {
                 auto& player_element = player_element_comp.value().get().element;
                 auto& source_element = source_element_comp.value().get().element;
 

@@ -24,13 +24,13 @@ namespace NIKE {
 	bool Transition::IdleToAttack::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
 			// Somehow e_player_comp is getting nullptr
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and within range of enemy
-				if (Enemy::withinRange(entity, other_entity)){
+				if (Enemy::withinRange(entity, player)){
 					return true;
 				}
 			}
@@ -53,10 +53,10 @@ namespace NIKE {
 	{
 		// This function will check if there is a path from player to enemy entity(param)
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
 			if (e_player_comp.has_value() && e_player_transform.has_value() && e_enemy_transform.has_value())
@@ -99,7 +99,7 @@ namespace NIKE {
 
 				// Transition happens when path is not empty
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
-				if (!path.path.empty() && !Enemy::withinRange(entity, other_entity)) {
+				if (!path.path.empty() && !Enemy::withinRange(entity, player)) {
 					return true;
 				}
 			}
@@ -119,6 +119,13 @@ namespace NIKE {
 
 	bool Transition::IdleToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
+		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+		if (target_health_comp.has_value())
+		{
+			if (target_health_comp.value().get().lives <= 0) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -134,12 +141,12 @@ namespace NIKE {
 	bool Transition::AttackToIdle::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (!Enemy::withinRange(entity, other_entity)) {
+				if (!Enemy::withinRange(entity, player)) {
 					return true;
 				}
 			}
@@ -162,10 +169,10 @@ namespace NIKE {
 	{
 		// This function will check if there is a path from player to enemy entity(param)
 				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
 			if (e_player_comp.has_value() && e_player_transform.has_value() && e_enemy_transform.has_value())
@@ -208,7 +215,7 @@ namespace NIKE {
 
 				// Transition happens when path is not empty
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
-				if (!path.path.empty() && !Enemy::withinRange(entity, other_entity)) {
+				if (!path.path.empty() && !Enemy::withinRange(entity, player)) {
 					return true;
 				}
 			}
@@ -228,6 +235,13 @@ namespace NIKE {
 
 	bool Transition::AttackToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
+		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+		if (target_health_comp.has_value())
+		{
+			if (target_health_comp.value().get().lives <= 0) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -243,7 +257,7 @@ namespace NIKE {
 	bool Transition::ChaseToAttack::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
 			if (e_player_comp.has_value())
 			{
@@ -271,9 +285,9 @@ namespace NIKE {
 	{
 		// This function will check if there is a path from player to enemy entity(param)
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-		for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
 
 			if (e_player_comp.has_value())
 			{
@@ -299,6 +313,13 @@ namespace NIKE {
 
 	bool Transition::ChaseToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
+		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+		if (target_health_comp.has_value())
+		{
+			if (target_health_comp.value().get().lives <= 0) {
+				return true;
+			}
+		}
 		return false;
 	}
 
