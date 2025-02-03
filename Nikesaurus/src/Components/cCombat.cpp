@@ -113,19 +113,19 @@ namespace NIKE {
 
 		// Register faction for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Faction>(
-			// 🔹 Serialize
+			// Serialize
 			[](Faction const& comp) -> nlohmann::json {
 				return {
 					{ "Faction", comp.faction }
 				};
 			},
 
-			// 🔹 Deserialize
+			// Deserialize
 			[](Faction& comp, nlohmann::json const& data) {
 				comp.faction = data.value("Faction", Factions::NEUTRAL);
 			},
 
-			// 🔹 Override Serialize (for delta updates)
+			// Override Serialize (for delta updates)
 			[](Faction const& comp, Faction const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
 
@@ -136,7 +136,7 @@ namespace NIKE {
 				return delta;
 			},
 
-			// 🔹 Override Deserialize (for delta updates)
+			// Override Deserialize (for delta updates)
 			[](Faction& comp, nlohmann::json const& delta) {
 				if (delta.contains("Faction")) {
 					comp.faction = delta["Faction"];
