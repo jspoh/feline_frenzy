@@ -4177,13 +4177,11 @@ namespace NIKE {
 
 	void LevelEditor::CameraPanel::dispatchCameraChange(Entity::Type cam, const std::string& name) {
 		if (cam == UINT16_MAX) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(name, free_cam));
 		}
 		else {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(name));
 		}
-
-		NIKE_CAMERA_SERVICE->setActiveCamName(name);
 	}
 
 	void LevelEditor::CameraPanel::init() {
@@ -4197,7 +4195,7 @@ namespace NIKE {
 		combo_index = 0;
 		last_dispatched_index = 0;
 
-		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(UINT16_MAX, free_cam));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>("Free Cam", free_cam));
 	}
 
 	void LevelEditor::CameraPanel::update() {

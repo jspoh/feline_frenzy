@@ -27,7 +27,6 @@ namespace NIKE {
 			Vector2f up;
 
 			//Active cam id
-			Entity::Type cam_id;
 			std::string cam_name;
 
 			//Default Camera
@@ -70,7 +69,7 @@ namespace NIKE {
 			*********************************************************************/
 
 			// Return active Cam id
-			Entity::Type getActiveCamId() const;
+			std::optional<Entity::Type> getActiveCamId() const;
 
 			// Set active cam name
 			void setActiveCamName(std::string active_cam);

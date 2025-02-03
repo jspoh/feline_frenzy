@@ -677,7 +677,6 @@ namespace NIKE {
 			//Free camera
 			std::shared_ptr<Render::Cam> free_cam;
 
-
 		public:
 			CameraPanel() : combo_index{ 0 }, last_dispatched_index {0} {}
 			~CameraPanel() = default;

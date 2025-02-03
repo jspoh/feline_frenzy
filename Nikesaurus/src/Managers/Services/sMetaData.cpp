@@ -151,7 +151,6 @@ namespace NIKE {
 
 	std::optional<Entity::Type> MetaData::Service::getEntityByName(std::string const& name) const {
 		if (entity_names.find(name) == entity_names.end()) {
-			NIKEE_CORE_WARN("Fetching invalid name");
 			return  std::nullopt;
 		}
 

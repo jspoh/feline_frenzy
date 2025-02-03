@@ -13,12 +13,13 @@
 namespace NIKE {
 
 	void Camera::Service::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
-		if (NIKE_ECS_MANAGER->checkEntity(event->entity_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(event->entity_id)) {
-			cam_id = event->entity_id;
+		auto entity = NIKE_METADATA_SERVICE->getEntityByName(event->entity_name);
+		if (entity.has_value() && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(entity.value())) {
+			cam_name = event->entity_name;
 		}
 		else {
 			if (event->fallback_cam != nullptr) {
-				cam_id = event->entity_id;
+				cam_name = event->entity_name;
 				def_cam = event->fallback_cam;
 			}
 		}
@@ -35,7 +36,6 @@ namespace NIKE {
 
 		up = Vector2(-sin(angleDisp), cos(angleDisp));
 		target = Vector2(cos(angleDisp), sin(angleDisp));
-		cam_id = 0;
 		cam_name = "Free Cam";
 		cam_height = 0;
 
@@ -66,18 +66,45 @@ namespace NIKE {
 	Matrix_33 Camera::Service::getWorldToNDCXform() const
 	{
 		Render::Cam cam;
+
+		//Get entity from cam name
+		auto cam_entity = NIKE_METADATA_SERVICE->getEntityByName(cam_name);
+
 		//Check if camera entity exists
-		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
-		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value()) {
+		if (cam_entity.has_value() && NIKE_ECS_MANAGER->checkEntity(cam_entity.value())) {
 
-			//Check if camera attached to entity has a transform
-			auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id);
+			//Get camp component
+			auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_entity.value());
+			if (e_cam_comp.has_value()) {
+				
+				//Check if camera attached to entity has a transform
+				auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_entity.value());
 
-			//Apply transformation to camera position
-			if(e_transform_comp.has_value()) e_cam_comp.value().get().position = e_transform_comp.value().get().position;
+				//Apply transformation to camera position
+				if (e_transform_comp.has_value()) e_cam_comp.value().get().position = e_transform_comp.value().get().position;
 
-			//Set camera value
-			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).value();
+				//Set camera value
+				cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_entity.value()).value();
+			}
+			else {
+
+				//Check if camera attached to entity has a transform
+				auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_entity.value());
+
+				//Apply transformation to camera position
+				if (e_transform_comp.has_value()) {
+					//Add camera component
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Cam>(cam_entity.value(), Render::Cam(e_transform_comp.value().get().position, cam_height));
+				}
+				else {
+					//Add camera component
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Cam>(cam_entity.value(), Render::Cam(cam_height));
+				}
+
+				//Set camera value
+				cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_entity.value()).value();
+			}
+
 		}
 		else {
 			cam = *def_cam.get();
@@ -150,8 +177,8 @@ namespace NIKE {
 	* CAMERA 
 	*********************************************************************/
 
-	Entity::Type Camera::Service::getActiveCamId() const {
-		return cam_id;
+	std::optional<Entity::Type> Camera::Service::getActiveCamId() const {
+		return NIKE_METADATA_SERVICE->getEntityByName(cam_name);
 	}
 
 	std::string Camera::Service::getActiveCamName() const {
@@ -164,18 +191,45 @@ namespace NIKE {
 
 	Render::Cam Camera::Service::getActiveCamera() const {
 		Render::Cam cam;
+
+		//Get entity from cam name
+		auto cam_entity = NIKE_METADATA_SERVICE->getEntityByName(cam_name);
+
 		//Check if camera entity exists
-		auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id);
-		//Check if camera attached to entity has a transform
-		auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_id);
-		if (NIKE_ECS_MANAGER->checkEntity(cam_id) && e_cam_comp.has_value()) {
+		if (cam_entity.has_value() && NIKE_ECS_MANAGER->checkEntity(cam_entity.value())) {
 
-			//Apply transformation to camera position
-			if (e_transform_comp.has_value()) 
-				e_cam_comp.value().get().position = e_transform_comp.value().get().position;
+			//Get camp component
+			auto e_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_entity.value());
+			if (e_cam_comp.has_value()) {
 
-			//Set camera value
-			cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_id).value();
+				//Check if camera attached to entity has a transform
+				auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_entity.value());
+
+				//Apply transformation to camera position
+				if (e_transform_comp.has_value()) e_cam_comp.value().get().position = e_transform_comp.value().get().position;
+
+				//Set camera value
+				cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_entity.value()).value();
+			}
+			else {
+
+				//Check if camera attached to entity has a transform
+				auto const& e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(cam_entity.value());
+
+				//Apply transformation to camera position
+				if (e_transform_comp.has_value()) {
+					//Add camera component
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Cam>(cam_entity.value(), Render::Cam(e_transform_comp.value().get().position, cam_height));
+				}
+				else {
+					//Add camera component
+					NIKE_ECS_MANAGER->addEntityComponent<Render::Cam>(cam_entity.value(), Render::Cam(cam_height));
+				}
+
+				//Set camera value
+				cam = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(cam_entity.value()).value();
+			}
+
 		}
 		else {
 			cam = *def_cam.get();

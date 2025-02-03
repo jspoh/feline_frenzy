@@ -119,13 +119,6 @@ namespace NIKE {
 					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
 				}
 
-				////Change camera to active cam
-				//if (comp_name == "Render::Cam") {
-				//	if (NIKE_CAMERA_SERVICE->getActiveCamName() == data.at("MetaData").at("Entity_ID").get<std::string>()) {
-				//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(entity));
-				//	}
-				//}
-
 				//Deserialize data into component
 				comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 			}
