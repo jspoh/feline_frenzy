@@ -102,7 +102,7 @@
             "Texture_ID": "Normal_Enemy_SpriteSheet.png"
         },
         "State::State": {
-            "State": "Chase"
+            "State": "Idle"
         },
         "Transform::Transform": {
             "Position": {
