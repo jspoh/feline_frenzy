@@ -10,6 +10,9 @@
         "Combat::Damage": {
             "Damage": 10.0
         },
+        "Combat::Faction": {
+            "Faction": 2
+	    },
         "Element::Entity": {
             "Element": 1
         },

@@ -27,6 +27,9 @@ namespace NIKE {
 
     void Physics::Manager::update() {
 
+        // Clear processed collisions
+        collision_system->clearProcessedCollisions();
+
         //Delta time
         float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
@@ -184,6 +187,8 @@ namespace NIKE {
                                     // Set the collision flags
                                     e_collider.b_collided = true;
                                     other_collider.b_collided = true;
+
+                                    //NIKEE_CORE_ERROR("Collision Detected");
 
                                     // Perform collision resolution
                                     collision_system->collisionResolution(
