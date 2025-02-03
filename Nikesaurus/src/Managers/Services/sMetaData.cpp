@@ -172,8 +172,11 @@ namespace NIKE {
 		//Set prefab master id
 		entities.at(entity).prefab_id = prefab_id;
 
-		//Load entity with prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		//Check if prefab id is valid
+		if (!entities.at(entity).prefab_id.empty() && entities.at(entity).prefab_id.find(".prefab") != std::string::npos) {
+			//Load entity with prefab
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+		}
 	}
 
 	std::string MetaData::Service::getEntityPrefabID(Entity::Type entity) const {
