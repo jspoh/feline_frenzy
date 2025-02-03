@@ -366,9 +366,16 @@ namespace NIKE {
         Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
+        // Check if this collision was already processed
+        auto collision_pair = std::minmax(entity_a, entity_b);
+        if (processed_collisions.count(collision_pair)) {
+            return; // Skip duplicate processing
+        }
+        processed_collisions.insert(collision_pair);  // Mark as processed
+
         // Dispatch collision event
         auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
-        NIKEE_CORE_WARN("Collision Event Dispatched");
+        //NIKEE_CORE_WARN("Collision Event Dispatched");
         NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
 
         // Destroy Resolution
@@ -414,5 +421,10 @@ namespace NIKE {
         if (collider_b.resolution == Physics::Resolution::SLIDE) {
             transform_b.position -= info.mtv;
         }
+    }
+
+    void Collision::System::clearProcessedCollisions() {
+        // To be reset at the start of each frame
+        processed_collisions.clear(); 
     }
 }
