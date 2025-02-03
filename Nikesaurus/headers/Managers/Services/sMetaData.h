@@ -132,6 +132,9 @@ namespace NIKE {
 			//Add Entity Tag
 			void addEntityTag(Entity::Type entity, std::string const& tag);
 
+			//Remove Entity Tag
+			void removeEntityTag(Entity::Type entity, std::string const& tag);
+
 			//Get Entity Tags
 			std::set<std::string> getEntityTags(Entity::Type entity);
 
