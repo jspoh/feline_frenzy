@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef PARTICLE_HPP
-#define PARTICLE_HPP
+#ifndef _SYS_PARTICLE_H_
+#define _SYS_PARTICLE_H_
 
 
 #include "Core/stdafx.h"
@@ -109,4 +109,4 @@ namespace NIKE {
 
 }
 
-#endif // !PARTICLE_HPP
+#endif // !_SYS_PARTICLE_H_

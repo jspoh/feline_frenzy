@@ -22,6 +22,34 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
 		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
+		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
+
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
+			//Serialize
+			[](Render::ParticleEmitter const& comp) -> nlohmann::json {
+				return	{
+					{ "preset", static_cast<int>(comp.preset) },
+					{ "offset", comp.offset.toJson() },
+					{ "duration", comp.duration },
+					{ "ref", comp.ref }
+				};
+			},
+			//Deserialize
+			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
+				comp.preset = static_cast<int>(data.at("preset").get<int>());
+				comp.offset.fromJson(data.at("offset"));
+				comp.duration = data.at("duration").get<float>();
+				comp.ref = data.at("ref").get<std::string>();
+			}
+		);
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::ParticleEmitter>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::ParticleEmitter& comp) {
+				ImGui::Text("Edit Particle Emitter variables");
+			}
+		);
+#endif
 
 		//Register cam for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Cam>(
@@ -201,8 +229,8 @@ namespace NIKE {
 					ImGui::Text("Select Font:");
 
 					// Hold the current and previous font selection
-					static std::string previous_font_id = comp.font_id; 
-					std::string current_font_id = comp.font_id;        
+					static std::string previous_font_id = comp.font_id;
+					std::string current_font_id = comp.font_id;
 
 					// Get all loaded fonts
 					const auto& all_loaded_fonts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Font);
@@ -312,7 +340,7 @@ namespace NIKE {
 						}
 					}
 				}
-				
+
 			}
 		);
 #endif
@@ -431,7 +459,7 @@ namespace NIKE {
 
 				}
 			}
-				
+
 		);
 #endif
 
@@ -480,7 +508,7 @@ namespace NIKE {
 					std::string current_texture = comp.texture_id;
 
 					ImGui::Text("Select Texture");
-					
+
 					auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
 
 					// Find the index of the currently selected texture in the list
@@ -782,7 +810,7 @@ namespace NIKE {
 
 						}
 					}
-					
+
 				}
 
 			}

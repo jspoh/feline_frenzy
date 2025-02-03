@@ -13,7 +13,6 @@
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
-#include "Systems/sysParticle.h"
 
 #ifndef RENDER_SERVICE_HPP
 #define RENDER_SERVICE_HPP
