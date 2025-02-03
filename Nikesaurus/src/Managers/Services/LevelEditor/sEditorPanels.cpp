@@ -959,10 +959,20 @@ namespace NIKE {
 				ImGui::Spacing();
 
 				//Select prefab
-				static int select_prefab = 0;
+				int select_prefab = 0;
 
 				//Prefab ref container
 				auto const& prefabs_ref = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
+				if (!NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity).empty()) {
+					for (auto const& ref : prefabs_ref) {
+						if (NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity) == ref) {
+							break;
+						}
+						++select_prefab;
+					}
+					//Clamp selected prefab
+					select_prefab = std::clamp(select_prefab, 0, static_cast<int>(prefabs_ref.size()) - 1);
+				}
 
 				//Select prefab ID
 				if (ImGui::Combo("##PrefabIDSetter", &select_prefab, prefabs_ref.data(), static_cast<int>(prefabs_ref.size()))) {
@@ -2458,7 +2468,7 @@ namespace NIKE {
 				prefab_comps.clear();
 
 				//Set prefab ID
-				prefab_id = new_prefab_id;
+				prefab_id = new_prefab_id + ".prefab";
 
 				//Craft file path from name
 				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Prefabs");
@@ -2607,6 +2617,18 @@ namespace NIKE {
 	}
 
 	void LevelEditor::PrefabsPanel::savePrefab() {
+
+		//Save entity prefab overrides
+		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+			//Find entities with prefab active
+			if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
+
+				//Serialize override data
+				NIKE_METADATA_SERVICE->setEntityPrefabOverride(entity, NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity, prefab_id));
+			}
+		}
+
 		//Save prefab to file
 		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
@@ -2616,8 +2638,11 @@ namespace NIKE {
 			//Apply prefab to all entities
 			if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
 
-				//Apply prefab changes to entity
-				NIKE_SERIALIZE_SERVICE->applyPrefabChangesToEntity(entity, prefab_id);
+				//Apply prefab
+				NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+
+				//Deserialize override data
+				NIKE_SERIALIZE_SERVICE->deserializePrefabOverrides(entity, NIKE_METADATA_SERVICE->getEntityPrefabOverride(entity));
 			}
 		}
 
@@ -5860,9 +5885,6 @@ namespace NIKE {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
 
-				//Get texture asset
-				auto prefab_path = NIKE_ASSETS_SERVICE->getAssetPath(asset_id);
-
 				// Define an undo/redo action
 				Action drag_drop_action;
 
@@ -5870,11 +5892,12 @@ namespace NIKE {
 				auto entity_id = std::make_shared<Entity::Type>();
 
 				//Do Action
-				drag_drop_action.do_action = [entity_id, prefab_path, asset_id, render_pos]() {
+				drag_drop_action.do_action = [entity_id, asset_id, render_pos]() {
 					//Creat new entity 
 					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
-					NIKE_SERIALIZE_SERVICE->loadEntityFromFile(*entity_id, prefab_path.string());
+					//Load entity from prefab
+					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(*entity_id, asset_id);
 
 					//Add transform
 					auto e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(*entity_id);

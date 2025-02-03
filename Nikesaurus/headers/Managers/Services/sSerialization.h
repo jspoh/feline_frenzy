@@ -85,12 +85,6 @@ namespace NIKE {
 			//Deserialize Entity
 			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
 
-			//Serialize prefab overrides
-			nlohmann::json serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id);
-
-			//Deserialize prefab overrides
-			void deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data);
-
 			//current scene path string when (de-serialising)
 			std::string curr_scene_file = "";
 
@@ -128,8 +122,11 @@ namespace NIKE {
 			//Deserialize Prefab
 			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path);
 
-			//Apply prefab change to entity
-			void applyPrefabChangesToEntity(Entity::Type entity, std::string const& prefab_id);
+			//Serialize prefab overrides
+			nlohmann::json serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id);
+
+			//Deserialize prefab overrides
+			void deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data);
 
 			//Serialize Entity into file path
 			void saveEntityToFile(Entity::Type entity, std::string const& file_path);

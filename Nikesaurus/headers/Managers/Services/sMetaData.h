@@ -25,6 +25,9 @@ namespace NIKE {
 			//Prefab tag
 			std::string prefab_id;
 
+			//Override data for variant prefab
+			nlohmann::json prefab_override;
+
 			//Boolean for locking entities in editor
 			bool b_locked;
 
@@ -119,6 +122,12 @@ namespace NIKE {
 
 			//Get Entity Master prefab
 			std::string getEntityPrefabID(Entity::Type entity) const;
+
+			//Set Entity prefab override
+			void setEntityPrefabOverride(Entity::Type entity, nlohmann::json const& data);
+
+			//Get Entity prefab override
+			nlohmann::json getEntityPrefabOverride(Entity::Type entity) const;
 
 			//Add Entity Tag
 			void addEntityTag(Entity::Type entity, std::string const& tag);
