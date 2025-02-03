@@ -104,6 +104,14 @@ namespace NIKE {
 			//Check if component is already present, if not add component
 			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
 				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+
+			}
+
+			//Change camera to active cam
+			if (comp_name == "Render::Cam") {
+				if (NIKE_CAMERA_SERVICE->getActiveCamName() == data.at("MetaData").at("Entity_ID").get<std::string>()) {
+					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(entity));
+				}
 			}
 
 			//Deserialize data into component
@@ -185,7 +193,6 @@ namespace NIKE {
 		nlohmann::json m_data;
 		m_data["Grid ID"] = grid_id;
 		data.push_back(m_data);
-		//}
 
 		// Camera Component Data
 		nlohmann::json cam_data;

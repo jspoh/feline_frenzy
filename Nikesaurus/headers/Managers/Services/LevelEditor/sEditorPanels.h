@@ -132,7 +132,7 @@ namespace NIKE {
 			void setGameState(bool state);
 
 		public:
-			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ true }, b_grid_state{ false }, b_gizmo_state{ false } {}
+			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false } {}
 			~MainPanel() = default;
 
 			//Panel Name
@@ -293,6 +293,9 @@ namespace NIKE {
 
 			//Unlock all entities
 			void unlockAllEntities();
+
+			//Get lock status of entity
+			bool isEntityLocked(Entity::Type entity) const;
 
 			//Check entity changed
 			bool isEntityChanged() const;

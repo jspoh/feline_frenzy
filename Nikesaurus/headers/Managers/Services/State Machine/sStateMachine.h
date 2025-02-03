@@ -46,7 +46,18 @@ namespace NIKE {
             ************************/
             std::unordered_map<std::string, std::shared_ptr<Itransition>> const& getTransitions();
             void addTransition(const std::string& transition_id, std::shared_ptr<Itransition> transition);
+            void removeTransition(const std::string& transition_id);
+            bool checkTransitionExist(const std::string& transition_id);
 
+            /***********************
+            * Animation handling
+            ************************/
+            void animationStart(Entity::Type& entity, int start_x, int start_y);
+            void animationEnd(Entity::Type& entity, int end_x, int end_y);
+            void flipX(Entity::Type& entity, bool yes_or_no);
+            void flipY(Entity::Type& entity, bool yes_or_no);
+            void setLastDirection(Entity::Type& entity, int dir);
+            int getLastDirection(Entity::Type& entity);
 
         private:
             // List of transitions
@@ -71,10 +82,7 @@ namespace NIKE {
 
             void removeState(const std::string& state_id);
 
-
-            /***********************
-            * FSM Managements
-            **************************/
+            std::string getStateID(std::shared_ptr<Istate> state) const;
 
             template <typename T>
             std::shared_ptr<T> getStateByID(const std::string& state_id) const {
@@ -88,12 +96,17 @@ namespace NIKE {
 
             std::shared_ptr<Istate> getStateByID(const std::string& state_id) const;
 
+
+            /***********************
+            * FSM Managements
+            **************************/
             void init();
             void update(Entity::Type& entity);
 
         private:
             // Shared pointer to current state
-            // FSM class will hold ownsership of the entity's current state
+            // FSM class will hold ownsership of the entity's current state (might not need alr
+            // use entity's state comp to hold ownership)
             std::shared_ptr<Istate> current_state;
             // List of states map
             std::unordered_map<std::string, std::shared_ptr<Istate>> state_map;

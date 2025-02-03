@@ -298,7 +298,6 @@ namespace NIKE {
 		window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
 	}
 
 	void LevelEditor::MainPanel::update() {
@@ -451,11 +450,12 @@ namespace NIKE {
 	void LevelEditor::MainPanel::deserializeConfig(nlohmann::json const& config) {
 		try {
 			auto const& data = config.at("EditorConfig");
+
 			b_debug_mode = data.at("Debug_Mode").get<bool>();
-			b_game_state = data.at("Game_State").get<bool>(); // Game state does not work due to systems not running yet
 			b_gizmo_state = data.at("Gizmo_State").get<bool>();
 			b_grid_state = data.at("Grid_State").get<bool>();
 
+			setGameState(data.at("Game_State").get<bool>());
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -829,6 +829,9 @@ namespace NIKE {
 						//Skip entities not on curr layer
 						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
 							continue;
+						// Skip locked entities so they don't block clicks!
+						if (isEntityLocked(entity.first))
+							continue;
 
 						// Check for entity clicking
 						if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
@@ -1087,6 +1090,17 @@ namespace NIKE {
 		for (auto& entity : entities) {
 			entity.second.b_locked = false;
 		}
+	}
+
+	bool LevelEditor::EntitiesPanel::isEntityLocked(Entity::Type entity) const {
+		//Get selected entity data
+		auto it = entities.find(entity);
+
+		if (it == entities.end()) {
+			throw std::runtime_error("Entity does not exist!");
+		}
+
+		return entities.at(entity).b_locked;
 	}
 
 	bool LevelEditor::EntitiesPanel::isEntityChanged() const {
@@ -4035,42 +4049,37 @@ namespace NIKE {
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
 		//Setup free cam to be referenced as default camera in camera system
-		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
+		free_cam = NIKE_CAMERA_SERVICE->getDefaultCamera();
 
 		combo_index = 0;
 		last_dispatched_index = 0;
 
-		NIKE_CAMERA_SERVICE->serializeCamera();
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(UINT16_MAX, free_cam));
 	}
 
 	void LevelEditor::CameraPanel::update() {
-		const std::unordered_map<Entity::Type, std::string> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
-		static auto previous_scene = NIKE_SCENES_SERVICE->getPrevSceneID();
+		const std::vector<std::pair<Entity::Type, std::string>> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
 
+		//Update list of camera entities (On scene change and when list of entities get updated)
+		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
 
-		//Update list of camera entities
-		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1 ||
-			previous_scene != NIKE_SCENES_SERVICE->getCurrSceneID() ) {
-			previous_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
 			NIKE_CAMERA_SERVICE->clearCameraEntities();
 			NIKE_CAMERA_SERVICE->emplaceCameraEntity(UINT16_MAX, "Free Cam");
 			combo_index = 0;
 			last_dispatched_index = 0;
+
 			int index = 0;
+
 			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
 				auto cam_name = entities_panel.lock()->getEntityName(entity);
 				NIKE_CAMERA_SERVICE->emplaceCameraEntity(entity, cam_name);
 
 				index++;
 				if (cam_name == NIKE_CAMERA_SERVICE->getActiveCamName()) {
-					dispatchCameraChange(entity, cam_name);
 					combo_index = index;
 					last_dispatched_index = index;
 				}
-
-
 			}
-			
 		}
 
 	}
@@ -4084,7 +4093,7 @@ namespace NIKE {
 		ImGui::Text("Select Camera:");
 
 		//Static for tracking last dispatched index & dispatching of new camera
-		static bool dispatch = true;
+		static bool dispatch = false;
 
 		// Convert unordered_map to vector of strings (camera names)
 		std::vector<const char*> cam_names;

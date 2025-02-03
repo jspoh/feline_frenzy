@@ -14,7 +14,57 @@
 
 namespace NIKE {
 	namespace Transition {
+
+		/****************************
+		* Idle Transitions
+		*****************************/
 		class IdleToAttack : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class IdleToChase : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		/****************************
+		* Attack Transitions
+		*****************************/
+		class AttackToIdle : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class AttackToChase : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		/****************************
+		* Chase Transitions
+		*****************************/
+		class ChaseToAttack : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class ChaseToIdle : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 

@@ -25,31 +25,13 @@
 namespace NIKE {
 	namespace Render {
 
-		
-
 		//Render Manager
-		class Manager : public System::ISystem, public Events::IEventListener<Windows::WindowResized> {
+		class Manager : public System::ISystem {
 		private:
 
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
-
-			//On windows resized event
-			void onEvent(std::shared_ptr<Windows::WindowResized> event) override;
-
-			//Shader system
-			std::unique_ptr<Shader::ShaderManager> shader_manager;
-
-			//For rendering viewport
-			unsigned int frame_buffer, texture_color_buffer;
-
-			//Quad rendering variables
-			unsigned int VAO, VBO;
-
-
-			//Render text
-			void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
 			//Helper function to encapsulate rendering entities
 			void transformAndRenderEntity(Entity::Type entity, bool debugMode);
@@ -60,7 +42,7 @@ namespace NIKE {
 
 
 			//Constructor
-			Manager();
+			Manager() = default;
 
 			//Destructor
 			~Manager() = default;

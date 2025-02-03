@@ -11,8 +11,9 @@
     }
   },
   "EditorConfig": {
+    "Editor_State" : true,
     "Debug_Mode": false,
-    "Game_State": true,
+    "Game_State": false,
     "Gizmo_State": true,
     "Grid_State": false
   },

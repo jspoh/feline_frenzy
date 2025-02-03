@@ -13,6 +13,18 @@
 
 namespace NIKE {
 	namespace State {
+
+		State::State()
+		{
+			// Default init of entity's state to idle
+			auto const& idle_state = NIKE_FSM_SERVICE->getStateByID("Idle");
+			if (idle_state)
+			{
+				current_state = idle_state;
+				state_id = "Idle";
+			}
+		}
+
 		void registerComponents()
 		{
 			// Register components
@@ -29,7 +41,10 @@ namespace NIKE {
 
 				// Deserialize
 				[](State& comp, nlohmann::json const& data) {
-					comp.state_id = data.at("State").get<std::string>();
+					UNREFERENCED_PARAMETER(data);
+					// Default deserialize to idle
+					// comp.state_id = data.at("State").get<std::string>();
+					comp.state_id = "Idle";
 					// Assign pointer based on state_id
 					comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
 
@@ -73,7 +88,7 @@ namespace NIKE {
 									auto prev_state_ptr = comp.current_state.lock();
 									auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
 									if (new_state_ptr) {
-										NIKE_FSM_SERVICE->changeState(new_state_ptr, *comp.entity_ref);
+										NIKE_FSM_SERVICE->changeState(new_state_ptr, comp.entity_ref);
 
 										// Update the component's state information
 										comp.state_id = new_state;
@@ -87,7 +102,7 @@ namespace NIKE {
 									auto prev_state_ptr = comp.current_state.lock();
 									auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
 									if (new_state_ptr) {
-										NIKE_FSM_SERVICE->changeState(new_state_ptr, *comp.entity_ref);
+										NIKE_FSM_SERVICE->changeState(new_state_ptr, comp.entity_ref);
 
 										// Update the component's state information
 										comp.state_id = new_state;
@@ -108,8 +123,9 @@ namespace NIKE {
 					}
 				}
 			);
-		}
 #endif
+		}
+
 	}
 
 }
