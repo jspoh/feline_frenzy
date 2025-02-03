@@ -135,7 +135,7 @@ namespace NIKE {
 		// Get enemy range
 		const auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
 		if (!enemy_attack_comp.has_value()) {
-			NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
+			//NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
 			return false;
 		}
 		const float enemy_range = enemy_attack_comp.value().get().range;

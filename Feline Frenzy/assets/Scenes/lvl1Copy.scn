@@ -874,7 +874,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -1196.86279296875,
-                                    "y": -4.22296142578125
+                                    "y": 0.77911376953125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -918,7 +918,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 1200.428955078125,
-                                    "y": -324.136474609375
+                                    "y": -4.2230000495910645
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1076,6 +1076,9 @@
                                 "Channel_Group_ID": "PlayerSFX",
                                 "Pitch": 1.0,
                                 "Volume": 0.5
+                            },
+                            "Combat::Faction": {
+                                "Faction": 1
                             },
                             "Element::Entity": {
                                 "Element": 1

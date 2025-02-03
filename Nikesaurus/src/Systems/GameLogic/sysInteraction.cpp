@@ -161,6 +161,12 @@ namespace NIKE {
         void Manager::changeElement(Entity::Type player, Entity::Type source) {
             const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
             const auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
+            const auto player_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(player);
+
+            // Prevent enemies from switching elements
+            if (player_faction_comp.has_value() && player_faction_comp.value().get().faction != Combat::Factions::PLAYER) {
+                return;
+            }
 
             if (player_element_comp && source_element_comp) {
                 auto& player_element = player_element_comp.value().get().element;
