@@ -34,6 +34,14 @@
             "Pitch": 1.0,
             "Volume": 0.5
         },
+        "Combat::Faction": {
+            "Faction": 1
+	},
+        "Combat::Health": {
+            "Health": 100.0,
+            "InvulnerableFlag": true,
+            "Lives": 1
+        },
         "Element::Entity": {
             "Element": 0
         },
