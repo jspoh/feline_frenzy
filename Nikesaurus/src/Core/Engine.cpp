@@ -290,8 +290,7 @@ namespace NIKE {
 		// !TODO: remove this, hardcoding for installer
 		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 
-
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
 #endif
@@ -312,17 +311,15 @@ namespace NIKE {
 #ifdef DEBUG
 			try {
 #endif
-
 				// have to poll events regardless of focus
 				//Poll system events
 				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
+				//Skip update when window is out of focus
 				if (!NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-					// Skip updates when unfocused, but continue polling events
-					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
-
 					continue;
 				}
+
 				//Calculate Delta Time
 				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
@@ -365,7 +362,6 @@ namespace NIKE {
 				if (err != GL_NO_ERROR) {
 					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 				}
-
 
 				// update rendered fps
 				static std::unordered_map<std::string, std::shared_ptr<void>> comps;

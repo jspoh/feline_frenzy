@@ -83,7 +83,7 @@ namespace NIKE {
 			nlohmann::json serializeEntity(Entity::Type entity);
 
 			//Deserialize Entity
-			void deserializeEntity(Entity::Type entity, nlohmann::json const& data);
+			bool deserializeEntity(Entity::Type entity, nlohmann::json const& data);
 
 			//current scene path string when (de-serialising)
 			std::string curr_scene_file = "";
@@ -114,6 +114,7 @@ namespace NIKE {
 			// Save grid to .map file
 			void saveGridToFile(const std::string& file_path);
 
+			//Load grid from .map file
 			void loadGridFromFile(const std::string& file_path);
 
 			//Serialize Prefab
@@ -126,7 +127,7 @@ namespace NIKE {
 			nlohmann::json serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id);
 
 			//Deserialize prefab overrides
-			void deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data);
+			bool deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data);
 
 			//Serialize Entity into file path
 			void saveEntityToFile(Entity::Type entity, std::string const& file_path);

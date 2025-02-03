@@ -55,7 +55,6 @@ namespace NIKE {
 			return;
 		}
 
-
 		// Save data into file
 		file << grid_data.dump(4);
 
@@ -75,6 +74,8 @@ namespace NIKE {
 		nlohmann::json grid_data;
 		file >> grid_data;
 		file.close();
+
+		if (grid_data.empty()) return;
 
 		NIKE_MAP_SERVICE->deserialize(grid_data);
 	}
@@ -97,40 +98,51 @@ namespace NIKE {
 		return data;
 	}
 
-	void Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& data) {
+	bool Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& data) {
+
+		//Boolean for flagging errors in deserializing
+		bool success = true;
 
 		//If there are no components
 		if (!data.contains("Components"))
-			return;
+			return success;
 
 		//Iterate through all components stored within data
 		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
 
-			//Check if component is already present, if not add component
-			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
-				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+			//Check if component exists within the system
+			if (NIKE_ECS_MANAGER->checkComponentType(comp_name)) {
+				Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
 
-			}
-
-			//Change camera to active cam
-			if (comp_name == "Render::Cam") {
-				if (NIKE_CAMERA_SERVICE->getActiveCamName() == data.at("MetaData").at("Entity_ID").get<std::string>()) {
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(entity));
+				//Check if component is already present, if not add component
+				if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
 				}
-			}
 
-			//Deserialize data into component
-			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+				////Change camera to active cam
+				//if (comp_name == "Render::Cam") {
+				//	if (NIKE_CAMERA_SERVICE->getActiveCamName() == data.at("MetaData").at("Entity_ID").get<std::string>()) {
+				//		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(entity));
+				//	}
+				//}
+
+				//Deserialize data into component
+				comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+			}
+			else {
+				success = false;
+			}
 		}
 
 		if (!data.contains("Layer ID")) {
 			NIKEE_CORE_INFO("Entity does not contain a layer id, setting to default");
 			NIKE_ECS_MANAGER->setEntityLayerID(entity, 0);
-			return;
+			return success;
 		}
 		// Set layer ID
 		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
+
+		return success;
 	}
 
 	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path) {
@@ -155,11 +167,14 @@ namespace NIKE {
 
 	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path) {
 
+		//Boolean for flagging errors in deserializing
+		bool success = true;
+
 		//Json Data
 		nlohmann::json data;
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -185,6 +200,16 @@ namespace NIKE {
 				//Deserialize data into component
 				comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
 			}
+			else {
+				success = false;
+			}
+		}
+
+		//Error encountered in deserializing
+		if (!success) {
+
+			//Save prefab again
+			savePrefab(comps, file_path);
 		}
 
 		//Close file
@@ -215,23 +240,34 @@ namespace NIKE {
 		return data;
 	}
 
-	void Serialization::Service::deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data) {
+	bool Serialization::Service::deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data) {
+		//Boolean for flagging errors in deserializing
+		bool success = true;
+
 		//If there are no components
 		if (!data.contains("Components"))
-			return;
+			return success;
 
 		//Iterate through all components stored within data
 		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+			//Check if component exists within the system
+			if (NIKE_ECS_MANAGER->checkComponentType(comp_name)) {
+				Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
 
-			//Check if component is already present, if not add component
-			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
-				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+				//Check if component is already present, if not add component
+				if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+				}
+
+				//Deserialize data into component
+				comp_registry->deserializeOverrideComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 			}
-
-			//Deserialize data into component
-			comp_registry->deserializeOverrideComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+			else {
+				success = false;
+			}
 		}
+
+		return success;
 	}
 
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
@@ -253,7 +289,7 @@ namespace NIKE {
 		nlohmann::json data;
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -267,7 +303,11 @@ namespace NIKE {
 			return;
 
 		//Deserialize data
-		deserializeEntity(entity, data);
+		if (!deserializeEntity(entity, data)) {
+
+			//Error encountered in deserialization
+			saveEntityToFile(entity, file_path);
+		}
 
 		//Close file
 		file.close();
@@ -281,7 +321,7 @@ namespace NIKE {
 		auto file_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_id);
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -294,22 +334,11 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
-		//If there are no components
-		if (!data.contains("Components"))
-			return;
+		//Deserialize data
+		if (!deserializeEntity(entity, data)) {
 
-		//Iterate through all components stored within data
-		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-
-			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
-
-			//Check if component is already present, if not add component
-			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
-				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
-			}
-
-			//Deserialize data into component
-			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+			//Error encountered in deserialization
+			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string());
 		}
 
 		//Add metadata
@@ -328,6 +357,7 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::saveSceneToFile(std::string const& file_path) {
+
 		//Json Data
 		nlohmann::json data;
 
@@ -441,6 +471,10 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadSceneFromFile(std::string const& file_path) {
+
+		//Boolean for flagging out errors in deserializations
+		bool success = true;
+
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
 			return;
@@ -449,7 +483,7 @@ namespace NIKE {
 		nlohmann::json data;
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
 
 		//Read data from file
 		file >> data;
@@ -518,10 +552,14 @@ namespace NIKE {
 								loadEntityFromPrefab(entity, meta_data.value().prefab_id);
 
 								//Apply overrides
-								deserializePrefabOverrides(entity, meta_data.value().prefab_override);
+								if (!deserializePrefabOverrides(entity, meta_data.value().prefab_override)) {
+									success = false;
+								}
 							}
 							else {
-								deserializeEntity(entity, e_data.at("Entity"));
+								if (!deserializeEntity(entity, e_data.at("Entity"))) {
+									success = false;
+								}
 							}
 						}
 
@@ -539,11 +577,16 @@ namespace NIKE {
 			}
 		}
 
-		//Close file
-		file.close();
-
 		// Save file path
 		curr_scene_file = file_path;
+
+		//Error in deserialization process
+		if (!success) {
+			saveSceneToFile(file_path);
+		}
+
+		//Close file
+		file.close();
 	}
 
 	nlohmann::json Serialization::Service::loadJsonFile(std::string const& file_path) {
