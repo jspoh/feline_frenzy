@@ -16,7 +16,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "entity_0017"
         }
     },
     {
@@ -1119,10 +1119,19 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -427.66375732421875,
-                                    "y": -75.90176391601563
+                                    "x": -258.55572509765625,
+                                    "y": 469.0336608886719
                                 },
-                                "Zoom": 1.5191729068756104
+                                "Zoom": 0.7472283840179443
+                            },
+                            "Render::ParticleEmitter": {
+                                "duration": 0.0,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "preset": 0,
+                                "ref": ""
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

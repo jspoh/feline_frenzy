@@ -40,16 +40,42 @@ namespace NIKE {
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
 				comp.ref = data.at("ref").get<std::string>();
+			},
+			// Override Serialize
+			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+				if (comp.preset != other_comp.preset) {
+					delta["preset"] = comp.preset;
+				}
+				if (comp.offset != other_comp.offset) {
+					delta["offset"] = comp.offset.toJson();
+				}
+				if (comp.duration != other_comp.duration) {
+					delta["duration"] = comp.duration;
+				}
+				if (comp.ref != other_comp.ref) {
+					delta["ref"] = comp.ref;
+				}
+				return delta;
+			},
+			// Override Deserialize
+			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
+				if (delta.contains("preset")) {
+					comp.preset = delta["preset"];
+				}
+				if (delta.contains("offset")) {
+					comp.offset.fromJson(delta["offset"]);
+				}
+				if (delta.contains("duration")) {
+					comp.duration = delta["duration"];
+				}
+				if (delta.contains("ref")) {
+					comp.ref = delta["ref"];
+				}
 			}
 		);
 
-#ifndef NDEBUG
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::ParticleEmitter>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::ParticleEmitter& comp) {
-				ImGui::Text("Edit Particle Emitter variables");
-			}
-		);
-#endif
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::ParticleEmitter>();
 
 		//Register cam for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Cam>(
@@ -307,6 +333,12 @@ namespace NIKE {
 	void Render::registerEditorComponents() {
 
 #ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::ParticleEmitter>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::ParticleEmitter& comp) {
+				ImGui::Text("Edit Particle Emitter variables");
+			}
+		);
+
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Cam& comp) {
 				ImGui::Text("Edit Camera variables");
@@ -344,9 +376,7 @@ namespace NIKE {
 				}
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
 
@@ -556,9 +586,7 @@ namespace NIKE {
 
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		// UI for shape
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
@@ -656,9 +684,7 @@ namespace NIKE {
 				}
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
 
