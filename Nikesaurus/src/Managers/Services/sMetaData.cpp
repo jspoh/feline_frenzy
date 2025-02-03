@@ -27,7 +27,7 @@ namespace NIKE {
 	void MetaData::EntityData::deserialize(nlohmann::json const& data) {
 
 		//If there is a name present
-		if (data.contains("name")) {
+		if (data.contains("Name")) {
 			name = data["Name"].get<std::string>();
 		}
 
@@ -38,10 +38,8 @@ namespace NIKE {
 		b_isactive = data.value("B_Is_Active", true);
 
 		//Get tags
-		if (data.contains("Tags")) {
-			for (const auto& tag : data.at("Tags").items()) {
-				tags.insert(tag.value());
-			}
+		if (data.contains("Tags") && data["Tags"].is_array()) {
+			tags = data["Tags"].get<std::set<std::string>>();
 		}
 	}
 
@@ -332,11 +330,29 @@ namespace NIKE {
 		entities.at(entity).b_isactive = it_clone->second.b_isactive;
 	}
 
+	nlohmann::json MetaData::Service::serializeEntityData(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			return nlohmann::json();
+		}
+
+		return entities.at(entity).serialize();
+	}
+
+	void MetaData::Service::deserializeEntityData(Entity::Type entity, nlohmann::json const& data) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			return;
+		}
+
+		entities.at(entity).deserialize(data);
+	}
+
 	Entity::Type MetaData::Service::getFirstEntity() const {
 		return entities.begin()->first;
 	}
 
-	std::optional<MetaData::EntityData> MetaData::Service::getEntityData(Entity::Type entity) const {
+	std::optional<MetaData::EntityData> MetaData::Service::getEntityDataCopy(Entity::Type entity) const {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
 			NIKEE_CORE_WARN("Entity does not exist");

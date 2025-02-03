@@ -422,7 +422,7 @@ namespace NIKE {
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
 				//Serialize entity meta data
-				auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+				auto meta_data = NIKE_METADATA_SERVICE->getEntityDataCopy(entity);
 				if (meta_data.has_value()) {
 					
 					//Check if prefab is empty
@@ -536,16 +536,19 @@ namespace NIKE {
 						Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").value("Layer ID", 0));
 
 						//Deserialize entity metadata
-						auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
-						if (meta_data.has_value()) {
-							meta_data.value().deserialize(e_data);
+						if (e_data.at("Entity").contains("MetaData")) {
+							//Deserialize
+							NIKE_METADATA_SERVICE->deserializeEntityData(entity, e_data.at("Entity").at("MetaData"));
+
+							//Get entity prefab ID
+							auto entity_prefab_id = NIKE_METADATA_SERVICE->getEntityPrefabID(entity);
 
 							//Check if prefab id is present
-							if (!meta_data.value().prefab_id.empty()) {
-								loadEntityFromPrefab(entity, meta_data.value().prefab_id);
+							if (!entity_prefab_id.empty()) {
+								loadEntityFromPrefab(entity, entity_prefab_id);
 
 								//Apply overrides
-								if (!deserializePrefabOverrides(entity, meta_data.value().prefab_override)) {
+								if (!deserializePrefabOverrides(entity, NIKE_METADATA_SERVICE->getEntityPrefabOverride(entity))) {
 									success = false;
 								}
 							}

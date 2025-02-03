@@ -159,6 +159,12 @@ namespace NIKE {
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);
 
+			//Serialize entity
+			nlohmann::json serializeEntityData(Entity::Type entity) const;
+
+			//Deserialize entity
+			void deserializeEntityData(Entity::Type entity, nlohmann::json const& data);
+
 			//Get first entity in list
 			Entity::Type getFirstEntity() const;
 
@@ -166,7 +172,7 @@ namespace NIKE {
 			std::set<Entity::Type> getEntitiesByTag(std::string const& tag) const;
 
 			//Get entity metadata
-			std::optional<EntityData> getEntityData(Entity::Type entity) const;
+			std::optional<EntityData> getEntityDataCopy(Entity::Type entity) const;
 
 			//Get entities data
 			std::map<Entity::Type, EntityData, EntitySorter> getEntitiesData() const;
