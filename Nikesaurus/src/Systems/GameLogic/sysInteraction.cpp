@@ -105,7 +105,7 @@ namespace NIKE {
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if (!(attacker_damage_comp && target_health_comp)) {
+            if (!(attacker_damage_comp.has_value() && target_health_comp.has_value())) {
                 return;
             }
 
@@ -152,7 +152,7 @@ namespace NIKE {
                 return;
             }
 
-            if (player_element_comp && source_element_comp) {
+            if (player_element_comp.has_value() && source_element_comp.has_value()) {
                 auto& player_element = player_element_comp.value().get().element;
                 auto& source_element = source_element_comp.value().get().element;
 
