@@ -490,7 +490,7 @@ namespace NIKE {
 			}
 
 			//If enter or ok button is pressed
-			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+			if (!tag_name.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
 
 				//Temporary create action
 				Action create;
@@ -600,7 +600,7 @@ namespace NIKE {
 			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
 
 			//If enter or ok button is pressed
-			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+			if (!entity_name.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
 				//Temporary create action
 				Action create;
 
@@ -752,7 +752,7 @@ namespace NIKE {
 			}
 
 			//If enter or clone button is pressed
-			if (ImGui::Button("Clone") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+			if (!entity_name.empty() && (ImGui::Button("Clone") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
 				//Temporary clone action
 				Action clone;
 
@@ -1016,10 +1016,10 @@ namespace NIKE {
 						//Checkbox for checking tag
 						if (ImGui::Checkbox(("##EntityTag" + tag).c_str(), &checked)) {
 							if (checked) {
-								e_tags.insert(tag);
+								NIKE_METADATA_SERVICE->addEntityTag(selected_entity, tag);
 							}
 							else {
-								e_tags.erase(tag);
+								NIKE_METADATA_SERVICE->removeEntityTag(selected_entity, tag);
 							}
 						}
 

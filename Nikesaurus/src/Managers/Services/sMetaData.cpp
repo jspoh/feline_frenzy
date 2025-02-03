@@ -227,6 +227,24 @@ namespace NIKE {
 		entities.at(entity).tags.insert(tag);
 	}
 
+	void MetaData::Service::removeEntityTag(Entity::Type entity, std::string const& tag) {
+
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if tag has been registered
+		if (!isTagValid(tag)) {
+			NIKEE_CORE_WARN("Tag not registered yet.");
+			return;
+		}
+
+		//Set tag
+		entities.at(entity).tags.erase(tag);
+	}
+
 	void MetaData::Service::setEntityActive(Entity::Type entity, bool b_active) {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
