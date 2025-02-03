@@ -133,20 +133,13 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
 
-            // Check if target health drops to zero or below
-            if (target_health.health <= 0) {
-                if (target_health.lives == 0) {
-                    // Target only has 1 life left
-                    NIKE_ECS_MANAGER->markEntityForDeletion(target);
-                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
-                }
-                else {
-                    // Target has more than 1 life
-                    --target_health.lives;
-                    target_health.health = 100;
-                    NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
-                }
-            }
+			// Check if target health drops to zero or below
+			if (target_health.health > 0) {
+				// Target has more than 1 life
+				--target_health.lives;
+				target_health.health = ENEMY_HEALTH;
+				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+			}
         }
 
         void changeElement(Entity::Type player, Entity::Type source) {

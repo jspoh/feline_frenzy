@@ -15,6 +15,10 @@
 #include "Core/stdafx.h"
 
 namespace NIKE {
+
+	#define ENEMY_HEALTH 100.f
+	#define ENEMY_LIVES 1
+
 	namespace Combat {
 		const enum class Factions : int {
 			NEUTRAL = 0,
@@ -36,7 +40,7 @@ namespace NIKE {
 			bool invulnerableFlag; 
 			//bool healthBarActive;
 
-			Health() : lives(1), health(100.f), invulnerableFlag(false) {};
+			Health() : lives(ENEMY_LIVES), health(ENEMY_HEALTH), invulnerableFlag(false) {};
 				//, healthBarActive(false) 
 			
 			Health(int const& lives, float const& health, bool const& invulnerableFlag = false)

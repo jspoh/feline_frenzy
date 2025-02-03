@@ -255,13 +255,15 @@ namespace NIKE {
 	}
 
 	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
-
+		// Play death animation
+		animationStart(entity,0,8);
+		NIKE_ECS_MANAGER->markEntityForDeletion(entity);
 	}
 	void State::DeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
 
 	}
 	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
-
+		animationEnd(entity, 2, 8);
 	}
 	void State::DeathState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
 	{
