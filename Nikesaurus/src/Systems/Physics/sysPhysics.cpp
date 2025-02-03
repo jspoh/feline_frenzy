@@ -186,6 +186,8 @@ namespace NIKE {
                                     e_collider.b_collided = true;
                                     other_collider.b_collided = true;
 
+                                    NIKEE_CORE_ERROR("Collision Detected");
+
                                     // Perform collision resolution
                                     collision_system->collisionResolution(
                                         entity, e_transform, e_dynamics, e_collider,

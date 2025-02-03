@@ -16,6 +16,12 @@
 
 namespace NIKE {
 	namespace Combat {
+		const enum class Factions : int {
+			NEUTRAL = 0,
+			PLAYER,
+			ENEMY,
+		};
+
 		struct Damage {
 			float damage;
 
@@ -34,8 +40,13 @@ namespace NIKE {
 				//, healthBarActive(false) 
 			
 			Health(int const& lives, float const& health, bool const& invulnerableFlag = false)
-				: lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {
-			}
+				: lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {};
+		};
+
+		struct Faction {
+			Factions faction;
+			Faction() : faction(Factions::NEUTRAL) {};
+			Faction(Factions const& faction) : faction(faction) {};
 		};
 
 		void registerComponents();

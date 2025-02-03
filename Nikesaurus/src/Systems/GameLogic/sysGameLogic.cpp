@@ -37,7 +37,7 @@ namespace NIKE {
 				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
-
+					
 					//Check if script is active
 					if (e_logic.script.script_id == "")
 						continue;
@@ -73,20 +73,6 @@ namespace NIKE {
 					}
 				}
 
-				//Check for health comp
-				//const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-				//if (e_health_comp.has_value()) {
-				//	// Health bar does not exist
-				//	if (e_health_comp.value().get().healthBarActive) {
-				//		// Update health bar position to entity position
-
-				//	}
-				//	else {
-				//		// Spawn health prefab
-				//		spawnHealthBar(entity);
-				//	}
-
-				//}
 				// Update of FSM will be called here
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}
@@ -103,24 +89,20 @@ namespace NIKE {
 			NIKEE_CORE_WARN("spawnEnemy: SPAWNER missing Transform Component, enemy not spawned");
 			return;
 		}
-
 		const Vector2f& spawner_pos = e_transform_comp.value().get().position;
 
 		// Create enemy entity
 		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity(0);
 
 		// Load entity from prefab
-		const std::string enemyArr[4] = { "enemy.prefab", "fireEnemy.prefab", "waterEnemy.prefab", "grassEnemy.prefab" };
-		std::string chosenEnemy = enemyArr[getRandomNumber(0, 3)];
-
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosenEnemy).string());
-
-		// Set Enemy Position
+		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosen_enemy).string());
 
 		// Randomly offset from spawner position
 		float offset_x = static_cast<float>(getRandomNumber(-20, 20));
 		float offset_y = static_cast<float>(getRandomNumber(-20, 20));
 
+		// Set Enemy Position
 		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy_entity);
 		if (enemy_transform_comp.has_value()) {
 			enemy_transform_comp.value().get().position = { spawner_pos.x + offset_x, spawner_pos.y + offset_y };

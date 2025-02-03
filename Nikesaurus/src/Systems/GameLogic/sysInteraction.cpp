@@ -81,8 +81,30 @@ namespace NIKE {
             //}
 
             // Collision between damage and health
-            applyDamage(entity_a, entity_b);
-            applyDamage(entity_b, entity_a);
+            const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
+            const auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_b);
+
+
+            if (a_damage_comp.has_value() || b_damage_comp.has_value()) {
+                const auto a_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
+                const auto b_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
+
+                // Friendly fire check
+                if (a_faction_comp.has_value() && b_faction_comp.has_value()) {
+                    const auto& a_faction = a_faction_comp.value().get().faction;
+                    const auto& b_faction = b_faction_comp.value().get().faction;
+
+                    //NIKEE_CORE_WARN("{} and {} == {}", static_cast<int>(a_faction), static_cast<int>(b_faction), a_faction == b_faction);
+
+                    if (a_faction == b_faction) {
+                        return;
+                    }
+                }
+
+                // Applying Damage
+                if (a_damage_comp.has_value()) applyDamage(entity_a, entity_b);
+                if (b_damage_comp.has_value()) applyDamage(entity_b, entity_a);
+            }
         }
 
         void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {

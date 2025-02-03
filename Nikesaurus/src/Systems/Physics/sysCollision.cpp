@@ -368,18 +368,25 @@ namespace NIKE {
 
         // Dispatch collision event
         auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
+        NIKEE_CORE_WARN("Collision Event Dispatched");
         NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
 
         // Destroy Resolution
-        if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
+        bool destroy_a = (collider_a.resolution == Physics::Resolution::DESTROY);
+        bool destroy_b = (collider_b.resolution == Physics::Resolution::DESTROY);
+
+        if (destroy_a && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
             NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
-            return;
         }
 
-        //if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
-        //    NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
-        //    return;
-        //}
+        if (destroy_b && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
+            NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
+        }
+
+        // Exit if either entity was marked for deletion
+        if (destroy_a || destroy_b) {
+            return;
+        }
 
         // Bounce Resolution (at least one entity has BOUNCE)
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {

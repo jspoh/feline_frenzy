@@ -13,6 +13,9 @@
         "Combat::Damage": {
             "Damage": 10.0
         },
+        "Combat::Faction": {
+            "Faction": 2
+	},
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
             "Pos_Offset": {

@@ -27,6 +27,9 @@
                 "y": 3
             }
         },
+        "Combat::Faction": {
+            "Faction": 2
+	},
         "Combat::Health": {
             "Health": 100.0,
             "InvulnerableFlag": false,

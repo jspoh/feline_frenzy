@@ -1504,6 +1504,9 @@
                                     "y": 0
                                 }
                             },
+                            "Combat::Faction": {
+                                "Faction": 2
+                            },
                             "Combat::Health": {
                                 "Health": 10.0,
                                 "InvulnerableFlag": false,
@@ -1566,7 +1569,7 @@
                                 "Texture_ID": "Normal_Enemy_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1592,6 +1595,9 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Faction": {
+                                "Faction": 2
+                            },
                             "Combat::Health": {
                                 "Health": 80.0,
                                 "InvulnerableFlag": false,
@@ -1667,7 +1673,7 @@
                                 "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1693,6 +1699,9 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Faction": {
+                                "Faction": 2
+                            },
                             "Combat::Health": {
                                 "Health": 90.0,
                                 "InvulnerableFlag": false,
@@ -1768,7 +1777,7 @@
                                 "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1794,6 +1803,9 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Combat::Faction": {
+                                "Faction": 2
+                            },
                             "Combat::Health": {
                                 "Health": 90.0,
                                 "InvulnerableFlag": false,
@@ -1869,7 +1881,7 @@
                                 "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
                             },
                             "State::State": {
-                                "State": "Chase"
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {

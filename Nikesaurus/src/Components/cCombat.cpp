@@ -184,5 +184,66 @@ namespace NIKE {
 			}
 		);
 #endif
+
+		// Register faction components
+		NIKE_ECS_MANAGER->registerComponent<Faction>();
+
+		//Register faction for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Faction>(
+			//Serialize
+			[](Faction const& comp) -> nlohmann::json {
+				return	{
+						{ "Faction", comp.faction },
+				};
+			},
+
+			//Deserialize
+			[](Faction& comp, nlohmann::json const& data) {
+				comp.faction = data.at("Faction").get<Factions>();
+			}
+		);
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Faction>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Faction& comp) {
+
+				ImGui::Text("Edit Damage Variables");
+
+					// For Faction
+				{
+					ImGui::Text("Adjust Faction:");
+					static const char* faction_names[] = { "NEUTRAL", "PLAYER", "ENEMY" };
+
+					static Factions before_select_faction;
+					static int previous_faction = static_cast<int>(comp.faction);
+					int current_faction = static_cast<int>(comp.faction);
+
+					if (ImGui::Combo("##Faction", &current_faction, faction_names, IM_ARRAYSIZE(faction_names))) {
+						Factions new_faction = static_cast<Factions>(current_faction);
+						if (new_faction != comp.faction) {
+							// Save action
+							LevelEditor::Action save_faction;
+							save_faction.do_action = [&, faction = new_faction]() {
+								comp.faction = faction;
+								};
+
+							// Undo action
+							save_faction.undo_action = [&, faction = before_select_faction]() {
+								comp.faction = faction;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_faction));
+
+							// Update the previous value
+							before_select_faction = comp.faction;
+							// Apply the new element
+							comp.faction = new_faction;
+						}
+					}
+				}
+			}
+		);
+#endif
+
 	}
 }
