@@ -522,7 +522,7 @@ namespace NIKE {
             if (bullet_sfx.has_value()) {
                 bullet_sfx.value().get().b_play_sfx = true;
             }
-            });
+        });
 
         //Spawn enemy function
         lua_state.set_function("Spawn Enemy", [&](float x, float y) {

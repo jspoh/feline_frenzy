@@ -19,57 +19,64 @@ namespace NIKE {
         }
 
         void Manager::update() {
-            //Get layers
+            // Get layers
             auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
-            //Reverse Iterate through layers
+            // Reverse iterate through layers
             for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
-
-                //Skip inactive layer
                 if (!(*layer)->getLayerState())
                     continue;
 
-                //Iterate through all entities
+                // Iterate through all entities
                 for (auto& entity : entities) {
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 
                         if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
                             continue;
 
-                        // Check for Elemental Source comp
+                        // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {
-                            // Look for entity w player component
+
+                            // Look for entity with player component
                             for (auto& other_entity : entities) {
                                 auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-                                // If player entity exists
-                                if (e_player_comp.has_value()) {
+
+                                if (e_player_comp.has_value()) { // Player entity exists
+
                                     // Get Render Component
                                     const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-                                    float& source_intensity = source_render_comp.value().get().intensity;
+                                    auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+                                    //float& source_intensity = source_render_comp.value().get().intensity;
+                                    Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    // Check if player is within range
-                                    if (withinRange(entity, other_entity) && source_intensity <= .5f) {
-                                        source_intensity += .02f;
-                                    }
-                                    else if (source_intensity > 0.1f){
-                                        source_intensity -= .02f;
+                                    float target_alpha = withinRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
+                                    float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+
+                                    // Smoothly interpolate alpha
+                                    source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+
+                                    // Clamp alpha between 0 and 1.0
+                                    source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+
+                                    // Player Element Swapping
+                                    if (withinRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                        changeElement(other_entity, entity);
+                                        if (e_sfx_comp.has_value()) {
+                                            e_sfx_comp.value().get().b_play_sfx = true;
+                                        }
                                     }
                                 }
                             }
                         }
-                        
                     }
                 }
             }
         }
 
+
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
-            // Player Element Swapping
-            // Check for E key pressed
-            //if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
-                changeElement(entity_a, entity_b);
-            //}
+
 
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);

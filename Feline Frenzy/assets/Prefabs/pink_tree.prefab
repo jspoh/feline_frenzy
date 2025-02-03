@@ -1,0 +1,58 @@
+{ 
+ "Components": {
+     "Physics::Collider": {
+         "B_Bind_To_Entity": false,
+         "Pos_Offset": {
+             "x": 0.0,
+             "y": -96.0
+         },
+         "Position": {
+             "x": -806.6473999023438,
+             "y": 668.1270141601563
+         },
+         "Resolution": 0,
+         "Rotation": 0.0,
+         "Scale": {
+             "x": 128.0,
+             "y": 32.0
+         }
+     },
+     "Render::Texture": {
+         "B_Blend": false,
+         "B_Flip": {
+             "x": false,
+             "y": false
+         },
+         "B_Stretch": false,
+         "Color": {
+             "w": 1.0,
+             "x": 0.0,
+             "y": 0.0,
+             "z": 0.0
+         },
+         "Frame_Index": {
+             "x": 0,
+             "y": 0
+         },
+         "Frame_Size": {
+             "x": 1,
+             "y": 1
+         },
+         "Intensity": 0.5,
+         "Texture_ID": "Tree3.png"
+     },
+     "Transform::Transform": {
+         "Position": {
+             "x": -806.6473999023438,
+             "y": 764.1270141601563
+         },
+         "Rotation": 0.0,
+         "Scale": {
+             "x": 255.99996948242188,
+             "y": 255.99996948242188
+         },
+         "Screen Position": false
+     }
+ },
+ "Layer ID": 2
+ }
