@@ -28,10 +28,14 @@ namespace NIKE {
 			int lives;
 			float health;
 			bool invulnerableFlag; 
+			//bool healthBarActive;
 
 			Health() : lives(1), health(100.f), invulnerableFlag(false) {};
+				//, healthBarActive(false) 
+			
 			Health(int const& lives, float const& health, bool const& invulnerableFlag = false)
-				: lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {}
+				: lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {
+			}
 		};
 
 		void registerComponents();

@@ -52,10 +52,10 @@ namespace NIKE {
 
                                     // Check if player is within range
                                     if (withinRange(entity, other_entity) && source_intensity <= .5f) {
-                                        source_intensity += .05f;
+                                        source_intensity += .02f;
                                     }
                                     else if (source_intensity > 0.1f){
-                                        source_intensity -= .05f;
+                                        source_intensity -= .02f;
                                     }
                                 }
                             }
@@ -76,9 +76,9 @@ namespace NIKE {
         void Manager::handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Player Element Swapping
             // Check for E key pressed
-            if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
+            //if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
                 changeElement(entity_a, entity_b);
-            }
+            //}
 
             // Collision between damage and health
             applyDamage(entity_a, entity_b);
@@ -146,6 +146,8 @@ namespace NIKE {
 
                 // Set player element to source element
                 player_element = source_element;
+
+                // !TODO: Play element change animation here
             }
         }
 

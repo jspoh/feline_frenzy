@@ -12,7 +12,7 @@
 #define C_FSM_H
 
 #include "Core/Engine.h"
-#include "Managers/Services/sStateMachine.h"
+#include "Managers/Services/State Machine/sStateMachine.h"
 
 namespace NIKE{
 	namespace State {
@@ -21,6 +21,9 @@ namespace NIKE{
 		{
 			std::weak_ptr<NIKE::StateMachine::Istate> current_state;
 			std::string state_id;
+			Entity::Type entity_ref;
+
+			State();
 		};
 
 		void registerComponents();

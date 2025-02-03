@@ -4,7 +4,7 @@
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   November 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -19,60 +19,62 @@
 
 namespace NIKE {
 	namespace Enemy {
-		class Manager : public System::ISystem {
-		private:
-			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete; 
-			void operator=(Manager const& copy) = delete;
+		// Enemey logic functions
+		// Check if player is within range
+		bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
 
+		// Shoot bullet
+		void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
 
-			enum class ENEMY_BEHAVIOR {
-				IDLE = 0,
-				CHASE,
-				Attack,
-			};
+		// Standard enemy moving function
+		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset);
 
-			// Enemy movement stuff
-			float movement_speed;  
-			// Distance threshold for waypoint
-			float waypoint_threshold;  
-			// Significant target movement threshold
-			float target_threshold;    
+		// Standard enemy moving function
+		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
 
-			//Internal lua system
-			//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
+		//bool hasTargetMoved(const Vector2f& target_pos, const Pathfinding::Path& path) const;
 
-			//Internal script management
-			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
+		//class Manager : public System::ISystem {
+		//private:
+		//	//Delete Copy Constructor & Copy Assignment
+		//	Manager(Manager const& copy) = delete; 
+		//	void operator=(Manager const& copy) = delete;
 
-			// Check if player is within range
-			bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
+		//	// Enemy movement stuff
+		//	float movement_speed;  
+		//	// Distance threshold for waypoint
+		//	float waypoint_threshold;  
+		//	// Significant target movement threshold
+		//	float target_threshold;    
 
-			// Shoot bullet
-			void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
+		//	//Internal lua system
+		//	//std::unique_ptr<Lua::System> NIKE_LUA_SERVICE;
 
-		public:
-			//Default Constructor
-			Manager() = default;
+		//	//Internal script management
+		//	//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
-			//Default Destructor
-			~Manager() = default;
+		//public:
+		//	//Default Constructor
+		//	Manager() = default;
 
-			//Init
-			void init() override;
+		//	//Default Destructor
+		//	~Manager() = default;
 
-			//System name
-			std::string getSysName() override
-			{
-				return "Enemy System";
-			}
+		//	//Init
+		//	void init() override;
 
-			//Register systems for lua
-			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+		//	//System name
+		//	std::string getSysName() override
+		//	{
+		//		return "Enemy System";
+		//	}
 
-			//Update
-			void update() override;
-		};
+		//	//Register systems for lua
+		//	//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
+
+		//	//Update
+		//	void update() override;
+		//};
 	}
 }
 #endif //!ENEMY_HPP

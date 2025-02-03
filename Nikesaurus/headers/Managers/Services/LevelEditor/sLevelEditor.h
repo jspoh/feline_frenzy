@@ -80,7 +80,7 @@ namespace NIKE {
 			~Service() = default;
 
 			//Init Editor
-			void init(nlohmann::json const& config);
+			void init();
 
 			//Update Editor
 			void update();
@@ -120,6 +120,9 @@ namespace NIKE {
 			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
 				std::dynamic_pointer_cast<ComponentsPanel>(panels_map.at(ComponentsPanel::getStaticName()))->registerCompUIFunc<T>(comp_func);
 			}
+
+			// Deserialize editor config (required as level editor is init before systems are created)
+			void deserializeConfig(nlohmann::json const& config);
 		};
 	}
 }

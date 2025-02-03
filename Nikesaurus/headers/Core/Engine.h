@@ -18,6 +18,7 @@
 #include "Managers/Services/sInput.h"
 #include "Managers/Services/sDebug.h"
 #include "Managers/Services/sSerialization.h"
+#include "Managers/Services/Render/sRender.h"
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/sMap.h"
@@ -27,7 +28,7 @@
 #include "Managers/Services/LevelEditor/sLevelEditor.h"
 #include "Managers/Services/sPath.h"
 #include "Managers/Services/sMetaData.h"
-#include "Managers/Services/sStateMachine.h"
+#include "Managers/Services/State Machine/sStateMachine.h"
 
 //Include all components here
 #include "Components/cAudio.h"
@@ -148,6 +149,7 @@ namespace NIKE {
 #define NIKE_AUDIO_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Audio::Service>()
 #define NIKE_ASSETS_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Assets::Service>()
 #define NIKE_SERIALIZE_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Serialization::Service>()
+#define NIKE_RENDER_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Render::Service>()
 #define NIKE_DEBUG_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Debug::Service>()
 #define NIKE_MAP_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Map::Service>()
 #define NIKE_CAMERA_SERVICE NIKE::Core::Engine::getInstance().getService<NIKE::Camera::Service>()

@@ -101,6 +101,10 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<State::State>());
+		// Yes i know it shldnt be here, but we make do first
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 
 		//Register physics manager
 		NIKE_ECS_MANAGER->registerSystem<Physics::Manager>(false);
@@ -133,9 +137,10 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Element::Entity>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Interaction::Manager>(NIKE_ECS_MANAGER->getComponentType<Element::Source>());
 
-		auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
-		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
-		NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
+		//auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
+		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
+		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
+		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
 	}
 
 	void Core::Engine::init(std::string const& file_path, int fps, [[maybe_unused]] std::string const& custom_welcome) {		//Provide ecs coordinator service for internal engine usage
@@ -149,6 +154,7 @@ namespace NIKE {
 		provideService(std::make_shared<Audio::Service>());
 		provideService(std::make_shared<Assets::Service>());
 		provideService(std::make_shared<Serialization::Service>());
+		provideService(std::make_shared<Render::Service>());
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
@@ -193,7 +199,7 @@ namespace NIKE {
 
 		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_LVLEDITOR_SERVICE);
-
+		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_RENDER_SERVICE);
 		//Add event listeners for key event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_LVLEDITOR_SERVICE);
 
@@ -251,6 +257,11 @@ namespace NIKE {
 
 		//Init metadata service
 		NIKE_METADATA_SERVICE->init();
+		
+#ifndef NDEBUG
+		//Init Level Editor
+		NIKE_LVLEDITOR_SERVICE->init();
+#endif
 
 		// Init FSM
 		NIKE_FSM_SERVICE->init();
@@ -267,6 +278,7 @@ namespace NIKE {
 
 		//Register default editor components
 		registerDefEditorComponents();
+		NIKE_LVLEDITOR_SERVICE->deserializeConfig(json_config);
 #endif
 
 		int max_texture_units;
@@ -281,8 +293,13 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 
+
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
+#ifdef NDEBUG
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
+#endif
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 		//Entity::Type FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
@@ -301,18 +318,18 @@ namespace NIKE {
 			try {
 #endif
 
-				// get delta time first
-				if (NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-					//Calculate Delta Time
-					NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-				}
-
 				// have to poll events regardless of focus
 				//Poll system events
 				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-				//Clear buffer
-				NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+				if (!NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+					// Skip updates when unfocused, but continue polling events
+					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
+
+					continue;
+				}
+				//Calculate Delta Time
+				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
 				//Update all audio pending actions
 				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
@@ -361,7 +378,9 @@ namespace NIKE {
 
 				elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 
-				if (frame_count > 0) {
+				comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+				comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+				if (comp) {
 					// toggle fps display
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1)) {
 						if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY)) {
@@ -388,7 +407,7 @@ namespace NIKE {
 					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
 					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
 					ss << "FPS: " << std::round(avg_fps);
-					//comp->text = ss.str();
+					comp->text = ss.str();
 					ss.str("");
 					ss.clear();
 				}
@@ -413,7 +432,8 @@ namespace NIKE {
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-				throw e;
+				NIKEE_CORE_ERROR("Error caught: {}", e.what());
+				break;
 			}
 #endif
 		}

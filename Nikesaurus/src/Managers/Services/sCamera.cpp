@@ -11,7 +11,6 @@
 #include "Core/Engine.h"
 
 namespace NIKE {
-	Camera::Service::Service() : target(Vector2f(0, 0)), up(Vector2f(0, 1)), cam_id{ 0 }, cam_height{ 0.0f } { }
 
 	void Camera::Service::onEvent(std::shared_ptr<Render::ChangeCamEvent> event) {
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_id) && NIKE_ECS_MANAGER->checkEntityComponent<Render::Cam>(event->entity_id)) {
@@ -27,11 +26,18 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
+	/*****************************************************************//**
+	* INITIALIZATION
+	*********************************************************************/
+
 	void Camera::Service::init(nlohmann::json const& config) {
 		float angleDisp = 0 * static_cast<float>(M_PI) / 180.f;
 
 		up = Vector2(-sin(angleDisp), cos(angleDisp));
 		target = Vector2(cos(angleDisp), sin(angleDisp));
+		cam_id = 0;
+		cam_name = "Free Cam";
+		cam_height = 0;
 
 		//Setup events listening
 		std::shared_ptr<Camera::Service> cam_sys_wrapped(this, [](Camera::Service*){});
@@ -53,17 +59,9 @@ namespace NIKE {
 		}
 	}
 
-	Entity::Type Camera::Service::getCamId() const {
-		return cam_id;
-	}
-
-	std::string Camera::Service::getActiveCamName() const{
-		return cam_name;
-	}
-
-	void Camera::Service::setActiveCamName(std::string active_cam) {
-		cam_name = active_cam;
-	}
+	/*****************************************************************//**
+	* TRANSFORMS
+	*********************************************************************/
 
 	Matrix_33 Camera::Service::getWorldToNDCXform() const
 	{
@@ -148,6 +146,22 @@ namespace NIKE {
 		return world_coords;
 	};
 
+	/*****************************************************************//**
+	* CAMERA 
+	*********************************************************************/
+
+	Entity::Type Camera::Service::getActiveCamId() const {
+		return cam_id;
+	}
+
+	std::string Camera::Service::getActiveCamName() const {
+		return cam_name;
+	}
+
+	void Camera::Service::setActiveCamName(std::string active_cam) {
+		cam_name = active_cam;
+	}
+
 	Render::Cam Camera::Service::getActiveCamera() const {
 		Render::Cam cam;
 		//Check if camera entity exists
@@ -170,6 +184,10 @@ namespace NIKE {
 		return cam;
 	}
 
+	std::shared_ptr<Render::Cam> Camera::Service::getDefaultCamera() const {
+		return def_cam;
+	}
+
 	void Camera::Service::setCameraHeight(float height) {
 		cam_height = height;
 	}
@@ -178,7 +196,11 @@ namespace NIKE {
 		return cam_height;
 	}
 
-	const std::unordered_map<Entity::Type, std::string>& Camera::Service::getCameraEntities() const {
+	/*****************************************************************//**
+	* CAMERA ENTITIES
+	*********************************************************************/
+
+	const std::vector<std::pair<Entity::Type, std::string>>& Camera::Service::getCameraEntities() const {
 		return cam_entities;
 	}
 
@@ -187,9 +209,12 @@ namespace NIKE {
 	}
 
 	void  Camera::Service::emplaceCameraEntity(Entity::Type entity, const std::string& name) {
-		cam_entities.emplace(entity, name);  // This will add the entity or update its name if it already exists
+		cam_entities.emplace_back(entity, name);  // This will add the entity or update its name if it already exists
 	}
 
+	/*****************************************************************//**
+	* SERIALISATION
+	*********************************************************************/
 
 	nlohmann::json Camera::Service::serializeCamera() const{
 		nlohmann::json camera_data;

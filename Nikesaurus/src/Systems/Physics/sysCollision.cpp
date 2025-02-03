@@ -376,10 +376,10 @@ namespace NIKE {
             return;
         }
 
-        if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
-            NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
-            return;
-        }
+        //if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
+        //    NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
+        //    return;
+        //}
 
         // Bounce Resolution (at least one entity has BOUNCE)
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {

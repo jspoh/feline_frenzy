@@ -4,7 +4,7 @@
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -50,7 +50,7 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
-	* Scene maanger
+	* Scene manager
 	*********************************************************************/
 	void Scenes::Service::initScene(std::string const& scene_id) {
 
@@ -88,7 +88,7 @@ namespace NIKE {
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
 		//Reset Camera
-		NIKE_CAMERA_SERVICE->setActiveCamName("Free Cam");
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
 		//Reset metadata service
 		NIKE_METADATA_SERVICE->reset();
@@ -127,6 +127,9 @@ namespace NIKE {
 		// Reset grid here
 		NIKE_MAP_SERVICE->resetGrid();
 
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
+
 		//Clear layers
 		layers.clear();
 
@@ -162,6 +165,9 @@ namespace NIKE {
 
 		// Reset grid here
 		NIKE_MAP_SERVICE->resetGrid();
+		
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
 		//Clear layers
 		layers.clear();
@@ -194,6 +200,9 @@ namespace NIKE {
 
 		// Reset grid here
 		NIKE_MAP_SERVICE->resetGrid();
+		
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
 		//Clear layers
 		layers.clear();

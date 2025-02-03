@@ -4,7 +4,7 @@
  * 
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
  * \date   November 2024
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -23,7 +23,8 @@ namespace NIKE {
 				return	{
 						{ "Lives", comp.lives },
 						{ "Health", comp.health },
-						{ "InvulnerableFlag", comp.invulnerableFlag }
+						{ "InvulnerableFlag", comp.invulnerableFlag },
+						//{ "HealthBarActive", comp.healthBarActive}
 				};
 			},
 

@@ -10,6 +10,13 @@
       "y": 900.0
     }
   },
+  "EditorConfig": {
+    "Editor_State" : true,
+    "Debug_Mode": false,
+    "Game_State": false,
+    "Gizmo_State": true,
+    "Grid_State": false
+  },
   "CameraConfig": {
     "Height": 900.0,
     "Position": {

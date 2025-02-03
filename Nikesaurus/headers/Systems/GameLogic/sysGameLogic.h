@@ -12,6 +12,7 @@
 #define GAME_LOGIC_HPP
 
 #include "Managers/ECS/mSystem.h"
+#include <random>
 
 namespace NIKE {
     namespace GameLogic {
@@ -22,11 +23,20 @@ namespace NIKE {
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
 
+			// Random Number Engine
+			//static std::mt19937 gen;
+
 			//Internal script management
 			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
 			// Player Shooting
-			void shootCursor(const Entity::Type& player_entity);
+			//void shootCursor(const Entity::Type& player_entity);
+
+			// Spawn Health Bar
+			//void spawnHealthBar(const Entity::Type& entity);
+
+			// Spawn Enemy
+			void spawnEnemy(const Entity::Type& spawner);
 
 	    public:
 		    //Default constructor
@@ -40,6 +50,15 @@ namespace NIKE {
 		    {
 			    return "Game Logic System";
 		    }
+
+			// Define static random engine
+			inline static std::mt19937 gen;
+
+			// Random Number Generator
+			int getRandomNumber(int min, int max) {
+				std::uniform_int_distribution<int> distrib(min, max);
+				return distrib(gen);
+			}
 
 			//Init Inputs
 			void init() override;

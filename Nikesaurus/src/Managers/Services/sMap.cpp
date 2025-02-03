@@ -484,12 +484,13 @@ namespace NIKE {
 		}
 	}
 
-	Map::Path& Map::Service::getPath(Entity::Type entity) {
+	Map::Path Map::Service::getPath(Entity::Type entity) {
 		if (paths.find(entity) != paths.end()) {
 			return paths.at(entity);
 		}
 
-		throw std::runtime_error("Path for entity does not exist. Unable to retrieve path");
+		// If not path found, return empty path obj
+		return Path();
 	}
 
 	bool Map::Service::checkPath(Entity::Type entity) const {
