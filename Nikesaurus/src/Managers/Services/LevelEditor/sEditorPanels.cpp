@@ -1233,8 +1233,9 @@ namespace NIKE {
 						//Skip entities not on curr layer
 						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
 							continue;
+
 						// Skip locked entities so they don't block clicks!
-						if (isEntityLocked(entity.first))
+						if (NIKE_METADATA_SERVICE->checkEntityLocked(entity))
 							continue;
 
 						// Check for entity clicking

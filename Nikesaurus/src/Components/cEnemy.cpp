@@ -130,6 +130,65 @@ namespace NIKE {
 		);
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Attack>();
+
+		// Register spawner for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Spawner>(
+			// Serialize
+			[](Spawner const& comp) -> nlohmann::json {
+				return {
+					{ "EnemyLimit", comp.enemy_limit},
+					{ "EnemiesSpawned", comp.enemies_spawned},
+					{ "Cooldown", comp.cooldown },
+					{ "LastSpawnTime", comp.last_spawn_time }
+				};
+			},
+
+			// Deserialize
+			[](Spawner& comp, nlohmann::json const& data) {
+				comp.enemy_limit = data.at("EnemyLimit").get<int>();
+				comp.enemies_spawned = data.at("EnemiesSpawned").get<int>();
+				comp.cooldown = data.at("Cooldown").get<float>();
+				comp.last_spawn_time = data.at("LastSpawnTime").get<float>();
+			},
+
+			// Override Serialize for Spawner
+			[](Spawner const& comp, Spawner const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.enemy_limit != other_comp.enemy_limit) {
+					delta["EnemyLimit"] = comp.enemy_limit;
+				}
+				if (comp.enemies_spawned != other_comp.enemies_spawned) {
+					delta["EnemiesSpawned"] = comp.enemies_spawned;
+				}
+				if (comp.cooldown != other_comp.cooldown) {
+					delta["Cooldown"] = comp.cooldown;
+				}
+				if (comp.last_spawn_time != other_comp.last_spawn_time) {
+					delta["LastSpawnTime"] = comp.last_spawn_time;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize for Spawner
+			[](Spawner& comp, nlohmann::json const& delta) {
+				if (delta.contains("EnemyLimit")) {
+					comp.enemy_limit = delta["EnemyLimit"];
+				}
+				if (delta.contains("EnemiesSpawned")) {
+					comp.enemies_spawned = delta["EnemiesSpawned"];
+				}
+				if (delta.contains("Cooldown")) {
+					comp.cooldown = delta["Cooldown"];
+				}
+				if (delta.contains("LastSpawnTime")) {
+					comp.last_spawn_time = delta["LastSpawnTime"];
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Spawner>();
 	}
 
 	void Enemy::registerEditorComponents() {
@@ -270,28 +329,6 @@ namespace NIKE {
 		);
 #endif
 
-		// Register spawner for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Spawner>(
-			// Serialize
-			[](Spawner const& comp) -> nlohmann::json {
-				return {
-					{ "EnemyLimit", comp.enemy_limit},
-					{ "EnemiesSpawned", comp.enemies_spawned},
-					{ "Cooldown", comp.cooldown },
-					{ "LastSpawnTime", comp.last_spawn_time }
-				};
-			},
-
-			// Deserialize
-			[](Spawner& comp, nlohmann::json const& data) {
-				comp.enemy_limit = data.at("EnemyLimit").get<int>();
-				comp.enemies_spawned = data.at("EnemiesSpawned").get<int>();
-				comp.cooldown = data.at("Cooldown").get<float>();
-				comp.last_spawn_time = data.at("LastSpawnTime").get<float>();
-			}
-		);
-
-		// !TODO: Add UI Registration for Spawner component
 #ifndef NDEBUG
 // Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Spawner>(

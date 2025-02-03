@@ -257,13 +257,8 @@ namespace NIKE {
 
 		//Init metadata service
 		NIKE_METADATA_SERVICE->init();
-		
-#ifndef NDEBUG
-		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init();
-#endif
 
-		// Init FSM
+		//Init FSM
 		NIKE_FSM_SERVICE->init();
 
 		//Register Def Components
@@ -274,11 +269,11 @@ namespace NIKE {
 
 #ifndef NDEBUG
 		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init(json_config);
+		NIKE_LVLEDITOR_SERVICE->init();
+		NIKE_LVLEDITOR_SERVICE->deserializeConfig(json_config);
 
 		//Register default editor components
 		registerDefEditorComponents();
-		NIKE_LVLEDITOR_SERVICE->deserializeConfig(json_config);
 #endif
 
 		int max_texture_units;
@@ -296,7 +291,7 @@ namespace NIKE {
 		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 
 
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
 #endif
