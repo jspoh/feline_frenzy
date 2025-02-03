@@ -73,7 +73,7 @@ namespace NIKE {
             }
         }
 
-        void Manager::handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
+        void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Player Element Swapping
             // Check for E key pressed
             //if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
@@ -85,7 +85,7 @@ namespace NIKE {
             applyDamage(entity_b, entity_a);
         }
 
-        void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {
+        void applyDamage(Entity::Type attacker, Entity::Type target) {
             const auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
             const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
             const auto attacker_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(attacker);
@@ -122,7 +122,7 @@ namespace NIKE {
 
             // Check if target health drops to zero or below
             if (target_health.health <= 0) {
-                if (target_health.lives <= 1) {
+                if (target_health.lives == 0) {
                     // Target only has 1 life left
                     NIKE_ECS_MANAGER->markEntityForDeletion(target);
                     NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
@@ -136,7 +136,7 @@ namespace NIKE {
             }
         }
 
-        void Manager::changeElement(Entity::Type player, Entity::Type source) {
+        void changeElement(Entity::Type player, Entity::Type source) {
             const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
             const auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
 
@@ -151,11 +151,11 @@ namespace NIKE {
             }
         }
 
-        float Manager::getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
+        float getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
             return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
         }
 
-        bool Manager::withinRange(const Entity::Type& source, const Entity::Type& player) {
+        bool withinRange(const Entity::Type& source, const Entity::Type& player) {
             // Get player transform
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
             Vector2f player_pos = player_transform_comp.value().get().position;

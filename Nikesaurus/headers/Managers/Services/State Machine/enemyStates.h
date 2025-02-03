@@ -1,8 +1,8 @@
 /*****************************************************************//**
- * \file   cEnemyStates.h
+ * \file   enemyStates.h
  * \brief  Enemy States
  *
- * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
+ * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
  *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -53,6 +53,18 @@ namespace NIKE {
 			//Acceptable offset per cell
 			float cell_offset;
 			float enemy_speed;
+		};
+
+		class DeathState : public StateMachine::Istate
+		{
+		public:
+			DeathState();
+
+			void onEnter(Entity::Type& entity) override;
+			void onUpdate(Entity::Type& entity) override;
+			void onExit(Entity::Type& entity) override;
+
+		private:
 		};
 	}
 }

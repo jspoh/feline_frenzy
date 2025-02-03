@@ -85,7 +85,7 @@ namespace NIKE {
 				ImGui::Text("Adjust State:");
 
 				// List of available states
-				static const char* state_names[] = { "Idle", "Chase", "Attack" };
+				static const char* state_names[] = { "Idle", "Chase", "Attack", "Death"};
 
 				// Current and previous state tracking
 				static std::string before_select_state = comp.state_id;
