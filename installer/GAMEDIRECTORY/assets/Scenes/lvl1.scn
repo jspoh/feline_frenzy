@@ -20,6 +20,13 @@
         }
     },
     {
+        "MetaData": {
+            "Entity_Tags": [
+                "player"
+            ]
+        }
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -27,9 +34,12 @@
                     "Entity": {
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "Prefab Master",
-                            "Prefab_ID": ""
+                            "Name": "entity_0000",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -75,9 +85,12 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Locked": true,
-                            "Entity_ID": "Background",
-                            "Prefab_ID": ""
+                            "B_Is_Active": true,
+                            "B_Locked": false,
+                            "Name": "entity_0001",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 }
@@ -152,9 +165,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "WaterSrc",
-                            "Prefab_ID": "ElementSrc.prefab"
+                            "Name": "entity_0002",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -220,9 +236,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "GrassSrc",
-                            "Prefab_ID": "ElementSrc.prefab"
+                            "Name": "entity_0003",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -261,9 +280,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "LeftWall",
-                            "Prefab_ID": ""
+                            "Name": "entity_0004",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -302,9 +324,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "RightWall",
-                            "Prefab_ID": ""
+                            "Name": "entity_0005",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -356,9 +381,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "TopWall",
-                            "Prefab_ID": ""
+                            "Name": "entity_0006",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -397,9 +425,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "BottomWall",
-                            "Prefab_ID": ""
+                            "Name": "entity_0007",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -485,7 +516,7 @@
                                     "x": 31.615283966064453,
                                     "y": -224.44717407226563
                                 },
-                                "Zoom": 2.0740139484405518
+                                "Zoom": 1.941298007965088
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -511,15 +542,8 @@
                                 "Intensity": 0.0,
                                 "Texture_ID": "Player_animation_sprite.png"
                             },
-                            "Shooting::Shooting": {
-                                "Cooldown": 0.5,
-                                "Function": "createBullet",
-                                "LastShotTime": 0.5,
-                                "Layer": 0,
-                                "Offset": 150.0,
-                                "ScriptID": "",
-                                "ScriptLoaded": false,
-                                "ScriptPath": "assets/Scripts/createBullet.lua"
+                            "State::State": {
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -536,9 +560,14 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "Player",
-                            "Prefab_ID": "playerfix.prefab"
+                            "Name": "player",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "player"
+                            ]
                         }
                     }
                 },
@@ -664,9 +693,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "Enemy",
-                            "Prefab_ID": "Enemy.prefab"
+                            "Name": "entity_0009",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -732,9 +764,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "FireSrc",
-                            "Prefab_ID": "ElementSrc.prefab"
+                            "Name": "entity_0010",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -860,9 +895,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "FireEnemy",
-                            "Prefab_ID": ""
+                            "Name": "entity_0011",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -988,9 +1026,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "WaterEnemy",
-                            "Prefab_ID": ""
+                            "Name": "entity_0012",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -1116,9 +1157,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "GrassEnemy",
-                            "Prefab_ID": ""
+                            "Name": "entity_0013",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 }

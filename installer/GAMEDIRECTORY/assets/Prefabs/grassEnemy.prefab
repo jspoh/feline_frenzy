@@ -27,6 +27,9 @@
                 "y": 3
             }
         },
+        "Combat::Faction": {
+            "Faction": 2
+	},
         "Combat::Health": {
             "Health": 100.0,
             "InvulnerableFlag": false,
@@ -102,7 +105,7 @@
             "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
         },
         "State::State": {
-            "State": "Chase"
+            "State": "Idle"
         },
         "Transform::Transform": {
             "Position": {

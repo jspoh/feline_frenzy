@@ -305,7 +305,7 @@ namespace NIKE {
 		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
-#ifdef DEBUG
+#ifdef NDEBUG
 			try {
 #endif
 				// have to poll events regardless of focus

@@ -22,6 +22,11 @@
         }
     },
     {
+        "MetaData": {
+            "Entity_Tags": []
+        }
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -67,9 +72,12 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "background",
-                            "Prefab_ID": ""
+                            "Name": "entity_0000",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 }
@@ -124,9 +132,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "entity_0000",
-                            "Prefab_ID": ""
+                            "Name": "entity_0001",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -172,9 +183,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "entity_0001",
-                            "Prefab_ID": ""
+                            "Name": "entity_0002",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -212,9 +226,12 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
+                            "B_Is_Active": true,
                             "B_Locked": false,
-                            "Entity_ID": "back_btn",
-                            "Prefab_ID": ""
+                            "Name": "entity_0003",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         },
                         "UI Btn": {
                             "Input_State": 1,

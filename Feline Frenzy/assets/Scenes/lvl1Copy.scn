@@ -1079,9 +1079,6 @@
                                 "Pitch": 1.0,
                                 "Volume": 0.5
                             },
-                            "Combat::Faction": {
-                                "Faction": 1
-                            },
                             "Element::Entity": {
                                 "Element": 1
                             },
