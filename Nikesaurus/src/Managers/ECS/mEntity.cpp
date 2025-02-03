@@ -37,7 +37,6 @@ namespace NIKE {
 			throw std::runtime_error("Layer does not exist.");
 		}
 
-
 		return id;
 	}
 

@@ -4,7 +4,7 @@
  * 
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu
  * \date   November 2024
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -30,13 +30,86 @@ namespace NIKE {
 
 			// Deserialize
 			[](Health& comp, nlohmann::json const& data) {
-				comp.lives = data.at("Lives").get<int>();
-				comp.health = data.at("Health").get<float>();
+				comp.lives = data.value("Lives", 1);
+				comp.health = data.value("Health", 100.0f);
 				comp.invulnerableFlag = data.value("InvulnerableFlag", false);
-				//comp.healthBarActive = data.at("HealthBarActive").get<bool>();
+			},
+
+			// Override Serialize
+			[](Health const& comp, Health const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.lives != other_comp.lives) {
+					delta["Lives"] = comp.lives;
+				}
+				if (comp.health != other_comp.health) {
+					delta["Health"] = comp.health;
+				}
+				if (comp.invulnerableFlag != other_comp.invulnerableFlag) {
+					delta["InvulnerableFlag"] = comp.invulnerableFlag;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Health& comp, nlohmann::json const& delta) {
+				if (delta.contains("Lives")) {
+					comp.lives = delta["Lives"];
+				}
+				if (delta.contains("Health")) {
+					comp.health = delta["Health"];
+				}
+				if (delta.contains("InvulnerableFlag")) {
+					comp.invulnerableFlag = delta["InvulnerableFlag"];
+				}
 			}
 		);
 
+		//Health Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Health>();
+	
+		//Register damage components
+		NIKE_ECS_MANAGER->registerComponent<Damage>();
+
+		//Register damage for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Damage>(
+			//Serialize
+			[](Damage const& comp) -> nlohmann::json {
+				return	{
+						{ "Damage", comp.damage },
+				};
+			},
+
+			//Deserialize
+			[](Damage& comp, nlohmann::json const& data) {
+				comp.damage = data.value("Damage", 1.0f);
+			},
+
+			// Override Serialize
+			[](Damage const& comp, Damage const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.damage != other_comp.damage) {
+					delta["Damage"] = comp.damage;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize for Damage
+			[](Damage& comp, nlohmann::json const& delta) {
+				if (delta.contains("Damage")) {
+					comp.damage = delta["Damage"];
+				}
+			}
+		);
+
+		//Damage Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Damage>();
+	}
+
+	void Combat::registerEditorComponents() {
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Health>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Health& comp) {
@@ -127,24 +200,6 @@ namespace NIKE {
 			}
 		);
 #endif
-	
-		//Register damage components
-		NIKE_ECS_MANAGER->registerComponent<Damage>();
-
-		//Register damage for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Damage>(
-			//Serialize
-			[](Damage const& comp) -> nlohmann::json {
-				return	{
-						{ "Damage", comp.damage },
-				};
-			},
-
-			//Deserialize
-			[](Damage& comp, nlohmann::json const& data) {
-				comp.damage = data.at("Damage").get<float>();
-			}
-		);
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Damage>(

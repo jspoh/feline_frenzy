@@ -105,7 +105,7 @@
             "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
         },
         "State::State": {
-            "State": "Chase"
+            "State": "Idle"
         },
         "Transform::Transform": {
             "Position": {

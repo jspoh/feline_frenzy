@@ -78,6 +78,8 @@ namespace NIKE {
 		};
 
 		void registerComponents();
+
+		void registerEditorComponents();
 	}
 }
 

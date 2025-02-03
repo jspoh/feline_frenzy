@@ -250,12 +250,13 @@ namespace NIKE {
 		//Toggle Level Editor On & Off ( Use Global NIKE input to toggle on and off )
 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
 			b_editor_active = !b_editor_active;
+			io.ClearEventsQueue(); // Clear all inputs done while editor is not active
 		}
 
 		//Return if editor is not active
 		if (!b_editor_active)
 			return;
-		
+
 		//Undo
 		static bool z_triggered = false;
 		if (io.KeyCtrl && io.KeysDown[ImGuiKey_Z]) {
@@ -366,7 +367,7 @@ namespace NIKE {
 		std::for_each(panels.begin(), panels.end(), [](std::shared_ptr<IPanel> panel) { panel->init(); });
 	}
 
-	void LevelEditor::Service::update() {
+	void LevelEditor::Service::updateAndRender() {
 
 		//Update imgui with proper delta time
 		ImGuiIO& io = ImGui::GetIO();
@@ -375,25 +376,6 @@ namespace NIKE {
 		//Update shortcuts
 		updateShortCuts();
 
-		//Return when imgui is not active
-		if (!b_editor_active) {
-			io.WantCaptureKeyboard = false;
-			io.WantCaptureMouse = false;
-			io.WantCaptureMouseUnlessPopupClose = false;
-			io.WantSetMousePos = false;
-			return;
-		}
-
-		//Update all panels
-		for (auto& panel : panels) {
-			panel->update();
-		}
-
-		//Save imgui layouts
-		ImGui::SaveIniSettingsToDisk(io.IniFilename);
-	}
-
-	void LevelEditor::Service::render() {
 		//Return when imgui is not active
 		if (!b_editor_active) {
 			return;
@@ -409,6 +391,9 @@ namespace NIKE {
 
 		//End render frame
 		endFrame();
+
+		//Save imgui layouts
+		ImGui::SaveIniSettingsToDisk(io.IniFilename);
 	}
 
 	void LevelEditor::Service::cleanUp() {
@@ -431,14 +416,6 @@ namespace NIKE {
 
 	bool LevelEditor::Service::getGameState() const {
 		return std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getGameState();
-	}
-
-	void LevelEditor::Service::setEntityMetaData(Entity::Type entity, EntityMetaData data) {
-		std::dynamic_pointer_cast<EntitiesPanel>(panels_map.at(EntitiesPanel::getStaticName()))->setEntityMetaData(entity, data);
-	}
-
-	LevelEditor::EntityMetaData LevelEditor::Service::getEntityMetaData(Entity::Type entity) const {
-		return std::dynamic_pointer_cast<EntitiesPanel>(panels_map.at(EntitiesPanel::getStaticName()))->getEntityMetaData(entity);
 	}
 
 	void LevelEditor::Service::addPanel(std::shared_ptr<LevelEditor::IPanel> panel) {

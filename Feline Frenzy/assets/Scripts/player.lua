@@ -1,12 +1,3 @@
-------------------------------------------------------------------------------------
---file   player.lua
---brief  Player lua script
---
---author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
---date   September 2024
---All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
--------------------------------------------------------------------------------------
-
 -- Player object
 Player = {}
 
@@ -24,7 +15,7 @@ local highDamageEnabled = false
 function Player:Animate(entity, args)
     -- Get Last Direction
     local lastDirection = LastDirection(entity)
-	
+    
     -- Get velocity
     local velo = Velocity(entity)
     
@@ -143,137 +134,100 @@ end
 
 -- Player movement
 function Player:Move(entity)
-
     -- Initialize force variables
     local fx, fy = 0.0, 0.0
 
     -- Accumulate forces based on key presses
     if IsKeyPressed(Key.W) then
-        fy = fy + PlayerConfig.forces.up -- Add upward force
+        fy = fy + PlayerConfig.forces.up
     end
 
     if IsKeyPressed(Key.A) then
-        fx = fx + PlayerConfig.forces.left -- Add leftward force
+        fx = fx + PlayerConfig.forces.left
     end
 
     if IsKeyPressed(Key.S) then
-        fy = fy + PlayerConfig.forces.down -- Add downward force
+        fy = fy + PlayerConfig.forces.down
     end
 
     if IsKeyPressed(Key.D) then
-        fx = fx + PlayerConfig.forces.right -- Add rightward force
+        fx = fx + PlayerConfig.forces.right
     end
 
     -- Apply the combined force to the entity
     ApplyForce(entity, fx, fy)
-
-    -- Pathfinding Test
-    --PathFind(entity, 0, 1, 1000.0);
-
 end
 
 -- Player shoot function
 function Player:Shoot(entity)
-
     if IsMouseTriggered(Key.MOUSE_LEFT) then
-        -- Check last direction before firing the bullet
-        local direction = lastDirection
+        -- Get direction based on last direction
+        local direction = LastDirection(entity)
 
-        -- Fire the bullet and pass the direction as an argument
+        -- Fire the bullet
         FireBullet(entity, direction)
-        
-        -- if direction == 0 then
-        --     -- Shooting to the right
-        --     AnimationStart(entity, 0, 9)
-        --     AnimationEnd(entity, 2, 9)
-        --     FlipX(entity, false)
-        -- elseif direction == 1 then
-        --     -- Shooting up-right
-        --     AnimationStart(entity, 0, 10)
-        --     AnimationEnd(entity, 2, 10)
-        --     FlipX(entity, false)
-        -- elseif direction == 2 then
-        --     -- Shooting up
-        --     AnimationStart(entity, 0, 11)
-        --     AnimationEnd(entity, 2, 11)
-        --     FlipX(entity, false)
-        -- elseif direction == 3 then
-        --     -- Shooting up-left
-        --     AnimationStart(entity, 0, 10)
-        --     AnimationEnd(entity, 2, 10)
-        --     FlipX(entity, true)
-        -- elseif direction == 4 then
-        --     -- Shooting down-right
-        --     AnimationStart(entity, 0, 9)
-        --     AnimationEnd(entity, 2, 9)
-        --     FlipX(entity, false)
-        -- elseif direction == 5 then
-        --     -- Shooting down
-        --     AnimationStart(entity, 0, 8)
-        --     AnimationEnd(entity, 2, 8)
-        --     FlipX(entity, false)
-        -- elseif direction == 6 then
-        --     -- Shooting down-left
-        --     AnimationStart(entity, 0, 9)
-        --     AnimationEnd(entity, 2, 9)
-        --     FlipX(entity, true)
-        -- else
-        --     -- Shooting left
-        --     AnimationStart(entity, 0, 9)
-        --     AnimationEnd(entity, 2, 9)
-        --     FlipX(entity, true)
-        -- end
-    end
 
+        -- Handle shooting animation
+        if direction == 0 then
+            AnimationStart(entity, 0, 9)
+            AnimationEnd(entity, 2, 9)
+            FlipX(entity, false)
+        elseif direction == 1 then
+            AnimationStart(entity, 0, 10)
+            AnimationEnd(entity, 2, 10)
+            FlipX(entity, false)
+        elseif direction == 2 then
+            AnimationStart(entity, 0, 11)
+            AnimationEnd(entity, 2, 11)
+            FlipX(entity, false)
+        elseif direction == 3 then
+            AnimationStart(entity, 0, 10)
+            AnimationEnd(entity, 2, 10)
+            FlipX(entity, true)
+        elseif direction == 4 then
+            AnimationStart(entity, 0, 9)
+            AnimationEnd(entity, 2, 9)
+            FlipX(entity, false)
+        elseif direction == 5 then
+            AnimationStart(entity, 0, 8)
+            AnimationEnd(entity, 2, 8)
+            FlipX(entity, false)
+        elseif direction == 6 then
+            AnimationStart(entity, 0, 9)
+            AnimationEnd(entity, 2, 9)
+            FlipX(entity, true)
+        else
+            AnimationStart(entity, 0, 9)
+            AnimationEnd(entity, 2, 9)
+            FlipX(entity, true)
+        end
+
+        -- Change state to Attack
+        SetState(entity, "Attack")
+    end
 end
 
 -- Player update function
 function Player:update(args)
+ local entity = args.entity
 
-    -- Cheat mode enable
-    if IsKeyTriggered(Key.KEY_0) and IsKeyTriggered(Key.KEY_9) then
-        cheatModeEnabled = not cheatModeEnabled
-        if cheatModeEnabled then
-            cout("Cheat mode enabled")
-        end
-        if not cheatModeEnabled then
-            cout("Cheat mode disabled")
+    -- Handle attack animation state
+    if State(entity) == "Attack" then
+        if AnimationCompleted(entity) >= 1 then
+            -- After attack animation finishes, return to idle or movement
+            SetState(entity, "Idle")
+        else
+            -- While attacking, do not process movement or animations
+            return
         end
     end
 
-    if cheatModeEnabled then
-        -- Teleport to cursor cheat
-        if IsKeyTriggered(Key.KEY_1) then
-            -- Get mouse position
-            local mousePos = WorldMousePos()
+    -- If not attacking, allow movement and animations
+    Player:Move(entity)
+    Player:Animate(entity, args)
 
-            -- Set player position to the mouse position
-            SetPosition(entity, mousePos.x, mousePos.y)
-
-            -- Log the new position
-            cout("Teleported player to: X = " .. mousePos.x .. ", Y = " .. mousePos.y)
-        end
-
-        -- God Mode toggle
-        if IsKeyTriggered(Key.KEY_2) then
-            godModeEnabled = not godModeEnabled
-            SetGodMode(entity, godModeEnabled)
-        end
-
-        -- High Damage toggle
-        if IsKeyTriggered(Key.KEY_3) then
-            highDamageEnabled = not highDamageEnabled
-            SetHighDamage(entity, highDamageEnabled)
-        end
-
-    end
-
-    Player:Animate(args.entity, args)
-
-    Player:Move(args.entity)
-
-    Player:Shoot(args.entity)
-
+    -- Handle shooting
+    Player:Shoot(entity)
 end
 
 -- Return player object

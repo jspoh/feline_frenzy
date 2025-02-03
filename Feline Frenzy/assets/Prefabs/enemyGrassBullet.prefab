@@ -7,15 +7,15 @@
             "Pitch": 1.0,
             "Volume": 0.5
         },
-        "Element::Entity": {
-            "Element": 3
-        },
         "Combat::Damage": {
             "Damage": 10.0
         },
         "Combat::Faction": {
             "Faction": 2
-	},
+	    },
+        "Element::Entity": {
+            "Element": 3
+        },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
             "Pos_Offset": {
@@ -79,7 +79,8 @@
             "Scale": {
                 "x": 49.99999237060547,
                 "y": 49.99999237060547
-            }
+            },
+            "Screen Position": false
         }
     },
     "Layer ID": 1

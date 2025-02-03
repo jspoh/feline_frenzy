@@ -38,6 +38,8 @@ namespace NIKE {
 
 			//Check if texture is loaded
 			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
+
+
 				//Allow stretching of texture
 				if (!e_texture.b_stretch) {
 					//Copy transform for texture mapping ( Locks the transformation of a texture )

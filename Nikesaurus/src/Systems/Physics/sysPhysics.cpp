@@ -15,7 +15,6 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Components/cPhysics.h"
 #include "Components/cTransform.h"
-#include "Components/cPathfinding.h"
 
 
 namespace NIKE {

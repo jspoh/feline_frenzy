@@ -64,6 +64,16 @@ inline Vector4<T>& Vector4<T>::operator/=(typename Vector4<T>::type rhs) {
 }
 
 template<typename T>
+inline bool Vector4<T>::operator==(const Vector4<T>& rhs) const {
+	return (this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z) && (this->w == rhs.w);
+}
+
+template<typename T>
+inline bool Vector4<T>::operator!=(const Vector4<T>& rhs) const {
+	return (this->x != rhs.x) || (this->y != rhs.y) || (this->z != rhs.z) || (this->w == rhs.w);
+}
+
+template<typename T>
 inline typename Vector4<T>::type Vector4<T>::dot(const Vector4<T>& rhs) const {
 	return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
 }

@@ -22,7 +22,7 @@ namespace NIKE {
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
 		//Reverse Iterate through layers
-		for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
+		for (auto layer = layers.rbegin(); layer != layers.rend(); ++layer) {
 
 			//Skip inactive layer
 			if (!(*layer)->getLayerState())

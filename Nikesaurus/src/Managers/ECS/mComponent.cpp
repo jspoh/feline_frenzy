@@ -104,6 +104,11 @@ namespace NIKE {
 		return component_types.at(type);
 	}
 
+	bool Component::Manager::checkComponentType(std::string const& type) const {
+		//Check if component has been registered
+		return component_types.find(type) != component_types.end();
+	}
+
 	size_t Component::Manager::getComponentEntitiesCount(Component::Type type) {
 		std::string component_string;
 		for (auto const& comp_type : component_types) {

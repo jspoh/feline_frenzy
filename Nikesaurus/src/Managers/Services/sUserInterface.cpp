@@ -21,8 +21,11 @@ namespace NIKE {
 	}
 
 	void UI::UIBtn::deserialize(nlohmann::json const& data) {
-		input_state = static_cast<UI::InputStates>(data["Input_State"].get<int>());
-		script.deserialize(data["Script"]);
+		input_state = data.value("Input_State", UI::InputStates::TRIGGERED);
+
+		if (data.contains("Script")) {
+			script.deserialize(data["Script"]);
+		}
 	}
 
 	void UI::Service::onEvent(std::shared_ptr<Input::KeyEvent> event) {

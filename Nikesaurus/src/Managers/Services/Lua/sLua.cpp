@@ -22,8 +22,40 @@ namespace NIKE {
     }
 
     void Lua::Script::deserialize(nlohmann::json const& data) {
-        script_id = data["Script_ID"].get<std::string>();
-        function = data["Function"].get<std::string>();
+        script_id = data.value("Script_ID", "");
+        function = data.value("Function", "");
+
+        if (data.contains("Named_Args")) {
+            for (const auto& [key, value] : data.at("Named_Args").items()) {
+                named_args[key] = value.get<LuaValue>();
+            }
+        }
+    }
+
+    nlohmann::json Lua::Script::overrideSerialize(Script const& other_script) const {
+        nlohmann::json delta;
+
+        if (script_id != other_script.script_id) {
+            delta["Script_ID"] = script_id;
+        }
+        if (function != other_script.function) {
+            delta["Function"] = function;
+        }
+        if (named_args != other_script.named_args) {
+            delta["Named_Args"] = named_args;
+        }
+
+        return delta;
+    }
+
+    void Lua::Script::overrideDeserialize(nlohmann::json const& data) {
+        if (data.contains("Script_ID")) {
+            script_id = data["Script_ID"];
+        }
+
+        if (data.contains("Function")) {
+            script_id = data["Function"];
+        }
 
         if (data.contains("Named_Args")) {
             for (const auto& [key, value] : data.at("Named_Args").items()) {

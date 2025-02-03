@@ -13,78 +13,101 @@
 #include "Systems/GameLogic/sysEnemy.h"
 
 namespace NIKE {
-	void Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed) {
-		//Acceptable offset per cell
-		const float cell_offset = 10.0f;
+	void Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset) {
 
-		//Get transform of entity for position mapping
+		// Get transform of entity for position mapping
 		auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (transform.has_value()) {
 
-			//Entity transform
+			// Entity transform
 			auto& e_transform = transform.value().get();
 
-			//Get index of entity as the starting position
+			// Get index of entity as the starting position
 			auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(e_transform.position);
 
-			//Get cell to travel to
+			// Get cell to travel to
 			if (start.has_value()) {
 
-				//Get start index
+				// Get start index
 				auto start_index = start.value();
 
-				//Check if path has been generated or if destination cell has changed
+				static float path_recalc_timer = 0.0f;
+				path_recalc_timer += NIKE_WINDOWS_SERVICE->getDeltaTime();
+				static int path_stick_threshold = 5; // How many frames to stick to a path
+				static int path_follow_counter = 0;
+
+				// Check if path has been generated or if destination cell has changed
 				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
-
-					//Condition if changes to grid blocked has been made
 					NIKE_MAP_SERVICE->checkGridChanged() ||
-
-					//Check if target got shifted
-					(NIKE_MAP_SERVICE->getPath(entity).goal.index != Vector2i(x_index, y_index)) ||
-
-					//Check if entity got shifted
-					(!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
-						(std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start_index.x) > 1 ||
-							std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start_index.y) > 1)) ||
-
-					//Check if path is finished & entity got shifted
-					(NIKE_MAP_SERVICE->getPath(entity).b_finished && start_index != NIKE_MAP_SERVICE->getPath(entity).end.index)
-
-					) {
-
-					//Search for path
+					path_recalc_timer >= 0.5f) {
+					// Search for path
 					NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
+					path_follow_counter = 0;
+					path_recalc_timer = 0.0f;
+				}
+				else {
+					++path_follow_counter;
 				}
 
-				//Get path 
+				// Get path
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
 
-				//Check if there are cells left in path
+				// Check if there are cells left in path
 				if (!path.path.empty()) {
-
-					//Get next cell
 					auto const& next_cell = path.path.front();
 
-					//Check if entity has arrived near destination
-					if ((next_cell.position - e_transform.position).length() > cell_offset) {
+					float distance = (next_cell.position - e_transform.position).length();
 
-						//Direction of next cell
-						float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+					// Stop moving when close to the FINAL target
+					if (distance < cell_offset * 1.5f && path.path.size() == 1) {
+						auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+						if (dynamics.has_value()) {
+							dynamics.value().get().force = { 0.0f, 0.0f };
+						}
+						//cout << "Stopping: Reached final goal" << endl;
+						// Stop here to prevent force flipping
+						return; 
+					}
 
-						//Apply force to entity
+					// Remove the front of the path once the entity reaches it
+					if (distance < cell_offset) {
+						//cout << "Arrived at next cell, popping front" << endl;
+						path.path.pop_front();
+					}
+
+					// Normal movement logic
+					// Check again in case we removed the last step
+					if (!path.path.empty()) {  
+						auto const& next_target = path.path.front();
+
+						float dir = atan2((next_target.position.y - e_transform.position.y),
+							(next_target.position.x - e_transform.position.x));
+
 						auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 						if (dynamics.has_value()) {
 							dynamics.value().get().force = { cos(dir) * speed, sin(dir) * speed };
 						}
-					}
-					else {
-						path.path.pop_front();
+						//cout << "Moving to next cell, Force: (" << cos(dir) * speed
+						//	<< ", " << sin(dir) * speed << ")" << endl;
 					}
 				}
 				else {
+					// No path left, stop movement
+					auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+					if (dynamics.has_value()) {
+						dynamics.value().get().force = { 0.0f, 0.0f };
+					}
+					//cout << "No more path left, stopping movement." << endl;
+					// Stop here if no valid path is available
+					return; 
+				}
 
-					//Marked path as finished
-					path.b_finished = true;
+				// If path follows the same direction for too long without progress, recalculate path
+				if (path_follow_counter >= path_stick_threshold) {
+					//cout << "Path is stuck, recalculating..." << endl;
+					path_follow_counter = 0;
+					path_recalc_timer = 0.0f;
+					NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
 				}
 			}
 		}
