@@ -31,13 +31,53 @@ namespace NIKE {
 
 			//Deserialize
 			[](Transform& comp, nlohmann::json const& data) {
-				comp.position.fromJson(data.at("Position"));
-				comp.scale.fromJson(data.at("Scale"));
-				comp.rotation = data.at("Rotation").get<float>();
+				comp.position.fromJson(data.value("Position", Vector2f::def_json));
+				comp.scale.fromJson(data.value("Scale", Vector2f::def_json));
+				comp.rotation = data.value("Rotation", 0.0f);
 				comp.use_screen_pos = data.value("Screen Position", false);
+			},
+
+			//Override Serialize
+			[](Transform const& comp, Transform const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.position != other_comp.position) {
+					delta["Position"] = comp.position.toJson();
+				}
+				if (comp.use_screen_pos != other_comp.use_screen_pos) {
+					delta["Screen Position"] = comp.use_screen_pos;
+				}
+				if (comp.scale != other_comp.scale) {
+					delta["Scale"] = comp.scale.toJson();
+				}
+				if (comp.rotation != other_comp.rotation) {
+					delta["Rotation"] = comp.rotation;
+				}
+
+				return delta;
+			},
+
+			//Override Deserialize
+			[](Transform& comp, nlohmann::json const& delta) {
+				if (delta.contains("Position")) {
+					comp.position.fromJson(delta.value("Position", Vector2f::def_json));
+				}
+				if (delta.contains("Scale")) {
+					comp.scale.fromJson(delta.value("Scale", Vector2f::def_json));
+				}
+				if (delta.contains("Rotation")) {
+					comp.rotation = delta.value("Rotation", 0.0f);
+				}
+				if (delta.contains("Screen Position")) {
+					comp.use_screen_pos = delta.value("Screen Position", false);
+				}
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Transform>();
+	}
+
+	void Transform::registerEditorComponents() {
 #ifndef NDEBUG
 		//Register transform for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Transform>(
@@ -61,7 +101,7 @@ namespace NIKE {
 
 					//Check if position has finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						
+
 						//Check for grid snapping
 						if (comp_panel.checkGridSnapping()) {
 							//Get snapped to cell position

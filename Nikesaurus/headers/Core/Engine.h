@@ -37,7 +37,6 @@
 #include "Components/cPhysics.h"
 #include "Components/cAnimation.h"
 #include "Components/cGameLogic.h"
-#include "Components/cShooting.h"
 #include "Components/cDespawn.h"
 #include "Components/cElement.h"
 #include "Components/cEnemy.h"
@@ -74,6 +73,9 @@ namespace NIKE {
 			//Register default components
 			void registerDefComponents();
 
+			//Register default components for editor
+			void registerDefEditorComponents();
+
 			//Register default assets
 			void registerDefSystems();
 		public:
@@ -83,6 +85,7 @@ namespace NIKE {
 			 *
 			 * \return instance
 			 */
+
 			static Engine& getInstance() {
 				static Core::Engine instance;
 				return instance;

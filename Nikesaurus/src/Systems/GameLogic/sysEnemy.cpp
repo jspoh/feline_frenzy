@@ -13,78 +13,101 @@
 #include "Systems/GameLogic/sysEnemy.h"
 
 namespace NIKE {
-	void Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed) {
-		//Acceptable offset per cell
-		const float cell_offset = 10.0f;
+	void Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset) {
 
-		//Get transform of entity for position mapping
+		// Get transform of entity for position mapping
 		auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (transform.has_value()) {
 
-			//Entity transform
+			// Entity transform
 			auto& e_transform = transform.value().get();
 
-			//Get index of entity as the starting position
+			// Get index of entity as the starting position
 			auto start = NIKE_MAP_SERVICE->getCellIndexFromCords(e_transform.position);
 
-			//Get cell to travel to
+			// Get cell to travel to
 			if (start.has_value()) {
 
-				//Get start index
+				// Get start index
 				auto start_index = start.value();
 
-				//Check if path has been generated or if destination cell has changed
+				static float path_recalc_timer = 0.0f;
+				path_recalc_timer += NIKE_WINDOWS_SERVICE->getDeltaTime();
+				static int path_stick_threshold = 5; // How many frames to stick to a path
+				static int path_follow_counter = 0;
+
+				// Check if path has been generated or if destination cell has changed
 				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
-
-					//Condition if changes to grid blocked has been made
 					NIKE_MAP_SERVICE->checkGridChanged() ||
-
-					//Check if target got shifted
-					(NIKE_MAP_SERVICE->getPath(entity).goal.index != Vector2i(x_index, y_index)) ||
-
-					//Check if entity got shifted
-					(!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
-						(std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start_index.x) > 1 ||
-							std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start_index.y) > 1)) ||
-
-					//Check if path is finished & entity got shifted
-					(NIKE_MAP_SERVICE->getPath(entity).b_finished && start_index != NIKE_MAP_SERVICE->getPath(entity).end.index)
-
-					) {
-
-					//Search for path
+					path_recalc_timer >= 0.5f) {
+					// Search for path
 					NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
+					path_follow_counter = 0;
+					path_recalc_timer = 0.0f;
+				}
+				else {
+					++path_follow_counter;
 				}
 
-				//Get path 
-				auto& path = NIKE_MAP_SERVICE->getPath(entity);
+				// Get path
+				auto path = NIKE_MAP_SERVICE->getPath(entity);
 
-				//Check if there are cells left in path
+				// Check if there are cells left in path
 				if (!path.path.empty()) {
-
-					//Get next cell
 					auto const& next_cell = path.path.front();
 
-					//Check if entity has arrived near destination
-					if ((next_cell.position - e_transform.position).length() > cell_offset) {
+					float distance = (next_cell.position - e_transform.position).length();
 
-						//Direction of next cell
-						float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+					// Stop moving when close to the FINAL target
+					if (distance < cell_offset * 1.5f && path.path.size() == 1) {
+						auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+						if (dynamics.has_value()) {
+							dynamics.value().get().force = { 0.0f, 0.0f };
+						}
+						//cout << "Stopping: Reached final goal" << endl;
+						// Stop here to prevent force flipping
+						return; 
+					}
 
-						//Apply force to entity
+					// Remove the front of the path once the entity reaches it
+					if (distance < cell_offset) {
+						//cout << "Arrived at next cell, popping front" << endl;
+						path.path.pop_front();
+					}
+
+					// Normal movement logic
+					// Check again in case we removed the last step
+					if (!path.path.empty()) {  
+						auto const& next_target = path.path.front();
+
+						float dir = atan2((next_target.position.y - e_transform.position.y),
+							(next_target.position.x - e_transform.position.x));
+
 						auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 						if (dynamics.has_value()) {
 							dynamics.value().get().force = { cos(dir) * speed, sin(dir) * speed };
 						}
-					}
-					else {
-						path.path.pop_front();
+						//cout << "Moving to next cell, Force: (" << cos(dir) * speed
+						//	<< ", " << sin(dir) * speed << ")" << endl;
 					}
 				}
 				else {
+					// No path left, stop movement
+					auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+					if (dynamics.has_value()) {
+						dynamics.value().get().force = { 0.0f, 0.0f };
+					}
+					//cout << "No more path left, stopping movement." << endl;
+					// Stop here if no valid path is available
+					return; 
+				}
 
-					//Marked path as finished
-					path.b_finished = true;
+				// If path follows the same direction for too long without progress, recalculate path
+				if (path_follow_counter >= path_stick_threshold) {
+					//cout << "Path is stuck, recalculating..." << endl;
+					path_follow_counter = 0;
+					path_recalc_timer = 0.0f;
+					NIKE_MAP_SERVICE->findPath(entity, start_index, Vector2i(x_index, y_index));
 				}
 			}
 		}
@@ -92,27 +115,39 @@ namespace NIKE {
 
 	bool Enemy::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
-		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		Vector2f player_pos = player_transform_comp.value().get().position;
-		Vector2f player_scale = player_transform_comp.value().get().scale;
+		const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		if (!player_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("withinRange: PLAYER missing TRANSFORM component!");
+			return false;
+		}
+		const Vector2f player_pos = player_transform_comp.value().get().position;
+		const Vector2f player_scale = player_transform_comp.value().get().scale;
 
 		// Get enemy transform
-		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
-		Vector2f enemy_pos = enemy_transform_comp.value().get().position;
-		Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
+		const auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		if (!enemy_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("withinRange: ENEMY missing TRANSFORM component!");
+			return false;
+		}
+		const Vector2f enemy_pos = enemy_transform_comp.value().get().position;
+		const Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
 
 		// Get enemy range
-		auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
-		float enemy_range = enemy_attack_comp.value().get().range;
+		const auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		if (!enemy_attack_comp.has_value()) {
+			NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
+			return false;
+		}
+		const float enemy_range = enemy_attack_comp.value().get().range;
 
 		// Calculations
-		float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
-		float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
+		const float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
+		const float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
 
-		float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
-		float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
+		const float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
+		const float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
 
-		float distance = (dist_x * dist_x) + (dist_y * dist_y);
+		const float distance = (dist_x * dist_x) + (dist_y * dist_y);
 
 		//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
 
@@ -123,15 +158,27 @@ namespace NIKE {
 	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform component
 		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		if (!p_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: PLAYER missing TRANSFORM component!");
+			return;
+		}
 		const Vector2f& player_pos = p_transform_comp.value().get().position;
 
 		// Get enemy components
 		// Transform Comp
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing TRANSFORM component!");
+			return;
+		}
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
 
 		// Attack Comp
 		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		if (!e_attack_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing ATTACK component!");
+			return;
+		}
 		const auto& enemy_attack_comp = e_attack_comp.value().get();
 		//const std::string& bullet_prefab = enemy_attack_comp.prefab_path;
 
@@ -141,7 +188,7 @@ namespace NIKE {
 		// Create entity for bullet
 		// Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(enemy_attack_comp.layer);
 		// I don't think this layer number actually matters, since it depends on the prefab layer
-		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(1);
+		Entity::Type bullet_entity = NIKE_ECS_MANAGER->createEntity(0);
 
 		// Load entity from prefab
 		if (e_element_comp.has_value()) {
@@ -150,7 +197,7 @@ namespace NIKE {
 		}
 		else {
 			// Missing Element Comp
-			NIKEE_CORE_WARN("ENEMY missing Elemental Component");
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing Elemental Component");
 			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
 		}
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
@@ -159,7 +206,7 @@ namespace NIKE {
 
 		// Offset spawn position of bullet
 		const float& offset = enemy_attack_comp.offset;
-		Vector2f bullet_pos = enemy_pos + (direction * offset);
+		const Vector2f bullet_pos = enemy_pos + (direction * offset);
 
 		// Set bullet's position
 		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);

@@ -28,10 +28,68 @@ namespace NIKE {
 
 			// Deserialize
 			[](Entity& comp, nlohmann::json const& data) {
-				comp.element = data.at("Element").get<Elements>();
+				comp.element = data.value("Element", Elements::NONE);
+			},
+
+			// Override Serialize
+			[](Entity const& comp, Entity const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.element != other_comp.element) {
+					delta["Element"] = comp.element;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Entity& comp, nlohmann::json const& delta) {
+				if (delta.contains("Element")) {
+					comp.element = delta["Element"];
+				}
 			}
 		);
 
+		//Entity Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Entity>();
+
+		// Register for Source serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Source>(
+			// Serialize
+			[](Source const& comp) -> nlohmann::json {
+				return {
+					{ "Element" , comp.element }
+				};
+			},
+
+			// Deserialize
+			[](Source& comp, nlohmann::json const& data) {
+				comp.element = data.value("Element", Elements::NONE);
+			},
+
+			// Override Serialize
+			[](Source const& comp, Source const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.element != other_comp.element) {
+					delta["Element"] = comp.element;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Source& comp, nlohmann::json const& delta) {
+				if (delta.contains("Element")) {
+					comp.element = delta["Element"];
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Source>();
+	}
+
+	void Element::registerEditorComponents() {
 #ifndef NDEBUG
 		// UI Registration for Player
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Entity>(
@@ -73,21 +131,6 @@ namespace NIKE {
 		);
 #endif
 
-		// Register for Source serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Source>(
-			// Serialize
-			[](Source const& comp) -> nlohmann::json {
-				return {
-					{ "Element" , comp.element }
-				};
-			},
-
-			// Deserialize
-			[](Source& comp, nlohmann::json const& data) {
-				comp.element = data.at("Element").get<Elements>();
-			}
-		);
-		
 #ifndef NDEBUG
 		// UI Registration for Source
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Source>(
@@ -96,12 +139,12 @@ namespace NIKE {
 				// For current element
 				{
 					ImGui::Text("Adjust element:");
-					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS"};
+					static const char* elements_names[] = { "NONE", "FIRE", "WATER", "GRASS" };
 
 					static Elements before_select_element;
 					static int previous_element = static_cast<int>(comp.element);
 					int current_element = static_cast<int>(comp.element);
-					
+
 					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
 						Elements new_element = static_cast<Elements>(current_element);
 						if (new_element != comp.element) {

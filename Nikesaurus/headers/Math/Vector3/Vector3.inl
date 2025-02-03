@@ -65,6 +65,16 @@ inline Vector3<T>& Vector3<T>::operator/=(typename Vector3<T>::type rhs) {
 }
 
 template<typename T>
+inline bool Vector3<T>::operator==(const Vector3<T>& rhs) const {
+	return (this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z);
+}
+
+template<typename T>
+inline bool Vector3<T>::operator!=(const Vector3<T>& rhs) const {
+	return (this->x != rhs.x) || (this->y != rhs.y) || (this->z != rhs.z);
+}
+
+template<typename T>
 inline typename Vector3<T>::type Vector3<T>::dot(const Vector3<T>& rhs) const {
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 }

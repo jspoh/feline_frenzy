@@ -4,7 +4,7 @@
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -50,7 +50,7 @@ namespace NIKE {
 	}
 
 	/*****************************************************************//**
-	* Scene maanger
+	* Scene manager
 	*********************************************************************/
 	void Scenes::Service::initScene(std::string const& scene_id) {
 
@@ -88,21 +88,19 @@ namespace NIKE {
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
 		//Reset Camera
-		NIKE_CAMERA_SERVICE->setActiveCamName("Free Cam");
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
+
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
 
 		//Clear layers
 		layers.clear();
 
 		//Create the first layer
 		createLayer();
-
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
-
-		//Check if scene exists
-		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
-			throw std::runtime_error("Error scene file does not exist");
-		}
 
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
@@ -123,14 +121,20 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
+
 		//Clear layers
 		layers.clear();
 
 		//Create the first layer
 		createLayer();
-
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
 
 		//ReRun scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
@@ -156,6 +160,15 @@ namespace NIKE {
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
 
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+		
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
+
 		//Clear layers
 		layers.clear();
 
@@ -167,16 +180,11 @@ namespace NIKE {
 			throw std::runtime_error("Error scene file does not exist");
 		}
 
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
-
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 	}
 
 	void Scenes::Service::resetScene() {
-		// Reset grid here
-		NIKE_MAP_SERVICE->resetGrid();
 
 		//Clear entities
 		NIKE_ECS_MANAGER->destroyAllEntities();
@@ -186,6 +194,15 @@ namespace NIKE {
 
 		//Stop all audios
 		NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+
+		//Reset metadata service
+		NIKE_METADATA_SERVICE->reset();
+
+		// Reset grid here
+		NIKE_MAP_SERVICE->resetGrid();
+		
+		//Reset Camera
+		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
 		//Clear layers
 		layers.clear();
@@ -267,13 +284,8 @@ namespace NIKE {
 		return layers;
 	}
 
-	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent const& new_event) {
-		if (!event_queue) {
-			event_queue = std::make_shared<Scenes::SceneEvent>(new_event);
-		}
-		else {
-			NIKEE_CORE_INFO("Multiple new scene event. First scene event will be used");
-		}
+	void Scenes::Service::queueSceneEvent(Scenes::SceneEvent&& new_event) {
+		event_queue.push(std::move(new_event));
 	}
 
 	void Scenes::Service::setCurrSceneID(std::string const& new_scene_id) {
@@ -303,10 +315,15 @@ namespace NIKE {
 		}
 
 		//Execute new scene queue
-		if (event_queue) {
-			switch (event_queue->scene_action) {
+		while (!event_queue.empty()) {
+
+			//Get front of the queue and pop
+			auto& action = event_queue.front();
+
+			//Execute action
+			switch (action.scene_action) {
 			case Scenes::Actions::CHANGE:
-				changeScene(event_queue->next_scene_id);
+				changeScene(action.next_scene_id);
 				break;
 			case Scenes::Actions::PREVIOUS:
 				previousScene();
@@ -324,8 +341,7 @@ namespace NIKE {
 				break;
 			}
 
-			//Reset queue
-			event_queue.reset();
+			event_queue.pop();
 		}
 	}
 }

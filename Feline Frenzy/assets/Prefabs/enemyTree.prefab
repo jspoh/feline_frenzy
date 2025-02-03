@@ -12,11 +12,6 @@
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
         },
-        "Health::Health": {
-            "Health": 100.0,
-            "InvulnerableFlag": false,
-            "Lives": 1
-        },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
             "Pos_Offset": {
@@ -67,7 +62,9 @@
             "Scale": {
                 "x": 99.99998474121094,
                 "y": 99.99998474121094
-            }
+            },
+            "Screen Position": false
         }
-    }
+    },
+    "Layer ID": 0
 }

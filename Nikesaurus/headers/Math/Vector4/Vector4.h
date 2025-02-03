@@ -41,6 +41,9 @@ namespace NIKE {
 			Vector4& operator*=(type rhs);
 			Vector4& operator/=(type rhs);
 
+			bool operator==(const Vector4& rhs) const;
+			bool operator!=(const Vector4& rhs) const;
+
 			type dot(const Vector4& rhs) const;
 			type lengthSq() const;
 			type length() const;
@@ -50,6 +53,9 @@ namespace NIKE {
 
 			//Deserialize from json
 			void fromJson(nlohmann::json const& data);
+
+			//Default json
+			static nlohmann::json def_json;
 		};
 
 		#include "Vector4.inl"
@@ -63,5 +69,9 @@ namespace NIKE {
 		using Vector4d = Vector4<double>;
 
 #pragma warning(pop) // Re-enable the warning after this block
+
+		//Default data for vector4 json
+		template <typename T>
+		nlohmann::json Vector4<T>::def_json = nlohmann::json({ {"x", 0}, { "y", 0 }, {"z", 0}, {"w", 0} });
 	}
 }

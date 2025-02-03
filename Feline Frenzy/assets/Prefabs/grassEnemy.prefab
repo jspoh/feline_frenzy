@@ -1,0 +1,121 @@
+{
+    "Components": {
+        "Animation::Base": {
+            "Animation_Count": 0,
+            "B_PingPong": false,
+            "B_Reverse": false,
+            "Completed_Animations": 106,
+            "Frame_Duration": 0.054999999701976776,
+            "Mode": 0,
+            "Timer": 0.03333333507180214
+        },
+        "Animation::Sprite": {
+            "Curr_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "End_Index": {
+                "x": 9,
+                "y": 3
+            },
+            "Sheet_Size": {
+                "x": 0,
+                "y": 0
+            },
+            "Start_Index": {
+                "x": 0,
+                "y": 3
+            }
+        },
+        "Combat::Health": {
+            "Health": 100.0,
+            "InvulnerableFlag": false,
+            "Lives": 1
+        },
+        "Element::Entity": {
+            "Element": 3
+        },
+        "Enemy::Attack": {
+            "Cooldown": 1.0,
+            "Function": "enemyBullet",
+            "LastShotTime": 0.43333348631858826,
+            "Layer": 1,
+            "Offset": 100.0,
+            "PrefabPath": "bullet.prefab",
+            "Range": 10.0,
+            "ScriptID": "",
+            "ScriptLoaded": false,
+            "ScriptPath": "assets/Scripts/enemyBullet.lua"
+        },
+        "Physics::Collider": {
+            "B_Bind_To_Entity": true,
+            "Pos_Offset": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Position": {
+                "x": 437.8940124511719,
+                "y": -323.79998779296875
+            },
+            "Resolution": 1,
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 91.98487091064453,
+                "y": 118.93585968017578
+            }
+        },
+        "Physics::Dynamics": {
+            "Drag": 0.0,
+            "Force": {
+                "x": -981.6494750976563,
+                "y": -190.6943359375
+            },
+            "Mass": 9.999999747378752e-05,
+            "Max_Speed": 100.0,
+            "Velocity": {
+                "x": -98.1649398803711,
+                "y": -19.069429397583008
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 4
+            },
+            "Frame_Size": {
+                "x": 10,
+                "y": 16
+            },
+            "Intensity": 0.0,
+            "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
+        },
+        "State::State": {
+            "State": "Idle"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 437.8940124511719,
+                "y": -323.79998779296875
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 91.98487091064453,
+                "y": 118.93585968017578
+            },
+            "Screen Position": false
+        }
+    },
+    "Layer ID": 1
+}

@@ -39,7 +39,6 @@ namespace NIKE {
 			bool operator!=(const Vector2& rhs) const; 
 			bool operator<(const Vector2& rhs) const;
 
-
 			type dot(const Vector2& rhs) const;
 			type lengthSq() const;
 			type length() const;
@@ -49,6 +48,9 @@ namespace NIKE {
 
 			//Deserialize from json
 			void fromJson(nlohmann::json const& data);
+
+			//Default json
+			static nlohmann::json def_json;
 		};
 
 		#include "Vector2.inl"
@@ -72,5 +74,9 @@ namespace NIKE {
 				return lhs.x == rhs.x && lhs.y == rhs.y;
 			}
 		};
+
+		//Default data for vector2 json
+		template <typename T>
+		nlohmann::json Vector2<T>::def_json = nlohmann::json({ {"x", 0}, { "y", 0 } });
 	}
 }

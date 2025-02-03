@@ -52,10 +52,10 @@ namespace NIKE {
 
                                     // Check if player is within range
                                     if (withinRange(entity, other_entity) && source_intensity <= .5f) {
-                                        source_intensity += .05f;
+                                        source_intensity += .02f;
                                     }
                                     else if (source_intensity > 0.1f){
-                                        source_intensity -= .05f;
+                                        source_intensity -= .02f;
                                     }
                                 }
                             }
@@ -146,6 +146,8 @@ namespace NIKE {
 
                 // Set player element to source element
                 player_element = source_element;
+
+                // !TODO: Play element change animation here
             }
         }
 

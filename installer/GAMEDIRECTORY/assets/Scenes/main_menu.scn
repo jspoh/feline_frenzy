@@ -18,7 +18,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "background"
         }
     },
     {
@@ -28,6 +28,13 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Zoom": 0.9809603095054626
+                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -141,7 +148,7 @@
                             "Script": {
                                 "Function": "Change",
                                 "Named_Args": {
-                                    "scene": "lvl1.scn"
+                                    "scene": "Demo.scn"
                                 },
                                 "Script_ID": "ChangeScene.lua"
                             }
@@ -207,7 +214,9 @@
                             "Input_State": 1,
                             "Script": {
                                 "Function": "Change",
-                                "Named_Args": {},
+                              "Named_Args": {
+                                "scene": "how_to_play.scn"
+                              },
                                 "Script_ID": "ChangeScene.lua"
                             }
                         },

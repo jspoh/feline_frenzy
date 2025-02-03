@@ -1,0 +1,23 @@
+{
+    "Components": {
+        "Enemy::Spawner": {
+            "Cooldown": 5.0,
+            "EnemiesSpawned": 2,
+            "EnemyLimit": 5,
+            "LastSpawnTime": 1.7166657447814941
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "Screen Position": false
+        }
+    },
+    "Layer ID": 0
+}

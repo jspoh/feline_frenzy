@@ -298,10 +298,6 @@ namespace NIKE {
 		window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		window_flags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-	}
-
-	void LevelEditor::MainPanel::update() {
 	}
 
 	void LevelEditor::MainPanel::render() {
@@ -436,6 +432,18 @@ namespace NIKE {
 				}
 			}
 
+			ImGui::Spacing();
+
+			//Reserialize All Data
+			{
+				ImGui::Text("Reserialize Data:");
+				if (ImGui::Button("Reserialize")) {
+
+					//Restart scene
+					NIKE_ASSETS_SERVICE->reserializeAllAssets();
+				}
+			}
+
 			//End of menu bar
 			ImGui::EndMenuBar();
 		}
@@ -451,11 +459,12 @@ namespace NIKE {
 	void LevelEditor::MainPanel::deserializeConfig(nlohmann::json const& config) {
 		try {
 			auto const& data = config.at("EditorConfig");
+
 			b_debug_mode = data.at("Debug_Mode").get<bool>();
-			b_game_state = data.at("Game_State").get<bool>(); // Game state does not work due to systems not running yet
 			b_gizmo_state = data.at("Gizmo_State").get<bool>();
 			b_grid_state = data.at("Grid_State").get<bool>();
 
+			setGameState(data.at("Game_State").get<bool>());
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -464,23 +473,108 @@ namespace NIKE {
 		}
 	}
 
-
-
 	/*****************************************************************//**
 	* Entities Panel
 	*********************************************************************/
-	nlohmann::json LevelEditor::EntityMetaData::serialize() const {
-		return	{
-		{"Entity_ID", entity_id},
-		{"Prefab_ID", prefab_id},
-		{"B_Locked", b_locked}
-		};
+
+	std::function<void()> LevelEditor::EntitiesPanel::addTagPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string tag_name;
+
+			//Get entity text
+			ImGui::Text("Enter a name for the new tag:");
+			if (ImGui::InputText("##Tag Name", tag_name.data(), tag_name.capacity() + 1)) {
+				tag_name.resize(strlen(tag_name.c_str()));
+			}
+
+			//If enter or ok button is pressed
+			if (!tag_name.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
+
+				//Temporary create action
+				Action create;
+
+				//Create a shared id for do & undo functions
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(tag_name);
+
+				//Do Action
+				create.do_action = [&, shared_id]() {
+					NIKE_METADATA_SERVICE->registerTag(*shared_id);
+					};
+
+				//Undo Action
+				create.undo_action = [&, shared_id]() {
+					NIKE_METADATA_SERVICE->unregisterTag(*shared_id);
+					};
+
+				//Execute create entity action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(create));
+
+				//Reset tag name
+				tag_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel creating new entity
+			if (ImGui::Button("Cancel")) {
+
+				//Reset tag name
+				tag_name.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+
 	}
 
-	void LevelEditor::EntityMetaData::deserialize(nlohmann::json const& data) {
-		entity_id = data["Entity_ID"].get<std::string>();
-		prefab_id = data["Prefab_ID"].get<std::string>();
-		b_locked = data["B_Locked"].get<bool>();
+	std::function<void()> LevelEditor::EntitiesPanel::removeTagPopUp(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Confirm removal of entity
+			ImGui::Text("Are you sure you want to remove %s tag?", selected_tag.c_str());
+
+			//If enter or ok button is pressed
+			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+
+				//Temporary create action
+				Action remove;
+
+				//Create a shared id for do & undo functions
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(selected_tag);
+
+				//Do Action
+				remove.do_action = [&, shared_id]() {
+					NIKE_METADATA_SERVICE->unregisterTag(*shared_id);
+					};
+
+				//Undo Action
+				remove.undo_action = [&, shared_id]() {
+					NIKE_METADATA_SERVICE->registerTag(*shared_id);
+					};
+
+				//Execute create entity action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(remove));
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			ImGui::SameLine();
+
+			//Cancel creating new entity
+			if (ImGui::Button("Cancel")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+
 	}
 
 	std::function<void()> LevelEditor::EntitiesPanel::createEntityPopUp(std::string const& popup_id) {
@@ -506,37 +600,37 @@ namespace NIKE {
 			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
 
 			//If enter or ok button is pressed
-			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+			if (!entity_name.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
 				//Temporary create action
 				Action create;
 
 				//Create a shared id for do & undo functions
 				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
 
-				//If entity name is not provided (Create a default)
-				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
-				{
-					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
-				}
-
 				//Do Action
 				create.do_action = [&, shared_id]() {
 					//Create new entity 
 					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
-					//Save entity name into entities ref
-					entities[new_id] = EntityMetaData(shared_id->c_str(), "", false);
-					entity_to_name[new_id] = shared_id->c_str();
-					name_to_entity[shared_id->c_str()] = new_id;
+					//If entity name is valid
+					if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
+					{
+						NIKE_METADATA_SERVICE->setEntityName(new_id, *shared_id);
+					}
+					else {
+						shared_id->assign(NIKE_METADATA_SERVICE->getEntityName(new_id));
+					}
 					};
 
 				//Undo Action
 				create.undo_action = [&, shared_id]() {
 
 					//Check if entity is still alive
-					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
+
+					if (entity.has_value()) {
 						//Destroy new entity
-						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+						NIKE_ECS_MANAGER->destroyEntity(entity.value());
 					}
 					};
 
@@ -573,8 +667,11 @@ namespace NIKE {
 	std::function<void()> LevelEditor::EntitiesPanel::removeEntityPopUp(std::string const& popup_id) {
 		return [this, popup_id]() {
 
+			//Selected entity name
+			std::string selected_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+
 			//Confirm removal of entity
-			ImGui::Text("Are you sure you want to remove %s?", entity_to_name.at(selected_entity).c_str());
+			ImGui::Text("Are you sure you want to remove %s?", selected_name.c_str());
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("Remove") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
@@ -583,14 +680,12 @@ namespace NIKE {
 				Action remove;
 
 				//Create a shared id for do & undo functions
-				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_to_name.at(selected_entity));
+				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(selected_name);
 
 				//Get all entity comps for pass by value storage
 				auto comps = NIKE_ECS_MANAGER->getAllCopiedEntityComponents(selected_entity);
 				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
 				int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
-
-
 
 				//Setup undo action for remove
 				remove.undo_action = [&, shared_id, comps, comp_types, layer_id]() {
@@ -604,28 +699,26 @@ namespace NIKE {
 						NIKE_ECS_MANAGER->setEntityComponent(new_id, comp_types.at(comp.first), comp.second);
 					}
 
-					//Save entity name into entities ref
-					entities[new_id] = EntityMetaData(shared_id->c_str(), "", false);
-					entity_to_name[new_id] = shared_id->c_str();
-					name_to_entity[shared_id->c_str()] = new_id;
+					//Update metadata name ref
+					NIKE_METADATA_SERVICE->setEntityName(new_id, *shared_id);
 
 					//Set selected entity back to old entity
-					selected_entity = name_to_entity.at(shared_id->data());
+					selected_entity = new_id;
 					};
 
 				//Setup action for removing entity
 				remove.do_action = [&, shared_id]() {
 
 					//Check if entity is still alive
-					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
 
-						//Destroy entity
-						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
-
-						//Set selected entity back to first entity
-						selected_entity = entities.empty() ? 0 : entities.begin()->first;
-
+					if (entity.has_value()) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(entity.value());
 					}
+
+					//Set selected entity to an invalid entity
+					selected_entity = UINT16_MAX;
 					};
 
 				//Execute remove action
@@ -659,18 +752,12 @@ namespace NIKE {
 			}
 
 			//If enter or clone button is pressed
-			if (ImGui::Button("Clone") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
+			if (!entity_name.empty() && (ImGui::Button("Clone") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
 				//Temporary clone action
 				Action clone;
 
 				//Create a shared id for do & undo functions
 				std::shared_ptr<std::string> shared_id = std::make_shared<std::string>(entity_name);
-
-				//If entity name is not provided (Create a default)
-				if (shared_id->empty() || name_to_entity.find(shared_id->data()) != name_to_entity.end())
-				{
-					snprintf(shared_id->data(), shared_id->capacity() + 1, "entity_%04d", NIKE_ECS_MANAGER->getEntitiesCount());
-				}
 
 				//Clone entity for capturing by value
 				Entity::Type clone_entity = selected_entity;
@@ -681,10 +768,14 @@ namespace NIKE {
 						//Clone entity 
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
 
-						//Save entity name into entities ref
-						entities[new_id] = EntityMetaData(shared_id->c_str(), "", false);
-						entity_to_name[new_id] = shared_id->c_str();
-						name_to_entity[shared_id->c_str()] = new_id;
+						//If entity name is valid
+						if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
+						{
+							NIKE_METADATA_SERVICE->setEntityName(new_id, *shared_id);
+						}
+						else {
+							shared_id->assign(NIKE_METADATA_SERVICE->getEntityName(new_id));
+						}
 					}
 					};
 
@@ -692,9 +783,11 @@ namespace NIKE {
 				clone.undo_action = [&, shared_id]() {
 
 					//Check if entity is still alive
-					if (name_to_entity.find(shared_id->data()) != name_to_entity.end()) {
+					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
+
+					if (entity.has_value()) {
 						//Destroy new entity
-						NIKE_ECS_MANAGER->destroyEntity(name_to_entity.at(shared_id->data()));
+						NIKE_ECS_MANAGER->destroyEntity(entity.value());
 					}
 					};
 
@@ -722,17 +815,11 @@ namespace NIKE {
 			};
 	}
 
-	void LevelEditor::EntitiesPanel::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
-		updateEntities(event->entities);
-	}
-
 	void LevelEditor::EntitiesPanel::init() {
 
-		//Setup events listening
-		std::shared_ptr<LevelEditor::EntitiesPanel> entitiespanel_wrapped(this, [](LevelEditor::EntitiesPanel*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<Coordinator::EntitiesChanged>(entitiespanel_wrapped);
-
 		//Register popups
+		registerPopUp("Add Tag", addTagPopUp("Add Tag"));
+		registerPopUp("Remove Tag", removeTagPopUp("Remove Tag"));
 		registerPopUp("Create Entity", createEntityPopUp("Create Entity"));
 		registerPopUp("Remove Entity", removeEntityPopUp("Remove Entity"));
 		registerPopUp("Clone Entity", cloneEntityPopUp("Clone Entity"));
@@ -749,64 +836,372 @@ namespace NIKE {
 		comp_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
 	}
 
-	void LevelEditor::EntitiesPanel::update() {
-		int index = 0;
-		for (auto it = entities.begin(); it != entities.end(); ++it) {
-
-			//Update entities ref
-			if (it->second.entity_id.find("entity_") != std::string::npos) {
-
-				//Create identifier for entity
-				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), "entity_%04d", index++);
-				auto data = getEntityMetaData(it->first);
-				data.entity_id = entity_name;
-				setEntityMetaData(it->first, data);
-			}
-		}
-
-	}
-
 	void LevelEditor::EntitiesPanel::render() {
 		ImGui::Begin(getName().c_str());
 
-		// Button to create an entity, which triggers the popup
-		if (ImGui::Button("Create") && entities.size() < Entity::MAX) {
-			openPopUp("Create Entity");
+		//Create entity tags
+		if (ImGui::CollapsingHeader("Entity Tags")) {
+
+			//Get all tags
+			auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
+
+			// Button to create an entity, which triggers the popup
+			if (ImGui::Button("Add##EntityTags")) {
+				openPopUp("Add Tag");
+			}
+
+			//Buttons Same Line
+			ImGui::SameLine();
+
+			// Button to remove an entity, which triggers the popup
+			if (!selected_tag.empty() && ImGui::Button("Remove##EntityTags")) {
+				openPopUp("Remove Tag");
+			}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Iterate through all tags
+			if (!tags.empty()) {
+				for (auto const& tag : tags) {
+
+					//Display tag for selection
+					if (ImGui::Selectable(tag.c_str(), selected_tag == tag)) {
+
+						// Prepare for redo/undo if the tag selection changes
+						if (selected_tag != tag) {
+							LevelEditor::Action select_tag_action;
+
+							// Define the do action for selecting the new tag
+							select_tag_action.do_action = [&, new_tag  = tag]() {
+								selected_tag = new_tag;
+
+								};
+
+							// Define the undo action for reverting to the previous tag
+							select_tag_action.undo_action = [&, prev_tag = selected_tag]() {
+								selected_tag = prev_tag;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_tag_action));
+						}
+						else {
+							LevelEditor::Action unselect_tag_action;
+
+							// Define the do action for unselecting
+							unselect_tag_action.do_action = [&]() {
+								selected_tag.clear();
+								};
+
+							// Define the undo action for reselecting the previous entity
+							unselect_tag_action.undo_action = [&, prev_tag = selected_tag]() {
+								selected_tag = prev_tag;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_tag_action));
+						}
+					}
+
+					//Start drag-and-drop source
+					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+						//Set drag payload with asset tag
+						ImGui::SetDragDropPayload(std::string("Entity Tag").c_str(), tag.c_str(), tag.size() + 1);
+						ImGui::Text(std::string("Entity Tag: " + tag).c_str());
+						ImGui::EndDragDropSource();
+					}
+					else {
+						//Hover item
+						if (ImGui::IsItemHovered()) {
+							ImGui::BeginTooltip();
+							ImGui::Text("Drag tag to entity under entity inspector to add tag.");
+							ImGui::EndTooltip();
+						}
+					}
+				}
+			}
+			else {
+				ImGui::Text("No Tags Exists.");
+			}
 		}
 
-		//Buttons Same Line
-		ImGui::SameLine();
+		//If an entity is selected
+		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
+			ImGui::Spacing();
 
-		// Button to remove an entity, which triggers the popup
-		if ((ImGui::Button("Remove") || ImGui::GetIO().KeysDown[ImGuiKey_Delete]) && (entities.find(selected_entity) != entities.end()) && !entities.empty()) {
-			openPopUp("Remove Entity");
+			//Static entity name input buffer
+			static std::string entity_name;
+
+			//Display selected entity info
+			if (ImGui::CollapsingHeader((NIKE_METADATA_SERVICE->getEntityName(selected_entity) + "##SelectedEntity").c_str())) {
+
+				//Get entity text
+				if (ImGui::InputText("##Entity Name", entity_name.data(), entity_name.capacity() + 1)) {
+					entity_name.resize(strlen(entity_name.c_str()));
+				}
+
+				ImGui::SameLine();
+
+				//Save new name
+				if (ImGui::SmallButton("Save")) {
+					if(NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
+						NIKE_METADATA_SERVICE->setEntityName(selected_entity, entity_name);
+					}
+					else {
+						entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+					}
+				}
+
+				//Lock entity
+				ImGui::SeparatorText("Lock Entity");
+				bool entity_locked = NIKE_METADATA_SERVICE->checkEntityLocked(selected_entity);
+				if (ImGui::Button(entity_locked ? "Locked" : "Unlocked")) {
+					NIKE_METADATA_SERVICE->setEntityLocked(selected_entity, !entity_locked);
+				}
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				ImGui::SeparatorText("Select Prefab");
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				//Select prefab
+				int select_prefab = 0;
+
+				//Prefab ref container
+				auto const& prefabs_ref = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
+				if (!NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity).empty()) {
+					for (auto const& ref : prefabs_ref) {
+						if (NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity) == ref) {
+							break;
+						}
+						++select_prefab;
+					}
+					//Clamp selected prefab
+					select_prefab = std::clamp(select_prefab, 0, static_cast<int>(prefabs_ref.size()) - 1);
+				}
+
+				//Select prefab ID
+				if (ImGui::Combo("##PrefabIDSetter", &select_prefab, prefabs_ref.data(), static_cast<int>(prefabs_ref.size()))) {
+					if (select_prefab > 0 && select_prefab < static_cast<int>(prefabs_ref.size())) {
+						NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, prefabs_ref[select_prefab]);
+					}
+					else {
+						NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, "");
+					}
+				}
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				ImGui::SeparatorText("Entity Tags");
+
+				//Add Spacing
+				ImGui::Spacing();
+
+				//Show number of entities in the level
+				auto e_tags = NIKE_METADATA_SERVICE->getEntityTags(selected_entity);
+				ImGui::Text("Number of tags: %d", e_tags.size());
+				auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
+				if (!tags.empty()) {
+					for (auto const& tag : tags) {
+
+						//Boolean
+						bool checked = e_tags.find(tag) != e_tags.end();
+
+						//Checkbox for checking tag
+						if (ImGui::Checkbox(("##EntityTag" + tag).c_str(), &checked)) {
+							if (checked) {
+								NIKE_METADATA_SERVICE->addEntityTag(selected_entity, tag);
+							}
+							else {
+								NIKE_METADATA_SERVICE->removeEntityTag(selected_entity, tag);
+							}
+						}
+
+						ImGui::SameLine();
+
+						//Tag name
+						ImGui::Text(tag.c_str());
+					}
+				}
+				else {
+					ImGui::Text("No Tags Exists.");
+				}
+			}
+			else {
+				entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+			}
 		}
 
-		//Buttons Same Line
-		ImGui::SameLine();
-
-		// Button to clone an entity, which triggers the popup
-		if (ImGui::Button("Clone") && (entities.find(selected_entity) != entities.end()) && entities.size() < Entity::MAX) {
-			openPopUp("Clone Entity");
-		}
-
-		//Add Spacing
+		//Add spacing
 		ImGui::Spacing();
 
-		//Show number of entities in the level
-		ImGui::Text("Number of entities in level: %d", entities.size());
+		//Create entity tags
+		if (ImGui::CollapsingHeader("Entities")) {
 
-		//Add Spacing
-		ImGui::Spacing();
+			//Show number of entities in the level
+			ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
 
-		//Reset entity changed
-		b_entity_changed = false;
+			//Add Spacing
+			ImGui::Spacing();
 
-		//Check if there are entities present
-		if (!entities.empty()) {
-			// Get entities marked for deletion
-			auto entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
+			//Tag filtering
+			ImGui::SeparatorText("Tag Filtering");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Static selected index
+			static int selected_tag_filter = 0;
+
+			//Static tag filter
+			static std::string tag_filter = "";
+
+			//Tag const char* container
+			std::vector<const char*> tag_container = { "None" };
+			for (auto const& str : NIKE_METADATA_SERVICE->getRegisteredTags()) {
+				tag_container.push_back(str.c_str());
+			}
+
+			//Select tag filter
+			if (ImGui::Combo("##TagDropDown", &selected_tag_filter, tag_container.data(), static_cast<int>(tag_container.size()))) {
+				if (selected_tag_filter > 0 && selected_tag_filter < static_cast<int>(tag_container.size())) {
+					tag_filter = tag_container[selected_tag_filter];
+				}
+				else {
+					tag_filter = "";
+				}
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Tag filtering
+			ImGui::SeparatorText("Entities Inspector");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			// Button to create an entity, which triggers the popup
+			if (ImGui::Button("Create##Entity")) {
+				openPopUp("Create Entity");
+			}
+
+			//Buttons Same Line
+			ImGui::SameLine();
+
+			// Button to remove an entity, which triggers the popup
+			if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
+				openPopUp("Remove Entity");
+			}
+
+			//Buttons Same Line
+			ImGui::SameLine();
+
+			// Button to clone an entity, which triggers the popup
+			if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::Button("Clone##Entity")) {
+				openPopUp("Clone Entity");
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Reset entity changed
+			b_entity_changed = false;
+
+			//Check if there are entities present
+			if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
+
+				//Iterate through all entities to showcase active entities
+				for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+					//Entity data
+					auto entity_name = NIKE_METADATA_SERVICE->getEntityName(entity);
+					auto entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
+					if (entity_name == "" || (!tag_filter.empty() && entity_tags.find(tag_filter) == entity_tags.end())) continue;
+
+					//Check if entity is selected
+					bool selected = NIKE_ECS_MANAGER->checkEntity(selected_entity) && entity == selected_entity;
+
+					// Show selectable
+					if (ImGui::Selectable((entity_name + "##Entity").c_str(), selected)) {
+						// Check if currently editing grid
+						if (tilemap_panel.lock()->checkGridEditing()) {
+							error_msg->assign("Editing grid now, unable to select entity.");
+							openPopUp("Error");
+							unselectEntity();
+							break;
+						}
+
+						// Prepare for redo/undo if the entity selection changes
+						if (selected_entity != entity) {
+							LevelEditor::Action select_entity_action;
+
+							// Capture current and previous selected entities
+							auto prev_entity = selected_entity;
+							auto new_entity = entity;
+
+							// Define the do action for selecting the new entity
+							select_entity_action.do_action = [&, prev_entity, new_entity]() {
+								selected_entity = new_entity;
+								b_entity_changed = true;
+								};
+
+							// Define the undo action for reverting to the previous entity
+							select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+								selected_entity = prev_entity;
+								b_entity_changed = true;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+						}
+						// Unselect the entity
+						else {
+							LevelEditor::Action unselect_entity_action;
+
+							// Capture the current selected entity
+							auto prev_entity = selected_entity;
+
+							// Define the do action for unselecting
+							unselect_entity_action.do_action = [&, prev_entity]() {
+								unselectEntity();
+								b_entity_changed = true;
+								};
+
+							// Define the undo action for reselecting the previous entity
+							unselect_entity_action.undo_action = [&, prev_entity]() {
+								selected_entity = prev_entity;
+								b_entity_changed = true;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+						}
+					}
+
+					//Drop Entity tag payload
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string("Entity Tag").c_str())) {
+							//Get entity tag
+							std::string tag(static_cast<const char*>(payload->Data));
+
+							//Add tag for entity
+							NIKE_METADATA_SERVICE->addEntityTag(entity, tag);
+						}
+						ImGui::EndDragDropTarget();
+					}
+				}
+			}
+		}
+
+		//Check for entity interaction
+		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
 
 			//Check for disable entity interaction flag
 			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
@@ -824,22 +1219,26 @@ namespace NIKE {
 						continue;
 
 					//Iterate through all entities
-					for (auto& entity : entities) {
+					for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
 
 						//Skip entities not on curr layer
-						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity.first))
+						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
+							continue;
+
+						// Skip locked entities so they don't block clicks!
+						if (NIKE_METADATA_SERVICE->checkEntityLocked(entity))
 							continue;
 
 						// Check for entity clicking
-						if (isCursorInEntity(entity.first) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+						if (isCursorInEntity(entity) && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
 							// Only act if the entity changes
-							if (selected_entity != entity.first) {
+							if (selected_entity != entity) {
 
 								LevelEditor::Action select_entity_action;
 
 								// Capture current and previous selected entities
 								auto prev_entity = selected_entity;
-								auto new_entity = entity.first;
+								auto new_entity = entity;
 
 								// Define the do action for selecting the new entity
 								select_entity_action.do_action = [&, prev_entity, new_entity]() {
@@ -860,10 +1259,7 @@ namespace NIKE {
 							}
 
 							// Set the selected entity
-							selected_entity = entity.first;
-
-							// Get selected entity data
-							auto it = entity_to_name.find(selected_entity);
+							selected_entity = entity;
 
 							// Signal entity changed
 							b_entity_changed = true;
@@ -906,79 +1302,7 @@ namespace NIKE {
 				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
 					//Get mouse pos
 					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
-
 				}
-
-			}
-
-			//Iterate through all entities to showcase active entities
-			for (auto& entity : entities) {
-
-				// Skip through "Prefab Master" entity
-				if (entity.second.entity_id.find("Prefab Master") != std::string::npos) {
-					continue;
-				}
-
-				//Check if entity is selected
-				bool selected = (entities.find(selected_entity) != entities.end()) && entity_to_name.at(entity.first).c_str() == entity_to_name.at(selected_entity).c_str();
-
-				// Show selectable
-				if (ImGui::Selectable(entity_to_name.at(entity.first).c_str(), selected)) {
-					// Check if currently editing grid
-					if (tilemap_panel.lock()->checkGridEditing()) {
-						error_msg->assign("Editing grid now, unable to select entity.");
-						openPopUp("Error");
-						unselectEntity();
-						break;
-					}
-
-					// Prepare for redo/undo if the entity selection changes
-					if (selected_entity != entity.first) {
-						LevelEditor::Action select_entity_action;
-
-						// Capture current and previous selected entities
-						auto prev_entity = selected_entity;
-						auto new_entity = entity.first;
-
-						// Define the do action for selecting the new entity
-						select_entity_action.do_action = [&, prev_entity, new_entity]() {
-							selected_entity = new_entity;
-							b_entity_changed = true;
-							};
-
-						// Define the undo action for reverting to the previous entity
-						select_entity_action.undo_action = [&, prev_entity, new_entity]() {
-							selected_entity = prev_entity;
-							b_entity_changed = true;
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
-					}
-					// Unselect the entity
-					else {
-						LevelEditor::Action unselect_entity_action;
-
-						// Capture the current selected entity
-						auto prev_entity = selected_entity;
-
-						// Define the do action for unselecting
-						unselect_entity_action.do_action = [&, prev_entity]() {
-							unselectEntity();
-							b_entity_changed = true;
-							};
-
-						// Define the undo action for reselecting the previous entity
-						unselect_entity_action.undo_action = [&, prev_entity]() {
-							selected_entity = prev_entity;
-							b_entity_changed = true;
-							};
-
-						// Execute the action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
-					}
-				}
-
 			}
 		}
 
@@ -988,141 +1312,16 @@ namespace NIKE {
 		ImGui::End();
 	}
 
-	std::string LevelEditor::EntitiesPanel::getEntityName(Entity::Type entity) {
-		auto it = entity_to_name.find(entity);
-
-		if (it == entity_to_name.end()) {
-			throw std::runtime_error("Entity not found");
-		}
-
-		return it->second;
-	}
-
 	Entity::Type LevelEditor::EntitiesPanel::getSelectedEntity() const {
 		return selected_entity;
-	}
-
-	std::optional<std::string> LevelEditor::EntitiesPanel::getSelectedEntityName() const {
-		//Get selected entity data
-		auto it = entity_to_name.find(selected_entity);
-
-		if (it != entity_to_name.end()) {
-			return it->second;
-		}
-		else {
-			return "";
-		}
 	}
 
 	void LevelEditor::EntitiesPanel::unselectEntity() {
 		selected_entity = UINT16_MAX;
 	}
 
-	void LevelEditor::EntitiesPanel::setEntityMetaData(Entity::Type entity, EntityMetaData data) {
-		//Get selected entity data
-		auto it = entities.find(entity);
-
-		if (it == entities.end()) {
-			throw std::runtime_error("Entity does not exist!");
-		}
-
-		entities[entity] = data;
-		entity_to_name[entity] = data.entity_id;
-		name_to_entity[data.entity_id] = entity;
-	}
-
-	LevelEditor::EntityMetaData LevelEditor::EntitiesPanel::getEntityMetaData(Entity::Type entity) const {
-		//Get selected entity data
-		auto it = entities.find(entity);
-
-		if (it != entities.end()) {
-			return entities.at(entity);
-		}
-		else {
-			throw std::runtime_error("Entity does not exist!");
-		}
-	}
-
-	std::optional<std::reference_wrapper<LevelEditor::EntityMetaData>> LevelEditor::EntitiesPanel::getSelectedEntityMetaData() {
-		//Get selected entity data
-		auto it = entities.find(selected_entity);
-
-		if (it != entities.end()) {
-			return it->second;
-		}
-		else {
-			return std::nullopt;
-		}
-	}
-
-	void LevelEditor::EntitiesPanel::lockEntity(Entity::Type entity) {
-		//Get selected entity data
-		auto it = entities.find(entity);
-
-		if (it == entities.end()) {
-			throw std::runtime_error("Entity does not exist!");
-		}
-
-		entities.at(entity).b_locked = true;
-	}
-
-	void LevelEditor::EntitiesPanel::lockAllEntities() {
-		for (auto& entity : entities) {
-			entity.second.b_locked = true;
-		}
-	}
-
-	void LevelEditor::EntitiesPanel::unlockEntity(Entity::Type entity) {
-		//Get selected entity data
-		auto it = entities.find(entity);
-
-		if (it == entities.end()) {
-			throw std::runtime_error("Entity does not exist!");
-		}
-
-		entities.at(entity).b_locked = false;
-	}
-
-	void LevelEditor::EntitiesPanel::unlockAllEntities() {
-		for (auto& entity : entities) {
-			entity.second.b_locked = false;
-		}
-	}
-
 	bool LevelEditor::EntitiesPanel::isEntityChanged() const {
 		return b_entity_changed;
-	}
-
-	void LevelEditor::EntitiesPanel::updateEntities(std::set<Entity::Type> ecs_entities) {
-
-		//Remove entities that are no longer in the ECS
-		for (auto it = entities.begin(); it != entities.end();) {
-			if (ecs_entities.find(it->first) == ecs_entities.end()) {
-				//Remove the entity from all associated maps
-				name_to_entity.erase(entity_to_name.at(it->first));
-				entity_to_name.erase(it->first);
-				it = entities.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
-
-		//Add new entities from the ECS that are not yet in the editor
-		for (auto& entity : ecs_entities) {
-
-			if (entities.find(entity) == entities.end()) {
-
-				//Create identifier for entity
-				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), "entity_%04d", static_cast<int>(entity_to_name.size()));
-
-				//Add entity to editor structures
-				entities.emplace(entity, EntityMetaData(entity_name, "", false));
-				entity_to_name.emplace(entity, entity_name);
-				name_to_entity.emplace(entity_name, entity);
-			}
-		}
 	}
 
 	bool LevelEditor::EntitiesPanel::isCursorInEntity(Entity::Type entity) const {
@@ -1148,7 +1347,7 @@ namespace NIKE {
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::interactGizmo() {
 		//Check if entity is locked
-		if (!entities_panel.lock()->getSelectedEntityMetaData().has_value() || entities_panel.lock()->getSelectedEntityMetaData().value().get().b_locked) {
+		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -1732,8 +1931,12 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 	}
 
-	void LevelEditor::ComponentsPanel::update() {
+	void LevelEditor::ComponentsPanel::setCompStringRef(std::string const& to_set)
+	{
+		comp_string_ref = to_set;
+	}
 
+	void LevelEditor::ComponentsPanel::render() {
 		//Update components list
 		if (comps.size() != NIKE_ECS_MANAGER->getComponentsCount()) {
 
@@ -1747,24 +1950,21 @@ namespace NIKE {
 				}
 				});
 		}
-	}
 
-	void LevelEditor::ComponentsPanel::setCompStringRef(std::string const& to_set)
-	{
-		comp_string_ref = to_set;
-	}
-
-	void LevelEditor::ComponentsPanel::render() {
+		//Begin render
 		ImGui::Begin(getName().c_str());
 
 		//Reset gizmo interaction
 		gizmo.b_interacting = false;
 
+		//Selected entity
+		Entity::Type selected_entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if an entity has been selected
-		if (NIKE_ECS_MANAGER->checkEntity(entities_panel.lock()->getSelectedEntity())) {
+		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
 
 			//Print out selected entity string ref
-			ImGui::Text("Selected Entity: %s", entities_panel.lock()->getSelectedEntityName().value_or("").c_str());
+			ImGui::Text("Selected Entity: %s", NIKE_METADATA_SERVICE->getEntityName(selected_entity).c_str());
 
 			//Print out selected entity component count
 			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entities_panel.lock()->getSelectedEntity()));
@@ -1772,27 +1972,13 @@ namespace NIKE {
 			//Print out selected entity layer id
 			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity()));
 
-			//Entity locking
-			{
-				//Lock entity
-				ImGui::Text("Lock Entity: ");
-				ImGui::SameLine();
-				if (entities_panel.lock()->getSelectedEntityMetaData().has_value()) {
-					auto& locked = entities_panel.lock()->getSelectedEntityMetaData().value().get().b_locked;
-					if (ImGui::SmallButton(locked ? "Locked" : "Unlocked")) {
-						locked = !locked;
-					}
+			//Return if entity is locked
+			if (NIKE_METADATA_SERVICE->checkEntityLocked(selected_entity)) {
+				//Render popups
+				renderPopUps();
 
-					//Return if entity is locked
-					if (locked) {
-						ImGui::End();
-						return;
-					}
-				}
-				else {
-					//Return if entity editor does not have value
-					return;
-				}
+				ImGui::End();
+				return;
 			}
 
 			//Transformation gizmo is enabled
@@ -2047,7 +2233,7 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
 		//Check if entity is locked
-		if (!entities_panel.lock()->getSelectedEntityMetaData().has_value() || entities_panel.lock()->getSelectedEntityMetaData().value().get().b_locked) {
+		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2077,7 +2263,7 @@ namespace NIKE {
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
 		//Check if entity is locked
-		if (!entities_panel.lock()->getSelectedEntityMetaData().has_value() || entities_panel.lock()->getSelectedEntityMetaData().value().get().b_locked) {
+		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2212,17 +2398,17 @@ namespace NIKE {
 			ImGui::Spacing();
 
 			//Iterate over all registered components
-			for (const auto& component : comps_panel.lock()->getComps()) {
+			for (const auto& component : NIKE_SERIALIZE_SERVICE->getCompFuncs()) {
 
 				//Check if component already exists
-				if (NIKE_ECS_MANAGER->checkEntityComponent(prefab_display, component.second))
+				if (prefab_comps.find(component.first) != prefab_comps.end())
 					continue;
 
 				//Display each component as a button
 				if (ImGui::Button(component.first.c_str())) {
 
-					//Add default comp to entity
-					NIKE_ECS_MANAGER->addDefEntityComponent(prefab_display, component.second);
+					//Add default comp to prefab
+					prefab_comps[component.first] = component.second();
 
 					//Close popup
 					closePopUp(popup_id);
@@ -2252,11 +2438,9 @@ namespace NIKE {
 
 			// Confirm button
 			if (ImGui::Button("Ok##Prefab")) {
-				// Retrieve component type from reference
-				Component::Type comp_type_copy = comps_panel.lock()->getComps().at(comp_ref);
 
-				// Remove the component from the entity
-				NIKE_ECS_MANAGER->removeEntityComponent(prefab_display, comp_type_copy);
+				// Remove the component from the prefab
+				prefab_comps.erase(comp_ref);
 
 				//Reset comp string ref
 				comp_ref.clear();
@@ -2282,38 +2466,44 @@ namespace NIKE {
 			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "You are creating an empty prefab, remember to save it later!");
 
 			//Static entity name input buffer
-			static std::string prefab_id;
+			static std::string new_prefab_id;
 
-			//Get Scene text
+			//Get prefab ID
 			ImGui::Text("Enter a name for the prefab without .prefab:");
-			if (ImGui::InputText("##prefab Name", prefab_id.data(), prefab_id.capacity() + 1)) {
-				prefab_id.resize(strlen(prefab_id.c_str()));
+			if (ImGui::InputText("##prefab Name", new_prefab_id.data(), new_prefab_id.capacity() + 1)) {
+				new_prefab_id.resize(strlen(new_prefab_id.c_str()));
 			}
 
 			//Add spacing
 			ImGui::Spacing();
 
 			//Display each component as a button
-			if (ImGui::Button("Ok") && !prefab_id.empty() && (prefab_id.find(".prefab") == prefab_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(std::string(prefab_id + ".prefab"))) {
+			if (ImGui::Button("Ok") && !new_prefab_id.empty() && (new_prefab_id.find(".prefab") == new_prefab_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(std::string(new_prefab_id + ".prefab"))) {
+
+				//Reset prefab comps
+				prefab_comps.clear();
+
+				//Set prefab ID
+				prefab_id = new_prefab_id + ".prefab";
 
 				//Craft file path from name
 				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Prefabs");
 				if (std::filesystem::exists(path)) {
-					path /= std::string(prefab_id + ".prefab");
+					path /= std::string(new_prefab_id + ".prefab");
 				}
 				else {
 					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
-					path /= std::string(prefab_id + ".prefab");
+					path /= std::string(new_prefab_id + ".prefab");
 				}
 
 				//Normalize prefab path
-				prefab_path = NIKE_PATH_SERVICE->normalizePath(path);
+				auto prefab_path = NIKE_PATH_SERVICE->normalizePath(path);
 
-				//Path found, but create a temp entity
-				createDisplayPrefab("");
+				//Save empty prefab to path
+				NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, prefab_path.string());
 
 				//Reset scene id buffer
-				prefab_id.clear();
+				new_prefab_id.clear();
 
 				//Close popup
 				closePopUp(popup_id);
@@ -2345,21 +2535,24 @@ namespace NIKE {
 				const auto& all_loaded_prefabs = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
 
 				// Track the selected prefab
-				static int current_index = -1;
+				static int current_index = 0;
 
 				// Display a combo box for prefab selection
 				if (ImGui::Combo("##SelectPrefab", &current_index, all_loaded_prefabs.data(), static_cast<int>(all_loaded_prefabs.size()))) {
 					// Clear any temporary prefab entity before creating a new one
-					if (current_index >= 0 && current_index < static_cast<int>(all_loaded_prefabs.size())) {
-						std::string selected_prefab_path = all_loaded_prefabs[current_index];
+					if (current_index > 0 && current_index < static_cast<int>(all_loaded_prefabs.size())) {
+						prefab_id = all_loaded_prefabs[current_index];
 
-						//Create prefab
-						createDisplayPrefab(selected_prefab_path);
+						//Clear prefab comps
+						prefab_comps.clear();
 
 						//Reset current index
-						current_index = -1;
+						current_index = 0;
 
-						// Close the popup after loading
+						//Load prefab comps
+						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+
+						//Close the popup after loading
 						closePopUp(popup_id);
 					}
 				}
@@ -2405,12 +2598,12 @@ namespace NIKE {
 				//Create new entity
 				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
 
-				//Load entity from path
-				NIKE_SERIALIZE_SERVICE->loadEntityFromFile(new_id, prefab_path.string());
-
 				//Add metadata to entity
-				EntityMetaData data(entity_name.c_str(), prefab_path.filename().string(), false);
-				entities_panel.lock()->setEntityMetaData(new_id, data);
+				NIKE_METADATA_SERVICE->setEntityName(new_id, entity_name.c_str());
+				NIKE_METADATA_SERVICE->setEntityPrefabID(new_id, prefab_id);
+
+				//Load entity from path
+				NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(new_id, prefab_id);
 
 				//Reset layer id
 				layer_id = 0;
@@ -2440,8 +2633,38 @@ namespace NIKE {
 	}
 
 	void LevelEditor::PrefabsPanel::savePrefab() {
+
+		//Save entity prefab overrides
+		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+			//Find entities with prefab active
+			if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
+
+				//Serialize override data
+				NIKE_METADATA_SERVICE->setEntityPrefabOverride(entity, NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity, prefab_id));
+			}
+		}
+
 		//Save prefab to file
-		NIKE_SERIALIZE_SERVICE->saveEntityToFile(prefab_display, prefab_path.string());
+		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+
+		//Iterate through all entities and check their metadata
+		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+
+			//Apply prefab to all entities
+			if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
+
+				//Apply prefab
+				NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+
+				//Deserialize override data
+				NIKE_SERIALIZE_SERVICE->deserializePrefabOverrides(entity, NIKE_METADATA_SERVICE->getEntityPrefabOverride(entity));
+			}
+		}
+
+		//Open success popup
+		msg->assign("Prefab Saved!");
+		openPopUp("Success");
 	}
 
 	void LevelEditor::PrefabsPanel::init() {
@@ -2463,16 +2686,6 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", msg));
 	}
 
-	void LevelEditor::PrefabsPanel::update() {
-		copy_count = 0;
-		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-			auto const& data = entities_panel.lock()->getEntityMetaData(entity);
-			if (data.prefab_id == prefab_path.filename().string()) {
-				copy_count++;
-			}
-		}
-	}
-
 	void LevelEditor::PrefabsPanel::render() {
 		ImGui::Begin(getName().c_str());
 
@@ -2485,13 +2698,18 @@ namespace NIKE {
 		ImGui::SetCursorPos(pos);
 
 		//Check if prefab display is valid
-		if (prefab_display != UINT16_MAX && NIKE_ECS_MANAGER->checkEntity(prefab_display)) {
+		if (!prefab_id.empty()) {
 
-			//Set flag to true
-			b_editing_prefab = true;
+			//Update with accuarate copy count
+			copy_count = 0;
+			for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
+				if (NIKE_METADATA_SERVICE->getEntityPrefabID(entity) == prefab_id) {
+					copy_count++;
+				}
+			}
 
 			//Display prefab ID
-			ImGui::Text("Editing Prefab ID: %s", prefab_path.filename().string().c_str());
+			ImGui::Text("Editing Prefab ID: %s", prefab_id.c_str());
 			ImGui::Text("Prefab's Copies: %i", copy_count);
 
 			//Load prefab template
@@ -2504,17 +2722,14 @@ namespace NIKE {
 			//Save prefab template
 			if (ImGui::Button("Save Prefab")) {
 				savePrefab();
-
-				//Open success popup
-				msg->assign("Prefab Saved!");
-				openPopUp("Success");
 			}
 
 			ImGui::SameLine();
 
 			//Save prefab template
 			if (ImGui::Button("Close Prefab")) {
-				destroyDisplayPrefab();
+				prefab_id.clear();
+				prefab_comps.clear();
 			}
 
 			ImGui::Spacing();
@@ -2538,43 +2753,6 @@ namespace NIKE {
 				openPopUp("Create Entity");
 			}
 
-			ImGui::SameLine();
-
-			//Add component
-			if (ImGui::Button("Apply To Entities")) {
-
-				//Save prefab
-				savePrefab();
-
-				//Iterate through all entities and check their metadata
-				for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-					auto const& data = entities_panel.lock()->getEntityMetaData(entity);
-
-					//Apply prefab to all entities
-					if (data.prefab_id == prefab_path.filename().string()) {
-
-						//Check for transform
-						auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-						if (e_trans_comp.has_value()) {
-
-							//Save old position
-							auto& e_transform = e_trans_comp.value().get();
-							Vector2f prev_pos = e_transform.position;
-
-							//Load entity
-							NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, prefab_path.string());
-
-							//Apply old position back
-							e_transform.position = prev_pos;
-						}
-						else {
-							//Load entity
-							NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, prefab_path.string());
-						}
-					}
-				}
-			}
-
 			ImGui::Spacing();
 
 			ImGui::Separator();
@@ -2585,8 +2763,6 @@ namespace NIKE {
 			renderPrefabComponents();
 		}
 		else {
-			//Set flag to false
-			b_editing_prefab = false;
 
 			ImGui::Text("Drag or load a prefab here to start editing.");
 
@@ -2616,7 +2792,16 @@ namespace NIKE {
 				//Get asset ID
 				std::string asset_id(static_cast<const char*>(payload->Data));
 
-				createDisplayPrefab(asset_id);
+				//Set prefab ID
+				prefab_id = asset_id;
+
+				//Clear prefab comps
+				prefab_comps.clear();
+
+				//Load prefab comps
+				NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+
+				//createDisplayPrefab(asset_id);
 			}
 
 			ImGui::EndDragDropTarget();
@@ -2626,7 +2811,7 @@ namespace NIKE {
 	void LevelEditor::PrefabsPanel::renderPrefabComponents()
 	{
 		// Iterate through components of the entity
-		for (auto& comp : NIKE_ECS_MANAGER->getAllEntityComponents(prefab_display)) {
+		for (auto& comp : prefab_comps) {
 
 			// Display a collapsible header for each component
 			if (ImGui::CollapsingHeader(comp.first.c_str(), ImGuiTreeNodeFlags_None)) {
@@ -2644,55 +2829,10 @@ namespace NIKE {
 		}
 	}
 
-	void LevelEditor::PrefabsPanel::createDisplayPrefab(const std::string& file_path)
-	{
-		//Destroy previous master copy
-		if (prefab_display != UINT16_MAX && NIKE_ECS_MANAGER->checkEntity(prefab_display)) {
-			destroyDisplayPrefab();
-		}
-
-		// Create a temporary entity (excluded from systems)
-		prefab_display = NIKE_ECS_MANAGER->createEntity();
-
-		//Update entities list with master name
-		EntityMetaData temp = entities_panel.lock()->getEntityMetaData(prefab_display);
-		temp.entity_id = "Prefab Master";
-		entities_panel.lock()->setEntityMetaData(prefab_display, temp);
-
-		//Return if file path is empty
-		if (file_path.empty()) {
-			return;
-		}
-
-		//Load new entity
-		prefab_path = NIKE_ASSETS_SERVICE->getAssetPath(file_path);
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(prefab_display, prefab_path.string());
-	}
-
-	void LevelEditor::PrefabsPanel::destroyDisplayPrefab()
-	{
-		//Destroy entity
-		NIKE_ECS_MANAGER->destroyEntity(prefab_display);
-
-		//Set prefab display to invalid value
-		prefab_display = UINT16_MAX;
-
-		//Reset prefab path
-		prefab_path = "";
-	}
-
-	bool LevelEditor::PrefabsPanel::isPrefabEditing() const {
-		return b_editing_prefab;
-	}
-
 	/*****************************************************************//**
 	* Debugging Tools Panel
 	*********************************************************************/
 	void LevelEditor::DebugPanel::init() {
-
-	}
-
-	void LevelEditor::DebugPanel::update() {
 
 	}
 
@@ -2920,10 +3060,6 @@ namespace NIKE {
 	void LevelEditor::AudioPanel::init() {
 		registerPopUp("Add New Channel", createChannelPopUp("Add New Channel"));
 		registerPopUp("Delete Channel", deleteChannelPopUp("Delete Channel"));
-	}
-
-	void LevelEditor::AudioPanel::update() {
-
 	}
 
 	void LevelEditor::AudioPanel::render() {
@@ -3643,7 +3779,8 @@ namespace NIKE {
 			});
 	}
 
-	void LevelEditor::ResourcePanel::update() {
+	void LevelEditor::ResourcePanel::render() {
+		
 		//Update resource panel with file change events
 		while (!file_event_queue.empty()) {
 
@@ -3661,9 +3798,7 @@ namespace NIKE {
 				NIKEE_CORE_WARN("Invalid Callback From FileWatcher Handled. Loop Continues.");
 			}
 		}
-	}
 
-	void LevelEditor::ResourcePanel::render() {
 		if (ImGui::Begin(getName().c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
 
 			ImGui::BeginMenuBar();
@@ -4019,71 +4154,62 @@ namespace NIKE {
 
 	void LevelEditor::CameraPanel::dispatchCameraChange(Entity::Type cam, const std::string& name) {
 		if (cam == UINT16_MAX) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam, free_cam));
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(name, free_cam));
 		}
 		else {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(cam));
+			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(name));
 		}
-
-		NIKE_CAMERA_SERVICE->setActiveCamName(name);
 	}
 
 	void LevelEditor::CameraPanel::init() {
-		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
 		//Game panel reference
 		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 
 		//Setup free cam to be referenced as default camera in camera system
-		free_cam = std::make_shared<Render::Cam>(Vector2f(0.0f, 0.0f), 1.0f);
+		free_cam = NIKE_CAMERA_SERVICE->getDefaultCamera();
 
 		combo_index = 0;
 		last_dispatched_index = 0;
 
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>("Free Cam", free_cam));
 	}
 
-	void LevelEditor::CameraPanel::update() {
-		const std::unordered_map<Entity::Type, std::string> cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
-		static auto previous_scene = NIKE_SCENES_SERVICE->getPrevSceneID();
+	void LevelEditor::CameraPanel::render() {
 
-
-		//Update list of camera entities
-		if (cam_entities.size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1 ||
-			previous_scene != NIKE_SCENES_SERVICE->getCurrSceneID() ) {
+		//Update list of camera entities (On scene change and when list of entities get updated)
+		if (NIKE_CAMERA_SERVICE->getCameraEntities().size() != NIKE_ECS_MANAGER->getComponentEntitiesCount(NIKE_ECS_MANAGER->getComponentType<Render::Cam>()) + 1) {
 
 			NIKE_CAMERA_SERVICE->clearCameraEntities();
 			NIKE_CAMERA_SERVICE->emplaceCameraEntity(UINT16_MAX, "Free Cam");
 			combo_index = 0;
 			last_dispatched_index = 0;
+
 			int index = 0;
+
 			for (auto entity : NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<Render::Cam>())) {
-				auto cam_name = entities_panel.lock()->getEntityName(entity);
+				auto cam_name = NIKE_METADATA_SERVICE->getEntityName(entity);
 				NIKE_CAMERA_SERVICE->emplaceCameraEntity(entity, cam_name);
 
 				index++;
 				if (cam_name == NIKE_CAMERA_SERVICE->getActiveCamName()) {
-					dispatchCameraChange(entity, cam_name);
 					combo_index = index;
 					last_dispatched_index = index;
 				}
-
-
 			}
-			
 		}
 
-	}
-
-	void LevelEditor::CameraPanel::render() {
-		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
-
+		//Begin camera panel
 		ImGui::Begin(getName().c_str());
+
+		//Get cam entities
+		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
 
 		//Select camera
 		ImGui::Text("Select Camera:");
 
 		//Static for tracking last dispatched index & dispatching of new camera
-		static bool dispatch = true;
+		static bool dispatch = false;
 
 		// Convert unordered_map to vector of strings (camera names)
 		std::vector<const char*> cam_names;
@@ -4406,18 +4532,12 @@ namespace NIKE {
 				if (b_model) {
 					//Create button
 					auto entity = NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Shape(render_ref, btn_color));
-					auto const& e_panel = entities_panel.lock();
-					EntityMetaData copy = e_panel->getEntityMetaData(entity);
-					copy.entity_id = btn_id;
-					e_panel->setEntityMetaData(entity, copy);
+					NIKE_METADATA_SERVICE->setEntityName(entity, btn_id);
 				}
 				else {
 					//Create button
 					auto entity = NIKE_UI_SERVICE->createButton(btn_id, std::move(trans_copy), std::move(txt_copy), Render::Texture(render_ref, btn_color, false, 0.5f, true));
-					auto const& e_panel = entities_panel.lock();
-					EntityMetaData copy = e_panel->getEntityMetaData(entity);
-					copy.entity_id = btn_id;
-					e_panel->setEntityMetaData(entity, copy);
+					NIKE_METADATA_SERVICE->setEntityName(entity, btn_id);
 				}
 
 				//Reset btn id
@@ -4478,10 +4598,6 @@ namespace NIKE {
 		registerPopUp("Create Button", createButtonPopup("Create Button"));
 
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
-	}
-
-	void LevelEditor::UIPanel::update() {
-
 	}
 
 	void LevelEditor::UIPanel::render() {
@@ -4728,8 +4844,7 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 	}
 
-	void LevelEditor::TileMapPanel::update() {
-
+	void LevelEditor::TileMapPanel::render() {
 		//Clicking to set map cells to blocked
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 		auto wrapped_cell = NIKE_MAP_SERVICE->getCursorCell();
@@ -4738,14 +4853,9 @@ namespace NIKE {
 			//Set cell to blocked
 			auto& cell = wrapped_cell.value().get();
 			cell.b_blocked = !cell.b_blocked;
-
-			cout << cell.index.x << " " << cell.index.y << endl;
-
-			cout << cell.position.x << " " << cell.position.y << endl;
 		}
-	}
 
-	void LevelEditor::TileMapPanel::render() {
+		//Begin Render
 		ImGui::Begin(getName().c_str());
 
 		ImGui::Spacing();
@@ -5161,22 +5271,39 @@ namespace NIKE {
 			if (ImGui::Button("Ok") && !scn_id.empty() && (scn_id.find(".scn") == scn_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(scn_id)) {
 
 				//Craft file path from name
-				std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
+				std::filesystem::path scenes_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
 
-				if (!std::filesystem::exists(path)) {
-					std::filesystem::create_directories(path); // Create the directory if it doesn't exist
+				if (!std::filesystem::exists(scenes_path)) {
+					std::filesystem::create_directories(scenes_path); // Create the directory if it doesn't exist
 				}
 
-				path /= std::string(scn_id + ".scn");
+				//Craft file path from name
+				std::filesystem::path grids_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
+
+				if (!std::filesystem::exists(grids_path)) {
+					std::filesystem::create_directories(grids_path); // Create the directory if it doesn't exist
+				}
+
+				//Scn path
+				std::filesystem::path scn_path = scenes_path / std::string(scn_id + ".scn");
+
+				//Grid path
+				std::filesystem::path grid_path = grids_path / std::string(scn_id + ".grid");
 
 				//Reset scene
-				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESET, ""));
+				NIKE_SCENES_SERVICE->resetScene();
 
 				//When user click save/create scene, grid is saved together
 				tile_panel.lock()->saveGrid(scn_id);
 
 				//Serialize new empty scene
-				NIKE_SERIALIZE_SERVICE->saveSceneToFile(path.string());
+				NIKE_SERIALIZE_SERVICE->saveSceneToFile(scn_path.string());
+
+				//Register grid
+				NIKE_ASSETS_SERVICE->registerAsset(grid_path.string(), false);
+
+				//Register scn
+				NIKE_ASSETS_SERVICE->registerAsset(scn_path.string(), false);
 
 				//Queue new scene
 				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, std::string(scn_id + ".scn")));
@@ -5247,7 +5374,6 @@ namespace NIKE {
 			}
 			};
 	}
-
 
 	std::function<void()> LevelEditor::ScenesPanel::editBitMaskPopup(std::string const& popup_id) {
 		return [this, popup_id]() {
@@ -5434,11 +5560,6 @@ namespace NIKE {
 		tile_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
 	}
 
-	void LevelEditor::ScenesPanel::update()
-	{
-		// Empty for now, nothing to update
-	}
-
 	void LevelEditor::ScenesPanel::render()
 	{
 		ImGui::Begin(getName().c_str());
@@ -5622,8 +5743,6 @@ namespace NIKE {
 			openPopUp("Edit Layer Bit Mask");
 		}
 
-
-
 		//Render popups
 		renderPopUps();
 
@@ -5692,8 +5811,6 @@ namespace NIKE {
 
 				// Execute the action
 				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(drag_drop_action));
-
-
 			}
 
 			//Model file payload
@@ -5726,6 +5843,47 @@ namespace NIKE {
 
 					//Add model
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Shape>(*entity_id, Render::Shape(asset_id, color));
+					};
+
+				//Undo Action
+				drag_drop_action.undo_action = [entity_id]() {
+
+					//Check if entity is still alive
+					if (NIKE_ECS_MANAGER->checkEntity(*entity_id)) {
+						//Destroy new entity
+						NIKE_ECS_MANAGER->destroyEntity(*entity_id);
+					}
+					};
+
+				// Execute the action
+				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(drag_drop_action));
+			}
+
+			//Prefab file payload
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Prefab_FILE")) {
+
+				//Get asset ID
+				std::string asset_id(static_cast<const char*>(payload->Data));
+
+				// Define an undo/redo action
+				Action drag_drop_action;
+
+				// For lamda to use
+				auto entity_id = std::make_shared<Entity::Type>();
+
+				//Do Action
+				drag_drop_action.do_action = [entity_id, asset_id, render_pos]() {
+					//Creat new entity 
+					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+
+					//Load entity from prefab
+					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(*entity_id, asset_id);
+
+					//Add transform
+					auto e_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(*entity_id);
+					if (e_transform.has_value()) {
+						e_transform.value().get().position = render_pos;
+					}
 					};
 
 				//Undo Action
@@ -5848,9 +6006,6 @@ namespace NIKE {
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
 	}
 
-	void LevelEditor::GameWindowPanel::update() {
-	}
-
 	void LevelEditor::GameWindowPanel::render()
 	{
 		ImGui::Begin(getName().c_str());
@@ -5926,17 +6081,4 @@ namespace NIKE {
 
 		ImGui::End();
 	}
-}
-
-
-std::map<NIKE::Entity::Type, NIKE::LevelEditor::EntityMetaData, NIKE::LevelEditor::EntitiesPanel::EntitySorter>& NIKE::LevelEditor::EntitiesPanel::getEntityMap() {
-	return entities;
-}
-
-std::unordered_map<NIKE::Entity::Type, std::string>& NIKE::LevelEditor::EntitiesPanel::getEntityToNameMap() {
-	return entity_to_name;
-}
-
-std::unordered_map<std::string, NIKE::Entity::Type>& NIKE::LevelEditor::EntitiesPanel::getNameToEntityMap() {
-	return name_to_entity;
 }

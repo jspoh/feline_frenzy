@@ -80,13 +80,10 @@ namespace NIKE {
 			~Service() = default;
 
 			//Init Editor
-			void init(nlohmann::json const& config);
+			void init();
 
 			//Update Editor
-			void update();
-
-			//Render Editor
-			void render();
+			void updateAndRender();
 
 			//Clean up Editor
 			void cleanUp();
@@ -102,12 +99,6 @@ namespace NIKE {
 
 			//Get Game State
 			bool getGameState() const;
-
-			//Set entity metadata
-			void setEntityMetaData(Entity::Type entity, EntityMetaData data);
-
-			//Get entity metadata
-			EntityMetaData getEntityMetaData(Entity::Type entity) const;
 
 			//Add panel ( added into map based on IPanel getName() )
 			void addPanel(std::shared_ptr<IPanel> panel);
@@ -126,6 +117,9 @@ namespace NIKE {
 			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
 				std::dynamic_pointer_cast<ComponentsPanel>(panels_map.at(ComponentsPanel::getStaticName()))->registerCompUIFunc<T>(comp_func);
 			}
+
+			// Deserialize editor config (required as level editor is init before systems are created)
+			void deserializeConfig(nlohmann::json const& config);
 		};
 	}
 }

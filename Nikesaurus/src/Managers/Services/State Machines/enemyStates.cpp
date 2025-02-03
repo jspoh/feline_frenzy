@@ -53,7 +53,7 @@ namespace NIKE {
 	State::AttackState::AttackState()
 	{
 		// Add transitions here
-		//addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
+		addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
 		addTransition("AttackToChase", std::make_shared<Transition::AttackToChase>());
 	}
 
@@ -70,9 +70,11 @@ namespace NIKE {
 	{
 		// Check for attack comp
 		auto e_enemy_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(entity);
-		if (e_enemy_comp.has_value()) {
+		auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		if (e_enemy_comp.has_value() && e_enemy_dyna.has_value()) {
 
 			auto& enemy_comp = e_enemy_comp.value().get();
+			auto& dyna_comp = e_enemy_dyna.value().get();
 
 			// If shot on cooldown
 			if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
@@ -88,6 +90,9 @@ namespace NIKE {
 				if (e_player_comp.has_value()) {
 					// Check if player is within range & shot not on cooldown
 					if (enemy_comp.last_shot_time >= enemy_comp.cooldown) {
+						// Stop enemy when they shooting
+						dyna_comp.force = { 0,0 };
+						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
 
@@ -110,7 +115,7 @@ namespace NIKE {
 	* Chase State functions
 	*****************************/
 
-	State::ChaseState::ChaseState() : cell_offset{ 10.0f }, enemy_speed{ 1000.0f }
+	State::ChaseState::ChaseState() : cell_offset{ 15.0f }, enemy_speed{ 1000.0f }
 	{
 		// Add transitions here
 		addTransition("ChaseToAttack", std::make_shared<Transition::ChaseToAttack>());
@@ -122,45 +127,94 @@ namespace NIKE {
 		//cout << "enter chase state" << endl;
 	}
 
-	void NIKE::State::ChaseState::onUpdate([[maybe_unused]] Entity::Type& entity)
+	void State::ChaseState::onUpdate(Entity::Type& entity)
 	{
-
-		// cout << "update chase state" << endl;
-		auto& path = NIKE_MAP_SERVICE->getPath(entity);
-		auto e_transform_enemy = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-
-		if (!path.path.empty())
+		for (const auto& other_entity : NIKE_ECS_MANAGER->getAllEntities())
 		{
-			if (e_transform_enemy.has_value())
+			// Getting components from player and enemy entities
+			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
+
+			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+			auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+			if (e_enemy_transform.has_value() && e_player_game_logic.has_value() && e_player_transform.has_value() && e_enemy_dyna.has_value())
 			{
-				//Get next cell
-				auto const& next_cell = path.path.front();
-				auto& e_transform = e_transform_enemy.value().get();
+				auto& player_transform = e_player_transform.value().get();
 
-				//Check if entity has arrived near destination
-				if ((next_cell.position - e_transform.position).length() > cell_offset) {
+				// Get enemy position as starting cell
+				auto end = NIKE_MAP_SERVICE->getCellIndexFromCords(player_transform.position);
+				if (!end.has_value()) return;
 
-					//Direction of next cell
-					float dir = atan2((next_cell.position.y - e_transform.position.y), (next_cell.position.x - e_transform.position.x));
+				// Move the entity along the computed path
+				Enemy::moveAlongPath(entity, end.value().x, end.value().y, enemy_speed, cell_offset);
+			}
 
-					//Apply force to entity
-					auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-					if (dynamics.has_value()) {
-						dynamics.value().get().force = { cos(dir) * enemy_speed, sin(dir) * enemy_speed };
-					}
+
+			// Update animation based on movement direction
+			if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
+				float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
+
+				if (dir >= -M_PI / 8 && dir < M_PI / 8) {
+					// Moving right
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, false);
+					setLastDirection(entity, 0);
+				}
+				else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
+					// Moving up-right (diagonal)
+					animationStart(entity, 0, 2);
+					animationEnd(entity, 9, 2);
+					flipX(entity, false);
+					setLastDirection(entity, 1);
+				}
+				else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
+					// Moving up
+					animationStart(entity, 0, 0);
+					animationEnd(entity, 9, 0);
+					flipX(entity, false);
+					setLastDirection(entity, 2);
+				}
+				else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+					// Moving up-left (diagonal)
+					animationStart(entity, 0, 2);
+					animationEnd(entity, 9, 2);
+					flipX(entity, true);
+					setLastDirection(entity, 3);
+				}
+				else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+					// Moving down-right (diagonal)
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, false);
+					setLastDirection(entity, 4);
+				}
+				else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
+					// Moving down
+					animationStart(entity, 0, 0);
+					animationEnd(entity, 9, 0);
+					flipX(entity, false);
+					setLastDirection(entity, 5);
+				}
+				else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+					// Moving down-left (diagonal)
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, true);
+					setLastDirection(entity, 6);
 				}
 				else {
-					path.path.pop_front();
+					// Moving left
+					animationStart(entity, 0, 1);
+					animationEnd(entity, 9, 1);
+					flipX(entity, true);
+					setLastDirection(entity, 7);
 				}
 			}
-		}
-		else {
 
-			//Marked path as finished
-			path.b_finished = true;
 		}
-
 	}
+
 
 	void NIKE::State::ChaseState::onExit([[maybe_unused]] Entity::Type& entity)
 	{

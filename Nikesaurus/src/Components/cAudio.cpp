@@ -27,19 +27,66 @@ namespace NIKE {
 						{ "Channel_Group_ID", comp.channel_group_id },
 						{ "Volume", comp.volume },
 						{ "Pitch", comp.pitch }
-						};
+				};
 			},
 
 			//Deserialize
 			[](Audio::SFX& comp, nlohmann::json const& data) {
-				comp.b_play_sfx = data.at("B_Play_SFX").get<bool>();
-				comp.audio_id = data.at("Audio_ID").get<std::string>();
-				comp.channel_group_id = data.at("Channel_Group_ID").get<std::string>();
-				comp.volume = data.at("Volume").get<float>();
-				comp.pitch = data.at("Pitch").get<float>();
+				comp.b_play_sfx = data.value("B_Play_SFX", false);
+				comp.audio_id = data.value("Audio_ID", "");
+				comp.channel_group_id = data.value("Channel_Group_ID", "");
+				comp.volume = data.value("Volume", 1.0f);
+				comp.pitch = data.value("Pitch", 1.0f);
+			},
+
+			// Override Serialize
+			[](Audio::SFX const& comp, Audio::SFX const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.b_play_sfx != other_comp.b_play_sfx) {
+					delta["B_Play_SFX"] = comp.b_play_sfx;
+				}
+				if (comp.audio_id != other_comp.audio_id) {
+					delta["Audio_ID"] = comp.audio_id;
+				}
+				if (comp.channel_group_id != other_comp.channel_group_id) {
+					delta["Channel_Group_ID"] = comp.channel_group_id;
+				}
+				if (comp.volume != other_comp.volume) {
+					delta["Volume"] = comp.volume;
+				}
+				if (comp.pitch != other_comp.pitch) {
+					delta["Pitch"] = comp.pitch;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Audio::SFX& comp, nlohmann::json const& delta) {
+				if (delta.contains("B_Play_SFX")) {
+					comp.b_play_sfx = delta["B_Play_SFX"];
+				}
+				if (delta.contains("Audio_ID")) {
+					comp.audio_id = delta["Audio_ID"];
+				}
+				if (delta.contains("Channel_Group_ID")) {
+					comp.channel_group_id = delta["Channel_Group_ID"];
+				}
+				if (delta.contains("Volume")) {
+					comp.volume = delta["Volume"];
+				}
+				if (delta.contains("Pitch")) {
+					comp.pitch = delta["Pitch"];
+				}
 			}
 		);
 
+		//Audio Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Audio::SFX>();
+	}
+
+	void Audio::registerEditorComponents() {
 #ifndef NDEBUG
 		//Register SFX for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Audio::SFX>(
@@ -228,7 +275,7 @@ namespace NIKE {
 						}
 					}
 				}
-				
+
 			}
 		);
 #endif

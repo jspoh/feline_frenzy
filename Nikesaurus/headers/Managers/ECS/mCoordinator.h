@@ -83,7 +83,6 @@ namespace NIKE {
 			//Get entities marked for deletion
 			std::vector<Entity::Type> getEntitiesToDestroy() const;
 
-
 			/*****************************************************************//**
 			* Component Methods
 			*********************************************************************/
@@ -170,6 +169,8 @@ namespace NIKE {
 			Component::Type getComponentType(std::string const& type) {
 				return component_manager->getComponentType(type);
 			}
+
+			bool checkComponentType(std::string const& type) const;
 
 			size_t getComponentEntitiesCount(Component::Type comp_type);
 
