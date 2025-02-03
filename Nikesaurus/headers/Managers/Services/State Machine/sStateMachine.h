@@ -1,8 +1,8 @@
 /********************************************************************
  * \file   sStateMachine.h
- * \brief  state machine service
+ * \brief  state machine servic
  *
- * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim Li Cheng
  * \date   January 2025
  * All content © 2025 DigiPen Institute of Technology Singapore, all rights reserved.
  ********************************************************************/

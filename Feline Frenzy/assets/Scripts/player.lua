@@ -171,7 +171,7 @@ function Player:Shoot(entity)
         if direction == 0 then
             AnimationStart(entity, 0, 9)
             AnimationEnd(entity, 2, 9)
-            FlipX(entity, false)    
+            FlipX(entity, false)
         elseif direction == 1 then
             AnimationStart(entity, 0, 10)
             AnimationEnd(entity, 2, 10)

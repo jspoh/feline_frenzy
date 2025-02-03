@@ -2,8 +2,7 @@
  * \file   sysEnemy.cpp
  * \brief  Enemy system for engine
  *
- * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (70%)
- * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (30%)
+ * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  *
  * \date   November 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -136,7 +135,7 @@ namespace NIKE {
 		// Get enemy range
 		const auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
 		if (!enemy_attack_comp.has_value()) {
-			//NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
+			NIKEE_CORE_WARN("withinRange: ENEMY missing ATTACK component!");
 			return false;
 		}
 		const float enemy_range = enemy_attack_comp.value().get().range;

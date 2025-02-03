@@ -1,8 +1,8 @@
 /*****************************************************************//**
- * \file   enemyStates.cpp
+ * \file   cEnemyStates.cpp
  * \brief  Enemy States
  *
- * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
  * \date   January 2025
  *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -11,7 +11,6 @@
 #include "Managers/Services/State Machine/enemyStates.h"
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Systems/GameLogic/sysEnemy.h"
-#include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
 namespace NIKE {
@@ -25,7 +24,6 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("IdleToAttack", std::make_shared<Transition::IdleToAttack>());
 		addTransition("IdleToChase", std::make_shared<Transition::IdleToChase>());
-		addTransition("IdleToDeath", std::make_shared<Transition::IdleToDeath>());
 	}
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -57,7 +55,6 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
 		addTransition("AttackToChase", std::make_shared<Transition::AttackToChase>());
-		addTransition("AttackToDeath", std::make_shared<Transition::AttackToDeath>());
 	}
 
 	void NIKE::State::AttackState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -99,9 +96,6 @@ namespace NIKE {
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
 
-						// Apply damage when enemy shoot at player
-						Interaction::applyDamage(entity, other_entity);
-
 						// Reset the last shot time after shooting
 						enemy_comp.last_shot_time = 0.f;
 					}
@@ -126,7 +120,6 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("ChaseToAttack", std::make_shared<Transition::ChaseToAttack>());
 		addTransition("ChaseToIdle", std::make_shared<Transition::ChaseToIdle>());
-		addTransition("ChaseToDeath", std::make_shared<Transition::ChaseToDeath>());
 	}
 
 	void NIKE::State::ChaseState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -227,24 +220,4 @@ namespace NIKE {
 	{
 		//cout << "exit chase state" << endl;
 	}
-
-	/*******************************
-	* Death State functions
-	*****************************/
-
-	State::DeathState::DeathState()
-	{
-	}
-
-	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
-
-	}
-	void State::DeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
-
-	}
-	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
-
-	}
 }
-
-

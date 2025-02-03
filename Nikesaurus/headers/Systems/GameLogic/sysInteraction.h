@@ -14,26 +14,9 @@
 #include "Managers/Services/sEvents.h"
 #include "Managers/ECS/mEntity.h"
 #include "Managers/ECS/mSystem.h"
-#include "Components/cElement.h"
 
 namespace NIKE {
     namespace Interaction {
-
-        // Handles interaction logic between two entities
-        void handleCollision(Entity::Type entity_a, Entity::Type entity_b);
-
-        // Apply damage
-        void applyDamage(Entity::Type attacker, Entity::Type target);
-
-        // Change element
-        void changeElement(Entity::Type player, Entity::Type source);
-
-        // Get Elemental Multiplier for Elements
-        float getElementMultiplier(Element::Elements attacker, Element::Elements target);
-
-        // Check if player is within range
-        bool withinRange(const Entity::Type& source, const Entity::Type& player);
-
         class Manager : 
             public System::ISystem,
             public Events::IEventListener<Physics::CollisionEvent> {
@@ -62,20 +45,20 @@ namespace NIKE {
             Manager(Manager const& copy) = delete;
             void operator=(Manager const& copy) = delete;
 
-            //// Handles interaction logic between two entities
-            //void handleCollision(Entity::Type entity_a, Entity::Type entity_b);
+            // Handles interaction logic between two entities
+            void handleCollision(Entity::Type entity_a, Entity::Type entity_b);
 
-            //// Apply damage
-            //void applyDamage(Entity::Type attacker, Entity::Type target);
+            // Apply damage
+            void applyDamage(Entity::Type attacker, Entity::Type target);
 
-            //// Change element
-            //void changeElement(Entity::Type player, Entity::Type source);
+            // Change element
+            void changeElement(Entity::Type player, Entity::Type source);
 
-            //// Get Elemental Multiplier for Elements
-            //float getElementMultiplier(Element::Elements attacker, Element::Elements target);
+            // Get Elemental Multiplier for Elements
+            float getElementMultiplier(Element::Elements attacker, Element::Elements target);
 
-            //// Check if player is within range
-            //bool withinRange(const Entity::Type& source, const Entity::Type& player);
+            // Check if player is within range
+            bool withinRange(const Entity::Type& source, const Entity::Type& player);
 
         };
     }

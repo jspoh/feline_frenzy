@@ -2,7 +2,7 @@
  * \file   sStateMachine.cpp
  * \brief  state machine service
  *
- * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
+ * \author Bryan Lim Li Cheng
  * \date   January 2025
  * All content © 2025 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -187,7 +187,6 @@ namespace NIKE {
 			registerState("Idle", std::make_shared<State::IdleState>());
 			registerState("Attack", std::make_shared<State::AttackState>());
 			registerState("Chase", std::make_shared<State::ChaseState>());
-			registerState("Death", std::make_shared<State::DeathState>());
 		}
 
 		void Service::update(Entity::Type& entity) {
@@ -203,6 +202,7 @@ namespace NIKE {
 				current_state = state_comp.current_state.lock();
 				if (current_state)
 				{
+					// Update here is causing the throw
 					current_state->onUpdate(entity);
 					// Iterate current state's transitions
 					for (auto& transition : current_state->getTransitions())
