@@ -15,7 +15,6 @@
 #include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
-#include "Components/cPathfinding.h"
 
 namespace NIKE {
 	namespace Physics {
@@ -52,9 +51,6 @@ namespace NIKE {
 
 			//Update
 			void update() override;
-
-			////Register lua bindings
-			//void registerLuaBindings(sol::state& lua_state) override;
 
 			//On change physics event
 			void onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) override;

@@ -430,14 +430,6 @@ namespace NIKE {
 		return std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getGameState();
 	}
 
-	void LevelEditor::Service::setEntityMetaData(Entity::Type entity, EntityMetaData data) {
-		std::dynamic_pointer_cast<EntitiesPanel>(panels_map.at(EntitiesPanel::getStaticName()))->setEntityMetaData(entity, data);
-	}
-
-	LevelEditor::EntityMetaData LevelEditor::Service::getEntityMetaData(Entity::Type entity) const {
-		return std::dynamic_pointer_cast<EntitiesPanel>(panels_map.at(EntitiesPanel::getStaticName()))->getEntityMetaData(entity);
-	}
-
 	void LevelEditor::Service::addPanel(std::shared_ptr<LevelEditor::IPanel> panel) {
 		auto it = panels_map.find(panel->getName());
 		if (it != panels_map.end()) {

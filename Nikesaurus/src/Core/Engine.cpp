@@ -40,14 +40,8 @@ namespace NIKE {
 		//Register render components
 		Render::registerComponents();
 
-		//Register pathfinding components
-		Pathfinding::registerComponents();
-
 		//Register render components
 		GameLogic::registerComponents();
-
-		//Register shooting components
-		Shooting::registerComponents();
 
 		//Register Enemy components
 		Enemy::registerComponents();
@@ -65,11 +59,45 @@ namespace NIKE {
 		State::registerComponents();
 	}
 
+	void Core::Engine::registerDefEditorComponents() {
+		//Register Audio Components
+		Audio::registerEditorComponents();
+
+		//Register transform component
+		Transform::registerEditorComponents();
+
+		//Register physics components
+		Physics::registerEditorComponents();
+
+		//Register animation components
+		Animation::registerEditorComponents();
+
+		//Register render components
+		Render::registerEditorComponents();
+
+		//Register render components
+		GameLogic::registerEditorComponents();
+
+		//Register Enemy components
+		Enemy::registerEditorComponents();
+
+		//Register Despawn components
+		Despawn::registerEditorComponents();
+
+		//Register Element components
+		Element::registerEditorComponents();
+
+		//Register Combat components
+		Combat::registerEditorComponents();
+
+		// Regiser state component
+		State::registerEditorComponents();
+	}
+
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
 		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
-		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Shooting::Shooting>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
@@ -227,12 +255,10 @@ namespace NIKE {
 		//Init Lua
 		NIKE_LUA_SERVICE->init();
 
-#ifndef NDEBUG
-		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init();
-#endif
+		//Init metadata service
+		NIKE_METADATA_SERVICE->init();
 
-		// Init FSM
+		//Init FSM
 		NIKE_FSM_SERVICE->init();
 
 		//Register Def Components
@@ -242,7 +268,12 @@ namespace NIKE {
 		registerDefSystems();
 
 #ifndef NDEBUG
+		//Init Level Editor
+		NIKE_LVLEDITOR_SERVICE->init();
 		NIKE_LVLEDITOR_SERVICE->deserializeConfig(json_config);
+
+		//Register default editor components
+		registerDefEditorComponents();
 #endif
 
 		int max_texture_units;
@@ -258,7 +289,6 @@ namespace NIKE {
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
 		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
-
 
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
 #ifdef NDEBUG
@@ -277,18 +307,19 @@ namespace NIKE {
 		fps_history.reserve(300);		// unlikely to exceed 300fps
 		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
-			try {
 
+#ifdef DEBUG
+			try {
+#endif
 				// have to poll events regardless of focus
 				//Poll system events
 				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
+				//Skip update when window is out of focus
 				if (!NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-					// Skip updates when unfocused, but continue polling events
-					NIKE_WINDOWS_SERVICE->getWindow()->clearBuffer();
-
 					continue;
 				}
+
 				//Calculate Delta Time
 				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
@@ -331,7 +362,6 @@ namespace NIKE {
 				if (err != GL_NO_ERROR) {
 					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
 				}
-
 
 				// update rendered fps
 				static std::unordered_map<std::string, std::shared_ptr<void>> comps;
@@ -377,22 +407,7 @@ namespace NIKE {
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
 
-#ifndef NDEBUG
-					std::shared_ptr<LevelEditor::EntitiesPanel> entities_panel = std::dynamic_pointer_cast<LevelEditor::EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(NIKE::LevelEditor::EntitiesPanel::getStaticName()));
-					if (!entities_panel) {
-						NIKEE_CORE_ERROR("Entities Panel not found");
-						throw;
-					}
-					auto& entity_map = entities_panel->getEntityMap();
-					auto& entity_to_name_map = entities_panel->getEntityToNameMap();
-					auto& name_to_entity_map = entities_panel->getNameToEntityMap();
-
-					entity_map[FPS_DISPLAY_ENTITY] = LevelEditor::EntityMetaData(FPS_DISPLAY_NAME, "", false);
-					name_to_entity_map.erase(entity_to_name_map[FPS_DISPLAY_ENTITY]);
-					name_to_entity_map[FPS_DISPLAY_NAME] = FPS_DISPLAY_ENTITY;
-					entity_to_name_map[FPS_DISPLAY_ENTITY] = FPS_DISPLAY_NAME;
-#endif
-
+					NIKE_METADATA_SERVICE->setEntityName(FPS_DISPLAY_ENTITY, FPS_DISPLAY_NAME);
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
 					NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { });
@@ -403,12 +418,15 @@ namespace NIKE {
 				}
 
 				frame_count++;
+
+#ifdef NDEBUG
 			}
 			catch (std::runtime_error const& e) {
 				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
 				NIKEE_CORE_ERROR("Error caught: {}", e.what());
 				break;
 			}
+#endif
 		}
 
 		//Stop watching all directories

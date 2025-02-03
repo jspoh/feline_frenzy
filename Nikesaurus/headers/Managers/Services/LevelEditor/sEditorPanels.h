@@ -170,45 +170,17 @@ namespace NIKE {
 			void render() override;
 		};
 
-		//Entities management structure
-		struct EntityMetaData {
-			std::string entity_id;
-			std::string prefab_id;
-			bool b_locked;
-
-			EntityMetaData() : entity_id{ "" }, prefab_id{ "" }, b_locked{ false } {}
-			EntityMetaData(std::string const& entity_id, std::string const& prefab_id, bool b_locked)
-				: entity_id{ entity_id }, b_locked{ b_locked }, prefab_id{ prefab_id } {}
-
-			//Serialization
-			nlohmann::json serialize() const;
-
-			//Deserialization
-			void deserialize(nlohmann::json const& data);
-		};
-
 		//Entities Management Panel
 		class EntitiesPanel :
-			public IPanel,
-			public Events::IEventListener<Coordinator::EntitiesChanged>
+			public IPanel
 		{
 		private:
-			//Sort entities
-			struct EntitySorter{
-				bool operator()(Entity::Type const& e1, Entity::Type const& e2) const {
-					return e1 < e2;
-				}
-			};
-
-			//Set of active entities
-			std::map<Entity::Type, EntityMetaData, EntitySorter> entities;
-
-			//BI-Mapping of entity type to string * vice versa
-			std::unordered_map<Entity::Type, std::string> entity_to_name;
-			std::unordered_map<std::string, Entity::Type> name_to_entity;
 
 			//Selected entity
 			Entity::Type selected_entity;
+
+			//Selected tag
+			std::string selected_tag;
 
 			//Entity changed event boolean
 			bool b_entity_changed;
@@ -225,7 +197,11 @@ namespace NIKE {
 			//Error msg
 			std::shared_ptr<std::string> error_msg;
 
-			std::set<unsigned int> reusable_indices;
+			//Add tag popup
+			std::function<void()> addTagPopUp(std::string const& popup_id);
+
+			//Remove tag popup
+			std::function<void()> removeTagPopUp(std::string const& popup_id);
 
 			//Create entity popup
 			std::function<void()> createEntityPopUp(std::string const& popup_id);
@@ -236,10 +212,8 @@ namespace NIKE {
 			//Clone entity popup
 			std::function<void()> cloneEntityPopUp(std::string const& popup_id);
 
-			//On entities changed event
-			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 		public:
-			EntitiesPanel() : selected_entity{ UINT16_MAX }, b_entity_changed{ false } {}
+			EntitiesPanel() : selected_entity{ UINT16_MAX }, selected_tag{}, b_entity_changed { false } {}
 			~EntitiesPanel() = default;
 
 			//Panel Name
@@ -261,55 +235,17 @@ namespace NIKE {
 			//Render
 			void render() override;
 
-			//Get entity name
-			std::string getEntityName(Entity::Type entity);
-
 			//Get selected entity
 			Entity::Type getSelectedEntity() const;
-			
-			//Get selected entity name
-			std::optional<std::string> getSelectedEntityName() const;
 
 			//Unselect entity
 			void unselectEntity();
 
-			//Set entity metadata
-			void setEntityMetaData(Entity::Type entity, EntityMetaData data);
-
-			//Get entity metadata
-			EntityMetaData getEntityMetaData(Entity::Type entity) const;
-
-			//Get selected entity editor variables
-			std::optional<std::reference_wrapper<LevelEditor::EntityMetaData>> getSelectedEntityMetaData();
-
-			//Lock entity
-			void lockEntity(Entity::Type entity);
-
-			//Lock all entities
-			void lockAllEntities();
-
-			//Unlock entity
-			void unlockEntity(Entity::Type entity);
-
-			//Unlock all entities
-			void unlockAllEntities();
-
-			//Get lock status of entity
-			bool isEntityLocked(Entity::Type entity) const;
-
 			//Check entity changed
 			bool isEntityChanged() const;
 
-			//Update entities list
-			void updateEntities(std::set<Entity::Type> ecs_entities);
-
 			//Check if cusor is in entity
 			bool isCursorInEntity(Entity::Type entity) const;
-
-			// getters
-			std::map<Entity::Type, EntityMetaData, EntitySorter>& getEntityMap();
-			std::unordered_map<Entity::Type, std::string>& getEntityToNameMap();
-			std::unordered_map<std::string, Entity::Type>& getNameToEntityMap();
 		};
 
 		//Components Management Panel
@@ -473,16 +409,11 @@ namespace NIKE {
 		//Prefabs Management panel
 		class PrefabsPanel : public IPanel {
 		private:
-			//For prefab temp entity
-			Entity::Type prefab_display;
 
 			//Prefab ID
-			std::filesystem::path prefab_path;
+			std::string prefab_id;
 
-			//Boolean for checking if prefab editing is active
-			bool b_editing_prefab;
-
-			//Count of entities using the same prefab
+			//Prefab copy count
 			size_t copy_count;
 
 			//For comp management
@@ -496,6 +427,9 @@ namespace NIKE {
 
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			//Map to array of component type
+			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
 			//Add component popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
@@ -516,7 +450,7 @@ namespace NIKE {
 			void savePrefab();
 
 		public:
-			PrefabsPanel() : prefab_display{ UINT16_MAX }, b_editing_prefab{ false }, copy_count{ 0 } {}
+			PrefabsPanel() : copy_count{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name
@@ -543,15 +477,6 @@ namespace NIKE {
 
 			// For component stuff
 			void renderPrefabComponents();
-
-			// Utility functions for managing prefab entity
-			void createDisplayPrefab(const std::string& file_path);
-
-			//Destroy display prefab
-			void destroyDisplayPrefab();
-
-			//Get prefab editing state
-			bool isPrefabEditing() const;
 		};
 
 		//Debug Management Panel
@@ -740,8 +665,6 @@ namespace NIKE {
 		//Camera Management Panel
 		class CameraPanel : public IPanel {
 		private:
-			//Entities panel for string reference
-			std::weak_ptr<EntitiesPanel> entities_panel;
 
 			//Reference to game window panel
 			std::weak_ptr<GameWindowPanel> game_panel;
@@ -753,7 +676,6 @@ namespace NIKE {
 
 			//Free camera
 			std::shared_ptr<Render::Cam> free_cam;
-
 
 		public:
 			CameraPanel() : combo_index{ 0 }, last_dispatched_index {0} {}

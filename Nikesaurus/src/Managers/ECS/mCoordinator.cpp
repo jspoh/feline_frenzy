@@ -168,6 +168,10 @@ namespace NIKE {
 		component_manager->setEntityComponent(entity, type, comp);
 	}
 
+	bool Coordinator::Manager::checkComponentType(std::string const& type) const {
+		return component_manager->checkComponentType(type);
+	}
+
 	size_t Coordinator::Manager::getComponentEntitiesCount(Component::Type comp_type) {
 		return component_manager->getComponentEntitiesCount(comp_type);
 	}

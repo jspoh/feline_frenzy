@@ -22,15 +22,21 @@ namespace NIKE {
 		return deserializers.at(comp_name)(comp, data);
 	}
 
+	nlohmann::json Serialization::CompSerializer::serializeOverrideComponent(std::string const& comp_name, const void* comp, const void* other_comp) const {
+		return override_serializers.at(comp_name)(comp, other_comp);
+	}
+
+	void Serialization::CompSerializer::deserializeOverrideComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const {
+		return override_deserializers.at(comp_name)(comp, data);
+	}
+
 	/*****************************************************************//**
 	* Serialization Services
 	*********************************************************************/
 
-	/*****************************************************************//**
-	* Audio Channels
-	*********************************************************************/
-
-	
+	std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>const& Serialization::Service::getCompFuncs() const {
+		return comp_funcs;
+	}
 
 	/*****************************************************************//**
 	* Grid
@@ -48,7 +54,6 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("File does not exist!");
 			return;
 		}
-
 
 		// Save data into file
 		file << grid_data.dump(4);
@@ -69,6 +74,8 @@ namespace NIKE {
 		nlohmann::json grid_data;
 		file >> grid_data;
 		file.close();
+
+		if (grid_data.empty()) return;
 
 		NIKE_MAP_SERVICE->deserialize(grid_data);
 	}
@@ -91,7 +98,87 @@ namespace NIKE {
 		return data;
 	}
 
-	void Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& data) {
+	bool Serialization::Service::deserializeEntity(Entity::Type entity, nlohmann::json const& data) {
+
+		//Boolean for flagging errors in deserializing
+		bool success = true;
+
+		//If there are no components
+		if (!data.contains("Components"))
+			return success;
+
+		//Iterate through all components stored within data
+		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+
+			//Check if component exists within the system
+			if (NIKE_ECS_MANAGER->checkComponentType(comp_name)) {
+				Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+				//Check if component is already present, if not add component
+				if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+				}
+
+				//Deserialize data into component
+				comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+			}
+			else {
+				success = false;
+			}
+		}
+
+		if (!data.contains("Layer ID")) {
+			NIKEE_CORE_INFO("Entity does not contain a layer id, setting to default");
+			NIKE_ECS_MANAGER->setEntityLayerID(entity, 0);
+			return success;
+		}
+		// Set layer ID
+		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
+
+		return success;
+	}
+
+	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path) {
+
+		//Create new data
+		nlohmann::json data;
+
+		//Iterate through all comp
+		for (auto const& comp : comps) {
+			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
+		}
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::out);
+
+		//Store data
+		file << data.dump(4);
+
+		//Close file
+		file.close();
+	}
+
+	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path) {
+
+		//Boolean for flagging errors in deserializing
+		bool success = true;
+
+		//Json Data
+		nlohmann::json data;
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::in | std::ios::out);
+
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
+		//Read data from file
+		file >> data;
+
+		//Return if there is no data
+		if (data.empty())
+			return;
 
 		//If there are no components
 		if (!data.contains("Components"))
@@ -99,32 +186,81 @@ namespace NIKE {
 
 		//Iterate through all components stored within data
 		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-			Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+			//Check for comp functions validity
+			if (comp_funcs.find(comp_name) != comp_funcs.end()) {
+				comps[comp_name] = comp_funcs[comp_name]();
 
-			//Check if component is already present, if not add component
-			if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
-				NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
-
+				//Deserialize data into component
+				comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
 			}
+			else {
+				success = false;
+			}
+		}
 
-			//Change camera to active cam
-			if (comp_name == "Render::Cam") {
-				if (NIKE_CAMERA_SERVICE->getActiveCamName() == data.at("MetaData").at("Entity_ID").get<std::string>()) {
-					NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ChangeCamEvent>(entity));
+		//Error encountered in deserializing
+		if (!success) {
+
+			//Save prefab again
+			savePrefab(comps, file_path);
+		}
+
+		//Close file
+		file.close();
+	}
+
+	nlohmann::json Serialization::Service::serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id) {
+
+		//Create new data
+		nlohmann::json data;
+
+		//Map to array of component type
+		std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
+
+		//Load prefab into prefab comps
+		loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+
+		//Iterate through all comp
+		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
+			if (prefab_comps.find(comp.first) != prefab_comps.end()) {
+				data["Components"][comp.first] = comp_registry->serializeOverrideComponent(comp.first, comp.second.get(), prefab_comps.at(comp.first).get());
+			}
+			else {
+				data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
+			}
+		}
+
+		return data;
+	}
+
+	bool Serialization::Service::deserializePrefabOverrides(Entity::Type entity, nlohmann::json const& data) {
+		//Boolean for flagging errors in deserializing
+		bool success = true;
+
+		//If there are no components
+		if (!data.contains("Components"))
+			return success;
+
+		//Iterate through all components stored within data
+		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+			//Check if component exists within the system
+			if (NIKE_ECS_MANAGER->checkComponentType(comp_name)) {
+				Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+				//Check if component is already present, if not add component
+				if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
 				}
+
+				//Deserialize data into component
+				comp_registry->deserializeOverrideComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
 			}
-
-			//Deserialize data into component
-			comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+			else {
+				success = false;
+			}
 		}
 
-		if (!data.contains("Layer ID")) {
-			NIKEE_CORE_INFO("Entity does not contain a layer id, setting to default");
-			NIKE_ECS_MANAGER->setEntityLayerID(entity, 0);
-			return;
-		}
-		// Set layer ID
-		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
+		return success;
 	}
 
 	void Serialization::Service::saveEntityToFile(Entity::Type entity, std::string const& file_path) {
@@ -146,7 +282,7 @@ namespace NIKE {
 		nlohmann::json data;
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -160,7 +296,46 @@ namespace NIKE {
 			return;
 
 		//Deserialize data
-		deserializeEntity(entity, data);
+		if (!deserializeEntity(entity, data)) {
+
+			//Error encountered in deserialization
+			saveEntityToFile(entity, file_path);
+		}
+
+		//Close file
+		file.close();
+	}
+
+	void Serialization::Service::loadEntityFromPrefab(Entity::Type entity, std::string const& prefab_id) {
+		//Json Data
+		nlohmann::json data;
+
+		//Get file path
+		auto file_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_id);
+
+		//Open file stream
+		std::fstream file(file_path, std::ios::in | std::ios::out);
+
+		//Return if there is no data
+		if (!std::filesystem::exists(file_path))
+			return;
+
+		//Read data from file
+		file >> data;
+
+		//Return if there is no data
+		if (data.empty())
+			return;
+
+		//Deserialize data
+		if (!deserializeEntity(entity, data)) {
+
+			//Error encountered in deserialization
+			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string());
+		}
+
+		//Add metadata
+		NIKE_METADATA_SERVICE->setEntityPrefabID(entity, prefab_id);
 
 		//Close file
 		file.close();
@@ -175,6 +350,7 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::saveSceneToFile(std::string const& file_path) {
+
 		//Json Data
 		nlohmann::json data;
 
@@ -189,7 +365,7 @@ namespace NIKE {
 
 		// Check if the "Grids" folder contains the .grid file
 		//if (std::filesystem::exists(grid_path)) {
-			// Add grid ID data only if the file exists
+		// Add grid ID data only if the file exists
 		nlohmann::json m_data;
 		m_data["Grid ID"] = grid_id;
 		data.push_back(m_data);
@@ -198,6 +374,11 @@ namespace NIKE {
 		nlohmann::json cam_data;
 		cam_data["Camera"] = NIKE_CAMERA_SERVICE->serializeCamera();
 		data.push_back(cam_data);
+
+		// Camera Component Data
+		nlohmann::json mt_data;
+		mt_data["MetaData"] = NIKE_METADATA_SERVICE->serialize();
+		data.push_back(mt_data);
 
 		//UI Entities
 		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
@@ -238,14 +419,25 @@ namespace NIKE {
 				nlohmann::json e_data;
 
 				//Serialize entity
-				e_data["Entity"] = serializeEntity(entity);
-				//e_data["Entity"]["Entity Name"] = NIKE_LVLEDITOR_SERVICE->getEntityByType(entity);
 				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
 
-				//Serialize entity editor meta data
-				#ifndef NDEBUG
-				e_data["Entity"]["MetaData"] = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(entity).serialize();
-				#endif
+				//Serialize entity meta data
+				auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+				if (meta_data.has_value()) {
+					
+					//Check if prefab is empty
+					if (!meta_data.value().prefab_id.empty()) {
+						//Serialize override data
+						NIKE_METADATA_SERVICE->setEntityPrefabOverride(entity, NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity, meta_data.value().prefab_id));
+					}
+					else{
+						//Serialize entity data
+						e_data["Entity"] = serializeEntity(entity);
+					}
+
+					//Serialize metadata
+					e_data["Entity"]["MetaData"] = meta_data.value().serialize();
+				}
 
 				//If entity is a UI Entity
 				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
@@ -272,6 +464,10 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadSceneFromFile(std::string const& file_path) {
+
+		//Boolean for flagging out errors in deserializations
+		bool success = true;
+
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
 			return;
@@ -280,7 +476,7 @@ namespace NIKE {
 		nlohmann::json data;
 
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
 
 		//Read data from file
 		file >> data;
@@ -290,19 +486,23 @@ namespace NIKE {
 			return;
 
 
-		//Iterate through all layer data
+		//Iterate through all data
 		for (const auto& l_data : data) {
 
+			//Deserialize servies
 			if (l_data.contains("Channels")) {
 				NIKE_AUDIO_SERVICE->deserializeAudioChannels(l_data["Channels"]);
 			}
 			if (l_data.contains("Camera")) {
 				NIKE_CAMERA_SERVICE->deserializeCamera(l_data["Camera"]);
 			}
+			if (l_data.contains("MetaData")) {
+				NIKE_METADATA_SERVICE->deserialize(l_data["MetaData"]);
+			}
 
 			//Load map grid if a map file path is specified
 			if (l_data.contains("Grid ID")) {
-				std::string grid_id = l_data.at("Grid ID").get<std::string>();
+				std::string grid_id = l_data.value("Grid ID", "");
 				std::string full_grid_path = NIKE_ASSETS_SERVICE->getAssetPath(grid_id).string();
 
 				if (std::filesystem::exists(full_grid_path)) {
@@ -316,7 +516,7 @@ namespace NIKE {
 			}
 
 			//If data contains layer
-			if (l_data.contains("Layer")) {
+			if (l_data.contains("Layer") && l_data.at("Layer").contains("ID") && l_data.at("Layer").contains("Entities")) {
 				//Deserialize layer
 				if (!NIKE_SCENES_SERVICE->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
 					auto layer = NIKE_SCENES_SERVICE->createLayer();
@@ -329,36 +529,57 @@ namespace NIKE {
 				//Iterate through all entities within layer
 				for (const auto& e_data : l_data["Layer"]["Entities"]) {
 
-					//Deserialize all entities
-					Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").at("Layer ID").get<unsigned int>());
-					deserializeEntity(entity, e_data.at("Entity"));
-
-					// Wrapped for Release to build!
-					//Deserialize entity metadata
-					#ifndef NDEBUG
-					LevelEditor::EntityMetaData meta_data;
-					meta_data.deserialize(e_data.at("Entity").at("MetaData"));
-					NIKE_LVLEDITOR_SERVICE->setEntityMetaData(entity, meta_data);
-					#endif				
-
 					//Check if entity is a UI entity
-					if (e_data.at("Entity").contains("UI ID")) {
+					if (e_data.contains("Entity")) {
 
-						UI::UIBtn btn;
-						btn.deserialize(e_data.at("Entity").at("UI Btn"));
-						btn.entity_id = entity;
-						btn.b_hovered = false;
-						NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
+						//Deserialize all entities
+						Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").value("Layer ID", 0));
+
+						//Deserialize entity metadata
+						auto meta_data = NIKE_METADATA_SERVICE->getEntityData(entity);
+						if (meta_data.has_value()) {
+							meta_data.value().deserialize(e_data);
+
+							//Check if prefab id is present
+							if (!meta_data.value().prefab_id.empty()) {
+								loadEntityFromPrefab(entity, meta_data.value().prefab_id);
+
+								//Apply overrides
+								if (!deserializePrefabOverrides(entity, meta_data.value().prefab_override)) {
+									success = false;
+								}
+							}
+							else {
+								if (!deserializeEntity(entity, e_data.at("Entity"))) {
+									success = false;
+								}
+							}
+						}
+
+						//Check if entity is a UI entity
+						if (e_data.at("Entity").contains("UI ID")) {
+
+							UI::UIBtn btn;
+							btn.deserialize(e_data.at("Entity").at("UI Btn"));
+							btn.entity_id = entity;
+							btn.b_hovered = false;
+							NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
+						}
 					}
 				}
 			}
 		}
 
-		//Close file
-		file.close();
-
 		// Save file path
 		curr_scene_file = file_path;
+
+		//Error in deserialization process
+		if (!success) {
+			saveSceneToFile(file_path);
+		}
+
+		//Close file
+		file.close();
 	}
 
 	nlohmann::json Serialization::Service::loadJsonFile(std::string const& file_path) {
@@ -378,84 +599,5 @@ namespace NIKE {
 		//Return loaded json data
 		return data;
 	}
-
-
-	//void Serialization::Service::loadMapFromFile(const std::string& file, std::shared_ptr<NIKE::Scenes::Layer>& background_layer, std::shared_ptr<NIKE::Scenes::Layer>& player_layer, std::vector<std::vector<int>>& grid, const NIKE::Math::Vector2<float>& center) {
-	//	// Open Scene file
-	//	std::ifstream ifs{ file, std::ios::in };
-	//	if (!ifs) {
-	//		throw std::runtime_error("Failed to open mesh file: " + file);
-	//	}
-
-	//	// Read grid width and height
-	//	int width, height;
-	//	ifs >> width >> height;
-	//	if (!ifs) {
-	//		throw std::runtime_error("Failed to read grid dimensions from file: " + file);
-	//	}
-
-	//	// Create a grid to store tile information
-	//	grid.resize(height, std::vector<int>(width));
-
-	//	// Save each tile ID into the grid
-	//	for (int row = 0; row < height; ++row) {
-	//		for (int col = 0; col < width; ++col) {
-	//			if (!(ifs >> grid[row][col])) {
-	//				throw std::runtime_error("Failed to read tile data at row " + std::to_string(row) + ", column " + std::to_string(col));
-	//			}
-	//		}
-	//	}
-
-	//	// Calculate offset to center the grid
-	//	float tile_size = 100.0f;
-	//	float offset_x = (width * tile_size) / 2.0f - center.x;
-	//	float offset_y = (height * tile_size) / 2.0f - center.y;
-
-	//	// Create entities from grid info
-	//	for (int row = 0; row < height; ++row) {
-	//		for (int col = 0; col < width; ++col) {
-	//			// Create tile
-	//			createTile(grid[row][col], row, col, tile_size, offset_x, offset_y, width, height, background_layer, player_layer);
-	//		}
-	//	}
-	//}
-
-	//void Serialization::Service::createTile(int tileID, int row, int col, float tile_size, float offset_x, float offset_y, int width, int height,
-	//	std::shared_ptr<NIKE::Scenes::Layer>& background_layer,
-	//	std::shared_ptr<NIKE::Scenes::Layer>& player_layer) {
-	//	bool flip{ false };
-	//	bool collide{ false };
-	//	std::string texture_name{};
-
-	//	switch (tileID) {
-	//	case 1: texture_name = "wallTopCorner"; collide = true; break;
-	//	case 2: texture_name = "wallTopMiddle"; collide = true; break;
-	//	case 3: texture_name = "wallLeft"; collide = true; break;
-	//	case 4: texture_name = "grass"; break;
-	//	case 5: texture_name = "wallBottomCorner"; collide = true; break;
-	//	case 6: texture_name = "wallBottomMiddle"; collide = true; break;
-	//	case 7: texture_name = "wallTopCorner"; flip = true; collide = true; break;
-	//	case 8: texture_name = "wallLeft"; flip = true; collide = true; break;
-	//	case 9: texture_name = "wallBottomCorner"; flip = true; collide = true; break;
-	//	default: texture_name = "grass"; break;
-	//	}
-
-	//	// Set layer to background if not collidable
-	//	unsigned int layer = (collide) ? player_layer->getLayerID() : background_layer->getLayerID();
-	//	NIKE::Entity::Type tile_entity = NIKE_ECS_SERVICE->createEntity(layer);
-
-	//	NIKE_IMGUI_SERVICE->addEntityRef("tile_" + std::to_string(row) + "_" + std::to_string(col), tile_entity);
-	//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Transform::Transform>(tile_entity,
-	//		NIKE::Transform::Transform({ col * tile_size - offset_x, (height - 1 - row) * tile_size - offset_y },
-	//			{ 100.0f, 100.0f }, 0.0f));
-
-	//	if (collide) {
-	//		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Dynamics>(tile_entity, NIKE::Physics::Dynamics(200.0f, 1.0f, 0.1f));
-	//		NIKE_ECS_SERVICE->addEntityComponent<NIKE::Physics::Collider>(tile_entity, NIKE::Physics::Collider(NIKE::Physics::Resolution::NONE));
-	//	}
-
-	//	NIKE_ECS_SERVICE->addEntityComponent<NIKE::Render::Texture>(tile_entity, NIKE::Render::Texture(texture_name,
-	//		{ 1.0f, 1.0f, 1.0f, 1.0f }, false, 0.5f, false, { 1, 1 }, { 0, 0 }, { flip, false }));
-	//}
 }
 

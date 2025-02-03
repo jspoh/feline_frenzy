@@ -278,6 +278,9 @@ namespace NIKE {
 			//Get Component Type string overload
 			Component::Type getComponentType(std::string const& type);
 
+			//Check component exists
+			bool checkComponentType(std::string const& type) const;
+
 			//Get count of entities with that component
 			size_t getComponentEntitiesCount(Component::Type comp_type);
 

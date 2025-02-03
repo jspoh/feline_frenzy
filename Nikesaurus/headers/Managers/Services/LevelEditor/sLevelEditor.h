@@ -103,12 +103,6 @@ namespace NIKE {
 			//Get Game State
 			bool getGameState() const;
 
-			//Set entity metadata
-			void setEntityMetaData(Entity::Type entity, EntityMetaData data);
-
-			//Get entity metadata
-			EntityMetaData getEntityMetaData(Entity::Type entity) const;
-
 			//Add panel ( added into map based on IPanel getName() )
 			void addPanel(std::shared_ptr<IPanel> panel);
 

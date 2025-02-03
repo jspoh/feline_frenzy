@@ -35,10 +35,248 @@ namespace NIKE {
 
 			//Deserialize
 			[](Render::Cam& comp, nlohmann::json const& data) {
-				comp.position.fromJson(data.at("Position"));
-				comp.zoom = data.at("Zoom").get<float>();
+				comp.position.fromJson(data.value("Position", Vector2f::def_json));
+				comp.zoom = data.value("Zoom", 1.0f);
+			},
+
+			// Override Serialize
+			[](Render::Cam const& comp, Render::Cam const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.position != other_comp.position) {
+					delta["Position"] = comp.position.toJson();
+				}
+				if (comp.zoom != other_comp.zoom) {
+					delta["Zoom"] = comp.zoom;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Cam& comp, nlohmann::json const& delta) {
+				if (delta.contains("Position")) {
+					comp.position.fromJson(delta["Position"]);
+				}
+				if (delta.contains("Zoom")) {
+					comp.zoom = delta["Zoom"];
+				}
 			}
 		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Cam>();
+
+		//Register text for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Text>(
+			//Serialize
+			[](Render::Text const& comp) -> nlohmann::json {
+				return	{
+						{ "Font_ID", comp.font_id },
+						{ "Text", comp.text },
+						{ "Color", comp.color.toJson() },
+						{ "Scale", comp.scale },
+						{ "Size", comp.size.toJson() },
+						{ "Origin", static_cast<int>(comp.origin) }
+				};
+			},
+
+			//Deserialize
+			[](Render::Text& comp, nlohmann::json const& data) {
+				comp.font_id = data.value("Font_ID", "");
+				comp.text = data.value("Text", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+				comp.scale = data.value("Scale", 1.0f);
+				comp.size.fromJson(data.value("Size", Vector2f::def_json));
+				comp.origin = data.value("Origin", TextOrigin::CENTER);
+			},
+
+			// Override Serialize
+			[](Render::Text const& comp, Render::Text const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.font_id != other_comp.font_id) {
+					delta["Font_ID"] = comp.font_id;
+				}
+				if (comp.text != other_comp.text) {
+					delta["Text"] = comp.text;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+				if (comp.scale != other_comp.scale) {
+					delta["Scale"] = comp.scale;
+				}
+				if (comp.size != other_comp.size) {
+					delta["Size"] = comp.size.toJson();
+				}
+				if (comp.origin != other_comp.origin) {
+					delta["Origin"] = static_cast<int>(comp.origin);
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Text& comp, nlohmann::json const& delta) {
+				if (delta.contains("Font_ID")) {
+					comp.font_id = delta["Font_ID"];
+				}
+				if (delta.contains("Text")) {
+					comp.text = delta["Text"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+				if (delta.contains("Scale")) {
+					comp.scale = delta["Scale"];
+				}
+				if (delta.contains("Size")) {
+					comp.size.fromJson(delta["Size"]);
+				}
+				if (delta.contains("Origin")) {
+					comp.origin = static_cast<TextOrigin>(delta["Origin"]);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Text>();
+
+		//Register shape for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Shape>(
+			//Serialize
+			[](Render::Shape const& comp) -> nlohmann::json {
+				return	{
+						{ "Model_ID", comp.model_id },
+						{ "Color", comp.color.toJson() }
+				};
+			},
+
+			//Deserialize
+			[](Render::Shape& comp, nlohmann::json const& data) {
+				comp.model_id = data.value("Model_ID", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+			},
+
+			// Override Serialize
+			[](Render::Shape const& comp, Render::Shape const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.model_id != other_comp.model_id) {
+					delta["Model_ID"] = comp.model_id;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Shape& comp, nlohmann::json const& delta) {
+				if (delta.contains("Model_ID")) {
+					comp.model_id = delta["Model_ID"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Shape>();
+
+		//Register shape for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
+			//Serialize
+			[](Render::Texture const& comp) -> nlohmann::json {
+				return	{
+						{ "Texture_ID", comp.texture_id },
+						{ "Color", comp.color.toJson() },
+						{ "Frame_Size", comp.frame_size.toJson() },
+						{ "Frame_Index", comp.frame_index.toJson() },
+						{ "B_Blend", comp.b_blend },
+						{ "Intensity", comp.intensity },
+						{ "B_Stretch", comp.b_stretch },
+						{ "B_Flip", comp.b_flip.toJson() }
+				};
+			},
+
+			//Deserialize
+			[](Render::Texture& comp, nlohmann::json const& data) {
+				comp.texture_id = data.value("Texture_ID", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+				comp.frame_size.fromJson(data.value("Frame_Size", Vector2i::def_json));
+				comp.frame_index.fromJson(data.value("Frame_Index", Vector2i::def_json));
+				comp.b_blend = data.value("B_Blend", false);
+				comp.intensity = data.value("Intensity", 0.5f);
+				comp.b_stretch = data.value("B_Stretch", false);
+				comp.b_flip.fromJson(data.value("B_Flip", Vector2b::def_json));
+			},
+
+			// Override Serialize
+			[](Render::Texture const& comp, Render::Texture const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.texture_id != other_comp.texture_id) {
+					delta["Texture_ID"] = comp.texture_id;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+				if (comp.frame_size != other_comp.frame_size) {
+					delta["Frame_Size"] = comp.frame_size.toJson();
+				}
+				if (comp.frame_index != other_comp.frame_index) {
+					delta["Frame_Index"] = comp.frame_index.toJson();
+				}
+				if (comp.b_blend != other_comp.b_blend) {
+					delta["B_Blend"] = comp.b_blend;
+				}
+				if (comp.intensity != other_comp.intensity) {
+					delta["Intensity"] = comp.intensity;
+				}
+				if (comp.b_stretch != other_comp.b_stretch) {
+					delta["B_Stretch"] = comp.b_stretch;
+				}
+				if (comp.b_flip != other_comp.b_flip) {
+					delta["B_Flip"] = comp.b_flip.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Texture& comp, nlohmann::json const& delta) {
+				if (delta.contains("Texture_ID")) {
+					comp.texture_id = delta["Texture_ID"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+				if (delta.contains("Frame_Size")) {
+					comp.frame_size.fromJson(delta["Frame_Size"]);
+				}
+				if (delta.contains("Frame_Index")) {
+					comp.frame_index.fromJson(delta["Frame_Index"]);
+				}
+				if (delta.contains("B_Blend")) {
+					comp.b_blend = delta["B_Blend"];
+				}
+				if (delta.contains("Intensity")) {
+					comp.intensity = delta["Intensity"];
+				}
+				if (delta.contains("B_Stretch")) {
+					comp.b_stretch = delta["B_Stretch"];
+				}
+				if (delta.contains("B_Flip")) {
+					comp.b_flip.fromJson(delta["B_Flip"]);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Texture>();
+	}
+
+	void Render::registerEditorComponents() {
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
@@ -79,31 +317,6 @@ namespace NIKE {
 			}
 		);
 #endif
-
-		//Register text for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Text>(
-			//Serialize
-			[](Render::Text const& comp) -> nlohmann::json {
-				return	{
-						{ "Font_ID", comp.font_id },
-						{ "Text", comp.text },
-						{ "Color", comp.color.toJson() },
-						{ "Scale", comp.scale },
-						{ "Size", comp.size.toJson() },
-						{ "Origin", static_cast<int>(comp.origin) }
-				};
-			},
-
-			//Deserialize
-			[](Render::Text& comp, nlohmann::json const& data) {
-				comp.font_id = data.at("Font_ID").get<std::string>();
-				comp.text = data.at("Text").get<std::string>();
-				comp.color.fromJson(data.at("Color"));
-				comp.scale = data.at("Scale").get<float>();
-				comp.size.fromJson(data.at("Size"));
-				comp.origin = static_cast<TextOrigin>(data.at("Origin").get<int>());
-			}
-		);
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
@@ -201,8 +414,8 @@ namespace NIKE {
 					ImGui::Text("Select Font:");
 
 					// Hold the current and previous font selection
-					static std::string previous_font_id = comp.font_id; 
-					std::string current_font_id = comp.font_id;        
+					static std::string previous_font_id = comp.font_id;
+					std::string current_font_id = comp.font_id;
 
 					// Get all loaded fonts
 					const auto& all_loaded_fonts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Font);
@@ -312,27 +525,10 @@ namespace NIKE {
 						}
 					}
 				}
-				
+
 			}
 		);
 #endif
-
-		//Register shape for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Shape>(
-			//Serialize
-			[](Render::Shape const& comp) -> nlohmann::json {
-				return	{
-						{ "Model_ID", comp.model_id },
-						{ "Color", comp.color.toJson() }
-				};
-			},
-
-			//Deserialize
-			[](Render::Shape& comp, nlohmann::json const& data) {
-				comp.model_id = data.at("Model_ID").get<std::string>();
-				comp.color.fromJson(data.at("Color"));
-			}
-		);
 
 #ifndef NDEBUG
 		// UI for shape
@@ -431,39 +627,8 @@ namespace NIKE {
 
 				}
 			}
-				
 		);
 #endif
-
-
-		//Register shape for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
-			//Serialize
-			[](Render::Texture const& comp) -> nlohmann::json {
-				return	{
-						{ "Texture_ID", comp.texture_id },
-						{ "Color", comp.color.toJson() },
-						{ "Frame_Size", comp.frame_size.toJson() },
-						{ "Frame_Index", comp.frame_index.toJson() },
-						{ "B_Blend", comp.b_blend },
-						{ "Intensity", comp.intensity },
-						{ "B_Stretch", comp.b_stretch },
-						{ "B_Flip", comp.b_flip.toJson() }
-				};
-			},
-
-			//Deserialize
-			[](Render::Texture& comp, nlohmann::json const& data) {
-				comp.texture_id = data.at("Texture_ID").get<std::string>();
-				comp.color.fromJson(data.at("Color"));
-				comp.frame_size.fromJson(data.at("Frame_Size"));
-				comp.frame_index.fromJson(data.at("Frame_Index"));
-				comp.b_blend = data.at("B_Blend").get<bool>();
-				comp.intensity = data.at("Intensity").get<float>();
-				comp.b_stretch = data.at("B_Stretch").get<bool>();
-				comp.b_flip.fromJson(data.at("B_Flip"));
-			}
-		);
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
@@ -480,7 +645,7 @@ namespace NIKE {
 					std::string current_texture = comp.texture_id;
 
 					ImGui::Text("Select Texture");
-					
+
 					auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
 
 					// Find the index of the currently selected texture in the list
@@ -782,7 +947,7 @@ namespace NIKE {
 
 						}
 					}
-					
+
 				}
 
 			}

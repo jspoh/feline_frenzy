@@ -42,19 +42,156 @@ namespace NIKE {
 
 			// Deserialize
 			[](Attack& comp, nlohmann::json const& data) {
-				comp.range = data.at("Range").get<float>();
-				comp.cooldown = data.at("Cooldown").get<float>();
-				comp.last_shot_time = data.at("LastShotTime").get<float>();
-				comp.offset = data.at("Offset").get<float>();
-				comp.layer = data.at("Layer").get<int>();
-				comp.prefab_path = data.at("PrefabPath").get<std::string>();
-				comp.script.script_id = data.at("ScriptID").get<std::string>();
-				comp.script.script_path = data.at("ScriptPath").get<std::string>();
-				comp.script.function = data.at("Function").get<std::string>();
-				comp.script.b_loaded = data.at("ScriptLoaded").get<bool>();
+				comp.range = data.value("Range", 10.f);
+				comp.cooldown = data.value("Cooldown", 10.f);
+				comp.last_shot_time = data.value("LastShotTime", 10.f);
+				comp.offset = data.value("Offset", 100.0f);
+				comp.layer = data.value("Layer", 0);
+				comp.prefab_path = data.value("PrefabPath", "");
+				comp.script.script_id = data.value("ScriptID", "");
+				comp.script.script_path = data.value("ScriptPath", "");
+				comp.script.function = data.value("Function", "");
+				comp.script.b_loaded = data.value("ScriptLoaded", false);
+			},
+
+			// Override Serialize
+			[](Attack const& comp, Attack const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.range != other_comp.range) {
+					delta["Range"] = comp.range;
+				}
+				if (comp.cooldown != other_comp.cooldown) {
+					delta["Cooldown"] = comp.cooldown;
+				}
+				if (comp.last_shot_time != other_comp.last_shot_time) {
+					delta["LastShotTime"] = comp.last_shot_time;
+				}
+				if (comp.offset != other_comp.offset) {
+					delta["Offset"] = comp.offset;
+				}
+				if (comp.layer != other_comp.layer) {
+					delta["Layer"] = comp.layer;
+				}
+				if (comp.prefab_path != other_comp.prefab_path) {
+					delta["PrefabPath"] = comp.prefab_path;
+				}
+				if (comp.script.script_id != other_comp.script.script_id) {
+					delta["ScriptID"] = comp.script.script_id;
+				}
+				if (comp.script.script_path != other_comp.script.script_path) {
+					delta["ScriptPath"] = comp.script.script_path;
+				}
+				if (comp.script.function != other_comp.script.function) {
+					delta["Function"] = comp.script.function;
+				}
+				if (comp.script.b_loaded != other_comp.script.b_loaded) {
+					delta["ScriptLoaded"] = comp.script.b_loaded;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Attack& comp, nlohmann::json const& delta) {
+				if (delta.contains("Range")) {
+					comp.range = delta["Range"];
+				}
+				if (delta.contains("Cooldown")) {
+					comp.cooldown = delta["Cooldown"];
+				}
+				if (delta.contains("LastShotTime")) {
+					comp.last_shot_time = delta["LastShotTime"];
+				}
+				if (delta.contains("Offset")) {
+					comp.offset = delta["Offset"];
+				}
+				if (delta.contains("Layer")) {
+					comp.layer = delta["Layer"];
+				}
+				if (delta.contains("PrefabPath")) {
+					comp.prefab_path = delta["PrefabPath"];
+				}
+
+				// Nested script properties
+				if (delta.contains("ScriptID")) {
+					comp.script.script_id = delta["ScriptID"];
+				}
+				if (delta.contains("ScriptPath")) {
+					comp.script.script_path = delta["ScriptPath"];
+				}
+				if (delta.contains("Function")) {
+					comp.script.function = delta["Function"];
+				}
+				if (delta.contains("ScriptLoaded")) {
+					comp.script.b_loaded = delta["ScriptLoaded"];
+				}
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Attack>();
+
+		// Register spawner for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Spawner>(
+			// Serialize
+			[](Spawner const& comp) -> nlohmann::json {
+				return {
+					{ "EnemyLimit", comp.enemy_limit},
+					{ "EnemiesSpawned", comp.enemies_spawned},
+					{ "Cooldown", comp.cooldown },
+					{ "LastSpawnTime", comp.last_spawn_time }
+				};
+			},
+
+			// Deserialize
+			[](Spawner& comp, nlohmann::json const& data) {
+				comp.enemy_limit = data.at("EnemyLimit").get<int>();
+				comp.enemies_spawned = data.at("EnemiesSpawned").get<int>();
+				comp.cooldown = data.at("Cooldown").get<float>();
+				comp.last_spawn_time = data.at("LastSpawnTime").get<float>();
+			},
+
+			// Override Serialize for Spawner
+			[](Spawner const& comp, Spawner const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.enemy_limit != other_comp.enemy_limit) {
+					delta["EnemyLimit"] = comp.enemy_limit;
+				}
+				if (comp.enemies_spawned != other_comp.enemies_spawned) {
+					delta["EnemiesSpawned"] = comp.enemies_spawned;
+				}
+				if (comp.cooldown != other_comp.cooldown) {
+					delta["Cooldown"] = comp.cooldown;
+				}
+				if (comp.last_spawn_time != other_comp.last_spawn_time) {
+					delta["LastSpawnTime"] = comp.last_spawn_time;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize for Spawner
+			[](Spawner& comp, nlohmann::json const& delta) {
+				if (delta.contains("EnemyLimit")) {
+					comp.enemy_limit = delta["EnemyLimit"];
+				}
+				if (delta.contains("EnemiesSpawned")) {
+					comp.enemies_spawned = delta["EnemiesSpawned"];
+				}
+				if (delta.contains("Cooldown")) {
+					comp.cooldown = delta["Cooldown"];
+				}
+				if (delta.contains("LastSpawnTime")) {
+					comp.last_spawn_time = delta["LastSpawnTime"];
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Spawner>();
+	}
+
+	void Enemy::registerEditorComponents() {
 #ifndef NDEBUG
 		// Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Attack>(
@@ -192,28 +329,6 @@ namespace NIKE {
 		);
 #endif
 
-		// Register spawner for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Spawner>(
-			// Serialize
-			[](Spawner const& comp) -> nlohmann::json {
-				return {
-					{ "EnemyLimit", comp.enemy_limit},
-					{ "EnemiesSpawned", comp.enemies_spawned},
-					{ "Cooldown", comp.cooldown },
-					{ "LastSpawnTime", comp.last_spawn_time }
-				};
-			},
-
-			// Deserialize
-			[](Spawner& comp, nlohmann::json const& data) {
-				comp.enemy_limit = data.at("EnemyLimit").get<int>();
-				comp.enemies_spawned = data.at("EnemiesSpawned").get<int>();
-				comp.cooldown = data.at("Cooldown").get<float>();
-				comp.last_spawn_time = data.at("LastSpawnTime").get<float>();
-			}
-		);
-
-		// !TODO: Add UI Registration for Spawner component
 #ifndef NDEBUG
 // Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Spawner>(
