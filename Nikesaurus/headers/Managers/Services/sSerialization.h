@@ -76,6 +76,9 @@ namespace NIKE {
 			//Component Serialization Registry
 			std::unique_ptr<CompSerializer> comp_registry;
 
+			//Comp adding functions
+			std::unordered_map<std::string, std::function<std::shared_ptr<void>()>> comp_funcs;
+
 			//Serialize Entity
 			nlohmann::json serializeEntity(Entity::Type entity);
 
@@ -101,6 +104,19 @@ namespace NIKE {
 				comp_registry->registerComponent<T>(serialize, deserialize, override_serialize, override_deserialize);
 			}
 
+			//Register component adding
+			template<typename T>
+			void registerComponentAdding() {
+
+				//Create a default component of type T adding function
+				comp_funcs[Utility::convertTypeString(typeid(T).name())] = []() -> std::shared_ptr<void> {
+					return std::make_shared<T>();
+					};
+			}
+
+			//Get component adding functions
+			std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>const& getCompFuncs() const;
+
 			// Save grid to .map file
 			void saveGridToFile(const std::string& file_path);
 
@@ -110,7 +126,7 @@ namespace NIKE {
 			void savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path);
 
 			//Deserialize Prefab
-			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>& comp_funcs, std::string const& file_path);
+			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path);
 
 			//Serialize Entity into file path
 			void saveEntityToFile(Entity::Type entity, std::string const& file_path);

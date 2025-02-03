@@ -34,11 +34,9 @@ namespace NIKE {
 	* Serialization Services
 	*********************************************************************/
 
-	/*****************************************************************//**
-	* Audio Channels
-	*********************************************************************/
-
-	
+	std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>const& Serialization::Service::getCompFuncs() const {
+		return comp_funcs;
+	}
 
 	/*****************************************************************//**
 	* Grid
@@ -132,6 +130,8 @@ namespace NIKE {
 		//Create new data
 		nlohmann::json data;
 
+
+
 		////Iterate through all comp
 		//for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
 		//	data["Components"][comp.first] = comp_registry->serializeOverrideComponent(comp.first, comp.second.get());
@@ -164,7 +164,7 @@ namespace NIKE {
 		file.close();
 	}
 
-	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>& comp_funcs, std::string const& file_path) {
+	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path) {
 
 		//Json Data
 		nlohmann::json data;

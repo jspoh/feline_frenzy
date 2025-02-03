@@ -120,12 +120,6 @@ namespace NIKE {
 			void registerCompUIFunc(std::function<void(ComponentsPanel&, T&)> comp_func) {
 				std::dynamic_pointer_cast<ComponentsPanel>(panels_map.at(ComponentsPanel::getStaticName()))->registerCompUIFunc<T>(comp_func);
 			}
-
-			//Register prefab comp
-			template<typename T>
-			void registerPrefabComp() {
-				std::dynamic_pointer_cast<PrefabsPanel>(panels_map.at(PrefabsPanel::getStaticName()))->registerPrefabComp<T>();
-			}
 		};
 	}
 }

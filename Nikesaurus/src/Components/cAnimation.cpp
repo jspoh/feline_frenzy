@@ -100,6 +100,72 @@ namespace NIKE {
 			}
 		);
 
+		//Animation component adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Animation::Base>();
+
+		//Register Sprite For Serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Animation::Sprite>(
+			//Serialize
+			[](Animation::Sprite const& comp) -> nlohmann::json {
+				return	{
+						{ "Sheet_Size", comp.sheet_size.toJson() },
+						{ "Start_Index", comp.start_index.toJson() },
+						{ "End_Index", comp.end_index.toJson() },
+						{ "Curr_Index", comp.curr_index.toJson() }
+				};
+			},
+
+			//Deserialize
+			[](Animation::Sprite& comp, nlohmann::json const& data) {
+				comp.sheet_size.fromJson(data.value("Sheet_Size", Vector2f::def_json));
+				comp.start_index.fromJson(data.value("Start_Index", Vector2f::def_json));
+				comp.end_index.fromJson(data.value("End_Index", Vector2f::def_json));
+				comp.curr_index.fromJson(data.value("Curr_Index", Vector2f::def_json));
+			}, 
+
+			// Override Serialize
+			[](Animation::Sprite const& comp, Animation::Sprite const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.sheet_size != other_comp.sheet_size) {
+					delta["Sheet_Size"] = comp.sheet_size.toJson();
+				}
+				if (comp.start_index != other_comp.start_index) {
+					delta["Start_Index"] = comp.start_index.toJson();
+				}
+				if (comp.end_index != other_comp.end_index) {
+					delta["End_Index"] = comp.end_index.toJson();
+				}
+				if (comp.curr_index != other_comp.curr_index) {
+					delta["Curr_Index"] = comp.curr_index.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Animation::Sprite& comp, nlohmann::json const& delta) {
+				if (delta.contains("Sheet_Size")) {
+					comp.sheet_size.fromJson(delta["Sheet_Size"]);
+				}
+				if (delta.contains("Start_Index")) {
+					comp.start_index.fromJson(delta["Start_Index"]);
+				}
+				if (delta.contains("End_Index")) {
+					comp.end_index.fromJson(delta["End_Index"]);
+				}
+				if (delta.contains("Curr_Index")) {
+					comp.curr_index.fromJson(delta["Curr_Index"]);
+				}
+			}
+		);
+
+		//Animation Sprite Component adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Animation::Sprite>();
+	}
+
+	void Animation::registerEditorComponents() {
+
 #ifndef NDEBUG
 		// Animation base comp UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Animation::Base>(
@@ -239,67 +305,7 @@ namespace NIKE {
 				}
 			}
 		);
-
-		//Animation Base Prefab Comp
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Animation::Base>();
 #endif
-
-		//Register Sprite For Serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Animation::Sprite>(
-			//Serialize
-			[](Animation::Sprite const& comp) -> nlohmann::json {
-				return	{
-						{ "Sheet_Size", comp.sheet_size.toJson() },
-						{ "Start_Index", comp.start_index.toJson() },
-						{ "End_Index", comp.end_index.toJson() },
-						{ "Curr_Index", comp.curr_index.toJson() }
-				};
-			},
-
-			//Deserialize
-			[](Animation::Sprite& comp, nlohmann::json const& data) {
-				comp.sheet_size.fromJson(data.value("Sheet_Size", Vector2f::def_json));
-				comp.start_index.fromJson(data.value("Start_Index", Vector2f::def_json));
-				comp.end_index.fromJson(data.value("End_Index", Vector2f::def_json));
-				comp.curr_index.fromJson(data.value("Curr_Index", Vector2f::def_json));
-			}, 
-
-			// Override Serialize
-			[](Animation::Sprite const& comp, Animation::Sprite const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-
-				if (comp.sheet_size != other_comp.sheet_size) {
-					delta["Sheet_Size"] = comp.sheet_size.toJson();
-				}
-				if (comp.start_index != other_comp.start_index) {
-					delta["Start_Index"] = comp.start_index.toJson();
-				}
-				if (comp.end_index != other_comp.end_index) {
-					delta["End_Index"] = comp.end_index.toJson();
-				}
-				if (comp.curr_index != other_comp.curr_index) {
-					delta["Curr_Index"] = comp.curr_index.toJson();
-				}
-
-				return delta;
-			},
-
-			// Override Deserialize
-			[](Animation::Sprite& comp, nlohmann::json const& delta) {
-				if (delta.contains("Sheet_Size")) {
-					comp.sheet_size.fromJson(delta["Sheet_Size"]);
-				}
-				if (delta.contains("Start_Index")) {
-					comp.start_index.fromJson(delta["Start_Index"]);
-				}
-				if (delta.contains("End_Index")) {
-					comp.end_index.fromJson(delta["End_Index"]);
-				}
-				if (delta.contains("Curr_Index")) {
-					comp.curr_index.fromJson(delta["Curr_Index"]);
-				}
-			}
-		);
 
 #ifndef NDEBUG
 		// Animation base comp UI
@@ -375,9 +381,6 @@ namespace NIKE {
 				ImGui::BulletText("Y = %d", comp.curr_index.y);
 			}
 		);
-
-		//Animation Sprite Prefab Comp
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Animation::Sprite>();
 #endif
 	}
 }

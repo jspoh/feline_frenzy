@@ -51,6 +51,11 @@ namespace NIKE {
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<GameLogic::ILogic>();
+	}
+
+
+	void GameLogic::registerEditorComponents() {
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<GameLogic::ILogic>(
@@ -242,7 +247,7 @@ namespace NIKE {
 							}
 						}
 					}
-				
+
 
 
 
@@ -251,8 +256,6 @@ namespace NIKE {
 				}
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<GameLogic::ILogic>();
 #endif
 	}
 }

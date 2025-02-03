@@ -123,6 +123,10 @@ namespace NIKE {
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Attack>();
+	}
+
+	void Enemy::registerEditorComponents() {
 #ifndef NDEBUG
 		// Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Attack>(
@@ -258,8 +262,6 @@ namespace NIKE {
 				ImGui::Text("Last Shot time: %f", comp.last_shot_time);
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Attack>();
 #endif
 	}
 }

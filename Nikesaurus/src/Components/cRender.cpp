@@ -64,47 +64,7 @@ namespace NIKE {
 			}
 		);
 
-#ifndef NDEBUG
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Cam& comp) {
-				ImGui::Text("Edit Camera variables");
-
-				// For cam height
-				{
-					//Position before change
-					static float before_change;
-
-					ImGui::DragFloat("Camera Zoom", &comp.zoom, 0.1f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
-
-					//Check if position has begun editing
-					if (ImGui::IsItemActivated()) {
-						before_change = comp.zoom;
-					}
-
-					//Check if position has finished editing
-					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						LevelEditor::Action change_zoom;
-
-						//Change pos do action
-						change_zoom.do_action = [&, zoom = comp.zoom]() {
-							comp.zoom = zoom;
-							};
-
-						//Change pos undo action
-						change_zoom.undo_action = [&, zoom = before_change]() {
-							comp.zoom = zoom;
-							};
-
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_zoom));
-					}
-
-				}
-			}
-		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Cam>();
-#endif
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Cam>();
 
 		//Register text for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Text>(
@@ -178,6 +138,185 @@ namespace NIKE {
 				}
 			}
 		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Text>();
+
+		//Register shape for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Shape>(
+			//Serialize
+			[](Render::Shape const& comp) -> nlohmann::json {
+				return	{
+						{ "Model_ID", comp.model_id },
+						{ "Color", comp.color.toJson() }
+				};
+			},
+
+			//Deserialize
+			[](Render::Shape& comp, nlohmann::json const& data) {
+				comp.model_id = data.value("Model_ID", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+			},
+
+			// Override Serialize
+			[](Render::Shape const& comp, Render::Shape const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.model_id != other_comp.model_id) {
+					delta["Model_ID"] = comp.model_id;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Shape& comp, nlohmann::json const& delta) {
+				if (delta.contains("Model_ID")) {
+					comp.model_id = delta["Model_ID"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Shape>();
+
+		//Register shape for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
+			//Serialize
+			[](Render::Texture const& comp) -> nlohmann::json {
+				return	{
+						{ "Texture_ID", comp.texture_id },
+						{ "Color", comp.color.toJson() },
+						{ "Frame_Size", comp.frame_size.toJson() },
+						{ "Frame_Index", comp.frame_index.toJson() },
+						{ "B_Blend", comp.b_blend },
+						{ "Intensity", comp.intensity },
+						{ "B_Stretch", comp.b_stretch },
+						{ "B_Flip", comp.b_flip.toJson() }
+				};
+			},
+
+			//Deserialize
+			[](Render::Texture& comp, nlohmann::json const& data) {
+				comp.texture_id = data.value("Texture_ID", "");
+				comp.color.fromJson(data.value("Color", Vector4f::def_json));
+				comp.frame_size.fromJson(data.value("Frame_Size", Vector2i::def_json));
+				comp.frame_index.fromJson(data.value("Frame_Index", Vector2i::def_json));
+				comp.b_blend = data.value("B_Blend", false);
+				comp.intensity = data.value("Intensity", 0.5f);
+				comp.b_stretch = data.value("B_Stretch", false);
+				comp.b_flip.fromJson(data.value("B_Flip", Vector2b::def_json));
+			},
+
+			// Override Serialize
+			[](Render::Texture const& comp, Render::Texture const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.texture_id != other_comp.texture_id) {
+					delta["Texture_ID"] = comp.texture_id;
+				}
+				if (comp.color != other_comp.color) {
+					delta["Color"] = comp.color.toJson();
+				}
+				if (comp.frame_size != other_comp.frame_size) {
+					delta["Frame_Size"] = comp.frame_size.toJson();
+				}
+				if (comp.frame_index != other_comp.frame_index) {
+					delta["Frame_Index"] = comp.frame_index.toJson();
+				}
+				if (comp.b_blend != other_comp.b_blend) {
+					delta["B_Blend"] = comp.b_blend;
+				}
+				if (comp.intensity != other_comp.intensity) {
+					delta["Intensity"] = comp.intensity;
+				}
+				if (comp.b_stretch != other_comp.b_stretch) {
+					delta["B_Stretch"] = comp.b_stretch;
+				}
+				if (comp.b_flip != other_comp.b_flip) {
+					delta["B_Flip"] = comp.b_flip.toJson();
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Texture& comp, nlohmann::json const& delta) {
+				if (delta.contains("Texture_ID")) {
+					comp.texture_id = delta["Texture_ID"];
+				}
+				if (delta.contains("Color")) {
+					comp.color.fromJson(delta["Color"]);
+				}
+				if (delta.contains("Frame_Size")) {
+					comp.frame_size.fromJson(delta["Frame_Size"]);
+				}
+				if (delta.contains("Frame_Index")) {
+					comp.frame_index.fromJson(delta["Frame_Index"]);
+				}
+				if (delta.contains("B_Blend")) {
+					comp.b_blend = delta["B_Blend"];
+				}
+				if (delta.contains("Intensity")) {
+					comp.intensity = delta["Intensity"];
+				}
+				if (delta.contains("B_Stretch")) {
+					comp.b_stretch = delta["B_Stretch"];
+				}
+				if (delta.contains("B_Flip")) {
+					comp.b_flip.fromJson(delta["B_Flip"]);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Texture>();
+	}
+
+	void Render::registerEditorComponents() {
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Cam& comp) {
+				ImGui::Text("Edit Camera variables");
+
+				// For cam height
+				{
+					//Position before change
+					static float before_change;
+
+					ImGui::DragFloat("Camera Zoom", &comp.zoom, 0.1f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					//Check if position has begun editing
+					if (ImGui::IsItemActivated()) {
+						before_change = comp.zoom;
+					}
+
+					//Check if position has finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_zoom;
+
+						//Change pos do action
+						change_zoom.do_action = [&, zoom = comp.zoom]() {
+							comp.zoom = zoom;
+							};
+
+						//Change pos undo action
+						change_zoom.undo_action = [&, zoom = before_change]() {
+							comp.zoom = zoom;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_zoom));
+					}
+
+				}
+			}
+		);
+#endif
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
@@ -275,8 +414,8 @@ namespace NIKE {
 					ImGui::Text("Select Font:");
 
 					// Hold the current and previous font selection
-					static std::string previous_font_id = comp.font_id; 
-					std::string current_font_id = comp.font_id;        
+					static std::string previous_font_id = comp.font_id;
+					std::string current_font_id = comp.font_id;
 
 					// Get all loaded fonts
 					const auto& all_loaded_fonts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Font);
@@ -386,53 +525,10 @@ namespace NIKE {
 						}
 					}
 				}
-				
+
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Text>();
 #endif
-
-		//Register shape for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Shape>(
-			//Serialize
-			[](Render::Shape const& comp) -> nlohmann::json {
-				return	{
-						{ "Model_ID", comp.model_id },
-						{ "Color", comp.color.toJson() }
-				};
-			},
-
-			//Deserialize
-			[](Render::Shape& comp, nlohmann::json const& data) {
-				comp.model_id = data.value("Model_ID", "");
-				comp.color.fromJson(data.value("Color", Vector4f::def_json));
-			},
-
-			// Override Serialize
-			[](Render::Shape const& comp, Render::Shape const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-
-				if (comp.model_id != other_comp.model_id) {
-					delta["Model_ID"] = comp.model_id;
-				}
-				if (comp.color != other_comp.color) {
-					delta["Color"] = comp.color.toJson();
-				}
-
-				return delta;
-			},
-
-			// Override Deserialize
-			[](Render::Shape& comp, nlohmann::json const& delta) {
-				if (delta.contains("Model_ID")) {
-					comp.model_id = delta["Model_ID"];
-				}
-				if (delta.contains("Color")) {
-					comp.color.fromJson(delta["Color"]);
-				}
-			}
-		);
 
 #ifndef NDEBUG
 		// UI for shape
@@ -532,99 +628,7 @@ namespace NIKE {
 				}
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Shape>();
 #endif
-
-
-		//Register shape for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
-			//Serialize
-			[](Render::Texture const& comp) -> nlohmann::json {
-				return	{
-						{ "Texture_ID", comp.texture_id },
-						{ "Color", comp.color.toJson() },
-						{ "Frame_Size", comp.frame_size.toJson() },
-						{ "Frame_Index", comp.frame_index.toJson() },
-						{ "B_Blend", comp.b_blend },
-						{ "Intensity", comp.intensity },
-						{ "B_Stretch", comp.b_stretch },
-						{ "B_Flip", comp.b_flip.toJson() }
-				};
-			},
-
-			//Deserialize
-			[](Render::Texture& comp, nlohmann::json const& data) {
-				comp.texture_id = data.value("Texture_ID", "");
-				comp.color.fromJson(data.value("Color", Vector4f::def_json));
-				comp.frame_size.fromJson(data.value("Frame_Size", Vector2i::def_json));
-				comp.frame_index.fromJson(data.value("Frame_Index", Vector2i::def_json));
-				comp.b_blend = data.value("B_Blend", false);
-				comp.intensity = data.value("Intensity", 0.5f);
-				comp.b_stretch = data.value("B_Stretch", false);
-				comp.b_flip.fromJson(data.value("B_Flip", Vector2b::def_json));
-			},
-
-			// Override Serialize
-			[](Render::Texture const& comp, Render::Texture const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-
-				if (comp.texture_id != other_comp.texture_id) {
-					delta["Texture_ID"] = comp.texture_id;
-				}
-				if (comp.color != other_comp.color) {
-					delta["Color"] = comp.color.toJson();
-				}
-				if (comp.frame_size != other_comp.frame_size) {
-					delta["Frame_Size"] = comp.frame_size.toJson();
-				}
-				if (comp.frame_index != other_comp.frame_index) {
-					delta["Frame_Index"] = comp.frame_index.toJson();
-				}
-				if (comp.b_blend != other_comp.b_blend) {
-					delta["B_Blend"] = comp.b_blend;
-				}
-				if (comp.intensity != other_comp.intensity) {
-					delta["Intensity"] = comp.intensity;
-				}
-				if (comp.b_stretch != other_comp.b_stretch) {
-					delta["B_Stretch"] = comp.b_stretch;
-				}
-				if (comp.b_flip != other_comp.b_flip) {
-					delta["B_Flip"] = comp.b_flip.toJson();
-				}
-
-				return delta;
-			},
-
-			// Override Deserialize
-			[](Render::Texture& comp, nlohmann::json const& delta) {
-				if (delta.contains("Texture_ID")) {
-					comp.texture_id = delta["Texture_ID"];
-				}
-				if (delta.contains("Color")) {
-					comp.color.fromJson(delta["Color"]);
-				}
-				if (delta.contains("Frame_Size")) {
-					comp.frame_size.fromJson(delta["Frame_Size"]);
-				}
-				if (delta.contains("Frame_Index")) {
-					comp.frame_index.fromJson(delta["Frame_Index"]);
-				}
-				if (delta.contains("B_Blend")) {
-					comp.b_blend = delta["B_Blend"];
-				}
-				if (delta.contains("Intensity")) {
-					comp.intensity = delta["Intensity"];
-				}
-				if (delta.contains("B_Stretch")) {
-					comp.b_stretch = delta["B_Stretch"];
-				}
-				if (delta.contains("B_Flip")) {
-					comp.b_flip.fromJson(delta["B_Flip"]);
-				}
-			}
-		);
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
@@ -641,7 +645,7 @@ namespace NIKE {
 					std::string current_texture = comp.texture_id;
 
 					ImGui::Text("Select Texture");
-					
+
 					auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
 
 					// Find the index of the currently selected texture in the list
@@ -943,13 +947,11 @@ namespace NIKE {
 
 						}
 					}
-					
+
 				}
 
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Render::Texture>();
 #endif
 	}
 }

@@ -58,6 +58,11 @@ namespace NIKE {
 
 		);
 
+		//Lifetime Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Lifetime>();
+	}
+
+	void Despawn::registerEditorComponents() {
 #ifndef NDEBUG
 		// Level Editor UI registration
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Lifetime>(
@@ -126,9 +131,6 @@ namespace NIKE {
 				}
 			}
 		);
-
-		//Lifetime Prefab Comp
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Lifetime>();
 #endif
 	}
 }

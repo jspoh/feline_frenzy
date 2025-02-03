@@ -82,6 +82,11 @@ namespace NIKE {
 			}
 		);
 
+		//Audio Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Audio::SFX>();
+	}
+
+	void Audio::registerEditorComponents() {
 #ifndef NDEBUG
 		//Register SFX for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Audio::SFX>(
@@ -273,9 +278,6 @@ namespace NIKE {
 
 			}
 		);
-
-		//Audio Prefab Comp
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Audio::SFX>();
 #endif
 	}
 }

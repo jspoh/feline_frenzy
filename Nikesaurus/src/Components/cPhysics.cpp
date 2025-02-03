@@ -83,6 +83,85 @@ namespace NIKE {
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Dynamics>();
+
+		//Register Collider for serializarion
+		NIKE_SERIALIZE_SERVICE->registerComponent<Physics::Collider>(
+			//Serialize
+			[](Physics::Collider const& comp) -> nlohmann::json {
+				return	{
+						{ "B_Bind_To_Entity", comp.b_bind_to_entity },
+						{ "Position", comp.transform.position.toJson()},
+						{ "Scale", comp.transform.scale.toJson()},
+						{ "Rotation", comp.transform.rotation},
+						{ "Pos_Offset", comp.pos_offset.toJson()},
+						{ "Resolution", static_cast<int>(comp.resolution) }
+						};
+			},
+
+			//Deserialize
+			[](Physics::Collider& comp, nlohmann::json const& data) {
+				comp.b_bind_to_entity = data.value("B_Bind_To_Entity", true);
+				comp.transform.position.fromJson(data.value("Position", Vector2f::def_json));
+				comp.transform.scale.fromJson(data.value("Scale", Vector2f::def_json));
+				comp.transform.rotation = data.value("Rotation", 0.0f);
+				comp.pos_offset.fromJson(data.value("Pos_Offset", Vector2f::def_json));
+				comp.resolution = data.value("Resolution", Resolution::NONE);
+			},
+
+			// Override Serialize
+			[](Physics::Collider const& comp, Physics::Collider const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.b_bind_to_entity != other_comp.b_bind_to_entity) {
+					delta["B_Bind_To_Entity"] = comp.b_bind_to_entity;
+				}
+				if (comp.transform.position != other_comp.transform.position) {
+					delta["Position"] = comp.transform.position.toJson();
+				}
+				if (comp.transform.scale != other_comp.transform.scale) {
+					delta["Scale"] = comp.transform.scale.toJson();
+				}
+				if (comp.transform.rotation != other_comp.transform.rotation) {
+					delta["Rotation"] = comp.transform.rotation;
+				}
+				if (comp.pos_offset != other_comp.pos_offset) {
+					delta["Pos_Offset"] = comp.pos_offset.toJson();
+				}
+				if (comp.resolution != other_comp.resolution) {
+					delta["Resolution"] = static_cast<int>(comp.resolution);
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Physics::Collider& comp, nlohmann::json const& delta) {
+				if (delta.contains("B_Bind_To_Entity")) {
+					comp.b_bind_to_entity = delta["B_Bind_To_Entity"];
+				}
+				if (delta.contains("Position")) {
+					comp.transform.position.fromJson(delta["Position"]);
+				}
+				if (delta.contains("Scale")) {
+					comp.transform.scale.fromJson(delta["Scale"]);
+				}
+				if (delta.contains("Rotation")) {
+					comp.transform.rotation = delta["Rotation"];
+				}
+				if (delta.contains("Pos_Offset")) {
+					comp.pos_offset.fromJson(delta["Pos_Offset"]);
+				}
+				if (delta.contains("Resolution")) {
+					comp.resolution = static_cast<Resolution>(delta["Resolution"]);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Collider>();
+	}
+
+	void Physics::registerEditorComponents() {
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Dynamics>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Dynamics& comp) {
@@ -252,82 +331,7 @@ namespace NIKE {
 				ImGui::Text("Last Direction %d", comp.last_direction);
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Dynamics>();
 #endif
-
-		//Register Collider for serializarion
-		NIKE_SERIALIZE_SERVICE->registerComponent<Physics::Collider>(
-			//Serialize
-			[](Physics::Collider const& comp) -> nlohmann::json {
-				return	{
-						{ "B_Bind_To_Entity", comp.b_bind_to_entity },
-						{ "Position", comp.transform.position.toJson()},
-						{ "Scale", comp.transform.scale.toJson()},
-						{ "Rotation", comp.transform.rotation},
-						{ "Pos_Offset", comp.pos_offset.toJson()},
-						{ "Resolution", static_cast<int>(comp.resolution) }
-						};
-			},
-
-			//Deserialize
-			[](Physics::Collider& comp, nlohmann::json const& data) {
-				comp.b_bind_to_entity = data.value("B_Bind_To_Entity", true);
-				comp.transform.position.fromJson(data.value("Position", Vector2f::def_json));
-				comp.transform.scale.fromJson(data.value("Scale", Vector2f::def_json));
-				comp.transform.rotation = data.value("Rotation", 0.0f);
-				comp.pos_offset.fromJson(data.value("Pos_Offset", Vector2f::def_json));
-				comp.resolution = data.value("Resolution", Resolution::NONE);
-			},
-
-			// Override Serialize
-			[](Physics::Collider const& comp, Physics::Collider const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-
-				if (comp.b_bind_to_entity != other_comp.b_bind_to_entity) {
-					delta["B_Bind_To_Entity"] = comp.b_bind_to_entity;
-				}
-				if (comp.transform.position != other_comp.transform.position) {
-					delta["Position"] = comp.transform.position.toJson();
-				}
-				if (comp.transform.scale != other_comp.transform.scale) {
-					delta["Scale"] = comp.transform.scale.toJson();
-				}
-				if (comp.transform.rotation != other_comp.transform.rotation) {
-					delta["Rotation"] = comp.transform.rotation;
-				}
-				if (comp.pos_offset != other_comp.pos_offset) {
-					delta["Pos_Offset"] = comp.pos_offset.toJson();
-				}
-				if (comp.resolution != other_comp.resolution) {
-					delta["Resolution"] = static_cast<int>(comp.resolution);
-				}
-
-				return delta;
-			},
-
-			// Override Deserialize
-			[](Physics::Collider& comp, nlohmann::json const& delta) {
-				if (delta.contains("B_Bind_To_Entity")) {
-					comp.b_bind_to_entity = delta["B_Bind_To_Entity"];
-				}
-				if (delta.contains("Position")) {
-					comp.transform.position.fromJson(delta["Position"]);
-				}
-				if (delta.contains("Scale")) {
-					comp.transform.scale.fromJson(delta["Scale"]);
-				}
-				if (delta.contains("Rotation")) {
-					comp.transform.rotation = delta["Rotation"];
-				}
-				if (delta.contains("Pos_Offset")) {
-					comp.pos_offset.fromJson(delta["Pos_Offset"]);
-				}
-				if (delta.contains("Resolution")) {
-					comp.resolution = static_cast<Resolution>(delta["Resolution"]);
-				}
-			}
-		);
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Collider>(
@@ -507,8 +511,6 @@ namespace NIKE {
 					}
 				}
 			});
-
-			NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Collider>();
 #endif
 	}
 }

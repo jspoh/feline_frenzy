@@ -428,9 +428,6 @@ namespace NIKE {
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
-			//Comp adding functions
-			std::unordered_map<std::string, std::function<std::shared_ptr<void>()>> comp_funcs;
-
 			//Map to array of component type
 			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
@@ -480,15 +477,6 @@ namespace NIKE {
 
 			// For component stuff
 			void renderPrefabComponents();
-
-			template<typename T>
-			void registerPrefabComp() {
-
-				//Create a default component of type T adding function
-				comp_funcs[Utility::convertTypeString(typeid(T).name())] = []() -> std::shared_ptr<void> {
-					return std::make_shared<T>();
-					};
-			}
 		};
 
 		//Debug Management Panel

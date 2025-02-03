@@ -72,6 +72,9 @@ namespace NIKE {
 			//Register default components
 			void registerDefComponents();
 
+			//Register default components for editor
+			void registerDefEditorComponents();
+
 			//Register default assets
 			void registerDefSystems();
 		public:

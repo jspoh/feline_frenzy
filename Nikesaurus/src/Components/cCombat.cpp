@@ -65,6 +65,50 @@ namespace NIKE {
 			}
 		);
 
+		//Health Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Health>();
+	
+		//Register damage components
+		NIKE_ECS_MANAGER->registerComponent<Damage>();
+
+		//Register damage for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Damage>(
+			//Serialize
+			[](Damage const& comp) -> nlohmann::json {
+				return	{
+						{ "Damage", comp.damage },
+				};
+			},
+
+			//Deserialize
+			[](Damage& comp, nlohmann::json const& data) {
+				comp.damage = data.value("Damage", 1.0f);
+			},
+
+			// Override Serialize
+			[](Damage const& comp, Damage const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.damage != other_comp.damage) {
+					delta["Damage"] = comp.damage;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize for Damage
+			[](Damage& comp, nlohmann::json const& delta) {
+				if (delta.contains("Damage")) {
+					comp.damage = delta["Damage"];
+				}
+			}
+		);
+
+		//Damage Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Damage>();
+	}
+
+	void Combat::registerEditorComponents() {
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Health>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Health& comp) {
@@ -154,46 +198,7 @@ namespace NIKE {
 				}
 			}
 		);
-
-		//Health Prefab Comp
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Health>();
 #endif
-	
-		//Register damage components
-		NIKE_ECS_MANAGER->registerComponent<Damage>();
-
-		//Register damage for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Damage>(
-			//Serialize
-			[](Damage const& comp) -> nlohmann::json {
-				return	{
-						{ "Damage", comp.damage },
-				};
-			},
-
-			//Deserialize
-			[](Damage& comp, nlohmann::json const& data) {
-				comp.damage = data.value("Damage", 1.0f);
-			},
-
-			// Override Serialize
-			[](Damage const& comp, Damage const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-
-				if (comp.damage != other_comp.damage) {
-					delta["Damage"] = comp.damage;
-				}
-
-				return delta;
-			},
-
-			// Override Deserialize for Damage
-			[](Damage& comp, nlohmann::json const& delta) {
-				if (delta.contains("Damage")) {
-					comp.damage = delta["Damage"];
-				}
-			}
-		);
 
 #ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Damage>(
@@ -232,9 +237,6 @@ namespace NIKE {
 				}
 			}
 		);
-
-		//Damage Prefab Comp
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Damage>();
 #endif
 	}
 }

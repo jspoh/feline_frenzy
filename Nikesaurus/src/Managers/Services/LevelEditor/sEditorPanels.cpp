@@ -2372,7 +2372,7 @@ namespace NIKE {
 			ImGui::Spacing();
 
 			//Iterate over all registered components
-			for (const auto& component : comp_funcs) {
+			for (const auto& component : NIKE_SERIALIZE_SERVICE->getCompFuncs()) {
 
 				//Check if component already exists
 				if (prefab_comps.find(component.first) != prefab_comps.end())
@@ -2524,7 +2524,7 @@ namespace NIKE {
 						current_index = 0;
 
 						//Load prefab comps
-						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, comp_funcs, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 						//Close the popup after loading
 						closePopUp(popup_id);

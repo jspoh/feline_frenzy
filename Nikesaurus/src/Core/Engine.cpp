@@ -59,6 +59,41 @@ namespace NIKE {
 		State::registerComponents();
 	}
 
+	void Core::Engine::registerDefEditorComponents() {
+		//Register Audio Components
+		Audio::registerEditorComponents();
+
+		//Register transform component
+		Transform::registerEditorComponents();
+
+		//Register physics components
+		Physics::registerEditorComponents();
+
+		//Register animation components
+		Animation::registerEditorComponents();
+
+		//Register render components
+		Render::registerEditorComponents();
+
+		//Register render components
+		GameLogic::registerEditorComponents();
+
+		//Register Enemy components
+		Enemy::registerEditorComponents();
+
+		//Register Despawn components
+		Despawn::registerEditorComponents();
+
+		//Register Element components
+		Element::registerEditorComponents();
+
+		//Register Combat components
+		Combat::registerEditorComponents();
+
+		// Regiser state component
+		State::registerEditorComponents();
+	}
+
 	void Core::Engine::registerDefSystems() {
 
 		//Register game logic manager
@@ -220,16 +255,19 @@ namespace NIKE {
 		// Init FSM
 		NIKE_FSM_SERVICE->init();
 
-#ifndef NDEBUG
-		//Init Level Editor
-		NIKE_LVLEDITOR_SERVICE->init(json_config);
-#endif
-
 		//Register Def Components
 		registerDefComponents();
 
 		//Register Def Managers
 		registerDefSystems();
+
+#ifndef NDEBUG
+		//Init Level Editor
+		NIKE_LVLEDITOR_SERVICE->init(json_config);
+
+		//Register default editor components
+		registerDefEditorComponents();
+#endif
 
 		int max_texture_units;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);

@@ -74,6 +74,10 @@ namespace NIKE {
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Transform>();
+	}
+
+	void Transform::registerEditorComponents() {
 #ifndef NDEBUG
 		//Register transform for level editor UI
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Transform>(
@@ -97,7 +101,7 @@ namespace NIKE {
 
 					//Check if position has finished editing
 					if (ImGui::IsItemDeactivatedAfterEdit()) {
-						
+
 						//Check for grid snapping
 						if (comp_panel.checkGridSnapping()) {
 							//Get snapped to cell position
@@ -194,8 +198,6 @@ namespace NIKE {
 				}
 			}
 		);
-
-		NIKE_LVLEDITOR_SERVICE->registerPrefabComp<Transform>();
 #endif
 	}
 }
