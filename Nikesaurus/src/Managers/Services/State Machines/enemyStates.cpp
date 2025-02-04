@@ -90,7 +90,7 @@ namespace NIKE {
 			}
 
 			// Look for entity w player component
-			for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
 				// If player entity exists
@@ -145,7 +145,7 @@ namespace NIKE {
 
 	void State::ChaseState::onUpdate(Entity::Type& entity)
 	{
-		for (const auto& other_entity : NIKE_ECS_MANAGER->getAllEntities())
+		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player"))
 		{
 			// Getting components from player and enemy entities
 			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
@@ -241,6 +241,11 @@ namespace NIKE {
 		}
 	}
 
+	void State::ChaseState::playWalkSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id)
+	{
+
+	}
+
 	/*******************************
 	* Death State functions
 	*****************************/
@@ -267,7 +272,7 @@ namespace NIKE {
 			// Use delta time to let animation play before deleting entity
 			static float dt = 0.0f;
 			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-			if (dt >= 0.5f) { 
+			if (dt >= 0.2f) { 
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 				// Reset delta time
 				dt = 0.f;
@@ -283,6 +288,10 @@ namespace NIKE {
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
 			Interaction::handleCollision(event->entity_a, event->entity_b);
 		}
+	}
+	void State::DeathState::playDeathSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id)
+	{
+
 	}
 }
 

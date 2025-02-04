@@ -118,32 +118,6 @@ namespace NIKE {
 			return INT_MAX;
 		}
 
-		void Istate::playSFX(Entity::Type& entity, bool play_or_stop)
-		{
-			auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-			if (e_sfx_comp.has_value()) {
-				auto& e_sfx = e_sfx_comp.value().get();
-
-				//Check if group exists
-				auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
-				if (!group) {
-					e_sfx.b_play_sfx = play_or_stop;
-					return;
-				}
-				else {
-					//Play sound
-					if (play_or_stop && !group->isPlaying()) {
-						e_sfx.b_play_sfx = play_or_stop;
-					}
-				}
-
-				//stop sfx
-				if (!play_or_stop) {
-					group->stop();
-				}
-			}
-		}
-
 		void Service::changeState(std::shared_ptr<Istate> new_state, Entity::Type& entity)
 		{
 

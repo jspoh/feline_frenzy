@@ -552,8 +552,8 @@ namespace NIKE {
         lua_state.set_function("SetGodMode", [&](Entity::Type entity, bool enable) {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
             if (health_comp) {
-                health_comp.value().get().invulnerableFlag = enable;
-                if (health_comp.value().get().invulnerableFlag) {
+                health_comp.value().get().invulnerable_flag = enable;
+                if (health_comp.value().get().invulnerable_flag) {
                     cout << "Player god mode enabled" << endl;
                 }
                 else {

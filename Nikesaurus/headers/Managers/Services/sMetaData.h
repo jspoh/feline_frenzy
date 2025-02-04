@@ -34,13 +34,16 @@ namespace NIKE {
 			//Layer ID
 			unsigned int layer_id;
 
+			//Layer order
+			size_t layer_order;
+
 			//Dynamic tagging
 			std::set<std::string> tags;
 
 			//Constructors
-			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 } {}
+			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
 			EntityData(std::string const& name)
-				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 } {}
+				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
 
 			//Serialize data
 			nlohmann::json serialize() const;
@@ -164,6 +167,12 @@ namespace NIKE {
 
 			//Get Entity layer ID
 			unsigned int getEntityLayerID(Entity::Type entity) const;
+
+			//Set Entity layer order
+			void setEntityLayerOrder(Entity::Type entity, size_t layer_id);
+
+			//Get Entity layer order
+			size_t getEntityLayerOrder(Entity::Type entity) const;
 
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);

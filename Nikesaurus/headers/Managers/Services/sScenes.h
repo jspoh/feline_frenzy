@@ -28,6 +28,7 @@ namespace NIKE {
 		public:
 			using LayerMask = std::bitset<64>;
 		private:
+			
 			//Friend of layer class
 			friend class Service;
 
@@ -39,6 +40,9 @@ namespace NIKE {
 
 			//Layer state
 			bool b_state;
+
+			//Vector of entity in order
+			std::vector<Entity::Type> entities;
 		public:
 			Layer() : b_state{ true }, id{ 0 } {}
 			~Layer() = default;
@@ -57,6 +61,30 @@ namespace NIKE {
 
 			//Get layer mask
 			LayerMask getLayerMask() const;
+
+			//Insert entity
+			void insertEntity(Entity::Type entity);
+
+			//Remove entity
+			void removeEntity(Entity::Type entity);
+
+			//Check entity
+			bool checkEntity(Entity::Type entity);
+
+			//Sort entities
+			void sortEntitiesBasedOnMetaData();
+
+			//Set entity order in layer
+			void setEntityOrder(Entity::Type entity, size_t order_in_layer);
+
+			//get entity order in layer
+			size_t getEntityOrder(Entity::Type entity) const;
+
+			//Get entities
+			std::vector<Entity::Type> getEntitites() const;
+
+			//Get entities size
+			size_t getEntitiesSize() const;
 
 			//Serialize layer
 			nlohmann::json serialize() const;

@@ -212,5 +212,11 @@ namespace NIKE {
 			// Set force
 			bullet_physics_comp.value().get().force = { direction.x, direction.y };
 		}
+
+		//Set bullet SFX
+		auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
+		if (bullet_sfx.has_value()) {
+			bullet_sfx.value().get().b_play_sfx = true;
+		}
 	}
 }

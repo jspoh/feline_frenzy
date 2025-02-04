@@ -51,6 +51,10 @@ namespace NIKE {
 		//Remove entities that are no longer in the ECS
 		for (auto it = entities.begin(); it != entities.end();) {
 			if (ecs_entities.find(it->first) == ecs_entities.end()) {
+				//Remove entity from layer
+				NIKE_SCENES_SERVICE->getLayer(it->second.layer_id)->removeEntity(it->first);
+
+				//Erase entity
 				it = entities.erase(it);
 			}
 			else {
@@ -72,7 +76,17 @@ namespace NIKE {
 		for (auto& entity : ecs_entities) {
 
 			//Update entities ref
-			if (entities.find(entity) == entities.end() || entities.at(entity).name.find(def_name) != std::string::npos) {
+			if (entities.find(entity) == entities.end()) {
+
+				//Create identifier for entity
+				char entity_name[32];
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				entities[entity].name = entity_name;
+
+				//Set a proper layer ID
+				setEntityLayerID(entity, 0);
+			}
+			else if (entities.at(entity).name.find(def_name) != std::string::npos) {
 
 				//Create identifier for entity
 				char entity_name[32];
@@ -310,8 +324,26 @@ namespace NIKE {
 			return;
 		}
 
+		//Check if layer ID is valid
+		if (layer_id < 0 && layer_id >= NIKE_SCENES_SERVICE->getLayerCount()) {
+			NIKEE_CORE_WARN("Layer ID out of range");
+			return;
+		}
+
+		//Remove entity from prev layer
+		if (NIKE_SCENES_SERVICE->checkLayer(entities.at(entity).layer_id)) {
+			NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id)->removeEntity(entity);
+		}
+
 		//Set layer ID
 		entities.at(entity).layer_id = layer_id;
+
+		//Insert entity into new layer
+		auto layer = NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id);
+		layer->insertEntity(entity);
+
+		//Get layer order assigned
+		entities.at(entity).layer_order = layer->getEntityOrder(entity);
 	}
 
 	unsigned int MetaData::Service::getEntityLayerID(Entity::Type entity) const {
@@ -323,6 +355,38 @@ namespace NIKE {
 
 		//Return layer ID
 		return entities.at(entity).layer_id;
+	}
+
+	void MetaData::Service::setEntityLayerOrder(Entity::Type entity, size_t layer_order) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if layer ID is valid
+		if (layer_order < 0 && layer_order >= NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id)->getEntitites().size()) {
+			NIKEE_CORE_WARN("Layer Order out of range");
+			return;
+		}
+
+		//Set layer Order
+		entities.at(entity).layer_order = layer_order;
+
+		//Set layer order within layer
+		auto layer = NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id);
+		layer->setEntityOrder(entity, entities.at(entity).layer_order);
+	}
+
+	size_t MetaData::Service::getEntityLayerOrder(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return 0;
+		}
+
+		//Return layer ID
+		return entities.at(entity).layer_order;
 	}
 
 	std::set<std::string> MetaData::Service::getEntityTags(Entity::Type entity) {
