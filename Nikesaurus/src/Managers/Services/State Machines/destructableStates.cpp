@@ -38,7 +38,6 @@ namespace NIKE {
 		//		dt = 0.f;
 		//	}
 		//}
-		NIKE_METADATA_SERVICE->destroyEntity(entity);
 	}
 
 	void State::DestructableDeathState::onExit([[maybe_unused]] Entity::Type& entity)

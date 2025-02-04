@@ -11,6 +11,7 @@
 #include "Managers/Services/Lua/sLuaBindings.h"
 
 namespace NIKE {
+
     void Lua::luaKeyBinds(sol::state& lua_state) {
 
         //Lua key bindings
@@ -283,12 +284,17 @@ namespace NIKE {
 
         //Register destroy entity
         lua_state.set_function("KillEntity", [&](Entity::Type entity) {
-            NIKE_ECS_MANAGER->destroyEntity(entity);
+            NIKE_METADATA_SERVICE->destroyEntity(entity);
             });
 
     }
 
     void Lua::luaGameBinds(sol::state& lua_state) {
+
+        //Register destroy entity
+        lua_state.set_function("KillEntity", [&](Entity::Type entity) {
+            NIKE_METADATA_SERVICE->destroyEntity(entity);
+            });
 
         //Apply force to entities
         lua_state.set_function("ApplyForce", [&](Entity::Type entity, float x, float y) {
@@ -298,6 +304,12 @@ namespace NIKE {
                 e_trans_comp.value().get().force.y = y;
             }
             });
+
+        //Get fixed delta time
+        lua_state.set_function("GetFixedDeltaTime", [&]()-> float {
+            return NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+            }
+        );
 
         //Change animation start & end
         lua_state.set_function("AnimationStart", [&](Entity::Type entity, int start_x, int start_y) {
@@ -533,6 +545,19 @@ namespace NIKE {
                 e_trans_comp.value().get().position.x = x;
                 e_trans_comp.value().get().position.y = y;
             }
+            });
+
+        // Player death annimation function
+        lua_state.set_function("CheckDeath", [&](Entity::Type entity) -> bool {
+            auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+            if (health_comp.has_value()) {
+                // When player do not have any health
+                if (health_comp.value().get().lives <= 0)
+                {
+                    return true;
+                }
+            }
+            return false;
             });
 
         //Play audio
