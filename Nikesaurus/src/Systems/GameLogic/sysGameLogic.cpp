@@ -95,6 +95,7 @@ namespace NIKE {
 						
 
 						// Update healthbar location
+						// !TODO: Offset the healthbar to the left
 						healthbar_pos.x = player_pos.x;
 						healthbar_pos.y = player_pos.y + offset_y * 0.8f;
 					}

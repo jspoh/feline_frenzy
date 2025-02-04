@@ -70,6 +70,12 @@ namespace NIKE {
                         }
                     }
                 }
+
+                // Check for healthdrop tag
+                        // Check for state component
+                        // If death state
+                        // Spawn health pack
+
             }
         }
 
@@ -99,6 +105,39 @@ namespace NIKE {
                 if (a_damage_comp.has_value()) applyDamage(entity_a, entity_b);
                 if (b_damage_comp.has_value()) applyDamage(entity_b, entity_a);
             }
+
+            // Collision between health drop and health
+            const auto a_health_drop_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_a);
+            const auto b_health_drop_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_b);
+
+            if (a_health_drop_comp.has_value() || b_health_drop_comp.has_value()) {
+                if (a_health_drop_comp.has_value()) restoreHealth(entity_a, entity_b);
+                if (b_health_drop_comp.has_value()) restoreHealth(entity_b, entity_a);
+            }
+        }
+
+        void restoreHealth(Entity::Type healer, Entity::Type target) {
+            const auto healer_heal_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(healer);
+            const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
+            const auto& healer_heal = healer_heal_comp.value().get().heal_amount;
+
+            // Return if target has no health
+            if (target_health_comp.has_value() == false) {
+                return;
+            }
+
+            //const auto target_player_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(target);
+            //auto& player_faction = target_player_comp.value().get().faction;
+            
+            // !TODO: Return if faction not player
+
+            auto& target_health = target_health_comp.value().get().health;
+            const auto& target_max_health = target_health_comp.value().get().max_health;
+
+            // Heal Target
+            if (target_health < target_max_health) {
+                target_health += healer_heal;
+            }
         }
 
         void applyDamage(Entity::Type attacker, Entity::Type target) {
@@ -108,7 +147,7 @@ namespace NIKE {
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if (!(attacker_damage_comp.has_value() && target_health_comp.has_value())) {
+            if ((attacker_damage_comp.has_value() && target_health_comp.has_value()) == false) {
                 return;
             }
 
