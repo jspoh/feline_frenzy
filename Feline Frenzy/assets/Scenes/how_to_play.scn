@@ -27,6 +27,9 @@
         }
     },
     {
+        "Layer Count": 2
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -70,26 +73,17 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
                             "Name": "entity_0000",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         }
                     }
-                }
-            ],
-            "ID": 0,
-            "Mask": 1
-        }
-    },
-    {
-        "Layer": {
-            "B_State": true,
-            "Entities": [
+                },
                 {
                     "Entity": {
                         "Components": {
@@ -130,10 +124,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
                             "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -181,10 +175,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -224,10 +218,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
                             "Name": "entity_0003",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -245,6 +239,14 @@
                     }
                 }
             ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
             "ID": 1,
             "Mask": 2
         }
