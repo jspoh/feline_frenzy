@@ -71,6 +71,36 @@ namespace NIKE {
 					}
 				}
 
+				// Health bar logic
+				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
+					// Look for player
+					for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+						const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+						const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
+						const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+						// Check for missing component
+						if (e_player_health.has_value() == false || e_player_transform.has_value() == false || e_healthbar_transform.has_value() == false) {
+							NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
+							return;
+						}
+
+						const auto& player_pos = e_player_transform.value().get().position;
+						const auto& player_scale = e_player_transform.value().get().scale;
+						auto& healthbar_pos = e_healthbar_transform.value().get().position;
+						auto& healthbar_scale = e_healthbar_transform.value().get().scale;
+						const float offset_y = player_scale.y*0.9f;
+
+						// Set healthbar to player health
+						healthbar_scale.x = (e_player_health.value().get().health / e_player_health.value().get().max_health) * 150.0f;
+						
+
+						// Update healthbar location
+						// !TODO: Offset the healthbar to the left
+						healthbar_pos.x = player_pos.x;
+						healthbar_pos.y = player_pos.y + offset_y * 0.8f;
+					}
+				}
+
 				// Update of FSM will be called here
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}

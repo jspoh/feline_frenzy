@@ -31,6 +31,7 @@
         "MetaData": {
             "Entity_Tags": [
                 "enemy",
+                "healthbar",
                 "objects",
                 "player"
             ]
@@ -920,6 +921,12 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "Lives": 1,
+                                "MaxHealth": 100.0,
+                                "invulnerable_flag": false
+                            },
                             "Element::Entity": {
                                 "Element": 1
                             },
@@ -965,7 +972,7 @@
                                     "x": -138.10108947753906,
                                     "y": -163.7489776611328
                                 },
-                                "Zoom": 2.0091185569763184
+                                "Zoom": 1.2473058700561523
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1340,9 +1347,19 @@
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
                                 "Components": {
+                                    "Animation::Base": {
+                                        "Animation_Count": 0,
+                                        "B_PingPong": false,
+                                        "B_Reverse": false,
+                                        "Completed_Animations": 0,
+                                        "Frame_Duration": 0.0,
+                                        "Mode": 0,
+                                        "Timer": 0.0
+                                    },
                                     "Combat::Health": {
                                         "Health": 100.0,
                                         "Lives": 1,
+                                        "MaxHealth": 100.0,
                                         "invulnerable_flag": false
                                     },
                                     "Physics::Collider": null,
@@ -1976,6 +1993,33 @@
                             "Prefab_Override": null,
                             "Tags": [
                                 "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
+                            "Name": "healthbar",
+                            "Prefab_ID": "healthBar.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                }
+                            },
+                            "Tags": [
+                                "healthbar"
                             ]
                         }
                     }

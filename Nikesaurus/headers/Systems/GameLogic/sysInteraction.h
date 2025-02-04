@@ -25,6 +25,9 @@ namespace NIKE {
         // Apply damage
         void applyDamage(Entity::Type attacker, Entity::Type target);
 
+        // Restore Health
+        void restoreHealth(Entity::Type healer, Entity::Type target);
+
         // Change element
         void changeElement(Entity::Type player, Entity::Type source);
 

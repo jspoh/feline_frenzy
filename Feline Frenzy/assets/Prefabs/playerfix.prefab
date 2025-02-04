@@ -39,6 +39,7 @@
 	},
         "Combat::Health": {
             "Health": 100.0,
+            "MaxHealth": 100.0,
             "InvulnerableFlag": true,
             "Lives": 1
         },
