@@ -159,7 +159,7 @@
                             "Script": {
                                 "Function": "Change",
                                 "Named_Args": {
-                                    "scene": "Demo.scn"
+                                    "scene": "lvl1Copy.scn"
                                 },
                                 "Script_ID": "ChangeScene.lua"
                             }
