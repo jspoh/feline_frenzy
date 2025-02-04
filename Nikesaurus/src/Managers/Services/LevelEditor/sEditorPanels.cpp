@@ -453,11 +453,11 @@ namespace NIKE {
 		try {
 			auto const& data = config.at("EditorConfig");
 
-			b_debug_mode = data.at("Debug_Mode").get<bool>();
-			b_gizmo_state = data.at("Gizmo_State").get<bool>();
-			b_grid_state = data.at("Grid_State").get<bool>();
+			b_debug_mode = data.value("Debug_Mode", false);
+			b_gizmo_state = data.value("Gizmo_State", false);
+			b_grid_state = data.value("Grid_State", false);
 
-			setGameState(data.at("Game_State").get<bool>());
+			setGameState(data.value("Game_State", false));
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
