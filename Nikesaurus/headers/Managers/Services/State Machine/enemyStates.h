@@ -54,7 +54,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
-
+			void updateAttackAnimation(Entity::Type& entity);
 		};
 
 		class ChaseState : public StateMachine::Istate

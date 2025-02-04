@@ -160,6 +160,11 @@ namespace NIKE {
 		}
 	}
 
+	void State::AttackState::updateAttackAnimation(Entity::Type& entity)
+	{
+
+	}
+
 	/*******************************
 	* Chase State functions
 	*****************************/
