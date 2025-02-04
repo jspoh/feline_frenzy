@@ -318,15 +318,6 @@ namespace NIKE {
 					continue;
 				}
 
-				//Calculate Delta Time
-				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-
-				//Update all audio pending actions
-				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
-
-				//Update scenes manager
-				NIKE_SCENES_SERVICE->update();
-
 				//Escape Key
 				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
@@ -337,14 +328,23 @@ namespace NIKE {
 					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 				}
 
-				//Update map grid
-				NIKE_MAP_SERVICE->gridUpdate();
+				//Calculate Delta Time
+				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
 
-				//Update all systems
+				//Update all systems ( Always update systems before any other services )
 				NIKE_ECS_MANAGER->updateSystems();
 
 				//Update meta data
 				NIKE_METADATA_SERVICE->update();
+
+				//Update scenes manager
+				NIKE_SCENES_SERVICE->update();
+
+				//Update map grid
+				NIKE_MAP_SERVICE->gridUpdate();
+
+				//Update all audio pending actions
+				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
 #ifndef NDEBUG
 				//Update & Render Level Editor
