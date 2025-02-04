@@ -648,10 +648,10 @@ namespace NIKE {
 					auto temp = NIKE_ECS_MANAGER->createEntity();
 
 					//Deserialize
-					NIKE_SERIALIZE_SERVICE->loadEntityFromFile(temp, asset_data.second.primary_path.string());
+					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(temp, asset_data.first);
 
 					//Serialize
-					NIKE_SERIALIZE_SERVICE->saveEntityToFile(temp, asset_data.second.primary_path.string());
+					NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(temp), asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityLayerID(temp));
 
 					break;
 				}

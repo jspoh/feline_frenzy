@@ -36,12 +36,12 @@
         },
         "Combat::Faction": {
             "Faction": 1
-	},
+        },
         "Combat::Health": {
             "Health": 100.0,
+            "Lives": 1,
             "MaxHealth": 100.0,
-            "InvulnerableFlag": true,
-            "Lives": 1
+            "invulnerable_flag": false
         },
         "Element::Entity": {
             "Element": 0

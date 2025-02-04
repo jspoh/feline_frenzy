@@ -327,7 +327,7 @@ namespace NIKE {
 		}
 
 		//Check if layer ID is valid
-		if (layer_id < 0 && layer_id >= NIKE_SCENES_SERVICE->getLayerCount()) {
+		if (layer_id < 0 || layer_id >= NIKE_SCENES_SERVICE->getLayerCount()) {
 			NIKEE_CORE_WARN("Layer ID out of range");
 			return;
 		}
@@ -340,12 +340,16 @@ namespace NIKE {
 		//Set layer ID
 		entities.at(entity).layer_id = layer_id;
 
-		//Insert entity into new layer
-		auto layer = NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id);
-		layer->insertEntity(entity);
+		//Check if layer exists
+		if (NIKE_SCENES_SERVICE->checkLayer(entities.at(entity).layer_id)) {
 
-		//Get layer order assigned
-		entities.at(entity).layer_order = layer->getEntityOrder(entity);
+			//Insert entity into new layer
+			auto layer = NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id);
+			layer->insertEntity(entity);
+
+			//Get layer order assigned
+			entities.at(entity).layer_order = layer->getEntityOrder(entity);
+		}
 	}
 
 	unsigned int MetaData::Service::getEntityLayerID(Entity::Type entity) const {

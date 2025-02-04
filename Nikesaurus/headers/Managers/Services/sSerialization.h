@@ -118,10 +118,10 @@ namespace NIKE {
 			void loadGridFromFile(const std::string& file_path);
 
 			//Serialize Prefab
-			void savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path);
+			void savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, unsigned int layer_id = 0);
 
 			//Deserialize Prefab
-			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path);
+			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, unsigned int& layer_id, std::string const& file_path);
 
 			//Serialize prefab overrides
 			nlohmann::json serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id);

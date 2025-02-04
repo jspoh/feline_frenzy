@@ -38,6 +38,9 @@
         }
     },
     {
+        "Layer Count": 5
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -1266,7 +1269,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 18,
                             "Name": "barrel_3",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1291,7 +1294,8 @@
                                             "y": -191.4810333251953
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1304,7 +1308,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 19,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1329,7 +1333,8 @@
                                             "y": 565.755126953125
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1342,7 +1347,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 20,
                             "Name": "barrel_1",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1375,7 +1380,8 @@
                                         "State": "Idle"
                                     },
                                     "Transform::Transform": null
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1388,7 +1394,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 21,
                             "Name": "yellow_tree1",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1413,7 +1419,8 @@
                                             "y": 129.9788818359375
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1426,7 +1433,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 22,
                             "Name": "yellow_tree3",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1451,7 +1458,8 @@
                                             "y": -440.776123046875
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1464,7 +1472,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 23,
                             "Name": "pink_tree1",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1489,7 +1497,8 @@
                                             "y": 539.44580078125
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1502,7 +1511,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 24,
                             "Name": "green_tree4",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1517,7 +1526,8 @@
                                         }
                                     },
                                     "Transform::Transform": null
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1530,7 +1540,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 25,
                             "Name": "green_tree1",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1555,7 +1565,8 @@
                                             "y": -196.44607543945313
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1568,7 +1579,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 26,
                             "Name": "green_tree3",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1593,7 +1604,8 @@
                                             "y": -610.4813232421875
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1606,7 +1618,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 27,
                             "Name": "green_tree2",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1643,7 +1655,8 @@
                                             "y": 688.1229858398438
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1656,7 +1669,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 28,
                             "Name": "yellow_tree2",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1681,7 +1694,8 @@
                                             "y": 594.9881591796875
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1694,7 +1708,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 29,
                             "Name": "pink_tree4",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1719,7 +1733,8 @@
                                             "y": -472.15814208984375
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1732,7 +1747,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 30,
                             "Name": "pink_tree2",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1757,7 +1772,8 @@
                                             "y": 720.3187255859375
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1770,7 +1786,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 31,
                             "Name": "entity_0031",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1795,7 +1811,8 @@
                                             "y": 254.51080322265625
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -2002,7 +2019,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 34,
                             "Name": "healthbar",
                             "Prefab_ID": "healthBar.prefab",
                             "Prefab_Override": {
@@ -2016,7 +2033,8 @@
                                         }
                                     },
                                     "Transform::Transform": null
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "healthbar"

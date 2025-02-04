@@ -842,7 +842,7 @@ namespace NIKE {
 				auto prefab_path = NIKE_PATH_SERVICE->normalizePath(path);
 
 				//Save empty prefab to path
-				NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity), prefab_path.string());
+				NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity), prefab_path.string(), NIKE_METADATA_SERVICE->getEntityLayerID(selected_entity));
 
 				//Reset prefab id buffer
 				entity_prefab_id.clear();
@@ -2670,7 +2670,7 @@ namespace NIKE {
 						current_index = 0;
 
 						//Load prefab comps
-						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, prefab_layer_id, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 						//Close the popup after loading
 						closePopUp(popup_id);
@@ -2861,6 +2861,29 @@ namespace NIKE {
 
 			ImGui::Text("Modify Prefab Template");
 
+			//Display prefab layer ID
+			ImGui::Text("Layer ID: %d", prefab_layer_id);
+
+			ImGui::SameLine();
+
+			//Decrement
+			if (ImGui::SmallButton(" - ##PrefabLayerID")) {
+				if (prefab_layer_id > 0) {
+					prefab_layer_id = prefab_layer_id - 1;
+				}
+			}
+
+			ImGui::SameLine();
+
+			//Increment 
+			if (ImGui::SmallButton(" + ##PrefabLayerID")) {
+				if (prefab_layer_id < NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+					prefab_layer_id = prefab_layer_id + 1;
+				}
+			}
+
+			ImGui::Spacing();
+
 			//Add component
 			if (ImGui::Button("Add Component")) {
 				openPopUp("Add Component");
@@ -2920,7 +2943,7 @@ namespace NIKE {
 				prefab_comps.clear();
 
 				//Load prefab comps
-				NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+				NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, prefab_layer_id, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 				//createDisplayPrefab(asset_id);
 			}

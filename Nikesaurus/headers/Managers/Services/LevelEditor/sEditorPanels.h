@@ -413,6 +413,9 @@ namespace NIKE {
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
+			//Prefab layer ID
+			unsigned int prefab_layer_id;
+
 			//Map to array of component type
 			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
