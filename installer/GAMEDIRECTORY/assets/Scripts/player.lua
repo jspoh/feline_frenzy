@@ -65,13 +65,13 @@ function Player:Animate(entity, args)
             AnimationStart(entity, 0, 1)
             AnimationEnd(entity, 5, 1)
             FlipX(entity, true)
-            PlaySFX(entity, true)
+            PlaySFX(entity, false)
         else
             -- Idle facing left
             AnimationStart(entity, 0, 1)
             AnimationEnd(entity, 5, 1)
             FlipX(entity, true)
-            PlaySFX(entity, true)
+            PlaySFX(entity, false)
         end
     else
         -- Calculate angle of movement (in radians)
