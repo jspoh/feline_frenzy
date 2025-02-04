@@ -20,6 +20,7 @@ namespace NIKE {
 			{"Prefab_Override", prefab_override},
 			{"B_Locked", b_locked},
 			{"Layer_ID", layer_id},
+			{"Layer_Order", layer_order},
 			{"Tags", tags}
 		};
 	}
@@ -36,6 +37,7 @@ namespace NIKE {
 		prefab_override = data.value("Prefab_Override", nlohmann::json());
 		b_locked = data.value("B_Locked", false);
 		layer_id = data.value("Layer_ID", static_cast<unsigned int>(0));
+		layer_order = data.value("Layer_Order", static_cast<unsigned int>(0));
 
 		//Get tags
 		if (data.contains("Tags") && data["Tags"].is_array()) {

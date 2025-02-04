@@ -404,7 +404,7 @@ namespace NIKE {
 				else {
 					// initialization of fps text
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
-					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
+					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity();
 
 					NIKE_METADATA_SERVICE->setEntityName(FPS_DISPLAY_ENTITY, FPS_DISPLAY_NAME);
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));

@@ -26,6 +26,11 @@ namespace NIKE {
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
 
+			/***********************
+			* SFX handling
+			************************/
+			void playSFX(Entity::Type& entity, bool play_or_no) override;
+
 		private:
 
 		};
@@ -38,6 +43,11 @@ namespace NIKE {
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
+
+			/***********************
+			* SFX handling
+			************************/
+			void playSFX(Entity::Type& entity, bool play_or_no) override;
 
 
 			// Event handling for collisions
@@ -56,16 +66,18 @@ namespace NIKE {
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
 
+			/***********************
+			* SFX handling
+			************************/
+			void playSFX(Entity::Type& entity, bool play_or_no) override;
+
 		private:
 			//Acceptable offset per cell
 			float cell_offset;
 			float enemy_speed;
 
 			void updateChaseAnimation(Entity::Type& entity, float& dir);
-			/***********************
-			* SFX handling
-			************************/
-			void playWalkSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id);
+
 		};
 
 		class DeathState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
@@ -80,11 +92,13 @@ namespace NIKE {
 			// Event handling for collisions
 			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
-		private:
 			/***********************
 			* SFX handling
 			************************/
-			void playDeathSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id);
+			void playSFX(Entity::Type& entity, bool play_or_no) override;
+
+		private:
+
 		};
 	}
 }

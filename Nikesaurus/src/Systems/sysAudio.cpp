@@ -25,11 +25,7 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 
-			for (auto& entity : entities) {
-
-				//Skip entities that are not present within layer
-				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
+			for (auto& entity : layer->getEntitites()) {
 
 				//If there is sfx value
 				if (auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity); e_sfx_comp.has_value()) {

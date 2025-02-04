@@ -24,15 +24,14 @@ namespace NIKE {
 
             // Reverse iterate through layers
             for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
+
+                //Skip inactive layers
                 if (!(*layer)->getLayerState())
                     continue;
 
                 // Iterate through all entities
-                for (auto& entity : entities) {
+                for (auto& entity : (*layer)->getEntitites()) {
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-
-                        if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-                            continue;
 
                         // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
@@ -145,7 +144,8 @@ namespace NIKE {
             if (e_audio_comp.has_value())
             {
                 auto& audio_comp = e_audio_comp.value().get();
-                //audio_comp.channel_group_id 
+                audio_comp.channel_group_id = "EnemyGetHit.wav";
+                audio_comp.b_play_sfx = true;
             }
 
 			// Check if target health drops to zero or below

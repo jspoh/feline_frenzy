@@ -29,9 +29,7 @@ namespace NIKE {
 				continue;
 
 			//Iterate through all entities
-			for (auto& entity : entities) {
-				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
+			for (auto& entity : (*layer)->getEntitites()) {
 
 				//Check for player logic comp
 				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
@@ -118,7 +116,7 @@ namespace NIKE {
 		const Vector2f& spawner_pos = e_transform_comp.value().get().position;
 
 		// Create enemy entity
-		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity(0);
+		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
 		// Load entity from prefab
 		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
@@ -129,8 +127,8 @@ namespace NIKE {
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
 		// Randomly offset from spawner position
-		float offset_x = static_cast<float>(getRandomNumber(-20, 20));
-		float offset_y = static_cast<float>(getRandomNumber(-20, 20));
+		float offset_x = getRandomNumber(-20.f, 20.f);
+		float offset_y = getRandomNumber(-20.f, 20.f);
 
 		// Set Enemy Position
 		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy_entity);
