@@ -30,23 +30,29 @@ namespace NIKE {
 			float blend_intensity{};
 		};
 
-		class FramebufferTexture {
-			public:
-				unsigned int frame_buffer{};
-				unsigned int texture_color_buffer{};
+		struct FramebufferTexture {
+			unsigned int frame_buffer{};
+			unsigned int texture_color_buffer{};
 
-				int width{};
-				int height{};
+			int width{};
+			int height{};
 
-				void init();
+			bool b_window_sized;
+
+			void init(Vector2i const& size);
+
+			//Default constructor
+			FramebufferTexture() : frame_buffer{ 0 }, texture_color_buffer{ 0 }, width{ 1 }, height{ 1 }, b_window_sized{ false } {};
 		};
 
-		class TextBuffer {
-			public:
-				unsigned int vao{}; // Vertex Array Object
-				unsigned int vbo{}; // Vertex Buffer Object
+		struct TextBuffer {
+			unsigned int vao{}; // Vertex Array Object
+			unsigned int vbo{}; // Vertex Buffer Object
 
-				void init();
+			void init();
+
+			//Default constructor
+			TextBuffer() : vao{ 0 }, vbo{ 0 } {};
 		};
 
 		class Service : public Events::IEventListener<Windows::WindowResized> {
@@ -61,7 +67,12 @@ namespace NIKE {
 
 				//Shader system
 				std::unique_ptr<Shader::ShaderManager> shader_manager;
+
+				//Text buffer for rendering text
 				TextBuffer text_buffer;
+
+				//Map of framebuffer
+				std::unordered_map<std::string, FramebufferTexture> frame_buffers;
 
 			public:
 
@@ -74,14 +85,31 @@ namespace NIKE {
 
 				Service() = default;
 				~Service() = default;
-				
-				FramebufferTexture framebuffer_tex;
 
 				/*****************************************************************//**
 				* INITIALIZATION
 				*********************************************************************/
 
 				void init();
+
+				/*****************************************************************//**
+				* FRAME BUFFERS
+				*********************************************************************/
+
+				//Create new frame buffer
+				void createFrameBuffer(std::string const& name, Vector2i const& size, bool b_window_sized = false);
+
+				//Create new frame buffer
+				void deleteFrameBuffer(std::string const& name);
+
+				//Create new frame buffer
+				FramebufferTexture getFrameBuffer(std::string const& name);
+
+				//Bind frame buffer
+				void bindFrameBuffer(std::string const& name);
+
+				//Unbind frame buffer
+				void unbindFrameBuffer();
 
 				/*****************************************************************//**
 				* TRANSFORM

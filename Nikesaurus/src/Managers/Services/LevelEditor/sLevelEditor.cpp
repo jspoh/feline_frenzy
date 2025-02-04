@@ -430,6 +430,22 @@ namespace NIKE {
 		return std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getGameState();
 	}
 
+	void LevelEditor::Service::bindEditorFrameBuffer() const {
+		//render to framebuffer if imgui is active
+		if (b_editor_active) {
+			NIKE_RENDER_SERVICE->bindFrameBuffer(std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()))->getEditorFrameBuffer());
+		}
+		else {
+			NIKE_RENDER_SERVICE->unbindFrameBuffer();
+		}
+	}
+
+	void LevelEditor::Service::unbindEditorFrameBuffer() const {
+		if (b_editor_active) {
+			NIKE_RENDER_SERVICE->unbindFrameBuffer();
+		}
+	}
+
 	void LevelEditor::Service::addPanel(std::shared_ptr<LevelEditor::IPanel> panel) {
 		auto it = panels_map.find(panel->getName());
 		if (it != panels_map.end()) {

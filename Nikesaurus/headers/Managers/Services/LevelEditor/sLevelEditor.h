@@ -100,6 +100,12 @@ namespace NIKE {
 			//Get Game State
 			bool getGameState() const;
 
+			//Bind editor frame buffer
+			void bindEditorFrameBuffer() const;
+
+			//unBind editor frame buffer
+			void unbindEditorFrameBuffer() const;
+
 			//Add panel ( added into map based on IPanel getName() )
 			void addPanel(std::shared_ptr<IPanel> panel);
 

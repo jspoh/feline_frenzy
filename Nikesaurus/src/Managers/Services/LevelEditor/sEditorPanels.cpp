@@ -454,11 +454,11 @@ namespace NIKE {
 		try {
 			auto const& data = config.at("EditorConfig");
 
-			b_debug_mode = data.at("Debug_Mode").get<bool>();
-			b_gizmo_state = data.at("Gizmo_State").get<bool>();
-			b_grid_state = data.at("Grid_State").get<bool>();
+			b_debug_mode = data.value("Debug_Mode", false);
+			b_gizmo_state = data.value("Gizmo_State", false);
+			b_grid_state = data.value("Grid_State", false);
 
-			setGameState(data.at("Game_State").get<bool>());
+			setGameState(data.value("Game_State", false));
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -6097,11 +6097,6 @@ namespace NIKE {
 		}
 	}
 
-	void LevelEditor::GameWindowPanel::onEvent(std::shared_ptr<Render::ViewportTexture> event) {
-		texture_id = event->tex_id;
-		event->setEventProcessed(true);
-	}
-
 	Vector2f LevelEditor::GameWindowPanel::getWorldMousePos() const {
 		return world_mouse_pos;
 	}
@@ -6127,9 +6122,11 @@ namespace NIKE {
 		}
 	}
 
+	std::string LevelEditor::GameWindowPanel::getEditorFrameBuffer() const {
+		return editor_frame_buffer;
+	}
+
 	void LevelEditor::GameWindowPanel::init() {
-		std::shared_ptr<GameWindowPanel> game_window_listener(this, [](GameWindowPanel*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<Render::ViewportTexture>(game_window_listener);
 
 		//Usage of tile map panel for rendering grid
 		tile_map_panel = std::dynamic_pointer_cast<TileMapPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(TileMapPanel::getStaticName()));
@@ -6139,6 +6136,10 @@ namespace NIKE {
 
 		//Components panel reference
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
+
+		//Create frame buffer for rendering game preview
+		editor_frame_buffer = "EditorBuffer";
+		NIKE_RENDER_SERVICE->createFrameBuffer(editor_frame_buffer, Vector2i(), true);
 	}
 
 	void LevelEditor::GameWindowPanel::render()
@@ -6193,7 +6194,7 @@ namespace NIKE {
 		ImVec2 uv1(u_max, -v_max); // Top-right
 
 		//Render game to viewport
-		ImGui::Image((ImTextureID)texture_id, ImVec2(viewport_width, viewport_height), uv0, uv1);
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(editor_frame_buffer).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		//Accept render assets payload
 		renderAcceptPayload();
