@@ -896,6 +896,9 @@ namespace NIKE {
 	void LevelEditor::EntitiesPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Reset entity changed flag
+		b_entity_changed = false;
+
 		//Create entity tags
 		if (ImGui::CollapsingHeader("Entity Tags")) {
 
@@ -984,7 +987,212 @@ namespace NIKE {
 			}
 		}
 
-		//If an entity is selected
+		//Add spacing
+		ImGui::Spacing();
+
+		//Create entity tags
+		if (ImGui::CollapsingHeader("Entities")) {
+
+			//Show number of entities in the level
+			ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Tag filtering
+			ImGui::SeparatorText("Tag Filtering");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Static selected index
+			static int selected_tag_filter = 0;
+
+			//Static tag filter
+			static std::string tag_filter = "";
+
+			//Tag const char* container
+			std::vector<const char*> tag_container = { "None" };
+			for (auto const& str : NIKE_METADATA_SERVICE->getRegisteredTags()) {
+				tag_container.push_back(str.c_str());
+			}
+
+			//Select tag filter
+			if (ImGui::Combo("##TagDropDown", &selected_tag_filter, tag_container.data(), static_cast<int>(tag_container.size()))) {
+				if (selected_tag_filter > 0 && selected_tag_filter < static_cast<int>(tag_container.size())) {
+					tag_filter = tag_container[selected_tag_filter];
+				}
+				else {
+					tag_filter = "";
+				}
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Tag filtering
+			ImGui::SeparatorText("Entities Inspector");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Iterate through layers to get entities within layer
+			for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+				if (ImGui::CollapsingHeader((std::string("Layer ") + std::to_string(layer->getLayerID())).c_str())) {
+
+					//Drop Entity payload for layer ID
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string("Selected Entity").c_str())) {
+							//Get entity tag
+							Entity::Type entity_dragged = *(Entity::Type*)payload->Data;
+
+							//Change layer ID
+							NIKE_METADATA_SERVICE->setEntityLayerID(entity_dragged, layer->getLayerID());
+						}
+						ImGui::EndDragDropTarget();
+					}
+
+					//Show number of entities in the level
+					ImGui::Text("Number of entities in layer: %d", layer->getEntitiesSize());
+
+					// Button to create an entity, which triggers the popup
+					if (ImGui::Button("Create##Entity")) {
+						openPopUp("Create Entity");
+					}
+
+					//Buttons Same Line
+					ImGui::SameLine();
+
+					// Button to remove an entity, which triggers the popup
+					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
+						openPopUp("Remove Entity");
+					}
+
+					//Buttons Same Line
+					ImGui::SameLine();
+
+					// Button to clone an entity, which triggers the popup
+					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && ImGui::Button("Clone##Entity")) {
+						openPopUp("Clone Entity");
+					}
+
+					//Add Spacing
+					ImGui::Spacing();
+
+					//Iterate through entities within layer
+					for (auto entity : layer->getEntitites()) {
+
+						//Entity data
+						auto entity_name = NIKE_METADATA_SERVICE->getEntityName(entity);
+						auto entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
+						if (entity_name == "" || (!tag_filter.empty() && entity_tags.find(tag_filter) == entity_tags.end())) continue;
+
+						//Check if entity is selected
+						bool selected = NIKE_ECS_MANAGER->checkEntity(selected_entity) && entity == selected_entity;
+
+						// Show selectable
+						if (ImGui::Selectable((entity_name + "##Entity").c_str(), selected)) {
+							// Check if currently editing grid
+							if (tilemap_panel.lock()->checkGridEditing()) {
+								error_msg->assign("Editing grid now, unable to select entity.");
+								openPopUp("Error");
+								unselectEntity();
+								break;
+							}
+
+							// Prepare for redo/undo if the entity selection changes
+							if (selected_entity != entity) {
+								LevelEditor::Action select_entity_action;
+
+								// Capture current and previous selected entities
+								auto prev_entity = selected_entity;
+								auto new_entity = entity;
+
+								// Define the do action for selecting the new entity
+								select_entity_action.do_action = [&, prev_entity, new_entity]() {
+									selected_entity = new_entity;
+									b_entity_changed = true;
+									};
+
+								// Define the undo action for reverting to the previous entity
+								select_entity_action.undo_action = [&, prev_entity, new_entity]() {
+									selected_entity = prev_entity;
+									b_entity_changed = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
+							}
+							// Unselect the entity
+							else {
+								LevelEditor::Action unselect_entity_action;
+
+								// Capture the current selected entity
+								auto prev_entity = selected_entity;
+
+								// Define the do action for unselecting
+								unselect_entity_action.do_action = [&, prev_entity]() {
+									unselectEntity();
+									b_entity_changed = true;
+									};
+
+								// Define the undo action for reselecting the previous entity
+								unselect_entity_action.undo_action = [&, prev_entity]() {
+									selected_entity = prev_entity;
+									b_entity_changed = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
+							}
+						}
+
+						//Start drag-and-drop entity
+						if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+
+							//Set drag payload with asset tag
+							ImGui::SetDragDropPayload(std::string("Selected Entity").c_str(), &entity, sizeof(Entity::Type));
+							ImGui::Text(std::string("Entity: " + NIKE_METADATA_SERVICE->getEntityName(entity)).c_str());
+							ImGui::EndDragDropSource();
+						}
+						else {
+							//Hover item
+							if (ImGui::IsItemHovered()) {
+								ImGui::BeginTooltip();
+								ImGui::Text("Drag entity to reorder or change layer ID.");
+								ImGui::EndTooltip();
+							}
+						}
+
+						//Drop Entity tag payload
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string("Entity Tag").c_str())) {
+								//Get entity tag
+								std::string tag(static_cast<const char*>(payload->Data));
+
+								//Add tag for entity
+								NIKE_METADATA_SERVICE->addEntityTag(entity, tag);
+							}
+							ImGui::EndDragDropTarget();
+						}
+
+						//Drop Entity payload for layer order
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string("Selected Entity").c_str())) {
+								//Get entity tag
+								Entity::Type entity_dragged = *(Entity::Type*)payload->Data;
+
+								//Change entity order
+								NIKE_METADATA_SERVICE->setEntityLayerOrder(entity_dragged, NIKE_METADATA_SERVICE->getEntityLayerOrder(entity));
+							}
+							ImGui::EndDragDropTarget();
+						}
+					}
+				}
+			}
+		}
+
+		//Entity Metadata popup panel
 		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
 
 			// Get the Dock ID of the Entities Panel
@@ -994,7 +1202,7 @@ namespace NIKE {
 			ImGui::SetNextWindowDockID(entities_dock_id, ImGuiCond_Once);
 
 			//Begin entity metadata panel
-			ImGui::Begin((NIKE_METADATA_SERVICE->getEntityName(selected_entity) + "##SelectedEntity").c_str());
+			ImGui::Begin((NIKE_METADATA_SERVICE->getEntityName(selected_entity) + "##SelectedEntity").c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
 
 			//Static entity name input buffer
 			static std::string entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
@@ -1016,7 +1224,7 @@ namespace NIKE {
 
 			//Save new name
 			if (ImGui::SmallButton("Save##SaveNewEntityName")) {
-				if(NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
+				if (NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
 					NIKE_METADATA_SERVICE->setEntityName(selected_entity, entity_name);
 				}
 				else {
@@ -1080,6 +1288,62 @@ namespace NIKE {
 			//Add Spacing
 			ImGui::Spacing();
 
+			ImGui::SeparatorText("Set Layer ID##Entity MetaData");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Display entity current layer
+			auto entity_layer_id = NIKE_METADATA_SERVICE->getEntityLayerID(selected_entity);
+			ImGui::Text("Layer ID: %d", entity_layer_id);
+
+			ImGui::SameLine();
+
+			//Decrement
+			if (ImGui::SmallButton(" - ##MetaDataLayerID")) {
+				if (entity_layer_id > 0) {
+					NIKE_METADATA_SERVICE->setEntityLayerID(selected_entity, entity_layer_id - 1);
+				}
+			}
+
+			ImGui::SameLine();
+
+			//Increment 
+			if (ImGui::SmallButton(" + ##MetaDataLayerID")) {
+				if (entity_layer_id < NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+					NIKE_METADATA_SERVICE->setEntityLayerID(selected_entity, entity_layer_id + 1);
+				}
+			}
+
+			//Display entities count in current layer
+			auto entities_count = NIKE_SCENES_SERVICE->getLayer(entity_layer_id)->getEntitiesSize();
+			ImGui::Text("Layer Entities Count: %d", entities_count);
+
+			//Display entity current layer
+			auto entity_layer_order = NIKE_METADATA_SERVICE->getEntityLayerOrder(selected_entity);
+			ImGui::Text("Layer Order: %d", entity_layer_order);
+
+			ImGui::SameLine();
+
+			//Decrement
+			if (ImGui::SmallButton(" - ##MetaDataLayerOrder")) {
+				if (entity_layer_order > 0) {
+					NIKE_METADATA_SERVICE->setEntityLayerOrder(selected_entity, entity_layer_order - 1);
+				}
+			}
+
+			ImGui::SameLine();
+
+			//Increment 
+			if (ImGui::SmallButton(" + ##MetaDataLayerOrder")) {
+				if (entity_layer_order < entities_count - 1) {
+					NIKE_METADATA_SERVICE->setEntityLayerOrder(selected_entity, entity_layer_order + 1);
+				}
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
 			ImGui::SeparatorText("Entity Tags");
 
 			//Add Spacing
@@ -1116,168 +1380,6 @@ namespace NIKE {
 			}
 
 			ImGui::End();
-		}
-
-		//Add spacing
-		ImGui::Spacing();
-
-		//Create entity tags
-		if (ImGui::CollapsingHeader("Entities")) {
-
-			//Show number of entities in the level
-			ImGui::Text("Number of entities in level: %d", NIKE_ECS_MANAGER->getEntitiesCount());
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			//Tag filtering
-			ImGui::SeparatorText("Tag Filtering");
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			//Static selected index
-			static int selected_tag_filter = 0;
-
-			//Static tag filter
-			static std::string tag_filter = "";
-
-			//Tag const char* container
-			std::vector<const char*> tag_container = { "None" };
-			for (auto const& str : NIKE_METADATA_SERVICE->getRegisteredTags()) {
-				tag_container.push_back(str.c_str());
-			}
-
-			//Select tag filter
-			if (ImGui::Combo("##TagDropDown", &selected_tag_filter, tag_container.data(), static_cast<int>(tag_container.size()))) {
-				if (selected_tag_filter > 0 && selected_tag_filter < static_cast<int>(tag_container.size())) {
-					tag_filter = tag_container[selected_tag_filter];
-				}
-				else {
-					tag_filter = "";
-				}
-			}
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			//Tag filtering
-			ImGui::SeparatorText("Entities Inspector");
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			// Button to create an entity, which triggers the popup
-			if (ImGui::Button("Create##Entity")) {
-				openPopUp("Create Entity");
-			}
-
-			//Buttons Same Line
-			ImGui::SameLine();
-
-			// Button to remove an entity, which triggers the popup
-			if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
-				openPopUp("Remove Entity");
-			}
-
-			//Buttons Same Line
-			ImGui::SameLine();
-
-			// Button to clone an entity, which triggers the popup
-			if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::Button("Clone##Entity")) {
-				openPopUp("Clone Entity");
-			}
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			//Reset entity changed
-			b_entity_changed = false;
-
-			//Check if there are entities present
-			if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
-
-				//Iterate through all entities to showcase active entities
-				for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-
-					//Entity data
-					auto entity_name = NIKE_METADATA_SERVICE->getEntityName(entity);
-					auto entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
-					if (entity_name == "" || (!tag_filter.empty() && entity_tags.find(tag_filter) == entity_tags.end())) continue;
-
-					//Check if entity is selected
-					bool selected = NIKE_ECS_MANAGER->checkEntity(selected_entity) && entity == selected_entity;
-
-					// Show selectable
-					if (ImGui::Selectable((entity_name + "##Entity").c_str(), selected)) {
-						// Check if currently editing grid
-						if (tilemap_panel.lock()->checkGridEditing()) {
-							error_msg->assign("Editing grid now, unable to select entity.");
-							openPopUp("Error");
-							unselectEntity();
-							break;
-						}
-
-						// Prepare for redo/undo if the entity selection changes
-						if (selected_entity != entity) {
-							LevelEditor::Action select_entity_action;
-
-							// Capture current and previous selected entities
-							auto prev_entity = selected_entity;
-							auto new_entity = entity;
-
-							// Define the do action for selecting the new entity
-							select_entity_action.do_action = [&, prev_entity, new_entity]() {
-								selected_entity = new_entity;
-								b_entity_changed = true;
-								};
-
-							// Define the undo action for reverting to the previous entity
-							select_entity_action.undo_action = [&, prev_entity, new_entity]() {
-								selected_entity = prev_entity;
-								b_entity_changed = true;
-								};
-
-							// Execute the action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_entity_action));
-						}
-						// Unselect the entity
-						else {
-							LevelEditor::Action unselect_entity_action;
-
-							// Capture the current selected entity
-							auto prev_entity = selected_entity;
-
-							// Define the do action for unselecting
-							unselect_entity_action.do_action = [&, prev_entity]() {
-								unselectEntity();
-								b_entity_changed = true;
-								};
-
-							// Define the undo action for reselecting the previous entity
-							unselect_entity_action.undo_action = [&, prev_entity]() {
-								selected_entity = prev_entity;
-								b_entity_changed = true;
-								};
-
-							// Execute the action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(unselect_entity_action));
-						}
-					}
-
-					//Drop Entity tag payload
-					if (ImGui::BeginDragDropTarget()) {
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string("Entity Tag").c_str())) {
-							//Get entity tag
-							std::string tag(static_cast<const char*>(payload->Data));
-
-							//Add tag for entity
-							NIKE_METADATA_SERVICE->addEntityTag(entity, tag);
-						}
-						ImGui::EndDragDropTarget();
-					}
-				}
-			}
 		}
 
 		//Check for entity interaction

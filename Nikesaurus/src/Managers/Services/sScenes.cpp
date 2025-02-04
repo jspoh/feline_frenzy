@@ -62,6 +62,10 @@ namespace NIKE {
 		}
 	}
 
+	bool Scenes::Layer::checkEntity(Entity::Type entity) {
+		return std::find(entities.begin(), entities.end(), entity) != entities.end();
+	}
+
 	void Scenes::Layer::sortEntitiesBasedOnMetaData() {
 		if (entities.empty()) {
 			return;
@@ -94,6 +98,11 @@ namespace NIKE {
 		else {
 			std::rotate(entities.begin() + order_in_layer, entities.begin() + current_index, entities.begin() + current_index + 1);
 		}
+
+		//Update all entities layer order in metadata
+		for (size_t i = 0; i < entities.size(); ++i) {
+			NIKE_METADATA_SERVICE->setEntityLayerOrder(entities.at(i), i);
+		}
 	}
 
 	size_t Scenes::Layer::getEntityOrder(Entity::Type entity) const {
@@ -106,8 +115,12 @@ namespace NIKE {
 		}
 	}
 
-	std::vector<Entity::Type> Scenes::Layer::getEntitites() {
+	std::vector<Entity::Type> Scenes::Layer::getEntitites() const {
 		return entities;
+	}
+
+	size_t Scenes::Layer::getEntitiesSize() const {
+		return entities.size();
 	}
 
 	nlohmann::json Scenes::Layer::serialize() const {

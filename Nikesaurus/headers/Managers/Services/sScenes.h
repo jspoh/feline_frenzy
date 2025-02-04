@@ -68,6 +68,9 @@ namespace NIKE {
 			//Remove entity
 			void removeEntity(Entity::Type entity);
 
+			//Check entity
+			bool checkEntity(Entity::Type entity);
+
 			//Sort entities
 			void sortEntitiesBasedOnMetaData();
 
@@ -78,7 +81,10 @@ namespace NIKE {
 			size_t getEntityOrder(Entity::Type entity) const;
 
 			//Get entities
-			std::vector<Entity::Type> getEntitites();
+			std::vector<Entity::Type> getEntitites() const;
+
+			//Get entities size
+			size_t getEntitiesSize() const;
 
 			//Serialize layer
 			nlohmann::json serialize() const;
