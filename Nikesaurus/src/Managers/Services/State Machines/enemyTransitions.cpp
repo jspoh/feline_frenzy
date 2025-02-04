@@ -58,8 +58,10 @@ namespace NIKE {
 			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
 			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+			auto e_enemy_combat = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
 
-			if (e_player_comp.has_value() && e_player_transform.has_value() && e_enemy_transform.has_value())
+			if (e_player_comp.has_value() && e_player_transform.has_value() && e_enemy_transform.has_value() && 
+				e_enemy_combat.has_value())
 			{
 				auto& player_transform = e_player_transform.value().get();
 				auto& enemy_transform = e_enemy_transform.value().get();
@@ -120,7 +122,8 @@ namespace NIKE {
 	bool Transition::IdleToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-		if (target_health_comp.has_value())
+		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
+		if (target_health_comp.has_value() && faction_comp.has_value())
 		{
 			if (target_health_comp.value().get().lives <= 0) {
 				return true;
@@ -236,7 +239,8 @@ namespace NIKE {
 	bool Transition::AttackToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-		if (target_health_comp.has_value())
+		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
+		if (target_health_comp.has_value() && faction_comp.has_value())
 		{
 			if (target_health_comp.value().get().lives <= 0) {
 				return true;
@@ -314,7 +318,8 @@ namespace NIKE {
 	bool Transition::ChaseToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-		if (target_health_comp.has_value())
+		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
+		if (target_health_comp.has_value() && faction_comp.has_value())
 		{
 			if (target_health_comp.value().get().lives <= 0) {
 				return true;

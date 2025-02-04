@@ -25,6 +25,9 @@ namespace NIKE {
         // Apply damage
         void applyDamage(Entity::Type attacker, Entity::Type target);
 
+        // Restore Health
+        void restoreHealth(Entity::Type healer, Entity::Type target);
+
         // Change element
         void changeElement(Entity::Type player, Entity::Type source);
 
@@ -33,6 +36,8 @@ namespace NIKE {
 
         // Check if player is within range
         bool withinRange(const Entity::Type& source, const Entity::Type& player);
+
+        void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
 
         class Manager : 
             public System::ISystem {
