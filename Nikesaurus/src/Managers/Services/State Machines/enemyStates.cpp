@@ -241,6 +241,11 @@ namespace NIKE {
 		}
 	}
 
+	void State::ChaseState::playWalkSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id)
+	{
+
+	}
+
 	/*******************************
 	* Death State functions
 	*****************************/
@@ -283,6 +288,10 @@ namespace NIKE {
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
 			Interaction::handleCollision(event->entity_a, event->entity_b);
 		}
+	}
+	void State::DeathState::playDeathSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id)
+	{
+
 	}
 }
 

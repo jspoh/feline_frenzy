@@ -62,6 +62,10 @@ namespace NIKE {
 			float enemy_speed;
 
 			void updateChaseAnimation(Entity::Type& entity, float& dir);
+			/***********************
+			* SFX handling
+			************************/
+			void playWalkSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id);
 		};
 
 		class DeathState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
@@ -77,6 +81,10 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
+			/***********************
+			* SFX handling
+			************************/
+			void playDeathSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id);
 		};
 	}
 }

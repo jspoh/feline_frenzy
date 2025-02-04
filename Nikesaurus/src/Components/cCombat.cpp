@@ -23,7 +23,7 @@ namespace NIKE {
 				return	{
 						{ "Lives", comp.lives },
 						{ "Health", comp.health },
-						{ "InvulnerableFlag", comp.invulnerableFlag },
+						{ "invulnerable_flag", comp.invulnerable_flag },
 						//{ "HealthBarActive", comp.healthBarActive}
 				};
 			},
@@ -32,7 +32,7 @@ namespace NIKE {
 			[](Health& comp, nlohmann::json const& data) {
 				comp.lives = data.value("Lives", 1);
 				comp.health = data.value("Health", 100.0f);
-				comp.invulnerableFlag = data.value("InvulnerableFlag", false);
+				comp.invulnerable_flag = data.value("invulnerable_flag", false);
 			},
 
 			// Override Serialize
@@ -45,8 +45,8 @@ namespace NIKE {
 				if (comp.health != other_comp.health) {
 					delta["Health"] = comp.health;
 				}
-				if (comp.invulnerableFlag != other_comp.invulnerableFlag) {
-					delta["InvulnerableFlag"] = comp.invulnerableFlag;
+				if (comp.invulnerable_flag != other_comp.invulnerable_flag) {
+					delta["invulnerable_flag"] = comp.invulnerable_flag;
 				}
 
 				return delta;
@@ -60,8 +60,8 @@ namespace NIKE {
 				if (delta.contains("Health")) {
 					comp.health = delta["Health"];
 				}
-				if (delta.contains("InvulnerableFlag")) {
-					comp.invulnerableFlag = delta["InvulnerableFlag"];
+				if (delta.contains("invulnerable_flag")) {
+					comp.invulnerable_flag = delta["invulnerable_flag"];
 				}
 			}
 		);
@@ -217,19 +217,19 @@ namespace NIKE {
 
 				// For invulnerable flag
 				{
-					bool prev_flag = comp.invulnerableFlag;
+					bool prev_flag = comp.invulnerable_flag;
 
-					if (ImGui::Checkbox("Invulnerable", &comp.invulnerableFlag)) {
+					if (ImGui::Checkbox("Invulnerable", &comp.invulnerable_flag)) {
 						LevelEditor::Action toggle_invulnerability;
 
 						// Change do action
-						toggle_invulnerability.do_action = [&, flag = comp.invulnerableFlag]() {
-							comp.invulnerableFlag = flag;
+						toggle_invulnerability.do_action = [&, flag = comp.invulnerable_flag]() {
+							comp.invulnerable_flag = flag;
 							};
 
 						// Change undo action
 						toggle_invulnerability.undo_action = [&, flag = prev_flag]() {
-							comp.invulnerableFlag = flag;
+							comp.invulnerable_flag = flag;
 							};
 
 						// Execute action
