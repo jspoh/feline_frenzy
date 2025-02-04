@@ -39,6 +39,16 @@ namespace NIKE {
 
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
 
+        /***********************
+        * Animation handling
+        ************************/
+        void animationHurtStart(Entity::Type& entity, int start_x, int start_y);
+        void animationHurtEnd(Entity::Type& entity, int end_x, int end_y);
+        void flipX(Entity::Type& entity, bool yes_or_no);
+        void flipY(Entity::Type& entity, bool yes_or_no);
+        void setLastDirection(Entity::Type& entity, int dir);
+        int getLastDirection(Entity::Type& entity);
+
         class Manager : 
             public System::ISystem {
         public:

@@ -111,6 +111,86 @@ namespace NIKE {
             }
         }
 
+        void animationHurtStart(Entity::Type& entity, int start_x, int start_y)
+        {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            if (e_animate_comp.has_value()) {
+                //static Vector2i prev_start = e_animate_comp.value().get().start_index;
+
+                if (e_animate_comp.value().get().start_index != Vector2i(start_x, start_y)) {
+                    e_animate_comp.value().get().start_index.x = start_x;
+                    e_animate_comp.value().get().start_index.y = start_y;
+                    //prev_start = e_animate_comp.value().get().start_index;
+
+                    //Restart animation
+                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+                    if (e_base_comp.has_value()) {
+                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
+                    }
+                }
+            }
+        }
+
+        void animationHurtEnd(Entity::Type& entity, int end_x, int end_y)
+        {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            if (e_animate_comp.has_value()) {
+                //static Vector2i prev_end = e_animate_comp.value().get().end_index;
+
+                if (e_animate_comp.value().get().end_index != Vector2i(end_x, end_y)) {
+                    e_animate_comp.value().get().end_index.x = end_x;
+                    e_animate_comp.value().get().end_index.y = end_y;
+                    //prev_end = e_animate_comp.value().get().end_index;
+
+                    //Restart animation
+                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+                    if (e_base_comp.has_value()) {
+                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
+                    }
+                }
+            }
+        }
+
+        void flipX(Entity::Type& entity, bool yes_or_no)
+        {
+            auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+            if (e_texture_comp.has_value()) {
+                if (e_texture_comp.value().get().b_flip.x != yes_or_no)
+                {
+                    e_texture_comp.value().get().b_flip.x = yes_or_no;
+                }
+            }
+        }
+
+        void flipY(Entity::Type& entity, bool yes_or_no)
+        {
+            auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+            if (e_texture_comp.has_value()) {
+                if (e_texture_comp.value().get().b_flip.y != yes_or_no)
+                {
+                    e_texture_comp.value().get().b_flip.y = yes_or_no;
+                }
+            }
+        }
+
+        void setLastDirection(Entity::Type& entity, int dir)
+        {
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_physics_comp.has_value()) {
+                e_physics_comp.value().get().last_direction = dir;
+            }
+        }
+
+        int getLastDirection(Entity::Type& entity)
+        {
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_physics_comp.has_value()) {
+                return e_physics_comp.value().get().last_direction;
+            }
+            // Return a rand value when cnt retrieve last dir
+            return INT_MAX;
+        }
+
 
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Collision between damage and health
@@ -208,6 +288,22 @@ namespace NIKE {
                 target, attacker_damage, attacker, target_health.health);
             // Play SFX when apply damage
             playSFX(attacker, true);
+            // Play animation when taken damage
+            static float deathAnimationTimer = 0.0f;
+            static const float deathAnimationDuration = 0.5f; 
+            // Handle death animation
+            animationHurtStart(target, 0, 12);
+            flipX(target, false);
+
+            // Slow down transition from frame 0 to frame 1
+            deathAnimationTimer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();  
+
+            // If timer reaches the desired duration, proceed to frame 1
+            if (deathAnimationTimer >= deathAnimationDuration) {
+                animationHurtEnd(target, 1, 12);
+                // Reset timer
+                deathAnimationTimer = 0.0f;  
+            }
 
 			// Check if target health drops to zero or below
 			if (target_health.health <= 0) {
