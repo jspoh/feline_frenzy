@@ -1124,14 +1124,6 @@
                                 },
                                 "Zoom": 0.7472283840179443
                             },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 28.899999618530273
-                                },
-                                "preset": 1
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {

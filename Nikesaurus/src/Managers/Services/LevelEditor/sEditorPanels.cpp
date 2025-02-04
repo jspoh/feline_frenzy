@@ -1909,6 +1909,8 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
+				// !TODO: jspoh remove particle system when component is removed
+
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
 
