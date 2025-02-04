@@ -930,6 +930,12 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "MaxHealth":  100.0,
+                                "InvulnerableFlag": false,
+                                "Lives": 1
+                            },
                             "Element::Entity": {
                                 "Element": 1
                             },
@@ -1299,6 +1305,7 @@
                             },
                             "Combat::Health": {
                                 "Health": 100.0,
+                                "MaxHealth":  100.0,
                                 "Lives": 1,
                                 "invulnerable_flag": false
                             },
