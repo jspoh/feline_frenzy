@@ -249,8 +249,20 @@ namespace NIKE {
 
 		//Toggle Level Editor On & Off ( Use Global NIKE input to toggle on and off )
 		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
+
+			//Toggle editor mode
 			b_editor_active = !b_editor_active;
-			io.ClearEventsQueue(); // Clear all inputs done while editor is not active
+
+			//If editor is active, set game to paused
+			if (b_editor_active) {
+				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(false);
+			}
+			else {
+				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(true);
+			}
+
+			// Clear all inputs done while editor is not active
+			io.ClearEventsQueue();
 		}
 
 		//Return if editor is not active

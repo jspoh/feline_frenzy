@@ -263,6 +263,9 @@ namespace NIKE {
 		//Get all ecs systems
 		auto& systems = NIKE_ECS_MANAGER->getAllSystems();
 
+		//Dispatch pause audio event
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(b_game_state));
+
 		//Set the state of each systems based on new game state
 		if (!b_game_state) {
 			std::for_each(systems.begin(), systems.end(),
@@ -271,12 +274,18 @@ namespace NIKE {
 						system->setActiveState(false);
 					}
 				});
+
+			//Restart scene
+			NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
 		}
 		else {
 			std::for_each(systems.begin(), systems.end(),
 				[](std::shared_ptr<System::ISystem>& system) {
 					system->setActiveState(true);
 				});
+
+			//Exit editor mode
+			NIKE_LVLEDITOR_SERVICE->setEditorState(false);
 		}
 	}
 
@@ -318,27 +327,12 @@ namespace NIKE {
 
 			//Game State Switching
 			{
-				ImGui::Text("Play/Pause Game: ");
-				ImGui::Button(b_game_state ? "Pause" : "Play");
+				ImGui::Text("Play Game: ");
+				ImGui::Button("Play");
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
-					Action set_game_state;
-
-					//Do game mode
-					set_game_state.do_action = [&, mode = !b_game_state]() {
-						setGameState(mode);
-						NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(mode));
-						};
-
-					//Undo game mode
-					set_game_state.undo_action = [&, mode = b_game_state]() {
-						setGameState(mode);
-						NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(mode));
-						};
-
-					//Execute action
-					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_game_state));
+					setGameState(true);
 				}
 			}
 

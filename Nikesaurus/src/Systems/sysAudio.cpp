@@ -27,6 +27,9 @@ namespace NIKE {
 
 			for (auto& entity : layer->getEntitites()) {
 
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
+
 				//If there is sfx value
 				if (auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity); e_sfx_comp.has_value()) {
 					//Get sfx comp ref

@@ -62,6 +62,9 @@ namespace NIKE {
                 //Iterate through all entities
                 for (auto& entity : layer->getEntitites()) {
 
+                    //Skip entity not registered to this system
+                    if (entities.find(entity) == entities.end()) continue;
+
                     //Skip entities with no transform
                     auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     if (!e_transform_comp) continue;

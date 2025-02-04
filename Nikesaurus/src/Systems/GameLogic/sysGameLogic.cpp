@@ -31,6 +31,9 @@ namespace NIKE {
 			//Iterate through all entities
 			for (auto& entity : (*layer)->getEntitites()) {
 
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
+
 				//Check for player logic comp
 				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {

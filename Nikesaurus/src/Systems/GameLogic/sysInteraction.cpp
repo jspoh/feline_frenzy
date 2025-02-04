@@ -31,6 +31,10 @@ namespace NIKE {
 
                 // Iterate through all entities
                 for (auto& entity : (*layer)->getEntitites()) {
+
+                    //Skip entity not registered to this system
+                    if (entities.find(entity) == entities.end()) continue;
+
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 
                         // Check for Elemental Source component
