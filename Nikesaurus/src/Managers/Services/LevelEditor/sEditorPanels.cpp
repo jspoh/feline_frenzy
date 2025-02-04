@@ -13,6 +13,7 @@
 #include "Core/Engine.h"
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -1793,8 +1794,28 @@ namespace NIKE {
 					//Setup do action for add component
 					//add_comp.do_action = [=]() {
 
-						//Add default comp to entity
+					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
+
+					// add active particle system if particle emitter is added
+					if (component.first == "Render::ParticleEmitter") {
+						// get entity position
+						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+
+						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+						
+						const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
+						// update default particle system config
+						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+						pe_comp->duration = -1.f;
+						pe_comp->preset = static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::CLUSTER);
+						pe_comp->ref = particle_emitter_ref;
+						pe_comp->offset = { 0.f, 0.f };
+
+						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets::CLUSTER, comp->position + pe_comp->offset);
+					}
+
 					//	};
 
 					//Execute add component action

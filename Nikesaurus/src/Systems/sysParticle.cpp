@@ -21,6 +21,13 @@ using NSPM = NIKE::SysParticle::Manager;
 NSPM::Manager() {
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
 
+	// create vao and vbo for BASE particle preset
+	vao_map[Data::ParticlePresets::BASE] = 0;
+	vbo_map[Data::ParticlePresets::BASE] = 0;
+	glCreateBuffers(1, &vao_map[Data::ParticlePresets::BASE]);
+	glCreateBuffers(1, &vbo_map[Data::ParticlePresets::BASE]);
+	glVertexArrayVertexBuffer(vao_map[Data::ParticlePresets::BASE], 0, vbo_map[Data::ParticlePresets::BASE], 0, 0);
+
 	// create vao and vbo for CLUSTER particle preset
 	vao_map[Data::ParticlePresets::CLUSTER] = 0;
 	vbo_map[Data::ParticlePresets::CLUSTER] = 0;
@@ -52,6 +59,7 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 
 
 	active_particle_systems[ref] = new_particle_system;
+	next_ps_id++;
 
 	return true;
 }
@@ -184,4 +192,8 @@ unsigned int NSPM::getVAO(Data::ParticlePresets preset) const {
 
 unsigned int NSPM::getVBO(Data::ParticlePresets preset) const {
 	return vbo_map.at(preset);
+}
+
+int NSPM::getNewPSID() {
+	return next_ps_id;
 }

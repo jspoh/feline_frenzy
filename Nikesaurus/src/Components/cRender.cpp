@@ -32,19 +32,25 @@ namespace NIKE {
 					{ "preset", static_cast<int>(comp.preset) },
 					{ "offset", comp.offset.toJson() },
 					{ "duration", comp.duration },
-					{ "ref", comp.ref }
+					//{ "ref", comp.ref }
 				};
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
+				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
 				comp.preset = static_cast<int>(data.at("preset").get<int>());
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
-				comp.ref = data.at("ref").get<std::string>();
+				comp.ref = particle_emitter_ref;
+
+				// add particle system
+				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
+
 				if (comp.preset != other_comp.preset) {
 					delta["preset"] = comp.preset;
 				}
@@ -54,13 +60,15 @@ namespace NIKE {
 				if (comp.duration != other_comp.duration) {
 					delta["duration"] = comp.duration;
 				}
-				if (comp.ref != other_comp.ref) {
-					delta["ref"] = comp.ref;
-				}
+				//if (comp.ref != other_comp.ref) {
+				//	delta["ref"] = comp.ref;
+				//}
 				return delta;
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
+				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
 				if (delta.contains("preset")) {
 					comp.preset = delta["preset"];
 				}
@@ -71,7 +79,7 @@ namespace NIKE {
 					comp.duration = delta["duration"];
 				}
 				if (delta.contains("ref")) {
-					comp.ref = delta["ref"];
+					comp.ref = particle_emitter_ref;
 				}
 			}
 		);

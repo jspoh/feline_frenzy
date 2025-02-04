@@ -500,10 +500,8 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
-		bool temp_vao = false;
 		if (vao == 0) {
-			temp_vao = true;
-			glCreateVertexArrays(1, &vao);
+			vao = NIKE::SysParticle::Manager::getInstance().getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
 		}
 		glBindVertexArray(vao);
 
@@ -512,10 +510,6 @@ namespace NIKE {
 
 		glBindVertexArray(0);
 		shader_manager->unuseShader();
-
-		if (temp_vao) {
-			glDeleteVertexArrays(1, &vao);
-		}
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {

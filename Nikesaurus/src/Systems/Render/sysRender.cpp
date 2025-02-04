@@ -196,6 +196,21 @@ namespace NIKE {
 #else
 					transformAndRenderEntity(entity, false);
 #endif
+					// !TODO: jspoh move this code to entity update
+					// update entity particles
+					if (NIKE_ECS_MANAGER->checkEntityComponent<Render::ParticleEmitter>(entity)) {
+
+						const std::unordered_map<std::string, std::shared_ptr<void>> comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+
+						// get particle emitter component
+						const Render::ParticleEmitter* pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+
+						// get transform component
+						const Transform::Transform* transform_comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+
+						// update particle location
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, transform_comp->position + pe_comp->offset);
+					}
 				}
 			}
 		}
@@ -216,16 +231,13 @@ namespace NIKE {
 					continue;
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
 					transformAndRenderText(entity);
-
-					//Vector2f screen_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity).value().get().position;
-					//Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
-
-					//NIKE_RENDER_SERVICE->renderParticleSystem("base", screen_pos);
 				}
 			}
 		}
 
 		// render particles
+		// for non entity related particles
+
 
 		// !TODO: jspoh move this update function
 		NIKE::SysParticle::Manager::getInstance().update();
@@ -248,9 +260,9 @@ namespace NIKE {
 			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, vao, static_cast<int>(ps.particles.size()));
 		}
 
+		// mouse particles
 		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("ps1", mouse_particle_pos);
-
-		NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
+		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 
 
 #ifndef NDEBUG

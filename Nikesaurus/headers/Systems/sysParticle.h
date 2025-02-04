@@ -85,7 +85,7 @@ namespace NIKE {
 
 		class Manager {
 		private:
-
+			int next_ps_id{};
 			std::unordered_map<std::string, ParticleSystem>  active_particle_systems;
 
 			std::unordered_map<Data::ParticlePresets, unsigned int> vao_map;
@@ -95,10 +95,12 @@ namespace NIKE {
 			~Manager();
 		public:
 
+			int getNewPSID();
+
 			static Manager& getInstance();
 
 			/**
-			 * .
+			 * 
 			 *
 			 * \param preset
 			 * \return if particle system was successfully added
