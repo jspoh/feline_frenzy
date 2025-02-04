@@ -11,6 +11,10 @@ local cheatModeEnabled = false
 local godModeEnabled = false
 local highDamageEnabled = false
 
+-- SFX list
+local extraSFX = {"WalkingNature.wav", "TakeDamageMeow1.wav"}
+SetAdditionalSFX(entity, extraSFX)
+
 -- Player animation
 function Player:Animate(entity, args)
     -- Get Last Direction

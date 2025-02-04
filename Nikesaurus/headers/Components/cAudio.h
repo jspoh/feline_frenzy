@@ -24,8 +24,8 @@ namespace NIKE {
             PausedEvent(bool b_game_state) : b_game_state{ b_game_state } {}
         };
 
-        // SFXEntry Struct – represents an individual sound effect entry.
-        struct SFXEntry {
+        // For additional SFX
+        /*struct SFXEntry {
             bool b_play_sfx;
             std::string audio_id;
             std::string channel_group_id;
@@ -51,10 +51,9 @@ namespace NIKE {
             bool operator!=(const SFXEntry& other) const {
                 return !(*this == other);
             }
-        };
+        };*/
 
-        // SFX Component
-        // Add an extra member (additional_sfx) that can store extra SFX entries.
+        // SFX Component (main SFX)
         struct SFX {
             bool b_play_sfx;
             std::string audio_id;
@@ -62,26 +61,28 @@ namespace NIKE {
             float volume;
             float pitch;
 
-            // Hold additional SFX entries.
-            std::vector<SFXEntry> additional_sfx;
+            // Hold additional SFX file names.
+            std::vector<std::string> sfx_list;
 
-            SFX() : b_play_sfx(false), audio_id(""), channel_group_id(""), volume(1.0f), pitch(1.0f) {}
+            // Default constructor initializes members and sets sfx_list with the default audio_id.
+            SFX()
+                : b_play_sfx(false),
+                audio_id(""),
+                channel_group_id(""),
+                volume(1.0f),
+                pitch(1.0f),
+                sfx_list{ "" } // initialize with one element: the default audio_id (which is "")
+            {}
+
+            // Parameterized constructor initializes members and sets sfx_list with the provided audio_id.
             SFX(bool play, std::string const& audio_id, std::string const& channel_group_id, float volume, float pitch)
-                : b_play_sfx(play), audio_id(audio_id), channel_group_id(channel_group_id), volume(volume), pitch(pitch) {
-            }
-
-            // Comparison operators (needed for override serialization)
-            bool operator==(const SFX& other) const {
-                return b_play_sfx == other.b_play_sfx &&
-                    audio_id == other.audio_id &&
-                    channel_group_id == other.channel_group_id &&
-                    volume == other.volume &&
-                    pitch == other.pitch &&
-                    additional_sfx == other.additional_sfx;
-            }
-            bool operator!=(const SFX& other) const {
-                return !(*this == other);
-            }
+                : b_play_sfx(play),
+                audio_id(audio_id),
+                channel_group_id(channel_group_id),
+                volume(volume),
+                pitch(pitch),
+                sfx_list{ audio_id } // initialize with one element: the passed-in audio_id
+            {}
         };
 
         void registerComponents();

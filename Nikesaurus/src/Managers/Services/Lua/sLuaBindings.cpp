@@ -548,6 +548,23 @@ namespace NIKE {
             }
             });
 
+        // Set SFX list from script
+        lua_state.set_function("SetAdditionalSFX", [&](Entity::Type entity, sol::table sfxTable) {
+            auto compOpt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+            if (compOpt.has_value()) {
+                auto& comp = compOpt.value().get();
+                comp.sfx_list.clear();
+                for (auto& kv : sfxTable) {
+                    std::string sfxName = kv.second.as<std::string>();
+                    // Only add if sfxName is not already present.
+                    if (std::find(comp.sfx_list.begin(), comp.sfx_list.end(), sfxName) == comp.sfx_list.end()) {
+                        comp.sfx_list.push_back(sfxName);
+                    }
+                }
+            }
+            });
+
+
         // God mode toggle
         lua_state.set_function("SetGodMode", [&](Entity::Type entity, bool enable) {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
