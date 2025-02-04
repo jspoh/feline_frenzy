@@ -830,10 +830,11 @@ namespace NIKE {
 		};
 
 		//Game Window Panel
-		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
+		class GameWindowPanel : public IPanel {
 		private:
-			//Game texture
-			unsigned int texture_id;
+
+			//Frame buffer string
+			std::string editor_frame_buffer;
 
 			//Mouse position relative to Game Window
 			Vector2f window_mouse_pos;
@@ -850,14 +851,11 @@ namespace NIKE {
 			//Entities panel reference
 			std::weak_ptr<ComponentsPanel> comps_panel;
 
-			//Game window render event
-			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
-
 			//Render accept payload
 			void renderAcceptPayload();
 
 		public:
-			GameWindowPanel() : texture_id{ 0 } {}
+			GameWindowPanel() = default;
 			~GameWindowPanel() = default;
 
 			//Panel Name
@@ -879,6 +877,9 @@ namespace NIKE {
 			//Check if mouse is in game window
 			bool isMouseInWindow() const;
 
+			//Get editor frame buffer name
+			std::string getEditorFrameBuffer() const;
+
 			//Init
 			void init() override;
 
@@ -889,6 +890,5 @@ namespace NIKE {
 }
 
 #endif //!EDITOR_PANELS_HPP
-
 
 #endif

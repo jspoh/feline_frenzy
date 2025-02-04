@@ -16,45 +16,52 @@ namespace NIKE {
 
 	void Render::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
 
-		if (framebuffer_tex.width == event->frame_buffer.x &&
-			framebuffer_tex.height == event->frame_buffer.y) {
+		//Iterate through all frame buffers
+		for (auto& frame_buffer : frame_buffers) {
 
-			return; // Skip unnecessary recreation if size hasn't changed
-		}
-		framebuffer_tex.width = event->frame_buffer.x;
-		framebuffer_tex.height = event->frame_buffer.y;
+			//Skip frame buffers that are not bound to the window size
+			if (!frame_buffer.second.b_window_sized) continue;
 
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
-		}
+			if (frame_buffer.second.width == event->frame_buffer.x &&
+				frame_buffer.second.height == event->frame_buffer.y) {
 
-		// Cleanup old resources
-		glDeleteFramebuffers(1, &framebuffer_tex.frame_buffer);
-		glDeleteTextures(1, &framebuffer_tex.texture_color_buffer);
+				return; // Skip unnecessary recreation if size hasn't changed
+			}
+			frame_buffer.second.width = event->frame_buffer.x;
+			frame_buffer.second.height = event->frame_buffer.y;
 
-		// Create a new framebuffer
-		glGenFramebuffers(1, &framebuffer_tex.frame_buffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_tex.frame_buffer);
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+			}
 
-		// Create a color attachment texture
-		glGenTextures(1, &framebuffer_tex.texture_color_buffer);
-		glBindTexture(GL_TEXTURE_2D, framebuffer_tex.texture_color_buffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, event->frame_buffer.x, event->frame_buffer.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_tex.texture_color_buffer, 0);
+			// Cleanup old resources
+			glDeleteFramebuffers(1, &frame_buffer.second.frame_buffer);
+			glDeleteTextures(1, &frame_buffer.second.texture_color_buffer);
 
-		// Check if framebuffer is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
+			// Create a new framebuffer
+			glGenFramebuffers(1, &frame_buffer.second.frame_buffer);
+			glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer.second.frame_buffer);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			// Create a color attachment texture
+			glGenTextures(1, &frame_buffer.second.texture_color_buffer);
+			glBindTexture(GL_TEXTURE_2D, frame_buffer.second.texture_color_buffer);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, event->frame_buffer.x, event->frame_buffer.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frame_buffer.second.texture_color_buffer, 0);
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+			// Check if framebuffer is complete
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+				NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+			}
 		}
 
 		event->setEventProcessed(true);
@@ -64,7 +71,7 @@ namespace NIKE {
 	* INITIALIZATION
 	*********************************************************************/
 
-	void Render::FramebufferTexture::init() {
+	void Render::FramebufferTexture::init(Vector2i const& size) {
 		// Generate and bind the framebuffer
 		glGenFramebuffers(1, &frame_buffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
@@ -74,7 +81,12 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
 
 		// Specify the texture size
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		if (b_window_sized) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		}
+		else {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		}
 
 		// Set texture parameters for filtering and wrapping
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -131,14 +143,60 @@ namespace NIKE {
 		}
 
 		shader_manager->init();
-
-		framebuffer_tex.init();
 		
 		text_buffer.init();
 
 		//Setup event listening for frame buffer resize
 		std::shared_ptr<Render::Service> render_sys_wrapped(this, [](Render::Service*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(render_sys_wrapped);
+	}
+
+	/*****************************************************************//**
+	* FRAME BUFFERS
+	*********************************************************************/
+
+	void Render::Service::createFrameBuffer(std::string const& name, Vector2i const& size, bool b_window_sized) {
+		if (frame_buffers.find(name) != frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to create new frame buffer. Name already taken");
+			return;
+		}
+
+		//Create and initialize new frame buffer
+		frame_buffers[name].b_window_sized = b_window_sized;
+		frame_buffers[name].init(size);
+	}
+
+	void Render::Service::deleteFrameBuffer(std::string const& name) {
+		if (frame_buffers.find(name) == frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to delete frame buffer. Name not found");
+			return;
+		}
+
+		//Delete frame buffer
+		frame_buffers.erase(name);
+	}
+
+	Render::FramebufferTexture Render::Service::getFrameBuffer(std::string const& name) {
+		if (frame_buffers.find(name) == frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to get frame buffer. Name not found");
+			return Render::FramebufferTexture();
+		}
+
+		return frame_buffers.at(name);
+	}
+
+	void Render::Service::bindFrameBuffer(std::string const& name) {
+		if (frame_buffers.find(name) == frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to bind frame buffer. Name not found");
+			return;
+		}
+
+		//Bind frame buffer
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffers.at(name).frame_buffer);
+	}
+
+	void Render::Service::unbindFrameBuffer() {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	/*****************************************************************//**

@@ -151,21 +151,13 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		glClearColor(0, 0, 0, 1);
-
 #ifndef NDEBUG
-		// render to framebuffer if imgui is active
-		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
-			glBindFramebuffer(GL_FRAMEBUFFER, NIKE_RENDER_SERVICE->framebuffer_tex.frame_buffer);
-			//cout << "Rendering to frame buffer" << endl;
-		}
-		else {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//cout << "Rendering to screen" << endl;
-		}
+		//Bind frame buffer for rendering to editor ( Binding occurs when editor is active )
+		NIKE_LVLEDITOR_SERVICE->bindEditorFrameBuffer();
 #endif
 
 		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0, 0, 0, 1);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 
@@ -221,10 +213,8 @@ namespace NIKE {
 		}
 
 #ifndef NDEBUG
-		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(NIKE_RENDER_SERVICE->framebuffer_tex.texture_color_buffer));
-			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
-		}
+		//Unbind when editor is active for rendering
+		NIKE_LVLEDITOR_SERVICE->unbindEditorFrameBuffer();
 #endif
 
 		err = glGetError();
