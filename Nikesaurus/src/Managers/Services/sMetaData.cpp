@@ -332,9 +332,9 @@ namespace NIKE {
 			return;
 		}
 
-		//Remove entity from prev layer
-		if (NIKE_SCENES_SERVICE->checkLayer(entities.at(entity).layer_id)) {
-			NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id)->removeEntity(entity);
+		//Remove entity from every layer
+		for (auto layer : NIKE_SCENES_SERVICE->getLayers()) {
+			layer->removeEntity(entity);
 		}
 
 		//Set layer ID

@@ -557,8 +557,11 @@ namespace NIKE {
 
 						//Deserialize entity metadata
 						if (e_data.at("Entity").contains("MetaData")) {
+
 							//Deserialize
 							NIKE_METADATA_SERVICE->deserializeEntityData(entity, e_data.at("Entity").at("MetaData"));
+							NIKE_METADATA_SERVICE->setEntityLayerID(entity, NIKE_METADATA_SERVICE->getEntityLayerID(entity));
+							NIKE_METADATA_SERVICE->setEntityLayerOrder(entity, NIKE_METADATA_SERVICE->getEntityLayerOrder(entity));
 
 							//Get entity prefab ID
 							auto entity_prefab_id = NIKE_METADATA_SERVICE->getEntityPrefabID(entity);
