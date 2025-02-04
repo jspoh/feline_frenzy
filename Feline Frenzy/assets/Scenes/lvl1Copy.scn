@@ -38,6 +38,9 @@
         }
     },
     {
+        "Layer Count": 5
+    },
+    {
         "Layer": {
             "B_State": true,
             "Entities": [
@@ -1291,7 +1294,8 @@
                                             "y": -191.4810333251953
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1329,7 +1333,8 @@
                                             "y": 565.755126953125
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1375,7 +1380,8 @@
                                         "State": "Idle"
                                     },
                                     "Transform::Transform": null
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1413,7 +1419,8 @@
                                             "y": 129.9788818359375
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1451,7 +1458,8 @@
                                             "y": -440.776123046875
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1489,7 +1497,8 @@
                                             "y": 539.44580078125
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1517,7 +1526,8 @@
                                         }
                                     },
                                     "Transform::Transform": null
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1555,7 +1565,8 @@
                                             "y": -196.44607543945313
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1593,7 +1604,8 @@
                                             "y": -610.4813232421875
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1643,7 +1655,8 @@
                                             "y": 688.1229858398438
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1681,7 +1694,8 @@
                                             "y": 594.9881591796875
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1719,7 +1733,8 @@
                                             "y": -472.15814208984375
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1757,7 +1772,8 @@
                                             "y": 720.3187255859375
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -1795,7 +1811,8 @@
                                             "y": 254.51080322265625
                                         }
                                     }
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "objects"
@@ -2016,7 +2033,8 @@
                                         }
                                     },
                                     "Transform::Transform": null
-                                }
+                                },
+                                "Layer ID": 0
                             },
                             "Tags": [
                                 "healthbar"
