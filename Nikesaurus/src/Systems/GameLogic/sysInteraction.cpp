@@ -187,7 +187,7 @@ namespace NIKE {
 			if (target_health.health <= 0) {
 				// Target has more than 1 life
 				--target_health.lives;
-				target_health.health = ENEMY_HEALTH;
+				target_health.health = target_health.max_health;
 				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
 			}
         }
