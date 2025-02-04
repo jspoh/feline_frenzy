@@ -219,7 +219,8 @@ namespace NIKE {
 
 		//Place always place UI entity at the top layer
 		UIBtn btn;
-		btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
 		ui_entities.emplace(btn_id, btn);
 
@@ -250,7 +251,8 @@ namespace NIKE {
 
 		//Place always place UI entity at the top layer
 		UIBtn btn;
-		btn.entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
 		ui_entities.emplace(btn_id, btn);
 
@@ -415,8 +417,8 @@ namespace NIKE {
 		for (auto& entity : ui_entities) {
 
 			//Always set UI layer entity to the last layer
-			if (NIKE_ECS_MANAGER->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
-				NIKE_ECS_MANAGER->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			if (NIKE_METADATA_SERVICE->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+				NIKE_METADATA_SERVICE->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 			}
 
 			//Reset all input checks to false

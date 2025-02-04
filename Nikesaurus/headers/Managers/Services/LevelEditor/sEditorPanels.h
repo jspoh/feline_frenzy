@@ -309,12 +309,6 @@ namespace NIKE {
 
 			std::string comp_string_ref;
 
-			////Save Prefab popup
-			//std::function<void()> createPrefabPopUp(std::string const& popup_id);
-
-			//Set Layer ID popup
-			std::function<void()> setLayerIDPopUp(std::string const& popup_id);
-
 			//Component setting error message ( Usage: Editing error popup message )
 			std::shared_ptr<std::string> error_msg;
 

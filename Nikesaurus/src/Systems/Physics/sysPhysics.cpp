@@ -44,28 +44,7 @@ namespace NIKE {
                     continue;
 
                 //Iterate through all entities
-                for (auto& entity : entities) {
-
-                    // Skip entities marked for deletion
-                    //if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end()) {
-                    //    NIKEE_CORE_INFO("Skipping entity {} marked for deletion", entity);
-                    //    continue;
-                    //}
-
-                    try {
-                        if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-                            continue;
-                    }
-                    catch (const std::exception& e) {
-                        NIKEE_CORE_ERROR("Error accessing entity layer ID: {}", e.what());
-                        continue;
-                    }
-
-
-
-                    //Skip entities that are not present within layer & entities without transform component
-                    //if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-                    //    continue;
+                for (auto& entity : layer->getEntitites()) {
 
                     //Skip entities with no transform
                     auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -135,57 +114,79 @@ namespace NIKE {
                             e_collider.transform.position = e_transform.position + e_collider.pos_offset;
                         }
 
-                        // Check for collisions with other entities
-                        for (auto& colliding_entity : entities) {
+                        //Iterate through layers for collision
+                        for (auto& colliding_layer : NIKE_SCENES_SERVICE->getLayers()) {
 
-                            // Skip colliding entities that are not in the layer mask or are the same entity
-                            if (!layer->getLayerMask().test(NIKE_ECS_MANAGER->getEntityLayerID(colliding_entity)) ||
-                                entity == colliding_entity)
+                            //Skip inactive layer or layers that are not interactive
+                            if (!colliding_layer->getLayerState() || !layer->getLayerMask().test(colliding_layer->getLayerID()))
                                 continue;
 
-                            auto other_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
-                            auto other_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
-                            auto other_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
+                            // Check for collisions with other entities
+                            for (auto& colliding_entity : layer->getEntitites()) {
 
-                            if (!other_collider_comp.has_value() || !other_transform_comp.has_value()) continue;
+                                //Skip colliding entities that are the same
+                                if (entity == colliding_entity) continue;
 
-                            auto& other_transform = other_transform_comp.value().get();
-                            auto& other_collider = other_collider_comp.value().get();
-                            auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
+                                auto other_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(colliding_entity);
+                                auto other_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(colliding_entity);
+                                auto other_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(colliding_entity);
 
-                            //Update collision transform
-                            if (other_collider.b_bind_to_entity) {
-                                other_collider.transform = other_transform;
-                            }
-                            else {
-                                other_collider.transform.position = other_transform.position + other_collider.pos_offset;
-                            }
+                                if (!other_collider_comp.has_value() || !other_transform_comp.has_value()) continue;
 
-                            // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
-                            std::string e_model_id = "square.model"; // Default model
-                            std::string other_model_id = "square.model"; // Default model
-                            auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-                            if (e_shape_comp.has_value()) {
-                                e_model_id = e_shape_comp.value().get().model_id;
-                            }
-                            auto other_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity);
-                            if (other_shape_comp.has_value()) {
-                                other_model_id = other_shape_comp.value().get().model_id;
-                            }
+                                auto& other_transform = other_transform_comp.value().get();
+                                auto& other_collider = other_collider_comp.value().get();
+                                auto& other_dynamics = other_dynamics_comp.has_value() ? other_dynamics_comp.value().get() : def_dynamics;
 
-                            Collision::CollisionInfo info;
+                                //Update collision transform
+                                if (other_collider.b_bind_to_entity) {
+                                    other_collider.transform = other_transform;
+                                }
+                                else {
+                                    other_collider.transform.position = other_transform.position + other_collider.pos_offset;
+                                }
 
-                            // Perform AABB collision detection first
-                            if (!(static_cast<int>(e_collider.transform.rotation) % 180) &&
-                                !(static_cast<int>(other_collider.transform.rotation) % 180)) {
+                                // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
+                                std::string e_model_id = "square.model"; // Default model
+                                std::string other_model_id = "square.model"; // Default model
+                                auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+                                if (e_shape_comp.has_value()) {
+                                    e_model_id = e_shape_comp.value().get().model_id;
+                                }
+                                auto other_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(colliding_entity);
+                                if (other_shape_comp.has_value()) {
+                                    other_model_id = other_shape_comp.value().get().model_id;
+                                }
 
-                                //If AABB collision
-                                if (collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
+                                Collision::CollisionInfo info;
+
+                                // Perform AABB collision detection first
+                                if (!(static_cast<int>(e_collider.transform.rotation) % 180) &&
+                                    !(static_cast<int>(other_collider.transform.rotation) % 180)) {
+
+                                    //If AABB collision
+                                    if (collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
+                                        // Set the collision flags
+                                        e_collider.b_collided = true;
+                                        other_collider.b_collided = true;
+
+                                        //NIKEE_CORE_ERROR("Collision Detected");
+
+                                        // Perform collision resolution
+                                        collision_system->collisionResolution(
+                                            entity, e_transform, e_dynamics, e_collider,
+                                            colliding_entity, other_transform, other_dynamics, other_collider,
+                                            info
+                                        );
+
+                                        continue;
+                                    }
+                                }
+                                // Perform SAT collision detection if AABB fails
+                                else if (collision_system->detectSATCollision(e_collider, other_collider, e_model_id, other_model_id, info)) {
+
                                     // Set the collision flags
                                     e_collider.b_collided = true;
                                     other_collider.b_collided = true;
-
-                                    //NIKEE_CORE_ERROR("Collision Detected");
 
                                     // Perform collision resolution
                                     collision_system->collisionResolution(
@@ -196,27 +197,11 @@ namespace NIKE {
 
                                     continue;
                                 }
+
+                                // Reset collision flags if no collision
+                                e_collider.b_collided = false;
+                                other_collider.b_collided = false;
                             }
-                            // Perform SAT collision detection if AABB fails
-                            else if (collision_system->detectSATCollision(e_collider, other_collider, e_model_id, other_model_id, info)) {
-
-                                // Set the collision flags
-                                e_collider.b_collided = true;
-                                other_collider.b_collided = true;
-
-                                // Perform collision resolution
-                                collision_system->collisionResolution(
-                                    entity, e_transform, e_dynamics, e_collider,
-                                    colliding_entity, other_transform, other_dynamics, other_collider,
-                                    info
-                                );
-
-                                continue;
-                            }
-
-                            // Reset collision flags if no collision
-                            e_collider.b_collided = false;
-                            other_collider.b_collided = false;
                         }
                     }
                 }

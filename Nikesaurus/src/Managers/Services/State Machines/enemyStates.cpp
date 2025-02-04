@@ -48,6 +48,10 @@ namespace NIKE {
 		// removeTransition("IdleToAttack");
 	}
 
+	void State::IdleState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	{
+	}
+
 	/*******************************
 	* Attack State functions
 	*****************************/
@@ -102,7 +106,11 @@ namespace NIKE {
 						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
-
+						auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+						if (e_audio_comp.has_value())
+						{
+							playSFX(entity, false);
+						}
 						// Reset the last shot time after shooting
 						enemy_comp.last_shot_time = 0.f;
 					}
@@ -118,12 +126,43 @@ namespace NIKE {
 		// removeTransition("AttackToIdle");
 	}
 
+	void State::AttackState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	{
+		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+		if (e_sfx_comp.has_value()) {
+			auto& e_sfx = e_sfx_comp.value().get();
+
+			//Check if group exists
+			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+			if (!group) {
+				e_sfx.b_play_sfx = play_or_no;
+				return;
+			}
+			else {
+				//Play sound
+				if (play_or_no && !group->isPlaying()) {
+					e_sfx.b_play_sfx = play_or_no;
+				}
+			}
+
+			//stop sfx
+			if (!play_or_no) {
+				group->stop();
+			}
+		}
+	}
+
 	void State::AttackState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
 	{
 		// Ensure entities exist and handle the collision
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
 			Interaction::handleCollision(event->entity_a, event->entity_b);
 		}
+	}
+
+	void State::AttackState::updateAttackAnimation(Entity::Type& entity)
+	{
+
 	}
 
 	/*******************************
@@ -163,6 +202,12 @@ namespace NIKE {
 
 				// Move the entity along the computed path
 				Enemy::moveAlongPath(entity, end.value().x, end.value().y, enemy_speed, cell_offset);
+				// Play SFX when walking
+				auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+				if (e_audio_comp.has_value())
+				{
+					playSFX(entity, true);
+				}
 			}
 
 
@@ -179,6 +224,34 @@ namespace NIKE {
 	void NIKE::State::ChaseState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
 		//cout << "exit chase state" << endl;
+	}
+
+	void State::ChaseState::playSFX(Entity::Type& entity, bool play_or_no)
+	{
+		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+		if (e_sfx_comp.has_value()) {
+			auto& e_sfx = e_sfx_comp.value().get();
+
+			//Check if group exists
+			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+			//e_sfx.audio_id = ""
+
+			if (!group) {
+				e_sfx.b_play_sfx = play_or_no;
+				return;
+			}
+			else {
+				//Play sound
+				if (play_or_no && !group->isPlaying()) {
+					e_sfx.b_play_sfx = play_or_no;
+				}
+			}
+
+			//stop sfx
+			if (!play_or_no) {
+				group->stop();
+			}
+		}
 	}
 
 	void State::ChaseState::updateChaseAnimation(Entity::Type& entity, float& dir)
@@ -241,11 +314,6 @@ namespace NIKE {
 		}
 	}
 
-	void State::ChaseState::playWalkSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id)
-	{
-
-	}
-
 	/*******************************
 	* Death State functions
 	*****************************/
@@ -253,10 +321,6 @@ namespace NIKE {
 	State::DeathState::DeathState()
 	{
 		// Add transitions here
-
-		// Register the Manager as a listener for collision events
-		std::shared_ptr<DeathState> death_state_wrapped(this, [](DeathState*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(death_state_wrapped);
 	}
 
 	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
@@ -282,16 +346,33 @@ namespace NIKE {
 	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
 		
 	}
-	void State::DeathState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
-	{
-		// Ensure entities exist and handle the collision
-		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
-			Interaction::handleCollision(event->entity_a, event->entity_b);
-		}
-	}
-	void State::DeathState::playDeathSFX(Entity::Type& entity, bool play_or_stop, std::string const& asset_id)
-	{
 
+	void State::DeathState::playSFX(Entity::Type& entity, bool play_or_no)
+	{
+		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+		if (e_sfx_comp.has_value()) {
+			auto& e_sfx = e_sfx_comp.value().get();
+
+			//Check if group exists
+			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+			//e_sfx.audio_id = ""
+			
+			if (!group) {
+				e_sfx.b_play_sfx = play_or_no;
+				return;
+			}
+			else {
+				//Play sound
+				if (play_or_no && !group->isPlaying()) {
+					e_sfx.b_play_sfx = play_or_no;
+				}
+			}
+
+			//stop sfx
+			if (!play_or_no) {
+				group->stop();
+			}
+		}
 	}
 }
 

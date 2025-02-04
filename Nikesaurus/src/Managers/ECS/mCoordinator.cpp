@@ -21,18 +21,17 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entity Methods
 	*********************************************************************/
-	Entity::Type Coordinator::Manager::createEntity(unsigned int layer_id) {
-		auto entity = entity_manager->createEntity(layer_id);
+	Entity::Type Coordinator::Manager::createEntity() {
+		auto entity = entity_manager->createEntity();
 
 		//Dispatch event
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
-		entity_manager->setLayerID(entity, layer_id);
 
 		return entity;
 	}
 
 	Entity::Type Coordinator::Manager::cloneEntity(Entity::Type copy) {
-		Entity::Type new_entity = entity_manager->createEntity(entity_manager->getLayerID(copy));
+		Entity::Type new_entity = entity_manager->createEntity();
 		component_manager->cloneEntity(new_entity, copy);
 		entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
 		system_manager->cloneEntity(new_entity, copy);
@@ -72,14 +71,6 @@ namespace NIKE {
 
 	std::set<Entity::Type> Coordinator::Manager::getAllEntities() const {
 		return entity_manager->getAllEntities();
-	}
-
-	void Coordinator::Manager::setEntityLayerID(Entity::Type entity, unsigned int layer_id) {
-		entity_manager->setLayerID(entity, layer_id);
-	}
-
-	unsigned int Coordinator::Manager::getEntityLayerID(Entity::Type entity) const {
-		return entity_manager->getLayerID(entity);
 	}
 
 	void Coordinator::Manager::updateSystems() {

@@ -93,8 +93,6 @@ namespace NIKE {
 			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
-		data["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
-
 		return data;
 	}
 
@@ -126,14 +124,6 @@ namespace NIKE {
 				success = false;
 			}
 		}
-
-		if (!data.contains("Layer ID")) {
-			NIKEE_CORE_INFO("Entity does not contain a layer id, setting to default");
-			NIKE_ECS_MANAGER->setEntityLayerID(entity, 0);
-			return success;
-		}
-		// Set layer ID
-		NIKE_ECS_MANAGER->setEntityLayerID(entity, data["Layer ID"].get<unsigned int>());
 
 		return success;
 	}
@@ -393,16 +383,14 @@ namespace NIKE {
 			//Serialize layer
 			nlohmann::json l_data;
 
+			//Serialize layer
 			l_data["Layer"] = layer->serialize();
 
 			//Create json array
 			l_data["Layer"]["Entities"] = nlohmann::json::array();
 
-			//Iterate through all entities
-			for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-				//Skip entities not present in layer
-				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
+			//Iterate through all entities in layer
+			for (auto& entity : layer->getEntitites()) {
 
 				// skip 'built in' fps display entity
 				const auto entity_components = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
@@ -415,16 +403,13 @@ namespace NIKE {
 				//Entity data
 				nlohmann::json e_data;
 
-				//Serialize entity
-				e_data["Entity"]["Layer ID"] = NIKE_ECS_MANAGER->getEntityLayerID(entity);
-
 				//Check if prefab is valid
 				auto prefab_id = NIKE_METADATA_SERVICE->getEntityPrefabID(entity);
 				if (!prefab_id.empty()) {
 					//Serialize override data
 					NIKE_METADATA_SERVICE->setEntityPrefabOverride(entity, NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity, prefab_id));
 				}
-				else{
+				else {
 					//Serialize entity data
 					e_data["Entity"] = serializeEntity(entity);
 				}
@@ -437,7 +422,7 @@ namespace NIKE {
 					e_data["Entity"]["UI ID"] = ui_entity_to_ref.at(entity);
 					e_data["Entity"]["UI Btn"] = ui_entities.at(ui_entity_to_ref.at(entity)).serialize();
 				}
-				
+
 				//Push entity into layer data
 				l_data["Layer"]["Entities"].push_back(e_data);
 			}
@@ -526,7 +511,7 @@ namespace NIKE {
 					if (e_data.contains("Entity")) {
 
 						//Deserialize all entities
-						Entity::Type entity = NIKE_ECS_MANAGER->createEntity(e_data.at("Entity").value("Layer ID", 0));
+						Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
 
 						//Deserialize entity metadata
 						if (e_data.at("Entity").contains("MetaData")) {

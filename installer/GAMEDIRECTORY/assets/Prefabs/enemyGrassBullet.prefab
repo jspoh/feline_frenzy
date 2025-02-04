@@ -1,18 +1,18 @@
 {
     "Components": {
         "Audio::SFX": {
-            "Audio_ID": "Pop1.wav",
-            "B_Play_SFX": false,
+            "Audio_ID": "Laser1.wav",
+            "B_Play_SFX": true,
             "Channel_Group_ID": "BulletSFX",
             "Pitch": 1.0,
-            "Volume": 0.5
+            "Volume": 1.0
         },
         "Combat::Damage": {
             "Damage": 10.0
         },
         "Combat::Faction": {
             "Faction": 2
-	    },
+        },
         "Element::Entity": {
             "Element": 3
         },

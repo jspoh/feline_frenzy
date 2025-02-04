@@ -20,7 +20,7 @@ namespace NIKE {
 		}
 	}
 
-	Entity::Type Entity::Manager::createEntity(unsigned int layer_id) {
+	Entity::Type Entity::Manager::createEntity() {
 
 		//Check if entity has reached the max limit
 		if (avail_entities.empty()) {
@@ -31,11 +31,6 @@ namespace NIKE {
 		Entity::Type id{ avail_entities.front() };
 		entities.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple());
 		avail_entities.pop();
-
-		//Add layer id
-		if (!NIKE_SCENES_SERVICE->checkLayer(layer_id)) {
-			throw std::runtime_error("Layer does not exist.");
-		}
 
 		return id;
 	}
@@ -62,7 +57,7 @@ namespace NIKE {
 		}
 
 		//Set Signature
-		entities.at(entity).first = signature;
+		entities.at(entity) = signature;
 	}
 
 	Component::Signature const& Entity::Manager::getSignature(Entity::Type entity) const {
@@ -72,62 +67,8 @@ namespace NIKE {
 		}
 
 		//Get Signature
-		return entities.at(entity).first;
+		return entities.at(entity);
 	}
-
-	void Entity::Manager::setLayerID(Entity::Type entity, unsigned int layer_id) {
-		//Check if entity has alr been created
-		if (entities.find(entity) == entities.end()) {
-			throw std::runtime_error("Entity not found.");
-		}
-
-		//Set Signature
-		entities.at(entity).second = layer_id;
-	}
-
-	unsigned int Entity::Manager::getLayerID(Entity::Type entity) const {
-		//Check if entity has alr been created
-		if (entities.find(entity) == entities.end()) {
-			throw std::runtime_error("Entity not found.");
-		}
-
-		/*
-		// Get entities marked for deletion
-		if (NIKE_ECS_MANAGER == nullptr) {
-			throw std::runtime_error("NIKE_ECS_MANAGER is null.");
-		}
-
-		std::vector<Entity::Type> entities_to_destroy;
-		if (entities_to_destroy.empty()) {
-			NIKEE_CORE_WARN("No entities to destroy.");
-		}
-
-		try {
-			entities_to_destroy = NIKE_ECS_MANAGER->getEntitiesToDestroy();
-		}
-		catch (const std::exception& e) {
-			NIKEE_CORE_ERROR("Error retrieving entities to destroy: {}", e.what());
-		}
-
-		// Skip entities marked for deletion
-		if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end()) {
-			NIKEE_CORE_WARN("Entity {} is marked for deletion, returning default layer ID.", entity);  
-			return 0;
-		}
-			//throw std::runtime_error("Entity marked for deletion.");
-
-		try {
-		//NIKEE_CORE_INFO("Checking entity: {}", entity);
-		}
-		catch (const std::exception& e) {
-			NIKEE_CORE_ERROR("Error accessing entity layer ID: {}", e.what());
-		}
-		*/
-
-		//Get Signature
-		return entities.at(entity).second;
-	}
-
 
 	int Entity::Manager::getEntityComponentCount(Entity::Type entity) const {
 		//Check if entity has alr been created
@@ -135,7 +76,7 @@ namespace NIKE {
 			throw std::runtime_error("Entity not found.");
 		}
 
-		return static_cast<int>(entities.at(entity).first.count());
+		return static_cast<int>(entities.at(entity).count());
 	}
 
 	int Entity::Manager::getEntitiesCount() const {
