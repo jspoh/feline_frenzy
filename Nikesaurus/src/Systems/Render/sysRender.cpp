@@ -250,8 +250,22 @@ namespace NIKE {
 						const Vector2f world_particle_origin = transform_comp->position + pe_comp->offset;
 						const Vector2f screen_particle_origin = worldToScreen(world_particle_origin);
 
+						NIKE::SysParticle::ParticleSystem& ps = NIKE::SysParticle::Manager::getInstance().getParticleSystem(pe_comp->ref);
+
 						// update particle location
-						NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, screen_particle_origin);
+						if (ps.origin != screen_particle_origin) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, screen_particle_origin);
+						}
+
+						// update changes to particle preset
+						if (static_cast<int>(ps.preset) != pe_comp->preset) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemPreset(pe_comp->ref, static_cast<SysParticle::Data::ParticlePresets>(pe_comp->preset));
+						}
+
+						// update particle duration
+						if (ps.duration != pe_comp->duration) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemDuration(pe_comp->ref, pe_comp->duration);
+						}
 					}
 				}
 			}

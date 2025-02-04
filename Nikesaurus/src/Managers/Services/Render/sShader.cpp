@@ -97,6 +97,7 @@ namespace NIKE {
 		compileShader("text", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.frag").string());
 		compileShader("base_particle", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base_particle.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base_particle.frag").string());
 		compileShader("cluster_particle", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/cluster_particle.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/cluster_particle.frag").string());
+		compileShader("fire_particle", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/fire_particle.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/fire_particle.frag").string());
 	}
 
 	void Shader::ShaderManager::useShader(const std::string& shader_ref) {

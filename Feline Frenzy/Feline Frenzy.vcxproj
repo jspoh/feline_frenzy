@@ -164,6 +164,8 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <None Include="assets\Engine\Shaders\batched_texture.vert" />
     <None Include="assets\Engine\Shaders\cluster_particle.frag" />
     <None Include="assets\Engine\Shaders\cluster_particle.vert" />
+    <None Include="assets\Engine\Shaders\fire_particle.frag" />
+    <None Include="assets\Engine\Shaders\fire_particle.vert" />
     <None Include="assets\Engine\Shaders\text.frag" />
     <None Include="assets\Engine\Shaders\text.vert" />
     <None Include="assets\Engine\Shaders\texture.frag" />

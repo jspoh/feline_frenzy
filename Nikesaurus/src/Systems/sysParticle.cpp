@@ -10,9 +10,8 @@
 #include "Core/stdafx.h"
 #include "Systems/sysParticle.h"
 
-// !TODO: jspoh use world pos, create imgui component ParticleEmitter, add more particle types
-// !NOTE: jspoh. future - add texture support for particles
-// !NOTE: jspoh. future - add lua support for particles
+ // !NOTE: jspoh. future - add texture support for particles
+ // !NOTE: jspoh. future - add lua support for particles
 
 
 using namespace NIKE::SysParticle;
@@ -32,6 +31,11 @@ NSPM::Manager() {
 	vao_map[Data::ParticlePresets::CLUSTER] = 0;
 	vbo_map[Data::ParticlePresets::CLUSTER] = 0;
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::CLUSTER], vbo_map[Data::ParticlePresets::CLUSTER]);
+
+	// create vao and vbo for FIRE particle preset
+	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::FIRE];
+	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::FIRE];
+
 }
 
 NSPM::~Manager() {
@@ -160,7 +164,89 @@ void NSPM::update() {
 
 					ps.particles.push_back(new_particle);
 				}
-			
+
+
+			}
+			break;
+		}
+		case Data::ParticlePresets::FIRE: {
+			static constexpr float LIFESPAN = 5.f;
+			static constexpr float ACCELERATION = 0.f;
+			constexpr int NEW_PARTICLES_PER_SECOND = 50;
+			const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+
+			for (auto& p : ps.particles) {
+				// Update particle
+				p.pos += p.vector * p.velocity * dt;
+				p.velocity += p.acceleration * dt;
+				p.time_alive += dt;
+
+				if (p.lifespan != -1.f) {
+					// fade out
+					p.color.a -= dt / p.lifespan;
+
+					// darken
+					p.color.r -= dt / p.lifespan;
+					p.color.g -= dt / p.lifespan;
+					p.color.b -= dt / p.lifespan;
+				}
+
+				// particle death
+
+				if (p.size.x <= 0 || p.size.y <= 0) {
+					p.is_alive = false;
+				}
+
+				if (p.color.a <= 0) {
+					p.is_alive = false;
+				}
+
+				if (p.lifespan != -1 && p.time_alive > p.lifespan) {
+					p.is_alive = false;
+				}
+			}
+
+			// remove dead particles
+			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
+
+			// spawn new particles
+
+			static float time_since_last_spawn = 0.f;
+			time_since_last_spawn += dt;
+
+			int particles_to_spawn = static_cast<int>(time_since_last_spawn * NEW_PARTICLES_PER_SECOND);
+
+			if (ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+				particles_to_spawn = 0;
+				time_since_last_spawn = 0.f;
+			}
+
+			if (particles_to_spawn > 0) {
+				// reset state
+				time_since_last_spawn = 0.f;
+
+				for (int _{}; _ < particles_to_spawn; _++) {
+					Particle new_particle;
+					new_particle.preset = Data::ParticlePresets::CLUSTER;
+					new_particle.pos = ps.origin;
+					new_particle.vector = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
+					new_particle.vector.normalize();
+					new_particle.velocity = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
+					new_particle.acceleration = ACCELERATION;
+					new_particle.lifespan = LIFESPAN;
+					new_particle.color = {
+						(rand() % 100 + 155.f) / 255.f ,
+						0.f,
+						0.f,
+						1.f
+					};
+					new_particle.rotation = 0.f;
+					new_particle.is_alive = true;
+					new_particle.size = { 5.f, 5.f };
+
+					ps.particles.push_back(new_particle);
+				}
+
 
 			}
 			break;
@@ -184,6 +270,18 @@ std::vector<ParticleSystem>NSPM::getActiveParticleSystems() const {
 
 void NSPM::setParticleSystemOrigin(const std::string& ref, const Vector2f& origin) {
 	active_particle_systems.at(ref).origin = origin;
+}
+
+void NSPM::setParticleSystemPreset(const std::string& ref, Data::ParticlePresets preset) {
+	active_particle_systems.at(ref).preset = preset;
+}
+
+void NSPM::setParticleSystemDuration(const std::string& ref, float duration) {
+	active_particle_systems.at(ref).duration = duration;
+}
+
+NIKE::SysParticle::ParticleSystem& NSPM::getParticleSystem(const std::string& ref) {
+	return active_particle_systems.at(ref);
 }
 
 unsigned int NSPM::getVAO(Data::ParticlePresets preset) const {

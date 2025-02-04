@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   cluster_particle.frag
+ * \file   fire_particle.frag
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)

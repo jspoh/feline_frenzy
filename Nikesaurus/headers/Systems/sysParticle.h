@@ -34,12 +34,14 @@ namespace NIKE {
 			enum class ParticlePresets {
 				BASE = 0,
 				CLUSTER,
+				FIRE,
 				NUM_PARTICLE_PRESETS
 			};
 
 			static inline std::unordered_map<ParticlePresets, std::string> particle_preset_map{
 				{ ParticlePresets::BASE, "base" },
-				{ ParticlePresets::CLUSTER, "cluster" }
+				{ ParticlePresets::CLUSTER, "cluster" },
+				{ ParticlePresets::FIRE, "fire"}
 			};
 
 			static ParticlePresets getParticlePreset(const std::string& ref) {
@@ -112,6 +114,11 @@ namespace NIKE {
 			std::vector<ParticleSystem> getActiveParticleSystems() const;
 
 			void setParticleSystemOrigin(const std::string& ref, const Vector2f& origin);
+			void setParticleSystemPreset(const std::string& ref, Data::ParticlePresets preset);
+			void setParticleSystemDuration(const std::string& ref, float duration);
+
+			// get modifiable particle system
+			ParticleSystem& getParticleSystem(const std::string& ref);
 
 			unsigned int getVAO(Data::ParticlePresets preset) const;
 			unsigned int getVBO(Data::ParticlePresets preset) const;
