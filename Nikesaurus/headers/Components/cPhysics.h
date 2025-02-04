@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   cPhysics.h
+ * \file   cCollision.h
  * \brief  Defines the components used for Collision
  *
  * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
