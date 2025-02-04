@@ -98,7 +98,7 @@
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
                                 "EnemyLimit": 4,
-                                "LastSpawnTime": 10.0
+                                "LastSpawnTime": 1.3999993801116943
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -155,10 +155,10 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1155,
+                                "Completed_Animations": 1169,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.28333336114883423
+                                "Timer": 0.11666666716337204
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -233,14 +233,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1264,
+                                "Completed_Animations": 1286,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.13333334028720856
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -270,7 +270,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -311,14 +311,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1264,
+                                "Completed_Animations": 1286,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.13333334028720856
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -348,7 +348,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -389,14 +389,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1230,
+                                "Completed_Animations": 1252,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -426,7 +426,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -467,10 +467,10 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1155,
+                                "Completed_Animations": 1169,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.28333336114883423
+                                "Timer": 0.11666666716337204
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -545,10 +545,10 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1155,
+                                "Completed_Animations": 1169,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.28333336114883423
+                                "Timer": 0.11666666716337204
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -623,10 +623,10 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1155,
+                                "Completed_Animations": 1169,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.28333336114883423
+                                "Timer": 0.11666666716337204
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -899,19 +899,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
+                                "Completed_Animations": 13,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 2,
-                                    "y": 1
+                                    "x": 4,
+                                    "y": 0
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 1
+                                    "y": 0
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -919,7 +919,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 1
+                                    "y": 0
                                 }
                             },
                             "Audio::SFX": {
@@ -927,7 +927,7 @@
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "PlayerSFX",
                                 "Pitch": 1.0,
-                                "Volume": 0.5
+                                "Volume": 1.0
                             },
                             "Element::Entity": {
                                 "Element": 1
@@ -935,7 +935,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 101
+                                    "entity": 13
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -946,8 +946,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -156.0512237548828,
-                                    "y": 122.41563415527344
+                                    "x": -138.10108947753906,
+                                    "y": -163.7489776611328
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -971,10 +971,10 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -156.0512237548828,
-                                    "y": 122.41563415527344
+                                    "x": -138.10108947753906,
+                                    "y": -163.7489776611328
                                 },
-                                "Zoom": 1.6855379343032837
+                                "Zoom": 2.0091185569763184
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -990,8 +990,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
-                                    "y": 1
+                                    "x": 4,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -1005,8 +1005,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -156.0512237548828,
-                                    "y": 122.41563415527344
+                                    "x": -138.10108947753906,
+                                    "y": -163.7489776611328
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1050,7 +1050,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.0,
+                                    "w": 1.401298464324817e-45,
                                     "x": 0.9489796161651611,
                                     "y": 0.2614535689353943,
                                     "z": 0.0
@@ -1803,14 +1803,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1258,
+                                "Completed_Animations": 1280,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.21666666865348816
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -1857,7 +1857,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -1900,14 +1900,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1265,
+                                "Completed_Animations": 1287,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.13333334028720856
+                                "Timer": 0.2666666805744171
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -1954,7 +1954,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 },
                                 "Frame_Size": {

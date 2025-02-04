@@ -136,7 +136,6 @@ namespace NIKE {
 
             // Apply damage
             target_health.health -= (attacker_damage * multiplier);
-            cout << target_health.health << endl;
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
             // Play SFX when apply damage
