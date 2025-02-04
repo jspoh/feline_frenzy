@@ -88,6 +88,9 @@ namespace NIKE {
 			//Clean up Editor
 			void cleanUp();
 
+			//Auto save functionality
+			void autoSave() const;
+
 			//Set Editor State
 			void setEditorState(bool state);
 

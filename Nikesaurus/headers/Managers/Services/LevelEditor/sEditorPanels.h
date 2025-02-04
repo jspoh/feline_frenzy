@@ -125,6 +125,9 @@ namespace NIKE {
 			//Boolean for enabling/disabling transform gizmo
 			bool b_gizmo_state;
 
+			//Boolean for auto saving editor
+			bool b_auto_save;
+
 		public:
 			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false } {}
 			~MainPanel() = default;
