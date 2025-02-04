@@ -160,16 +160,14 @@ namespace NIKE {
                                 Collision::CollisionInfo info;
 
                                 // Perform AABB collision detection first
-                                if (!(static_cast<int>(e_collider.transform.rotation) % 180) &&
-                                    !(static_cast<int>(other_collider.transform.rotation) % 180)) {
+                                if (!(static_cast<int>(e_collider.transform.rotation) % 90) &&
+                                    !(static_cast<int>(other_collider.transform.rotation) % 90)) {
 
                                     //If AABB collision
                                     if (collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info)) {
                                         // Set the collision flags
                                         e_collider.b_collided = true;
                                         other_collider.b_collided = true;
-
-                                        //NIKEE_CORE_ERROR("Collision Detected");
 
                                         // Perform collision resolution
                                         collision_system->collisionResolution(
@@ -182,7 +180,7 @@ namespace NIKE {
                                     }
                                 }
                                 // Perform SAT collision detection if AABB fails
-                                else if (collision_system->detectSATCollision(e_collider, other_collider, e_model_id, other_model_id, info)) {
+                                else if (collision_system->detectAABBRectRect(e_dynamics, e_collider, other_dynamics, other_collider, info) || collision_system->detectSATCollision(e_collider, other_collider, e_model_id, other_model_id, info)) {
 
                                     // Set the collision flags
                                     e_collider.b_collided = true;

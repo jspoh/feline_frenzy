@@ -88,20 +88,23 @@ namespace NIKE {
         CollisionInfo& info) {
         
         // References to components
+        bool a_flip = static_cast<int>(collider_a.transform.rotation) % 90 == 0 && static_cast<int>(collider_a.transform.rotation) % 180 != 0;
+        bool b_flip = static_cast<int>(collider_b.transform.rotation) % 90 == 0 && static_cast<int>(collider_b.transform.rotation) % 180 != 0;
+
         AABB aabb_a({
-            collider_a.transform.position.x - (collider_a.transform.scale.x * 0.5f),
-            collider_a.transform.position.y - (collider_a.transform.scale.y * 0.5f)
+            collider_a.transform.position.x - (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
+            collider_a.transform.position.y - (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
         }, {
-            collider_a.transform.position.x + (collider_a.transform.scale.x * 0.5f),
-            collider_a.transform.position.y + (collider_a.transform.scale.y * 0.5f)
+            collider_a.transform.position.x + (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
+            collider_a.transform.position.y + (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
         });
 
         AABB aabb_b({
-            collider_b.transform.position.x - (collider_b.transform.scale.x * 0.5f),
-            collider_b.transform.position.y - (collider_b.transform.scale.y * 0.5f)
+            collider_b.transform.position.x - (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
+            collider_b.transform.position.y - (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
         }, {
-            collider_b.transform.position.x + (collider_b.transform.scale.x * 0.5f),
-            collider_b.transform.position.y + (collider_b.transform.scale.y * 0.5f)
+            collider_b.transform.position.x + (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
+            collider_b.transform.position.y + (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
         });
 
         // Get delta time
