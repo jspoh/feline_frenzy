@@ -98,6 +98,7 @@
 #include <optional>
 #include <stack>
 #include <regex>
+#include <limits>
 
  /*****************************************************************//**
  * Data (json)

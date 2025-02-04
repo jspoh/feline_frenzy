@@ -986,125 +986,136 @@ namespace NIKE {
 
 		//If an entity is selected
 		if (NIKE_ECS_MANAGER->checkEntity(selected_entity)) {
-			ImGui::Spacing();
+
+			// Get the Dock ID of the Entities Panel
+			ImGuiID entities_dock_id = ImGui::GetWindowDockID();
+
+			// Ensure the Metadata Panel docks to the right of the Entities Panel
+			ImGui::SetNextWindowDockID(entities_dock_id, ImGuiCond_Once);
+
+			//Begin entity metadata panel
+			ImGui::Begin((NIKE_METADATA_SERVICE->getEntityName(selected_entity) + "##SelectedEntity").c_str());
 
 			//Static entity name input buffer
-			static std::string entity_name;
+			static std::string entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+			static Entity::Type prev_entity = selected_entity;
 
-			//Display selected entity info
-			if (ImGui::CollapsingHeader((NIKE_METADATA_SERVICE->getEntityName(selected_entity) + "##SelectedEntity").c_str())) {
+			//Check for change in selected entity
+			if (prev_entity != selected_entity) {
+				//Update entity name
+				entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+				prev_entity = selected_entity;
+			}
 
-				//Get entity text
-				if (ImGui::InputText("##Entity Name", entity_name.data(), entity_name.capacity() + 1)) {
-					entity_name.resize(strlen(entity_name.c_str()));
-				}
+			//Get entity text
+			if (ImGui::InputText("##Entity Name", entity_name.data(), entity_name.capacity() + 1)) {
+				entity_name.resize(strlen(entity_name.c_str()));
+			}
 
-				ImGui::SameLine();
+			ImGui::SameLine();
 
-				//Save new name
-				if (ImGui::SmallButton("Save##SaveNewEntityName")) {
-					if(NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
-						NIKE_METADATA_SERVICE->setEntityName(selected_entity, entity_name);
-					}
-					else {
-						entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
-					}
-				}
-
-				//Lock entity
-				ImGui::SeparatorText("Lock Entity");
-				bool entity_locked = NIKE_METADATA_SERVICE->checkEntityLocked(selected_entity);
-				if (ImGui::Button(entity_locked ? "Locked" : "Unlocked")) {
-					NIKE_METADATA_SERVICE->setEntityLocked(selected_entity, !entity_locked);
-				}
-
-				//Add Spacing
-				ImGui::Spacing();
-
-				ImGui::SeparatorText("Select Prefab");
-
-				//Add Spacing
-				ImGui::Spacing();
-
-				//Select prefab
-				int select_prefab = 0;
-
-				//Prefab ref container
-				auto const& prefabs_ref = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
-				if (!NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity).empty()) {
-					for (auto const& ref : prefabs_ref) {
-						if (NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity) == ref) {
-							break;
-						}
-						++select_prefab;
-					}
-					//Clamp selected prefab
-					select_prefab = std::clamp(select_prefab, 0, static_cast<int>(prefabs_ref.size()) - 1);
-				}
-
-				//Select prefab ID
-				if (ImGui::Combo("##PrefabIDSetter", &select_prefab, prefabs_ref.data(), static_cast<int>(prefabs_ref.size()))) {
-					if (select_prefab > 0 && select_prefab < static_cast<int>(prefabs_ref.size())) {
-						NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, prefabs_ref[select_prefab]);
-					}
-					else {
-						NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, "");
-					}
-				}
-
-				ImGui::Spacing();
-
-				ImGui::SeparatorText("Save Entity As Prefab");
-
-				//Add Spacing
-				ImGui::Spacing();
-
-				//Make entity into prefab
-				if (ImGui::Button("Save## Save Entity As Prefab")) {
-					openPopUp("Save Entity As Prefab");
-				}
-
-				//Add Spacing
-				ImGui::Spacing();
-
-				ImGui::SeparatorText("Entity Tags");
-
-				//Add Spacing
-				ImGui::Spacing();
-
-				//Show number of entities in the level
-				auto e_tags = NIKE_METADATA_SERVICE->getEntityTags(selected_entity);
-				ImGui::Text("Number of tags: %d", e_tags.size());
-				auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
-				if (!tags.empty()) {
-					for (auto const& tag : tags) {
-
-						//Boolean
-						bool checked = e_tags.find(tag) != e_tags.end();
-
-						//Checkbox for checking tag
-						if (ImGui::Checkbox(("##EntityTag" + tag).c_str(), &checked)) {
-							if (checked) {
-								NIKE_METADATA_SERVICE->addEntityTag(selected_entity, tag);
-							}
-							else {
-								NIKE_METADATA_SERVICE->removeEntityTag(selected_entity, tag);
-							}
-						}
-
-						ImGui::SameLine();
-
-						//Tag name
-						ImGui::Text(tag.c_str());
-					}
+			//Save new name
+			if (ImGui::SmallButton("Save##SaveNewEntityName")) {
+				if(NIKE_METADATA_SERVICE->isNameValid(entity_name)) {
+					NIKE_METADATA_SERVICE->setEntityName(selected_entity, entity_name);
 				}
 				else {
-					ImGui::Text("No Tags Exists.");
+					entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+				}
+			}
+
+			//Lock entity
+			ImGui::SeparatorText("Lock Entity");
+			bool entity_locked = NIKE_METADATA_SERVICE->checkEntityLocked(selected_entity);
+			if (ImGui::Button(entity_locked ? "Locked" : "Unlocked")) {
+				NIKE_METADATA_SERVICE->setEntityLocked(selected_entity, !entity_locked);
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			ImGui::SeparatorText("Select Prefab");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Select prefab
+			int select_prefab = 0;
+
+			//Prefab ref container
+			auto const& prefabs_ref = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Prefab);
+			if (!NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity).empty()) {
+				for (auto const& ref : prefabs_ref) {
+					if (NIKE_METADATA_SERVICE->getEntityPrefabID(selected_entity) == ref) {
+						break;
+					}
+					++select_prefab;
+				}
+				//Clamp selected prefab
+				select_prefab = std::clamp(select_prefab, 0, static_cast<int>(prefabs_ref.size()) - 1);
+			}
+
+			//Select prefab ID
+			if (ImGui::Combo("##PrefabIDSetter", &select_prefab, prefabs_ref.data(), static_cast<int>(prefabs_ref.size()))) {
+				if (select_prefab > 0 && select_prefab < static_cast<int>(prefabs_ref.size())) {
+					NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, prefabs_ref[select_prefab]);
+				}
+				else {
+					NIKE_METADATA_SERVICE->setEntityPrefabID(selected_entity, "");
+				}
+			}
+
+			ImGui::Spacing();
+
+			ImGui::SeparatorText("Save Entity As Prefab");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Make entity into prefab
+			if (ImGui::Button("Save## Save Entity As Prefab")) {
+				openPopUp("Save Entity As Prefab");
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			ImGui::SeparatorText("Entity Tags");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Show number of entities in the level
+			auto e_tags = NIKE_METADATA_SERVICE->getEntityTags(selected_entity);
+			ImGui::Text("Number of tags: %d", e_tags.size());
+			auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
+			if (!tags.empty()) {
+				for (auto const& tag : tags) {
+
+					//Boolean
+					bool checked = e_tags.find(tag) != e_tags.end();
+
+					//Checkbox for checking tag
+					if (ImGui::Checkbox(("##EntityTag" + tag).c_str(), &checked)) {
+						if (checked) {
+							NIKE_METADATA_SERVICE->addEntityTag(selected_entity, tag);
+						}
+						else {
+							NIKE_METADATA_SERVICE->removeEntityTag(selected_entity, tag);
+						}
+					}
+
+					ImGui::SameLine();
+
+					//Tag name
+					ImGui::Text(tag.c_str());
 				}
 			}
 			else {
-				entity_name = NIKE_METADATA_SERVICE->getEntityName(selected_entity);
+				ImGui::Text("No Tags Exists.");
 			}
+
+			ImGui::End();
 		}
 
 		//Add spacing
