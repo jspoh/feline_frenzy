@@ -180,6 +180,11 @@ namespace NIKE {
                             auto& b_collider = b_collider_comp.value().get();
                             auto& b_dynamics = b_dynamics_comp.has_value() ? b_dynamics_comp.value().get() : def_dynamics;
 
+                            //Skip collision check if objects are definitely not colliding
+                            if ((a_collider.transform.position - b_collider.transform.position).length() > (a_collider.transform.scale + b_collider.transform.scale).length()) {
+                                continue;
+                            }
+
                             // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
                             std::string a_model_id = "square.model"; // Default model
                             std::string b_model_id = "square.model"; // Default model

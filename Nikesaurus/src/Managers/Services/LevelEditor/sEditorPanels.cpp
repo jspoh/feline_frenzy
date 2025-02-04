@@ -4090,6 +4090,19 @@ namespace NIKE {
 
 			//Loadable type actions
 			if (NIKE_ASSETS_SERVICE->isAssetLoadable(selected_asset_id)) {
+
+				//Show audio length if asset is loaded & an audio file
+				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id) && (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
+					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music)) {
+
+					//Show audio length
+					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength();
+					ImGui::Text("Length:");
+					ImGui::Text("%d ms", length);
+					ImGui::Text("%.2f s", length / 1000.0f);
+					ImGui::Text("%.2f mins", (length / 1000.0f) / 60.0f);
+				}
+
 				//Asset loading or unloading
 				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
 					//Unload action
