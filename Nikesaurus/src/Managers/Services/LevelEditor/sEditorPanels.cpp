@@ -610,7 +610,8 @@ namespace NIKE {
 				//Do Action
 				create.do_action = [&, shared_id]() {
 					//Create new entity 
-					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity();
+					NIKE_METADATA_SERVICE->setEntityLayerID(new_id, layer_id);
 
 					//If entity name is valid
 					if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
@@ -685,13 +686,14 @@ namespace NIKE {
 				//Get all entity comps for pass by value storage
 				auto comps = NIKE_ECS_MANAGER->getAllCopiedEntityComponents(selected_entity);
 				auto comp_types = NIKE_ECS_MANAGER->getAllComponentTypes();
-				int layer_id = NIKE_ECS_MANAGER->getEntityLayerID(selected_entity);
+				int layer_id = NIKE_METADATA_SERVICE->getEntityLayerID(selected_entity);
 
 				//Setup undo action for remove
 				remove.undo_action = [&, shared_id, comps, comp_types, layer_id]() {
 
 					//Creat new entity 
-					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+					Entity::Type new_id = NIKE_ECS_MANAGER->createEntity();
+					NIKE_METADATA_SERVICE->setEntityLayerID(new_id, layer_id);
 
 					//Add all the comps back
 					for (auto&& comp : comps) {
@@ -1401,11 +1403,7 @@ namespace NIKE {
 						continue;
 
 					//Iterate through all entities
-					for (auto& entity : NIKE_ECS_MANAGER->getAllEntities()) {
-
-						//Skip entities not on curr layer
-						if (layer->get()->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-							continue;
+					for (auto& entity : (*layer)->getEntitites()) {
 
 						// Skip locked entities so they don't block clicks!
 						if (NIKE_METADATA_SERVICE->checkEntityLocked(entity))
@@ -1999,62 +1997,6 @@ namespace NIKE {
 			};
 	}
 
-	std::function<void()> LevelEditor::ComponentsPanel::setLayerIDPopUp(std::string const& popup_id) {
-		return [this, popup_id]() {
-
-			//Set a layer ID
-			ImGui::Text("Set Layer ID For Entity");
-
-			//Add spacing
-			ImGui::Spacing();
-
-			//Static layer id
-			static int layer_id = 0;
-			if (ImGui::IsItemActivated()) {
-				layer_id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity());
-			}
-
-			//Input int
-			ImGui::InputInt("##NewLayerID", &layer_id, 1);
-
-			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
-
-			//Click set to set layer
-			if (ImGui::Button("Set")) {
-
-				//Temporary set layer action
-				Action set_layer;
-
-				//Setup undo action for set layer
-				set_layer.undo_action = [&, id = NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity())]() {
-					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel.lock()->getSelectedEntity(), id);
-					};
-
-				//Setup do action for set layer
-				set_layer.do_action = [&, id = layer_id]() {
-					NIKE_ECS_MANAGER->setEntityLayerID(entities_panel.lock()->getSelectedEntity(), id);
-					};
-
-				//Execute set layer action
-				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_layer));
-
-				//Close popup
-				closePopUp(popup_id);
-			}
-
-			//Add Spacing
-			ImGui::Spacing();
-
-			//Cancel setting layer id
-			if (ImGui::Button("Cancel")) {
-
-				//Close popup
-				closePopUp(popup_id);
-			}
-			};
-	}
-
 	std::function<void()> LevelEditor::ComponentsPanel::removeComponentPopUp(std::string const& popup_id)
 	{
 		return [this, popup_id] {
@@ -2105,7 +2047,6 @@ namespace NIKE {
 
 		//Register add component popup
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
-		registerPopUp("Set Layer ID", setLayerIDPopUp("Set Layer ID"));
 		registerPopUp("Remove Component", removeComponentPopUp("Remove Component"));
 		error_msg = std::make_shared<std::string>("Comp Error");
 		success_msg = std::make_shared<std::string>("Saving Success");
@@ -2150,9 +2091,6 @@ namespace NIKE {
 
 			//Print out selected entity component count
 			ImGui::Text("Number of Components in entity: %d", NIKE_ECS_MANAGER->getEntityComponentCount(entities_panel.lock()->getSelectedEntity()));
-
-			//Print out selected entity layer id
-			ImGui::Text("Entity's Layer: %d", NIKE_ECS_MANAGER->getEntityLayerID(entities_panel.lock()->getSelectedEntity()));
 
 			//Return if entity is locked
 			if (NIKE_METADATA_SERVICE->checkEntityLocked(selected_entity)) {
@@ -2778,7 +2716,8 @@ namespace NIKE {
 				}
 
 				//Create new entity
-				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity(layer_id);
+				Entity::Type new_id = NIKE_ECS_MANAGER->createEntity();
+				NIKE_METADATA_SERVICE->setEntityLayerID(new_id, layer_id);
 
 				//Add metadata to entity
 				NIKE_METADATA_SERVICE->setEntityName(new_id, entity_name.c_str());
@@ -5972,7 +5911,10 @@ namespace NIKE {
 				//Do Action
 				drag_drop_action.do_action = [entity_id, texture, asset_id, render_pos]() {
 					//Creat new entity 
-					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+					*entity_id = NIKE_ECS_MANAGER->createEntity();
+
+					//Set layer ID
+					NIKE_METADATA_SERVICE->setEntityLayerID(*entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 					//Add transform
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(render_pos, Vector2f((float)texture->size.x, (float)texture->size.y), 0.0f));
@@ -6018,7 +5960,10 @@ namespace NIKE {
 				//Do Action
 				drag_drop_action.do_action = [entity_id, size, color, asset_id, render_pos]() {
 					//Creat new entity 
-					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+					*entity_id = NIKE_ECS_MANAGER->createEntity();
+
+					//Set layer ID
+					NIKE_METADATA_SERVICE->setEntityLayerID(*entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 					//Add transform
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(render_pos, size, 0.0f));
@@ -6056,7 +6001,10 @@ namespace NIKE {
 				//Do Action
 				drag_drop_action.do_action = [entity_id, asset_id, render_pos]() {
 					//Creat new entity 
-					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+					*entity_id = NIKE_ECS_MANAGER->createEntity();
+
+					//Set layer ID
+					NIKE_METADATA_SERVICE->setEntityLayerID(*entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 					//Load entity from prefab
 					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(*entity_id, asset_id);
@@ -6108,7 +6056,10 @@ namespace NIKE {
 				//Do Action
 				drag_drop_action.do_action = [entity_id, color, asset_id, place_holder, local_world_mouse_pos]() {
 					//Creat new entity 
-					*entity_id = NIKE_ECS_MANAGER->createEntity(NIKE_SCENES_SERVICE->getLayerCount() - 1);
+					*entity_id = NIKE_ECS_MANAGER->createEntity();
+
+					//Set layer ID
+					NIKE_METADATA_SERVICE->setEntityLayerID(*entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 
 					//Add transform
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(*entity_id, Transform::Transform(Vector2f(local_world_mouse_pos.x, local_world_mouse_pos.y), Vector2f(0.0f, 0.0f), 0.0f));

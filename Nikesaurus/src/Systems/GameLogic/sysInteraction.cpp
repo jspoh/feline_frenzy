@@ -24,15 +24,14 @@ namespace NIKE {
 
             // Reverse iterate through layers
             for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
+
+                //Skip inactive layers
                 if (!(*layer)->getLayerState())
                     continue;
 
                 // Iterate through all entities
-                for (auto& entity : entities) {
+                for (auto& entity : (*layer)->getEntitites()) {
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-
-                        if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-                            continue;
 
                         // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
