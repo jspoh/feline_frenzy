@@ -17,6 +17,44 @@
 #include "Math/Mtx33.h"
 #include "Systems/sysParticle.h"
 
+namespace {
+
+	Matrix_33 getWorldToScreenMtx() {
+		// transform to screen coords
+		NIKE::Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
+
+		Matrix_33 view_xform{
+			1, 0,  -cam.position.x,
+			0, 1,  -cam.position.y,
+			0, 0, 1
+		};
+
+		const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
+
+		Matrix_33 cam_to_ndc_xform{
+			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
+			0, 2.0f / (cam_height * cam.zoom), 0,
+			0, 0, 1
+		};
+
+		const float screenWidth = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x;
+		const float screenHeight = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
+
+		Matrix_33 screen_xform = Matrix_33{
+			screenWidth * 0.5f, 0, screenWidth * 0.5f,
+			0, screenHeight * 0.5f, screenHeight * 0.5f,
+			0, 0, 1
+		} *cam_to_ndc_xform * view_xform;
+
+		return screen_xform;
+	};
+
+	Vector2f worldToScreen(const Vector2f& world_pos) {
+		Matrix_33 screen_xform = getWorldToScreenMtx();
+		return screen_xform * world_pos;
+	}
+}
+
 namespace NIKE {
 
 	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
@@ -208,41 +246,9 @@ namespace NIKE {
 						// get transform component
 						const Transform::Transform* transform_comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
 
-						auto getWorldToScreenMtx = []() {
-							// transform to screen coords
-							Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
-
-							Matrix_33 view_xform{
-								1, 0,  -cam.position.x,
-								0, 1,  -cam.position.y,
-								0, 0, 1
-							};
-
-							const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
-
-							Matrix_33 cam_to_ndc_xform{
-								2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
-								0, 2.0f / (cam_height * cam.zoom), 0,
-								0, 0, 1
-							};
-
-							const float screenWidth = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x;
-							const float screenHeight = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
-
-							Matrix_33 screen_xform = Matrix_33{
-								screenWidth * 0.5f, 0, screenWidth * 0.5f,
-								0, screenHeight * 0.5f, screenHeight * 0.5f,
-								0, 0, 1
-							} *cam_to_ndc_xform * view_xform;
-
-							return screen_xform;
-						};
-
-						const Matrix_33 screen_xform = getWorldToScreenMtx();
-						const Vector2f particle_origin = transform_comp->position + pe_comp->offset;
-
-						const Vector2f screen_particle_origin = screen_xform * particle_origin;
-
+						// get particle location in screen coords
+						const Vector2f world_particle_origin = transform_comp->position + pe_comp->offset;
+						const Vector2f screen_particle_origin = worldToScreen(world_particle_origin);
 
 						// update particle location
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, screen_particle_origin);
