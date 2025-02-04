@@ -2291,11 +2291,6 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			//Set layer id popup
-			if (ImGui::Button("Set Layer ID")) {
-				openPopUp("Set Layer ID");
-			}
-
 			//Add Spacing
 			ImGui::Spacing();
 
