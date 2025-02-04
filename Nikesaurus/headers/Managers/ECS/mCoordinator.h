@@ -42,7 +42,7 @@ namespace NIKE {
 			* Entity Methods
 			*********************************************************************/
 			//Create Entity
-			Entity::Type createEntity(unsigned int layer_id = 0);
+			Entity::Type createEntity();
 
 			//Clone entity ( ID of clone returned )
 			Entity::Type cloneEntity(Entity::Type copy);
@@ -64,12 +64,6 @@ namespace NIKE {
 
 			//Get all active entities
 			std::set<Entity::Type> getAllEntities() const;
-
-			//Set entity layer id
-			void setEntityLayerID(Entity::Type entity, unsigned int layer_id);
-
-			//Get entity layer id
-			unsigned int getEntityLayerID(Entity::Type entity) const;
 
 			/*****************************************************************//**
 			* Component Methods
