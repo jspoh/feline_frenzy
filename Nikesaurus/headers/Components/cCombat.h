@@ -37,14 +37,14 @@ namespace NIKE {
 		struct Health {
 			int lives;
 			float health;
-			bool invulnerableFlag; 
+			bool invulnerable_flag; 
 			//bool healthBarActive;
 
-			Health() : lives(ENEMY_LIVES), health(ENEMY_HEALTH), invulnerableFlag(false) {};
+			Health() : lives(ENEMY_LIVES), health(ENEMY_HEALTH), invulnerable_flag(false) {};
 				//, healthBarActive(false) 
 			
-			Health(int const& lives, float const& health, bool const& invulnerableFlag = false)
-				: lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {};
+			Health(int const& lives, float const& health, bool const& invulnerable_flag = false)
+				: lives{ lives }, health{ health }, invulnerable_flag{ invulnerable_flag } {};
 		};
 
 		struct Faction {

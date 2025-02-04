@@ -120,7 +120,7 @@ namespace NIKE {
             auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
             // Check invulnerability flag
-            if (target_health.invulnerableFlag) {
+            if (target_health.invulnerable_flag) {
                 return; // Skip damage
             }
 
@@ -137,11 +137,19 @@ namespace NIKE {
 
             // Apply damage
             target_health.health -= (attacker_damage * multiplier);
+            cout << target_health.health << endl;
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+            // Play SFX when apply damage
+            auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(target);
+            if (e_audio_comp.has_value())
+            {
+                auto& audio_comp = e_audio_comp.value().get();
+                //audio_comp.channel_group_id 
+            }
 
 			// Check if target health drops to zero or below
-			if (target_health.health > 0) {
+			if (target_health.health <= 0) {
 				// Target has more than 1 life
 				--target_health.lives;
 				target_health.health = ENEMY_HEALTH;

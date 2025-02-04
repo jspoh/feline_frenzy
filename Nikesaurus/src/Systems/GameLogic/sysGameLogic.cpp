@@ -114,6 +114,10 @@ namespace NIKE {
 		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
 		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosen_enemy).string());
 
+		// When enemy spwan from spawner, set the tag to enemy
+		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
+			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
+		}
 		// Randomly offset from spawner position
 		float offset_x = static_cast<float>(getRandomNumber(-20, 20));
 		float offset_y = static_cast<float>(getRandomNumber(-20, 20));
