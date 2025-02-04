@@ -101,10 +101,14 @@ namespace NIKE {
 
 		//Empty destroy entities queue
 		if (!entities_to_destroy.empty()) {
-			while (!entities_to_destroy.empty()) {
-				NIKE_ECS_MANAGER->destroyEntity(entities_to_destroy.front());
-				entities_to_destroy.pop();
+			for (auto entity : entities_to_destroy) {
+				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
+					NIKE_ECS_MANAGER->destroyEntity(entity);
+				}
 			}
+
+			//Clear entities to destroy
+			entities_to_destroy.clear();
 		}
 	}
 
@@ -265,12 +269,12 @@ namespace NIKE {
 		}
 
 		//Check if entity is active
-		entities_to_destroy.push(entity);
+		entities_to_destroy.insert(entity);
 	}
 
 	void MetaData::Service::destroyAllEntities() {
 		for (auto& e_data : entities) {
-			entities_to_destroy.push(e_data.first);
+			entities_to_destroy.insert(e_data.first);
 		}
 	}
 

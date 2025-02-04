@@ -80,7 +80,7 @@ namespace NIKE {
 			std::map<Entity::Type, EntityData, EntitySorter> entities;
 
 			//Entities to destroy
-			std::queue<Entity::Type> entities_to_destroy;
+			std::set<Entity::Type> entities_to_destroy;
 
 			//On entities changed event
 			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
