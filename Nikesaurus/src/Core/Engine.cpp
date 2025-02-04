@@ -432,6 +432,9 @@ namespace NIKE {
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
 #ifndef NDEBUG
+		//Auto Save if needed
+		NIKE_LVLEDITOR_SERVICE->autoSave();
+
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();
 #endif

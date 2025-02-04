@@ -1374,6 +1374,9 @@ namespace NIKE {
 				ImGui::Text("No Tags Exists.");
 			}
 
+			//Render popups
+			renderPopUps();
+
 			ImGui::End();
 		}
 
@@ -2767,7 +2770,7 @@ namespace NIKE {
 		}
 
 		//Save prefab to file
-		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string(), prefab_layer_id);
 
 		//Iterate through all entities and check their metadata
 		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
@@ -5765,7 +5768,6 @@ namespace NIKE {
 		{
 			if (ImGui::Button("Save Scene")) {
 				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
-
 
 					std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
 
