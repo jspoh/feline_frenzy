@@ -103,7 +103,7 @@ namespace NIKE {
 			void worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color);
 
 			//Render line to draw list
-			void worldLine(ImDrawList* draw_list, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
+			void worldLine(ImDrawList* draw_list, Transform::Transform const& e_transform, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
 			#endif // Only in nike build
 		};
 
