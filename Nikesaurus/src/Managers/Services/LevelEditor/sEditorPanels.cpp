@@ -301,6 +301,10 @@ namespace NIKE {
 		return b_gizmo_state;
 	}
 
+	bool LevelEditor::MainPanel::getAutoSave() const {
+		return b_auto_save;
+	}
+
 	void LevelEditor::MainPanel::init() {
 
 		//Setup window flags
@@ -333,6 +337,32 @@ namespace NIKE {
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
 					setGameState(true);
+				}
+			}
+
+			ImGui::Spacing();
+
+			//Auto save mode
+			{
+				ImGui::Text("Save: ");
+				ImGui::Button(b_auto_save ? "Auto##SaveMode" : "Manual##SaveMode");
+
+				//Check if button has been activated
+				if (ImGui::IsItemActivated()) {
+					Action set_auto_state;
+
+					//Do save mode
+					set_auto_state.do_action = [&, mode = !b_auto_save]() {
+						b_auto_save = mode;
+						};
+
+					//Undo save mode
+					set_auto_state.undo_action = [&, mode = b_auto_save]() {
+						b_auto_save = mode;
+						};
+
+					//Execute action
+					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_auto_state));
 				}
 			}
 
@@ -457,6 +487,7 @@ namespace NIKE {
 			b_debug_mode = data.value("Debug_Mode", false);
 			b_gizmo_state = data.value("Gizmo_State", false);
 			b_grid_state = data.value("Grid_State", false);
+			b_auto_save = data.value("Auto_Save", true);
 
 			setGameState(data.value("Game_State", false));
 		}
@@ -2747,6 +2778,11 @@ namespace NIKE {
 
 	void LevelEditor::PrefabsPanel::savePrefab() {
 
+		//Return if prefab id is empty
+		if (prefab_id.empty()) {
+			return;
+		}
+
 		//Save entity prefab overrides
 		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
 
@@ -2774,10 +2810,6 @@ namespace NIKE {
 				NIKE_SERIALIZE_SERVICE->deserializePrefabOverrides(entity, NIKE_METADATA_SERVICE->getEntityPrefabOverride(entity));
 			}
 		}
-
-		//Open success popup
-		msg->assign("Prefab Saved!");
-		openPopUp("Success");
 	}
 
 	void LevelEditor::PrefabsPanel::init() {
@@ -2835,6 +2867,10 @@ namespace NIKE {
 			//Save prefab template
 			if (ImGui::Button("Save Prefab")) {
 				savePrefab();
+
+				//Open success popup
+				msg->assign("Prefab Saved!");
+				openPopUp("Success");
 			}
 
 			ImGui::SameLine();
@@ -5252,15 +5288,6 @@ namespace NIKE {
 		// Open the file for writing
 		std::ofstream file(path.string(), std::ios::out | std::ios::trunc);
 
-		// Check if the file opened successfully
-		if (!file.is_open()) {
-			openPopUp("Error");
-		}
-		else
-		{
-			openPopUp("Success");
-		}
-
 		// Write the serialized grid data to the file
 		file << grid_data.dump(4);
 		file.close();
@@ -5695,6 +5722,16 @@ namespace NIKE {
 		err_msg->assign(msg);
 	}
 
+	void LevelEditor::ScenesPanel::saveScene() {
+		std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
+
+		// When user click save scene, grid is saved together
+		tile_panel.lock()->saveGrid(scn_id);
+
+		//Save scene
+		NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+	}
+
 	void LevelEditor::ScenesPanel::init()
 	{
 		err_msg = std::make_shared<std::string>("Error");
@@ -5758,13 +5795,8 @@ namespace NIKE {
 			if (ImGui::Button("Save Scene")) {
 				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
 
-					std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
-
-					// When user click save scene, grid is saved together
-					tile_panel.lock()->saveGrid(scn_id);
-
 					//Save scene
-					NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+					saveScene();
 
 					success_msg->assign("Scene successfully saved.");
 					openPopUp("Success");

@@ -415,36 +415,15 @@ namespace NIKE {
 	}
 
 	void LevelEditor::Service::autoSave() const {
-		if (std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getDebugState()) {
 
-			//Save grid to file
-			std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
-
-			std::string grid_file_name = Utility::extractFileName(scn_id.string());
-
-			std::filesystem::path path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
-
-			// Serialize the grid data using the grid service
-			nlohmann::json grid_data = NIKE_MAP_SERVICE->serialize();
-
-			// Saving of grid
-			if (!grid_file_name.empty() && (grid_file_name.find(".grid") == grid_file_name.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(grid_file_name)) {
-
-				//Craft file path from name
-				if (std::filesystem::exists(path)) {
-					path /= std::string(grid_file_name + ".grid");
-				}
-				else {
-					path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/");
-					path /= std::string(grid_file_name + ".grid");
-				}
-			}
-
-			// When user click save scene, grid is saved together
-			NIKE_SERIALIZE_SERVICE->saveGridToFile(path.string());
+		//Check if auto save is on
+		if (std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getAutoSave()) {
 
 			//Save scene
-			NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+			std::dynamic_pointer_cast<ScenesPanel>(panels_map.at(ScenesPanel::getStaticName()))->saveScene();
+
+			//Save prefab
+			std::dynamic_pointer_cast<PrefabsPanel>(panels_map.at(PrefabsPanel::getStaticName()))->savePrefab();
 		}
 	}
 

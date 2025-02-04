@@ -129,7 +129,7 @@ namespace NIKE {
 			bool b_auto_save;
 
 		public:
-			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false } {}
+			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false }, b_auto_save{ true } {}
 			~MainPanel() = default;
 
 			//Panel Name
@@ -156,6 +156,9 @@ namespace NIKE {
 
 			//Public get gizmo state
 			bool getGizmoState() const;
+
+			//Public get auto save
+			bool getAutoSave() const;
 
 			//Deserialize config
 			void deserializeConfig(nlohmann::json const& config);
@@ -437,11 +440,8 @@ namespace NIKE {
 			//Create entity popup
 			std::function<void()> createEntityPopup(std::string const& popup_id);
 
-			//Save prefab
-			void savePrefab();
-
 		public:
-			PrefabsPanel() : copy_count{ 0 } {}
+			PrefabsPanel() : copy_count{ 0 }, prefab_layer_id{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name
@@ -465,6 +465,9 @@ namespace NIKE {
 
 			// For component stuff
 			void renderPrefabComponents();
+
+			//Save prefab
+			void savePrefab();
 		};
 
 		//Debug Management Panel
@@ -827,6 +830,9 @@ namespace NIKE {
 
 			//Set error message for popup
 			void setPopUpErrorMsg(std::string const& msg);
+
+			//Save scene functionality
+			void saveScene();
 
 			//Init
 			void init() override;
