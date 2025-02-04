@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   mSerialization.h
+ * \file   sSerialization.h
  * \brief  Serialization manager
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
