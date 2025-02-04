@@ -145,7 +145,8 @@ namespace NIKE {
             if (e_audio_comp.has_value())
             {
                 auto& audio_comp = e_audio_comp.value().get();
-                //audio_comp.channel_group_id 
+                audio_comp.channel_group_id = "EnemyGetHit.wav";
+                audio_comp.b_play_sfx = true;
             }
 
 			// Check if target health drops to zero or below
