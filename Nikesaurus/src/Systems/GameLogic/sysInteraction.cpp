@@ -73,6 +73,34 @@ namespace NIKE {
             }
         }
 
+        void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+        {
+            auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+            if (e_sfx_comp.has_value()) {
+                auto& e_sfx = e_sfx_comp.value().get();
+
+                //Check if group exists
+                auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+                if (!group) {
+                    e_sfx.audio_id = "EnemyGetHit.wav";
+                    e_sfx.b_play_sfx = play_or_no;
+                    return;
+                }
+                else {
+                    //Play sound
+                    if (play_or_no && !group->isPlaying()) {
+                        e_sfx.audio_id = "EnemyGetHit.wav";
+                        e_sfx.b_play_sfx = play_or_no;
+                    }
+                }
+
+                //stop sfx
+                if (!play_or_no) {
+                    group->stop();
+                }
+            }
+        }
+
 
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
 
@@ -139,13 +167,7 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
             // Play SFX when apply damage
-            auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(target);
-            if (e_audio_comp.has_value())
-            {
-                auto& audio_comp = e_audio_comp.value().get();
-                audio_comp.audio_id = "EnemyGetHit.wav";
-                audio_comp.b_play_sfx = true;
-            }
+            playSFX(attacker, true);
 
 			// Check if target health drops to zero or below
 			if (target_health.health <= 0) {
