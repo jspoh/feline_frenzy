@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   cTransform.h
- * \brief
+ * \brief  Transform component
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (90%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (5%)

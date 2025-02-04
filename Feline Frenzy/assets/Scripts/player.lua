@@ -12,8 +12,8 @@ local godModeEnabled = false
 local highDamageEnabled = false
 
 -- SFX list
-local extraSFX = {"WalkingNature.wav", "TakeDamageMeow1.wav"}
-SetAdditionalSFX(entity, extraSFX)
+--local extraSFX = {"WalkingNature.wav", "TakeDamageMeow1.wav"}
+--SetAdditionalSFX(entity, extraSFX) -- Error!!!
 
 -- Player animation
 function Player:Animate(entity, args)
