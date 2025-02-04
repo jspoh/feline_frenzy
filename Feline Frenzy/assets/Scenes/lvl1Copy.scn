@@ -95,7 +95,7 @@
                     "Entity": {
                         "Components": {
                             "Enemy::Spawner": {
-                                "Cooldown": 10.0,
+                                "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
                                 "EnemyLimit": 4,
                                 "LastSpawnTime": 10.0
