@@ -13,6 +13,7 @@
 
  // States
 #include "Managers/Services/State Machine/enemyStates.h"
+#include "Managers/Services/State Machine/destructableStates.h"
 
 namespace NIKE {
 	namespace StateMachine {
@@ -188,6 +189,7 @@ namespace NIKE {
 			registerState("Attack", std::make_shared<State::AttackState>());
 			registerState("Chase", std::make_shared<State::ChaseState>());
 			registerState("Death", std::make_shared<State::DeathState>());
+			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
 		}
 
 		void Service::update(Entity::Type& entity) {

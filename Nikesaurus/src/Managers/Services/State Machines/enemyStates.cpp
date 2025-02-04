@@ -9,10 +9,13 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/State Machine/enemyStates.h"
-#include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
+
+// Transitions
+#include "Managers/Services/State Machine/enemyTransitions.h"
+#include "Managers/Services/State Machine/destructableTransitions.h"
 
 namespace NIKE {
 
@@ -26,6 +29,7 @@ namespace NIKE {
 		addTransition("IdleToAttack", std::make_shared<Transition::IdleToAttack>());
 		addTransition("IdleToChase", std::make_shared<Transition::IdleToChase>());
 		addTransition("IdleToDeath", std::make_shared<Transition::IdleToDeath>());
+		addTransition("IdleToDestructableDeath", std::make_shared<Transition::IdleToDestructableDeath>());
 	}
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
