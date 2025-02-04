@@ -137,6 +137,7 @@ namespace NIKE {
 
             // Apply damage
             target_health.health -= (attacker_damage * multiplier);
+            cout << target_health.health << endl;
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
             // Play SFX when apply damage
@@ -148,7 +149,7 @@ namespace NIKE {
             }
 
 			// Check if target health drops to zero or below
-			if (target_health.health > 0) {
+			if (target_health.health <= 0) {
 				// Target has more than 1 life
 				--target_health.lives;
 				target_health.health = ENEMY_HEALTH;

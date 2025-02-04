@@ -272,7 +272,7 @@ namespace NIKE {
 			// Use delta time to let animation play before deleting entity
 			static float dt = 0.0f;
 			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-			if (dt >= 0.5f) { 
+			if (dt >= 0.2f) { 
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 				// Reset delta time
 				dt = 0.f;
