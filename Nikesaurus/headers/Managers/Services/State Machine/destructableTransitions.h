@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   destructableTransitions.h
- * \brief  Enemy States
+ * \brief  Destructable Transitions
  *
  * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025

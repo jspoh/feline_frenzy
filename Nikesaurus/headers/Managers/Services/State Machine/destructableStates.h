@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   destructableStates.h
- * \brief  Enemy States
+ * \brief  Destructable States
  *
  * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
