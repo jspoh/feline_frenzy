@@ -4,7 +4,7 @@
  *
  * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
- * All content © 2025 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2025 DigiPen Institute of Technology Singapore, all rights reserved.
  ********************************************************************/
 #pragma once
 
