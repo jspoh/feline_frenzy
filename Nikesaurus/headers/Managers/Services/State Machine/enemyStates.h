@@ -54,7 +54,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
-
+			void updateAttackAnimation(Entity::Type& entity);
 		};
 
 		class ChaseState : public StateMachine::Istate
@@ -80,7 +80,7 @@ namespace NIKE {
 
 		};
 
-		class DeathState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
+		class DeathState : public StateMachine::Istate
 		{
 		public:
 			DeathState();
@@ -88,9 +88,6 @@ namespace NIKE {
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
 			void onExit(Entity::Type& entity) override;
-
-			// Event handling for collisions
-			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 			/***********************
 			* SFX handling

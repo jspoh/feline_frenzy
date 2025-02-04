@@ -18,6 +18,7 @@ namespace NIKE {
 
 	#define ENEMY_HEALTH 100.f
 	#define ENEMY_LIVES 1
+	#define HEAL_AMOUNT 10.f
 
 	namespace Combat {
 		const enum class Factions : int {
@@ -52,6 +53,13 @@ namespace NIKE {
 			Factions faction;
 			Faction() : faction(Factions::NEUTRAL) {};
 			Faction(Factions const& faction) : faction(faction) {};
+		};
+
+		struct HealthDrop {
+			float heal_amount;
+
+			HealthDrop() : heal_amount(HEAL_AMOUNT) {};
+			HealthDrop(float const& heal_amount) : heal_amount{ heal_amount } {};
 		};
 
 		void registerComponents();

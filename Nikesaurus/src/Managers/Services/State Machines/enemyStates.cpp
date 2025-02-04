@@ -160,6 +160,11 @@ namespace NIKE {
 		}
 	}
 
+	void State::AttackState::updateAttackAnimation(Entity::Type& entity)
+	{
+
+	}
+
 	/*******************************
 	* Chase State functions
 	*****************************/
@@ -316,10 +321,6 @@ namespace NIKE {
 	State::DeathState::DeathState()
 	{
 		// Add transitions here
-
-		// Register the Manager as a listener for collision events
-		std::shared_ptr<DeathState> death_state_wrapped(this, [](DeathState*) {});
-		NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(death_state_wrapped);
 	}
 
 	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
@@ -345,13 +346,7 @@ namespace NIKE {
 	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
 		
 	}
-	void State::DeathState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
-	{
-		// Ensure entities exist and handle the collision
-		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
-			Interaction::handleCollision(event->entity_a, event->entity_b);
-		}
-	}
+
 	void State::DeathState::playSFX(Entity::Type& entity, bool play_or_no)
 	{
 		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);

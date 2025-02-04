@@ -154,6 +154,45 @@ namespace NIKE {
 
 		// Faction Component Adding
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Faction>();
+
+		// Register health components
+		NIKE_ECS_MANAGER->registerComponent<HealthDrop>();
+
+		// Register health for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<HealthDrop>(
+			// Serialize
+			[](HealthDrop const& comp) -> nlohmann::json {
+				return	{
+						{ "HealAmount", comp.heal_amount },
+				};
+			},
+
+			// Deserialize
+			[](HealthDrop& comp, nlohmann::json const& data) {
+				comp.heal_amount = data.value("HealAmount", 10.0f);
+			},
+
+			// Override Serialize
+			[](HealthDrop const& comp, HealthDrop const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.heal_amount != other_comp.heal_amount) {
+					delta["HealAmount"] = comp.heal_amount;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](HealthDrop& comp, nlohmann::json const& delta) {
+				if (delta.contains("HealAmount")) {
+					comp.heal_amount = delta["HealAmount"];
+				}
+			}
+		);
+
+		//Health Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<HealthDrop>();
 	}
 
 	void Combat::registerEditorComponents() {
@@ -349,6 +388,45 @@ namespace NIKE {
 						// Update previous values for next undo/redo
 						before_select_faction = comp.faction;
 						previous_faction = static_cast<int>(comp.faction);
+					}
+				}
+			}
+		);
+#endif
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<HealthDrop>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, HealthDrop& comp) {
+
+				ImGui::Text("Edit Health Drop Variables");
+
+				// For shooting damage
+				{
+					static float before_change_heal_amount;
+
+					ImGui::DragFloat("Amount Healed", &comp.heal_amount, 0.1f);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_heal_amount = comp.heal_amount;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_heal_amount;
+
+						//Change do action
+						change_heal_amount.do_action = [&, heal_amount = comp.heal_amount]() {
+							comp.heal_amount = heal_amount;
+							};
+
+						//Change undo action
+						change_heal_amount.undo_action = [&, heal_amount = before_change_heal_amount]() {
+							comp.heal_amount = heal_amount;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_heal_amount));
 					}
 				}
 			}

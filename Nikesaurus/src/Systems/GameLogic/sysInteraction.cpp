@@ -75,12 +75,9 @@ namespace NIKE {
 
 
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
-
-
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
             const auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_b);
-
 
             if (a_damage_comp.has_value() || b_damage_comp.has_value()) {
                 const auto a_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
@@ -136,7 +133,6 @@ namespace NIKE {
 
             // Apply damage
             target_health.health -= (attacker_damage * multiplier);
-            cout << target_health.health << endl;
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
             // Play SFX when apply damage
@@ -144,7 +140,7 @@ namespace NIKE {
             if (e_audio_comp.has_value())
             {
                 auto& audio_comp = e_audio_comp.value().get();
-                audio_comp.channel_group_id = "EnemyGetHit.wav";
+                audio_comp.audio_id = "EnemyGetHit.wav";
                 audio_comp.b_play_sfx = true;
             }
 

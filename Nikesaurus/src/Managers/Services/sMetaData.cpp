@@ -195,7 +195,7 @@ namespace NIKE {
 		}
 
 		//Check if id is valid
-		if (prefab_id.substr(prefab_id.find_first_of('.')) != ".prefab") {
+		if (!prefab_id.empty() && prefab_id.substr(prefab_id.find_first_of('.')) != ".prefab") {
 			NIKEE_CORE_WARN("Trying To Set An Invalid Prefab ID!!!");
 			return;
 		}
