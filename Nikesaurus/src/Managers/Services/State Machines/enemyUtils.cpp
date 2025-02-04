@@ -196,7 +196,7 @@ namespace NIKE {
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
 		Vector2f direction = player_pos - enemy_pos;
 		direction.normalize();
-
+			
 		// Offset spawn position of bullet
 		const float& offset = enemy_attack_comp.offset;
 		const Vector2f bullet_pos = enemy_pos + (direction * offset);
@@ -204,7 +204,14 @@ namespace NIKE {
 		// Set bullet's position
 		auto bullet_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
 		if (bullet_transform_comp.has_value()) {
-			bullet_transform_comp.value().get().position = bullet_pos;
+			auto& transform = bullet_transform_comp.value().get();
+			transform.position = bullet_pos;
+
+			// Calculate rotation angle in radians
+			float angle = std::atan2(direction.y, direction.x); // Radians
+
+			// Convert to degrees if your system uses degrees
+			transform.rotation = (angle * (180.0f / static_cast<float>(M_PI))) - 90.0f;   // Convert radians to degrees
 		}
 
 		// Set bullet physics

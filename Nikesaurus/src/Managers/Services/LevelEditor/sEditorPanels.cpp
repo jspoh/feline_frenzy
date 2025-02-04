@@ -116,7 +116,7 @@ namespace NIKE {
 		if (use_screen_pos) {
 			return {
 				window_pos.x + (render_size.x / 2.0f) + (pos.x * scale.x),
-				window_pos.y + (render_size.y / 2.0f) + (pos.y * scale.y)
+				window_pos.y + (render_size.y / 2.0f) - (pos.y * scale.y)
 			};
 		}
 		return { window_pos.x + (render_size.x / 2.0f) + ((-NIKE_CAMERA_SERVICE->getActiveCamera().position.x + pos.x) * scale.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),
@@ -126,15 +126,15 @@ namespace NIKE {
 	void LevelEditor::IPanel::worldRectFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding) {
 
 		//Draw filled rect
-		draw_list->AddRectFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+		draw_list->AddRectFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 			color, rounding);
 	}
 
 	void LevelEditor::IPanel::worldRect(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float rounding, float thickness) {
 		//Draw filled rect
-		draw_list->AddRect(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+		draw_list->AddRect(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 			color, rounding, 0, thickness);
 	}
 
@@ -144,9 +144,9 @@ namespace NIKE {
 
 		//Draw quad bounding box
 		draw_list->AddQuadFilled(worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size),
-			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size),
-			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size),
-			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size), color);
+			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size, e_transform.use_screen_pos),
+			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size, e_transform.use_screen_pos), color);
 	}
 
 	void LevelEditor::IPanel::worldQuad(ImDrawList* draw_list, Transform::Transform const& e_transform, ImVec2 const& render_size, ImU32 color, float thickness) {
@@ -177,7 +177,7 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Render filled circle
-		draw_list->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y), render_size),
+		draw_list->AddCircleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y), render_size, e_transform.use_screen_pos),
 			(e_transform.scale.x * scale.x) / 2.0f / zoom, color);
 	}
 
@@ -192,53 +192,52 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Render filled circle
-		draw_list->AddCircle(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y), render_size),
+		draw_list->AddCircle(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y), render_size, e_transform.use_screen_pos),
 			(e_transform.scale.x * scale.x) / 2.0f / zoom, color, 0, thickness / zoom * fullscreen_scale.x);
 	}
 
 	void LevelEditor::IPanel::worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color) {
-
 		//Render filled triangle based on direction
 		switch (dir) {
 		case ImGuiDir::ImGuiDir_Up: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 				color);
 			break;
 		}
 		case ImGuiDir::ImGuiDir_Down: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 				color);
 			break;
 		}
 		case ImGuiDir::ImGuiDir_Right: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 				color);
 			break;
 		}
 		case ImGuiDir::ImGuiDir_Left: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 				color);
 			break;
 		}
 		default: {
-			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
-				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size),
+			draw_list->AddTriangleFilled(worldToScreen(ImVec2(e_transform.position.x, e_transform.position.y - (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x + (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
+				worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y + (e_transform.scale.y / 2.0f)), render_size, e_transform.use_screen_pos),
 				color);
 			break;
 		}
 		}
 	}
 
-	void LevelEditor::IPanel::worldLine(ImDrawList* draw_list, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness) {
+	void LevelEditor::IPanel::worldLine(ImDrawList* draw_list, Transform::Transform const& e_transform, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness) {
 
 		//Full Screen scale
 		auto fullscreen_scale = NIKE_WINDOWS_SERVICE->getWindow()->getFullScreenScale();
@@ -247,7 +246,7 @@ namespace NIKE {
 		auto zoom = NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 
 		//Draw line of rotation
-		draw_list->AddLine(worldToScreen(ImVec2(point1.x, point1.y), render_size), worldToScreen(ImVec2(point2.x, point2.y), render_size), color, thickness / zoom * fullscreen_scale.x);
+		draw_list->AddLine(worldToScreen(ImVec2(point1.x, point1.y), render_size, e_transform.use_screen_pos), worldToScreen(ImVec2(point2.x, point2.y), render_size, e_transform.use_screen_pos), color, thickness / zoom * fullscreen_scale.x);
 	}
 
 	/*****************************************************************//**
@@ -1549,7 +1548,7 @@ namespace NIKE {
 			return false;
 		}
 	}
-
+	//
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
@@ -1574,8 +1573,13 @@ namespace NIKE {
 		//Get gizmo Scale
 		float gizmo_scale = gizmo.gizmo_scaling * cam_zoom;
 
+		Vector2i window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		Vector2f mouse_pos = game_panel.lock()->getWindowMousePos();
+
 		//Get mouse pos
-		Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
+		Vector2f world_mouse = e_transform.use_screen_pos ? Vector2f(mouse_pos.x - window_size.x * 0.5f, -(mouse_pos.y - window_size.y * 0.5f)) :
+			game_panel.lock()->getWorldMousePos();
+
 
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
@@ -2422,6 +2426,13 @@ namespace NIKE {
 		//Get transform
 		auto& e_transform = e_transform_comp.value().get();
 
+		// Sync use_screen_pos to all gizmo objects
+		if (e_transform.use_screen_pos != gizmo.objects["Center"].first.use_screen_pos) { // Comparing to one of the gizmo object
+			for (auto& [name, gizmo_pair] : gizmo.objects) {
+				gizmo_pair.first.use_screen_pos = e_transform.use_screen_pos;
+			}
+		}
+
 		//Internal imgui draw
 		auto draw = static_cast<ImDrawList*>(draw_list);
 
@@ -2495,7 +2506,7 @@ namespace NIKE {
 			auto const& rotation_point = gizmo.objects["Rot Point"];
 
 			//Draw line of rotation
-			worldLine(draw, e_transform.position, rotation_point.first.position, rendersize, IM_COL32(255, 255, 255, 255), gizmo.gizmo_scaling * 0.15f);
+			worldLine(draw, rotation_point.first, e_transform.position, rotation_point.first.position, rendersize, IM_COL32(255, 255, 255, 255), gizmo.gizmo_scaling * 0.15f);
 
 			//Draw point of rotation
 			worldCircleFilled(draw, rotation_point.first, rendersize, IM_COL32(rotation_point.second.r, rotation_point.second.g, rotation_point.second.b, rotation_point.second.a));
@@ -2509,10 +2520,10 @@ namespace NIKE {
 		//Render gizmo text
 		if (gizmo.mode == GizmoMode::Rotate) {
 			auto const& rotation_circle = gizmo.objects["Rot Circle"].first;
-			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), rotation_circle.position.y - (rotation_circle.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), rotation_circle.position.y - (rotation_circle.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 		else {
-			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y * 0.6f)), rendersize), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 	}
 
