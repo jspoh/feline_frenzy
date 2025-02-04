@@ -125,9 +125,6 @@ namespace NIKE {
 			//Boolean for enabling/disabling transform gizmo
 			bool b_gizmo_state;
 
-			//Set Game State
-			void setGameState(bool state);
-
 		public:
 			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false } {}
 			~MainPanel() = default;
@@ -144,6 +141,9 @@ namespace NIKE {
 
 			//Public get debug state
 			bool getDebugState() const;
+
+			//Set Game State
+			void setGameState(bool state);
 
 			//Public get game state
 			bool getGameState() const;

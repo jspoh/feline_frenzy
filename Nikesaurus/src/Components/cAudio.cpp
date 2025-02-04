@@ -1,11 +1,11 @@
 /*****************************************************************//**
  * \file   cAudio.cpp
- * \brief	Animation components
+ * \brief  Audio components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \date   October 2024
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -131,12 +131,12 @@ namespace NIKE {
 								LevelEditor::Action change_audio_action;
 								change_audio_action.do_action = [&, audio_id = new_audio_id]() {
 									comp.audio_id = audio_id;
-									};
+								};
 
 								// Undo action
 								change_audio_action.undo_action = [&, audio_id = previous_audio_id]() {
 									comp.audio_id = audio_id;
-									};
+								};
 
 								// Execute the action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_audio_action));
@@ -186,12 +186,12 @@ namespace NIKE {
 								LevelEditor::Action change_channel_group_id_action;
 								change_channel_group_id_action.do_action = [&, channel_group_id = new_channel_group_id]() {
 									comp.channel_group_id = channel_group_id;
-									};
+								};
 
 								// Undo action
 								change_channel_group_id_action.undo_action = [&, channel_group_id = previous_channel_group_id]() {
 									comp.channel_group_id = channel_group_id;
-									};
+								};
 
 								// Execute the action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_channel_group_id_action));
@@ -229,12 +229,12 @@ namespace NIKE {
 								//Change volume do action
 								change_volume.do_action = [&, vol = comp.volume]() {
 									comp.volume = vol;
-									};
+								};
 
 								//Change volume undo action
 								change_volume.undo_action = [&, vol = vol_before_change]() {
 									comp.volume = vol;
-									};
+								};
 
 								//Execute action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_volume));
@@ -269,12 +269,12 @@ namespace NIKE {
 								//Change pitch do action
 								change_pitch.do_action = [&, pitch = comp.pitch]() {
 									comp.pitch = pitch;
-									};
+								};
 
 								//Change [volume]itch undo action
 								change_pitch.undo_action = [&, pitch = pitch_before_change]() {
 									comp.pitch = pitch;
-									};
+								};
 
 								//Execute action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pitch));

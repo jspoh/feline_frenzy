@@ -168,11 +168,15 @@ namespace NIKE {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
 			
 			for (auto& entity : layer->getEntitites()) {
+
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
 
 				//Skip entity if no transform is present
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
@@ -202,7 +206,11 @@ namespace NIKE {
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
-			for (auto& entity : entities) {
+			for (auto& entity : layer->getEntitites()) {
+				
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
+
 				// skip entity if is hidden
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
 					continue;

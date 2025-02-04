@@ -9,10 +9,13 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/State Machine/enemyStates.h"
-#include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
+
+// Transitions
+#include "Managers/Services/State Machine/enemyTransitions.h"
+#include "Managers/Services/State Machine/destructableTransitions.h"
 
 namespace NIKE {
 
@@ -26,6 +29,7 @@ namespace NIKE {
 		addTransition("IdleToAttack", std::make_shared<Transition::IdleToAttack>());
 		addTransition("IdleToChase", std::make_shared<Transition::IdleToChase>());
 		addTransition("IdleToDeath", std::make_shared<Transition::IdleToDeath>());
+		addTransition("IdleToDestructableDeath", std::make_shared<Transition::IdleToDestructableDeath>());
 	}
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -106,6 +110,7 @@ namespace NIKE {
 						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
+						updateAttackAnimation(entity);
 						auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 						if (e_audio_comp.has_value())
 						{
@@ -160,9 +165,34 @@ namespace NIKE {
 		}
 	}
 
-	void State::AttackState::updateAttackAnimation(Entity::Type& entity)
+	void State::AttackState::updateAttackAnimation([[maybe_unused]] Entity::Type& entity)
 	{
-
+		int get_last_direction = getLastDirection(entity);
+		if (get_last_direction == 0)
+		{
+			// Attack right
+			animationStart(entity, 0, 5);
+			animationEnd(entity, 5, 5);
+			flipX(entity, false);
+		}
+		else if (get_last_direction == 2) {
+			// Attack up
+			animationStart(entity, 0, 7);
+			animationEnd(entity, 5, 7);
+			flipX(entity, false);
+		}
+		else if (get_last_direction == 5) {
+			// Attack down
+			animationStart(entity, 0, 4);
+			animationEnd(entity, 5, 4);
+			flipX(entity, false);
+		}
+		else{
+			// Attack left
+			animationStart(entity, 0, 4);
+			animationEnd(entity, 5, 4);
+			flipX(entity, true);
+		}
 	}
 
 	/*******************************
@@ -272,8 +302,8 @@ namespace NIKE {
 		}
 		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Moving up
-			animationStart(entity, 0, 0);
-			animationEnd(entity, 9, 0);
+			animationStart(entity, 0, 3);
+			animationEnd(entity, 9, 3);
 			flipX(entity, false);
 			setLastDirection(entity, 2);
 		}

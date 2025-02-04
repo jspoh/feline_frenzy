@@ -32,6 +32,9 @@ namespace NIKE {
 				//Iterate through all entities
 				for (auto& entity : layer->getEntitites()) {
 
+					//Skip entity not registered to this system
+					if (entities.find(entity) == entities.end()) continue;
+
 					//Get base animator comp
 					auto e_baseanimator_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 					if (!e_baseanimator_comp.has_value()) continue;

@@ -4,7 +4,7 @@
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   November 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -31,6 +31,10 @@ namespace NIKE {
 
                 // Iterate through all entities
                 for (auto& entity : (*layer)->getEntitites()) {
+
+                    //Skip entity not registered to this system
+                    if (entities.find(entity) == entities.end()) continue;
+
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 
                         // Check for Elemental Source component
@@ -70,17 +74,48 @@ namespace NIKE {
                         }
                     }
                 }
+
+                // Check for healthdrop tag
+                        // Check for state component
+                        // If death state
+                        // Spawn health pack
+
+            }
+        }
+
+        void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+        {
+            auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+            if (e_sfx_comp.has_value()) {
+                auto& e_sfx = e_sfx_comp.value().get();
+
+                //Check if group exists
+                auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+                if (!group) {
+                    e_sfx.audio_id = "EnemyGetHit.wav";
+                    e_sfx.b_play_sfx = play_or_no;
+                    return;
+                }
+                else {
+                    //Play sound
+                    if (play_or_no && !group->isPlaying()) {
+                        e_sfx.audio_id = "EnemyGetHit.wav";
+                        e_sfx.b_play_sfx = play_or_no;
+                    }
+                }
+
+                //stop sfx
+                if (!play_or_no) {
+                    group->stop();
+                }
             }
         }
 
 
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
-
-
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
             const auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_b);
-
 
             if (a_damage_comp.has_value() || b_damage_comp.has_value()) {
                 const auto a_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
@@ -102,6 +137,39 @@ namespace NIKE {
                 if (a_damage_comp.has_value()) applyDamage(entity_a, entity_b);
                 if (b_damage_comp.has_value()) applyDamage(entity_b, entity_a);
             }
+
+            // Collision between health drop and health
+            const auto a_health_drop_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_a);
+            const auto b_health_drop_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_b);
+
+            if (a_health_drop_comp.has_value() || b_health_drop_comp.has_value()) {
+                if (a_health_drop_comp.has_value()) restoreHealth(entity_a, entity_b);
+                if (b_health_drop_comp.has_value()) restoreHealth(entity_b, entity_a);
+            }
+        }
+
+        void restoreHealth(Entity::Type healer, Entity::Type target) {
+            const auto healer_heal_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(healer);
+            const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
+            const auto& healer_heal = healer_heal_comp.value().get().heal_amount;
+
+            // Return if target has no health
+            if (target_health_comp.has_value() == false) {
+                return;
+            }
+
+            //const auto target_player_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(target);
+            //auto& player_faction = target_player_comp.value().get().faction;
+            
+            // !TODO: Return if faction not player
+
+            auto& target_health = target_health_comp.value().get().health;
+            const auto& target_max_health = target_health_comp.value().get().max_health;
+
+            // Heal Target
+            if (target_health < target_max_health) {
+                target_health += healer_heal;
+            }
         }
 
         void applyDamage(Entity::Type attacker, Entity::Type target) {
@@ -111,7 +179,7 @@ namespace NIKE {
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if (!(attacker_damage_comp.has_value() && target_health_comp.has_value())) {
+            if ((attacker_damage_comp.has_value() && target_health_comp.has_value()) == false) {
                 return;
             }
 
@@ -139,19 +207,13 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
             // Play SFX when apply damage
-            auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(target);
-            if (e_audio_comp.has_value())
-            {
-                auto& audio_comp = e_audio_comp.value().get();
-                audio_comp.audio_id = "EnemyGetHit.wav";
-                audio_comp.b_play_sfx = true;
-            }
+            playSFX(attacker, true);
 
 			// Check if target health drops to zero or below
 			if (target_health.health <= 0) {
 				// Target has more than 1 life
 				--target_health.lives;
-				target_health.health = ENEMY_HEALTH;
+				target_health.health = target_health.max_health;
 				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
 			}
         }

@@ -6,7 +6,7 @@
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
- *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once

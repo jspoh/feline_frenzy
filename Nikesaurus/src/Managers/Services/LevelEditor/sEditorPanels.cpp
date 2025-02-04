@@ -262,6 +262,9 @@ namespace NIKE {
 		//Get all ecs systems
 		auto& systems = NIKE_ECS_MANAGER->getAllSystems();
 
+		//Dispatch pause audio event
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(b_game_state));
+
 		//Set the state of each systems based on new game state
 		if (!b_game_state) {
 			std::for_each(systems.begin(), systems.end(),
@@ -270,12 +273,18 @@ namespace NIKE {
 						system->setActiveState(false);
 					}
 				});
+
+			//Restart scene
+			NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
 		}
 		else {
 			std::for_each(systems.begin(), systems.end(),
 				[](std::shared_ptr<System::ISystem>& system) {
 					system->setActiveState(true);
 				});
+
+			//Exit editor mode
+			NIKE_LVLEDITOR_SERVICE->setEditorState(false);
 		}
 	}
 
@@ -317,27 +326,12 @@ namespace NIKE {
 
 			//Game State Switching
 			{
-				ImGui::Text("Play/Pause Game: ");
-				ImGui::Button(b_game_state ? "Pause" : "Play");
+				ImGui::Text("Play Game: ");
+				ImGui::Button("Play");
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
-					Action set_game_state;
-
-					//Do game mode
-					set_game_state.do_action = [&, mode = !b_game_state]() {
-						setGameState(mode);
-						NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(mode));
-						};
-
-					//Undo game mode
-					set_game_state.undo_action = [&, mode = b_game_state]() {
-						setGameState(mode);
-						NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Audio::PausedEvent>(mode));
-						};
-
-					//Execute action
-					NIKE_LVLEDITOR_SERVICE->executeAction(std::move(set_game_state));
+					setGameState(true);
 				}
 			}
 
@@ -2295,11 +2289,6 @@ namespace NIKE {
 
 			ImGui::SameLine();
 
-			//Set layer id popup
-			if (ImGui::Button("Set Layer ID")) {
-				openPopUp("Set Layer ID");
-			}
-
 			//Add Spacing
 			ImGui::Spacing();
 
@@ -4106,6 +4095,19 @@ namespace NIKE {
 
 			//Loadable type actions
 			if (NIKE_ASSETS_SERVICE->isAssetLoadable(selected_asset_id)) {
+
+				//Show audio length if asset is loaded & an audio file
+				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id) && (NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Sound ||
+					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music)) {
+
+					//Show audio length
+					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength();
+					ImGui::Text("Length:");
+					ImGui::Text("%d ms", length);
+					ImGui::Text("%.2f s", length / 1000.0f);
+					ImGui::Text("%.2f mins", (length / 1000.0f) / 60.0f);
+				}
+
 				//Asset loading or unloading
 				if (NIKE_ASSETS_SERVICE->isAssetCached(selected_asset_id)) {
 					//Unload action

@@ -64,6 +64,8 @@ namespace NIKE {
 				TextBuffer text_buffer;
 
 			public:
+
+				//Rendering constants
 				const bool BATCHED_RENDERING = true;
 				static constexpr unsigned int MAX_INSTANCES = 500;
 				static constexpr int MAX_UNIQUE_TEX_HDLS = 32;
@@ -126,6 +128,7 @@ namespace NIKE {
 				// batch render shape (uses renderObject)
 				void batchRenderObject();
 
+				// batch render bounding boxes
 				void batchRenderBoundingBoxes();
 
 				// batch render texture (uses renderObject)

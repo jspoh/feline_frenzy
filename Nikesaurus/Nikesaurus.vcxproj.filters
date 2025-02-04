@@ -62,6 +62,8 @@
     <ClCompile Include="src\Managers\Services\State Machines\enemyTransitions.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sRender.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\destructableStates.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\destructableTransitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -136,6 +138,8 @@
     <ClInclude Include="headers\Managers\Services\State Machine\enemyTransitions.h" />
     <ClInclude Include="headers\Managers\Services\Render\sRender.h" />
     <ClInclude Include="headers\Managers\Services\Render\sShader.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\destructableStates.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\destructableTransitions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

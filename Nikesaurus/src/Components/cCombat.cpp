@@ -22,6 +22,7 @@ namespace NIKE {
 			[](Health const& comp) -> nlohmann::json {
 				return	{
 						{ "Lives", comp.lives },
+						{ "MaxHealth", comp.max_health},
 						{ "Health", comp.health },
 						{ "invulnerable_flag", comp.invulnerable_flag },
 						//{ "HealthBarActive", comp.healthBarActive}
@@ -31,6 +32,7 @@ namespace NIKE {
 			// Deserialize
 			[](Health& comp, nlohmann::json const& data) {
 				comp.lives = data.value("Lives", 1);
+				comp.max_health = data.value("MaxHealth", 100.0f);
 				comp.health = data.value("Health", 100.0f);
 				comp.invulnerable_flag = data.value("invulnerable_flag", false);
 			},
@@ -41,6 +43,9 @@ namespace NIKE {
 
 				if (comp.lives != other_comp.lives) {
 					delta["Lives"] = comp.lives;
+				}
+				if (comp.max_health != other_comp.max_health) {
+					delta["MaxHealth"] = comp.max_health;
 				}
 				if (comp.health != other_comp.health) {
 					delta["Health"] = comp.health;
@@ -56,6 +61,9 @@ namespace NIKE {
 			[](Health& comp, nlohmann::json const& delta) {
 				if (delta.contains("Lives")) {
 					comp.lives = delta["Lives"];
+				}
+				if (delta.contains("MaxHealth")) {
+					comp.max_health = delta["MaxHealth"];
 				}
 				if (delta.contains("Health")) {
 					comp.health = delta["Health"];
@@ -146,6 +154,45 @@ namespace NIKE {
 
 		// Faction Component Adding
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Faction>();
+
+		// Register health components
+		NIKE_ECS_MANAGER->registerComponent<HealthDrop>();
+
+		// Register health for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<HealthDrop>(
+			// Serialize
+			[](HealthDrop const& comp) -> nlohmann::json {
+				return	{
+						{ "HealAmount", comp.heal_amount },
+				};
+			},
+
+			// Deserialize
+			[](HealthDrop& comp, nlohmann::json const& data) {
+				comp.heal_amount = data.value("HealAmount", 10.0f);
+			},
+
+			// Override Serialize
+			[](HealthDrop const& comp, HealthDrop const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.heal_amount != other_comp.heal_amount) {
+					delta["HealAmount"] = comp.heal_amount;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](HealthDrop& comp, nlohmann::json const& delta) {
+				if (delta.contains("HealAmount")) {
+					comp.heal_amount = delta["HealAmount"];
+				}
+			}
+		);
+
+		//Health Comp Adding
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<HealthDrop>();
 	}
 
 	void Combat::registerEditorComponents() {
@@ -182,6 +229,36 @@ namespace NIKE {
 
 						// Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_health));
+					}
+				}
+
+				// For max health
+				{
+					static float before_change_max_health;
+
+					ImGui::DragFloat("Max Health", &comp.max_health, 0.1f);
+
+					// Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_max_health = comp.max_health;
+					}
+
+					// Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_max_health;
+
+						// Change do action
+						change_max_health.do_action = [&, max_health = comp.max_health]() {
+							comp.max_health = max_health;
+							};
+
+						// Change undo action
+						change_max_health.undo_action = [&, max_health = before_change_max_health]() {
+							comp.max_health = max_health;
+							};
+
+						// Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_max_health));
 					}
 				}
 
@@ -311,6 +388,45 @@ namespace NIKE {
 						// Update previous values for next undo/redo
 						before_select_faction = comp.faction;
 						previous_faction = static_cast<int>(comp.faction);
+					}
+				}
+			}
+		);
+#endif
+
+#ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<HealthDrop>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, HealthDrop& comp) {
+
+				ImGui::Text("Edit Health Drop Variables");
+
+				// For shooting damage
+				{
+					static float before_change_heal_amount;
+
+					ImGui::DragFloat("Amount Healed", &comp.heal_amount, 0.1f);
+
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_heal_amount = comp.heal_amount;
+					}
+
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_heal_amount;
+
+						//Change do action
+						change_heal_amount.do_action = [&, heal_amount = comp.heal_amount]() {
+							comp.heal_amount = heal_amount;
+							};
+
+						//Change undo action
+						change_heal_amount.undo_action = [&, heal_amount = before_change_heal_amount]() {
+							comp.heal_amount = heal_amount;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_heal_amount));
 					}
 				}
 			}

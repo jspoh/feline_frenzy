@@ -1,0 +1,60 @@
+{
+    "Components": {
+        "Combat::HealthDrop": {
+            "HealAmount": 10.0
+        },
+        "Physics::Collider": {
+            "B_Bind_To_Entity": true,
+            "Pos_Offset": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Resolution": 3,
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.0,
+            "Texture_ID": "Heart.png"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 256.0,
+                "y": 256.0
+            },
+            "Screen Position": false
+        }
+    }
+}
