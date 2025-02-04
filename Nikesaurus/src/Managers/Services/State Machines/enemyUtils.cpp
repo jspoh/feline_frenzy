@@ -12,6 +12,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
+#include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
 	void Enemy::moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset) {
@@ -217,6 +218,15 @@ namespace NIKE {
 		auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
 		if (bullet_sfx.has_value()) {
 			bullet_sfx.value().get().b_play_sfx = true;
+			// float rand_pitch = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);		
+			std::random_device rd;
+			// Mersenne Twister random engine
+			std::mt19937 gen(rd());  
+			// Rand pitch between 0.5 and 2
+			std::uniform_real_distribution<float> dist(0.5f, 2.0f);
+
+			float rand_pitch = GameLogic::getRandomNumber(0.5f,2.f);
+			bullet_sfx.value().get().pitch = rand_pitch;
 		}
 	}
 }

@@ -99,6 +99,7 @@
 #include <stack>
 #include <regex>
 #include <limits>
+#include <random>
 
  /*****************************************************************//**
  * Data (json)
