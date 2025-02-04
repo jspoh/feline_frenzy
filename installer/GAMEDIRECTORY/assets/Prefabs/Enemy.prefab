@@ -29,7 +29,7 @@
         },
         "Combat::Faction": {
             "Faction": 2
-	},
+        },
         "Combat::Health": {
             "Health": 100.0,
             "InvulnerableFlag": false,
@@ -49,6 +49,12 @@
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
+        },
+        "Enemy::Spawner": {
+            "Cooldown": 10.0,
+            "EnemiesSpawned": 0,
+            "EnemyLimit": 0,
+            "LastSpawnTime": 10.0
         },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
@@ -119,6 +125,5 @@
             },
             "Screen Position": false
         }
-    },
-    "Layer ID": 1
+    }
 }

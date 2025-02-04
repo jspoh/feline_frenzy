@@ -59,6 +59,11 @@ namespace NIKE {
             void setLastDirection(Entity::Type& entity, int dir);
             int getLastDirection(Entity::Type& entity);
 
+            /***********************
+            * SFX handling
+            ************************/
+            void playSFX(Entity::Type& entity, bool play_or_stop);
+
         private:
             // List of transitions
             std::unordered_map<std::string, std::shared_ptr<Itransition>> transitions;

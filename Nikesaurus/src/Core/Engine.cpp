@@ -286,10 +286,11 @@ namespace NIKE {
 	void Core::Engine::run() {
 		// !TODO: remove this, hardcoding for installer
 		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
-
+#ifndef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
+#endif
 #ifdef NDEBUG
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #endif
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
@@ -348,10 +349,10 @@ namespace NIKE {
 #ifndef NDEBUG
 				//Update & Render Level Editor
 				NIKE_LVLEDITOR_SERVICE->updateAndRender();
+#endif
 
 				//update UI First
 				NIKE_UI_SERVICE->update();
-#endif
 
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
