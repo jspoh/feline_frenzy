@@ -78,8 +78,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": true,
+                            "Layer_ID": 0,
                             "Name": "background",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -129,8 +129,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -145,14 +145,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1128,
+                                "Completed_Animations": 1135,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -207,8 +207,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -223,14 +223,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1220,
+                                "Completed_Animations": 1231,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.10000000149011612
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -260,7 +260,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -285,8 +285,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0003",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -301,14 +301,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1220,
+                                "Completed_Animations": 1231,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.10000000149011612
+                                "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -338,7 +338,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -363,8 +363,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0004",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -379,14 +379,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1186,
+                                "Completed_Animations": 1197,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.2666666805744171
+                                "Timer": 0.18333333730697632
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -416,7 +416,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -441,8 +441,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0005",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -457,14 +457,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1128,
+                                "Completed_Animations": 1135,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -519,8 +519,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0006",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -535,14 +535,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1128,
+                                "Completed_Animations": 1135,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -597,8 +597,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0007",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -613,14 +613,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1128,
+                                "Completed_Animations": 1135,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.0833333358168602
+                                "Timer": 0.0
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 1
                                 },
                                 "End_Index": {
@@ -675,8 +675,8 @@
                         },
                         "Layer ID": 0,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0008",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -697,43 +697,30 @@
                     "Entity": {
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "enemy_1",
                             "Prefab_ID": "Enemy.prefab",
                             "Prefab_Override": {
                                 "Components": {
                                     "Animation::Base": {
-                                        "Completed_Animations": 53,
+                                        "Completed_Animations": 11,
                                         "Timer": 0.05000000447034836
                                     },
-                                    "Animation::Sprite": {
-                                        "Curr_Index": {
-                                            "x": 0,
-                                            "y": 2
-                                        },
-                                        "End_Index": {
-                                            "x": 9,
-                                            "y": 2
-                                        },
-                                        "Start_Index": {
-                                            "x": 0,
-                                            "y": 2
-                                        }
-                                    },
+                                    "Animation::Sprite": null,
                                     "Combat::Faction": null,
                                     "Combat::Health": null,
                                     "Element::Entity": null,
                                     "Enemy::Attack": {
-                                        "LastShotTime": 0.5333334803581238
+                                        "LastShotTime": 0.5500001311302185
                                     },
                                     "Enemy::Spawner": {
                                         "LastSpawnTime": 10.016666412353516
                                     },
                                     "Physics::Collider": {
                                         "Position": {
-                                            "x": 357.5060119628906,
-                                            "y": -79.95215606689453
+                                            "x": 197.58847045898438,
+                                            "y": 64.78801727294922
                                         }
                                     },
                                     "Physics::Dynamics": {
@@ -747,15 +734,15 @@
                                         }
                                     },
                                     "Render::Texture": {
+                                        "B_Flip": {
+                                            "x": false,
+                                            "y": false
+                                        },
                                         "Color": {
                                             "w": 1.0,
                                             "x": 0.0,
                                             "y": 0.0,
                                             "z": 0.0
-                                        },
-                                        "Frame_Index": {
-                                            "x": 0,
-                                            "y": 2
                                         }
                                     },
                                     "State::State": {
@@ -763,8 +750,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 357.5060119628906,
-                                            "y": -79.95215606689453
+                                            "x": 197.58847045898438,
+                                            "y": 64.78801727294922
                                         },
                                         "Scale": {
                                             "x": 94.74974060058594,
@@ -814,8 +801,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -858,8 +845,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0011",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -915,8 +902,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -959,8 +946,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0013",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -975,19 +962,19 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 188,
+                                "Completed_Animations": 8,
                                 "Frame_Duration": 0.054999999701976776,
                                 "Mode": 0,
                                 "Timer": 0.01666666753590107
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 1
                                 },
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 0
+                                    "y": 1
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -995,7 +982,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 1
                                 }
                             },
                             "Audio::SFX": {
@@ -1011,7 +998,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 13
+                                    "entity": 14
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -1022,8 +1009,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 239.45477294921875,
-                                    "y": 204.20970153808594
+                                    "x": 302.2340393066406,
+                                    "y": -294.0303955078125
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -1055,7 +1042,7 @@
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
-                                    "x": false,
+                                    "x": true,
                                     "y": false
                                 },
                                 "B_Stretch": false,
@@ -1066,8 +1053,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -1081,8 +1068,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 239.45477294921875,
-                                    "y": 204.20970153808594
+                                    "x": 302.2340393066406,
+                                    "y": -294.0303955078125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1094,8 +1081,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1126,7 +1113,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.401298464324817e-45,
+                                    "w": 3.6229323000049385e-27,
                                     "x": 0.9489796161651611,
                                     "y": 0.2614535689353943,
                                     "z": 0.0
@@ -1157,8 +1144,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0015",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1218,8 +1205,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0016",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1248,7 +1235,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.401298464324817e-45,
+                                    "w": 2.74704225736417e-20,
                                     "x": 0.17211580276489258,
                                     "y": 0.8877550959587097,
                                     "z": 0.0
@@ -1279,8 +1266,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0017",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1330,8 +1317,8 @@
                         },
                         "Layer ID": 1,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0018",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1352,8 +1339,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "barrel_3",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1390,8 +1377,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1428,8 +1415,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "barrel_1",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1456,8 +1443,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "yellow_tree1",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1494,8 +1481,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "yellow_tree3",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1532,8 +1519,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "pink_tree1",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1570,8 +1557,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "green_tree4",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1598,8 +1585,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "green_tree1",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1636,8 +1623,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "green_tree3",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1674,8 +1661,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "green_tree2",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1724,8 +1711,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "yellow_tree2",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1762,8 +1749,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "pink_tree4",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1800,8 +1787,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "pink_tree2",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1838,8 +1825,8 @@
                     "Entity": {
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "entity_0032",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1879,14 +1866,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1214,
+                                "Completed_Animations": 1225,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.18333333730697632
+                                "Timer": 0.10000000149011612
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -1933,7 +1920,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -1958,8 +1945,8 @@
                         },
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "lamp_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1976,14 +1963,14 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1221,
+                                "Completed_Animations": 1232,
                                 "Frame_Duration": 0.30000001192092896,
                                 "Mode": 0,
-                                "Timer": 0.23333333432674408
+                                "Timer": 0.15000000596046448
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
-                                    "x": 0,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "End_Index": {
@@ -2030,7 +2017,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2055,8 +2042,8 @@
                         },
                         "Layer ID": 2,
                         "MetaData": {
-                            "B_Is_Active": true,
                             "B_Locked": false,
+                            "Layer_ID": 0,
                             "Name": "torch_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
