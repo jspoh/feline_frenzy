@@ -250,10 +250,9 @@ namespace NIKE {
 		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
 
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
-		const Data::ParticlePresets preset = Data::ParticlePresets::CLUSTER;
 		for (const auto& ps : PM.getActiveParticleSystems()) {
-			const unsigned int vao = PM.getVAO(preset);
-			const unsigned int vbo = PM.getVBO(preset);
+			const unsigned int vao = PM.getVAO(ps.preset);
+			const unsigned int vbo = PM.getVBO(ps.preset);
 
 			glNamedBufferSubData(vbo, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
 
