@@ -219,6 +219,7 @@ namespace NIKE {
 							};
 
 							const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
+
 							Matrix_33 cam_to_ndc_xform{
 								2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
 								0, 2.0f / (cam_height * cam.zoom), 0,
@@ -230,7 +231,7 @@ namespace NIKE {
 
 							Matrix_33 screen_xform = Matrix_33{
 								screenWidth * 0.5f, 0, screenWidth * 0.5f,
-								0, -screenHeight * 0.5f, screenHeight * 0.5f,
+								0, screenHeight * 0.5f, screenHeight * 0.5f,
 								0, 0, 1
 							} *cam_to_ndc_xform * view_xform;
 
