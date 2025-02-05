@@ -172,8 +172,9 @@ void NSPM::update() {
 		case Data::ParticlePresets::FIRE: {
 			static constexpr float LIFESPAN = 5.f;
 			static constexpr float ACCELERATION = 0.f;
-			constexpr int NEW_PARTICLES_PER_SECOND = 50;
-			const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+			static constexpr int NEW_PARTICLES_PER_SECOND = 50;
+			static const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+			static constexpr int X_OFFSET = 10;
 
 			for (auto& p : ps.particles) {
 				// Update particle
@@ -227,9 +228,10 @@ void NSPM::update() {
 
 				for (int _{}; _ < particles_to_spawn; _++) {
 					Particle new_particle;
-					new_particle.preset = Data::ParticlePresets::CLUSTER;
-					new_particle.pos = ps.origin;
-					new_particle.vector = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
+					new_particle.preset = Data::ParticlePresets::FIRE;
+					const float x_offset = static_cast<float>(rand() % X_OFFSET);
+					new_particle.pos = {ps.origin.x + (rand() % 2 ? 1 : -1) * x_offset, ps.origin.y};
+					new_particle.vector = { 0.f, static_cast<float>(rand() % 100) / 100.f };
 					new_particle.vector.normalize();
 					new_particle.velocity = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
 					new_particle.acceleration = ACCELERATION;
