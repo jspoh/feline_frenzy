@@ -149,17 +149,17 @@ void NSPM::update() {
 			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
 
 			// spawn new particles
-			float LIFESPAN;
-			float ACCELERATION;
-			int NEW_PARTICLES_PER_SECOND;
-			Vector2f PARTICLE_VELOCITY_RANGE;
-			int MAX_OFFSET;
-			Vector2f VECTOR;
-			float VELOCITY;
-			Vector4f COLOR;
-			float ROTATION;
-			Vector2f SIZE;
-			Vector2f PARTICLE_ORIGIN;
+			float LIFESPAN{};
+			float ACCELERATION{};
+			int NEW_PARTICLES_PER_SECOND{};
+			Vector2f PARTICLE_VELOCITY_RANGE{};
+			int MAX_OFFSET{};
+			Vector2f VECTOR{};
+			float VELOCITY{};
+			Vector4f COLOR{};
+			float ROTATION{};
+			Vector2f SIZE{};
+			Vector2f PARTICLE_ORIGIN{};
 
 			switch (ps.preset) {
 			case Data::ParticlePresets::CLUSTER: {
@@ -252,7 +252,6 @@ void NSPM::update() {
 
 
 			}
-			break;
 		}
 
 	}
