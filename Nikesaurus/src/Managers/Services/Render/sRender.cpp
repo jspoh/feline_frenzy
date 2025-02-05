@@ -543,9 +543,12 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		const std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type));
-
+		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type));
+		if (preset == static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::BASE)) {
+			ref = "base";
+		}
 		const std::string shader_name = ref + "_particle";
+
 
 		shader_manager->useShader(shader_name);
 

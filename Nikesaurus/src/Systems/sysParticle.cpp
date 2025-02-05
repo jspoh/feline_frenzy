@@ -80,6 +80,9 @@ void NSPM::update() {
 		// Update particle system
 		if (ps.duration != -1 && ps.time_alive >= ps.duration) {
 			ps.is_alive = false;
+		}
+
+		if (!ps.is_alive && ps.particles.size() == 0) {
 			continue;
 		}
 
@@ -136,7 +139,7 @@ void NSPM::update() {
 
 			int particles_to_spawn = static_cast<int>(time_since_last_spawn * NEW_PARTICLES_PER_SECOND);
 
-			if (ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+			if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
 				particles_to_spawn = 0;
 				time_since_last_spawn = 0.f;
 			}
@@ -274,7 +277,14 @@ void NSPM::update() {
 
 	// !TODO: jspoh restore this
 	// remove dead particle systems
-	//active_particle_systems.erase(std::remove_if(active_particle_systems.begin(), active_particle_systems.end(), [](const auto& pair) { return pair.second.is_alive; }), active_particle_systems.end());
+	for (auto it = active_particle_systems.begin(); it != active_particle_systems.end();) {
+		if (!it->second.is_alive && it->second.particles.size() == 0) {
+			it = active_particle_systems.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
 }
 
 std::vector<ParticleSystem>NSPM::getActiveParticleSystems() const {
