@@ -259,6 +259,8 @@ namespace NIKE {
 		//Init metadata service
 		NIKE_METADATA_SERVICE->init();
 
+		NIKE_FSM_SERVICE->init();
+
 		//Register Def Components
 		registerDefComponents();
 

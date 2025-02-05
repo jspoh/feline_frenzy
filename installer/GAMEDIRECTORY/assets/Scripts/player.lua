@@ -11,6 +11,18 @@ local cheatModeEnabled = false
 local godModeEnabled = false
 local highDamageEnabled = false
 
+-- SFX setting flag
+local SFXSetFlag = false;
+
+-- Function to initialize additional SFX on the entity
+function Player:InitSFX(entity)
+    -- SFX list (an array of audio file names)
+    local extraSFX = {"WalkingNature.wav", "TakeDamageMeow2.wav", "PlayerDeathMeow2.wav", }
+    -- Call the C++ binding function within this function context.
+    SetAdditionalSFX(entity, extraSFX)
+    SFXSetFlag = true
+end
+
 -- Player animation
 function Player:Animate(entity, args)
     -- Get Last Direction
@@ -209,7 +221,12 @@ end
 
 -- Player update function
 function Player:update(args)
- local entity = args.entity
+    local entity = args.entity
+
+    -- Initialize additional SFX only once
+    if not SFXSetFlag then
+        Player:InitSFX(entity)
+    end
 
     -- Handle attack animation state
     if State(entity) == "Attack" then
@@ -222,12 +239,26 @@ function Player:update(args)
         end
     end
 
+        -- Handle death stuff
+    if CheckDeath(entity) then
+        -- Play a custom death SFX once:
+        PlayCustomSFXOnce(entity, true, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0, 1.0)
+        -- Change state to Death
+        SetState(entity, "Death")
+        AnimationStart(entity, 0, 12)
+        AnimationEnd(entity, 1, 12)
+        FlipX(entity, false)
+        if AnimationCompleted(entity) >= 1 then
+            KillEntity(entity)
+        end
+    end
+
     -- If not attacking, allow movement and animations
     Player:Move(entity)
     Player:Animate(entity, args)
-
-    -- Handle shooting
     Player:Shoot(entity)
+
+
 end
 
 -- Return player object

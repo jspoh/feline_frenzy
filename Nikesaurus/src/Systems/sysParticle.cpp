@@ -130,7 +130,7 @@ void NSPM::update() {
 					p.color.b -= dt / p.lifespan;
 				}
 
-				// particle death
+				// particle EnemyDeathState
 
 				if (p.size.x <= 0 || p.size.y <= 0) {
 					p.is_alive = false;

@@ -11,11 +11,12 @@
     }
   },
   "EditorConfig": {
-    "Editor_State" : true,
+    "Editor_State": true,
     "Debug_Mode": false,
     "Game_State": false,
     "Gizmo_State": true,
-    "Grid_State": false
+    "Grid_State": false,
+    "Auto_Save" : true
   },
   "CameraConfig": {
     "Height": 900.0,

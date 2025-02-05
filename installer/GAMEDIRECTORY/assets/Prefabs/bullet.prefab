@@ -12,7 +12,7 @@
         },
         "Combat::Faction": {
             "Faction": 1
-	    },
+        },
         "Element::Entity": {
             "Element": 0
         },

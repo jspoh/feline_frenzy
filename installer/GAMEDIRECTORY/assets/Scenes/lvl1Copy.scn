@@ -31,10 +31,14 @@
         "MetaData": {
             "Entity_Tags": [
                 "enemy",
+                "healthbar",
                 "objects",
                 "player"
             ]
         }
+    },
+    {
+        "Layer Count": 5
     },
     {
         "Layer": {
@@ -80,10 +84,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": true,
                             "Layer_ID": 0,
+                            "Layer_Order": 0,
                             "Name": "background",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -137,10 +141,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 1,
                             "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -215,10 +219,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 2,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -293,10 +297,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 3,
                             "Name": "entity_0003",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -371,10 +375,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 4,
                             "Name": "entity_0004",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -449,10 +453,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 5,
                             "Name": "entity_0005",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -527,10 +531,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 6,
                             "Name": "entity_0006",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -605,10 +609,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 7,
                             "Name": "entity_0007",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -683,26 +687,17 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 0,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 8,
                             "Name": "entity_0008",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         }
                     }
-                }
-            ],
-            "ID": 0,
-            "Mask": 1
-        }
-    },
-    {
-        "Layer": {
-            "B_State": true,
-            "Entities": [
+                },
                 {
                     "Entity": {
                         "Components": {
@@ -736,10 +731,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 9,
                             "Name": "entity_0009",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -780,10 +775,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 10,
                             "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -837,10 +832,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 11,
                             "Name": "entity_0011",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -881,10 +876,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 12,
                             "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -929,6 +924,12 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "Lives": 1,
+                                "MaxHealth": 100.0,
+                                "invulnerable_flag": false
+                            },
                             "Element::Entity": {
                                 "Element": 1
                             },
@@ -972,9 +973,18 @@
                             "Render::Cam": {
                                 "Position": {
                                     "x": -138.10108947753906,
-                                    "y": -163.7489776611328
+                                    "y": -145.03443908691406
                                 },
-                                "Zoom": 2.0091185569763184
+                                "Zoom": 1.2321094274520874
+                            },
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 64.30000305175781
+                                },
+                                "preset": 2,
+                                "render_type": 0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1006,7 +1016,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -138.10108947753906,
-                                    "y": -163.7489776611328
+                                    "y": -145.03443908691406
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1016,10 +1026,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 13,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1033,7 +1043,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1079,10 +1089,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 14,
                             "Name": "entity_0014",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1094,7 +1104,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1140,10 +1150,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 15,
                             "Name": "entity_0015",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1155,7 +1165,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1201,10 +1211,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 16,
                             "Name": "entity_0016",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1252,32 +1262,23 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 1,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 17,
                             "Name": "entity_0017",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         }
                     }
-                }
-            ],
-            "ID": 1,
-            "Mask": 6
-        }
-    },
-    {
-        "Layer": {
-            "B_State": true,
-            "Entities": [
+                },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 18,
                             "Name": "barrel_3",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1302,6 +1303,11 @@
                                             "y": -191.4810333251953
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1312,10 +1318,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 19,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1340,6 +1346,11 @@
                                             "y": 565.755126953125
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1350,14 +1361,29 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 20,
                             "Name": "barrel_1",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
                                 "Components": {
+                                    "Animation::Base": {
+                                        "Animation_Count": 0,
+                                        "B_PingPong": false,
+                                        "B_Reverse": false,
+                                        "Completed_Animations": 0,
+                                        "Frame_Duration": 0.0,
+                                        "Mode": 0,
+                                        "Timer": 0.0
+                                    },
+                                    "Combat::Health": {
+                                        "Health": 100.0,
+                                        "Lives": 1,
+                                        "MaxHealth": 100.0,
+                                        "invulnerable_flag": false
+                                    },
                                     "Physics::Collider": null,
                                     "Render::Texture": {
                                         "Color": {
@@ -1367,7 +1393,15 @@
                                             "z": 0.0
                                         }
                                     },
+                                    "State::State": {
+                                        "State": "Idle"
+                                    },
                                     "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1378,10 +1412,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 21,
                             "Name": "yellow_tree1",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1406,6 +1440,11 @@
                                             "y": 129.9788818359375
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1416,10 +1455,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 22,
                             "Name": "yellow_tree3",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1444,6 +1483,11 @@
                                             "y": -440.776123046875
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1454,10 +1498,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 23,
                             "Name": "pink_tree1",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1482,6 +1526,11 @@
                                             "y": 539.44580078125
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1492,10 +1541,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 24,
                             "Name": "green_tree4",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1510,6 +1559,11 @@
                                         }
                                     },
                                     "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1520,10 +1574,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 25,
                             "Name": "green_tree1",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1548,6 +1602,11 @@
                                             "y": -196.44607543945313
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1558,10 +1617,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 26,
                             "Name": "green_tree3",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1586,6 +1645,11 @@
                                             "y": -610.4813232421875
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1596,10 +1660,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 27,
                             "Name": "green_tree2",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1632,10 +1696,15 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 679.4071044921875,
-                                            "y": 643.3342895507813
+                                            "x": 728.8015747070313,
+                                            "y": 688.1229858398438
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1646,10 +1715,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 28,
                             "Name": "yellow_tree2",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1674,6 +1743,11 @@
                                             "y": 594.9881591796875
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1684,10 +1758,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 29,
                             "Name": "pink_tree4",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1712,6 +1786,11 @@
                                             "y": -472.15814208984375
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1722,10 +1801,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 30,
                             "Name": "pink_tree2",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1750,6 +1829,11 @@
                                             "y": 720.3187255859375
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1760,10 +1844,10 @@
                 },
                 {
                     "Entity": {
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 31,
                             "Name": "entity_0031",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1788,6 +1872,11 @@
                                             "y": 254.51080322265625
                                         }
                                     }
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
                                 }
                             },
                             "Tags": [
@@ -1880,10 +1969,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 32,
                             "Name": "lamp_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1977,10 +2066,10 @@
                                 "Screen Position": false
                             }
                         },
-                        "Layer ID": 2,
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
+                            "Layer_Order": 33,
                             "Name": "torch_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1989,8 +2078,56 @@
                             ]
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 34,
+                            "Name": "healthbar",
+                            "Prefab_ID": "healthBar.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "healthbar"
+                                    ]
+                                }
+                            },
+                            "Tags": [
+                                "healthbar"
+                            ]
+                        }
+                    }
                 }
             ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
+            "ID": 1,
+            "Mask": 6
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [],
             "ID": 2,
             "Mask": 2
         }

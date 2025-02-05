@@ -6,7 +6,7 @@
                 "x": false,
                 "y": false
             },
-            "B_Stretch": false,
+            "B_Stretch": true,
             "Color": {
                 "w": 1.0,
                 "x": 0.0,
@@ -37,5 +37,8 @@
             "Screen Position": false
         }
     },
-    "Layer ID": 4
+    "MetaData": {
+        "Layer ID": 0,
+        "Tags": []
+    }
 }

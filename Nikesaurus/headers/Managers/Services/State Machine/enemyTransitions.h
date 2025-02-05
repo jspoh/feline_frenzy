@@ -18,7 +18,7 @@ namespace NIKE {
 		/****************************
 		* Idle Transitions
 		*****************************/
-		class IdleToAttack : public StateMachine::Itransition {
+		class IdleToEnemyAttack : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 
@@ -26,7 +26,7 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
-		class IdleToChase : public StateMachine::Itransition {
+		class IdleToEnemyChase : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 
@@ -34,34 +34,7 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
-		class IdleToDeath : public StateMachine::Itransition {
-			// Determines if the transition to the next state is valid.
-			bool isValid(Entity::Type& entity) const override;
-
-			// Returns the state that should be transitioned to, if valid.
-			std::shared_ptr<StateMachine::Istate> getNextState() const override;
-		};
-
-		/****************************
-		* Attack Transitions
-		*****************************/
-		class AttackToIdle : public StateMachine::Itransition {
-			// Determines if the transition to the next state is valid.
-			bool isValid(Entity::Type& entity) const override;
-
-			// Returns the state that should be transitioned to, if valid.
-			std::shared_ptr<StateMachine::Istate> getNextState() const override;
-		};
-
-		class AttackToChase : public StateMachine::Itransition {
-			// Determines if the transition to the next state is valid.
-			bool isValid(Entity::Type& entity) const override;
-
-			// Returns the state that should be transitioned to, if valid.
-			std::shared_ptr<StateMachine::Istate> getNextState() const override;
-		};
-
-		class AttackToDeath : public StateMachine::Itransition {
+		class IdleToEnemyDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 
@@ -70,9 +43,9 @@ namespace NIKE {
 		};
 
 		/****************************
-		* Chase Transitions
+		* Enemy Attack Transitions
 		*****************************/
-		class ChaseToAttack : public StateMachine::Itransition {
+		class EnemyAttackToIdle : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 
@@ -80,7 +53,7 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
-		class ChaseToIdle : public StateMachine::Itransition {
+		class EnemyAttackToEnemyChase : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 
@@ -88,7 +61,34 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
-		class ChaseToDeath : public StateMachine::Itransition {
+		class EnemyAttackToEnemyDeath : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		/****************************
+		* EnemyChaseState Transitions
+		*****************************/
+		class EnemyChaseToEnemyAttack : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class EnemyChaseToIdle : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class EnemyChaseToEnemyDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 
@@ -97,7 +97,7 @@ namespace NIKE {
 		};
 
 		/************************************************************************************
-		* Death Transitions (No transitions for now unless theres gonna be a revivie or sum)
+		* Enemy Death State Transitions (No transitions for now unless theres gonna be a revivie or sum)
 		***********************************************************************/
 	}
 }

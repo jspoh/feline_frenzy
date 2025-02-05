@@ -15,7 +15,7 @@ namespace NIKE {
     namespace Interaction {
 
         void Manager::init() {
-          
+
         }
 
         void Manager::update() {
@@ -95,6 +95,7 @@ namespace NIKE {
                     if (play_or_no && !group->isPlaying()) {
                         e_sfx.audio_id = "EnemyGetHit2.wav";
                         e_sfx.b_play_sfx = play_or_no;
+                        return;
                     }
                 }
 
@@ -109,12 +110,12 @@ namespace NIKE {
         {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
             if (e_animate_comp.has_value()) {
-                //static Vector2i prev_start = e_animate_comp.value().get().start_index;
+                static Vector2i prev_start = e_animate_comp.value().get().start_index;
 
-                if (e_animate_comp.value().get().start_index != Vector2i(start_x, start_y)) {
+                if (prev_start != Vector2i(start_x, start_y)) {
                     e_animate_comp.value().get().start_index.x = start_x;
                     e_animate_comp.value().get().start_index.y = start_y;
-                    //prev_start = e_animate_comp.value().get().start_index;
+                    prev_start = e_animate_comp.value().get().start_index;
 
                     //Restart animation
                     auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
@@ -129,17 +130,17 @@ namespace NIKE {
         {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
             if (e_animate_comp.has_value()) {
-                //static Vector2i prev_end = e_animate_comp.value().get().end_index;
+                static Vector2i prev_end = e_animate_comp.value().get().end_index;
 
-                if (e_animate_comp.value().get().end_index != Vector2i(end_x, end_y)) {
+                if (prev_end != Vector2i(end_x, end_y)) {
                     e_animate_comp.value().get().end_index.x = end_x;
                     e_animate_comp.value().get().end_index.y = end_y;
-                    //prev_end = e_animate_comp.value().get().end_index;
+                    prev_end = e_animate_comp.value().get().end_index;
 
                     //Restart animation
                     auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
                     if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
+                        e_base_comp.value().get().animation_mode = Animation::Mode::END;
                     }
                 }
             }
@@ -332,24 +333,27 @@ namespace NIKE {
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+            target_health.taken_damage = true;
             // Play SFX when apply damage
             playSFX(attacker, true);
             // Play animation when taken damage
+            // Play animation when taken damage
             static float deathAnimationTimer = 0.0f;
-            static const float deathAnimationDuration = 0.5f; 
+            static const float deathAnimationDuration = 1.5f;
             // Handle death animation
             animationHurtStart(target, 0, 12);
             flipX(target, false);
 
             // Slow down transition from frame 0 to frame 1
-            deathAnimationTimer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();  
+            deathAnimationTimer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 
             // If timer reaches the desired duration, proceed to frame 1
             if (deathAnimationTimer >= deathAnimationDuration) {
                 animationHurtEnd(target, 1, 12);
                 // Reset timer
-                deathAnimationTimer = 0.0f;  
+                deathAnimationTimer = 0.0f;
             }
+
 
 			// Check if target health drops to zero or below
 			if (target_health.health <= 0) {
