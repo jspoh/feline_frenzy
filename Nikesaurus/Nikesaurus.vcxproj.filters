@@ -55,6 +55,7 @@
     <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cCombat.cpp" />
+    <ClCompile Include="src\Systems\sysParticle.cpp" />
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\sStateMachine.cpp" />
     <ClCompile Include="src\Components\cState.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cCombat.h" />
+    <ClInclude Include="headers\Systems\sysParticle.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\sStateMachine.h" />
     <ClInclude Include="headers\Components\cState.h" />

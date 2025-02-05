@@ -111,6 +111,13 @@ namespace NIKE {
 		struct BuiltIn {
 		};
 
+		struct ParticleEmitter {
+			Vector2f offset;		// offset from entity position
+			int preset;			// ParticlePresets type
+			std::string ref;		// reference to particle system
+			float duration;		// -1 for infinite
+		};
+
 		void registerComponents();
 
 		void registerEditorComponents();

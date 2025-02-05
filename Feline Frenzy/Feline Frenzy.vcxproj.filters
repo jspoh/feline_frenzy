@@ -34,7 +34,6 @@
     <Text Include="assets\Models\triangle.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\Scenes\mainmenu.scn" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
     <None Include="assets\Shaders\texture.frag" />
@@ -51,8 +50,23 @@
     <None Include="src\Core\Config.json" />
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\enemyBullet.lua" />
-    <None Include="assets\Scripts\test.lua" />
     <None Include="assets\Scripts\ChangeScene.lua" />
     <None Include="assets\Scripts\GameFlow.lua" />
+    <None Include="assets\Engine\Shaders\base.frag" />
+    <None Include="assets\Engine\Shaders\base.vert" />
+    <None Include="assets\Engine\Shaders\base_particle.frag" />
+    <None Include="assets\Engine\Shaders\base_particle.vert" />
+    <None Include="assets\Engine\Shaders\batched_base.frag" />
+    <None Include="assets\Engine\Shaders\batched_base.vert" />
+    <None Include="assets\Engine\Shaders\batched_texture.frag" />
+    <None Include="assets\Engine\Shaders\batched_texture.vert" />
+    <None Include="assets\Engine\Shaders\cluster_particle.frag" />
+    <None Include="assets\Engine\Shaders\cluster_particle.vert" />
+    <None Include="assets\Engine\Shaders\text.frag" />
+    <None Include="assets\Engine\Shaders\text.vert" />
+    <None Include="assets\Engine\Shaders\texture.frag" />
+    <None Include="assets\Engine\Shaders\texture.vert" />
+    <None Include="assets\Engine\Shaders\fire_particle.frag" />
+    <None Include="assets\Engine\Shaders\fire_particle.vert" />
   </ItemGroup>
 </Project>

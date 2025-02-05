@@ -15,6 +15,45 @@
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
+#include "Systems/sysParticle.h"
+
+namespace {
+
+	Matrix_33 getWorldToScreenMtx() {
+		// transform to screen coords
+		NIKE::Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
+
+		Matrix_33 view_xform{
+			1, 0,  -cam.position.x,
+			0, 1,  -cam.position.y,
+			0, 0, 1
+		};
+
+		const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
+
+		Matrix_33 cam_to_ndc_xform{
+			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
+			0, 2.0f / (cam_height * cam.zoom), 0,
+			0, 0, 1
+		};
+
+		const float screenWidth = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x;
+		const float screenHeight = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
+
+		Matrix_33 screen_xform = Matrix_33{
+			screenWidth * 0.5f, 0, screenWidth * 0.5f,
+			0, screenHeight * 0.5f, screenHeight * 0.5f,
+			0, 0, 1
+		} *cam_to_ndc_xform * view_xform;
+
+		return screen_xform;
+	};
+
+	Vector2f worldToScreen(const Vector2f& world_pos) {
+		Matrix_33 screen_xform = getWorldToScreenMtx();
+		return screen_xform * world_pos;
+	}
+}
 
 namespace NIKE {
 
@@ -184,6 +223,39 @@ namespace NIKE {
 #else
 					transformAndRenderEntity(entity, false);
 #endif
+					// !TODO: jspoh move this code to entity update
+					// update entity particles
+					if (NIKE_ECS_MANAGER->checkEntityComponent<Render::ParticleEmitter>(entity)) {
+
+						const std::unordered_map<std::string, std::shared_ptr<void>> comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+
+						// get particle emitter component
+						const Render::ParticleEmitter* pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+
+						// get transform component
+						const Transform::Transform* transform_comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+
+						// get particle location in screen coords
+						const Vector2f world_particle_origin = transform_comp->position + pe_comp->offset;
+						const Vector2f screen_particle_origin = worldToScreen(world_particle_origin);
+
+						NIKE::SysParticle::ParticleSystem& ps = NIKE::SysParticle::Manager::getInstance().getParticleSystem(pe_comp->ref);
+
+						// update particle location
+						if (ps.origin != screen_particle_origin) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, screen_particle_origin);
+						}
+
+						// update changes to particle preset
+						if (static_cast<int>(ps.preset) != pe_comp->preset) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemPreset(pe_comp->ref, static_cast<SysParticle::Data::ParticlePresets>(pe_comp->preset));
+						}
+
+						// update particle duration
+						if (ps.duration != pe_comp->duration) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemDuration(pe_comp->ref, pe_comp->duration);
+						}
+					}
 				}
 			}
 		}
@@ -194,7 +266,7 @@ namespace NIKE {
 			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
 		}
 
-		// render text last
+		// render text
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
@@ -211,6 +283,35 @@ namespace NIKE {
 				}
 			}
 		}
+
+		// render particles
+		// for non entity related particles
+
+
+		// !TODO: jspoh move this update function
+		NIKE::SysParticle::Manager::getInstance().update();
+
+		Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
+		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
+
+		using namespace NIKE::SysParticle;
+		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
+
+		auto& PM = NIKE::SysParticle::Manager::getInstance();
+		for (const auto& ps : PM.getActiveParticleSystems()) {
+			const unsigned int vao = PM.getVAO(ps.preset);
+			const unsigned int vbo = PM.getVBO(ps.preset);
+
+			glNamedBufferSubData(vbo, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
+
+			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, vao, static_cast<int>(ps.particles.size()));
+		}
+
+		// mouse particles
+		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("ps1", mouse_particle_pos);
+		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
+
 
 #ifndef NDEBUG
 		//Unbind when editor is active for rendering

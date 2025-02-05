@@ -11,6 +11,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/Render/sRender.h"
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 
@@ -143,7 +144,7 @@ namespace NIKE {
 		}
 
 		shader_manager->init();
-		
+
 		text_buffer.init();
 
 		//Setup event listening for frame buffer resize
@@ -536,6 +537,49 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, unsigned int vao, int draw_count) { 
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+
+		const std::string ref = NIKE::SysParticle::Data::particle_preset_map.at(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
+
+		const std::string shader_name = ref + "_particle";
+
+		shader_manager->useShader(shader_name);
+
+		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
+		shader_manager->setUniform(shader_name, "particleOrigin", origin);
+		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
+		}
+
+		if (vao == 0) {
+			vao = NIKE::SysParticle::Manager::getInstance().getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
+		}
+		glBindVertexArray(vao);
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL after binding vao in {0}: {1}", __FUNCTION__, err);
+		}
+
+		static constexpr int NUM_VERTICES = 6;		// defined in vertex shader
+		glDrawArraysInstanced(GL_TRIANGLES, 0, NUM_VERTICES, draw_count);
+
+
+		glBindVertexArray(0);
+		shader_manager->unuseShader();
+
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
 	/*****************************************************************//**
 	* BATCH RENDERING
 	*********************************************************************/
@@ -580,7 +624,7 @@ namespace NIKE {
 		std::vector<unsigned int> indices;
 
 		indices.reserve(render_instances_quad.size() * NUM_INDICES_FOR_QUAD); // Adjust based on expected batch size
-		
+
 		// 0 1 2 2 3 0 -> 4 5 6 6 7 4
 		for (size_t i{}; i < render_instances_quad.size(); i++) {
 			unsigned int baseOffset = static_cast<unsigned int>(i * NUM_VERTICES_IN_MODEL);
