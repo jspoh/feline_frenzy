@@ -150,50 +150,55 @@ namespace NIKE {
 		//Setup event listening for frame buffer resize
 		std::shared_ptr<Render::Service> render_sys_wrapped(this, [](Render::Service*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(render_sys_wrapped);
+
+		//Start counter
+		counter = 0;
 	}
 
 	/*****************************************************************//**
 	* FRAME BUFFERS
 	*********************************************************************/
 
-	void Render::Service::createFrameBuffer(std::string const& name, Vector2i const& size, bool b_window_sized) {
-		if (frame_buffers.find(name) != frame_buffers.end()) {
-			NIKEE_CORE_WARN("Unable to create new frame buffer. Name already taken");
-			return;
-		}
+	unsigned int Render::Service::createFrameBuffer(Vector2i const& size, bool b_window_sized) {
+
+		//Generate hash
+		auto id = counter++;
 
 		//Create and initialize new frame buffer
-		frame_buffers[name].b_window_sized = b_window_sized;
-		frame_buffers[name].init(size);
+		frame_buffers[id].b_window_sized = b_window_sized;
+		frame_buffers[id].init(size);
+
+		//Return ID
+		return id;
 	}
 
-	void Render::Service::deleteFrameBuffer(std::string const& name) {
-		if (frame_buffers.find(name) == frame_buffers.end()) {
-			NIKEE_CORE_WARN("Unable to delete frame buffer. Name not found");
+	void Render::Service::deleteFrameBuffer(unsigned int id) {
+		if (frame_buffers.find(id) == frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to delete frame buffer. ID not found");
 			return;
 		}
 
 		//Delete frame buffer
-		frame_buffers.erase(name);
+		frame_buffers.erase(id);
 	}
 
-	Render::FramebufferTexture Render::Service::getFrameBuffer(std::string const& name) {
-		if (frame_buffers.find(name) == frame_buffers.end()) {
-			NIKEE_CORE_WARN("Unable to get frame buffer. Name not found");
+	Render::FramebufferTexture Render::Service::getFrameBuffer(unsigned int id) {
+		if (frame_buffers.find(id) == frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to get frame buffer. ID not found");
 			return Render::FramebufferTexture();
 		}
 
-		return frame_buffers.at(name);
+		return frame_buffers.at(id);
 	}
 
-	void Render::Service::bindFrameBuffer(std::string const& name) {
-		if (frame_buffers.find(name) == frame_buffers.end()) {
-			NIKEE_CORE_WARN("Unable to bind frame buffer. Name not found");
+	void Render::Service::bindFrameBuffer(unsigned int id) {
+		if (frame_buffers.find(id) == frame_buffers.end()) {
+			NIKEE_CORE_WARN("Unable to bind frame buffer. ID not found");
 			return;
 		}
 
 		//Bind frame buffer
-		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffers.at(name).frame_buffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, frame_buffers.at(id).frame_buffer);
 	}
 
 	void Render::Service::unbindFrameBuffer() {
