@@ -17,6 +17,8 @@
 #include "Math/Mtx33.h"
 #include "Systems/sysParticle.h"
 
+
+// !TODO: jspoh reorg
 namespace {
 
 	Matrix_33 getWorldToScreenMtx() {
@@ -237,18 +239,22 @@ namespace NIKE {
 
 						// get particle location in screen coords
 						const Vector2f world_particle_origin = transform_comp->position + pe_comp->offset;
-						const Vector2f screen_particle_origin = worldToScreen(world_particle_origin);
 
 						NIKE::SysParticle::ParticleSystem& ps = NIKE::SysParticle::Manager::getInstance().getParticleSystem(pe_comp->ref);
 
 						// update particle location
-						if (ps.origin != screen_particle_origin) {
-							NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, screen_particle_origin);
+						if (ps.origin != world_particle_origin) {
+							NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, world_particle_origin);
 						}
 
 						// update changes to particle preset
 						if (static_cast<int>(ps.preset) != pe_comp->preset) {
 							NIKE::SysParticle::Manager::getInstance().setParticleSystemPreset(pe_comp->ref, static_cast<SysParticle::Data::ParticlePresets>(pe_comp->preset));
+						}
+
+						// update changes to particle render type
+						if (static_cast<int>(ps.render_type) != pe_comp->render_type) {
+							ps.render_type = static_cast<SysParticle::Data::ParticleRenderType>(pe_comp->render_type);
 						}
 
 						// update particle duration
@@ -303,9 +309,18 @@ namespace NIKE {
 			const unsigned int vao = PM.getVAO(ps.preset);
 			const unsigned int vbo = PM.getVBO(ps.preset);
 
-			glNamedBufferSubData(vbo, 0, ps.particles.size() * sizeof(Particle), ps.particles.data());
+			std::vector<Particle> particles = ps.particles;
 
-			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, vao, static_cast<int>(ps.particles.size()));
+			// assume world pos
+			if (ps.using_world_pos) {
+				std::for_each(particles.begin(), particles.end(), [&](Particle& p) {
+					p.pos = worldToScreen(p.pos);
+				});
+			}
+
+			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
+
+			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), static_cast<int>(particles.size()));
 		}
 
 		// mouse particles

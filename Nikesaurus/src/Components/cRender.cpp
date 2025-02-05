@@ -30,6 +30,7 @@ namespace NIKE {
 			[](Render::ParticleEmitter const& comp) -> nlohmann::json {
 				return	{
 					{ "preset", static_cast<int>(comp.preset) },
+					{ "render_type", static_cast<int>(comp.render_type) },
 					{ "offset", comp.offset.toJson() },
 					{ "duration", comp.duration },
 					//{ "ref", comp.ref }
@@ -40,12 +41,13 @@ namespace NIKE {
 				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				comp.preset = static_cast<int>(data.at("preset").get<int>());
+				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
 				comp.ref = particle_emitter_ref;
 
 				// add particle system
-				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, comp.duration);
+				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
@@ -53,6 +55,9 @@ namespace NIKE {
 
 				if (comp.preset != other_comp.preset) {
 					delta["preset"] = comp.preset;
+				}
+				if (comp.render_type != other_comp.render_type) {
+					delta["render_type"] = comp.render_type;
 				}
 				if (comp.offset != other_comp.offset) {
 					delta["offset"] = comp.offset.toJson();
@@ -71,6 +76,9 @@ namespace NIKE {
 
 				if (delta.contains("preset")) {
 					comp.preset = delta["preset"];
+				}
+				if (delta.contains("render_type")) {
+					comp.render_type = delta["render_type"];
 				}
 				if (delta.contains("offset")) {
 					comp.offset.fromJson(delta["offset"]);
@@ -382,6 +390,34 @@ namespace NIKE {
 						}
 					}
 
+					// render type
+					ImGui::Text("Particle Render Type:");
+					std::string render_type_options{};
+					for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
+						render_type_options += render_type_ref + '\0';
+					}
+					render_type_options += '\0';
+
+					int selected_render_type = static_cast<int>(comp.render_type);
+					static int previous_render_type = selected_render_type;
+					if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
+						// If the value changed, process the change
+						if (selected_render_type != previous_render_type) {
+							previous_render_type = selected_render_type;
+							LevelEditor::Action change_render_type;
+							// Store the value before the change
+							change_render_type.do_action = [&, render_type = selected_render_type]() {
+								comp.render_type = render_type;
+								};
+							// Store the undo action
+							change_render_type.undo_action = [&, render_type = previous_render_type]() {
+								comp.render_type = render_type;
+								};
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
+						}
+					}
+
 					// Offset
 					ImGui::Text("Particle Offset:");
 					ImGui::DragFloat2("##Offset", &comp.offset.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
@@ -403,9 +439,26 @@ namespace NIKE {
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
 					}
+
+					// advanced options (for programmatic usage only)
+					 
+					ImGui::BeginDisabled(true);
 					// Duration
+					static bool infinite = comp.duration == -1.f;
+					static bool prev_infinite = infinite;
+					ImGui::Checkbox("Infinite Duration", &infinite);
+					if (infinite) {
+						comp.duration = -1.f;
+					}
+					else if (prev_infinite && !infinite) {
+						comp.duration = 0.f;
+					}
+					prev_infinite = infinite;
+
+					//ImGui::BeginDisabled(infinite);
 					ImGui::Text("Particle Duration:");
 					ImGui::DragFloat("##Duration", &comp.duration, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::EndDisabled();
 				}
 			}
 		);

@@ -32,7 +32,7 @@ NSPM::Manager() {
 	vbo_map[Data::ParticlePresets::CLUSTER] = 0;
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::CLUSTER], vbo_map[Data::ParticlePresets::CLUSTER]);
 
-	// create vao and vbo for FIRE particle preset
+	// create vao and vbo for FIRE particley preset
 	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
 	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
 
@@ -48,7 +48,7 @@ NSPM& NSPM::getInstance() {
 	return instance;
 }
 
-bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, float duration) {
+bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, Data::ParticleRenderType particle_render_type, float duration, bool using_world_pos) {
 	if (active_particle_systems.size() >= MAX_ACTIVE_PARTICLE_SYSTEMS) {
 		return false;
 	}
@@ -60,11 +60,22 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 	new_particle_system.is_alive = true;
 	new_particle_system.duration = duration;
 	new_particle_system.time_alive = 0.f;
+	new_particle_system.using_world_pos = using_world_pos;
+	new_particle_system.render_type = particle_render_type;
 
 
 	active_particle_systems[ref] = new_particle_system;
 	next_ps_id++;
 
+	return true;
+}
+
+
+bool NSPM::removeActiveParticleSystem(const std::string& ref) {
+	if (active_particle_systems.find(ref) == active_particle_systems.end()) {
+		return false;
+	}
+	active_particle_systems.erase(ref);
 	return true;
 }
 
@@ -78,6 +89,9 @@ void NSPM::update() {
 		// Update particle system
 		if (ps.duration != -1 && ps.time_alive >= ps.duration) {
 			ps.is_alive = false;
+		}
+
+		if (!ps.is_alive && ps.particles.size() == 0) {
 			continue;
 		}
 
@@ -134,7 +148,7 @@ void NSPM::update() {
 
 			int particles_to_spawn = static_cast<int>(time_since_last_spawn * NEW_PARTICLES_PER_SECOND);
 
-			if (ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+			if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
 				particles_to_spawn = 0;
 				time_since_last_spawn = 0.f;
 			}
@@ -272,7 +286,14 @@ void NSPM::update() {
 
 	// !TODO: jspoh restore this
 	// remove dead particle systems
-	//active_particle_systems.erase(std::remove_if(active_particle_systems.begin(), active_particle_systems.end(), [](const auto& pair) { return pair.second.is_alive; }), active_particle_systems.end());
+	for (auto it = active_particle_systems.begin(); it != active_particle_systems.end();) {
+		if (!it->second.is_alive && it->second.particles.size() == 0) {
+			it = active_particle_systems.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
 }
 
 std::vector<ParticleSystem>NSPM::getActiveParticleSystems() const {

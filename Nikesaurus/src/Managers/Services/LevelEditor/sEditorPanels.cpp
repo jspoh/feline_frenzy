@@ -2005,6 +2005,8 @@ namespace NIKE {
 
 					// add active particle system if particle emitter is added
 					if (component.first == "Render::ParticleEmitter") {
+						using namespace NIKE::SysParticle;
+
 						// get entity position
 						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
 
@@ -2015,11 +2017,12 @@ namespace NIKE {
 						// update default particle system config
 						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
 						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::CLUSTER);
+						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
 						pe_comp->ref = particle_emitter_ref;
 						pe_comp->offset = { 0.f, 0.f };
+						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
 
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets::CLUSTER, comp->position + pe_comp->offset);
+						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
 					}
 
 					//	};
@@ -2059,7 +2062,16 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
-				// !TODO: jspoh remove particle system when component is removed
+				if (comp_string_ref == "Render::ParticleEmitter") {
+					// get entity position
+					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+					if (!success) {
+						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+					}
+				}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);

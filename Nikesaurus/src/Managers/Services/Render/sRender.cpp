@@ -537,15 +537,18 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, unsigned int vao, int draw_count) { 
+	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		const std::string ref = NIKE::SysParticle::Data::particle_preset_map.at(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
-
+		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type));
+		if (preset == static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::BASE)) {
+			ref = "base";
+		}
 		const std::string shader_name = ref + "_particle";
+
 
 		shader_manager->useShader(shader_name);
 
@@ -558,9 +561,8 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
-		if (vao == 0) {
-			vao = NIKE::SysParticle::Manager::getInstance().getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
-		}
+
+		const unsigned int vao = NIKE::SysParticle::Manager::getInstance().getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
 		glBindVertexArray(vao);
 
 		err = glGetError();

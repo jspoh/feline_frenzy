@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   fire_particle.vert
+ * \file   quad_particle.vert
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
