@@ -505,6 +505,11 @@ namespace NIKE {
 		}
 		glBindVertexArray(vao);
 
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL after binding vao in {0}: {1}", __FUNCTION__, err);
+		}
+
 		static constexpr int NUM_VERTICES = 6;		// defined in vertex shader
 		glDrawArraysInstanced(GL_TRIANGLES, 0, NUM_VERTICES, draw_count);
 
@@ -512,8 +517,7 @@ namespace NIKE {
 		glBindVertexArray(0);
 		shader_manager->unuseShader();
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
+		while ((err = glGetError()) != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
 		}
 	}

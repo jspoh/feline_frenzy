@@ -33,8 +33,8 @@ NSPM::Manager() {
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::CLUSTER], vbo_map[Data::ParticlePresets::CLUSTER]);
 
 	// create vao and vbo for FIRE particle preset
-	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::FIRE];
-	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::FIRE];
+	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
+	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
 
 }
 
