@@ -48,7 +48,7 @@ NSPM& NSPM::getInstance() {
 	return instance;
 }
 
-bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, float duration) {
+bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, float duration, bool using_world_pos) {
 	if (active_particle_systems.size() >= MAX_ACTIVE_PARTICLE_SYSTEMS) {
 		return false;
 	}
@@ -60,6 +60,7 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 	new_particle_system.is_alive = true;
 	new_particle_system.duration = duration;
 	new_particle_system.time_alive = 0.f;
+	new_particle_system.using_world_pos = using_world_pos;
 
 
 	active_particle_systems[ref] = new_particle_system;

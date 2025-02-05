@@ -90,6 +90,7 @@ namespace NIKE {
 
 			struct ParticleSystem {
 				Vector2f origin{};
+				bool using_world_pos{ true };
 				Data::ParticlePresets preset{};
 				std::vector<Particle> particles{};
 				Data::ParticleRenderType render_type{};
@@ -121,7 +122,7 @@ namespace NIKE {
 				 * \param preset
 				 * \return if particle system was successfully added
 				 */
-				bool addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& start_pos, float duration = -1.f);
+				bool addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& start_pos, float duration = -1.f, bool using_world_pos = true);
 
 				void update();
 

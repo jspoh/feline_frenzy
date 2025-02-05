@@ -24,7 +24,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "player"
+            "Active Cam ID": "Free Cam"
         }
     },
     {
@@ -975,7 +975,15 @@
                                     "x": -138.10108947753906,
                                     "y": -163.7489776611328
                                 },
-                                "Zoom": 3.4644265174865723
+                                "Zoom": 1.2321094274520874
+                            },
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 69.30000305175781
+                                },
+                                "preset": 2
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
