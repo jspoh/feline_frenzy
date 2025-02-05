@@ -18,14 +18,25 @@ using namespace NIKE::SysParticle;
 using NSPM = NIKE::SysParticle::Manager;
 
 NSPM::Manager() {
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+	}
+
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
 
 	// create vao and vbo for BASE particle preset
 	vao_map[Data::ParticlePresets::BASE] = 0;
 	vbo_map[Data::ParticlePresets::BASE] = 0;
-	glCreateBuffers(1, &vao_map[Data::ParticlePresets::BASE]);
+	glCreateVertexArrays(1, &vao_map[Data::ParticlePresets::BASE]);
 	glCreateBuffers(1, &vbo_map[Data::ParticlePresets::BASE]);
 	glVertexArrayVertexBuffer(vao_map[Data::ParticlePresets::BASE], 0, vbo_map[Data::ParticlePresets::BASE], 0, 0);
+
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error after creating empty vao and vbo in {0}: {1}", __FUNCTION__, err);
+	}
+	
 
 	// create vao and vbo for CLUSTER particle preset
 	vao_map[Data::ParticlePresets::CLUSTER] = 0;
@@ -36,6 +47,10 @@ NSPM::Manager() {
 	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
 	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
 
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+	}
 }
 
 NSPM::~Manager() {
@@ -97,16 +112,8 @@ void NSPM::update() {
 
 		ps.time_alive += dt;
 
-		switch (ps.preset) {
-		case Data::ParticlePresets::BASE: {
-			break;
-		}
-		case Data::ParticlePresets::CLUSTER: {
-			static constexpr float LIFESPAN = 5.f;
-			static constexpr float ACCELERATION = 0.f;
-			constexpr int NEW_PARTICLES_PER_SECOND = 50;
-			const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-
+		// update particles
+		{
 			for (auto& p : ps.particles) {
 				// Update particle
 				p.pos += p.vector * p.velocity * dt;
@@ -140,6 +147,76 @@ void NSPM::update() {
 
 			// remove dead particles
 			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
+
+			// spawn new particles
+			float LIFESPAN{};
+			float ACCELERATION{};
+			int NEW_PARTICLES_PER_SECOND{};
+			Vector2f PARTICLE_VELOCITY_RANGE{};
+			int MAX_OFFSET{};
+			Vector2f VECTOR{};
+			float VELOCITY{};
+			Vector4f COLOR{};
+			float ROTATION{};
+			Vector2f SIZE{};
+			Vector2f PARTICLE_ORIGIN{};
+
+			switch (ps.preset) {
+			case Data::ParticlePresets::CLUSTER: {
+				PARTICLE_ORIGIN = ps.origin;
+				LIFESPAN = 5.f;
+				ACCELERATION = 0.f;
+				NEW_PARTICLES_PER_SECOND = 50;
+				PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+				VECTOR = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
+				VECTOR.normalize();
+				VELOCITY = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
+				COLOR = {
+						rand() % 255 / 255.f,
+						rand() % 255 / 255.f,
+						rand() % 255 / 255.f,
+						1.f
+				};
+				ROTATION = 0.f;
+				SIZE = { 5.f, 5.f };
+				break;
+			}
+			case Data::ParticlePresets::FIRE: {
+				LIFESPAN = 3.f;
+				ACCELERATION = 10.f;
+				NEW_PARTICLES_PER_SECOND = 100;
+				PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+				MAX_OFFSET = 10;
+
+				const float offset = static_cast<float>(rand() % MAX_OFFSET);
+				float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+				float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+				float len = sqrtf(rx * rx + ry * ry);
+				if (len == 0) len = 1;  // Prevent division by zero
+				rx /= len;
+				ry /= len;
+				const float x_offset = rx * offset;
+				const float y_offset = ry * offset;
+				PARTICLE_ORIGIN = {
+					ps.origin.x + x_offset,
+					ps.origin.y + y_offset
+				};
+
+				VECTOR = { 0.f, static_cast<float>(rand() % 100) / 100.f };
+				VECTOR.normalize();
+				VELOCITY = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
+				LIFESPAN = LIFESPAN - (x_offset / MAX_OFFSET);
+				COLOR = {
+					(rand() % 100 + 155.f) / 255.f ,
+					0.f,
+					0.f,
+					1.f
+				};
+				ROTATION = 0.f;
+				SIZE = { 5.f, 5.f };
+				break;
+			}
+			}
 
 			// spawn new particles
 
@@ -159,129 +236,24 @@ void NSPM::update() {
 
 				for (int _{}; _ < particles_to_spawn; _++) {
 					Particle new_particle;
-					new_particle.preset = Data::ParticlePresets::CLUSTER;
-					new_particle.pos = ps.origin;
-					new_particle.vector = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
-					new_particle.vector.normalize();
-					new_particle.velocity = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
+					new_particle.preset = ps.preset;
+					new_particle.pos = PARTICLE_ORIGIN;
+					new_particle.vector = VECTOR;
+					new_particle.velocity = VELOCITY;
 					new_particle.acceleration = ACCELERATION;
 					new_particle.lifespan = LIFESPAN;
-					new_particle.color = {
-						rand() % 255 / 255.f,
-						rand() % 255 / 255.f,
-						rand() % 255 / 255.f,
-						1.f
-					};
-					new_particle.rotation = 0.f;
+					new_particle.color = COLOR;
+					new_particle.rotation = ROTATION;
 					new_particle.is_alive = true;
-					new_particle.size = { 5.f, 5.f };
+					new_particle.size = SIZE;
 
 					ps.particles.push_back(new_particle);
 				}
 
 
 			}
-			break;
 		}
-		case Data::ParticlePresets::FIRE: {
-			static constexpr float LIFESPAN = 3.f;
-			static constexpr float ACCELERATION = 10.f;
-			static constexpr int NEW_PARTICLES_PER_SECOND = 100;
-			static const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-			static constexpr int MAX_OFFSET = 10;
 
-			for (auto& p : ps.particles) {
-				// Update particle
-				p.pos += p.vector * p.velocity * dt;
-				p.velocity += p.acceleration * dt;
-				p.time_alive += dt;
-
-				if (p.lifespan != -1.f) {
-					// fade out
-					p.color.a -= dt / p.lifespan;
-
-					// darken
-					p.color.r -= dt / p.lifespan;
-					p.color.g -= dt / p.lifespan;
-					p.color.b -= dt / p.lifespan;
-				}
-
-				// particle death
-
-				if (p.size.x <= 0 || p.size.y <= 0) {
-					p.is_alive = false;
-				}
-
-				if (p.color.a <= 0) {
-					p.is_alive = false;
-				}
-
-				if (p.lifespan != -1 && p.time_alive > p.lifespan) {
-					p.is_alive = false;
-				}
-			}
-
-			// remove dead particles
-			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
-
-			// spawn new particles
-
-			static float time_since_last_spawn = 0.f;
-			time_since_last_spawn += dt;
-
-			int particles_to_spawn = static_cast<int>(time_since_last_spawn * NEW_PARTICLES_PER_SECOND);
-
-			if (ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-				particles_to_spawn = 0;
-				time_since_last_spawn = 0.f;
-			}
-
-			if (particles_to_spawn > 0) {
-				// reset state
-				time_since_last_spawn = 0.f;
-
-				for (int _{}; _ < particles_to_spawn; _++) {
-					Particle new_particle;
-					new_particle.preset = Data::ParticlePresets::FIRE;
-
-					// spawn particles in a circle around origin
-					const float offset = static_cast<float>(rand() % MAX_OFFSET);
-					float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-					float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-					float len = sqrtf(rx * rx + ry * ry);
-					if (len == 0) len = 1;  // Prevent division by zero
-					rx /= len;
-					ry /= len;
-					const float x_offset = rx * offset;
-					const float y_offset = ry * offset;
-					new_particle.pos = {
-						ps.origin.x + x_offset,
-						ps.origin.y + y_offset
-					};
-
-					new_particle.vector = { 0.f, static_cast<float>(rand() % 100) / 100.f };
-					new_particle.vector.normalize();
-					new_particle.velocity = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
-					new_particle.acceleration = ACCELERATION;
-					new_particle.lifespan = LIFESPAN - (x_offset / MAX_OFFSET);
-					new_particle.color = {
-						(rand() % 100 + 155.f) / 255.f ,
-						0.f,
-						0.f,
-						1.f
-					};
-					new_particle.rotation = 0.f;
-					new_particle.is_alive = true;
-					new_particle.size = { 5.f, 5.f };
-
-					ps.particles.push_back(new_particle);
-				}
-
-
-			}
-			break;
-		}
-		}
 	}
 
 	// !TODO: jspoh restore this

@@ -71,8 +71,11 @@ namespace NIKE {
 				//Text buffer for rendering text
 				TextBuffer text_buffer;
 
+				//Hash counter
+				std::atomic<unsigned int> counter;
+
 				//Map of framebuffer
-				std::unordered_map<std::string, FramebufferTexture> frame_buffers;
+				std::unordered_map<unsigned int, FramebufferTexture> frame_buffers;
 
 			public:
 
@@ -97,16 +100,16 @@ namespace NIKE {
 				*********************************************************************/
 
 				//Create new frame buffer
-				void createFrameBuffer(std::string const& name, Vector2i const& size, bool b_window_sized = false);
+				unsigned int createFrameBuffer(Vector2i const& size, bool b_window_sized = false);
 
 				//Create new frame buffer
-				void deleteFrameBuffer(std::string const& name);
+				void deleteFrameBuffer(unsigned int id);
 
 				//Create new frame buffer
-				FramebufferTexture getFrameBuffer(std::string const& name);
+				FramebufferTexture getFrameBuffer(unsigned int id);
 
 				//Bind frame buffer
-				void bindFrameBuffer(std::string const& name);
+				void bindFrameBuffer(unsigned int id);
 
 				//Unbind frame buffer
 				void unbindFrameBuffer();

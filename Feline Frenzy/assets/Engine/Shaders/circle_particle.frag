@@ -1,14 +1,14 @@
-﻿/*****************************************************************//**
+#version 450 core
+
+/*****************************************************************//**
  * \file   circle_particle.frag
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   31 Jan 2024
- * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content Copyright 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-
-#version 450
 
 layout(location=0) out vec4 f_color;
 

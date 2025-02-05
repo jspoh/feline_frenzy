@@ -2856,6 +2856,27 @@ namespace NIKE {
 			};
 	}
 
+	void LevelEditor::PrefabsPanel::renderPrefabPreview() {
+
+		//Bind frame buffer
+		NIKE_RENDER_SERVICE->bindFrameBuffer(preview_buffer_id);
+
+		//Clear buffer
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0, 0, 0, 1);
+
+		//Unbind frame buffer
+		NIKE_RENDER_SERVICE->unbindFrameBuffer();
+
+		//Begin window for rendering
+		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str());
+
+		//Render game to viewport
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(500, 500));
+
+		ImGui::End();
+	}
+
 	void LevelEditor::PrefabsPanel::savePrefab() {
 
 		//Return if prefab id is empty
@@ -2902,6 +2923,9 @@ namespace NIKE {
 		//Main panel reference
 		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 
+		//Init frame buffer name
+		preview_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(500, 500));
+
 		//Popups registration
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Remove Component", removeComponentPopUp("Remove Component"));
@@ -2927,6 +2951,9 @@ namespace NIKE {
 
 		//Check if prefab display is valid
 		if (!prefab_id.empty()) {
+
+			//Render prefab preview
+			renderPrefabPreview();
 
 			//Update with accuarate copy count
 			copy_count = 0;
@@ -6299,8 +6326,8 @@ namespace NIKE {
 		}
 	}
 
-	std::string LevelEditor::GameWindowPanel::getEditorFrameBuffer() const {
-		return editor_frame_buffer;
+	unsigned int LevelEditor::GameWindowPanel::getEditorFrameBuffer() const {
+		return editor_buffer_id;
 	}
 
 	void LevelEditor::GameWindowPanel::init() {
@@ -6315,8 +6342,7 @@ namespace NIKE {
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
 
 		//Create frame buffer for rendering game preview
-		editor_frame_buffer = "EditorBuffer";
-		NIKE_RENDER_SERVICE->createFrameBuffer(editor_frame_buffer, Vector2i(), true);
+		editor_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(), true);
 	}
 
 	void LevelEditor::GameWindowPanel::render()
@@ -6371,7 +6397,7 @@ namespace NIKE {
 		ImVec2 uv1(u_max, -v_max); // Top-right
 
 		//Render game to viewport
-		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(editor_frame_buffer).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(editor_buffer_id).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		//Accept render assets payload
 		renderAcceptPayload();

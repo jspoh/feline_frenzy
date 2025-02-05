@@ -15,6 +15,11 @@
 
 namespace NIKE {
 	void Shader::ShaderManager::compileShader(std::string const& shader_ref, const std::string& vtx_path, const std::string& frag_path) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
 		// read and compile vertex shader
 		std::ifstream vtx_file{ vtx_path };
 		if (!vtx_file.is_open()) {
@@ -35,6 +40,16 @@ namespace NIKE {
 		}
 		glShaderSource(vtx_handle, 1, &vtx_src, nullptr);
 		glCompileShader(vtx_handle);
+
+		// Check vertex shader compilation
+		int success;
+		char info_log[512];
+		glGetShaderiv(vtx_handle, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(vtx_handle, 512, nullptr, info_log);
+			NIKEE_CORE_ERROR("Vertex shader compilation failed for {0}:\n{1}", shader_ref, info_log);
+			throw std::exception();
+		}
 
 		// read and compile fragment shader
 		std::ifstream frag_file{ frag_path };
@@ -57,6 +72,16 @@ namespace NIKE {
 		glShaderSource(frag_handle, 1, &frag_src, nullptr);
 		glCompileShader(frag_handle);
 
+		// Check fragment shader compilation
+		success;
+		info_log[512];
+		glGetShaderiv(frag_handle, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(vtx_handle, 512, nullptr, info_log);
+			NIKEE_CORE_ERROR("Fragment shader compilation failed for {0}:\n{1}", shader_ref, info_log);
+			throw std::exception();
+		}
+
 		// link shaders
 		unsigned int shader_handle = glCreateProgram();
 		if (!shader_handle) {
@@ -69,11 +94,10 @@ namespace NIKE {
 		glLinkProgram(shader_handle);
 
 		// validate shader program
-		int success = false;
+		success = false;
 		glGetProgramiv(shader_handle, GL_LINK_STATUS, &success);
 
 		if (!success) {
-			char info_log[512];
 			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
 			cerr << "Failed to link shader program " << ": " << info_log << endl;
 			throw std::exception();
@@ -86,6 +110,11 @@ namespace NIKE {
 		NIKEE_CORE_INFO("Sucessfully loaded shader from " + vtx_path + " " + frag_path);
 
 		shaders[shader_ref] = shader_handle;
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Shader::ShaderManager::init() {
