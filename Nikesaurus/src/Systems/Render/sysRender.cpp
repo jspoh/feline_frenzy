@@ -39,8 +39,8 @@ namespace {
 			0, 0, 1
 		};
 
-		const float screenWidth = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x;
-		const float screenHeight = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y;
+		const float screenWidth = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+		const float screenHeight = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 
 		Matrix_33 screen_xform = Matrix_33{
 			screenWidth * 0.5f, 0, screenWidth * 0.5f,

@@ -325,7 +325,6 @@ namespace NIKE {
 
 			//Game State Switching
 			{
-
 				//Show play button only when game state is inactive
 				if (!getGameState()) {
 					ImGui::Button("Play##GameButton");
@@ -333,6 +332,9 @@ namespace NIKE {
 					//Check if button has been activated
 					if (ImGui::IsItemActivated()) {
 						setGameState(true);
+
+						//Auto save
+						NIKE_LVLEDITOR_SERVICE->autoSave();
 					}
 				}
 				else {
@@ -368,6 +370,13 @@ namespace NIKE {
 			{
 				ImGui::Text("Save: ");
 				ImGui::Button(b_auto_save ? "Auto##SaveMode" : "Manual##SaveMode");
+
+				//Hover item
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text("Auto save for exiting editor/application & playing the game.\n Switch to manual to turn off auto save.");
+					ImGui::EndTooltip();
+				}
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
@@ -940,6 +949,9 @@ namespace NIKE {
 
 		//Components panel reference
 		comp_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
+
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
@@ -1435,7 +1447,7 @@ namespace NIKE {
 		}
 
 		//Check for entity interaction
-		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
+		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0 && !main_panel.lock()->getGameState()) {
 
 			//Check for disable entity interaction flag
 			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
@@ -1576,8 +1588,8 @@ namespace NIKE {
 	* Components Panel
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::interactGizmo() {
-		//Check if entity is locked
-		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		//Check if entity is locked or game is playing
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2436,8 +2448,8 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
-		//Check if entity is locked
-		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		//Check if entity is locked or game is playing
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2466,8 +2478,8 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
-		//Check if entity is locked
-		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		//Check if entity is locked or game is playing
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2886,6 +2898,9 @@ namespace NIKE {
 
 		// Editor entities panel ref
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 
 		//Popups registration
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
