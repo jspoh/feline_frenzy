@@ -227,24 +227,17 @@ namespace NIKE {
 		Matrix_33Transpose(x_form, result);
 	}
 
-	void Render::Service::transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe) {
+	void Render::Service::transformDirectionMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat) {
 		//Transform matrix here
 		Matrix_33 result, scale_mat, rot_mat, trans_mat, pre_trans_mat, post_trans_mat;
 
-		if (!render_wireframe) {
-			Matrix_33RotDeg(rot_mat, obj.rotation);
-			Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
-			Matrix_33Translate(pre_trans_mat, -((obj.scale.x / 2.0f)), -((obj.scale.y / 2.0f)));
-			Matrix_33Translate(post_trans_mat, ((obj.scale.x / 2.0f)), ((obj.scale.y / 2.0f)));
-			Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-			result = world_to_ndc_mat * trans_mat * pre_trans_mat * rot_mat * post_trans_mat * scale_mat;
-		}
-		else {
-			Matrix_33RotDeg(rot_mat, obj.rotation);
-			Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
-			Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
-			result = world_to_ndc_mat * trans_mat * rot_mat * scale_mat;
-		}
+		// Rotate about a point
+		Matrix_33RotDeg(rot_mat, obj.rotation);
+		Matrix_33Scale(scale_mat, obj.scale.x, obj.scale.y);
+		Matrix_33Translate(pre_trans_mat, -((obj.scale.x / 2.0f)), -((obj.scale.y / 2.0f)));
+		Matrix_33Translate(post_trans_mat, ((obj.scale.x / 2.0f)), ((obj.scale.y / 2.0f)));
+		Matrix_33Translate(trans_mat, obj.position.x, obj.position.y);
+		result = world_to_ndc_mat * trans_mat * pre_trans_mat * rot_mat * post_trans_mat * scale_mat;
 
 		// OpenGL requires matrix in col maj so transpose
 		Matrix_33Transpose(x_form, result);

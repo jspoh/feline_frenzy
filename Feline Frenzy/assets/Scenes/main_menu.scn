@@ -105,12 +105,12 @@
                         "Components": {
                             "Animation::Base": {
                                 "Animation_Count": 0,
-                                "B_PingPong": true,
+                                "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 10253,
+                                "Completed_Animations": 11070,
                                 "Frame_Duration": 0.20000000298023224,
                                 "Mode": 0,
-                                "Timer": 0.10000000149011612
+                                "Timer": 0.06666667014360428
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -118,15 +118,15 @@
                                     "y": 0
                                 },
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 5,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 1,
+                                    "x": 7,
                                     "y": 1
                                 },
                                 "Start_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 }
                             },
@@ -140,9 +140,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
+                                    "x": 1.9303920269012451,
+                                    "y": 1.899019479751587,
+                                    "z": 2.2009804248809814
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -171,11 +171,11 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 7,
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Play_Game.png"
+                                "Texture_ID": "UI_PlayGame_spritesheet_updated.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -184,8 +184,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 315.79168701171875,
-                                    "y": 60.00041961669922
+                                    "x": 489.8549499511719,
+                                    "y": 93.25690460205078
                                 },
                                 "Screen Position": true
                             }
@@ -217,12 +217,12 @@
                         "Components": {
                             "Animation::Base": {
                                 "Animation_Count": 0,
-                                "B_PingPong": true,
+                                "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 922,
+                                "Completed_Animations": 1958,
                                 "Frame_Duration": 0.20000000298023224,
                                 "Mode": 0,
-                                "Timer": 0.0
+                                "Timer": 0.1666666716337204
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -252,9 +252,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.8803921937942505,
-                                    "y": 0.8490196466445923,
-                                    "z": 1.1509803533554077
+                                    "x": 1.3303921222686768,
+                                    "y": 1.2990195751190186,
+                                    "z": 1.600980281829834
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -279,7 +279,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -287,7 +287,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "UI_PlayGame_spritesheet.png"
+                                "Texture_ID": "UI_QuitGame_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -296,8 +296,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 305.2088928222656,
-                                    "y": 62.99150848388672
+                                    "x": 353.40863037109375,
+                                    "y": 72.47637939453125
                                 },
                                 "Screen Position": true
                             }
@@ -327,12 +327,12 @@
                         "Components": {
                             "Animation::Base": {
                                 "Animation_Count": 0,
-                                "B_PingPong": true,
+                                "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 467,
+                                "Completed_Animations": 1452,
                                 "Frame_Duration": 0.20000000298023224,
                                 "Mode": 0,
-                                "Timer": 0.18333333730697632
+                                "Timer": 0.15000000596046448
                             },
                             "Animation::Sprite": {
                                 "Curr_Index": {
@@ -344,7 +344,7 @@
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 1,
+                                    "x": 6,
                                     "y": 1
                                 },
                                 "Start_Index": {
@@ -362,9 +362,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
+                                    "x": 0.45000001788139343,
+                                    "y": 0.45000001788139343,
+                                    "z": 0.45000001788139343
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -393,11 +393,11 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 6,
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "UI_HowToPlay.png"
+                                "Texture_ID": "UI_HowToPlay_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -406,8 +406,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 359.76397705078125,
-                                    "y": 44.875423431396484
+                                    "x": 413.7682800292969,
+                                    "y": 70.30827331542969
                                 },
                                 "Screen Position": true
                             }

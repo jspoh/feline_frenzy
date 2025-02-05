@@ -293,7 +293,7 @@ namespace NIKE {
 		using namespace NIKE::SysParticle;
 		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("ps1", Data::ParticlePresets::CLUSTER, {window_size.x / 2.f, window_size.y / 2.f}, Data::ParticleRenderType::CIRCLE, -1.f, false);
 #ifndef NDEBUG
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #endif 
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));

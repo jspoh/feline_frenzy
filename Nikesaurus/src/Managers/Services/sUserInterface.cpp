@@ -436,10 +436,10 @@ namespace NIKE {
 			if (!e_text_comp.has_value()) continue;
 			auto& e_text = e_text_comp.value().get();
 
-			//Get texture comp
-			auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity.second.entity_id);
-			if (!e_texture_comp.has_value()) continue;
-			auto& e_texture = e_texture_comp.value().get();
+			//Get animation comp
+			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity.second.entity_id);
+			if (!e_animate_comp.has_value()) continue;
+			auto& e_animate = e_animate_comp.value().get();
 
 			//Clamp rotation ( Disable rotating buttons for now )
 			e_transform.rotation = 0.0f;
@@ -460,8 +460,6 @@ namespace NIKE {
 			//Clamp scale
 			e_text.scale = std::clamp(e_text.scale, EPSILON, 10.0f);
 
-			e_texture.texture_id = e_texture.texture_id;
-
 			//Check if button is hovered
 			if (buttonHovered(entity.second.entity_id)) {
 				entity.second.b_hovered = true;
@@ -470,7 +468,7 @@ namespace NIKE {
 				if (!hover_container[entity.first].b_hovered) {
 					hover_container[entity.first].btn_transform.scale = e_transform.scale;
 					hover_container[entity.first].btn_text.color = e_text.color;
-					hover_container[entity.first].btn_texture = e_texture;
+					hover_container[entity.first].btn_animate = e_animate;
 					hover_container[entity.first].b_hovered = true;
 
 				}
@@ -483,9 +481,8 @@ namespace NIKE {
 				e_text.color.g = hover_container[entity.first].btn_text.color.g + 0.15f;
 				e_text.color.b = hover_container[entity.first].btn_text.color.b + 0.15f;
 
-				e_texture.frame_size = Vector2i(6, 1);
-				e_texture.frame_index = Vector2i(4, 0);
-				e_texture.texture_id = "UI_PlayGame_spritesheet.png";
+				e_animate.start_index = Vector2i(1, 0);
+				e_animate.end_index = Vector2i(5,0);
 
 				//Execute script for trigger
 				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
@@ -497,7 +494,7 @@ namespace NIKE {
 				if (hover_container[entity.first].b_hovered) {
 					e_transform.scale = hover_container[entity.first].btn_transform.scale;
 					e_text.color = hover_container[entity.first].btn_text.color;
-					e_texture = hover_container[entity.first].btn_texture;
+					e_animate = hover_container[entity.first].btn_animate;
 					hover_container[entity.first].b_hovered = false;				
 				}
 
