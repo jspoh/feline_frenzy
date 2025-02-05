@@ -35,7 +35,7 @@ namespace NIKE {
         float getElementMultiplier(Element::Elements attacker, Element::Elements target);
 
         // Check if player is within range
-        bool withinRange(const Entity::Type& source, const Entity::Type& player);
+        bool withinRange(Entity::Type source, Entity::Type player);
 
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
 

@@ -74,12 +74,6 @@ namespace NIKE {
                         }
                     }
                 }
-
-                // Check for healthdrop tag
-                        // Check for state component
-                        // If death state
-                        // Spawn health pack
-
             }
         }
 
@@ -339,7 +333,7 @@ namespace NIKE {
             return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
         }
 
-        bool withinRange(const Entity::Type& source, const Entity::Type& player) {
+        bool withinRange(Entity::Type source, Entity::Type player) {
             // Get player transform
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
             Vector2f player_pos = player_transform_comp.value().get().position;

@@ -18,6 +18,7 @@
 #include "Components/cTransform.h"
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/ECS/mCoordinator.h"
+#include "Managers/Services/sMetaData.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -103,7 +104,7 @@ namespace NIKE {
 			void worldTriangleFilled(ImDrawList* draw_list, Transform::Transform const& e_transform, ImGuiDir dir, ImVec2 const& render_size, ImU32 color);
 
 			//Render line to draw list
-			void worldLine(ImDrawList* draw_list, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
+			void worldLine(ImDrawList* draw_list, Transform::Transform const& e_transform, Vector2f const& point1, Vector2f const& point2, ImVec2 const& render_size, ImU32 color, float thickness = 1.0f);
 			#endif // Only in nike build
 		};
 
@@ -125,8 +126,11 @@ namespace NIKE {
 			//Boolean for enabling/disabling transform gizmo
 			bool b_gizmo_state;
 
+			//Boolean for auto saving editor
+			bool b_auto_save;
+
 		public:
-			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false } {}
+			MainPanel() :window_flags{ 0 }, b_debug_mode{ false }, b_game_state{ false }, b_grid_state{ false }, b_gizmo_state{ false }, b_auto_save{ true } {}
 			~MainPanel() = default;
 
 			//Panel Name
@@ -153,6 +157,9 @@ namespace NIKE {
 
 			//Public get gizmo state
 			bool getGizmoState() const;
+
+			//Public get auto save
+			bool getAutoSave() const;
 
 			//Deserialize config
 			void deserializeConfig(nlohmann::json const& config);
@@ -413,6 +420,9 @@ namespace NIKE {
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
+			//Prefab layer ID
+			MetaData::EntityData meta_data;
+
 			//Map to array of component type
 			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
@@ -430,9 +440,6 @@ namespace NIKE {
 
 			//Create entity popup
 			std::function<void()> createEntityPopup(std::string const& popup_id);
-
-			//Save prefab
-			void savePrefab();
 
 		public:
 			PrefabsPanel() : copy_count{ 0 } {}
@@ -459,6 +466,9 @@ namespace NIKE {
 
 			// For component stuff
 			void renderPrefabComponents();
+
+			//Save prefab
+			void savePrefab();
 		};
 
 		//Debug Management Panel
@@ -822,6 +832,9 @@ namespace NIKE {
 			//Set error message for popup
 			void setPopUpErrorMsg(std::string const& msg);
 
+			//Save scene functionality
+			void saveScene();
+
 			//Init
 			void init() override;
 
@@ -830,10 +843,11 @@ namespace NIKE {
 		};
 
 		//Game Window Panel
-		class GameWindowPanel : public IPanel, public Events::IEventListener<Render::ViewportTexture> {
+		class GameWindowPanel : public IPanel {
 		private:
-			//Game texture
-			unsigned int texture_id;
+
+			//Frame buffer string
+			std::string editor_frame_buffer;
 
 			//Mouse position relative to Game Window
 			Vector2f window_mouse_pos;
@@ -850,14 +864,11 @@ namespace NIKE {
 			//Entities panel reference
 			std::weak_ptr<ComponentsPanel> comps_panel;
 
-			//Game window render event
-			void onEvent(std::shared_ptr<Render::ViewportTexture> event);
-
 			//Render accept payload
 			void renderAcceptPayload();
 
 		public:
-			GameWindowPanel() : texture_id{ 0 } {}
+			GameWindowPanel() = default;
 			~GameWindowPanel() = default;
 
 			//Panel Name
@@ -879,6 +890,9 @@ namespace NIKE {
 			//Check if mouse is in game window
 			bool isMouseInWindow() const;
 
+			//Get editor frame buffer name
+			std::string getEditorFrameBuffer() const;
+
 			//Init
 			void init() override;
 
@@ -889,6 +903,5 @@ namespace NIKE {
 }
 
 #endif //!EDITOR_PANELS_HPP
-
 
 #endif

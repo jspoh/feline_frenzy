@@ -327,25 +327,29 @@ namespace NIKE {
 		}
 
 		//Check if layer ID is valid
-		if (layer_id < 0 && layer_id >= NIKE_SCENES_SERVICE->getLayerCount()) {
+		if (layer_id < 0 || layer_id >= NIKE_SCENES_SERVICE->getLayerCount()) {
 			NIKEE_CORE_WARN("Layer ID out of range");
 			return;
 		}
 
-		//Remove entity from prev layer
-		if (NIKE_SCENES_SERVICE->checkLayer(entities.at(entity).layer_id)) {
-			NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id)->removeEntity(entity);
+		//Remove entity from every layer
+		for (auto layer : NIKE_SCENES_SERVICE->getLayers()) {
+			layer->removeEntity(entity);
 		}
 
 		//Set layer ID
 		entities.at(entity).layer_id = layer_id;
 
-		//Insert entity into new layer
-		auto layer = NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id);
-		layer->insertEntity(entity);
+		//Check if layer exists
+		if (NIKE_SCENES_SERVICE->checkLayer(entities.at(entity).layer_id)) {
 
-		//Get layer order assigned
-		entities.at(entity).layer_order = layer->getEntityOrder(entity);
+			//Insert entity into new layer
+			auto layer = NIKE_SCENES_SERVICE->getLayer(entities.at(entity).layer_id);
+			layer->insertEntity(entity);
+
+			//Get layer order assigned
+			entities.at(entity).layer_order = layer->getEntityOrder(entity);
+		}
 	}
 
 	unsigned int MetaData::Service::getEntityLayerID(Entity::Type entity) const {
@@ -447,6 +451,87 @@ namespace NIKE {
 		}
 
 		entities.at(entity).deserialize(data);
+	}
+
+	nlohmann::json MetaData::Service::serializePrefabData(MetaData::EntityData const& metadata) const {
+
+		nlohmann::json data;
+
+		//Serialize layer id
+		data["Layer ID"] = metadata.layer_id;
+
+		//Serialize tags
+		data["Tags"] = metadata.tags;
+
+		return data;
+	}
+
+	nlohmann::json MetaData::Service::serializePrefabOverrideData(MetaData::EntityData const& entity_data, MetaData::EntityData const& prefab_data) const {
+		nlohmann::json data;
+
+		//Check if layer ID is the same as prefab
+		if (entity_data.layer_id != prefab_data.layer_id) {
+			data["Layer ID"] = entity_data.layer_id;
+		}
+
+		//Check if tags is the same as prefab
+		if (entity_data.tags != prefab_data.tags) {
+			data["Tags"] = entity_data.tags;
+		}
+
+		return data;
+	}
+
+	bool MetaData::Service::deserializePrefabData(Entity::Type entity, nlohmann::json const& data) {
+		bool success = true;
+
+		//Deserialize layer ID
+		if (data.contains("Layer ID")) {
+			NIKE_METADATA_SERVICE->setEntityLayerID(entity, data.at("Layer ID"));
+		}
+		else {
+			success = false;
+		}
+
+		//Get tags
+		if (data.contains("Tags") && data["Tags"].is_array()) {
+			auto tags = data["Tags"].get<std::set<std::string>>();
+
+			for (auto tag : tags) {
+				NIKE_METADATA_SERVICE->addEntityTag(entity, tag);
+			}
+		}
+		else {
+			success = false;
+		}
+
+		return success;
+	}
+
+	bool MetaData::Service::deserializePrefabData(MetaData::EntityData& metadata, nlohmann::json const& data) {
+		bool success = true;
+
+		//Deserialize layer ID
+		if (data.contains("Layer ID")) {
+			metadata.layer_id = data.at("Layer ID");
+		}
+		else {
+			success = false;
+		}
+
+		//Get tags
+		if (data.contains("Tags") && data["Tags"].is_array()) {
+			auto tags = data["Tags"].get<std::set<std::string>>();
+
+			for (auto tag : tags) {
+				metadata.tags.insert(tag);
+			}
+		}
+		else {
+			success = false;
+		}
+
+		return success;
 	}
 
 	Entity::Type MetaData::Service::getFirstEntity() const {

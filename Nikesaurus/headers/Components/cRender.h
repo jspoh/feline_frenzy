@@ -51,13 +51,6 @@ namespace NIKE {
 				: entity_name{ entity_name }, fallback_cam{ fallback_cam } {}
 		};
 
-		//Viewport texture event
-		struct ViewportTexture : public Events::IEvent {
-			unsigned int tex_id;
-
-			ViewportTexture(unsigned int tex_id) : tex_id{ tex_id } {}
-		};
-
 		enum class TextOrigin {
 			CENTER = 0,
 			TOP,
@@ -116,6 +109,13 @@ namespace NIKE {
 		 * built in components will not be saved to scene files.
 		 */
 		struct BuiltIn {
+		};
+
+		struct ParticleEmitter {
+			Vector2f offset;		// offset from entity position
+			int preset;			// ParticlePresets type
+			std::string ref;		// reference to particle system
+			float duration;		// -1 for infinite
 		};
 
 		void registerComponents();

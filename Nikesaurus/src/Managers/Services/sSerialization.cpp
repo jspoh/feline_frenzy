@@ -128,7 +128,7 @@ namespace NIKE {
 		return success;
 	}
 
-	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path) {
+	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, MetaData::EntityData const& meta_data) {
 
 		//Create new data
 		nlohmann::json data;
@@ -137,6 +137,9 @@ namespace NIKE {
 		for (auto const& comp : comps) {
 			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
+
+		//Serialize prefab metadata
+		data["MetaData"] = NIKE_METADATA_SERVICE->serializePrefabData(meta_data);
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::out);
@@ -148,7 +151,7 @@ namespace NIKE {
 		file.close();
 	}
 
-	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path) {
+	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, MetaData::EntityData& meta_data, std::string const& file_path) {
 
 		//Boolean for flagging errors in deserializing
 		bool success = true;
@@ -171,28 +174,38 @@ namespace NIKE {
 			return;
 
 		//If there are no components
-		if (!data.contains("Components"))
-			return;
+		if (data.contains("Components")) {
+			//Iterate through all components stored within data
+			for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+				//Check for comp functions validity
+				if (comp_funcs.find(comp_name) != comp_funcs.end()) {
+					comps[comp_name] = comp_funcs[comp_name]();
 
-		//Iterate through all components stored within data
-		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-			//Check for comp functions validity
-			if (comp_funcs.find(comp_name) != comp_funcs.end()) {
-				comps[comp_name] = comp_funcs[comp_name]();
+					//Deserialize data into component
+					comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
+				}
+				else {
+					success = false;
+				}
+			}
+		}
+		else {
+			success = false;
+		}
 
-				//Deserialize data into component
-				comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
-			}
-			else {
-				success = false;
-			}
+		//Load prefab metadata
+		if (!data.contains("MetaData")) {
+			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data);
+		}
+		else {
+			success = false;
 		}
 
 		//Error encountered in deserializing
 		if (!success) {
 
 			//Save prefab again
-			savePrefab(comps, file_path);
+			savePrefab(comps, file_path, meta_data);
 		}
 
 		//Close file
@@ -207,8 +220,11 @@ namespace NIKE {
 		//Map to array of component type
 		std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
+		//Layer ID
+		MetaData::EntityData metadata;
+
 		//Load prefab into prefab comps
-		loadPrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		loadPrefab(prefab_comps, metadata, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 		//Iterate through all comp
 		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
@@ -219,6 +235,9 @@ namespace NIKE {
 				data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 			}
 		}
+
+		//Serialize prefab override data
+		data["MetaData"] = NIKE_METADATA_SERVICE->serializePrefabOverrideData(NIKE_METADATA_SERVICE->getEntityDataCopy(entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(entity).value() : MetaData::EntityData(), metadata);
 
 		return data;
 	}
@@ -248,6 +267,11 @@ namespace NIKE {
 			else {
 				success = false;
 			}
+		}
+
+		//Deserialize prefab data
+		if (data.contains("MetaData")) {
+			NIKE_METADATA_SERVICE->deserializePrefabData(entity, data.at("MetaData"));
 		}
 
 		return success;
@@ -318,10 +342,18 @@ namespace NIKE {
 			return;
 
 		//Deserialize data
-		if (!deserializeEntity(entity, data)) {
+		if (!deserializeEntity(entity, data) || !data.contains("MetaData")) {
 
 			//Error encountered in deserialization
-			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string());
+			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(entity).value() : MetaData::EntityData());
+		}
+
+		//Deserialize prefab data
+		if (data.contains("MetaData")) {
+			cout << prefab_id << endl;
+			NIKE_METADATA_SERVICE->deserializePrefabData(entity, data.at("MetaData"));
+
+			cout << NIKE_METADATA_SERVICE->getEntityLayerID(entity) << endl;
 		}
 
 		//Close file
@@ -376,6 +408,11 @@ namespace NIKE {
 
 		//Layers in scene
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
+
+		//Scene data
+		nlohmann::json scn_data;
+		scn_data["Layer Count"] = layers.size();
+		data.push_back(scn_data);
 
 		//Iterate through all layers in current scene
 		for (auto const& layer : layers) {
@@ -493,8 +530,16 @@ namespace NIKE {
 				}
 			}
 
+			//Check for layer count
+			if (l_data.contains("Layer Count")) {
+				for (int i = 1; i < l_data.value("Layer Count", 1); ++i) {
+					NIKE_SCENES_SERVICE->createLayer();
+				}
+			}
+
 			//If data contains layer
 			if (l_data.contains("Layer") && l_data.at("Layer").contains("ID") && l_data.at("Layer").contains("Entities")) {
+
 				//Deserialize layer
 				if (!NIKE_SCENES_SERVICE->checkLayer(l_data.at("Layer").at("ID").get<int>())) {
 					auto layer = NIKE_SCENES_SERVICE->createLayer();
@@ -515,14 +560,19 @@ namespace NIKE {
 
 						//Deserialize entity metadata
 						if (e_data.at("Entity").contains("MetaData")) {
+
 							//Deserialize
 							NIKE_METADATA_SERVICE->deserializeEntityData(entity, e_data.at("Entity").at("MetaData"));
+							NIKE_METADATA_SERVICE->setEntityLayerID(entity, NIKE_METADATA_SERVICE->getEntityLayerID(entity));
+							NIKE_METADATA_SERVICE->setEntityLayerOrder(entity, NIKE_METADATA_SERVICE->getEntityLayerOrder(entity));
 
 							//Get entity prefab ID
 							auto entity_prefab_id = NIKE_METADATA_SERVICE->getEntityPrefabID(entity);
 
 							//Check if prefab id is present
 							if (!entity_prefab_id.empty()) {
+
+								//Load prefab
 								loadEntityFromPrefab(entity, entity_prefab_id);
 
 								//Apply overrides
@@ -581,4 +631,3 @@ namespace NIKE {
 		return data;
 	}
 }
-

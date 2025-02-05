@@ -49,16 +49,9 @@ namespace NIKE {
 	}
 
 	void Scenes::Layer::removeEntity(Entity::Type entity) {
-		for (auto it = entities.begin(); it != entities.end();) {
-
-			//Check for entity
-			if (*it == entity) {
-				entities.erase(it);
-				break;
-			}
-			else {
-				++it;
-			}
+		auto it = std::find(entities.begin(), entities.end(), entity);
+		if (it != entities.end()) {
+			entities.erase(it);
 		}
 	}
 

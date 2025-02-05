@@ -214,6 +214,8 @@ namespace NIKE {
 			 * \param path_to_texture
 			 */
 			Texture compileTexture(const std::string& path_to_texture);
+
+			static void createClusterParticleBuffers(unsigned int& vao, unsigned int& vbo);
 		};
 	}
 }

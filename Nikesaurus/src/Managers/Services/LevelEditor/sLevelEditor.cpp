@@ -253,14 +253,6 @@ namespace NIKE {
 			//Toggle editor mode
 			b_editor_active = !b_editor_active;
 
-			//If editor is active, set game to paused
-			if (b_editor_active) {
-				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(false);
-			}
-			else {
-				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(true);
-			}
-
 			// Clear all inputs done while editor is not active
 			io.ClearEventsQueue();
 		}
@@ -414,6 +406,19 @@ namespace NIKE {
 		ImGui::DestroyContext();
 	}
 
+	void LevelEditor::Service::autoSave() const {
+
+		//Check if auto save is on
+		if (std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getAutoSave()) {
+
+			//Save scene
+			std::dynamic_pointer_cast<ScenesPanel>(panels_map.at(ScenesPanel::getStaticName()))->saveScene();
+
+			//Save prefab
+			std::dynamic_pointer_cast<PrefabsPanel>(panels_map.at(PrefabsPanel::getStaticName()))->savePrefab();
+		}
+	}
+
 	void LevelEditor::Service::setEditorState(bool state) {
 		b_editor_active = state;
 	}
@@ -428,6 +433,22 @@ namespace NIKE {
 
 	bool LevelEditor::Service::getGameState() const {
 		return std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getGameState();
+	}
+
+	void LevelEditor::Service::bindEditorFrameBuffer() const {
+		//render to framebuffer if imgui is active
+		if (b_editor_active) {
+			NIKE_RENDER_SERVICE->bindFrameBuffer(std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()))->getEditorFrameBuffer());
+		}
+		else {
+			NIKE_RENDER_SERVICE->unbindFrameBuffer();
+		}
+	}
+
+	void LevelEditor::Service::unbindEditorFrameBuffer() const {
+		if (b_editor_active) {
+			NIKE_RENDER_SERVICE->unbindFrameBuffer();
+		}
 	}
 
 	void LevelEditor::Service::addPanel(std::shared_ptr<LevelEditor::IPanel> panel) {

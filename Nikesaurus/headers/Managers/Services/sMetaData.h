@@ -183,6 +183,18 @@ namespace NIKE {
 			//Deserialize entity
 			void deserializeEntityData(Entity::Type entity, nlohmann::json const& data);
 
+			//Serialize Prefab metadata
+			nlohmann::json serializePrefabData(MetaData::EntityData const& metadata) const;
+
+			//Serialize Prefab metadata
+			nlohmann::json serializePrefabOverrideData(MetaData::EntityData const& entity_data, MetaData::EntityData const& prefab_data) const;
+
+			//Deserialize Prefab metadata
+			bool deserializePrefabData(Entity::Type entity, nlohmann::json const& data);
+
+			//Deserialize Prefab metadata
+			bool deserializePrefabData(MetaData::EntityData& metadata, nlohmann::json const& data);
+
 			//Get first entity in list
 			Entity::Type getFirstEntity() const;
 

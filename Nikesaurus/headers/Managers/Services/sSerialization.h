@@ -10,6 +10,7 @@
 
 #include "Core/Engine.h"
 #include "Managers/ECS/mCoordinator.h"
+#include "Managers/Services/sMetaData.h"
 
 #ifndef M_SERIALIZATION_HPP
 #define M_SERIALIZATION_HPP
@@ -118,10 +119,10 @@ namespace NIKE {
 			void loadGridFromFile(const std::string& file_path);
 
 			//Serialize Prefab
-			void savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path);
+			void savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, MetaData::EntityData const& meta_data);
 
 			//Deserialize Prefab
-			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, std::string const& file_path);
+			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, MetaData::EntityData& meta_data, std::string const& file_path);
 
 			//Serialize prefab overrides
 			nlohmann::json serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id);
