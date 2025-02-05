@@ -124,6 +124,8 @@ namespace NIKE {
 				 */
 				bool addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& start_pos, Data::ParticleRenderType particle_render_type, float duration = -1.f, bool using_world_pos = true);
 
+				bool removeActiveParticleSystem(const std::string& ref);
+				
 				void update();
 
 				std::vector<ParticleSystem> getActiveParticleSystems() const;

@@ -71,6 +71,15 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 }
 
 
+bool NSPM::removeActiveParticleSystem(const std::string& ref) {
+	if (active_particle_systems.find(ref) == active_particle_systems.end()) {
+		return false;
+	}
+	active_particle_systems.erase(ref);
+	return true;
+}
+
+
 void NSPM::update() {
 	// !TODO: jspoh reorg update system
 

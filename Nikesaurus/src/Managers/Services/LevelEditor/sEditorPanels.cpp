@@ -2062,7 +2062,16 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
-				// !TODO: jspoh remove particle system when component is removed
+				if (comp_string_ref == "Render::ParticleEmitter") {
+					// get entity position
+					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+					if (!success) {
+						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+					}
+				}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
