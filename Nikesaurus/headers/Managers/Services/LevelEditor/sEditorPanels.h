@@ -18,6 +18,7 @@
 #include "Components/cTransform.h"
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/ECS/mCoordinator.h"
+#include "Managers/Services/sMetaData.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -420,7 +421,7 @@ namespace NIKE {
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
 			//Prefab layer ID
-			unsigned int prefab_layer_id;
+			MetaData::EntityData meta_data;
 
 			//Map to array of component type
 			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
@@ -441,7 +442,7 @@ namespace NIKE {
 			std::function<void()> createEntityPopup(std::string const& popup_id);
 
 		public:
-			PrefabsPanel() : copy_count{ 0 }, prefab_layer_id{ 0 } {}
+			PrefabsPanel() : copy_count{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name

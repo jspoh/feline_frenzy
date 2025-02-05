@@ -128,7 +128,7 @@ namespace NIKE {
 		return success;
 	}
 
-	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, unsigned int layer_id) {
+	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, MetaData::EntityData const& meta_data) {
 
 		//Create new data
 		nlohmann::json data;
@@ -138,8 +138,8 @@ namespace NIKE {
 			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
 		}
 
-		//Serialize layer id
-		data["Layer ID"] = layer_id;
+		//Serialize prefab metadata
+		data["MetaData"] = NIKE_METADATA_SERVICE->serializePrefabData(meta_data);
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::out);
@@ -151,7 +151,7 @@ namespace NIKE {
 		file.close();
 	}
 
-	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, unsigned int& layer_id, std::string const& file_path) {
+	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, MetaData::EntityData& meta_data, std::string const& file_path) {
 
 		//Boolean for flagging errors in deserializing
 		bool success = true;
@@ -174,26 +174,28 @@ namespace NIKE {
 			return;
 
 		//If there are no components
-		if (!data.contains("Components"))
-			return;
+		if (data.contains("Components")) {
+			//Iterate through all components stored within data
+			for (auto const& [comp_name, comp_data] : data["Components"].items()) {
+				//Check for comp functions validity
+				if (comp_funcs.find(comp_name) != comp_funcs.end()) {
+					comps[comp_name] = comp_funcs[comp_name]();
 
-		//Iterate through all components stored within data
-		for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-			//Check for comp functions validity
-			if (comp_funcs.find(comp_name) != comp_funcs.end()) {
-				comps[comp_name] = comp_funcs[comp_name]();
-
-				//Deserialize data into component
-				comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
-			}
-			else {
-				success = false;
+					//Deserialize data into component
+					comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
+				}
+				else {
+					success = false;
+				}
 			}
 		}
+		else {
+			success = false;
+		}
 
-		//Deserialize layer ID
-		if (data.contains("Layer ID")) {
-			layer_id = data.at("Layer ID");
+		//Load prefab metadata
+		if (!data.contains("MetaData")) {
+			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data);
 		}
 		else {
 			success = false;
@@ -203,7 +205,7 @@ namespace NIKE {
 		if (!success) {
 
 			//Save prefab again
-			savePrefab(comps, file_path);
+			savePrefab(comps, file_path, meta_data);
 		}
 
 		//Close file
@@ -219,10 +221,10 @@ namespace NIKE {
 		std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
 
 		//Layer ID
-		unsigned int layer_id = 0;
+		MetaData::EntityData metadata;
 
 		//Load prefab into prefab comps
-		loadPrefab(prefab_comps, layer_id, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		loadPrefab(prefab_comps, metadata, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 		//Iterate through all comp
 		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
@@ -234,10 +236,8 @@ namespace NIKE {
 			}
 		}
 
-		//Check if layer ID is the same as prefab
-		if (layer_id != NIKE_METADATA_SERVICE->getEntityLayerID(entity)) {
-			data["Layer ID"] = NIKE_METADATA_SERVICE->getEntityLayerID(entity);
-		}
+		//Serialize prefab override data
+		data["MetaData"] = NIKE_METADATA_SERVICE->serializePrefabOverrideData(NIKE_METADATA_SERVICE->getEntityDataCopy(entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(entity).value() : MetaData::EntityData(), metadata);
 
 		return data;
 	}
@@ -269,9 +269,9 @@ namespace NIKE {
 			}
 		}
 
-		//Deserialize layer ID
-		if (data.contains("Layer ID")) {
-			NIKE_METADATA_SERVICE->setEntityLayerID(entity, data.at("Layer ID"));
+		//Deserialize prefab data
+		if (data.contains("MetaData")) {
+			NIKE_METADATA_SERVICE->deserializePrefabData(entity, data.at("MetaData"));
 		}
 
 		return success;
@@ -342,15 +342,15 @@ namespace NIKE {
 			return;
 
 		//Deserialize data
-		if (!deserializeEntity(entity, data) || !data.contains("Layer ID")) {
+		if (!deserializeEntity(entity, data) || !data.contains("MetaData")) {
 
 			//Error encountered in deserialization
-			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string());
+			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(entity).value() : MetaData::EntityData());
 		}
 
-		//Deserialize layer ID
-		if (data.contains("Layer ID")) {
-			NIKE_METADATA_SERVICE->setEntityLayerID(entity, data.at("Layer ID"));
+		//Deserialize prefab data
+		if (data.contains("MetaData")) {
+			NIKE_METADATA_SERVICE->deserializePrefabData(entity, data.at("MetaData"));
 		}
 
 		//Close file
@@ -568,6 +568,8 @@ namespace NIKE {
 
 							//Check if prefab id is present
 							if (!entity_prefab_id.empty()) {
+
+								//Load prefab
 								loadEntityFromPrefab(entity, entity_prefab_id);
 
 								//Apply overrides
@@ -626,4 +628,3 @@ namespace NIKE {
 		return data;
 	}
 }
-
