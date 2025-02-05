@@ -385,7 +385,7 @@ namespace NIKE {
 
 			//Check if group exists
 			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
-			//e_sfx.audio_id = ""
+			e_sfx.audio_id = "EnemyDeathSound2.wav";
 			
 			if (!group) {
 				e_sfx.b_play_sfx = play_or_no;

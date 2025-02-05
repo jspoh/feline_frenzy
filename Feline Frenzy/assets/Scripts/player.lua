@@ -241,6 +241,8 @@ function Player:update(args)
 
         -- Handle death stuff
     if CheckDeath(entity) then
+        -- Play a custom death SFX once:
+        PlayCustomSFXOnce(entity, true, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0, 1.0)
         -- Change state to Death
         SetState(entity, "Death")
         AnimationStart(entity, 0, 12)

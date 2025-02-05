@@ -38,6 +38,8 @@ namespace NIKE {
         bool withinRange(Entity::Type source, Entity::Type player);
 
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
+        // Test
+        void playOneShotSFX(Entity::Type& entity, const std::string& custom_audio_id, const std::string& custom_channel_group_id, float custom_volume, float custom_pitch);
 
         class Manager : 
             public System::ISystem {

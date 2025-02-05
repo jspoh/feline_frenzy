@@ -10,6 +10,8 @@
 #include "Core/Engine.h"
 #include "Managers/Services/Lua/sLuaBindings.h"
 
+#include "Systems/GameLogic/sysInteraction.h"
+
 namespace NIKE {
 
     void Lua::luaKeyBinds(sol::state& lua_state) {
@@ -583,6 +585,23 @@ namespace NIKE {
                 }
             }
             });
+
+        // Play SFX once...
+        lua_state.set_function("PlayCustomSFXOnce", [&](Entity::Type entity,
+            bool play,
+            std::string custom_audio_id,
+            std::string custom_channel_group_id,
+            float custom_volume,
+            float custom_pitch) {
+                // For debugging, log that we are attempting playback.
+                NIKEE_CORE_INFO("Binding: PlayCustomSFXOnce called with audio '{}' on channel '{}' (vol: {}, pitch: {}).",
+                    custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
+
+                // Call our newly created one-shot function.
+                Interaction::playOneShotSFX(entity, custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
+            });
+
+
 
 
         // God mode toggle
