@@ -25,6 +25,8 @@ namespace NIKE {
 			NEUTRAL = 0,
 			PLAYER,
 			ENEMY,
+			PLAYERBULLET,
+			ENEMYBULLET,
 		};
 
 		struct Damage {

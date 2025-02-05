@@ -249,16 +249,16 @@ namespace NIKE {
                 const auto b_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
 
                 // Friendly fire check
-                if (a_faction_comp.has_value() && b_faction_comp.has_value()) {
-                    const auto& a_faction = a_faction_comp.value().get().faction;
-                    const auto& b_faction = b_faction_comp.value().get().faction;
+                //if (a_faction_comp.has_value() && b_faction_comp.has_value()) {
+                //    const auto& a_faction = a_faction_comp.value().get().faction;
+                //    const auto& b_faction = b_faction_comp.value().get().faction;
 
-                    //NIKEE_CORE_WARN("{} and {} == {}", static_cast<int>(a_faction), static_cast<int>(b_faction), a_faction == b_faction);
+                //    //NIKEE_CORE_WARN("{} and {} == {}", static_cast<int>(a_faction), static_cast<int>(b_faction), a_faction == b_faction);
 
-                    if (a_faction == b_faction) {
-                        return;
-                    }
-                }
+                //    if (a_faction == b_faction) {
+                //        return;
+                //    }
+                //}
 
                 // Applying Damage
                 if (a_damage_comp.has_value()) applyDamage(entity_a, entity_b);
@@ -285,17 +285,14 @@ namespace NIKE {
                 return;
             }
 
-            //const auto target_player_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(target);
-            //auto& player_faction = target_player_comp.value().get().faction;
-            
-            // !TODO: Return if faction not player
-
             auto& target_health = target_health_comp.value().get().health;
             const auto& target_max_health = target_health_comp.value().get().max_health;
 
             // Heal Target
+            // (The check might be redundant now as there is another check in sysCollision)
             if (target_health < target_max_health) {
                 target_health += healer_heal;
+                // !TODO: Add healing sound here
             }
         }
 
@@ -306,7 +303,7 @@ namespace NIKE {
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if ((attacker_damage_comp.has_value() && target_health_comp.has_value()) == false) {
+            if (!(attacker_damage_comp.has_value() && target_health_comp.has_value())) {
                 return;
             }
 
