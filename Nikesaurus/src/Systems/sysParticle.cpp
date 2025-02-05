@@ -170,11 +170,11 @@ void NSPM::update() {
 			break;
 		}
 		case Data::ParticlePresets::FIRE: {
-			static constexpr float LIFESPAN = 5.f;
-			static constexpr float ACCELERATION = 0.f;
-			static constexpr int NEW_PARTICLES_PER_SECOND = 50;
+			static constexpr float LIFESPAN = 3.f;
+			static constexpr float ACCELERATION = 10.f;
+			static constexpr int NEW_PARTICLES_PER_SECOND = 100;
 			static const Vector2f PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-			static constexpr int X_OFFSET = 10;
+			static constexpr int MAX_OFFSET = 10;
 
 			for (auto& p : ps.particles) {
 				// Update particle
@@ -229,13 +229,27 @@ void NSPM::update() {
 				for (int _{}; _ < particles_to_spawn; _++) {
 					Particle new_particle;
 					new_particle.preset = Data::ParticlePresets::FIRE;
-					const float x_offset = static_cast<float>(rand() % X_OFFSET);
-					new_particle.pos = {ps.origin.x + (rand() % 2 ? 1 : -1) * x_offset, ps.origin.y};
+
+					// spawn particles in a circle around origin
+					const float offset = static_cast<float>(rand() % MAX_OFFSET);
+					float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+					float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+					float len = sqrtf(rx * rx + ry * ry);
+					if (len == 0) len = 1;  // Prevent division by zero
+					rx /= len;
+					ry /= len;
+					const float x_offset = rx * offset;
+					const float y_offset = ry * offset;
+					new_particle.pos = {
+						ps.origin.x + x_offset,
+						ps.origin.y + y_offset
+					};
+
 					new_particle.vector = { 0.f, static_cast<float>(rand() % 100) / 100.f };
 					new_particle.vector.normalize();
 					new_particle.velocity = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
 					new_particle.acceleration = ACCELERATION;
-					new_particle.lifespan = LIFESPAN;
+					new_particle.lifespan = LIFESPAN - (x_offset / MAX_OFFSET);
 					new_particle.color = {
 						(rand() % 100 + 155.f) / 255.f ,
 						0.f,
