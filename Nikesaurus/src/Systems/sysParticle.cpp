@@ -18,14 +18,25 @@ using namespace NIKE::SysParticle;
 using NSPM = NIKE::SysParticle::Manager;
 
 NSPM::Manager() {
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+	}
+
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
 
 	// create vao and vbo for BASE particle preset
 	vao_map[Data::ParticlePresets::BASE] = 0;
 	vbo_map[Data::ParticlePresets::BASE] = 0;
-	glCreateBuffers(1, &vao_map[Data::ParticlePresets::BASE]);
+	glCreateVertexArrays(1, &vao_map[Data::ParticlePresets::BASE]);
 	glCreateBuffers(1, &vbo_map[Data::ParticlePresets::BASE]);
 	glVertexArrayVertexBuffer(vao_map[Data::ParticlePresets::BASE], 0, vbo_map[Data::ParticlePresets::BASE], 0, 0);
+
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error after creating empty vao and vbo in {0}: {1}", __FUNCTION__, err);
+	}
+	
 
 	// create vao and vbo for CLUSTER particle preset
 	vao_map[Data::ParticlePresets::CLUSTER] = 0;
@@ -36,6 +47,10 @@ NSPM::Manager() {
 	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
 	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
 
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+	}
 }
 
 NSPM::~Manager() {
@@ -134,17 +149,17 @@ void NSPM::update() {
 			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
 
 			// spawn new particles
-			float LIFESPAN;
-			float ACCELERATION;
-			int NEW_PARTICLES_PER_SECOND;
-			Vector2f PARTICLE_VELOCITY_RANGE;
-			int MAX_OFFSET;
-			Vector2f VECTOR;
-			float VELOCITY;
-			Vector4f COLOR;
-			float ROTATION;
-			Vector2f SIZE;
-			Vector2f PARTICLE_ORIGIN;
+			float LIFESPAN{};
+			float ACCELERATION{};
+			int NEW_PARTICLES_PER_SECOND{};
+			Vector2f PARTICLE_VELOCITY_RANGE{};
+			int MAX_OFFSET{};
+			Vector2f VECTOR{};
+			float VELOCITY{};
+			Vector4f COLOR{};
+			float ROTATION{};
+			Vector2f SIZE{};
+			Vector2f PARTICLE_ORIGIN{};
 
 			switch (ps.preset) {
 			case Data::ParticlePresets::CLUSTER: {
@@ -237,7 +252,6 @@ void NSPM::update() {
 
 
 			}
-			break;
 		}
 
 	}
