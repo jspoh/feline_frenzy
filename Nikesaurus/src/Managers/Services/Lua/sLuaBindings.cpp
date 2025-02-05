@@ -470,12 +470,12 @@ namespace NIKE {
             auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
             if (player_element_comp.has_value()) {
                 // Shoot elemental bullet
-                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::playerBullet[static_cast<int>(player_element_comp.value().get().element)]).string());
+                NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, Element::playerBullet[static_cast<int>(player_element_comp.value().get().element)]);
             }
             else {
                 // Missing Element Comp
                 NIKEE_CORE_WARN("PLAYER missing Elemental Component");
-                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+                NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, "bullet.prefab");
             }
 
             // Set/Teleport entity position
@@ -485,12 +485,6 @@ namespace NIKE {
                     transform.value().get().position = { x, y };
                 }
                 });
-
-#ifndef NDEBUG
-            //auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
-            //data.prefab_id = "bullet.prefab";
-            //NIKE_LVLEDITOR_SERVICE->setEntityMetaData(bullet_entity, data);
-#endif
 
             //Player position
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);

@@ -1,6 +1,6 @@
 ﻿/*****************************************************************//**
  * \file   cPhysics.h
- * \brief  Physics components header
+ * \brief  Defines the components used for physics
  *
  * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
  * \date   September 2024

@@ -651,7 +651,7 @@ namespace NIKE {
 					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(temp, asset_data.first);
 
 					//Serialize
-					NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(temp), asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityLayerID(temp));
+					NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(temp), asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(temp).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(temp).value() : NIKE::MetaData::EntityData());
 
 					break;
 				}

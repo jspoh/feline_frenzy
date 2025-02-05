@@ -76,7 +76,7 @@ namespace NIKE {
 			char info_log[512];
 			glGetProgramInfoLog(shader_handle, 512, nullptr, info_log);
 			cerr << "Failed to link shader program " << ": " << info_log << endl;
-			//throw std::exception();
+			throw std::exception();
 		}
 
 		// cleanup shaders
@@ -95,13 +95,26 @@ namespace NIKE {
 		compileShader("texture", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/texture.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/texture.frag").string());
 		compileShader("batched_texture", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_texture.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/batched_texture.frag").string());
 		compileShader("text", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/text.frag").string());
+		compileShader("base_particle", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base_particle.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/base_particle.frag").string());
+		compileShader("cluster_particle", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/cluster_particle.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/cluster_particle.frag").string());
+		compileShader("fire_particle", NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/fire_particle.vert").string(), NIKE_PATH_SERVICE->resolvePath("Engine_Assets:/Shaders/fire_particle.frag").string());
 	}
 
 	void Shader::ShaderManager::useShader(const std::string& shader_ref) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the start of {0}: {1}", __FUNCTION__, err);
+		}
+
 		if (shaders.find(shader_ref) == shaders.end()) {
 			throw std::runtime_error("Shader does not exist.");
 		}
 		glUseProgram(shaders.at(shader_ref));
+
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
 	}
 
 	void Shader::ShaderManager::unuseShader() {
@@ -119,7 +132,7 @@ namespace NIKE {
 			glUniform1i(location, value);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -132,7 +145,7 @@ namespace NIKE {
 			glUniform1f(location, value);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -145,7 +158,7 @@ namespace NIKE {
 			glUniformMatrix3fv(location, 1, GL_FALSE, &value(0, 0));
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -158,7 +171,7 @@ namespace NIKE {
 			glUniform3fv(location, 1, &value.x);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -171,7 +184,7 @@ namespace NIKE {
 			glUniform2f(location, value.x, value.y);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 
@@ -184,7 +197,7 @@ namespace NIKE {
 			glUniform4f(location, value.x, value.y, value.z, value.w);
 		}
 		else {
-			cerr << "Uniform location not found for: " << name << endl;
+			// cerr << "Uniform location not found for: " << name << endl;
 		}
 	}
 

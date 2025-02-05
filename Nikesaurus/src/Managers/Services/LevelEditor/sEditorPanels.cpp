@@ -13,6 +13,7 @@
 #include "Core/Engine.h"
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -273,18 +274,12 @@ namespace NIKE {
 						system->setActiveState(false);
 					}
 				});
-
-			//Restart scene
-			NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
 		}
 		else {
 			std::for_each(systems.begin(), systems.end(),
 				[](std::shared_ptr<System::ISystem>& system) {
 					system->setActiveState(true);
 				});
-
-			//Exit editor mode
-			NIKE_LVLEDITOR_SERVICE->setEditorState(false);
 		}
 	}
 
@@ -873,7 +868,7 @@ namespace NIKE {
 				auto prefab_path = NIKE_PATH_SERVICE->normalizePath(path);
 
 				//Save empty prefab to path
-				NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity), prefab_path.string(), NIKE_METADATA_SERVICE->getEntityLayerID(selected_entity));
+				NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity), prefab_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(selected_entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(selected_entity).value() : NIKE::MetaData::EntityData());
 
 				//Reset prefab id buffer
 				entity_prefab_id.clear();
@@ -2005,8 +2000,28 @@ namespace NIKE {
 					//Setup do action for add component
 					//add_comp.do_action = [=]() {
 
-						//Add default comp to entity
+					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
+
+					// add active particle system if particle emitter is added
+					if (component.first == "Render::ParticleEmitter") {
+						// get entity position
+						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+
+						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+						
+						const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
+						// update default particle system config
+						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+						pe_comp->duration = -1.f;
+						pe_comp->preset = static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::CLUSTER);
+						pe_comp->ref = particle_emitter_ref;
+						pe_comp->offset = { 0.f, 0.f };
+
+						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets::CLUSTER, comp->position + pe_comp->offset);
+					}
+
 					//	};
 
 					//Execute add component action
@@ -2043,6 +2058,8 @@ namespace NIKE {
 			if (ImGui::Button("Ok")) {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
+
+				// !TODO: jspoh remove particle system when component is removed
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2654,7 +2671,7 @@ namespace NIKE {
 				auto prefab_path = NIKE_PATH_SERVICE->normalizePath(path);
 
 				//Save empty prefab to path
-				NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, prefab_path.string());
+				NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, prefab_path.string(), meta_data);
 
 				//Reset scene id buffer
 				new_prefab_id.clear();
@@ -2704,7 +2721,7 @@ namespace NIKE {
 						current_index = 0;
 
 						//Load prefab comps
-						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, prefab_layer_id, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+						NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, meta_data, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 						//Close the popup after loading
 						closePopUp(popup_id);
@@ -2806,7 +2823,7 @@ namespace NIKE {
 		}
 
 		//Save prefab to file
-		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string(), prefab_layer_id);
+		NIKE_SERIALIZE_SERVICE->savePrefab(prefab_comps, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string(), meta_data);
 
 		//Iterate through all entities and check their metadata
 		for (auto const& entity : NIKE_ECS_MANAGER->getAllEntities()) {
@@ -2890,6 +2907,7 @@ namespace NIKE {
 			if (ImGui::Button("Close Prefab")) {
 				prefab_id.clear();
 				prefab_comps.clear();
+				meta_data = NIKE::MetaData::EntityData();
 			}
 
 			ImGui::Spacing();
@@ -2900,15 +2918,18 @@ namespace NIKE {
 
 			ImGui::Text("Modify Prefab Template");
 
+			//Add Spacing
+			ImGui::Spacing();
+
 			//Display prefab layer ID
-			ImGui::Text("Layer ID: %d", prefab_layer_id);
+			ImGui::Text("Layer ID: %d", meta_data.layer_id);
 
 			ImGui::SameLine();
 
 			//Decrement
 			if (ImGui::SmallButton(" - ##PrefabLayerID")) {
-				if (prefab_layer_id > 0) {
-					prefab_layer_id = prefab_layer_id - 1;
+				if (meta_data.layer_id > 0) {
+					meta_data.layer_id = meta_data.layer_id - 1;
 				}
 			}
 
@@ -2916,9 +2937,42 @@ namespace NIKE {
 
 			//Increment 
 			if (ImGui::SmallButton(" + ##PrefabLayerID")) {
-				if (prefab_layer_id < NIKE_SCENES_SERVICE->getLayerCount() - 1) {
-					prefab_layer_id = prefab_layer_id + 1;
+				if (meta_data.layer_id < NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+					meta_data.layer_id = meta_data.layer_id + 1;
 				}
+			}
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Show number of entities in the level
+			auto e_tags = meta_data.tags;
+			ImGui::Text("Number of tags: %d", e_tags.size());
+			auto const& tags = NIKE_METADATA_SERVICE->getRegisteredTags();
+			if (!tags.empty()) {
+				for (auto const& tag : tags) {
+
+					//Boolean
+					bool checked = e_tags.find(tag) != e_tags.end();
+
+					//Checkbox for checking tag
+					if (ImGui::Checkbox(("##PrefabMetadataTag" + tag).c_str(), &checked)) {
+						if (checked) {
+							meta_data.tags.insert(tag);
+						}
+						else {
+							meta_data.tags.erase(tag);
+						}
+					}
+
+					ImGui::SameLine();
+
+					//Tag name
+					ImGui::Text(tag.c_str());
+				}
+			}
+			else {
+				ImGui::Text("No Tags Exists.");
 			}
 
 			ImGui::Spacing();
@@ -2982,7 +3036,7 @@ namespace NIKE {
 				prefab_comps.clear();
 
 				//Load prefab comps
-				NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, prefab_layer_id, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+				NIKE_SERIALIZE_SERVICE->loadPrefab(prefab_comps, meta_data, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 				//createDisplayPrefab(asset_id);
 			}

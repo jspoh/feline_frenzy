@@ -11,6 +11,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Components/cRender.h"
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	void Render::registerComponents() {
@@ -22,6 +23,68 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
 		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
+		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
+
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
+			//Serialize
+			[](Render::ParticleEmitter const& comp) -> nlohmann::json {
+				return	{
+					{ "preset", static_cast<int>(comp.preset) },
+					{ "offset", comp.offset.toJson() },
+					{ "duration", comp.duration },
+					//{ "ref", comp.ref }
+				};
+			},
+			//Deserialize
+			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
+				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
+				comp.preset = static_cast<int>(data.at("preset").get<int>());
+				comp.offset.fromJson(data.at("offset"));
+				comp.duration = data.at("duration").get<float>();
+				comp.ref = particle_emitter_ref;
+
+				// add particle system
+				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, comp.duration);
+			},
+			// Override Serialize
+			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.preset != other_comp.preset) {
+					delta["preset"] = comp.preset;
+				}
+				if (comp.offset != other_comp.offset) {
+					delta["offset"] = comp.offset.toJson();
+				}
+				if (comp.duration != other_comp.duration) {
+					delta["duration"] = comp.duration;
+				}
+				//if (comp.ref != other_comp.ref) {
+				//	delta["ref"] = comp.ref;
+				//}
+				return delta;
+			},
+			// Override Deserialize
+			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
+				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
+				if (delta.contains("preset")) {
+					comp.preset = delta["preset"];
+				}
+				if (delta.contains("offset")) {
+					comp.offset.fromJson(delta["offset"]);
+				}
+				if (delta.contains("duration")) {
+					comp.duration = delta["duration"];
+				}
+				if (delta.contains("ref")) {
+					comp.ref = particle_emitter_ref;
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::ParticleEmitter>();
 
 		//Register cam for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Cam>(
@@ -279,6 +342,74 @@ namespace NIKE {
 	void Render::registerEditorComponents() {
 
 #ifndef NDEBUG
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::ParticleEmitter>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::ParticleEmitter& comp) {
+				{
+					// Before change
+					static int before_change_preset;
+					static Vector2f before_change_offset;
+
+					// Preset
+					ImGui::Text("Particle Preset:");
+
+					std::string preset_options{};
+					for (const auto& [preset, preset_ref] : SysParticle::Data::particle_preset_map) {
+						preset_options += preset_ref + '\0';
+					}
+					preset_options += '\0';
+
+					int selected_preset = static_cast<int>(comp.preset);
+					static int previous_preset = selected_preset;
+					if (ImGui::Combo("##Preset", &selected_preset, preset_options.c_str())) {
+						// If the value changed, process the change
+						if (selected_preset != previous_preset) {
+							previous_preset = selected_preset;
+
+							LevelEditor::Action change_preset;
+
+							// Store the value before the change
+							change_preset.do_action = [&, preset = selected_preset]() {
+								comp.preset = preset;
+								};
+
+							// Store the undo action
+							change_preset.undo_action = [&, preset = previous_preset]() {
+								comp.preset = preset;
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_preset));
+						}
+					}
+
+					// Offset
+					ImGui::Text("Particle Offset:");
+					ImGui::DragFloat2("##Offset", &comp.offset.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					//Check if begin editing
+					if (ImGui::IsItemActivated()) {
+						before_change_offset = comp.offset;
+					}
+					//Check if finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_offset;
+						//Change pos do action
+						change_offset.do_action = [&, offset = comp.offset]() {
+							comp.offset = offset;
+							};
+						//Change pos undo action
+						change_offset.undo_action = [&, offset = before_change_offset]() {
+							comp.offset = offset;
+							};
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
+					}
+					// Duration
+					ImGui::Text("Particle Duration:");
+					ImGui::DragFloat("##Duration", &comp.duration, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+				}
+			}
+		);
+
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Cam>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Cam& comp) {
 				ImGui::Text("Edit Camera variables");
@@ -316,9 +447,7 @@ namespace NIKE {
 				}
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Text>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Text& comp) {
 
@@ -528,9 +657,7 @@ namespace NIKE {
 
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		// UI for shape
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Shape>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Shape& comp) {
@@ -628,9 +755,7 @@ namespace NIKE {
 				}
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Texture>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Texture& comp) {
 

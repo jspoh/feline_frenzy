@@ -33,7 +33,7 @@ namespace NIKE {
 			void playSFX(Entity::Type& entity, bool play_or_no) override;
 
 		private:
-
+			void spawnHealthDrop(Entity::Type entity);
 		};
 	}
 }

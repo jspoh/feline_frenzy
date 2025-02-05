@@ -137,6 +137,15 @@ namespace NIKE {
 				//Render text
 				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
+				// render particle system
+
+				/**
+				 * use shader prefix (without '_') as ref.
+				 * 
+				 * \param ref
+				 */
+				void renderParticleSystem(int preset, const Vector2f& origin, unsigned int vao = 0, int draw_count = 1);
+
 				/*****************************************************************//**
 				* BATCH RENDERING
 				*********************************************************************/

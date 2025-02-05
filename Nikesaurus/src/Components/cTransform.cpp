@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   cTransform.cpp
- * \brief  Transform component for entity
+ * \brief  Transform components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (50%)

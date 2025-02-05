@@ -20,6 +20,7 @@ namespace NIKE {
 
 			Vector2() : x(0), y(0) {}
 			Vector2(type x, type y) : x(x), y(y) {}
+			Vector2(const Vector2<int>& other) : x(static_cast<type>(other.x)), y(static_cast<type>(other.y)) {}
 
 			Vector2 normalize();
 			Vector2 normalized() const;
