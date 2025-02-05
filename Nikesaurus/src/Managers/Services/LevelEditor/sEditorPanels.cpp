@@ -325,12 +325,40 @@ namespace NIKE {
 
 			//Game State Switching
 			{
-				ImGui::Text("Play Game: ");
-				ImGui::Button("Play");
 
-				//Check if button has been activated
-				if (ImGui::IsItemActivated()) {
-					setGameState(true);
+				//Show play button only when game state is inactive
+				if (!getGameState()) {
+					ImGui::Button("Play##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						setGameState(true);
+					}
+				}
+				else {
+					ImGui::Button("Pause##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						setGameState(false);
+					}
+
+					ImGui::Button("End##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						//Restart scene
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+						setGameState(false);
+					}
+
+					ImGui::Button("Restart##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						//Restart scene
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+					}
 				}
 			}
 
@@ -1543,7 +1571,7 @@ namespace NIKE {
 			return false;
 		}
 	}
-	//
+
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
