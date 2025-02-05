@@ -253,6 +253,27 @@ namespace NIKE {
 			//Toggle editor mode
 			b_editor_active = !b_editor_active;
 
+			//Set game to play
+			if (!b_editor_active) {
+
+				//Save editor data
+				autoSave();
+				
+				//Play game
+				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(true);
+
+				//Restart scene
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+			}
+			else {
+
+				//Pause the game
+				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(false);
+
+				//Restart scene
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+			}
+
 			// Clear all inputs done while editor is not active
 			io.ClearEventsQueue();
 		}
@@ -408,11 +429,18 @@ namespace NIKE {
 
 	void LevelEditor::Service::autoSave() const {
 
-		//Check if auto save is on
-		if (std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->getAutoSave()) {
+		//Main panel
+		auto main_panel = std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()));
 
-			//Save scene
-			std::dynamic_pointer_cast<ScenesPanel>(panels_map.at(ScenesPanel::getStaticName()))->saveScene();
+		//Check if auto save is on
+		if (main_panel->getAutoSave()) {
+
+			//Check if main panel game is active
+			if (!main_panel->getGameState()) {
+
+				//Save scene if game is not playing
+				std::dynamic_pointer_cast<ScenesPanel>(panels_map.at(ScenesPanel::getStaticName()))->saveScene();
+			}
 
 			//Save prefab
 			std::dynamic_pointer_cast<PrefabsPanel>(panels_map.at(PrefabsPanel::getStaticName()))->savePrefab();

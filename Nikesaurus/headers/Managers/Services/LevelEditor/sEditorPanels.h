@@ -192,6 +192,9 @@ namespace NIKE {
 			//Reference to game window panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
+			//Reference to main panel
+			std::weak_ptr<MainPanel> main_panel;
+
 			//Reference to component panel
 			std::weak_ptr<ComponentsPanel> comp_panel;
 
@@ -416,6 +419,9 @@ namespace NIKE {
 
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
+
+			//Reference to main panel
+			std::weak_ptr<MainPanel> main_panel;
 
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
