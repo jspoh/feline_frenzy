@@ -446,12 +446,29 @@ namespace NIKE {
         const auto faction_a = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
         const auto faction_b = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
 
-        // If an entity has a HealthDrop component, it only collides with player
+        // If HealthDrop collides with non-Player
         if ((health_drop_a.has_value() && (!faction_b.has_value() || faction_b.value().get().faction != Combat::Factions::PLAYER)) ||
             (health_drop_b.has_value() && (!faction_a.has_value() || faction_a.value().get().faction != Combat::Factions::PLAYER)))
         {
             // Ignore collision
             return false; 
+        }
+
+        // Check to see if player is at full health
+        if (health_drop_a.has_value() && faction_b.has_value() && faction_b.value().get().faction == Combat::Factions::PLAYER) {
+            const auto b_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity_b);
+
+            if (b_health_comp.has_value() && b_health_comp.value().get().health >= b_health_comp.value().get().max_health) {
+                return false; // Ignore collision if at full health
+            }
+        }
+
+        if (health_drop_b.has_value() && faction_a.has_value() && faction_a.value().get().faction == Combat::Factions::PLAYER) {
+            const auto a_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity_a);
+
+            if (a_health_comp.has_value() && a_health_comp.value().get().health >= a_health_comp.value().get().max_health) {
+                return false; // Ignore collision if at full health
+            }
         }
 
         // Allow collision
