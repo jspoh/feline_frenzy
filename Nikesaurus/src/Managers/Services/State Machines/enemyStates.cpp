@@ -1,17 +1,21 @@
 /*****************************************************************//**
- * \file   cEnemyStates.cpp
+ * \file   enemyStates.cpp
  * \brief  Enemy States
  *
- * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu
+ * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
  *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
 #include "Managers/Services/State Machine/enemyStates.h"
-#include "Managers/Services/State Machine/enemyTransitions.h"
-#include "Systems/GameLogic/sysEnemy.h"
+#include "Managers/Services/State Machine/enemyUtils.h"
+#include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
+
+// Transitions
+#include "Managers/Services/State Machine/enemyTransitions.h"
+#include "Managers/Services/State Machine/destructableTransitions.h"
 
 namespace NIKE {
 
@@ -24,6 +28,8 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("IdleToAttack", std::make_shared<Transition::IdleToAttack>());
 		addTransition("IdleToChase", std::make_shared<Transition::IdleToChase>());
+		addTransition("IdleToDeath", std::make_shared<Transition::IdleToDeath>());
+		addTransition("IdleToDestructableDeath", std::make_shared<Transition::IdleToDestructableDeath>());
 	}
 
 	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -46,6 +52,10 @@ namespace NIKE {
 		// removeTransition("IdleToAttack");
 	}
 
+	void State::IdleState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	{
+	}
+
 	/*******************************
 	* Attack State functions
 	*****************************/
@@ -55,6 +65,11 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("AttackToIdle", std::make_shared<Transition::AttackToIdle>());
 		addTransition("AttackToChase", std::make_shared<Transition::AttackToChase>());
+		addTransition("AttackToDeath", std::make_shared<Transition::AttackToDeath>());
+
+		// Register the Manager as a listener for collision events
+		std::shared_ptr<AttackState> attack_state_wrapped(this, [](AttackState*) {});
+		NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(attack_state_wrapped);
 	}
 
 	void NIKE::State::AttackState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -83,7 +98,7 @@ namespace NIKE {
 			}
 
 			// Look for entity w player component
-			for (auto& other_entity : NIKE_ECS_MANAGER->getAllEntities()) {
+			for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
 				// If player entity exists
@@ -95,7 +110,12 @@ namespace NIKE {
 						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
-
+						updateAttackAnimation(entity);
+						auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+						if (e_audio_comp.has_value())
+						{
+							playSFX(entity, false);
+						}
 						// Reset the last shot time after shooting
 						enemy_comp.last_shot_time = 0.f;
 					}
@@ -111,6 +131,70 @@ namespace NIKE {
 		// removeTransition("AttackToIdle");
 	}
 
+	void State::AttackState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	{
+		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+		if (e_sfx_comp.has_value()) {
+			auto& e_sfx = e_sfx_comp.value().get();
+
+			//Check if group exists
+			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+			if (!group) {
+				e_sfx.b_play_sfx = play_or_no;
+				return;
+			}
+			else {
+				//Play sound
+				if (play_or_no && !group->isPlaying()) {
+					e_sfx.b_play_sfx = play_or_no;
+				}
+			}
+
+			//stop sfx
+			if (!play_or_no) {
+				group->stop();
+			}
+		}
+	}
+
+	void State::AttackState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
+	{
+		// Ensure entities exist and handle the collision
+		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
+			Interaction::handleCollision(event->entity_a, event->entity_b);
+		}
+	}
+
+	void State::AttackState::updateAttackAnimation([[maybe_unused]] Entity::Type& entity)
+	{
+		int get_last_direction = getLastDirection(entity);
+		if (get_last_direction == 0)
+		{
+			// Attack right
+			animationStart(entity, 0, 5);
+			animationEnd(entity, 5, 5);
+			flipX(entity, false);
+		}
+		else if (get_last_direction == 2) {
+			// Attack up
+			animationStart(entity, 0, 7);
+			animationEnd(entity, 5, 7);
+			flipX(entity, false);
+		}
+		else if (get_last_direction == 5) {
+			// Attack down
+			animationStart(entity, 0, 4);
+			animationEnd(entity, 5, 4);
+			flipX(entity, false);
+		}
+		else{
+			// Attack left
+			animationStart(entity, 0, 4);
+			animationEnd(entity, 5, 4);
+			flipX(entity, true);
+		}
+	}
+
 	/*******************************
 	* Chase State functions
 	*****************************/
@@ -120,6 +204,7 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("ChaseToAttack", std::make_shared<Transition::ChaseToAttack>());
 		addTransition("ChaseToIdle", std::make_shared<Transition::ChaseToIdle>());
+		addTransition("ChaseToDeath", std::make_shared<Transition::ChaseToDeath>());
 	}
 
 	void NIKE::State::ChaseState::onEnter([[maybe_unused]] Entity::Type& entity)
@@ -129,7 +214,7 @@ namespace NIKE {
 
 	void State::ChaseState::onUpdate(Entity::Type& entity)
 	{
-		for (const auto& other_entity : NIKE_ECS_MANAGER->getAllEntities())
+		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player"))
 		{
 			// Getting components from player and enemy entities
 			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
@@ -147,69 +232,19 @@ namespace NIKE {
 
 				// Move the entity along the computed path
 				Enemy::moveAlongPath(entity, end.value().x, end.value().y, enemy_speed, cell_offset);
+				// Play SFX when walking
+				auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+				if (e_audio_comp.has_value())
+				{
+					playSFX(entity, true);
+				}
 			}
 
 
 			// Update animation based on movement direction
 			if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
 				float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
-
-				if (dir >= -M_PI / 8 && dir < M_PI / 8) {
-					// Moving right
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, false);
-					setLastDirection(entity, 0);
-				}
-				else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
-					// Moving up-right (diagonal)
-					animationStart(entity, 0, 2);
-					animationEnd(entity, 9, 2);
-					flipX(entity, false);
-					setLastDirection(entity, 1);
-				}
-				else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
-					// Moving up
-					animationStart(entity, 0, 0);
-					animationEnd(entity, 9, 0);
-					flipX(entity, false);
-					setLastDirection(entity, 2);
-				}
-				else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
-					// Moving up-left (diagonal)
-					animationStart(entity, 0, 2);
-					animationEnd(entity, 9, 2);
-					flipX(entity, true);
-					setLastDirection(entity, 3);
-				}
-				else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
-					// Moving down-right (diagonal)
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, false);
-					setLastDirection(entity, 4);
-				}
-				else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
-					// Moving down
-					animationStart(entity, 0, 0);
-					animationEnd(entity, 9, 0);
-					flipX(entity, false);
-					setLastDirection(entity, 5);
-				}
-				else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
-					// Moving down-left (diagonal)
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, true);
-					setLastDirection(entity, 6);
-				}
-				else {
-					// Moving left
-					animationStart(entity, 0, 1);
-					animationEnd(entity, 9, 1);
-					flipX(entity, true);
-					setLastDirection(entity, 7);
-				}
+				updateChaseAnimation(entity, dir);
 			}
 
 		}
@@ -220,4 +255,155 @@ namespace NIKE {
 	{
 		//cout << "exit chase state" << endl;
 	}
+
+	void State::ChaseState::playSFX(Entity::Type& entity, bool play_or_no)
+	{
+		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+		if (e_sfx_comp.has_value()) {
+			auto& e_sfx = e_sfx_comp.value().get();
+
+			//Check if group exists
+			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+			//e_sfx.audio_id = ""
+
+			if (!group) {
+				e_sfx.b_play_sfx = play_or_no;
+				return;
+			}
+			else {
+				//Play sound
+				if (play_or_no && !group->isPlaying()) {
+					e_sfx.b_play_sfx = play_or_no;
+				}
+			}
+
+			//stop sfx
+			if (!play_or_no) {
+				group->stop();
+			}
+		}
+	}
+
+	void State::ChaseState::updateChaseAnimation(Entity::Type& entity, float& dir)
+	{
+		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
+			// Moving right
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, false);
+			setLastDirection(entity, 0);
+		}
+		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
+			// Moving up-right (diagonal)
+			animationStart(entity, 0, 2);
+			animationEnd(entity, 9, 2);
+			flipX(entity, false);
+			setLastDirection(entity, 1);
+		}
+		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
+			// Moving up
+			animationStart(entity, 0, 3);
+			animationEnd(entity, 9, 3);
+			flipX(entity, false);
+			setLastDirection(entity, 2);
+		}
+		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+			// Moving up-left (diagonal)
+			animationStart(entity, 0, 2);
+			animationEnd(entity, 9, 2);
+			flipX(entity, true);
+			setLastDirection(entity, 3);
+		}
+		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+			// Moving down-right (diagonal)
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, false);
+			setLastDirection(entity, 4);
+		}
+		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
+			// Moving down
+			animationStart(entity, 0, 0);
+			animationEnd(entity, 9, 0);
+			flipX(entity, false);
+			setLastDirection(entity, 5);
+		}
+		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+			// Moving down-left (diagonal)
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, true);
+			setLastDirection(entity, 6);
+		}
+		else {
+			// Moving left
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
+			flipX(entity, true);
+			setLastDirection(entity, 7);
+		}
+	}
+
+	/*******************************
+	* Death State functions
+	*****************************/
+
+	State::DeathState::DeathState()
+	{
+		// Add transitions here
+	}
+
+	void State::DeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
+		// Play death animation
+		animationStart(entity, 0, 8);
+		animationEnd(entity, 2, 8);
+		flipX(entity, false);
+	}
+	void State::DeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
+		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (animation_comp.has_value())
+		{
+			// Use delta time to let animation play before deleting entity
+			static float dt = 0.0f;
+			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			if (dt >= 0.2f) { 
+				NIKE_METADATA_SERVICE->destroyEntity(entity);
+				// Reset delta time
+				dt = 0.f;
+			}
+		}
+	}
+	void State::DeathState::onExit([[maybe_unused]] Entity::Type& entity){
+		
+	}
+
+	void State::DeathState::playSFX(Entity::Type& entity, bool play_or_no)
+	{
+		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+		if (e_sfx_comp.has_value()) {
+			auto& e_sfx = e_sfx_comp.value().get();
+
+			//Check if group exists
+			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+			//e_sfx.audio_id = ""
+			
+			if (!group) {
+				e_sfx.b_play_sfx = play_or_no;
+				return;
+			}
+			else {
+				//Play sound
+				if (play_or_no && !group->isPlaying()) {
+					e_sfx.b_play_sfx = play_or_no;
+				}
+			}
+
+			//stop sfx
+			if (!play_or_no) {
+				group->stop();
+			}
+		}
+	}
 }
+
+

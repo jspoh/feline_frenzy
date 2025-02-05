@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- *  All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -88,6 +88,9 @@ namespace NIKE {
 			//Clean up Editor
 			void cleanUp();
 
+			//Auto save functionality
+			void autoSave() const;
+
 			//Set Editor State
 			void setEditorState(bool state);
 
@@ -99,6 +102,12 @@ namespace NIKE {
 
 			//Get Game State
 			bool getGameState() const;
+
+			//Bind editor frame buffer
+			void bindEditorFrameBuffer() const;
+
+			//unBind editor frame buffer
+			void unbindEditorFrameBuffer() const;
 
 			//Add panel ( added into map based on IPanel getName() )
 			void addPanel(std::shared_ptr<IPanel> panel);

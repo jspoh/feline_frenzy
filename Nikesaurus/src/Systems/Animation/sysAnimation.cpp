@@ -24,16 +24,16 @@ namespace NIKE {
 
 			//Iterate through layers
 			for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+
 				//SKip inactive layer
 				if (!layer->getLayerState())
 					continue;
 
 				//Iterate through all entities
-				for (auto& entity : entities) {
+				for (auto& entity : layer->getEntitites()) {
 
-					//Skip entities that are not present within layer, or doesnt have the base animators
-					if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-						continue;
+					//Skip entity not registered to this system
+					if (entities.find(entity) == entities.end()) continue;
 
 					//Get base animator comp
 					auto e_baseanimator_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);

@@ -43,8 +43,8 @@ namespace NIKE {
 				[](State& comp, nlohmann::json const& data) {
 					UNREFERENCED_PARAMETER(data);
 					// Default deserialize to idle
-					// comp.state_id = data.at("State").get<std::string>();
-					comp.state_id = "Idle";
+					comp.state_id = data.at("State").get<std::string>();
+					// comp.state_id = "Idle";
 					// Assign pointer based on state_id
 					comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
 
@@ -85,7 +85,7 @@ namespace NIKE {
 				ImGui::Text("Adjust State:");
 
 				// List of available states
-				static const char* state_names[] = { "Idle", "Chase", "Attack" };
+				static const char* state_names[] = { "Idle", "Chase", "Attack", "Death"};
 
 				// Current and previous state tracking
 				static std::string before_select_state = comp.state_id;

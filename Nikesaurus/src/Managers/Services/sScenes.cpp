@@ -35,6 +35,87 @@ namespace NIKE {
 		return mask;
 	}
 
+	void Scenes::Layer::insertEntity(Entity::Type entity) {
+		for (auto const& e : entities) {
+
+			//Check for duplicates
+			if (e == entity) {
+				return;
+			}
+		}
+
+		//Insert entity
+		entities.push_back(entity);
+	}
+
+	void Scenes::Layer::removeEntity(Entity::Type entity) {
+		auto it = std::find(entities.begin(), entities.end(), entity);
+		if (it != entities.end()) {
+			entities.erase(it);
+		}
+	}
+
+	bool Scenes::Layer::checkEntity(Entity::Type entity) {
+		return std::find(entities.begin(), entities.end(), entity) != entities.end();
+	}
+
+	void Scenes::Layer::sortEntitiesBasedOnMetaData() {
+		if (entities.empty()) {
+			return;
+		}
+
+		std::sort(entities.begin(), entities.end(), [](Entity::Type a, Entity::Type b) {
+			return NIKE_METADATA_SERVICE->getEntityLayerOrder(a) < NIKE_METADATA_SERVICE->getEntityLayerOrder(b);
+			});
+	}
+
+	void Scenes::Layer::setEntityOrder(Entity::Type entity, size_t order_in_layer) {
+
+		//Check for valid order
+		if (entities.empty() || order_in_layer >= entities.size()) {
+			return;
+		}
+
+		//Get curr index of entity
+		size_t current_index = getEntityOrder(entity);
+
+		//Check if entity is already in correct order
+		if (current_index == (std::numeric_limits<size_t>::max)() || current_index == order_in_layer) {
+			return;
+		}
+
+		//Reorder entity
+		if (current_index < order_in_layer) {
+			std::rotate(entities.begin() + current_index, entities.begin() + current_index + 1, entities.begin() + order_in_layer + 1);
+		}
+		else {
+			std::rotate(entities.begin() + order_in_layer, entities.begin() + current_index, entities.begin() + current_index + 1);
+		}
+
+		//Update all entities layer order in metadata
+		for (size_t i = 0; i < entities.size(); ++i) {
+			NIKE_METADATA_SERVICE->setEntityLayerOrder(entities.at(i), i);
+		}
+	}
+
+	size_t Scenes::Layer::getEntityOrder(Entity::Type entity) const {
+		auto it = std::find(entities.begin(), entities.end(), entity);
+		if (it == entities.end()) {
+			return (std::numeric_limits<size_t>::max)();
+		}
+		else {
+			return std::distance(entities.begin(), it);
+		}
+	}
+
+	std::vector<Entity::Type> Scenes::Layer::getEntitites() const {
+		return entities;
+	}
+
+	size_t Scenes::Layer::getEntitiesSize() const {
+		return entities.size();
+	}
+
 	nlohmann::json Scenes::Layer::serialize() const {
 		return	{
 				{"ID", id},
@@ -44,9 +125,9 @@ namespace NIKE {
 	}
 
 	void Scenes::Layer::deserialize(nlohmann::json const& data) {
-		id = data.at("ID").get<unsigned int>();
-		mask = LayerMask(data.at("Mask").get<unsigned long>());
-		b_state = data.at("B_State").get<bool>();
+		id = data.value("ID", static_cast<unsigned int>(0));
+		mask = LayerMask(data.value("Mask", static_cast<unsigned long>(0)));
+		b_state = data.value("B_State", true);
 	}
 
 	/*****************************************************************//**
@@ -138,7 +219,6 @@ namespace NIKE {
 
 		//ReRun scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
-
 	}
 
 	void Scenes::Service::previousScene() {
@@ -306,8 +386,6 @@ namespace NIKE {
 	}
 
 	void Scenes::Service::update() {
-		if (!NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
-		}
 
 		//Check if curr scene path is still active
 		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {

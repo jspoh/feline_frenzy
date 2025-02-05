@@ -29,15 +29,16 @@ namespace NIKE {
 				continue;
 
 			//Iterate through all entities
-			for (auto& entity : entities) {
-				if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
+			for (auto& entity : (*layer)->getEntitites()) {
+
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
 
 				//Check for player logic comp
 				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
-
+					
 					//Check if script is active
 					if (e_logic.script.script_id == "")
 						continue;
@@ -73,27 +74,40 @@ namespace NIKE {
 					}
 				}
 
-				//Check for health comp
-				//const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-				//if (e_health_comp.has_value()) {
-				//	// Health bar does not exist
-				//	if (e_health_comp.value().get().healthBarActive) {
-				//		// Update health bar position to entity position
+				// Health bar logic
+				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
+					// Look for player
+					for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+						const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+						const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
+						const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+						// Check for missing component
+						if (e_player_health.has_value() == false || e_player_transform.has_value() == false || e_healthbar_transform.has_value() == false) {
+							NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
+							return;
+						}
 
-				//	}
-				//	else {
-				//		// Spawn health prefab
-				//		spawnHealthBar(entity);
-				//	}
+						const auto& player_pos = e_player_transform.value().get().position;
+						const auto& player_scale = e_player_transform.value().get().scale;
+						auto& healthbar_pos = e_healthbar_transform.value().get().position;
+						auto& healthbar_scale = e_healthbar_transform.value().get().scale;
+						const float offset_y = player_scale.y*0.9f;
 
-				//}
+						// Set healthbar to player health
+						healthbar_scale.x = (e_player_health.value().get().health / e_player_health.value().get().max_health) * 150.0f;
+						
+
+						// Update healthbar location
+						// !TODO: Offset the healthbar to the left
+						healthbar_pos.x = player_pos.x;
+						healthbar_pos.y = player_pos.y + offset_y * 0.8f;
+					}
+				}
+
 				// Update of FSM will be called here
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}
 		}
-
-		// Destroy all entities that are marked for deletion
-		NIKE_ECS_MANAGER->destroyMarkedEntities();
 	}
 
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
@@ -103,24 +117,24 @@ namespace NIKE {
 			NIKEE_CORE_WARN("spawnEnemy: SPAWNER missing Transform Component, enemy not spawned");
 			return;
 		}
-
 		const Vector2f& spawner_pos = e_transform_comp.value().get().position;
 
 		// Create enemy entity
-		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity(0);
+		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
 		// Load entity from prefab
-		const std::string enemyArr[4] = { "enemy.prefab", "fireEnemy.prefab", "waterEnemy.prefab", "grassEnemy.prefab" };
-		std::string chosenEnemy = enemyArr[getRandomNumber(0, 3)];
+		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosen_enemy).string());
 
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosenEnemy).string());
+		// When enemy spwan from spawner, set the tag to enemy
+		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
+			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
+		}
+		// Randomly offset from spawner position
+		float offset_x = getRandomNumber(-20.f, 20.f);
+		float offset_y = getRandomNumber(-20.f, 20.f);
 
 		// Set Enemy Position
-
-		// Randomly offset from spawner position
-		float offset_x = static_cast<float>(getRandomNumber(-20, 20));
-		float offset_y = static_cast<float>(getRandomNumber(-20, 20));
-
 		auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy_entity);
 		if (enemy_transform_comp.has_value()) {
 			enemy_transform_comp.value().get().position = { spawner_pos.x + offset_x, spawner_pos.y + offset_y };

@@ -31,16 +31,19 @@ namespace NIKE {
 			//Boolean for locking entities in editor
 			bool b_locked;
 
-			//Boolean for checking if entity is active
-			bool b_isactive;
+			//Layer ID
+			unsigned int layer_id;
+
+			//Layer order
+			size_t layer_order;
 
 			//Dynamic tagging
 			std::set<std::string> tags;
 
 			//Constructors
-			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
+			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
 			EntityData(std::string const& name)
-				: name{ name }, prefab_id{ "" }, b_isactive{ true }, b_locked{ false } {}
+				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
 
 			//Serialize data
 			nlohmann::json serialize() const;
@@ -79,6 +82,9 @@ namespace NIKE {
 			//Set of active entities
 			std::map<Entity::Type, EntityData, EntitySorter> entities;
 
+			//Entities to destroy
+			std::set<Entity::Type> entities_to_destroy;
+
 			//On entities changed event
 			void onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) override;
 
@@ -92,6 +98,9 @@ namespace NIKE {
 
 			//Init meta data manager
 			void init(std::string const& def_entity_name = "entity_");
+
+			//Update
+			void update();
 
 			//Check if type is valid
 			bool isTagValid(std::string const& tag);
@@ -139,13 +148,10 @@ namespace NIKE {
 			std::set<std::string> getEntityTags(Entity::Type entity);
 
 			//Set Entity active State
-			void setEntityActive(Entity::Type entity, bool b_active);
+			void destroyEntity(Entity::Type entity);
 
 			//Set all entities active state
-			void setEntitiesActive(bool b_active);
-
-			//Check if entity is active
-			bool checkEntityActive(Entity::Type entity) const;
+			void destroyAllEntities();
 
 			//Set Entity locked or unlocked in editor
 			void setEntityLocked(Entity::Type entity, bool b_locked);
@@ -156,8 +162,38 @@ namespace NIKE {
 			//Check if entity is locked
 			bool checkEntityLocked(Entity::Type entity) const;
 
+			//Set Entity layer ID
+			void setEntityLayerID(Entity::Type entity, unsigned int layer_id);
+
+			//Get Entity layer ID
+			unsigned int getEntityLayerID(Entity::Type entity) const;
+
+			//Set Entity layer order
+			void setEntityLayerOrder(Entity::Type entity, size_t layer_id);
+
+			//Get Entity layer order
+			size_t getEntityLayerOrder(Entity::Type entity) const;
+
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);
+
+			//Serialize entity
+			nlohmann::json serializeEntityData(Entity::Type entity) const;
+
+			//Deserialize entity
+			void deserializeEntityData(Entity::Type entity, nlohmann::json const& data);
+
+			//Serialize Prefab metadata
+			nlohmann::json serializePrefabData(MetaData::EntityData const& metadata) const;
+
+			//Serialize Prefab metadata
+			nlohmann::json serializePrefabOverrideData(MetaData::EntityData const& entity_data, MetaData::EntityData const& prefab_data) const;
+
+			//Deserialize Prefab metadata
+			bool deserializePrefabData(Entity::Type entity, nlohmann::json const& data);
+
+			//Deserialize Prefab metadata
+			bool deserializePrefabData(MetaData::EntityData& metadata, nlohmann::json const& data);
 
 			//Get first entity in list
 			Entity::Type getFirstEntity() const;
@@ -166,7 +202,7 @@ namespace NIKE {
 			std::set<Entity::Type> getEntitiesByTag(std::string const& tag) const;
 
 			//Get entity metadata
-			std::optional<EntityData> getEntityData(Entity::Type entity) const;
+			std::optional<EntityData> getEntityDataCopy(Entity::Type entity) const;
 
 			//Get entities data
 			std::map<Entity::Type, EntityData, EntitySorter> getEntitiesData() const;

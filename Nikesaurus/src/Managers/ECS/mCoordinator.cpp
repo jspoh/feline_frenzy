@@ -21,18 +21,17 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Entity Methods
 	*********************************************************************/
-	Entity::Type Coordinator::Manager::createEntity(unsigned int layer_id) {
-		auto entity = entity_manager->createEntity(layer_id);
+	Entity::Type Coordinator::Manager::createEntity() {
+		auto entity = entity_manager->createEntity();
 
 		//Dispatch event
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<EntitiesChanged>(entity_manager->getAllEntities()));
-		entity_manager->setLayerID(entity, layer_id);
 
 		return entity;
 	}
 
 	Entity::Type Coordinator::Manager::cloneEntity(Entity::Type copy) {
-		Entity::Type new_entity = entity_manager->createEntity(entity_manager->getLayerID(copy));
+		Entity::Type new_entity = entity_manager->createEntity();
 		component_manager->cloneEntity(new_entity, copy);
 		entity_manager->setSignature(new_entity, entity_manager->getSignature(copy));
 		system_manager->cloneEntity(new_entity, copy);
@@ -74,14 +73,6 @@ namespace NIKE {
 		return entity_manager->getAllEntities();
 	}
 
-	void Coordinator::Manager::setEntityLayerID(Entity::Type entity, unsigned int layer_id) {
-		entity_manager->setLayerID(entity, layer_id);
-	}
-
-	unsigned int Coordinator::Manager::getEntityLayerID(Entity::Type entity) const {
-		return entity_manager->getLayerID(entity);
-	}
-
 	void Coordinator::Manager::updateSystems() {
 		system_manager->updateSystems();
 	}
@@ -89,43 +80,6 @@ namespace NIKE {
 	std::vector<std::shared_ptr<System::ISystem>>& Coordinator::Manager::getAllSystems() {
 		return system_manager->getAllSystems();
 	}
-
-	void Coordinator::Manager::markEntityForDeletion(Entity::Type entity) {
-		// Checking if entity is valid
-		if (!checkEntity(entity)) {
-			NIKEE_CORE_WARN("Attempted to mark invalid entity {} for deletion.", entity);
-			return;
-		}
-
-		if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) == entities_to_destroy.end()) {
-			entities_to_destroy.push_back(entity);
-		}
-		else {
-			NIKEE_CORE_INFO("Entity already marked for deletion");
-		}
-	}
-
-	void Coordinator::Manager::destroyMarkedEntities() {
-		//NIKEE_CORE_INFO("IN DESTROY MARKED ENTITIES");
-		for (auto entity : entities_to_destroy) {
-			if (checkEntity(entity)) {
-				//NIKEE_CORE_INFO("DESTROYING AN ENTITY");
-				destroyEntity(entity);
-				//NIKEE_CORE_INFO("AFTER DESTROYING AN ENTITY");
-			}
-			else {
-				NIKEE_CORE_INFO("Entity {} failed the checkEntity() check.", entity);
-				continue;
-			}
-		}
-		entities_to_destroy.clear();
-	}
-
-	std::vector<Entity::Type> Coordinator::Manager::getEntitiesToDestroy() const{
-		return entities_to_destroy;
-	}
-
-
 
 	/*****************************************************************//**
 	* Component Methods

@@ -1,0 +1,61 @@
+{
+    "Components": {
+        "Physics::Collider": {
+            "B_Bind_To_Entity": false,
+            "Pos_Offset": {
+                "x": 6.900000095367432,
+                "y": -100.0
+            },
+            "Position": {
+                "x": -282.0063171386719,
+                "y": 120.67849731445313
+            },
+            "Resolution": 0,
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 163.0,
+                "y": 34.0
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.5,
+            "Texture_ID": "Barrel.png"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": -288.90631103515625,
+                "y": 220.67849731445313
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 255.99996948242188,
+                "y": 255.99996948242188
+            },
+            "Screen Position": false
+        }
+    },
+    "MetaData": {
+        "Layer ID": 0,
+        "Tags": []
+    }
+}

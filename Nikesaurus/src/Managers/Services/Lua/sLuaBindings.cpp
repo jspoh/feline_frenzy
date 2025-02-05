@@ -11,6 +11,7 @@
 #include "Managers/Services/Lua/sLuaBindings.h"
 
 namespace NIKE {
+
     void Lua::luaKeyBinds(sol::state& lua_state) {
 
         //Lua key bindings
@@ -283,12 +284,17 @@ namespace NIKE {
 
         //Register destroy entity
         lua_state.set_function("KillEntity", [&](Entity::Type entity) {
-            NIKE_ECS_MANAGER->destroyEntity(entity);
+            NIKE_METADATA_SERVICE->destroyEntity(entity);
             });
 
     }
 
     void Lua::luaGameBinds(sol::state& lua_state) {
+
+        //Register destroy entity
+        lua_state.set_function("KillEntity", [&](Entity::Type entity) {
+            NIKE_METADATA_SERVICE->destroyEntity(entity);
+            });
 
         //Apply force to entities
         lua_state.set_function("ApplyForce", [&](Entity::Type entity, float x, float y) {
@@ -298,6 +304,12 @@ namespace NIKE {
                 e_trans_comp.value().get().force.y = y;
             }
             });
+
+        //Get fixed delta time
+        lua_state.set_function("GetFixedDeltaTime", [&]()-> float {
+            return NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+            }
+        );
 
         //Change animation start & end
         lua_state.set_function("AnimationStart", [&](Entity::Type entity, int start_x, int start_y) {
@@ -458,12 +470,12 @@ namespace NIKE {
             auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
             if (player_element_comp.has_value()) {
                 // Shoot elemental bullet
-                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::playerBullet[static_cast<int>(player_element_comp.value().get().element)]).string());
+                NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, Element::playerBullet[static_cast<int>(player_element_comp.value().get().element)]);
             }
             else {
                 // Missing Element Comp
                 NIKEE_CORE_WARN("PLAYER missing Elemental Component");
-                NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+                NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, "bullet.prefab");
             }
 
             // Set/Teleport entity position
@@ -473,12 +485,6 @@ namespace NIKE {
                     transform.value().get().position = { x, y };
                 }
                 });
-
-#ifndef NDEBUG
-            //auto data = NIKE_LVLEDITOR_SERVICE->getEntityMetaData(bullet_entity);
-            //data.prefab_id = "bullet.prefab";
-            //NIKE_LVLEDITOR_SERVICE->setEntityMetaData(bullet_entity, data);
-#endif
 
             //Player position
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -522,17 +528,30 @@ namespace NIKE {
             if (bullet_sfx.has_value()) {
                 bullet_sfx.value().get().b_play_sfx = true;
             }
-            });
+        });
 
         //Spawn enemy function
         lua_state.set_function("Spawn Enemy", [&](float x, float y) {
             Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath("Enemy.prefab").string());
+            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath("enemy.prefab").string());
             auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (e_trans_comp.has_value()) {
                 e_trans_comp.value().get().position.x = x;
                 e_trans_comp.value().get().position.y = y;
             }
+            });
+
+        // Player death annimation function
+        lua_state.set_function("CheckDeath", [&](Entity::Type entity) -> bool {
+            auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+            if (health_comp.has_value()) {
+                // When player do not have any health
+                if (health_comp.value().get().lives <= 0)
+                {
+                    return true;
+                }
+            }
+            return false;
             });
 
         //Play audio
@@ -548,12 +567,29 @@ namespace NIKE {
             }
             });
 
+        // Set SFX list from script
+        lua_state.set_function("SetAdditionalSFX", [&](Entity::Type entity, sol::table sfxTable) {
+            auto compOpt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+            if (compOpt.has_value()) {
+                auto& comp = compOpt.value().get();
+                comp.sfx_list.clear();
+                for (auto& kv : sfxTable) {
+                    std::string sfxName = kv.second.as<std::string>();
+                    // Only add if sfxName is not already present.
+                    if (std::find(comp.sfx_list.begin(), comp.sfx_list.end(), sfxName) == comp.sfx_list.end()) {
+                        comp.sfx_list.push_back(sfxName);
+                    }
+                }
+            }
+            });
+
+
         // God mode toggle
         lua_state.set_function("SetGodMode", [&](Entity::Type entity, bool enable) {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
             if (health_comp) {
-                health_comp.value().get().invulnerableFlag = enable;
-                if (health_comp.value().get().invulnerableFlag) {
+                health_comp.value().get().invulnerable_flag = enable;
+                if (health_comp.value().get().invulnerable_flag) {
                     cout << "Player god mode enabled" << endl;
                 }
                 else {

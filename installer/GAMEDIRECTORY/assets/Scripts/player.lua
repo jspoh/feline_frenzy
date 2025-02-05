@@ -65,13 +65,13 @@ function Player:Animate(entity, args)
             AnimationStart(entity, 0, 1)
             AnimationEnd(entity, 5, 1)
             FlipX(entity, true)
-            PlaySFX(entity, true)
+            PlaySFX(entity, false)
         else
             -- Idle facing left
             AnimationStart(entity, 0, 1)
             AnimationEnd(entity, 5, 1)
             FlipX(entity, true)
-            PlaySFX(entity, true)
+            PlaySFX(entity, false)
         end
     else
         -- Calculate angle of movement (in radians)
@@ -171,7 +171,7 @@ function Player:Shoot(entity)
         if direction == 0 then
             AnimationStart(entity, 0, 9)
             AnimationEnd(entity, 2, 9)
-            FlipX(entity, false)
+            FlipX(entity, false)    
         elseif direction == 1 then
             AnimationStart(entity, 0, 10)
             AnimationEnd(entity, 2, 10)
@@ -209,18 +209,25 @@ end
 
 -- Player update function
 function Player:update(args)
+ local entity = args.entity
 
-    if State(args.entity) == "Attack" then
-        if AnimationCompleted(args.entity) >= 1 then
-            
-            SetState(args.entity, "Idle")
+    -- Handle attack animation state
+    if State(entity) == "Attack" then
+        if AnimationCompleted(entity) >= 1 then
+            -- After attack animation finishes, return to idle or movement
+            SetState(entity, "Idle")
+        else
+            -- While attacking, do not process movement or animations
+            return
         end
-    elseif State(args.entity) ~= "Attack" then
-
-        Player:Animate(args.entity, args)
     end
-    Player:Move(args.entity)
-    Player:Shoot(args.entity)
+
+    -- If not attacking, allow movement and animations
+    Player:Move(entity)
+    Player:Animate(entity, args)
+
+    -- Handle shooting
+    Player:Shoot(entity)
 end
 
 -- Return player object

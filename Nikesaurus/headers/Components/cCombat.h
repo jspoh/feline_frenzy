@@ -15,7 +15,18 @@
 #include "Core/stdafx.h"
 
 namespace NIKE {
+
+	#define ENEMY_HEALTH 100.f
+	#define ENEMY_LIVES 1
+	#define HEAL_AMOUNT 10.f
+
 	namespace Combat {
+		const enum class Factions : int {
+			NEUTRAL = 0,
+			PLAYER,
+			ENEMY,
+		};
+
 		struct Damage {
 			float damage;
 
@@ -26,16 +37,29 @@ namespace NIKE {
 
 		struct Health {
 			int lives;
+			float max_health;
 			float health;
-			bool invulnerableFlag; 
+			bool invulnerable_flag;
 			//bool healthBarActive;
 
-			Health() : lives(1), health(100.f), invulnerableFlag(false) {};
+			Health() : lives(ENEMY_LIVES), max_health(ENEMY_HEALTH), health(max_health), invulnerable_flag(false) {};
 				//, healthBarActive(false) 
 			
-			Health(int const& lives, float const& health, bool const& invulnerableFlag = false)
-				: lives{ lives }, health{ health }, invulnerableFlag{ invulnerableFlag } {
-			}
+			Health(int const& lives, float const& max_health, float const& health, bool const& invulnerable_flag = false)
+				: lives{ lives }, max_health {max_health}, health{ health }, invulnerable_flag{ invulnerable_flag } {};
+		};
+
+		struct Faction {
+			Factions faction;
+			Faction() : faction(Factions::NEUTRAL) {};
+			Faction(Factions const& faction) : faction(faction) {};
+		};
+
+		struct HealthDrop {
+			float heal_amount;
+
+			HealthDrop() : heal_amount(HEAL_AMOUNT) {};
+			HealthDrop(float const& heal_amount) : heal_amount{ heal_amount } {};
 		};
 
 		void registerComponents();

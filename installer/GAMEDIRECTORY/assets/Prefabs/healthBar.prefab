@@ -33,8 +33,9 @@
             "Scale": {
                 "x": 149.99998474121094,
                 "y": 127.99998474121094
-            }
+            },
+            "Screen Position": false
         }
     },
-    "Layer ID": 1
+    "Layer ID": 4
 }

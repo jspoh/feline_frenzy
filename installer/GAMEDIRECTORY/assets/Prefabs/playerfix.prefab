@@ -34,6 +34,14 @@
             "Pitch": 1.0,
             "Volume": 0.5
         },
+        "Combat::Faction": {
+            "Faction": 1
+	},
+        "Combat::Health": {
+            "Health": 100.0,
+            "InvulnerableFlag": true,
+            "Lives": 1
+        },
         "Element::Entity": {
             "Element": 0
         },
@@ -105,16 +113,6 @@
             "Intensity": 0.0,
             "Texture_ID": "Player_animation_sprite.png"
         },
-        "Shooting::Shooting": {
-            "Cooldown": 0.5,
-            "Function": "createBullet",
-            "LastShotTime": 0.5,
-            "Layer": 0,
-            "Offset": 150.0,
-            "ScriptID": "",
-            "ScriptLoaded": false,
-            "ScriptPath": "assets/Scripts/createBullet.lua"
-        },
         "Transform::Transform": {
             "Position": {
                 "x": -198.85702514648438,
@@ -124,7 +122,8 @@
             "Scale": {
                 "x": 80.67974090576172,
                 "y": 116.1510009765625
-            }
+            },
+            "Screen Position": false
         }
     },
     "Layer ID": 0

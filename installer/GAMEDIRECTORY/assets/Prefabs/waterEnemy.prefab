@@ -27,10 +27,20 @@
                 "y": 3
             }
         },
+        "Audio::SFX": {
+            "Audio_ID": "WalkingNature.wav",
+            "B_Play_SFX": false,
+            "Channel_Group_ID": "EnemySFX",
+            "Pitch": 1.0,
+            "Volume": 1.0
+        },
+        "Combat::Faction": {
+            "Faction": 2
+        },
         "Combat::Health": {
             "Health": 100.0,
-            "InvulnerableFlag": false,
-            "Lives": 1
+            "Lives": 1,
+            "invulnerable_flag": false
         },
         "Element::Entity": {
             "Element": 2
@@ -102,7 +112,7 @@
             "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
         },
         "State::State": {
-            "State": "Chase"
+            "State": "Idle"
         },
         "Transform::Transform": {
             "Position": {

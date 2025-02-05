@@ -17,6 +17,7 @@
 #include "Systems/sysAudio.h"
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Managers/Services/State Machine/enemyUtils.h"
 #include "Systems/GameLogic/sysEnemy.h"
 #include "Systems/sysParticle.h"
 
@@ -259,9 +260,6 @@ namespace NIKE {
 		//Init metadata service
 		NIKE_METADATA_SERVICE->init();
 
-		//Init FSM
-		NIKE_FSM_SERVICE->init();
-
 		//Register Def Components
 		registerDefComponents();
 
@@ -295,10 +293,11 @@ namespace NIKE {
 
 		using namespace NIKE::SysParticle;
 		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("ps1", Data::ParticlePresets::CLUSTER, {window_size.x / 2.f, window_size.y / 2.f});
-
+#ifndef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1Copy.scn"));
+#endif
 #ifdef NDEBUG
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "Demo.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #endif
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
@@ -314,7 +313,7 @@ namespace NIKE {
 		float elapsed_time = 0.f;
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
-#ifdef DEBUG
+#ifdef NDEBUG
 			try {
 #endif
 				// have to poll events regardless of focus
@@ -326,15 +325,6 @@ namespace NIKE {
 					continue;
 				}
 
-				//Calculate Delta Time
-				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-
-				//Update all audio pending actions
-				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
-
-				//Update scenes manager
-				NIKE_SCENES_SERVICE->update();
-
 				//Escape Key
 				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
 					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
@@ -345,18 +335,31 @@ namespace NIKE {
 					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 				}
 
-				//Update all systems
+				//Calculate Delta Time
+				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+
+				//Update all systems ( Always update systems before any other services )
 				NIKE_ECS_MANAGER->updateSystems();
+
+				//Update meta data
+				NIKE_METADATA_SERVICE->update();
+
+				//Update scenes manager
+				NIKE_SCENES_SERVICE->update();
+
+				//Update map grid
+				NIKE_MAP_SERVICE->gridUpdate();
+
+				//Update all audio pending actions
+				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
 
 #ifndef NDEBUG
 				//Update & Render Level Editor
 				NIKE_LVLEDITOR_SERVICE->updateAndRender();
+#endif
 
 				//update UI First
 				NIKE_UI_SERVICE->update();
-#endif
-				//Update map grid
-				NIKE_MAP_SERVICE->gridUpdate();
 
 				//Swap Buffers
 				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
@@ -408,7 +411,7 @@ namespace NIKE {
 				else {
 					// initialization of fps text
 					constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
-					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
+					FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity();
 
 					NIKE_METADATA_SERVICE->setEntityName(FPS_DISPLAY_ENTITY, FPS_DISPLAY_NAME);
 					NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
@@ -436,6 +439,9 @@ namespace NIKE {
 		NIKE_PATH_SERVICE->stopWatchingAllDirectories();
 
 #ifndef NDEBUG
+		//Auto Save if needed
+		NIKE_LVLEDITOR_SERVICE->autoSave();
+
 		//Clean up level editor
 		NIKE_LVLEDITOR_SERVICE->cleanUp();
 #endif

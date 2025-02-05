@@ -4,7 +4,7 @@
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
  * \date   November 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -15,84 +15,165 @@ namespace NIKE {
     namespace Interaction {
 
         void Manager::init() {
-            // Register the Manager as a listener for collision events
-            std::shared_ptr<Manager> interaction_sys_wrapped(this, [](Manager*) {});
-            NIKE_EVENTS_SERVICE->addEventListeners<Physics::CollisionEvent>(interaction_sys_wrapped);
+          
         }
 
         void Manager::update() {
-            //Get layers
+            // Get layers
             auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
-            //Reverse Iterate through layers
+            // Reverse iterate through layers
             for (auto layer = layers.rbegin(); layer != layers.rend(); layer++) {
 
-                //Skip inactive layer
+                //Skip inactive layers
                 if (!(*layer)->getLayerState())
                     continue;
 
-                //Iterate through all entities
-                for (auto& entity : entities) {
+                // Iterate through all entities
+                for (auto& entity : (*layer)->getEntitites()) {
+
+                    //Skip entity not registered to this system
+                    if (entities.find(entity) == entities.end()) continue;
+
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 
-                        if ((*layer)->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-                            continue;
-
-                        // Check for Elemental Source comp
+                        // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {
-                            // Look for entity w player component
+
+                            // Look for entity with player component
                             for (auto& other_entity : entities) {
                                 auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
-                                // If player entity exists
-                                if (e_player_comp.has_value()) {
+
+                                if (e_player_comp.has_value()) { // Player entity exists
+
                                     // Get Render Component
                                     const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-                                    float& source_intensity = source_render_comp.value().get().intensity;
+                                    auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+                                    //float& source_intensity = source_render_comp.value().get().intensity;
+                                    Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    // Check if player is within range
-                                    if (withinRange(entity, other_entity) && source_intensity <= .5f) {
-                                        source_intensity += .02f;
-                                    }
-                                    else if (source_intensity > 0.1f){
-                                        source_intensity -= .02f;
+                                    float target_alpha = withinRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
+                                    float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+
+                                    // Smoothly interpolate alpha
+                                    source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+
+                                    // Clamp alpha between 0 and 1.0
+                                    source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+
+                                    // Player Element Swapping
+                                    if (withinRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                        changeElement(other_entity, entity);
+                                        if (e_sfx_comp.has_value()) {
+                                            e_sfx_comp.value().get().b_play_sfx = true;
+                                        }
                                     }
                                 }
                             }
                         }
-                        
                     }
                 }
             }
         }
 
-        void Manager::onEvent(std::shared_ptr<Physics::CollisionEvent> event) {
-            // Ensure entities exist and handle the collision
-            if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
-                handleCollision(event->entity_a, event->entity_b);
+        void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+        {
+            auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+            if (e_sfx_comp.has_value()) {
+                auto& e_sfx = e_sfx_comp.value().get();
+
+                //Check if group exists
+                auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
+                if (!group) {
+                    e_sfx.audio_id = "EnemyGetHit.wav";
+                    e_sfx.b_play_sfx = play_or_no;
+                    return;
+                }
+                else {
+                    //Play sound
+                    if (play_or_no && !group->isPlaying()) {
+                        e_sfx.audio_id = "EnemyGetHit.wav";
+                        e_sfx.b_play_sfx = play_or_no;
+                    }
+                }
+
+                //stop sfx
+                if (!play_or_no) {
+                    group->stop();
+                }
             }
         }
 
-        void Manager::handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
-            // Player Element Swapping
-            // Check for E key pressed
-            //if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_E)) {
-                changeElement(entity_a, entity_b);
-            //}
 
+        void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Collision between damage and health
-            applyDamage(entity_a, entity_b);
-            applyDamage(entity_b, entity_a);
+            const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
+            const auto b_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_b);
+
+            if (a_damage_comp.has_value() || b_damage_comp.has_value()) {
+                const auto a_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
+                const auto b_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
+
+                // Friendly fire check
+                if (a_faction_comp.has_value() && b_faction_comp.has_value()) {
+                    const auto& a_faction = a_faction_comp.value().get().faction;
+                    const auto& b_faction = b_faction_comp.value().get().faction;
+
+                    //NIKEE_CORE_WARN("{} and {} == {}", static_cast<int>(a_faction), static_cast<int>(b_faction), a_faction == b_faction);
+
+                    if (a_faction == b_faction) {
+                        return;
+                    }
+                }
+
+                // Applying Damage
+                if (a_damage_comp.has_value()) applyDamage(entity_a, entity_b);
+                if (b_damage_comp.has_value()) applyDamage(entity_b, entity_a);
+            }
+
+            // Collision between health drop and health
+            const auto a_health_drop_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_a);
+            const auto b_health_drop_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_b);
+
+            if (a_health_drop_comp.has_value() || b_health_drop_comp.has_value()) {
+                if (a_health_drop_comp.has_value()) restoreHealth(entity_a, entity_b);
+                if (b_health_drop_comp.has_value()) restoreHealth(entity_b, entity_a);
+            }
         }
 
-        void Manager::applyDamage(Entity::Type attacker, Entity::Type target) {
+        void restoreHealth(Entity::Type healer, Entity::Type target) {
+            const auto healer_heal_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(healer);
+            const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
+            const auto& healer_heal = healer_heal_comp.value().get().heal_amount;
+
+            // Return if target has no health
+            if (target_health_comp.has_value() == false) {
+                return;
+            }
+
+            //const auto target_player_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(target);
+            //auto& player_faction = target_player_comp.value().get().faction;
+            
+            // !TODO: Return if faction not player
+
+            auto& target_health = target_health_comp.value().get().health;
+            const auto& target_max_health = target_health_comp.value().get().max_health;
+
+            // Heal Target
+            if (target_health < target_max_health) {
+                target_health += healer_heal;
+            }
+        }
+
+        void applyDamage(Entity::Type attacker, Entity::Type target) {
             const auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
             const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
             const auto attacker_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(attacker);
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if (!(attacker_damage_comp && target_health_comp)) {
+            if ((attacker_damage_comp.has_value() && target_health_comp.has_value()) == false) {
                 return;
             }
 
@@ -100,7 +181,7 @@ namespace NIKE {
             auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
             // Check invulnerability flag
-            if (target_health.invulnerableFlag) {
+            if (target_health.invulnerable_flag) {
                 return; // Skip damage
             }
 
@@ -119,28 +200,29 @@ namespace NIKE {
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+            // Play SFX when apply damage
+            playSFX(attacker, true);
 
-            // Check if target health drops to zero or below
-            if (target_health.health <= 0) {
-                if (target_health.lives <= 1) {
-                    // Target only has 1 life left
-                    NIKE_ECS_MANAGER->markEntityForDeletion(target);
-                    NIKEE_CORE_INFO("Entity {} has been destroyed due to zero health.", target);
-                }
-                else {
-                    // Target has more than 1 life
-                    --target_health.lives;
-                    target_health.health = 100;
-                    NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
-                }
-            }
+			// Check if target health drops to zero or below
+			if (target_health.health <= 0) {
+				// Target has more than 1 life
+				--target_health.lives;
+				target_health.health = target_health.max_health;
+				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+			}
         }
 
-        void Manager::changeElement(Entity::Type player, Entity::Type source) {
+        void changeElement(Entity::Type player, Entity::Type source) {
             const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
             const auto source_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(source);
+            const auto player_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(player);
 
-            if (player_element_comp && source_element_comp) {
+            // Prevent enemies from switching elements
+            if (player_faction_comp.has_value() && player_faction_comp.value().get().faction != Combat::Factions::PLAYER) {
+                return;
+            }
+
+            if (player_element_comp.has_value() && source_element_comp.has_value()) {
                 auto& player_element = player_element_comp.value().get().element;
                 auto& source_element = source_element_comp.value().get().element;
 
@@ -151,11 +233,11 @@ namespace NIKE {
             }
         }
 
-        float Manager::getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
+        float getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
             return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
         }
 
-        bool Manager::withinRange(const Entity::Type& source, const Entity::Type& player) {
+        bool withinRange(Entity::Type source, Entity::Type player) {
             // Get player transform
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
             Vector2f player_pos = player_transform_comp.value().get().position;

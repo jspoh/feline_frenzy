@@ -1,11 +1,11 @@
 /*****************************************************************//**
  * \file   cAudio.cpp
- * \brief	Animation components
+ * \brief  Audio components
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (50%)
  * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (50%)
  * \date   October 2024
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content Â© 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -131,12 +131,12 @@ namespace NIKE {
 								LevelEditor::Action change_audio_action;
 								change_audio_action.do_action = [&, audio_id = new_audio_id]() {
 									comp.audio_id = audio_id;
-									};
+								};
 
 								// Undo action
 								change_audio_action.undo_action = [&, audio_id = previous_audio_id]() {
 									comp.audio_id = audio_id;
-									};
+								};
 
 								// Execute the action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_audio_action));
@@ -150,32 +150,56 @@ namespace NIKE {
 
 				//Set Channel Group ID
 				{
-					//Set Text input
-					ImGui::Text("Enter channel group:");
-					if (ImGui::InputText("##ChannelGroup", channel_group.data(), channel_group.capacity() + 1)) {
-						channel_group.resize(strlen(channel_group.c_str()));
+					// Display a combo box for selecting a audio
+					ImGui::Text("Select Channel Group:");
+
+					// Hold the current and previous audio selection
+					static std::string previous_channel_group_id = comp.channel_group_id;
+					std::string current_channel_group_id = comp.channel_group_id;
+
+					// Get all loaded audios
+					const auto& all_loaded_channel_groups = NIKE_AUDIO_SERVICE->getAllChannelGroups();
+
+					// Get the string from the map and change to const char* for imgui combo
+					std::vector<const char*> all_channel_group_names;
+					for (auto& elem : all_loaded_channel_groups)
+					{
+						all_channel_group_names.push_back(elem.first.c_str());
 					}
 
-					ImGui::SameLine();
+					// Find the index of the currently selected audio in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_channel_group_names.size(); ++i) {
+						if (current_channel_group_id == all_channel_group_names[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
+					}
 
-					//Save group Button
-					if (ImGui::Button("Save##Channel Group") && !channel_group.empty()) {
-						LevelEditor::Action save_group;
+					// Display combo box for audio selection
+					if (ImGui::Combo("##SelectChannelGroup", &current_index, all_channel_group_names.data(), static_cast<int>(all_channel_group_names.size()))) {
+						// Validate the selected index and get the new audio ID
+						if (current_index >= 0 && current_index < static_cast<int>(all_channel_group_names.size())) {
+							std::string new_channel_group_id = all_channel_group_names[current_index];
+							if (new_channel_group_id != comp.channel_group_id) {
+								// Save action
+								LevelEditor::Action change_channel_group_id_action;
+								change_channel_group_id_action.do_action = [&, channel_group_id = new_channel_group_id]() {
+									comp.channel_group_id = channel_group_id;
+								};
 
-						//Save group action
-						save_group.do_action = [&, group = channel_group]() {
-							comp.channel_group_id = group;
-							channel_group = comp.channel_group_id;
-							};
+								// Undo action
+								change_channel_group_id_action.undo_action = [&, channel_group_id = previous_channel_group_id]() {
+									comp.channel_group_id = channel_group_id;
+								};
 
-						//Undo save group action
-						save_group.undo_action = [&, group = comp.channel_group_id]() {
-							comp.channel_group_id = group;
-							channel_group = comp.channel_group_id;
-							};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_channel_group_id_action));
 
-						//Execute action
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_group));
+								// Update the previous audio ID
+								previous_channel_group_id = new_channel_group_id;
+							}
+						}
 					}
 				}
 
@@ -205,12 +229,12 @@ namespace NIKE {
 								//Change volume do action
 								change_volume.do_action = [&, vol = comp.volume]() {
 									comp.volume = vol;
-									};
+								};
 
 								//Change volume undo action
 								change_volume.undo_action = [&, vol = vol_before_change]() {
 									comp.volume = vol;
-									};
+								};
 
 								//Execute action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_volume));
@@ -245,12 +269,12 @@ namespace NIKE {
 								//Change pitch do action
 								change_pitch.do_action = [&, pitch = comp.pitch]() {
 									comp.pitch = pitch;
-									};
+								};
 
 								//Change [volume]itch undo action
 								change_pitch.undo_action = [&, pitch = pitch_before_change]() {
 									comp.pitch = pitch;
-									};
+								};
 
 								//Execute action
 								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pitch));

@@ -5,7 +5,7 @@
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (70%)
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -25,11 +25,10 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 
-			for (auto& entity : entities) {
+			for (auto& entity : layer->getEntitites()) {
 
-				//Skip entities that are not present within layer
-				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
 
 				//If there is sfx value
 				if (auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity); e_sfx_comp.has_value()) {

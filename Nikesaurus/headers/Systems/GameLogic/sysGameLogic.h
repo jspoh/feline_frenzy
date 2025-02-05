@@ -38,6 +38,9 @@ namespace NIKE {
 			// Spawn Enemy
 			void spawnEnemy(const Entity::Type& spawner);
 
+			// Prefabs for spawnEnemy
+			const std::string enemyArr[4] = { "enemy.prefab", "fireEnemy.prefab", "waterEnemy.prefab", "grassEnemy.prefab" };
+
 	    public:
 		    //Default constructor
 		    Manager() = default;
@@ -51,15 +54,6 @@ namespace NIKE {
 			    return "Game Logic System";
 		    }
 
-			// Define static random engine
-			inline static std::mt19937 gen;
-
-			// Random Number Generator
-			int getRandomNumber(int min, int max) {
-				std::uniform_int_distribution<int> distrib(min, max);
-				return distrib(gen);
-			}
-
 			//Init Inputs
 			void init() override;
 
@@ -69,6 +63,22 @@ namespace NIKE {
 		    //Update Inputs
 		    void update() override;
 	    };
+
+		// Random Number Generator
+		template <typename T>
+		T getRandomNumber(T min, T max) {
+			static std::random_device rd;
+			// Define static random engine
+			static std::mt19937 gen(rd());
+			if constexpr (std::is_floating_point_v<T>) {
+				std::uniform_real_distribution<T> distrib(min, max);
+				return distrib(gen);
+			}
+			else if constexpr (std::is_integral_v<T>) {
+				std::uniform_int_distribution<T> distrib(min, max);
+				return distrib(gen);
+			}
+		}
     }
 }
 

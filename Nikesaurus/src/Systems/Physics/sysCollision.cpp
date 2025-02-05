@@ -88,20 +88,23 @@ namespace NIKE {
         CollisionInfo& info) {
         
         // References to components
+        bool a_flip = static_cast<int>(collider_a.transform.rotation) % 90 == 0 && static_cast<int>(collider_a.transform.rotation) % 180 != 0;
+        bool b_flip = static_cast<int>(collider_b.transform.rotation) % 90 == 0 && static_cast<int>(collider_b.transform.rotation) % 180 != 0;
+
         AABB aabb_a({
-            collider_a.transform.position.x - (collider_a.transform.scale.x * 0.5f),
-            collider_a.transform.position.y - (collider_a.transform.scale.y * 0.5f)
+            collider_a.transform.position.x - (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
+            collider_a.transform.position.y - (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
         }, {
-            collider_a.transform.position.x + (collider_a.transform.scale.x * 0.5f),
-            collider_a.transform.position.y + (collider_a.transform.scale.y * 0.5f)
+            collider_a.transform.position.x + (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
+            collider_a.transform.position.y + (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
         });
 
         AABB aabb_b({
-            collider_b.transform.position.x - (collider_b.transform.scale.x * 0.5f),
-            collider_b.transform.position.y - (collider_b.transform.scale.y * 0.5f)
+            collider_b.transform.position.x - (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
+            collider_b.transform.position.y - (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
         }, {
-            collider_b.transform.position.x + (collider_b.transform.scale.x * 0.5f),
-            collider_b.transform.position.y + (collider_b.transform.scale.y * 0.5f)
+            collider_b.transform.position.x + (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
+            collider_b.transform.position.y + (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
         });
 
         // Get delta time
@@ -366,20 +369,34 @@ namespace NIKE {
         Entity::Type entity_b, Transform::Transform& transform_b, Physics::Dynamics& dynamics_b, Physics::Collider& collider_b,
         CollisionInfo const& info) {
 
+        // Check if this collision was already processed
+        auto collision_pair = std::minmax(entity_a, entity_b);
+        if (processed_collisions.count(collision_pair)) {
+            return; // Skip duplicate processing
+        }
+        processed_collisions.insert(collision_pair);  // Mark as processed
+
         // Dispatch collision event
         auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
+        //NIKEE_CORE_WARN("Collision Event Dispatched");
         NIKE_EVENTS_SERVICE->dispatchEvent(collision_event);
 
         // Destroy Resolution
-        if (collider_a.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
-            NIKE_ECS_MANAGER->markEntityForDeletion(entity_a);
-            return;
+        bool destroy_a = (collider_a.resolution == Physics::Resolution::DESTROY);
+        bool destroy_b = (collider_b.resolution == Physics::Resolution::DESTROY);
+
+        if (destroy_a && NIKE_ECS_MANAGER->checkEntity(entity_a)) {
+            NIKE_METADATA_SERVICE->destroyEntity(entity_a);
         }
 
-        //if (collider_b.resolution == Physics::Resolution::DESTROY && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
-        //    NIKE_ECS_MANAGER->markEntityForDeletion(entity_b);
-        //    return;
-        //}
+        if (destroy_b && NIKE_ECS_MANAGER->checkEntity(entity_b)) {
+            NIKE_METADATA_SERVICE->destroyEntity(entity_b);
+        }
+
+        // Exit if either entity was marked for deletion
+        if (destroy_a || destroy_b) {
+            return;
+        }
 
         // Bounce Resolution (at least one entity has BOUNCE)
         if (collider_a.resolution == Physics::Resolution::BOUNCE || collider_b.resolution == Physics::Resolution::BOUNCE) {
@@ -407,5 +424,10 @@ namespace NIKE {
         if (collider_b.resolution == Physics::Resolution::SLIDE) {
             transform_b.position -= info.mtv;
         }
+    }
+
+    void Collision::System::clearProcessedCollisions() {
+        // To be reset at the start of each frame
+        processed_collisions.clear(); 
     }
 }

@@ -190,35 +190,24 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
-		glClearColor(0, 0, 0, 1);
-
 #ifndef NDEBUG
-		// render to framebuffer if imgui is active
-		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
-			glBindFramebuffer(GL_FRAMEBUFFER, NIKE_RENDER_SERVICE->framebuffer_tex.frame_buffer);
-			//cout << "Rendering to frame buffer" << endl;
-		}
-		else {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//cout << "Rendering to screen" << endl;
-		}
+		//Bind frame buffer for rendering to editor ( Binding occurs when editor is active )
+		NIKE_LVLEDITOR_SERVICE->bindEditorFrameBuffer();
 #endif
 
 		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0, 0, 0, 1);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
+
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
+			
+			for (auto& entity : layer->getEntitites()) {
 
-			for (auto& entity : entities) {
-
-				// Skip entities marked for deletion
-				//if (std::find(entities_to_destroy.begin(), entities_to_destroy.end(), entity) != entities_to_destroy.end())
-				//	continue;
-
-				if (layer->getLayerID() != NIKE_ECS_MANAGER->getEntityLayerID(entity))
-					continue;
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
 
 				//Skip entity if no transform is present
 				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
@@ -281,7 +270,11 @@ namespace NIKE {
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 			if (!layer->getLayerState())
 				continue;
-			for (auto& entity : entities) {
+			for (auto& entity : layer->getEntitites()) {
+				
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
+
 				// skip entity if is hidden
 				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
 					continue;
@@ -321,10 +314,8 @@ namespace NIKE {
 
 
 #ifndef NDEBUG
-		if (NIKE_LVLEDITOR_SERVICE->getEditorState()) {
-			NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Render::ViewportTexture>(NIKE_RENDER_SERVICE->framebuffer_tex.texture_color_buffer));
-			glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind after rendering
-		}
+		//Unbind when editor is active for rendering
+		NIKE_LVLEDITOR_SERVICE->unbindEditorFrameBuffer();
 #endif
 
 		err = glGetError();

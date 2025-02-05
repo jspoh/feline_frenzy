@@ -1,10 +1,10 @@
 /********************************************************************
  * \file   sStateMachine.h
- * \brief  state machine servic
+ * \brief  state machine service
  *
- * \author Bryan Lim Li Cheng
+ * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
- * All content © 2025 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2025 DigiPen Institute of Technology Singapore, all rights reserved.
  ********************************************************************/
 #pragma once
 
@@ -58,6 +58,8 @@ namespace NIKE {
             void flipY(Entity::Type& entity, bool yes_or_no);
             void setLastDirection(Entity::Type& entity, int dir);
             int getLastDirection(Entity::Type& entity);
+
+            virtual void playSFX(Entity::Type& entity, bool play_or_false) = 0;
 
         private:
             // List of transitions
