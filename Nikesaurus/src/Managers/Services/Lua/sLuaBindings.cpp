@@ -574,6 +574,7 @@ namespace NIKE {
                 auto& comp = compOpt.value().get();
                 comp.sfx_list.clear();
                 for (auto& kv : sfxTable) {
+                    // Each element in sfxTable should be a string.
                     std::string sfxName = kv.second.as<std::string>();
                     // Only add if sfxName is not already present.
                     if (std::find(comp.sfx_list.begin(), comp.sfx_list.end(), sfxName) == comp.sfx_list.end()) {

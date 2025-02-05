@@ -1,17 +1,10 @@
 /*****************************************************************//**
- * \file   sysPhysics.cpp
- * \brief  Physics system for engine with broad-phase collision detection
- *         that properly handles large entities spanning many cells.
- *
- * This version uses the map grid to determine which cells an entity's
- * collider occupies. Instead of processing each cell independently,
- * for each entity we compute the union of all grid cells its AABB covers,
- * expand that region by one cell in all directions, and then gather all
- * candidate entities from that region for narrow-phase collision checking.
+ * \file   PhysicsSystem.cpp
+ * \brief  Physics system for engine
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (45%)
  * \co-author Min Khant Ko, 2301320, ko.m@digipen.edu (45%)
- * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
+ *\ co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (10%)
  *
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -22,16 +15,9 @@
 #include "Systems/Physics/sysPhysics.h"
 #include "Components/cPhysics.h"
 #include "Components/cTransform.h"
- // For accessing map service (grid size, cell size, etc.)
-#include "Managers/Services/sMap.h"
 
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include <cmath>
 
 namespace NIKE {
-
     void Physics::Manager::init() {
         collision_system = std::make_unique<Collision::System>();
 
@@ -41,238 +27,222 @@ namespace NIKE {
 
     void Physics::Manager::update() {
 
-        // Clear processed collisions at the start.
+        // Clear processed collisions
         collision_system->clearProcessedCollisions();
 
+        //Delta time
         float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+        //Get layers
         auto const& layers = NIKE_SCENES_SERVICE->getLayers();
 
-        //-------------------------------------------------------------------------
-        // Phase 1: Update Dynamics, Transforms and Collider Transforms.
-        //-------------------------------------------------------------------------
+        //Hashing function
+        auto hash = [](int x, int y) {
+            //Using common hashing multipliers
+            return (x * 73856093) ^ (y * 19349663);
+            };
+
+        //Iteration every fixed step for fixed delta time
         for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
+
+            //Broad-phase collision detection
+            std::unordered_map<int, std::vector<Entity::Type>> spatial_grid;
+            const Vector2f grid_scale = NIKE_MAP_SERVICE->getGridScale();
+
+            //Default dynamics place holder
+            Physics::Dynamics def_dynamics;
+
+            //Iterate through layers
             for (auto& layer : layers) {
+
+                //Skip inactive layer
                 if (!layer->getLayerState())
                     continue;
 
+                //Iterate through all entities
                 for (auto& entity : layer->getEntitites()) {
+
+                    //Skip entity not registered to this system
+                    if (entities.find(entity) == entities.end()) continue;
+
+                    //Skip entities with no transform
                     auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
                     if (!e_transform_comp) continue;
                     auto& e_transform = e_transform_comp.value().get();
 
+                    //Update entities with dynamics
                     auto e_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
                     if (e_dynamics_comp) {
+
                         auto& e_dynamics = e_dynamics_comp.value().get();
-                        e_dynamics.mass = (e_dynamics.mass == 0.0f) ? EPSILON : e_dynamics.mass;
+
+                        //Ensure that mass is not negative
+                        e_dynamics.mass = e_dynamics.mass == 0.0f ? EPSILON : e_dynamics.mass;
+
+                        //!!!Multiple forces to be implemented soon
+
+                        ////Calculate netforce
+                        //Vector2f net_force;
+
+                        ////iterate through forces to get net force and remove inactive forces
+                        //for (auto it = e_dynamics.forces.begin(); it != e_dynamics.forces.end();) {
+                        //    it->life_time -= dt;
+                        //    if (it->life_time > 0.0f) {
+                        //        net_force += it->direction;
+                        //        it++;
+                        //    }
+                        //    else {
+                        //        it = e_dynamics.forces.erase(it);
+                        //    }
+                        //}
+
+                        //Apply forces & mass to calculate direction
                         Vector2f acceleration = e_dynamics.force / e_dynamics.mass;
+
+                        //Update velocity based on acceleration
                         e_dynamics.velocity += acceleration * dt;
+
+                        //Add drag/friction
                         e_dynamics.velocity -= e_dynamics.velocity * e_dynamics.drag * dt;
-                        if (e_dynamics.velocity.length() > e_dynamics.max_speed)
+
+                        //Cap Velocity
+                        if (e_dynamics.velocity.length() > e_dynamics.max_speed) {
                             e_dynamics.velocity = e_dynamics.velocity.normalize() * e_dynamics.max_speed;
-                        if (e_dynamics.velocity.length() < EPSILON)
+                        }
+
+                        //Set velocity to zero if net velo < 0.01
+                        if (e_dynamics.velocity.length() < EPSILON) {
                             e_dynamics.velocity = { 0.0f, 0.0f };
+                        }
+
+                        //Update Transform position based on velocity
                         e_transform.position.x += e_dynamics.velocity.x * dt;
                         e_transform.position.y += e_dynamics.velocity.y * dt;
                     }
 
+                    // Collision detection
                     auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
                     if (e_collider_comp.has_value()) {
                         auto& e_collider = e_collider_comp.value().get();
-                        if (e_collider.b_bind_to_entity)
+
+                        //Update collision transform
+                        if (e_collider.b_bind_to_entity) {
                             e_collider.transform = e_transform;
-                        else
-                            e_collider.transform.position = e_transform.position + e_collider.pos_offset;
-                    }
-                }
-            }
-        }
-
-       //-------------------------------------------------------------------------
-       // Phase 2: Build Spatial Grid and Entity-to-Cells Mapping.
-       //-------------------------------------------------------------------------
-       // We compute each entity’s AABB and determine all grid cells it overlaps.
-        std::unordered_map<Vector2i, std::vector<Entity::Type>, Vector2iHasher> spatial_grid;
-        // Also, map each entity to its set of occupied grid cells.
-        std::unordered_map<Entity::Type, std::vector<Vector2i>> entityCells;
-        Vector2f cell_size = NIKE_MAP_SERVICE->getCellSize();
-
-        for (auto& layer : layers) {
-            if (!layer->getLayerState())
-                continue;
-
-            for (auto& entity : layer->getEntitites()) {
-                auto collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-                if (!collider_comp.has_value()) continue;
-                auto& collider = collider_comp.value().get();
-
-                Vector2f aabb_min, aabb_max;
-                // If the collider defines vertices, use them to compute a more accurate AABB.
-                if (!collider.vertices.empty()) {
-                    std::vector<Vector2f> worldVertices;
-                    float angleRad = collider.transform.rotation * static_cast<float>(M_PI) / 180.0f;
-                    float cosAngle = cos(angleRad);
-                    float sinAngle = sin(angleRad);
-                    for (auto& v : collider.vertices) {
-                        // Apply scale.
-                        Vector2f scaled = { v.x * collider.transform.scale.x, v.y * collider.transform.scale.y };
-                        // Rotate.
-                        Vector2f rotated = { scaled.x * cosAngle - scaled.y * sinAngle, scaled.x * sinAngle + scaled.y * cosAngle };
-                        // Translate.
-                        Vector2f worldPos = collider.transform.position + rotated;
-                        worldVertices.push_back(worldPos);
-                    }
-                    aabb_min = worldVertices[0];
-                    aabb_max = worldVertices[0];
-                    for (auto& wv : worldVertices) {
-                        if (wv.x < aabb_min.x) aabb_min.x = wv.x;
-                        if (wv.y < aabb_min.y) aabb_min.y = wv.y;
-                        if (wv.x > aabb_max.x) aabb_max.x = wv.x;
-                        if (wv.y > aabb_max.y) aabb_max.y = wv.y;
-                    }
-                }
-                else {
-                    // Fallback: assume the collider is centered at transform.position with half-extents = scale/2.
-                    Vector2f halfExtents = collider.transform.scale * 0.5f;
-                    aabb_min = collider.transform.position - halfExtents;
-                    aabb_max = collider.transform.position + halfExtents;
-                }
-
-                int min_cell_x = static_cast<int>(std::floor(aabb_min.x / cell_size.x));
-                int max_cell_x = static_cast<int>(std::floor(aabb_max.x / cell_size.x));
-                int min_cell_y = static_cast<int>(std::floor(aabb_min.y / cell_size.y));
-                int max_cell_y = static_cast<int>(std::floor(aabb_max.y / cell_size.y));
-
-                std::vector<Vector2i> cells;
-                for (int cx = min_cell_x; cx <= max_cell_x; ++cx) {
-                    for (int cy = min_cell_y; cy <= max_cell_y; ++cy) {
-                        Vector2i cell = { cx, cy };
-                        spatial_grid[cell].push_back(entity);
-                        cells.push_back(cell);
-                    }
-                }
-                entityCells[entity] = cells;
-            }
-        }
-
-        //-------------------------------------------------------------------------
-        // Phase 3: For Each Entity, Gather Nearby Candidates from the Union
-        // of its occupied cells (expanded by one cell margin) and perform narrow-phase checks.
-        //-------------------------------------------------------------------------
-        // We'll use a set to avoid duplicate collision checks.
-        std::unordered_set<std::pair<Entity::Type, Entity::Type>, Collision::System::EntityPairHash> checkedPairs;
-
-        // Get the grid size (number of cells in each direction) from the map service.
-        Vector2i gridSize = NIKE_MAP_SERVICE->getGridSize();
-
-        // Default dynamics placeholder.
-        Physics::Dynamics def_dynamics;
-
-        for (auto& [entity, cells] : entityCells) {
-            // Compute the union of cells occupied by the entity.
-            int minX = cells[0].x, minY = cells[0].y, maxX = cells[0].x, maxY = cells[0].y;
-            for (const auto& cell : cells) {
-                if (cell.x < minX) minX = cell.x;
-                if (cell.y < minY) minY = cell.y;
-                if (cell.x > maxX) maxX = cell.x;
-                if (cell.y > maxY) maxY = cell.y;
-            }
-            // Expand the union by one cell in every direction.
-            minX -= 1; minY -= 1; maxX += 1; maxY += 1;
-            // Clamp to valid grid cells.
-            minX = Utility::getMin(minX, 0);
-            minY = Utility::getMax(minY, 0);
-            maxX = Utility::getMin(maxX, gridSize.x - 1);
-            maxY = Utility::getMax(maxY, gridSize.y - 1);
-
-            // Gather candidate entities from all cells in the expanded region.
-            std::unordered_set<Entity::Type> candidates;
-            for (int cx = minX; cx <= maxX; ++cx) {
-                for (int cy = minY; cy <= maxY; ++cy) {
-                    Vector2i cell = { cx, cy };
-                    if (spatial_grid.find(cell) != spatial_grid.end()) {
-                        for (auto cand : spatial_grid[cell]) {
-                            // Avoid adding self.
-                            if (cand != entity)
-                                candidates.insert(cand);
                         }
+                        else {
+                            e_collider.transform.position = e_transform.position + e_collider.pos_offset;
+                        }
+
+                        //Hashing cell ID
+                        int cell_x = static_cast<int>(e_collider.transform.position.x / grid_scale.x);
+                        int cell_y = static_cast<int>(e_collider.transform.position.y / grid_scale.y);
+                        int cell_id = hash(cell_x, cell_y);
+
+                        //Insert into spatial grid for collision check
+                        spatial_grid[cell_id].push_back(entity);
                     }
                 }
             }
 
-            // Retrieve components for the primary entity.
-            auto a_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-            auto a_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-            auto a_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-            if (!a_transform_comp.has_value() || !a_collider_comp.has_value())
-                continue;
-            auto& a_transform = a_transform_comp.value().get();
-            auto& a_collider = a_collider_comp.value().get();
-            auto& a_dynamics = a_dynamics_comp.has_value() ? a_dynamics_comp.value().get() : def_dynamics;
+            //Narrow-phase collision detection
+            for (auto& [cell_id, cell_entities] : spatial_grid) {
+                for (size_t i = 0; i < cell_entities.size(); ++i) {
+                    auto entity_a = cell_entities[i];
+                    auto a_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity_a);
+                    auto a_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity_a);
+                    auto a_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity_a);
 
-            // For each candidate, perform narrow-phase collision detection.
-            for (auto candidate : candidates) {
-                // Avoid duplicate checks (order the pair by id).
-                auto pair = (entity < candidate) ? std::make_pair(entity, candidate)
-                    : std::make_pair(candidate, entity);
-                if (checkedPairs.find(pair) != checkedPairs.end())
-                    continue;
-                checkedPairs.insert(pair);
+                    if (!a_collider_comp.has_value() || !a_transform_comp.has_value()) continue;
 
-                auto b_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(candidate);
-                auto b_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(candidate);
-                auto b_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(candidate);
-                if (!b_transform_comp.has_value() || !b_collider_comp.has_value())
-                    continue;
-                auto& b_transform = b_transform_comp.value().get();
-                auto& b_collider = b_collider_comp.value().get();
-                auto& b_dynamics = b_dynamics_comp.has_value() ? b_dynamics_comp.value().get() : def_dynamics;
+                    //Get entity's layer
+                    auto& e_layer = layers.at(NIKE_METADATA_SERVICE->getEntityLayerID(entity_a));
 
-                // (Optional) Quick distance check.
-                if ((a_collider.transform.position - b_collider.transform.position).lengthSq() >
-                    (a_collider.transform.scale + b_collider.transform.scale).lengthSq())
-                    continue;
+                    //Skip if layer is inactive
+                    if (!e_layer->getLayerState()) continue;
 
-                // Retrieve model IDs for SAT collision (default "square.model").
-                std::string a_model_id = "square.model";
-                std::string b_model_id = "square.model";
-                auto a_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-                if (a_shape_comp.has_value())
-                    a_model_id = a_shape_comp.value().get().model_id;
-                auto b_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(candidate);
-                if (b_shape_comp.has_value())
-                    b_model_id = b_shape_comp.value().get().model_id;
+                    //Check for collision with entities within cell range
+                    for (size_t j = i + 1; j < cell_entities.size(); ++j) {
+                        auto entity_b = cell_entities[j];
+                        auto b_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity_b);
+                        auto b_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity_b);
+                        auto b_dynamics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity_b);
 
-                Collision::CollisionInfo info;
-                bool collisionDetected = false;
-                // Use AABB if both colliders are axis-aligned (rotation multiple of 90).
-                if (!(static_cast<int>(a_collider.transform.rotation) % 90) &&
-                    !(static_cast<int>(b_collider.transform.rotation) % 90)) {
-                    if (collision_system->detectAABBRectRect(a_dynamics, a_collider, b_dynamics, b_collider, info))
-                        collisionDetected = true;
-                }
-                // Otherwise, try AABB then SAT.
-                else if (collision_system->detectAABBRectRect(a_dynamics, a_collider, b_dynamics, b_collider, info) ||
-                    collision_system->detectSATCollision(a_collider, b_collider, a_model_id, b_model_id, info)) {
-                    collisionDetected = true;
-                }
+                        if (!b_collider_comp.has_value() || !b_transform_comp.has_value()) continue;
 
-                if (collisionDetected) {
-                    a_collider.b_collided = true;
-                    b_collider.b_collided = true;
-                    collision_system->collisionResolution(
-                        entity, a_transform, a_dynamics, a_collider,
-                        candidate, b_transform, b_dynamics, b_collider,
-                        info
-                    );
-                }
-                else {
-                    a_collider.b_collided = false;
-                    b_collider.b_collided = false;
+                        //Get all components
+                        auto& a_transform = a_transform_comp.value().get();
+                        auto& a_collider = a_collider_comp.value().get();
+                        auto& a_dynamics = a_dynamics_comp.has_value() ? a_dynamics_comp.value().get() : def_dynamics;
+                        auto& b_transform = b_transform_comp.value().get();
+                        auto& b_collider = b_collider_comp.value().get();
+                        auto& b_dynamics = b_dynamics_comp.has_value() ? b_dynamics_comp.value().get() : def_dynamics;
+
+                        //Skip collision between entities from unmasked layer
+                        if (!e_layer->getLayerMask().test(NIKE_METADATA_SERVICE->getEntityLayerID(entity_b))) continue;
+
+                        //Skip collision check if objects are definitely not colliding
+                        if ((a_collider.transform.position - b_collider.transform.position).lengthSq() > (a_collider.transform.scale + b_collider.transform.scale).lengthSq()) continue;
+
+                        // Temporary code to get model_id for SAT collision, current SAT uses model_id to determine vertices.
+                        std::string a_model_id = "square.model"; // Default model
+                        std::string b_model_id = "square.model"; // Default model
+                        auto a_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity_a);
+                        if (a_shape_comp.has_value()) {
+                            a_model_id = a_shape_comp.value().get().model_id;
+                        }
+                        auto b_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity_b);
+                        if (b_shape_comp.has_value()) {
+                            b_model_id = b_shape_comp.value().get().model_id;
+                        }
+
+                        //Collision info
+                        Collision::CollisionInfo info;
+
+                        // Perform AABB collision detection first
+                        if (!(static_cast<int>(a_collider.transform.rotation) % 90) &&
+                            !(static_cast<int>(b_collider.transform.rotation) % 90)) {
+
+                            //If AABB collision
+                            if (collision_system->detectAABBRectRect(a_dynamics, a_collider, b_dynamics, b_collider, info)) {
+
+                                // Set the collision flags
+                                a_collider.b_collided = true;
+                                b_collider.b_collided = true;
+
+                                // Perform collision resolution
+                                collision_system->collisionResolution(
+                                    entity_a, a_transform, a_dynamics, a_collider,
+                                    entity_b, b_transform, b_dynamics, b_collider,
+                                    info
+                                );
+
+                                continue;
+                            }
+                        }
+                        // Perform SAT collision detection if AABB fails
+                        else if (collision_system->detectAABBRectRect(a_dynamics, a_collider, b_dynamics, b_collider, info) || collision_system->detectSATCollision(a_collider, b_collider, a_model_id, b_model_id, info)) {
+
+                            // Set the collision flags
+                            a_collider.b_collided = true;
+                            b_collider.b_collided = true;
+
+                            // Perform collision resolution
+                            collision_system->collisionResolution(
+                                entity_a, a_transform, a_dynamics, a_collider,
+                                entity_b, b_transform, b_dynamics, b_collider,
+                                info
+                            );
+
+                            continue;
+                        }
+
+                        // Reset collision flags if no collision
+                        a_collider.b_collided = false;
+                        b_collider.b_collided = false;
+                    }
                 }
             }
         }
-
-        // End of update.
     }
 
     void Physics::Manager::onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) {
