@@ -1043,7 +1043,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1104,7 +1104,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1165,7 +1165,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
