@@ -1,7 +1,7 @@
 {
     "Components": {
         "Audio::SFX": {
-            "Audio_ID": "Windball1.wav",
+            "Audio_ID": "Pop1.wav",
             "B_Play_SFX": false,
             "Channel_Group_ID": "BulletSFX",
             "Pitch": 1.0,
@@ -11,10 +11,10 @@
             "Damage": 10.0
         },
         "Combat::Faction": {
-            "Faction": 3
+            "Faction": 4
         },
         "Element::Entity": {
-            "Element": 3
+            "Element": 0
         },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
@@ -68,7 +68,7 @@
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "GrassBullet_Player.png"
+            "Texture_ID": "NormalBullet_Player.png"
         },
         "Transform::Transform": {
             "Position": {
@@ -83,8 +83,5 @@
             "Screen Position": false
         }
     },
-    "MetaData": {
-        "Layer ID": 0,
-        "Tags": []
-    }
+    "Layer ID": 1
 }

@@ -376,6 +376,12 @@ namespace NIKE {
         }
         processed_collisions.insert(collision_pair);  // Mark as processed
 
+        // Health Drop collision
+        if (!healthDropCollisionCheck(entity_a, entity_b)) return; // Ignore collision
+
+        // Bullet collision
+        if (!factionCollisionCheck(entity_a, entity_b)) return; // Ignore collision
+
         // Dispatch collision event
         auto collision_event = std::make_shared<NIKE::Physics::CollisionEvent>(entity_a, entity_b);
         //NIKEE_CORE_WARN("Collision Event Dispatched");
@@ -430,4 +436,60 @@ namespace NIKE {
         // To be reset at the start of each frame
         processed_collisions.clear(); 
     }
+
+    bool Collision::System::healthDropCollisionCheck(Entity::Type entity_a, Entity::Type entity_b) {
+        // Check if entity_a or entity_b has a HealthDrop component
+        const auto health_drop_a = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_a);
+        const auto health_drop_b = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(entity_b);
+
+        // Get the factions of both entities
+        const auto faction_a = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
+        const auto faction_b = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
+
+        // If an entity has a HealthDrop component, it only collides with player
+        if ((health_drop_a.has_value() && (!faction_b.has_value() || faction_b.value().get().faction != Combat::Factions::PLAYER)) ||
+            (health_drop_b.has_value() && (!faction_a.has_value() || faction_a.value().get().faction != Combat::Factions::PLAYER)))
+        {
+            // Ignore collision
+            return false; 
+        }
+
+        // Allow collision
+        return true;
+    }
+
+    bool Collision::System::factionCollisionCheck(Entity::Type entity_a, Entity::Type entity_b) {
+        // Get the factions of both entities
+        const auto faction_a = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_a);
+        const auto faction_b = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
+
+        // If both entities have a faction and they are the same, allow collision
+        if (faction_a.has_value() && faction_b.has_value()) {
+            Combat::Factions factionA = faction_a.value().get().faction;
+            Combat::Factions factionB = faction_b.value().get().faction;
+
+            // Prevent bullets from hitting their own faction
+            if ((factionA == Combat::Factions::PLAYERBULLET && factionB == Combat::Factions::PLAYER) ||
+                (factionA == Combat::Factions::PLAYER && factionB == Combat::Factions::PLAYERBULLET) ||
+                (factionA == Combat::Factions::ENEMYBULLET && factionB == Combat::Factions::ENEMY) ||
+                (factionA == Combat::Factions::ENEMY && factionB == Combat::Factions::ENEMYBULLET))
+            {
+                // Ignore collision 
+                return false; 
+            }
+
+            // Prevent bullets from hitting other bullets
+            if ((factionA == Combat::Factions::PLAYERBULLET && factionB == Combat::Factions::ENEMYBULLET) ||
+                (factionA == Combat::Factions::ENEMYBULLET && factionB == Combat::Factions::PLAYERBULLET) ||
+                (factionA == Combat::Factions::PLAYERBULLET && factionB == Combat::Factions::PLAYERBULLET) ||
+                (factionA == Combat::Factions::ENEMYBULLET && factionB == Combat::Factions::ENEMYBULLET))
+            {
+                return false; // Ignore collision (bullets do not hit other bullets)
+            }
+        }
+
+        // Allow collision
+        return true; 
+    }
+
 }
