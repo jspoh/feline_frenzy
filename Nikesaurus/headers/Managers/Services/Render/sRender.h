@@ -142,9 +142,12 @@ namespace NIKE {
 				/**
 				 * use shader prefix (without '_') as ref.
 				 * 
+				 * preset follows NIKE::SysParticle::Data::particle_preset_map
+				 * render_type follows NIKE::SysParticle::Data::particle_render_type_map
+				 * 
 				 * \param ref
 				 */
-				void renderParticleSystem(int preset, const Vector2f& origin, unsigned int vao = 0, int draw_count = 1);
+				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1);
 
 				/*****************************************************************//**
 				* BATCH RENDERING

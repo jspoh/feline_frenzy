@@ -252,6 +252,11 @@ namespace NIKE {
 							NIKE::SysParticle::Manager::getInstance().setParticleSystemPreset(pe_comp->ref, static_cast<SysParticle::Data::ParticlePresets>(pe_comp->preset));
 						}
 
+						// update changes to particle render type
+						if (static_cast<int>(ps.render_type) != pe_comp->render_type) {
+							ps.render_type = static_cast<SysParticle::Data::ParticleRenderType>(pe_comp->render_type);
+						}
+
 						// update particle duration
 						if (ps.duration != pe_comp->duration) {
 							NIKE::SysParticle::Manager::getInstance().setParticleSystemDuration(pe_comp->ref, pe_comp->duration);
@@ -315,7 +320,7 @@ namespace NIKE {
 
 			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
 
-			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, vao, static_cast<int>(particles.size()));
+			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), static_cast<int>(particles.size()));
 		}
 
 		// mouse particles

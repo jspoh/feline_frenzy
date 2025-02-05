@@ -113,6 +113,7 @@ namespace NIKE {
 
 		struct ParticleEmitter {
 			Vector2f offset;		// offset from entity position
+			int render_type;	// ParticleRenderType type
 			int preset;			// ParticlePresets type
 			std::string ref;		// reference to particle system
 			float duration;		// -1 for infinite

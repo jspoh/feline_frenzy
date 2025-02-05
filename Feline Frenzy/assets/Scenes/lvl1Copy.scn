@@ -981,9 +981,10 @@
                                 "duration": -1.0,
                                 "offset": {
                                     "x": 0.0,
-                                    "y": 69.30000305175781
+                                    "y": 61.29999923706055
                                 },
-                                "preset": 2
+                                "preset": 2,
+                                "render_type": 0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

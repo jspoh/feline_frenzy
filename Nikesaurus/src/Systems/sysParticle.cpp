@@ -32,7 +32,7 @@ NSPM::Manager() {
 	vbo_map[Data::ParticlePresets::CLUSTER] = 0;
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::CLUSTER], vbo_map[Data::ParticlePresets::CLUSTER]);
 
-	// create vao and vbo for FIRE particle preset
+	// create vao and vbo for FIRE particley preset
 	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
 	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
 
@@ -48,7 +48,7 @@ NSPM& NSPM::getInstance() {
 	return instance;
 }
 
-bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, float duration, bool using_world_pos) {
+bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, Data::ParticleRenderType particle_render_type, float duration, bool using_world_pos) {
 	if (active_particle_systems.size() >= MAX_ACTIVE_PARTICLE_SYSTEMS) {
 		return false;
 	}
@@ -61,6 +61,7 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 	new_particle_system.duration = duration;
 	new_particle_system.time_alive = 0.f;
 	new_particle_system.using_world_pos = using_world_pos;
+	new_particle_system.render_type = particle_render_type;
 
 
 	active_particle_systems[ref] = new_particle_system;

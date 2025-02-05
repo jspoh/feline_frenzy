@@ -122,7 +122,7 @@ namespace NIKE {
 				 * \param preset
 				 * \return if particle system was successfully added
 				 */
-				bool addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& start_pos, float duration = -1.f, bool using_world_pos = true);
+				bool addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& start_pos, Data::ParticleRenderType particle_render_type, float duration = -1.f, bool using_world_pos = true);
 
 				void update();
 

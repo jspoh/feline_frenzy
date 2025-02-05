@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   fire_particle.frag
+ * \file   quad_particle.frag
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
@@ -22,9 +22,5 @@ layout(location=2) flat in vec2 f_particle_size;
 layout(location=3) flat in float f_rotation;
 
 void main() {
-  // render circle, discard if outside circle
-  float dist = length(gl_FragCoord.xy - f_particle_position);
-  if (dist > f_particle_size.x / 2.f) discard;
-
   f_color = vec4(f_particle_color);
 }
