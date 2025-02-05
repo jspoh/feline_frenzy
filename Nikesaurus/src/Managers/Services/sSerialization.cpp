@@ -350,10 +350,7 @@ namespace NIKE {
 
 		//Deserialize prefab data
 		if (data.contains("MetaData")) {
-			cout << prefab_id << endl;
 			NIKE_METADATA_SERVICE->deserializePrefabData(entity, data.at("MetaData"));
-
-			cout << NIKE_METADATA_SERVICE->getEntityLayerID(entity) << endl;
 		}
 
 		//Close file

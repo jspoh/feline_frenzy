@@ -24,7 +24,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "player"
+            "Active Cam ID": "Free Cam"
         }
     },
     {
@@ -975,7 +975,16 @@
                                     "x": -138.10108947753906,
                                     "y": -163.7489776611328
                                 },
-                                "Zoom": 3.4644265174865723
+                                "Zoom": 1.2321094274520874
+                            },
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 60.5
+                                },
+                                "preset": 2,
+                                "render_type": 0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1007,7 +1016,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -138.10108947753906,
-                                    "y": -163.7489776611328
+                                    "y": -145.03443908691406
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1034,7 +1043,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1095,7 +1104,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
@@ -1156,7 +1165,7 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,

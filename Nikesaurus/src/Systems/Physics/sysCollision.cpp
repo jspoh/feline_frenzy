@@ -1,6 +1,6 @@
 /*****************************************************************//**
 * \file   sysCollision.cpp
-* \brief  Implements the collision manager.
+* \brief  Collision system
 *
 * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
 * \date   September 2024

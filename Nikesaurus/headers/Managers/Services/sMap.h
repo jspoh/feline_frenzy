@@ -1,6 +1,6 @@
 /*****************************************************************//**
  * \file   sMap.h
- * \brief  Map manager
+ * \brief  Map system header
  *
  * \author Bryan Soh, 2301238, z.soh@digipen.edu (100%)
  * \date   November 2024

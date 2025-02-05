@@ -192,6 +192,9 @@ namespace NIKE {
 			//Reference to game window panel
 			std::weak_ptr<TileMapPanel> tilemap_panel;
 
+			//Reference to main panel
+			std::weak_ptr<MainPanel> main_panel;
+
 			//Reference to component panel
 			std::weak_ptr<ComponentsPanel> comp_panel;
 
@@ -417,6 +420,9 @@ namespace NIKE {
 			// Reference to component panel
 			std::weak_ptr<ComponentsPanel> comps_panel;
 
+			//Reference to main panel
+			std::weak_ptr<MainPanel> main_panel;
+
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
@@ -441,8 +447,14 @@ namespace NIKE {
 			//Create entity popup
 			std::function<void()> createEntityPopup(std::string const& popup_id);
 
+			//Frame buffer name
+			unsigned int preview_buffer_id;
+
+			//Render prefab preview
+			void renderPrefabPreview();
+
 		public:
-			PrefabsPanel() : copy_count{ 0 } {}
+			PrefabsPanel() : copy_count{ 0 }, preview_buffer_id{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name
@@ -846,8 +858,8 @@ namespace NIKE {
 		class GameWindowPanel : public IPanel {
 		private:
 
-			//Frame buffer string
-			std::string editor_frame_buffer;
+			//Editor buffer
+			unsigned int editor_buffer_id;
 
 			//Mouse position relative to Game Window
 			Vector2f window_mouse_pos;
@@ -891,7 +903,7 @@ namespace NIKE {
 			bool isMouseInWindow() const;
 
 			//Get editor frame buffer name
-			std::string getEditorFrameBuffer() const;
+			unsigned int getEditorFrameBuffer() const;
 
 			//Init
 			void init() override;

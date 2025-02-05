@@ -4,7 +4,7 @@
  *
  * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -385,7 +385,7 @@ namespace NIKE {
 
 			//Check if group exists
 			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
-			//e_sfx.audio_id = ""
+			e_sfx.audio_id = "EnemyDeathSound2.wav";
 			
 			if (!group) {
 				e_sfx.b_play_sfx = play_or_no;

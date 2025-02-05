@@ -325,12 +325,42 @@ namespace NIKE {
 
 			//Game State Switching
 			{
-				ImGui::Text("Play Game: ");
-				ImGui::Button("Play");
+				//Show play button only when game state is inactive
+				if (!getGameState()) {
+					ImGui::Button("Play##GameButton");
 
-				//Check if button has been activated
-				if (ImGui::IsItemActivated()) {
-					setGameState(true);
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						setGameState(true);
+
+						//Auto save
+						NIKE_LVLEDITOR_SERVICE->autoSave();
+					}
+				}
+				else {
+					ImGui::Button("Pause##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						setGameState(false);
+					}
+
+					ImGui::Button("End##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						//Restart scene
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+						setGameState(false);
+					}
+
+					ImGui::Button("Restart##GameButton");
+
+					//Check if button has been activated
+					if (ImGui::IsItemActivated()) {
+						//Restart scene
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
+					}
 				}
 			}
 
@@ -340,6 +370,13 @@ namespace NIKE {
 			{
 				ImGui::Text("Save: ");
 				ImGui::Button(b_auto_save ? "Auto##SaveMode" : "Manual##SaveMode");
+
+				//Hover item
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text("Auto save for exiting editor/application & playing the game.\n Switch to manual to turn off auto save.");
+					ImGui::EndTooltip();
+				}
 
 				//Check if button has been activated
 				if (ImGui::IsItemActivated()) {
@@ -912,6 +949,9 @@ namespace NIKE {
 
 		//Components panel reference
 		comp_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
+
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 	}
 
 	void LevelEditor::EntitiesPanel::render() {
@@ -1407,7 +1447,7 @@ namespace NIKE {
 		}
 
 		//Check for entity interaction
-		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0) {
+		if (NIKE_ECS_MANAGER->getEntitiesCount() > 0 && !main_panel.lock()->getGameState()) {
 
 			//Check for disable entity interaction flag
 			if (!checkPopUpShowing() && game_panel.lock()->isMouseInWindow() && !comp_panel.lock()->checkGizmoInteraction() && !tilemap_panel.lock()->checkGridEditing()) {
@@ -1543,13 +1583,13 @@ namespace NIKE {
 			return false;
 		}
 	}
-	//
+
 	/*****************************************************************//**
 	* Components Panel
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::interactGizmo() {
-		//Check if entity is locked
-		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		//Check if entity is locked or game is playing
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2005,6 +2045,8 @@ namespace NIKE {
 
 					// add active particle system if particle emitter is added
 					if (component.first == "Render::ParticleEmitter") {
+						using namespace NIKE::SysParticle;
+
 						// get entity position
 						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
 
@@ -2015,11 +2057,12 @@ namespace NIKE {
 						// update default particle system config
 						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
 						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::CLUSTER);
+						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
 						pe_comp->ref = particle_emitter_ref;
 						pe_comp->offset = { 0.f, 0.f };
+						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
 
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets::CLUSTER, comp->position + pe_comp->offset);
+						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
 					}
 
 					//	};
@@ -2059,7 +2102,16 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
-				// !TODO: jspoh remove particle system when component is removed
+				if (comp_string_ref == "Render::ParticleEmitter") {
+					// get entity position
+					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+					if (!success) {
+						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+					}
+				}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2396,8 +2448,8 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
-		//Check if entity is locked
-		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		//Check if entity is locked or game is playing
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2426,8 +2478,8 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
-		//Check if entity is locked
-		if (NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		//Check if entity is locked or game is playing
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
 			return;
 		}
 
@@ -2804,6 +2856,27 @@ namespace NIKE {
 			};
 	}
 
+	void LevelEditor::PrefabsPanel::renderPrefabPreview() {
+
+		//Bind frame buffer
+		NIKE_RENDER_SERVICE->bindFrameBuffer(preview_buffer_id);
+
+		//Clear buffer
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0, 0, 0, 1);
+
+		//Unbind frame buffer
+		NIKE_RENDER_SERVICE->unbindFrameBuffer();
+
+		//Begin window for rendering
+		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str());
+
+		//Render game to viewport
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(500, 500));
+
+		ImGui::End();
+	}
+
 	void LevelEditor::PrefabsPanel::savePrefab() {
 
 		//Return if prefab id is empty
@@ -2847,6 +2920,12 @@ namespace NIKE {
 		// Editor entities panel ref
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
 
+		//Main panel reference
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
+
+		//Init frame buffer name
+		preview_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(500, 500));
+
 		//Popups registration
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
 		registerPopUp("Remove Component", removeComponentPopUp("Remove Component"));
@@ -2872,6 +2951,9 @@ namespace NIKE {
 
 		//Check if prefab display is valid
 		if (!prefab_id.empty()) {
+
+			//Render prefab preview
+			renderPrefabPreview();
 
 			//Update with accuarate copy count
 			copy_count = 0;
@@ -6244,8 +6326,8 @@ namespace NIKE {
 		}
 	}
 
-	std::string LevelEditor::GameWindowPanel::getEditorFrameBuffer() const {
-		return editor_frame_buffer;
+	unsigned int LevelEditor::GameWindowPanel::getEditorFrameBuffer() const {
+		return editor_buffer_id;
 	}
 
 	void LevelEditor::GameWindowPanel::init() {
@@ -6260,8 +6342,7 @@ namespace NIKE {
 		comps_panel = std::dynamic_pointer_cast<ComponentsPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(ComponentsPanel::getStaticName()));
 
 		//Create frame buffer for rendering game preview
-		editor_frame_buffer = "EditorBuffer";
-		NIKE_RENDER_SERVICE->createFrameBuffer(editor_frame_buffer, Vector2i(), true);
+		editor_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(), true);
 	}
 
 	void LevelEditor::GameWindowPanel::render()
@@ -6316,7 +6397,7 @@ namespace NIKE {
 		ImVec2 uv1(u_max, -v_max); // Top-right
 
 		//Render game to viewport
-		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(editor_frame_buffer).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(editor_buffer_id).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		//Accept render assets payload
 		renderAcceptPayload();
