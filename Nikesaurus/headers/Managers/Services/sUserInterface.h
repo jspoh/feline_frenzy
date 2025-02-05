@@ -88,6 +88,7 @@ namespace NIKE {
 				Transform::Transform btn_transform;
 				Render::Text btn_text;
 				bool b_hovered;
+				Render::Texture btn_texture;
 			};
 
 			//Button hovering container
