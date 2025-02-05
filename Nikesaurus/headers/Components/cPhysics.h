@@ -1,6 +1,6 @@
 ﻿/*****************************************************************//**
- * \file   cCollision.h
- * \brief  Defines the components used for Collision
+ * \file   cPhysics.h
+ * \brief  Defines the components used for physics
  *
  * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
  * \date   September 2024
