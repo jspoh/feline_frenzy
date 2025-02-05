@@ -1,3 +1,5 @@
+#version 450 core
+
 /*****************************************************************//**
  * \file   base_particle.frag
  * \brief
@@ -7,8 +9,6 @@
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
-
-#version 450
 
 layout(location=0) out vec4 f_color;
 

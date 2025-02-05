@@ -1,13 +1,13 @@
-﻿/*****************************************************************//**
+#version 450 core
+
+/*****************************************************************//**
  * \file   quad_particle.vert
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   31 Jan 2024
- * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content Copyright 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
-
- #version 450 core
 
 // 2d passthrough vertex shader
 
