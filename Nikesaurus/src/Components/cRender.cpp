@@ -403,9 +403,26 @@ namespace NIKE {
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
 					}
+
+					// advanced options (for programmatic usage only)
+					 
+					ImGui::BeginDisabled(true);
 					// Duration
+					static bool infinite = comp.duration == -1.f;
+					static bool prev_infinite = infinite;
+					ImGui::Checkbox("Infinite Duration", &infinite);
+					if (infinite) {
+						comp.duration = -1.f;
+					}
+					else if (prev_infinite && !infinite) {
+						comp.duration = 0.f;
+					}
+					prev_infinite = infinite;
+
+					//ImGui::BeginDisabled(infinite);
 					ImGui::Text("Particle Duration:");
 					ImGui::DragFloat("##Duration", &comp.duration, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::EndDisabled();
 				}
 			}
 		);
