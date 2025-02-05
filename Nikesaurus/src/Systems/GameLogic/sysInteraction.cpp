@@ -15,7 +15,7 @@ namespace NIKE {
     namespace Interaction {
 
         void Manager::init() {
-          
+
         }
 
         void Manager::update() {
@@ -95,6 +95,7 @@ namespace NIKE {
                     if (play_or_no && !group->isPlaying()) {
                         e_sfx.audio_id = "EnemyGetHit2.wav";
                         e_sfx.b_play_sfx = play_or_no;
+                        return;
                     }
                 }
 
@@ -105,6 +106,85 @@ namespace NIKE {
             }
         }
 
+        void animationHurtStart(Entity::Type& entity, int start_x, int start_y)
+        {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            if (e_animate_comp.has_value()) {
+                static Vector2i prev_start = e_animate_comp.value().get().start_index;
+
+                if (prev_start != Vector2i(start_x, start_y)) {
+                    e_animate_comp.value().get().start_index.x = start_x;
+                    e_animate_comp.value().get().start_index.y = start_y;
+                    prev_start = e_animate_comp.value().get().start_index;
+
+                    //Restart animation
+                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+                    if (e_base_comp.has_value()) {
+                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
+                    }
+                }
+            }
+        }
+
+        void animationHurtEnd(Entity::Type& entity, int end_x, int end_y)
+        {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            if (e_animate_comp.has_value()) {
+                static Vector2i prev_end = e_animate_comp.value().get().end_index;
+
+                if (prev_end != Vector2i(end_x, end_y)) {
+                    e_animate_comp.value().get().end_index.x = end_x;
+                    e_animate_comp.value().get().end_index.y = end_y;
+                    prev_end = e_animate_comp.value().get().end_index;
+
+                    //Restart animation
+                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+                    if (e_base_comp.has_value()) {
+                        e_base_comp.value().get().animation_mode = Animation::Mode::END;
+                    }
+                }
+            }
+        }
+
+        void flipX(Entity::Type& entity, bool yes_or_no)
+        {
+            auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+            if (e_texture_comp.has_value()) {
+                if (e_texture_comp.value().get().b_flip.x != yes_or_no)
+                {
+                    e_texture_comp.value().get().b_flip.x = yes_or_no;
+                }
+            }
+        }
+
+        void flipY(Entity::Type& entity, bool yes_or_no)
+        {
+            auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+            if (e_texture_comp.has_value()) {
+                if (e_texture_comp.value().get().b_flip.y != yes_or_no)
+                {
+                    e_texture_comp.value().get().b_flip.y = yes_or_no;
+                }
+            }
+        }
+
+        void setLastDirection(Entity::Type& entity, int dir)
+        {
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_physics_comp.has_value()) {
+                e_physics_comp.value().get().last_direction = dir;
+            }
+        }
+
+        int getLastDirection(Entity::Type& entity)
+        {
+            auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+            if (e_physics_comp.has_value()) {
+                return e_physics_comp.value().get().last_direction;
+            }
+            // Return a rand value when cnt retrieve last dir
+            return INT_MAX;
+        }
         // Testing playing 1 custom SFX
         void playOneShotSFX(Entity::Type& entity,
             const std::string& custom_audio_id,
@@ -169,16 +249,16 @@ namespace NIKE {
                 const auto b_faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity_b);
 
                 // Friendly fire check
-                if (a_faction_comp.has_value() && b_faction_comp.has_value()) {
-                    const auto& a_faction = a_faction_comp.value().get().faction;
-                    const auto& b_faction = b_faction_comp.value().get().faction;
+                //if (a_faction_comp.has_value() && b_faction_comp.has_value()) {
+                //    const auto& a_faction = a_faction_comp.value().get().faction;
+                //    const auto& b_faction = b_faction_comp.value().get().faction;
 
-                    //NIKEE_CORE_WARN("{} and {} == {}", static_cast<int>(a_faction), static_cast<int>(b_faction), a_faction == b_faction);
+                //    //NIKEE_CORE_WARN("{} and {} == {}", static_cast<int>(a_faction), static_cast<int>(b_faction), a_faction == b_faction);
 
-                    if (a_faction == b_faction) {
-                        return;
-                    }
-                }
+                //    if (a_faction == b_faction) {
+                //        return;
+                //    }
+                //}
 
                 // Applying Damage
                 if (a_damage_comp.has_value()) applyDamage(entity_a, entity_b);
@@ -205,17 +285,14 @@ namespace NIKE {
                 return;
             }
 
-            //const auto target_player_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(target);
-            //auto& player_faction = target_player_comp.value().get().faction;
-            
-            // !TODO: Return if faction not player
-
             auto& target_health = target_health_comp.value().get().health;
             const auto& target_max_health = target_health_comp.value().get().max_health;
 
             // Heal Target
+            // (The check might be redundant now as there is another check in sysCollision)
             if (target_health < target_max_health) {
                 target_health += healer_heal;
+                // !TODO: Add healing sound here
             }
         }
 
@@ -226,7 +303,7 @@ namespace NIKE {
             const auto target_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
 
             // Return if no damage comp and health comp
-            if ((attacker_damage_comp.has_value() && target_health_comp.has_value()) == false) {
+            if (!(attacker_damage_comp.has_value() && target_health_comp.has_value())) {
                 return;
             }
 
@@ -253,8 +330,27 @@ namespace NIKE {
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+            target_health.taken_damage = true;
             // Play SFX when apply damage
             playSFX(attacker, true);
+            // Play animation when taken damage
+            // Play animation when taken damage
+            static float deathAnimationTimer = 0.0f;
+            static const float deathAnimationDuration = 1.5f;
+            // Handle death animation
+            animationHurtStart(target, 0, 12);
+            flipX(target, false);
+
+            // Slow down transition from frame 0 to frame 1
+            deathAnimationTimer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
+            // If timer reaches the desired duration, proceed to frame 1
+            if (deathAnimationTimer >= deathAnimationDuration) {
+                animationHurtEnd(target, 1, 12);
+                // Reset timer
+                deathAnimationTimer = 0.0f;
+            }
+
 
 			// Check if target health drops to zero or below
 			if (target_health.health <= 0) {

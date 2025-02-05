@@ -24,7 +24,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "player"
         }
     },
     {
@@ -924,6 +924,9 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
+                            "Combat::Faction": {
+                                "Faction": 1
+                            },
                             "Combat::Health": {
                                 "Health": 50.0,
                                 "Lives": 1,
@@ -972,8 +975,8 @@
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": 496.5694885253906,
-                                    "y": 46.25213623046875
+                                    "x": -138.10108947753906,
+                                    "y": -145.03443908691406
                                 },
                                 "Zoom": 1.2321094274520874
                             },

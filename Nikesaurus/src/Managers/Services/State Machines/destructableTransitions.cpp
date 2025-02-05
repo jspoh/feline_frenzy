@@ -17,7 +17,7 @@
 
 namespace NIKE {
 
-	bool Transition::IdleToDestructableDeath::isValid(Entity::Type& entity) const {
+	bool Transition::IdleToDestructableDeathState::isValid(Entity::Type& entity) const {
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 		if (target_health_comp.has_value())
 		{
@@ -29,7 +29,7 @@ namespace NIKE {
 	}
 
 
-	std::shared_ptr<StateMachine::Istate> NIKE::Transition::IdleToDestructableDeath::getNextState() const
+	std::shared_ptr<StateMachine::Istate> NIKE::Transition::IdleToDestructableDeathState::getNextState() const
 	{
 		return NIKE_FSM_SERVICE->getStateByID<State::DestructableDeathState>("DestructableDeath");
 	}

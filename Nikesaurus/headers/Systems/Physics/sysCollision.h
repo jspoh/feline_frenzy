@@ -43,6 +43,12 @@ namespace NIKE {
             std::vector<Vector2f> getSeparatingAxes(const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB);
             void projectVerticesOnAxis(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max);
 
+            // Health drop collision check
+            bool healthDropCollisionCheck(Entity::Type entity_a, Entity::Type entity_b);
+
+            // Faction collision check
+            bool factionCollisionCheck(Entity::Type entity_a, Entity::Type entity_b);
+
         public:
             // Move the EntityPairHash definition to public so that it is accessible.
             struct EntityPairHash {

@@ -35,10 +35,10 @@ namespace NIKE {
 
 		};
 
-		class AttackState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
+		class EnemyAttackState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
 		{
 		public:
-			AttackState();
+			EnemyAttackState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
@@ -54,13 +54,14 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
-			void updateAttackAnimation(Entity::Type& entity);
+			void updateEnemyAttackAnimation(Entity::Type& entity);
+			void updateEnemyHurtAnimation(Entity::Type& entity);
 		};
 
-		class ChaseState : public StateMachine::Istate
+		class EnemyChaseState : public StateMachine::Istate
 		{
 		public:
-			ChaseState();
+			EnemyChaseState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
@@ -76,14 +77,15 @@ namespace NIKE {
 			float cell_offset;
 			float enemy_speed;
 
-			void updateChaseAnimation(Entity::Type& entity, float& dir);
+			void updateEnemyChaseAnimation(Entity::Type& entity, float& dir);
+			void updateEnemyHurtAnimation(Entity::Type& entity);
 
 		};
 
-		class DeathState : public StateMachine::Istate
+		class EnemyDeathState : public StateMachine::Istate
 		{
 		public:
-			DeathState();
+			EnemyDeathState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;

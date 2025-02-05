@@ -1,7 +1,7 @@
 {
     "Components": {
         "Audio::SFX": {
-            "Audio_ID": "Pop1.wav",
+            "Audio_ID": "Waterball1.wav",
             "B_Play_SFX": false,
             "Channel_Group_ID": "BulletSFX",
             "Pitch": 1.0,
@@ -12,7 +12,7 @@
         },
         "Combat::Faction": {
             "Faction": 1
-	    },
+        },
         "Element::Entity": {
             "Element": 2
         },
@@ -83,5 +83,8 @@
             "Screen Position": false
         }
     },
-    "Layer ID": 1
+    "MetaData": {
+        "Layer ID": 0,
+        "Tags": []
+    }
 }

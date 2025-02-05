@@ -22,23 +22,24 @@ namespace NIKE {
 	void State::DestructableDeathState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
 		// !TODO: Check for health drop tag
-		spawnHealthDrop(entity);
+
 	}
 
 	void State::DestructableDeathState::onUpdate([[maybe_unused]] Entity::Type& entity)
 	{
-		//auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		//if (animation_comp.has_value())
-		//{
-		//	// Use delta time to let animation play before deleting entity
-		//	static float dt = 0.0f;
-		//	dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-		//	if (dt >= 0.2f) {
-		//		NIKE_METADATA_SERVICE->destroyEntity(entity);
-		//		// Reset delta time
-		//		dt = 0.f;
-		//	}
-		//}
+		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (animation_comp.has_value())
+		{
+			// Use delta time to let animation play before deleting entity
+			//static float dt = 0.0f;
+			//dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			//if (dt >= 0.2f) {
+				spawnHealthDrop(entity);
+				NIKE_METADATA_SERVICE->destroyEntity(entity);
+				// Reset delta time
+				//dt = 0.f;
+			//}
+		}
 	}
 
 	void State::DestructableDeathState::onExit([[maybe_unused]] Entity::Type& entity)
