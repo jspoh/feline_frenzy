@@ -253,14 +253,6 @@ namespace NIKE {
 			//Toggle editor mode
 			b_editor_active = !b_editor_active;
 
-			//If editor is active, set game to paused
-			if (b_editor_active) {
-				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(false);
-			}
-			else {
-				std::dynamic_pointer_cast<MainPanel>(panels_map.at(MainPanel::getStaticName()))->setGameState(true);
-			}
-
 			// Clear all inputs done while editor is not active
 			io.ClearEventsQueue();
 		}

@@ -273,18 +273,12 @@ namespace NIKE {
 						system->setActiveState(false);
 					}
 				});
-
-			//Restart scene
-			NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESTART, ""));
 		}
 		else {
 			std::for_each(systems.begin(), systems.end(),
 				[](std::shared_ptr<System::ISystem>& system) {
 					system->setActiveState(true);
 				});
-
-			//Exit editor mode
-			NIKE_LVLEDITOR_SERVICE->setEditorState(false);
 		}
 	}
 
