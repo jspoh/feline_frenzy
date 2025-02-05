@@ -21,7 +21,8 @@ namespace NIKE {
 
 	void State::DestructableDeathState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
-
+		// !TODO: Check for health drop tag
+		spawnHealthDrop(entity);
 	}
 
 	void State::DestructableDeathState::onUpdate([[maybe_unused]] Entity::Type& entity)
@@ -44,8 +45,30 @@ namespace NIKE {
 	{
 
 	}
+
 	void State::DestructableDeathState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
 	{
 
+	}
+
+	void State::DestructableDeathState::spawnHealthDrop(Entity::Type entity) {
+		// Get entity position
+		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("spawnHealthDrop: Entity missing Transform Component, enemy not spawned");
+			return;
+		}
+
+		// Create health drop entity
+		Entity::Type drop_entity = NIKE_ECS_MANAGER->createEntity();
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(drop_entity, NIKE_ASSETS_SERVICE->getAssetPath("healthDrop.prefab").string());
+
+		// Set health drop location
+		auto drop_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(drop_entity);
+		if (drop_transform_comp.has_value()) {
+			drop_transform_comp.value().get().position = e_transform_comp.value().get().position;
+		}
 	}
 }
