@@ -545,15 +545,50 @@ namespace NIKE {
                 e_trans_comp.value().get().position.x = x;
                 e_trans_comp.value().get().position.y = y;
             }
+            // Temporary hardcoded SFX
+            Interaction::playOneShotSFX(entity, "EnemySpawn1.wav", "EnemySFX", 1.0f, 1.0f);
+
             });
 
         // Player EnemyDeathState annimation function
         lua_state.set_function("CheckDeath", [&](Entity::Type entity) -> bool {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
             if (health_comp.has_value()) {
+
+                // Temporary method to store static map for health (TODO, remove after optimising another way)
+                auto& health = health_comp.value().get();
+                static std::unordered_map<Entity::Type, float> previousHealthMap;
+
+                // If this entity hasn't been tracked yet, initialize its previous health.
+                if (previousHealthMap.find(entity) == previousHealthMap.end()) {
+                    previousHealthMap[entity] = health.health;
+                }
+                float prevHealth = previousHealthMap[entity];
+                // Check if the health has decreased (damage taken)
+                if (health.health < prevHealth) {
+                    // Play damage SFX (adjust filename as desired)
+                    Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
+                    // Update stored health to the new lower value.
+                    previousHealthMap[entity] = health.health;
+                }
+                // If health has increased (healing), update the stored value.
+                else if (health.health > prevHealth) {
+                    previousHealthMap[entity] = health.health;
+                }
+
                 // When player do not have any health
                 if (health_comp.value().get().lives <= 0)
                 {
+                    // Temporary hardcoded SFX
+                    Interaction::playOneShotSFX(entity, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
+
+                    // Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
+                    float secondsToDelay = 0.5f;
+                    float currentDelay = 0.0f;
+                    while (currentDelay < secondsToDelay) {
+                        currentDelay += NIKE_WINDOWS_SERVICE->getDeltaTime();
+                    }
+
                     NIKE_METADATA_SERVICE->destroyEntity(entity);
                     return true;
                 }
