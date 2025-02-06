@@ -140,7 +140,7 @@ namespace NIKE {
                     //Restart animation
                     auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
                     if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::END;
+                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
                     }
                 }
             }
@@ -335,7 +335,7 @@ namespace NIKE {
                 target, attacker_damage, attacker, target_health.health);
             target_health.taken_damage = true;
             // Play SFX when apply damage
-            playSFX(attacker, true);
+            playSFX(target, true);
             // Play animation when taken damage
             // Play animation when taken damage
             static float deathAnimationTimer = 0.0f;

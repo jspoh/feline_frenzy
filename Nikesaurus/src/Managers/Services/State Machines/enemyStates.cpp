@@ -262,6 +262,16 @@ namespace NIKE {
 
 	void State::EnemyChaseState::onUpdate(Entity::Type& entity)
 	{
+		if (NIKE_METADATA_SERVICE->getEntitiesByTag("player").empty())
+		{
+			// Stop SFX when walking
+			auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+			if (e_audio_comp.has_value())
+			{
+				playSFX(entity, false);
+			}
+		}
+
 		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player"))
 		{
 			// Getting components from player and enemy entities

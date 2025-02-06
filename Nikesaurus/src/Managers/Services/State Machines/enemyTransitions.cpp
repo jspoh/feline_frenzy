@@ -101,7 +101,7 @@ namespace NIKE {
 
 				// Transition happens when path is not empty
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
-				if (!path.path.empty() && !Enemy::withinRange(entity, player)) {
+				if (!path.path.empty() && !Enemy::withinRange(entity, player) && !NIKE_METADATA_SERVICE->getEntitiesByTag("player").empty()) {
 					return true;
 				}
 			}
@@ -171,7 +171,6 @@ namespace NIKE {
 	bool Transition::EnemyAttackToEnemyChase::isValid(Entity::Type& entity) const
 	{
 		// This function will check if there is a path from player to enemy entity(param)
-				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
 			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
