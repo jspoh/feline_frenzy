@@ -548,6 +548,55 @@ namespace NIKE {
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
 					}
 
+					// particle settings
+					ImGui::Spacing();
+					ImGui::Text("Particle Settings:");
+					ImGui::Spacing();
+
+					// Num new particles per second
+					ImGui::Text("Num New Particles Per Second:");
+					ImGui::DragInt("##Num New Particles Per Second", &comp.num_new_particles_per_second, 1, 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
+
+					// Particle Lifespan
+					ImGui::Text("Particle Lifespan:");
+					ImGui::DragFloat("##Particle Lifespan", &comp.particle_lifespan, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					// Particle Velocity Range
+					ImGui::Text("Particle Velocity Range:");
+					ImGui::DragFloat2("##Particle Velocity Range", &comp.particle_velocity_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::SameLine();
+					ImGui::DragFloat2("##Particle Velocity Range", &comp.particle_velocity_range.y, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					// Particle Color
+					ImGui::Text("Particle color is random:");
+					ImGui::Checkbox("##Particle Color Is Random", &comp.particle_color_is_random);
+
+					ImGui::BeginDisabled(!comp.particle_color_is_random);
+					{
+						static float particle_color[4] = { comp.particle_color.x, comp.particle_color.y, comp.particle_color.z, comp.particle_color.w };
+						ImGui::Text("Particle Color:");
+						if (ImGui::ColorPicker4("##Particle Color", particle_color, ImGuiColorEditFlags_AlphaBar)) {
+							comp.particle_color = { particle_color[0], particle_color[1], particle_color[2], particle_color[3] };
+						}
+					}
+					ImGui::EndDisabled();
+
+					// Particle Rand Offset Range
+					ImGui::Text("Particle Rand Offset Range:");
+					ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::SameLine();
+					ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					// Particle Rand Width Range
+					ImGui::Text("Particle Rand Size Range:");
+					ImGui::DragFloat2("##Particle Rand Size Range", &comp.particle_rand_width_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::SameLine();
+					ImGui::DragFloat2("##Particle Rand Size Range", &comp.particle_rand_height_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					// Particle Rotation
+					ImGui::Text("Particle Rotation:");
+					ImGui::DragFloat("##Particle Rotation", &comp.particle_rotation, 0.1f, 0.f, 359.9f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
 					// advanced options (for programmatic usage only)
 
 					ImGui::BeginDisabled(true);

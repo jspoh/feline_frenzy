@@ -112,26 +112,26 @@ namespace NIKE {
 		};
 
 		struct ParticleEmitter {
-			Vector2f offset;		// offset from entity position
-			int render_type;	// ParticleRenderType type
-			int preset;			// ParticlePresets type
-			std::string ref;		// reference to particle system
-			float duration;		// -1 for infinite
+			Vector2f offset{};		// offset from entity position
+			int render_type{};	// ParticleRenderType type
+			int preset{};			// ParticlePresets type
+			std::string ref{};		// reference to particle system
+			float duration{};		// -1 for infinite
 
 			// particle
-			int num_new_particles_per_second;
-			float particle_lifespan;
-			float particle_acceleration;
-			Vector2f particle_velocity_range;
-			Vector2f particle_vector_x_range;
-			Vector2f particle_vector_y_range;
-			bool particle_color_is_random;
-			Vector4f particle_color;
-			Vector2f particle_rand_x_offset_range;
-			Vector2f particle_rand_y_offset_range;
-			float particle_rotation;
-			Vector2f particle_rand_width_range;
-			Vector2f particle_rand_height_range;
+			int num_new_particles_per_second{};
+			float particle_lifespan{};
+			float particle_acceleration{};
+			Vector2f particle_velocity_range{};
+			Vector2f particle_vector_x_range{};
+			Vector2f particle_vector_y_range{};
+			bool particle_color_is_random{};
+			Vector4f particle_color{};
+			Vector2f particle_rand_x_offset_range{};
+			Vector2f particle_rand_y_offset_range{};
+			float particle_rotation{};
+			Vector2f particle_rand_width_range{};
+			Vector2f particle_rand_height_range{};
 		};
 
 		void registerComponents();
