@@ -1,5 +1,5 @@
 /*****************************************************************//**
- * \file   StateService.cpp
+ * \file   sScenes.cpp
  * \brief  
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)

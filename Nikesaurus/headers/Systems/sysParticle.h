@@ -83,7 +83,7 @@ namespace NIKE {
 				Vector2f vector{};
 				float acceleration{};		// per second
 				float time_alive{};				// in seconds
-				float lifespan{};				// in seconds. -1 for infinite (-1 means particle death not dependent on time)
+				float lifespan{};				// in seconds. -1 for infinite (-1 means particle EnemyDeathState not dependent on time)
 				float rotation{};				// in degrees, anticlockwise
 
 			};

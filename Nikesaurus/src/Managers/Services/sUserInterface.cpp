@@ -11,6 +11,8 @@
 #include "Managers/Services/sUserInterface.h"
 #include "Core/Engine.h"
 
+#include "Systems/GameLogic/sysInteraction.h"
+
 namespace NIKE {
 
 	nlohmann::json UI::UIBtn::serialize() const {
@@ -436,6 +438,11 @@ namespace NIKE {
 			if (!e_text_comp.has_value()) continue;
 			auto& e_text = e_text_comp.value().get();
 
+			//Get animation comp
+			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity.second.entity_id);
+			if (!e_animate_comp.has_value()) continue;
+			auto& e_animate = e_animate_comp.value().get();
+
 			//Clamp rotation ( Disable rotating buttons for now )
 			e_transform.rotation = 0.0f;
 
@@ -457,13 +464,21 @@ namespace NIKE {
 
 			//Check if button is hovered
 			if (buttonHovered(entity.second.entity_id)) {
+
+				// Temporary hardcoded SFX (for main menu buttons)
+				if (!entity.second.b_hovered) {
+					Interaction::playOneShotSFX(entity.second.entity_id, "MenuHoverOverSFX.wav", "SFX", 1.0f, 1.0f);
+				}
+
 				entity.second.b_hovered = true;
 
 				//Save data before hover
 				if (!hover_container[entity.first].b_hovered) {
 					hover_container[entity.first].btn_transform.scale = e_transform.scale;
 					hover_container[entity.first].btn_text.color = e_text.color;
+					hover_container[entity.first].btn_animate = e_animate;
 					hover_container[entity.first].b_hovered = true;
+
 				}
 
 				//Hover
@@ -474,8 +489,16 @@ namespace NIKE {
 				e_text.color.g = hover_container[entity.first].btn_text.color.g + 0.15f;
 				e_text.color.b = hover_container[entity.first].btn_text.color.b + 0.15f;
 
+				e_animate.start_index = Vector2i(1, 0);
+				e_animate.end_index = Vector2i(5,0);
+
 				//Execute script for trigger
 				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
+					// Temporary hardcoded SFX (for main menu buttons)
+					// Get button ID
+					//...
+					Interaction::playOneShotSFX(entity.second.entity_id, "UI_Select.wav", "SFX", 1.0f, 1.0f);
+
 					NIKE_LUA_SERVICE->executeScript(entity.second.script);
 				}
 			}
@@ -484,7 +507,8 @@ namespace NIKE {
 				if (hover_container[entity.first].b_hovered) {
 					e_transform.scale = hover_container[entity.first].btn_transform.scale;
 					e_text.color = hover_container[entity.first].btn_text.color;
-					hover_container[entity.first].b_hovered = false;
+					e_animate = hover_container[entity.first].btn_animate;
+					hover_container[entity.first].b_hovered = false;				
 				}
 
 				//Reset polling for Mouse left button

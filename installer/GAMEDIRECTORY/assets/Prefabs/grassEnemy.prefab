@@ -28,7 +28,7 @@
             }
         },
         "Audio::SFX": {
-            "Audio_ID": "WalkingNature.wav",
+            "Audio_ID": "EnemyWalking1.wav",
             "B_Play_SFX": false,
             "Channel_Group_ID": "EnemySFX",
             "Pitch": 1.0,
@@ -40,6 +40,7 @@
         "Combat::Health": {
             "Health": 100.0,
             "Lives": 1,
+            "MaxHealth": 100.0,
             "invulnerable_flag": false
         },
         "Element::Entity": {
@@ -127,5 +128,8 @@
             "Screen Position": false
         }
     },
-    "Layer ID": 1
+    "MetaData": {
+        "Layer ID": 1,
+        "Tags": []
+    }
 }

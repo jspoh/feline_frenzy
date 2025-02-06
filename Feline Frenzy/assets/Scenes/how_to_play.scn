@@ -18,7 +18,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "entity_0001"
         }
     },
     {
@@ -74,10 +74,10 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
-                            "Name": "entity_0000",
+                            "Name": "Background",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -87,6 +87,13 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 12.650634765625
+                                },
+                                "Zoom": 0.8721715807914734
+                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -125,9 +132,9 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 1,
                             "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -176,19 +183,55 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 2,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         }
                     }
-                },
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
                 {
                     "Entity": {
                         "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Completed_Animations": 0,
+                                "Frame_Duration": 0.20000000298023224,
+                                "Mode": 0,
+                                "Timer": 0.0
+                            },
+                            "Animation::Sprite": {
+                                "Curr_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 6,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
@@ -198,31 +241,55 @@
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 1.3225961923599243,
+                                "Scale": 10.0,
                                 "Size": {
-                                    "x": 137.5500030517578,
-                                    "y": 50.2586555480957
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "Text": "Back"
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 6,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "UI_Back_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -14.744592666625977,
-                                    "y": -356.0240478515625
+                                    "x": -9.443603515625,
+                                    "y": -359.83270263671875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 275.1000061035156,
-                                    "y": 117.4000015258789
+                                    "x": 167.35284423828125,
+                                    "y": 66.9411392211914
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Layer_ID": 0,
+                            "Layer_ID": 1,
                             "Layer_Order": 0,
-                            "Name": "entity_0003",
+                            "Name": "back_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -239,14 +306,6 @@
                     }
                 }
             ],
-            "ID": 0,
-            "Mask": 1
-        }
-    },
-    {
-        "Layer": {
-            "B_State": true,
-            "Entities": [],
             "ID": 1,
             "Mask": 2
         }

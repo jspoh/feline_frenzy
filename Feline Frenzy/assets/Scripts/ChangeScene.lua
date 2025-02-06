@@ -9,8 +9,17 @@
 
 Scenes = {}
 
+-- A simple blocking wait function, note this is a busy-wait loop and will block execution.
+local function wait(seconds)
+    local start = os.clock()
+    while os.clock() - start < seconds do
+        -- TODO should change to NOT use busy-wait if possible
+    end
+end
+
 --Change Scene
 function Scenes:Change(args)
+--wait(1)  -- Delay for 1 second. Error!
 ChangeScene(args.scene)
 end
 

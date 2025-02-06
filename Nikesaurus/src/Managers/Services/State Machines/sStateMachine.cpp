@@ -43,12 +43,12 @@ namespace NIKE {
 		{
 			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
 			if (e_animate_comp.has_value()) {
-				//static Vector2i prev_start = e_animate_comp.value().get().start_index;
+				static Vector2i prev_start = e_animate_comp.value().get().start_index;
 
-				if (e_animate_comp.value().get().start_index != Vector2i(start_x, start_y)) {
+				if (prev_start != Vector2i(start_x, start_y)) {
 					e_animate_comp.value().get().start_index.x = start_x;
 					e_animate_comp.value().get().start_index.y = start_y;
-					//prev_start = e_animate_comp.value().get().start_index;
+					prev_start = e_animate_comp.value().get().start_index;
 
 					//Restart animation
 					auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
@@ -63,12 +63,12 @@ namespace NIKE {
 		{
 			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
 			if (e_animate_comp.has_value()) {
-				//static Vector2i prev_end = e_animate_comp.value().get().end_index;
+				static Vector2i prev_end = e_animate_comp.value().get().end_index;
 
-				if (e_animate_comp.value().get().end_index != Vector2i(end_x, end_y)) {
+				if (prev_end != Vector2i(end_x, end_y)) {
 					e_animate_comp.value().get().end_index.x = end_x;
 					e_animate_comp.value().get().end_index.y = end_y;
-					//prev_end = e_animate_comp.value().get().end_index;
+					prev_end = e_animate_comp.value().get().end_index;
 
 					//Restart animation
 					auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
@@ -186,9 +186,9 @@ namespace NIKE {
 		void Service::init() {
 			// Regiser states
 			registerState("Idle", std::make_shared<State::IdleState>());
-			registerState("Attack", std::make_shared<State::AttackState>());
-			registerState("Chase", std::make_shared<State::ChaseState>());
-			registerState("Death", std::make_shared<State::DeathState>());
+			registerState("EnemyAttack", std::make_shared<State::EnemyAttackState>());
+			registerState("EnemyChase", std::make_shared<State::EnemyChaseState>());
+			registerState("EnemyDeath", std::make_shared<State::EnemyDeathState>());
 			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
 		}
 

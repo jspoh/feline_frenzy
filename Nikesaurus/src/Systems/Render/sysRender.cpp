@@ -114,19 +114,19 @@ namespace NIKE {
 
 			//Check for collider component
 			if (auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);  e_collider_comp.has_value()) {
-				auto const& e_collider = e_collider_comp.value().get();
-
+				// Make a copy of collider comp
+				auto e_collider = e_collider_comp.value().get();
+				e_collider.transform.position = e_transform.position + e_collider.pos_offset;
 				if (e_collider.b_collided) {
 					bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
 				}
 
 				//Calculate bounding box matrix
-				NIKE_RENDER_SERVICE->transformMatrixDebug(e_collider.transform, matrix, cam_ndcx, true);
+				NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
 				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
 			}
 			else {
 				//Calculate bounding box matrix
-				NIKE_RENDER_SERVICE->transformMatrixDebug(e_transform, matrix, cam_ndcx, true);
 				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
 			}
 
@@ -137,9 +137,9 @@ namespace NIKE {
 				if (e_velo.velocity.x != 0.0f || e_velo.velocity.y != 0.0f) {
 					Transform::Transform dir_transform = e_transform;
 					dir_transform.scale.x = 1.0f;
-					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>((180.0f / M_PI));
+					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>(180.0f / M_PI);
 					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-					NIKE_RENDER_SERVICE->transformMatrixDebug(dir_transform, matrix, cam_ndcx, false);
+					NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
 					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
 				}
 			}

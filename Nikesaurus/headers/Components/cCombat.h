@@ -25,6 +25,8 @@ namespace NIKE {
 			NEUTRAL = 0,
 			PLAYER,
 			ENEMY,
+			PLAYERBULLET,
+			ENEMYBULLET,
 		};
 
 		struct Damage {
@@ -40,13 +42,14 @@ namespace NIKE {
 			float max_health;
 			float health;
 			bool invulnerable_flag;
+			bool taken_damage;
 			//bool healthBarActive;
 
-			Health() : lives(ENEMY_LIVES), max_health(ENEMY_HEALTH), health(max_health), invulnerable_flag(false) {};
+			Health() : lives(ENEMY_LIVES), max_health(ENEMY_HEALTH), health(max_health), invulnerable_flag(false), taken_damage{false} {};
 				//, healthBarActive(false) 
 			
 			Health(int const& lives, float const& max_health, float const& health, bool const& invulnerable_flag = false)
-				: lives{ lives }, max_health {max_health}, health{ health }, invulnerable_flag{ invulnerable_flag } {};
+				: lives{ lives }, max_health {max_health}, health{ health }, invulnerable_flag{ invulnerable_flag }, taken_damage{ false } {};
 		};
 
 		struct Faction {

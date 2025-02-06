@@ -10,6 +10,7 @@
 
 #include "Components/cTransform.h"
 #include "Components/cRender.h"
+#include "Components/cAnimation.h"
 #include "sInput.h"
 #include "sEvents.h"
 #include "sSerialization.h"
@@ -87,6 +88,7 @@ namespace NIKE {
 			struct HoverData {
 				Transform::Transform btn_transform;
 				Render::Text btn_text;
+				Animation::Sprite btn_animate;
 				bool b_hovered;
 			};
 

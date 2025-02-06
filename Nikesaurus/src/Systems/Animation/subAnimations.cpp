@@ -143,6 +143,11 @@ namespace NIKE {
 			//Reset Timer
 			base_component.timer = 0.0f;
 
+			// Stops the animation from running if start index == end index
+			if (sprite_component.start_index == sprite_component.end_index && sprite_component.start_index == sprite_component.curr_index) {
+				return;
+			}
+
 			//If End Has Been Reached
 			if (sprite_component.curr_index.x >= sprite_component.end_index.x && sprite_component.curr_index.y >= sprite_component.end_index.y) {
 				//Check If Animation Is Finished

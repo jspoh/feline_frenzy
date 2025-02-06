@@ -251,6 +251,8 @@ namespace NIKE {
     void Lua::luaSceneBinds(sol::state& lua_state) {
 
         lua_state.set_function("ChangeScene", [&](std::string const& scene) {
+            // Wait for 400 miliseconds before changing the scene. (TODO, optimise if possible)
+            std::this_thread::sleep_for(std::chrono::milliseconds(400));
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene));
             });
 
@@ -543,13 +545,14 @@ namespace NIKE {
             }
             });
 
-        // Player death annimation function
+        // Player EnemyDeathState annimation function
         lua_state.set_function("CheckDeath", [&](Entity::Type entity) -> bool {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
             if (health_comp.has_value()) {
                 // When player do not have any health
                 if (health_comp.value().get().lives <= 0)
                 {
+                    NIKE_METADATA_SERVICE->destroyEntity(entity);
                     return true;
                 }
             }
@@ -588,7 +591,7 @@ namespace NIKE {
 
         // Play SFX once...
         lua_state.set_function("PlayCustomSFXOnce", [&](Entity::Type entity,
-            bool play,
+            // bool play,
             std::string custom_audio_id,
             std::string custom_channel_group_id,
             float custom_volume,

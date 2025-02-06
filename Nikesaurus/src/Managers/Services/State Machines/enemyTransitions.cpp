@@ -18,10 +18,10 @@
 namespace NIKE {
 
 	/*******************************
-	* Idle To Attack transition functions
+	* Idle To Enemy Attack transition functions
 	*****************************/
 
-	bool Transition::IdleToAttack::isValid(Entity::Type& entity) const
+	bool Transition::IdleToEnemyAttack::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
@@ -40,16 +40,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::IdleToAttack::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::IdleToEnemyAttack::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::AttackState>("Attack");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyAttackState>("EnemyAttack");
 	}
 
 	/*******************************
-	* Idle To Chase transition functions
+	* Idle To Enemy Chase State transition functions
 	*****************************/
 
-	bool Transition::IdleToChase::isValid(Entity::Type& entity) const
+	bool Transition::IdleToEnemyChase::isValid(Entity::Type& entity) const
 	{
 		// This function will check if there is a path from player to enemy entity(param)
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
@@ -76,8 +76,8 @@ namespace NIKE {
 					continue;
 				}
 
-				// If path exist, transition to chase
-				// Check conditions that would trigger transition to Chase state
+				// If path exist, transition to EnemyChaseState
+				// Check conditions that would trigger transition to EnemyChaseState state
 				// Find path for player
 				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
 
@@ -110,16 +110,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::IdleToChase::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::IdleToEnemyChase::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::ChaseState>("Chase");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyChaseState>("EnemyChase");
 	}
 
 	/*******************************
-	* Idle To Death transition functions
+	* Idle To Enemy Death State transition functions
 	*****************************/
 
-	bool Transition::IdleToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
+	bool Transition::IdleToEnemyDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
@@ -132,16 +132,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::IdleToDeath::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::IdleToEnemyDeath::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::DeathState>("Death");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyDeathState>("EnemyDeath");
 	}
 
 	/*******************************
-	* Attack To Idle transition functions
+	* Enemy Attack To Idle transition functions
 	*****************************/
 
-	bool Transition::AttackToIdle::isValid(Entity::Type& entity) const
+	bool Transition::EnemyAttackToIdle::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
@@ -159,16 +159,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::AttackToIdle::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::EnemyAttackToIdle::getNextState() const
 	{
 		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
 	}
 
 	/*******************************
-	* Attack To Chase transition functions
+	* Enemy Attack To Enemy Chase State transition functions
 	*****************************/
 
-	bool Transition::AttackToChase::isValid(Entity::Type& entity) const
+	bool Transition::EnemyAttackToEnemyChase::isValid(Entity::Type& entity) const
 	{
 		// This function will check if there is a path from player to enemy entity(param)
 				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
@@ -193,8 +193,8 @@ namespace NIKE {
 					continue;
 				}
 
-				// If path exist, transition to chase
-				// Check conditions that would trigger transition to Chase state
+				// If path exist, transition to EnemyChaseState
+				// Check conditions that would trigger transition to EnemyChaseState state
 				// Find path for player
 				if (!NIKE_MAP_SERVICE->checkPath(entity) ||
 
@@ -227,16 +227,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::AttackToChase::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::EnemyAttackToEnemyChase::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::ChaseState>("Chase");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyChaseState>("EnemyChase");
 	}
 
 	/*******************************
-	* Attack To Death transition functions
+	* Attack To Enemy Death State transition functions
 	*****************************/
 
-	bool Transition::AttackToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
+	bool Transition::EnemyAttackToEnemyDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
@@ -249,16 +249,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::AttackToDeath::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::EnemyAttackToEnemyDeath::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::DeathState>("Death");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyDeathState>("EnemyDeath");
 	}
 
 	/*******************************
-	* Chase To Attack transition functions
+	* Enemy Chase State To Attack transition functions
 	*****************************/
 
-	bool Transition::ChaseToAttack::isValid(Entity::Type& entity) const
+	bool Transition::EnemyChaseToEnemyAttack::isValid(Entity::Type& entity) const
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
@@ -276,16 +276,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::ChaseToAttack::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::EnemyChaseToEnemyAttack::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::AttackState>("Attack");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyAttackState>("EnemyAttack");
 	}
 
 	/*******************************
-	* Chase To Idle transition functions
+	* Enemy Chase State To Idle transition functions
 	*****************************/
 
-	bool Transition::ChaseToIdle::isValid(Entity::Type& entity) const
+	bool Transition::EnemyChaseToIdle::isValid(Entity::Type& entity) const
 	{
 		// This function will check if there is a path from player to enemy entity(param)
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
@@ -306,16 +306,16 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::ChaseToIdle::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::EnemyChaseToIdle::getNextState() const
 	{
 		return NIKE_FSM_SERVICE->getStateByID<State::IdleState>("Idle");
 	}
 
 	/*******************************
-	* Chase To Death transition functions
+	* Enemy Chase State To Enemy Death State transition functions
 	*****************************/
 
-	bool Transition::ChaseToDeath::isValid([[maybe_unused]] Entity::Type& entity) const
+	bool Transition::EnemyChaseToEnemyDeath::isValid([[maybe_unused]] Entity::Type& entity) const
 	{
 		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
@@ -328,8 +328,8 @@ namespace NIKE {
 		return false;
 	}
 
-	std::shared_ptr<StateMachine::Istate> Transition::ChaseToDeath::getNextState() const
+	std::shared_ptr<StateMachine::Istate> Transition::EnemyChaseToEnemyDeath::getNextState() const
 	{
-		return NIKE_FSM_SERVICE->getStateByID<State::DeathState>("Death");
+		return NIKE_FSM_SERVICE->getStateByID<State::EnemyDeathState>("EnemyDeath");
 	}
 }

@@ -121,8 +121,8 @@ namespace NIKE {
 				//Transform matrix
 				void transformMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, const Vector2b& flip = { false, false });
 
-				//Transform matrix debug
-				void transformMatrixDebug(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat, bool render_wireframe);
+				//Transform direction matrix 
+				void transformDirectionMatrix(Transform::Transform const& obj, Matrix_33& x_form, Matrix_33 world_to_ndc_mat);
 
 				/*****************************************************************//**
 				* DRAW CALLS
