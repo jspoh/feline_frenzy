@@ -55,6 +55,13 @@ NSPM::Manager() {
 
 NSPM::~Manager() {
 	active_particle_systems.clear();
+
+	for (auto& [preset, vao] : vao_map) {
+		glDeleteVertexArrays(1, &vao);
+	}
+	for (auto& [preset, vbo] : vbo_map) {
+		glDeleteBuffers(1, &vbo);
+	}
 }
 
 
