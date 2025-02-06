@@ -557,23 +557,18 @@ namespace NIKE {
 
                 // Temporary method to store static map for health (TODO, remove after optimising another way)
                 auto& health = health_comp.value().get();
-                static std::unordered_map<Entity::Type, float> previousHealthMap;
 
-                // If this entity hasn't been tracked yet, initialize its previous health.
-                if (previousHealthMap.find(entity) == previousHealthMap.end()) {
-                    previousHealthMap[entity] = health.health;
-                }
-                float prevHealth = previousHealthMap[entity];
-                // Check if the health has decreased (damage taken)
+                // Note static
+                static float prevHealth = health.health;
+
+                // If health has decreased, play the damage-taken SFX and update prevHealth.
                 if (health.health < prevHealth) {
-                    // Play damage SFX (adjust filename as desired)
                     Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
-                    // Update stored health to the new lower value.
-                    previousHealthMap[entity] = health.health;
+                    prevHealth = health.health;
                 }
-                // If health has increased (healing), update the stored value.
-                else if (health.health > prevHealth) {
-                    previousHealthMap[entity] = health.health;
+                else {
+                    // If health has increased (e.g., healing) update prevHealth.
+                    prevHealth = health.health;
                 }
 
                 // When player do not have any health
