@@ -22,8 +22,8 @@
 
 namespace NIKE {
 	namespace SysParticle {
-		constexpr int MAX_GLOBAL_ACTIVE_PARTICLES = 10000;
-		constexpr int MAX_ACTIVE_PARTICLE_SYSTEMS = 10;
+		constexpr int MAX_GLOBAL_ACTIVE_PARTICLES = 100000;
+		constexpr int MAX_ACTIVE_PARTICLE_SYSTEMS = 20;
 		constexpr int MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES = MAX_GLOBAL_ACTIVE_PARTICLES / MAX_ACTIVE_PARTICLE_SYSTEMS;
 
 		class Data {
