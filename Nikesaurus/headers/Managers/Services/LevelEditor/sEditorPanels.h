@@ -751,6 +751,9 @@ namespace NIKE {
 			//Reference to game window panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
+			//Reference to main panel
+			std::weak_ptr<MainPanel> main_panel;
+
 		public:
 			TileMapPanel() : grid_thickness{ 1.0f }, grid_color{ 1.0f, 1.0f, 1.0f, 1.0f }, b_grid_edit{ false }, b_snap_to_grid{ false } {}
 			~TileMapPanel() = default;

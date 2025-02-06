@@ -38,8 +38,7 @@ namespace NIKE {
 
         //Hashing function
         auto hash = [](int x, int y) {
-            //Using common hashing multipliers
-            return (x * 73856093) ^ (y * 19349663);
+            return std::hash<int>()(x) ^ (std::hash<int>()(y) << 1);
             };
 
         //Iteration every fixed step for fixed delta time
