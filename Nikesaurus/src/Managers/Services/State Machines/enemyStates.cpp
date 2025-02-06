@@ -394,31 +394,17 @@ namespace NIKE {
 
 	void State::EnemyDeathState::playSFX(Entity::Type& entity, bool play_or_no)
 	{
-		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-		if (e_sfx_comp.has_value()) {
-			auto& e_sfx = e_sfx_comp.value().get();
+		if (play_or_no) {
+			// Temporary hardcoded SFX
+			Interaction::playOneShotSFX(entity, "EnemyDeath1.wav", "EnemySFX", 1.0f, 1.0f);
 
-			//Check if group exists
-			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
-			e_sfx.audio_id = "EnemyDeathSound2.wav";
-			
-			if (!group) {
-				e_sfx.b_play_sfx = play_or_no;
-				return;
+			// Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
+			float secondsToDelay = 0.5f;
+			float currentDelay = 0.0f;
+			while (currentDelay < secondsToDelay) {
+				currentDelay += NIKE_WINDOWS_SERVICE->getDeltaTime();
 			}
-			else {
-				//Play sound
-				if (play_or_no && !group->isPlaying()) {
-					e_sfx.b_play_sfx = play_or_no;
-					return;
-				}
-			}
-
-			//stop sfx
-			if (!play_or_no) {
-				group->stop();
-			}
-		}
+		}	
 	}
 
 	/*******************************

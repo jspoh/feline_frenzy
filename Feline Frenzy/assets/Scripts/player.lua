@@ -244,18 +244,16 @@ function Player:update(args)
     Player:Animate(entity, args)
     Player:Shoot(entity)
 
-            -- Handle death stuff
+    -- Handle death stuff
     CheckDeath(entity)
-        -- Play a custom death SFX once:
-        -- PlayCustomSFXOnce(entity, true, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0, 1.0)
-        -- Change state to Death
-        -- SetState(entity, "Death")
-        -- AnimationStart(entity, 0, 12)
-        -- AnimationEnd(entity, 1, 12)
-        -- FlipX(entity, false)
-        --if AnimationCompleted(entity) >= 1 then
-        --    KillEntity(entity)
-       -- end
+    -- Change state to Death
+    SetState(entity, "Death")
+    AnimationStart(entity, 0, 12)
+    AnimationEnd(entity, 1, 12)
+    FlipX(entity, false)
+    if AnimationCompleted(entity) >= 1 then
+        KillEntity(entity)
+    end
 end
 
 -- Return player object
