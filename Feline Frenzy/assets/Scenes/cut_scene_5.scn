@@ -93,6 +93,89 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
+                                    "x": 5,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Start_Index": {
+                                    "x": 1,
+                                    "y": 0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.8676470518112183,
+                                    "y": 0.8049019575119019,
+                                    "z": 1.149999976158142
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 1.0058999061584473,
+                                "Size": {
+                                    "x": 100.58999633789063,
+                                    "y": 37.21829605102539
+                                },
+                                "Text": "Next"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 7.2481689453125,
+                                    "y": -409.1751708984375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 201.17999267578125,
+                                    "y": 82.42499542236328
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 0,
+                            "Name": "next_button",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Function": "Change",
+                                "Named_Args": {
+                                    "scene": "cut_scene_6.scn"
+                                },
+                                "Script_ID": "ChangeScene.lua"
+                            }
+                        },
+                        "UI ID": "next_button"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.0
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
                                     "x": 0,
                                     "y": 0
                                 },
@@ -123,22 +206,22 @@
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 0.9580000042915344,
+                                "Scale": 0.9312500357627869,
                                 "Size": {
-                                    "x": 95.80000305175781,
-                                    "y": 35.44599914550781
+                                    "x": 96.8499984741211,
+                                    "y": 35.38750076293945
                                 },
-                                "Text": "Next"
+                                "Text": "Back"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 7.2481689453125,
-                                    "y": -409.1751708984375
+                                    "x": -739.0728759765625,
+                                    "y": 417.8553466796875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 191.60000610351563,
-                                    "y": 78.5
+                                    "x": 193.6999969482422,
+                                    "y": 141.5
                                 },
                                 "Screen Position": false
                             }
@@ -146,8 +229,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 0,
-                            "Name": "next_button",
+                            "Layer_Order": 1,
+                            "Name": "back_button",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -157,12 +240,12 @@
                             "Script": {
                                 "Function": "Change",
                                 "Named_Args": {
-                                    "scene": "lvl1Copy.scn"
+                                    "scene": "cut_scene_4.scn"
                                 },
                                 "Script_ID": "ChangeScene.lua"
                             }
                         },
-                        "UI ID": "next_button"
+                        "UI ID": "back_button"
                     }
                 }
             ],
