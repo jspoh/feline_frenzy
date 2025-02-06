@@ -57,13 +57,13 @@
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 1631.5250244140625,
-                                    "y": 917.7327880859375
+                                    "y": 917.7328491210938
                                 },
                                 "Screen Position": true
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "cut_scene_png",
@@ -187,6 +187,172 @@
                             }
                         },
                         "UI ID": "next_button"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.0
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.7176470756530762,
+                                    "y": 0.6549019813537598,
+                                    "z": 1.0
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 0.7975961565971375,
+                                "Size": {
+                                    "x": 82.94999694824219,
+                                    "y": 30.30865478515625
+                                },
+                                "Text": "Back"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -733.7400512695313,
+                                    "y": 411.7725524902344
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 165.89999389648438,
+                                    "y": 71.30000305175781
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "back_button",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Function": "Change",
+                                "Named_Args": {
+                                    "scene": "main_menu.scn"
+                                },
+                                "Script_ID": "ChangeScene.lua"
+                            }
+                        },
+                        "UI ID": "back_button"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.0
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.7176470756530762,
+                                    "y": 0.6549019813537598,
+                                    "z": 1.0
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 0.9660493731498718,
+                                "Size": {
+                                    "x": 78.25,
+                                    "y": 37.675926208496094
+                                },
+                                "Text": "Skip"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 725.4962158203125,
+                                    "y": 352.86859130859375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 156.5,
+                                    "y": 100.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 2,
+                            "Name": "skip_button",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Function": "Change",
+                                "Named_Args": {
+                                    "scene": "lvl1Copy.scn"
+                                },
+                                "Script_ID": "ChangeScene.lua"
+                            }
+                        },
+                        "UI ID": "skip_button"
                     }
                 }
             ],
