@@ -64,7 +64,7 @@ namespace NIKE {
 		Entity::Type drop_entity = NIKE_ECS_MANAGER->createEntity();
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(drop_entity, NIKE_ASSETS_SERVICE->getAssetPath("healthDrop.prefab").string());
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(drop_entity, "healthDrop.prefab");
 
 		// Set health drop location
 		auto drop_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(drop_entity);

@@ -537,7 +537,7 @@ namespace NIKE {
         //Spawn enemy function
         lua_state.set_function("Spawn Enemy", [&](float x, float y) {
             Entity::Type entity = NIKE_ECS_MANAGER->createEntity();
-            NIKE_SERIALIZE_SERVICE->loadEntityFromFile(entity, NIKE_ASSETS_SERVICE->getAssetPath("enemy.prefab").string());
+            NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, "enemy.prefab");
             auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (e_trans_comp.has_value()) {
                 e_trans_comp.value().get().position.x = x;

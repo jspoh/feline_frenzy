@@ -85,7 +85,7 @@ namespace NIKE {
 							NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
 							return;
 						}
-
+						
 						const auto& player_pos = e_player_transform.value().get().position;
 						const auto& player_scale = e_player_transform.value().get().scale;
 						auto& healthbar_pos = e_healthbar_transform.value().get().position;
@@ -93,13 +93,12 @@ namespace NIKE {
 						const float offset_y = player_scale.y*0.9f;
 
 						// Set healthbar to player health
-						healthbar_scale.x = (e_player_health.value().get().health / e_player_health.value().get().max_health) * 150.0f;
+						healthbar_scale.x = (e_player_health.value().get().health / e_player_health.value().get().max_health) * 300.0f;
 						
-
 						// Update healthbar location
 						// !TODO: Offset the healthbar to the left
-						healthbar_pos.x = player_pos.x;
-						healthbar_pos.y = player_pos.y + offset_y * 0.8f;
+						//healthbar_pos.x = player_pos.x;
+						//healthbar_pos.y = player_pos.y + offset_y * 0.8f;
 					}
 				}
 
@@ -123,7 +122,7 @@ namespace NIKE {
 
 		// Load entity from prefab
 		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(enemy_entity, NIKE_ASSETS_SERVICE->getAssetPath(chosen_enemy).string());
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
 
 		// When enemy spwan from spawner, set the tag to enemy
 		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){

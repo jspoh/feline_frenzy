@@ -186,12 +186,12 @@ namespace NIKE {
 		// Load entity from prefab
 		if (e_element_comp.has_value()) {
 			// Shoot elemental bullet
-			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath(Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]).string());
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]);
 		}
 		else {
 			// Missing Element Comp
 			NIKEE_CORE_WARN("shootBullet: ENEMY missing Elemental Component");
-			NIKE_SERIALIZE_SERVICE->loadEntityFromFile(bullet_entity, NIKE_ASSETS_SERVICE->getAssetPath("bullet.prefab").string());
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, "bullet.prefab");
 		}
 		// Calculate direction for bullet (Enemy Pos - Player Pos)
 		Vector2f direction = player_pos - enemy_pos;
