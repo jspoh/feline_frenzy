@@ -1899,6 +1899,16 @@
                                     "z": 0.0
                                 },
                                 "particle_color_is_random": false,
+                                "particle_final_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_final_size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
                                 "particle_lifespan": 0.0,
                                 "particle_rand_height_range": {
                                     "x": 0.0,
@@ -1917,6 +1927,7 @@
                                     "y": 0.0
                                 },
                                 "particle_rotation": 0.0,
+                                "particle_rotation_speed": 0.0,
                                 "particle_vector_x_range": {
                                     "x": 0.0,
                                     "y": 0.0

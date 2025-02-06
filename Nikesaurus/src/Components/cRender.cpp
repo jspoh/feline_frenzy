@@ -33,6 +33,7 @@ namespace NIKE {
 					{ "render_type", static_cast<int>(comp.render_type) },
 					{ "offset", comp.offset.toJson() },
 					{ "duration", comp.duration },
+
 					{ "num_new_particles_per_second", comp.num_new_particles_per_second },
 					{ "particle_lifespan", comp.particle_lifespan },
 					{ "particle_acceleration", comp.particle_acceleration },
@@ -47,6 +48,9 @@ namespace NIKE {
 					{ "particle_rand_width_range", comp.particle_rand_width_range.toJson()},
 					{ "particle_rand_height_range", comp.particle_rand_height_range.toJson()},
 
+					{ "particle_final_size", comp.particle_final_size.toJson()},
+					{ "particle_final_color", comp.particle_final_color.toJson()},
+					{ "particle_rotation_speed", comp.particle_rotation_speed }
 
 					//{ "ref", comp.ref }
 				};
@@ -74,6 +78,10 @@ namespace NIKE {
 				comp.particle_rotation = data.at("particle_rotation").get<float>();
 				comp.particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
 				comp.particle_rand_height_range.fromJson(data.at("particle_rand_height_range"));
+
+				comp.particle_final_size.fromJson(data.at("particle_final_size"));
+				comp.particle_final_color.fromJson(data.at("particle_final_color"));
+				comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
 
 				// add particle system
 				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
@@ -138,6 +146,16 @@ namespace NIKE {
 					delta["particle_rand_height_range"] = comp.particle_rand_height_range.toJson();
 				}
 
+				if (comp.particle_final_size != other_comp.particle_final_size) {
+					delta["particle_final_size"] = comp.particle_final_size.toJson();
+				}
+				if (comp.particle_final_color != other_comp.particle_final_color) {
+					delta["particle_final_color"] = comp.particle_final_color.toJson();
+				}
+				if (comp.particle_rotation_speed != other_comp.particle_rotation_speed) {
+					delta["particle_rotation_speed"] = comp.particle_rotation_speed;
+				}
+
 				return delta;
 			},
 			// Override Deserialize
@@ -196,6 +214,16 @@ namespace NIKE {
 				}
 				if (delta.contains("particle_rand_height_range")) {
 					comp.particle_rand_height_range.fromJson(delta["particle_rand_height_range"]);
+				}
+
+				if (delta.contains("particle_final_size")) {
+					comp.particle_final_size.fromJson(delta["particle_final_size"]);
+				}
+				if (delta.contains("particle_final_color")) {
+					comp.particle_final_color.fromJson(delta["particle_final_color"]);
+				}
+				if (delta.contains("particle_rotation_speed")) {
+					comp.particle_rotation_speed = delta["particle_rotation_speed"];
 				}
 
 				// add particle system
@@ -599,6 +627,27 @@ namespace NIKE {
 					// Particle Rotation
 					ImGui::Text("Particle Rotation:");
 					ImGui::DragFloat("##Particle Rotation", &comp.particle_rotation, 0.1f, 0.f, 359.9f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					ImGui::Spacing();
+					ImGui::Text("Particle behaviour over time");
+					ImGui::Spacing();
+
+					// Particle Final Size
+					ImGui::Text("Particle Final Size:");
+					ImGui::DragFloat2("##Particle Final Size", &comp.particle_final_size.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::SameLine();
+					ImGui::DragFloat2("##Particle Final Size", &comp.particle_final_size.y, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					// Particle Final Color
+					ImGui::Text("Particle Final Color:");
+					static float particle_final_color[4] = { comp.particle_final_color.x, comp.particle_final_color.y, comp.particle_final_color.z, comp.particle_final_color.w };
+					if (ImGui::ColorPicker4("##Particle Final Color", particle_final_color, ImGuiColorEditFlags_AlphaBar)) {
+						comp.particle_final_color = { particle_final_color[0], particle_final_color[1], particle_final_color[2], particle_final_color[3] };
+					}
+
+					// Particle rotation speed
+					ImGui::Text("Particle Rotation Speed(degrees anticlockwise / second):");
+					ImGui::DragFloat("##Particle Rotation Speed", &comp.particle_rotation_speed, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 
 					// advanced options (for programmatic usage only)
 

@@ -132,6 +132,11 @@ namespace NIKE {
 			float particle_rotation{};
 			Vector2f particle_rand_width_range{};
 			Vector2f particle_rand_height_range{};
+
+			// particle behaviour over time
+			Vector2f particle_final_size{};
+			Vector4f particle_final_color{};
+			float particle_rotation_speed{};		// in degrees (anticlockwise) per second !NOTE: rmb to convert to radians lol
 		};
 
 		void registerComponents();
