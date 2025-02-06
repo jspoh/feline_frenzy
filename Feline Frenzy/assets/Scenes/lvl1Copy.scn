@@ -181,15 +181,6 @@
                                     "y": 0
                                 }
                             },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "preset": 2,
-                                "render_type": 1
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -939,15 +930,6 @@
                                 },
                                 "Zoom": 1.285545825958252
                             },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 64.30000305175781
-                                },
-                                "preset": 2,
-                                "render_type": 1
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -1362,15 +1344,6 @@
                                         "invulnerable_flag": false
                                     },
                                     "Physics::Collider": null,
-                                    "Render::ParticleEmitter": {
-                                        "duration": -1.0,
-                                        "offset": {
-                                            "x": 0.0,
-                                            "y": 0.0
-                                        },
-                                        "preset": 1,
-                                        "render_type": 1
-                                    },
                                     "Render::Texture": {
                                         "Color": {
                                             "w": 1.0,
@@ -1382,7 +1355,12 @@
                                     "State::State": {
                                         "State": "Idle"
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -277.64605712890625,
+                                            "y": 220.67849731445313
+                                        }
+                                    }
                                 },
                                 "MetaData": {
                                     "Tags": [
@@ -1411,15 +1389,6 @@
                                             "x": -720.812255859375,
                                             "y": 33.9788818359375
                                         }
-                                    },
-                                    "Render::ParticleEmitter": {
-                                        "duration": -1.0,
-                                        "offset": {
-                                            "x": 0.0,
-                                            "y": 0.0
-                                        },
-                                        "preset": 0,
-                                        "render_type": 1
                                     },
                                     "Render::Texture": {
                                         "Color": {
