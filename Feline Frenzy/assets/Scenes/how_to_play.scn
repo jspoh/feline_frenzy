@@ -270,7 +270,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "UI_Back_Spritesheet.png"
+                                "Texture_ID": "UI_Back_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -279,8 +279,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 217.64651489257813,
-                                    "y": 87.05860900878906
+                                    "x": 217.6465606689453,
+                                    "y": 87.05862426757813
                                 },
                                 "Screen Position": true
                             }

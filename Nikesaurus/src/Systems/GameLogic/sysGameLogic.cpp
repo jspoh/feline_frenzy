@@ -75,7 +75,13 @@ namespace NIKE {
 
 				// Check if player tag exists
 				std::set<Entity::Type> playerEntities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
-
+				for (auto& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
+					// If no player exists, destroy the health bar
+					if (playerEntities.empty()) {
+						NIKE_ECS_MANAGER->destroyEntity(hp_container);
+						continue;
+					}
+				}
 				// Health bar logic
 				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
 					// If no player exists, destroy the health bar
@@ -98,17 +104,29 @@ namespace NIKE {
 
 						//const auto& player_pos = e_player_transform.value().get().position;
 						//const auto& player_scale = e_player_transform.value().get().scale;
-						//auto& healthbar_pos = e_healthbar_transform.value().get().position;
+						auto& healthbar_pos = e_healthbar_transform.value().get().position;
 						auto& healthbar_scale = e_healthbar_transform.value().get().scale;
 						//const float offset_y = player_scale.y * 0.9f;
 
 						// Set healthbar to player health
-						healthbar_scale.x = (e_player_health.value().get().health / e_player_health.value().get().max_health) * 300.0f;
-
+			
 						// Update healthbar location
 						// !TODO: Offset the healthbar to the left
 						//healthbar_pos.x = player_pos.x;
 						//healthbar_pos.y = player_pos.y + offset_y * 0.8f;
+
+						// Constants
+						static float original_healthbar_width = healthbar_scale.x;
+						static float original_healthbar_x = healthbar_pos.x;  // Store original X position once
+
+						// Get health percentage
+						float health_percentage = e_player_health.value().get().health / e_player_health.value().get().max_health;
+
+						// Update health bar scale
+						healthbar_scale.x = health_percentage * original_healthbar_width;
+
+						// Offset the health bar so it shrinks from right to left
+						healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
 					}
 				}
 
