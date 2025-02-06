@@ -57,6 +57,7 @@ namespace NIKE {
 	void Events::Service::windowfocus_cb([[maybe_unused]] GLFWwindow* window, int focused) {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Windows::WindowFocusEvent>(focused));
 	}
+
 	void Events::Service::dropfile_cb([[maybe_unused]] GLFWwindow* window, int count, const char** paths) {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Assets::FileDropEvent>(count, paths));
 	}

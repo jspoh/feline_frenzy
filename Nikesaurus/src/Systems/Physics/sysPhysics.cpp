@@ -37,8 +37,8 @@ namespace NIKE {
         auto const& layers = NIKE_SCENES_SERVICE->getLayers();
 
         //Hashing function
-        auto hash = [](int x, int y) {
-            return std::hash<int>()(x) ^ (std::hash<int>()(y) << 1);
+        auto hash = [](int x, int y) -> int {
+            return static_cast<int>(std::hash<int>()(x) ^ (std::hash<int>()(y) << 1));
             };
 
         //Iteration every fixed step for fixed delta time

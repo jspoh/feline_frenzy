@@ -72,7 +72,7 @@ namespace NIKE {
 		glfwWindowHint(GLFW_DEPTH_BITS, 24);
 		glfwWindowHint(GLFW_RED_BITS, 8); glfwWindowHint(GLFW_GREEN_BITS, 8);
 		glfwWindowHint(GLFW_BLUE_BITS, 8); glfwWindowHint(GLFW_ALPHA_BITS, 8);
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // window dimensions are static
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // window dimensions are static
 
 		//Create window
 		ptr_window = glfwCreateWindow(static_cast<int>(window_size.x), static_cast<int>(window_size.y), window_title.c_str(), nullptr, nullptr);

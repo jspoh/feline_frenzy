@@ -78,6 +78,9 @@ namespace NIKE {
 
 			//Register default assets
 			void registerDefSystems();
+
+			//Engine update logic
+			void updateLogic();
 		public:
 
 			/**

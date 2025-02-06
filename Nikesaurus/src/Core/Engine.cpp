@@ -284,22 +284,59 @@ namespace NIKE {
 		// default startup to fullscreen (M3 1931)
 		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 #endif
-	}
 
-	void Core::Engine::run() {
-		// !TODO: remove this, hardcoding for installer
-		// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
-
-		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
-
-		using namespace NIKE::SysParticle;
-		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("ps1", Data::ParticlePresets::CLUSTER, {window_size.x / 2.f, window_size.y / 2.f}, Data::ParticleRenderType::CIRCLE, -1.f, false);
 #ifndef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #endif 
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #endif
+	}
+
+	void Core::Engine::updateLogic() {
+
+		//Calculate Delta Time
+		NIKE_WINDOWS_SERVICE->calculateDeltaTime();
+
+		//Update all systems ( Always update systems before any other services )
+		NIKE_ECS_MANAGER->updateSystems();
+
+		//Update meta data
+		NIKE_METADATA_SERVICE->update();
+
+		//Update scenes manager
+		NIKE_SCENES_SERVICE->update();
+
+		//Update map grid
+		NIKE_MAP_SERVICE->gridUpdate();
+
+		//Update all audio pending actions
+		NIKE_AUDIO_SERVICE->getAudioSystem()->update();
+
+#ifndef NDEBUG
+		//Update & Render Level Editor
+		NIKE_LVLEDITOR_SERVICE->updateAndRender();
+#endif
+
+		//update UI First
+		NIKE_UI_SERVICE->update();
+
+		//Swap Buffers
+		NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
+
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Core::Engine::run() {
+
+		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		using namespace NIKE::SysParticle;
+		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("ps1", Data::ParticlePresets::CLUSTER, {window_size.x / 2.f, window_size.y / 2.f}, Data::ParticleRenderType::CIRCLE, -1.f, false);
+
 		//NIKE::Render::Manager::addEntity();
 		//constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
 		//Entity::Type FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity(0);
@@ -312,63 +349,106 @@ namespace NIKE {
 		std::vector<float> fps_history;
 		fps_history.reserve(300);		// unlikely to exceed 300fps
 		float elapsed_time = 0.f;
+
+		//Update loop
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
-#ifdef NDEBUG
-			try {
-#endif
-				// have to poll events regardless of focus
-				//Poll system events
-				NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
+			// have to poll events regardless of focus
+			//Poll system events
+			NIKE_WINDOWS_SERVICE->getWindow()->pollEvents();
 
-				//Skip update when window is out of focus
-				if (!NIKE_WINDOWS_SERVICE->getWindowFocus()) {
-					continue;
+			//Skip update when window is out of focus
+			if (!NIKE_WINDOWS_SERVICE->getWindowFocus()) {
+				continue;
+			}
+
+			//Escape Key
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				if (NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen()) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
 				}
-
-				//Escape Key
-				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				else {
 					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 				}
+			}
 
-				//Toggle full screen
-				if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
-					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			//Toggle full screen
+			if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
+				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
+			}
+
+			//Check if game is full screened
+			if (NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen()) {
+				try {
+					//Implement update logic
+					updateLogic();
+
+					// update rendered fps
+					static std::unordered_map<std::string, std::shared_ptr<void>> comps;
+					static Render::Text* comp = nullptr;
+
+					elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+					comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+					comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+					if (comp) {
+						// toggle fps display
+						if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1)) {
+							if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY)) {
+								NIKE_ECS_MANAGER->removeEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY);
+							}
+							else {
+								NIKE_ECS_MANAGER->addEntityComponent<Render::Hidden>(FPS_DISPLAY_ENTITY, {});
+							}
+						}
+
+						// calculatee fps
+						fps_history.push_back(NIKE_WINDOWS_SERVICE->getCurrentFPS());
+						if (elapsed_time < 1.f) {		// only update fps with average every n second
+							continue;			// CONTINUE CALL HERE. SO IF ANYTHING IS ADDED AFTER THIS, THIS MUST BE EDITED
+						}
+
+						elapsed_time = 0.f;
+						float sum_fps = 0;
+						std::for_each(fps_history.begin(), fps_history.end(), [&sum_fps](float& fps) { sum_fps += fps; });
+						const float avg_fps = sum_fps / fps_history.size();
+						fps_history.clear();
+
+						// update fps text
+						comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+						comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+						ss << "FPS: " << std::round(avg_fps);
+						comp->text = ss.str();
+						ss.str("");
+						ss.clear();
+					}
+					else {
+						// initialization of fps text
+						constexpr const char* FPS_DISPLAY_NAME = "FPS Display";
+						FPS_DISPLAY_ENTITY = NIKE_ECS_MANAGER->createEntity();
+
+						NIKE_METADATA_SERVICE->setEntityName(FPS_DISPLAY_ENTITY, FPS_DISPLAY_NAME);
+						NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(FPS_DISPLAY_ENTITY, Transform::Transform({ 600.f, 420.f }, { 600.f, 150.f }, 0.f, true));
+						NIKE_ECS_MANAGER->addEntityComponent<Render::Text>(FPS_DISPLAY_ENTITY, Render::Text("Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f));
+						NIKE_ECS_MANAGER->addEntityComponent<Render::BuiltIn>(FPS_DISPLAY_ENTITY, { });
+
+						comps = NIKE_ECS_MANAGER->getAllEntityComponents(FPS_DISPLAY_ENTITY);
+						comp = reinterpret_cast<Render::Text*>(comps["Render::Text"].get());
+						comp->origin = Render::TextOrigin::LEFT;
+					}
+
+					frame_count++;
+
 				}
-
-				//Calculate Delta Time
-				NIKE_WINDOWS_SERVICE->calculateDeltaTime();
-
-				//Update all systems ( Always update systems before any other services )
-				NIKE_ECS_MANAGER->updateSystems();
-
-				//Update meta data
-				NIKE_METADATA_SERVICE->update();
-
-				//Update scenes manager
-				NIKE_SCENES_SERVICE->update();
-
-				//Update map grid
-				NIKE_MAP_SERVICE->gridUpdate();
-
-				//Update all audio pending actions
-				NIKE_AUDIO_SERVICE->getAudioSystem()->update();
-
-#ifndef NDEBUG
-				//Update & Render Level Editor
-				NIKE_LVLEDITOR_SERVICE->updateAndRender();
-#endif
-
-				//update UI First
-				NIKE_UI_SERVICE->update();
-
-				//Swap Buffers
-				NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
-
-				GLenum err = glGetError();
-				if (err != GL_NO_ERROR) {
-					NIKEE_CORE_ERROR("OpenGL error after call to swapBuffers in {0}: {1}", __FUNCTION__, err);
+				catch (std::runtime_error const& e) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
+					NIKEE_CORE_ERROR("Error caught: {}", e.what());
+					break;
 				}
+			}
+			else {
+				//Implement update logic
+				updateLogic();
 
 				// update rendered fps
 				static std::unordered_map<std::string, std::shared_ptr<void>> comps;
@@ -425,15 +505,7 @@ namespace NIKE {
 				}
 
 				frame_count++;
-
-#ifdef NDEBUG
 			}
-			catch (std::runtime_error const& e) {
-				NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-				NIKEE_CORE_ERROR("Error caught: {}", e.what());
-				break;
-			}
-#endif
 		}
 
 		//Stop watching all directories

@@ -24,39 +24,27 @@ namespace NIKE {
 			//Serialize
 			[](Animation::Base const& comp) -> nlohmann::json {
 				return	{
-						{ "Mode", static_cast<int>(comp.animation_mode) },
 						{ "Animation_Count", comp.animations_to_complete },
-						{ "Completed_Animations", comp.completed_animations },
 						{ "B_PingPong", comp.b_pingpong },
 						{ "B_Reverse", comp.b_reverse },
-						{ "Frame_Duration", comp.frame_duration },
-						{ "Timer", comp.timer }
+						{ "Frame_Duration", comp.frame_duration }
 				};
 			},
 
 			//Deserialize
 			[](Animation::Base& comp, nlohmann::json const& data) {
-				comp.animation_mode = static_cast<Mode>(data.value("Mode", 0));
 				comp.animations_to_complete = data.value("Animation_Count", 0);
-				comp.completed_animations = data.value("Completed_Animations", 0);
 				comp.b_pingpong = data.value("B_PingPong", false);
 				comp.b_reverse = data.value("B_Reverse", false);
 				comp.frame_duration = data.value("Frame_Duration", 0.0f);
-				comp.timer = data.value("Timer", 0.0f);
 			},
 
 			// Override Serialize
 			[](Animation::Base const& comp, Animation::Base const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
 
-				if (comp.animation_mode != other_comp.animation_mode) {
-					delta["Mode"] = static_cast<int>(comp.animation_mode);
-				}
 				if (comp.animations_to_complete != other_comp.animations_to_complete) {
 					delta["Animation_Count"] = comp.animations_to_complete;
-				}
-				if (comp.completed_animations != other_comp.completed_animations) {
-					delta["Completed_Animations"] = comp.completed_animations;
 				}
 				if (comp.b_pingpong != other_comp.b_pingpong) {
 					delta["B_PingPong"] = comp.b_pingpong;
@@ -76,14 +64,8 @@ namespace NIKE {
 
 			// Override Deserialize
 			[](Animation::Base& comp, nlohmann::json const& delta) {
-				if (delta.contains("Mode")) {
-					comp.animation_mode = static_cast<Mode>(delta["Mode"]);
-				}
 				if (delta.contains("Animation_Count")) {
 					comp.animations_to_complete = delta["Animation_Count"];
-				}
-				if (delta.contains("Completed_Animations")) {
-					comp.completed_animations = delta["Completed_Animations"];
 				}
 				if (delta.contains("B_PingPong")) {
 					comp.b_pingpong = delta["B_PingPong"];
@@ -93,9 +75,6 @@ namespace NIKE {
 				}
 				if (delta.contains("Frame_Duration")) {
 					comp.frame_duration = delta["Frame_Duration"];
-				}
-				if (delta.contains("Timer")) {
-					comp.timer = delta["Timer"];
 				}
 			}
 		);
@@ -111,7 +90,6 @@ namespace NIKE {
 						{ "Sheet_Size", comp.sheet_size.toJson() },
 						{ "Start_Index", comp.start_index.toJson() },
 						{ "End_Index", comp.end_index.toJson() },
-						{ "Curr_Index", comp.curr_index.toJson() }
 				};
 			},
 
@@ -120,7 +98,6 @@ namespace NIKE {
 				comp.sheet_size.fromJson(data.value("Sheet_Size", Vector2f::def_json));
 				comp.start_index.fromJson(data.value("Start_Index", Vector2f::def_json));
 				comp.end_index.fromJson(data.value("End_Index", Vector2f::def_json));
-				comp.curr_index.fromJson(data.value("Curr_Index", Vector2f::def_json));
 			}, 
 
 			// Override Serialize
@@ -136,9 +113,6 @@ namespace NIKE {
 				if (comp.end_index != other_comp.end_index) {
 					delta["End_Index"] = comp.end_index.toJson();
 				}
-				if (comp.curr_index != other_comp.curr_index) {
-					delta["Curr_Index"] = comp.curr_index.toJson();
-				}
 
 				return delta;
 			},
@@ -153,9 +127,6 @@ namespace NIKE {
 				}
 				if (delta.contains("End_Index")) {
 					comp.end_index.fromJson(delta["End_Index"]);
-				}
-				if (delta.contains("Curr_Index")) {
-					comp.curr_index.fromJson(delta["Curr_Index"]);
 				}
 			}
 		);
@@ -238,9 +209,8 @@ namespace NIKE {
 					}
 				}
 
-				ImGui::Text("Animation timer: %f", &comp.timer);
+				ImGui::Text("Animation timer: %f", comp.timer);
 				ImGui::Text("Completed Animations: %d", comp.completed_animations);
-
 
 				// For Animtation settings
 				{
