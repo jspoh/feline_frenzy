@@ -5174,6 +5174,7 @@ namespace NIKE {
 	*********************************************************************/
 	void LevelEditor::TileMapPanel::init() {
 		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 		registerPopUp("Save Grid", saveGridPopUp("Save Grid"));
 		error_msg = std::make_shared<std::string>("Saving Error, Please load a scene first before saving!");
 		success_msg = std::make_shared<std::string>("Saving Success");
@@ -5185,7 +5186,7 @@ namespace NIKE {
 		//Clicking to set map cells to blocked
 		auto game_window = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
 		auto wrapped_cell = NIKE_MAP_SERVICE->getCursorCell();
-		if (!checkPopUpShowing() && b_grid_edit && game_window->isMouseInWindow() && wrapped_cell.has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
+		if (!checkPopUpShowing() && !main_panel.lock()->getGameState() && b_grid_edit && game_window->isMouseInWindow() && wrapped_cell.has_value() && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Left]) {
 
 			//Set cell to blocked
 			auto& cell = wrapped_cell.value().get();
