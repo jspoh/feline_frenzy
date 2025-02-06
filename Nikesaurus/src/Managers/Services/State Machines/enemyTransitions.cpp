@@ -384,12 +384,12 @@ namespace NIKE {
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-			auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(other_entity);
+			auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
 			if (e_player_comp.has_value() && health_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (Enemy::withinRange(entity, other_entity)) {
+				if (Enemy::withinRange(entity, other_entity) && !health_comp.value().get().taken_damage) {
 					return true;
 				}
 			}
@@ -483,7 +483,7 @@ namespace NIKE {
 		const auto faction_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
 		if (target_health_comp.has_value() && faction_comp.has_value())
 		{
-			if (target_health_comp.value().get().lives <= 0 && !target_health_comp.value().get().taken_damage) {
+			if (target_health_comp.value().get().lives <= 0) {
 				return true;
 			}
 		}

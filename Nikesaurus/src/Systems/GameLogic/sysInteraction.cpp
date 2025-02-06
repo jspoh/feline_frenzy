@@ -314,9 +314,27 @@ namespace NIKE {
             auto& target_health = target_health_comp.value().get();
             auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
+            // Check if target is in HurtState
+            auto state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(target);
+            if (state_comp.has_value()) {
+                auto& state = state_comp.value().get();
+                auto current_state = state.current_state.lock();
+
+                // If entity is already in HurtState, skip damage application
+                if (current_state == NIKE_FSM_SERVICE->getStateByID("EnemyHurt")) {
+                    return;  // Skip applying damage if in HurtState
+                }
+            }
+
             // Check invulnerability flag
             if (target_health.invulnerable_flag) {
                 return; // Skip damage
+            }
+
+            // When target minus, boolean here will set to true
+            if (!target_health.taken_damage)
+            {
+                target_health.taken_damage = true;
             }
 
             // Default dmg multiplier
@@ -335,16 +353,14 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
 
-            // When target minus, boolean here will set to true
-            target_health.taken_damage = true;
 
-			// Check if target health drops to zero or below
-			if (target_health.health <= 0) {
-				// Target has more than 1 life
-				--target_health.lives;
-				target_health.health = target_health.max_health;
-				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
-			}
+            // Check if target health drops to zero or below
+            if (target_health.health <= 0) {
+                // Target has more than 1 life
+                --target_health.lives;
+                target_health.health = target_health.max_health;
+                NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+            }
         }
 
         void changeElement(Entity::Type player, Entity::Type source) {

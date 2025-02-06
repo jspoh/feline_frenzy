@@ -188,7 +188,7 @@ namespace NIKE {
 			registerState("Idle", std::make_shared<State::IdleState>());
 			registerState("EnemyAttack", std::make_shared<State::EnemyAttackState>());
 			registerState("EnemyChase", std::make_shared<State::EnemyChaseState>());
-			registerState("EnemyHurt", std::make_shared<State::EnemyHurtState>());
+			//registerState("EnemyHurt", std::make_shared<State::EnemyHurtState>());
 			registerState("EnemyDeath", std::make_shared<State::EnemyDeathState>());
 			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
 		}
@@ -203,7 +203,10 @@ namespace NIKE {
 				auto& state_comp = e_state_comp.value().get();
 				state_comp.entity_ref = entity;
 				// Lock the weak pointer to the current state
-				current_state = state_comp.current_state.lock();
+				if (current_state != state_comp.current_state.lock())
+				{
+					current_state = state_comp.current_state.lock();
+				}
 				if (current_state)
 				{
 					current_state->onUpdate(entity);

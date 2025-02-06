@@ -127,7 +127,8 @@ namespace NIKE {
 			const Vector2f player_pos = player_transform_comp.value().get().position;
 			const Vector2f enemy_pos = enemy_transform_comp.value().get().position;
 
-			const float enemy_range = enemy_attack_comp.value().get().range;  // Range in grid cells
+			// Range in grid cells
+			const float enemy_range = enemy_attack_comp.value().get().range;  
 
 			// Convert player and enemy positions to grid cell indexes
 			auto player_cell = NIKE_MAP_SERVICE->getCellIndexFromCords(player_pos);
@@ -148,6 +149,7 @@ namespace NIKE {
 
 		return false;
 	}
+
 
 
 	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {

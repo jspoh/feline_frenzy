@@ -205,8 +205,8 @@ namespace NIKE {
 	State::EnemyChaseState::EnemyChaseState() : cell_offset{ 15.0f }, enemy_speed{ 1000.0f }
 	{
 		// Add transitions here
-		addTransition("EnemyChaseToEnemyAttack", std::make_shared<Transition::EnemyChaseToEnemyAttack>());
 		addTransition("EnemyChaseToIdle", std::make_shared<Transition::EnemyChaseToIdle>());
+		addTransition("EnemyChaseToEnemyAttack", std::make_shared<Transition::EnemyChaseToEnemyAttack>());
 		//addTransition("EnemyChaseToEnemyHurt", std::make_shared<Transition::EnemyChaseToEnemyHurt>());
 		addTransition("EnemyChaseToEnemyDeath", std::make_shared<Transition::EnemyChaseToEnemyDeath>());
 	}
@@ -428,8 +428,8 @@ namespace NIKE {
 	State::EnemyHurtState::EnemyHurtState()
 	{
 		// Add transitions here
-		addTransition("EnemyHurtToEnemyAttack", std::make_shared<Transition::EnemyHurtToEnemyAttack>());
 		addTransition("EnemyHurtToEnemyChase", std::make_shared<Transition::EnemyHurtToEnemyChase>());
+		addTransition("EnemyHurtToEnemyAttack", std::make_shared<Transition::EnemyHurtToEnemyAttack>());
 		addTransition("EnemyHurtToEnemyDeath", std::make_shared<Transition::EnemyHurtToEnemyDeath>());
 	}
 
@@ -438,6 +438,7 @@ namespace NIKE {
 		animationStart(entity, 0, 12);
 		animationEnd(entity, 1, 12);
 		flipX(entity, false);
+		playSFX(entity, true);
 	}
 	void State::EnemyHurtState::onUpdate([[maybe_unused]] Entity::Type& entity) {
 		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
@@ -452,7 +453,7 @@ namespace NIKE {
 		}
 	}
 	void State::EnemyHurtState::onExit([[maybe_unused]] Entity::Type& entity) {
-
+		playSFX(entity, false);
 	}
 
 	void State::EnemyHurtState::playSFX(Entity::Type& entity, bool play_or_no)

@@ -46,7 +46,7 @@
             "Layer": 1,
             "Offset": 100.0,
             "PrefabPath": "bullet.prefab",
-            "Range": 2.0,
+            "Range": 3.0,
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
@@ -103,7 +103,7 @@
                 "y": 16
             },
             "Intensity": 0.0,
-            "Texture_ID": "Normal_Enemy_SpriteSheet.png"
+            "Texture_ID": "Elite_Enemy_SpriteSheet.png"
         },
         "State::State": {
             "State": "Idle"
