@@ -10,6 +10,9 @@
 #include "Core/stdafx.h"
 #include "Systems/sysParticle.h"
 
+// !TODO: jspoh add auto init values for entity and prefabs
+// !TODO: jspoh update update() function to use ParticleEmitter component values
+
  // !NOTE: jspoh. future - add texture support for particles
  // !NOTE: jspoh. future - add lua support for particles
 
