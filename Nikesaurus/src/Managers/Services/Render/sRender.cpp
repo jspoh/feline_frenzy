@@ -541,9 +541,14 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
 
+		int NUM_VERTICES = 6;		// defined in vertex shader
+		GLenum PRIMITIVE = GL_TRIANGLES;
+
 		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type));
 		if (preset == static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::BASE)) {
 			ref = "base";
+			NUM_VERTICES = 4;
+			PRIMITIVE = GL_TRIANGLE_STRIP;
 		}
 		const std::string shader_name = ref + "_particle";
 
@@ -568,8 +573,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after binding vao in {0}: {1}", __FUNCTION__, err);
 		}
 
-		static constexpr int NUM_VERTICES = 6;		// defined in vertex shader
-		glDrawArraysInstanced(GL_TRIANGLES, 0, NUM_VERTICES, draw_count);
+		glDrawArraysInstanced(PRIMITIVE, 0, NUM_VERTICES, draw_count);
 
 
 		glBindVertexArray(0);
