@@ -306,7 +306,7 @@ namespace NIKE {
 
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
 		for (const auto& ps : PM.getActiveParticleSystems()) {
-			const unsigned int vao = PM.getVAO(ps.preset);
+			//const unsigned int vao = PM.getVAO(ps.preset);
 			const unsigned int vbo = PM.getVBO(ps.preset);
 
 			std::vector<Particle> particles = ps.particles;

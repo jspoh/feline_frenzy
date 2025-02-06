@@ -309,7 +309,8 @@ void NSPM::resetEntityParticleSystems() {
 	for (auto& [ref, ps] : active_particle_systems) {
 		// mark particle system to be removed
 		// pe prefix denotes particle emitter (from entity)
-		if (ref.substr(0, 2) == "pe") {
+		const std::string prefix{ ENTITY_PARTICLE_EMITTER_PREFIX };
+		if (ref.substr(0, prefix.size()) == prefix) {
 			ps.is_alive = false;
 		}
 	}

@@ -2052,7 +2052,7 @@ namespace NIKE {
 
 						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
 						
-						const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 						// update default particle system config
 						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
@@ -2105,7 +2105,6 @@ namespace NIKE {
 				if (comp_string_ref == "Render::ParticleEmitter") {
 					// get entity position
 					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
 					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
 					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
 					if (!success) {

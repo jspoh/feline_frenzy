@@ -103,6 +103,7 @@ namespace NIKE {
 			class Manager {
 			private:
 				int next_ps_id{};
+
 				std::unordered_map<std::string, ParticleSystem>  active_particle_systems;
 
 				std::unordered_map<Data::ParticlePresets, unsigned int> vao_map;
@@ -111,6 +112,7 @@ namespace NIKE {
 				Manager();
 				~Manager();
 			public:
+				static constexpr const char* ENTITY_PARTICLE_EMITTER_PREFIX = "EntityParticleEmitter_";
 
 				int getNewPSID();
 

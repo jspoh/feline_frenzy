@@ -38,7 +38,7 @@ namespace NIKE {
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
-				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+				const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				comp.preset = static_cast<int>(data.at("preset").get<int>());
 				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
@@ -72,7 +72,7 @@ namespace NIKE {
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
-				const std::string particle_emitter_ref = "pe" + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+				const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				if (delta.contains("preset")) {
 					comp.preset = delta["preset"];

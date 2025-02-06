@@ -93,7 +93,7 @@ namespace NIKE {
 			auto& enemy_comp = e_enemy_comp.value().get();
 			auto& dyna_comp = e_enemy_dyna.value().get();
 			auto& health_comp = e_enemy_health.value().get();
-			auto& ani_comp = e_enemy_ani.value().get();
+			//auto& ani_comp = e_enemy_ani.value().get();
 
 			//if (health_comp.taken_damage) {
 			//	if (ani_comp.animation_mode != Animation::Mode::END) {
