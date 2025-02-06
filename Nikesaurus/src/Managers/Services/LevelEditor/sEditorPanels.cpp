@@ -2643,7 +2643,8 @@ namespace NIKE {
 			ImGui::Spacing();
 
 			//Iterate over all registered components
-			for (const auto& component : NIKE_SERIALIZE_SERVICE->getCompFuncs()) {
+			const auto& comp_funcs = NIKE_SERIALIZE_SERVICE->getCompFuncs();
+			for (const auto& component : comp_funcs) {
 
 				//Check if component already exists
 				if (prefab_comps.find(component.first) != prefab_comps.end())
@@ -2657,7 +2658,35 @@ namespace NIKE {
 
 					//Close popup
 					closePopUp(popup_id);
+
+					// add active particle system if particle emitter is added
+					if (component.first == "Render::ParticleEmitter") {
+						using namespace NIKE::SysParticle;
+
+						// get entity position
+
+						if (prefab_comps.find("Transform::Transform") == prefab_comps.end()) {
+							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
+							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
+						}
+						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
+
+						const auto comp = reinterpret_cast<Transform::Transform*>(prefab_comps.at("Transform::Transform").get());
+
+						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+
+						// update default particle system config
+						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(prefab_comps.at("Render::ParticleEmitter").get());
+						pe_comp->duration = -1.f;
+						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
+						pe_comp->ref = particle_emitter_ref;
+						pe_comp->offset = { 0.f, 0.f };
+						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
+
+						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
+					}
 				}
+
 			}
 
 			//Add Spacing after components
@@ -2692,6 +2721,16 @@ namespace NIKE {
 
 				// Close popup
 				closePopUp(popup_id);
+
+				if (comp_ref == "Render::ParticleEmitter") {
+					// get entity position
+					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+					if (!success) {
+						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+					}
+				}
 			}
 
 			ImGui::SameLine();
@@ -3177,6 +3216,18 @@ namespace NIKE {
 
 	}
 
+	int LevelEditor::DebugPanel::overflow(int c) {
+		if (c == '\n') {
+			std::lock_guard<std::mutex> lock(buff_mutex);
+			console_logs.push_back(currentLine);
+			currentLine.clear();
+		}
+		else {
+			currentLine += static_cast<char>(c);
+		}
+		return c;
+	}
+
 	void LevelEditor::DebugPanel::render() {
 		if (!ImGui::Begin(getName().c_str())) {
 			//Return if window is not being shown
@@ -3256,6 +3307,52 @@ namespace NIKE {
 				ImGui::EndTabItem();
 			}
 
+			// Console tab
+			if (ImGui::BeginTabItem("Console Log")) {
+
+				//Static boolean for console state
+				static bool b_editor_log = false;
+
+				//Trigger redirect
+				ImGui::Text("Cout:");
+				ImGui::SameLine();
+				if (ImGui::Button(b_editor_log ? "Editor##Log" : "Console##Log")) {
+					b_editor_log = !b_editor_log;
+
+					if (b_editor_log) {
+						coutToEditor();
+					}
+					else {
+						restoreCout();
+					}
+				}
+
+				//Scroll logs
+				ImGui::SameLine();
+				static bool autoScroll = true;
+				ImGui::Checkbox("Auto-scroll", &autoScroll);
+
+				ImGui::Separator();
+
+				//Display console messages
+				std::lock_guard<std::mutex> lock(buff_mutex);
+				for (const auto& message : console_logs) {
+					ImGui::TextUnformatted(message.c_str());
+				}
+
+				//Clear console
+				if (ImGui::Button("Clear")) {
+					console_logs.clear();
+				}
+
+				//Scroll
+				if (autoScroll) {
+					ImGui::SetScrollHereY(1.0f);
+				}
+
+				ImGui::EndTabItem();
+			}
+
 			ImGui::EndTabBar();
 		}
 
@@ -3263,6 +3360,16 @@ namespace NIKE {
 		renderPopUps();
 
 		ImGui::End();
+	}
+
+	void LevelEditor::DebugPanel::coutToEditor() {
+		oldcout = cout.rdbuf(this);
+		oldcerr = cerr.rdbuf(this);
+	}
+
+	void LevelEditor::DebugPanel::restoreCout() {
+		cout.rdbuf(oldcout);
+		cerr.rdbuf(oldcerr);
 	}
 
 	/*****************************************************************//**

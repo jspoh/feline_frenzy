@@ -131,6 +131,15 @@ namespace NIKE {
 		//Vertices
 		std::vector<Vector2f> vert;
 
+		//Get World size
+		auto world_size = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
+
+		//Get window size
+		auto window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		//Calculate scale factor
+		Vector2f scale_factor = { static_cast<float>(window_size.x) / static_cast<float>(world_size.x), static_cast<float>(window_size.y) / static_cast<float>(world_size.y) };
+
 		//If Shape
 		auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
 		if (e_shape_comp.has_value()) {
@@ -153,14 +162,14 @@ namespace NIKE {
 
 			vert = getVertices();
 				for (auto& point : vert) {
-					point.x *= e_transform.scale.x;
-					point.y *= e_transform.scale.y;
-					point.x += e_transform.position.x;
-					point.y -= e_transform.position.y;
+					point.x *= (e_transform.scale.x * scale_factor.x);
+					point.y *= (e_transform.scale.y * scale_factor.y);
+					point.x += (e_transform.position.x * scale_factor.x);
+					point.y -= (e_transform.position.y * scale_factor.y);
 
 					//Translate model to world coordinates
-					point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-					point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
+					point.x += (window_size.x / 2.0f);
+					point.y += (window_size.y / 2.0f);
 				}
 		}
 		else {
@@ -180,14 +189,14 @@ namespace NIKE {
 
 			vert = getVertices();
 			for (auto& point : vert) {
-				point.x *= e_transform.scale.x;
-				point.y *= e_transform.scale.y;
-				point.x += e_transform.position.x;
-				point.y -= e_transform.position.y;
+				point.x *= (e_transform.scale.x * scale_factor.x);
+				point.y *= (e_transform.scale.y * scale_factor.y);
+				point.x += (e_transform.position.x * scale_factor.x);
+				point.y -= (e_transform.position.y * scale_factor.y);
 
 				//Translate model to world coordinates
-				point.x += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2.0f);
-				point.y += (NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2.0f);
+				point.x += (window_size.x / 2.0f);
+				point.y += (window_size.y / 2.0f);
 			}
 		}
 
