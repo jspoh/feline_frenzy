@@ -139,6 +139,8 @@ namespace NIKE {
 
 				unsigned int getVAO(Data::ParticlePresets preset) const;
 				unsigned int getVBO(Data::ParticlePresets preset) const;
+
+				void resetEntityParticleSystems();
 			};
 		}
 

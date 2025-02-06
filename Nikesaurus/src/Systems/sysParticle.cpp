@@ -230,7 +230,7 @@ void NSPM::update() {
 				time_since_last_spawn = 0.f;
 			}
 
-			if (particles_to_spawn > 0) {
+			if (ps.is_alive && particles_to_spawn > 0) {
 				// reset state
 				time_since_last_spawn = 0.f;
 
@@ -303,4 +303,17 @@ unsigned int NSPM::getVBO(Data::ParticlePresets preset) const {
 
 int NSPM::getNewPSID() {
 	return next_ps_id;
+}
+
+void NSPM::resetEntityParticleSystems() {
+	for (auto& [ref, ps] : active_particle_systems) {
+		// mark particle system to be removed
+		// pe prefix denotes particle emitter (from entity)
+		if (ref.substr(0, 2) == "pe") {
+			ps.is_alive = false;
+		}
+	}
+
+
+	next_ps_id = 0;
 }
