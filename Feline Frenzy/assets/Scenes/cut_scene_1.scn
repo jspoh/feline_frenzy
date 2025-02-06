@@ -1,0 +1,153 @@
+[
+    {
+        "Channels": null
+    },
+    {
+        "Grid ID": "cut_scene_1.grid"
+    },
+    {
+        "Camera": {
+            "Active Cam ID": "background"
+        }
+    },
+    {
+        "MetaData": {
+            "Entity_Tags": []
+        }
+    },
+    {
+        "Layer Count": 2
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Intro_Cutscene_1.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -5.89056396484375,
+                                    "y": -1.8759002685546875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1631.5250244140625,
+                                    "y": 917.7327880859375
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
+                            "Name": "cut_scene_png",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.47513771057128906,
+                                    "y": 0.0,
+                                    "z": 1.0
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 1.0,
+                                "Size": {
+                                    "x": 100.0,
+                                    "y": 37.0
+                                },
+                                "Text": "Next"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -12.45989990234375,
+                                    "y": -396.0364990234375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1.0,
+                                    "y": 1.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 0,
+                            "Name": "next_button",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Function": "Change",
+                                "Named_Args": {
+                                    "scene": "cut_scene_2.scn"
+                                },
+                                "Script_ID": "ChangeScene.lua"
+                            }
+                        },
+                        "UI ID": "next_button"
+                    }
+                }
+            ],
+            "ID": 1,
+            "Mask": 2
+        }
+    }
+]
