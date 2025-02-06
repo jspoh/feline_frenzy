@@ -401,7 +401,7 @@ namespace NIKE {
 
 			//Debug Mode Switching
 			{
-				ImGui::Text("Show Debug: ");
+				ImGui::Text("Debug: ");
 				ImGui::Button(b_debug_mode ? "Hide##DebugMode" : "Show##DebugMode");
 
 				//Check if button has been activated
@@ -427,7 +427,7 @@ namespace NIKE {
 
 			//Grid Mode Switching
 			{
-				ImGui::Text("Show Grid: ");
+				ImGui::Text("Grid: ");
 				ImGui::Button(b_grid_state ? "Hide##GridState" : "Show##GridState");
 
 				//Check if button has been activated
@@ -496,6 +496,16 @@ namespace NIKE {
 
 					//Restart scene
 					NIKE_ASSETS_SERVICE->reserializeAllAssets();
+				}
+			}
+
+			ImGui::Spacing();
+
+			//Toggle fullscreen
+			{
+				ImGui::Text("Toggle Fullscreen:");
+				if (ImGui::Button(NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen() ? "Escape" : "Fullscreen")) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(!NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen());
 				}
 			}
 
