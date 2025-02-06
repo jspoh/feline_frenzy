@@ -49,7 +49,7 @@ namespace NIKE {
 
             //Broad-phase collision detection
             std::unordered_map<int, std::vector<Entity::Type>> spatial_grid;
-            const Vector2f grid_scale = NIKE_MAP_SERVICE->getGridScale();
+            const Vector2f grid_scale = NIKE_MAP_SERVICE->getGridScale() / 2;
 
             //Default dynamics place holder
             Physics::Dynamics def_dynamics;

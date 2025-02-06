@@ -261,6 +261,8 @@ namespace NIKE {
             });
 
         lua_state.set_function("PreviousScene", [&]() {
+            // Wait for 400 miliseconds before changing the scene. (TODO, optimise if possible)
+            std::this_thread::sleep_for(std::chrono::milliseconds(400));
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PREVIOUS, ""));
             });
 
