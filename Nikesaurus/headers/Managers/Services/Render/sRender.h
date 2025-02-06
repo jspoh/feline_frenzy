@@ -150,7 +150,7 @@ namespace NIKE {
 				 * 
 				 * \param ref
 				 */
-				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1);
+				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1, bool use_screen_pos = false);
 
 				/*****************************************************************//**
 				* BATCH RENDERING

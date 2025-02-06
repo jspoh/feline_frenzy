@@ -276,6 +276,10 @@ std::vector<ParticleSystem>NSPM::getActiveParticleSystems() const {
 	return v;
 }
 
+std::unordered_map<std::string, NIKE::SysParticle::ParticleSystem>& NSPM::getActiveParticleSystemsMap() {
+	return active_particle_systems;
+}
+
 void NSPM::setParticleSystemOrigin(const std::string& ref, const Vector2f& origin) {
 	active_particle_systems.at(ref).origin = origin;
 }

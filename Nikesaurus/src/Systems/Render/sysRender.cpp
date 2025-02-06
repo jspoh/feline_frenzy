@@ -305,7 +305,7 @@ namespace NIKE {
 		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
 
 		auto& PM = NIKE::SysParticle::Manager::getInstance();
-		for (const auto& ps : PM.getActiveParticleSystems()) {
+		for (const auto& [ref, ps] : PM.getActiveParticleSystemsMap()) {
 			//const unsigned int vao = PM.getVAO(ps.preset);
 			const unsigned int vbo = PM.getVBO(ps.preset);
 
@@ -322,11 +322,11 @@ namespace NIKE {
 
 			const int num_particles = max(1, static_cast<int>(particles.size()));
 
-			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles);
+			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles, ref == "mouseps1");
 		}
 
 		// mouse particles
-		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("ps1", mouse_particle_pos);
+		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps1", mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 
 

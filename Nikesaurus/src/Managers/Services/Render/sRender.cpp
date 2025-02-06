@@ -13,6 +13,46 @@
 #include "Managers/Services/Render/sRender.h"
 #include "Systems/sysParticle.h"
 
+ // !TODO: jspoh reorg
+namespace {
+
+	Matrix_33 getWorldToScreenMtx() {
+		// transform to screen coords
+		NIKE::Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
+
+		Matrix_33 view_xform{
+			1, 0,  -cam.position.x,
+			0, 1,  -cam.position.y,
+			0, 0, 1
+		};
+
+		const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
+
+		Matrix_33 cam_to_ndc_xform{
+			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
+			0, 2.0f / (cam_height * cam.zoom), 0,
+			0, 0, 1
+		};
+
+		const float screenWidth = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
+		const float screenHeight = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+
+		Matrix_33 screen_xform = Matrix_33{
+			screenWidth * 0.5f, 0, screenWidth * 0.5f,
+			0, screenHeight * 0.5f, screenHeight * 0.5f,
+			0, 0, 1
+		} *cam_to_ndc_xform * view_xform;
+
+		return screen_xform;
+	};
+
+	Vector2f worldToScreen(const Vector2f& world_pos) {
+		Matrix_33 screen_xform = getWorldToScreenMtx();
+		return screen_xform * world_pos;
+	}
+}
+
+
 namespace NIKE {
 
 	void Render::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
@@ -535,7 +575,7 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count) {
+	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -556,8 +596,12 @@ namespace NIKE {
 		shader_manager->useShader(shader_name);
 
 		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
-		shader_manager->setUniform(shader_name, "particleOrigin", origin);
 		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
+		shader_manager->setUniform(shader_name, "particleScreenOrigin", worldToScreen(origin));			// particle screen pos
+
+		if (use_screen_pos) {
+			shader_manager->setUniform(shader_name, "particleScreenOrigin", origin);
+		}
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {

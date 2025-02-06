@@ -1409,7 +1409,7 @@
                                             "x": 0.0,
                                             "y": 0.0
                                         },
-                                        "preset": 1,
+                                        "preset": 0,
                                         "render_type": 1
                                     },
                                     "Render::Texture": {

@@ -107,16 +107,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 11070,
-                                "Frame_Duration": 0.20000000298023224,
-                                "Mode": 0,
-                                "Timer": 0.06666667014360428
+                                "Frame_Duration": 0.20000000298023224
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 5,
                                     "y": 0
@@ -219,16 +212,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1958,
-                                "Frame_Duration": 0.20000000298023224,
-                                "Mode": 0,
-                                "Timer": 0.1666666716337204
+                                "Frame_Duration": 0.20000000298023224
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 0,
                                     "y": 0
@@ -329,16 +315,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1452,
-                                "Frame_Duration": 0.20000000298023224,
-                                "Mode": 0,
-                                "Timer": 0.15000000596046448
+                                "Frame_Duration": 0.20000000298023224
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 0,
                                     "y": 0

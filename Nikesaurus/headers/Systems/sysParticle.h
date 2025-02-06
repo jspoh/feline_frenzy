@@ -131,6 +131,7 @@ namespace NIKE {
 				void update();
 
 				std::vector<ParticleSystem> getActiveParticleSystems() const;
+				std::unordered_map<std::string, ParticleSystem>& getActiveParticleSystemsMap();
 
 				void setParticleSystemOrigin(const std::string& ref, const Vector2f& origin);
 				void setParticleSystemPreset(const std::string& ref, Data::ParticlePresets preset);
