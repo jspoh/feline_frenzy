@@ -32,7 +32,7 @@ namespace NIKE {
 		mask.set(mask_id, state);
 	}
 
-	std::bitset<64> Scenes::Layer::getLayerMask() const {
+	std::bitset<Scenes::MAXLAYERS> Scenes::Layer::getLayerMask() const {
 		return mask;
 	}
 
