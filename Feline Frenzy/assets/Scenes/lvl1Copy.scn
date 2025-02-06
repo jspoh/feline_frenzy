@@ -1891,6 +1891,7 @@
                                     "x": 0.0,
                                     "y": 0.0
                                 },
+                                "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 0.0,
                                     "x": 0.0,
@@ -1916,6 +1917,14 @@
                                     "y": 0.0
                                 },
                                 "particle_rotation": 0.0,
+                                "particle_vector_x_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_vector_y_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
                                 "particle_velocity_range": {
                                     "x": 0.0,
                                     "y": 0.0
