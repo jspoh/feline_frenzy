@@ -96,8 +96,6 @@ bool NSPM::removeActiveParticleSystem(const std::string& ref) {
 
 
 void NSPM::update() {
-	// !TODO: jspoh reorg update system
-
 	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
 	for (auto& [ref, ps] : active_particle_systems) {
@@ -252,11 +250,12 @@ void NSPM::update() {
 
 
 			}
+
+			// end update particles
 		}
 
 	}
 
-	// !TODO: jspoh restore this
 	// remove dead particle systems
 	for (auto it = active_particle_systems.begin(); it != active_particle_systems.end();) {
 		if (!it->second.is_alive && it->second.particles.size() == 0) {
