@@ -3216,6 +3216,18 @@ namespace NIKE {
 
 	}
 
+	int LevelEditor::DebugPanel::overflow(int c) {
+		if (c == '\n') {
+			std::lock_guard<std::mutex> lock(buff_mutex);
+			console_logs.push_back(currentLine);
+			currentLine.clear();
+		}
+		else {
+			currentLine += static_cast<char>(c);
+		}
+		return c;
+	}
+
 	void LevelEditor::DebugPanel::render() {
 		if (!ImGui::Begin(getName().c_str())) {
 			//Return if window is not being shown
@@ -3295,6 +3307,52 @@ namespace NIKE {
 				ImGui::EndTabItem();
 			}
 
+			// Console tab
+			if (ImGui::BeginTabItem("Console Log")) {
+
+				//Static boolean for console state
+				static bool b_editor_log = false;
+
+				//Trigger redirect
+				ImGui::Text("Cout:");
+				ImGui::SameLine();
+				if (ImGui::Button(b_editor_log ? "Editor##Log" : "Console##Log")) {
+					b_editor_log = !b_editor_log;
+
+					if (b_editor_log) {
+						coutToEditor();
+					}
+					else {
+						restoreCout();
+					}
+				}
+
+				//Scroll logs
+				ImGui::SameLine();
+				static bool autoScroll = true;
+				ImGui::Checkbox("Auto-scroll", &autoScroll);
+
+				ImGui::Separator();
+
+				//Display console messages
+				std::lock_guard<std::mutex> lock(buff_mutex);
+				for (const auto& message : console_logs) {
+					ImGui::TextUnformatted(message.c_str());
+				}
+
+				//Clear console
+				if (ImGui::Button("Clear")) {
+					console_logs.clear();
+				}
+
+				//Scroll
+				if (autoScroll) {
+					ImGui::SetScrollHereY(1.0f);
+				}
+
+				ImGui::EndTabItem();
+			}
+
 			ImGui::EndTabBar();
 		}
 
@@ -3302,6 +3360,16 @@ namespace NIKE {
 		renderPopUps();
 
 		ImGui::End();
+	}
+
+	void LevelEditor::DebugPanel::coutToEditor() {
+		oldcout = cout.rdbuf(this);
+		oldcerr = cerr.rdbuf(this);
+	}
+
+	void LevelEditor::DebugPanel::restoreCout() {
+		cout.rdbuf(oldcout);
+		cerr.rdbuf(oldcerr);
 	}
 
 	/*****************************************************************//**
