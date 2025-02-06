@@ -66,7 +66,7 @@ namespace NIKE {
 		addTransition("EnemyAttackToIdle", std::make_shared<Transition::EnemyAttackToIdle>());
 		addTransition("EnemyAttackToEnemyChase", std::make_shared<Transition::EnemyAttackToEnemyChase>());
 		addTransition("EnemyAttackToEnemyDeath", std::make_shared<Transition::EnemyAttackToEnemyDeath>());
-		addTransition("EnemyAttackToEnemyHurt", std::make_shared<Transition::EnemyAttackToEnemyHurt>());
+		//addTransition("EnemyAttackToEnemyHurt", std::make_shared<Transition::EnemyAttackToEnemyHurt>());
 
 		// Register the Manager as a listener for collision events
 		std::shared_ptr<EnemyAttackState> attack_state_wrapped(this, [](EnemyAttackState*) {});
@@ -174,26 +174,26 @@ namespace NIKE {
 		if (get_last_direction == 0)
 		{
 			// Attack right
-			animationStart(entity, 0, 2);
-			animationEnd(entity, 5, 2);
+			animationStart(entity, 0, 5);
+			animationEnd(entity, 5, 5);
 			flipX(entity, false);
 		}
 		else if (get_last_direction == 2) {
 			// Attack up
-			animationStart(entity, 0, 3);
-			animationEnd(entity, 5, 3);
+			animationStart(entity, 0, 7);
+			animationEnd(entity, 5, 7);
 			flipX(entity, false);
 		}
 		else if (get_last_direction == 5) {
 			// Attack down
-			animationStart(entity, 0, 0);
-			animationEnd(entity, 5, 0);
+			animationStart(entity, 0, 4);
+			animationEnd(entity, 5, 4);
 			flipX(entity, false);
 		}
-		else{
+		else {
 			// Attack left
-			animationStart(entity, 0, 1);
-			animationEnd(entity, 5, 1);
+			animationStart(entity, 0, 5);
+			animationEnd(entity, 5, 5);
 			flipX(entity, true);
 		}
 	}
@@ -207,7 +207,7 @@ namespace NIKE {
 		// Add transitions here
 		addTransition("EnemyChaseToEnemyAttack", std::make_shared<Transition::EnemyChaseToEnemyAttack>());
 		addTransition("EnemyChaseToIdle", std::make_shared<Transition::EnemyChaseToIdle>());
-		addTransition("EnemyChaseToEnemyHurt", std::make_shared<Transition::EnemyChaseToEnemyHurt>());
+		//addTransition("EnemyChaseToEnemyHurt", std::make_shared<Transition::EnemyChaseToEnemyHurt>());
 		addTransition("EnemyChaseToEnemyDeath", std::make_shared<Transition::EnemyChaseToEnemyDeath>());
 	}
 
@@ -306,57 +306,57 @@ namespace NIKE {
 	{
 		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 			// Moving right
-			animationStart(entity, 0, 5);
-			animationEnd(entity, 9, 5);
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
 			flipX(entity, false);
 			setLastDirection(entity, 0);
 		}
 		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
 			// Moving up-right (diagonal)
-			animationStart(entity, 0, 6);
-			animationEnd(entity, 9, 6);
+			animationStart(entity, 0, 2);
+			animationEnd(entity, 9, 2);
 			flipX(entity, false);
 			setLastDirection(entity, 1);
 		}
 		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Moving up
-			animationStart(entity, 0, 7);
-			animationEnd(entity, 9, 7);
+			animationStart(entity, 0, 3);
+			animationEnd(entity, 9, 3);
 			flipX(entity, false);
 			setLastDirection(entity, 2);
 		}
 		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
 			// Moving up-left (diagonal)
-			animationStart(entity, 0, 6);
-			animationEnd(entity, 9, 6);
+			animationStart(entity, 0, 2);
+			animationEnd(entity, 9, 2);
 			flipX(entity, true);
 			setLastDirection(entity, 3);
 		}
 		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
 			// Moving down-right (diagonal)
-			animationStart(entity, 0, 5);
-			animationEnd(entity, 9, 5);
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
 			flipX(entity, false);
 			setLastDirection(entity, 4);
 		}
 		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Moving down
-			animationStart(entity, 0, 4);
-			animationEnd(entity, 9, 4);
+			animationStart(entity, 0, 0);
+			animationEnd(entity, 9, 0);
 			flipX(entity, false);
 			setLastDirection(entity, 5);
 		}
 		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
 			// Moving down-left (diagonal)
-			animationStart(entity, 0, 5);
-			animationEnd(entity, 9, 5);
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
 			flipX(entity, true);
 			setLastDirection(entity, 6);
 		}
 		else {
 			// Moving left
-			animationStart(entity, 0, 5);
-			animationEnd(entity, 9, 5);
+			animationStart(entity, 0, 1);
+			animationEnd(entity, 9, 1);
 			flipX(entity, true);
 			setLastDirection(entity, 7);
 		}
@@ -382,14 +382,9 @@ namespace NIKE {
 		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 		if (animation_comp.has_value())
 		{
-			// Use delta time to let animation play before deleting entity
-			static float dt = 0.0f;
-			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-			if (dt >= 0.2f) { 
+			if (animation_comp.value().get().completed_animations >= 1) { 
 				playSFX(entity, false);
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
-				// Reset delta time
-				dt = 0.f;
 			}
 		}
 	}
@@ -450,13 +445,9 @@ namespace NIKE {
 		playSFX(entity, true);
 		if (animation_comp.has_value() && health_comp.has_value())
 		{
-			// Use delta time to let animation play before resetting flag
-			static float dt = 0.0f;
-			dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-			if (dt >= 0.02f) {
-				health_comp.value().get().taken_damage = false;
-				// Reset delta time
-				dt = 0.f;
+			if (animation_comp.value().get().completed_animations >= 1) {
+				playSFX(entity, false);
+				NIKE_METADATA_SERVICE->destroyEntity(entity);
 			}
 		}
 	}

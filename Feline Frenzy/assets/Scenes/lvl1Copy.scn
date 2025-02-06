@@ -106,9 +106,9 @@
                         "Components": {
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
-                                "EnemiesSpawned": 1,
-                                "EnemyLimit": 2,
-                                "LastSpawnTime": 0.45000016689300537
+                                "EnemiesSpawned": 0,
+                                "EnemyLimit": 4,
+                                "LastSpawnTime": 2.2333319187164307
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -204,8 +204,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -275,7 +275,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -346,7 +346,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -417,7 +417,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -488,8 +488,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -559,8 +559,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -630,8 +630,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -865,7 +865,7 @@
                             "Animation::Sprite": {
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 1
+                                    "y": 2
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -873,7 +873,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 1
+                                    "y": 2
                                 }
                             },
                             "Audio::SFX": {
@@ -898,7 +898,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 18
+                                    "entity": 56
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -909,8 +909,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -233.34840393066406,
-                                    "y": -50.8573112487793
+                                    "x": 33.05697250366211,
+                                    "y": 315.63555908203125
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -928,16 +928,16 @@
                                 "Mass": 0.5,
                                 "Max_Speed": 3000.0,
                                 "Velocity": {
-                                    "x": 8.392613892738154e-08,
-                                    "y": -0.00023935212811920792
+                                    "x": 3.1348044872283936,
+                                    "y": 2.0842814445495605
                                 }
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -233.34840393066406,
-                                    "y": -50.8573112487793
+                                    "x": 33.05697250366211,
+                                    "y": 315.63555908203125
                                 },
-                                "Zoom": 0.7880338430404663
+                                "Zoom": 1.285545825958252
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -963,7 +963,7 @@
                                 },
                                 "Frame_Index": {
                                     "x": 3,
-                                    "y": 1
+                                    "y": 2
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -977,8 +977,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -233.34840393066406,
-                                    "y": -50.8573112487793
+                                    "x": 33.05697250366211,
+                                    "y": 315.63555908203125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1022,7 +1022,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 5.809748238050361e-10,
+                                    "w": 1.0,
                                     "x": 0.9489796161651611,
                                     "y": 0.2614535689353943,
                                     "z": 0.0
@@ -1083,7 +1083,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.401298464324817e-45,
+                                    "w": 0.0,
                                     "x": 0.0,
                                     "y": 0.90816330909729,
                                     "z": 1.0
@@ -1144,7 +1144,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.401298464324817e-45,
+                                    "w": 0.0,
                                     "x": 0.17211580276489258,
                                     "y": 0.8877550959587097,
                                     "z": 0.0
@@ -1934,7 +1934,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2024,7 +2024,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2080,8 +2080,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": -233.34840393066406,
-                                            "y": 41.30269241333008
+                                            "x": 32.66817855834961,
+                                            "y": 407.5370788574219
                                         },
                                         "Scale": {
                                             "x": 75.0,
@@ -2097,143 +2097,6 @@
                             },
                             "Tags": [
                                 "healthbar"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.054999999701976776
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 9,
-                                    "y": 5
-                                },
-                                "Sheet_Size": {
-                                    "x": 12,
-                                    "y": 16
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 5
-                                }
-                            },
-                            "Audio::SFX": {
-                                "Audio_ID": "EnemyWalking1.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "EnemySFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Combat::Faction": {
-                                "Faction": 2
-                            },
-                            "Combat::Health": {
-                                "Health": 100.0,
-                                "Lives": 1,
-                                "MaxHealth": 100.0,
-                                "invulnerable_flag": false
-                            },
-                            "Element::Entity": {
-                                "Element": 1
-                            },
-                            "Enemy::Attack": {
-                                "Cooldown": 1.0,
-                                "Function": "enemyBullet",
-                                "LastShotTime": 0.43333348631858826,
-                                "Layer": 1,
-                                "Offset": 100.0,
-                                "PrefabPath": "bullet.prefab",
-                                "Range": 10.0,
-                                "ScriptID": "",
-                                "ScriptLoaded": false,
-                                "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": -542.4006958007813,
-                                    "y": -93.09700012207031
-                                },
-                                "Resolution": 1,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 104.92821502685547,
-                                    "y": 107.68949127197266
-                                }
-                            },
-                            "Physics::Dynamics": {
-                                "Drag": 0.0,
-                                "Force": {
-                                    "x": 955.6348266601563,
-                                    "y": 294.5540466308594
-                                },
-                                "Mass": 9.999999747378752e-05,
-                                "Max_Speed": 100.0,
-                                "Velocity": {
-                                    "x": 95.56349182128906,
-                                    "y": 29.455406188964844
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 5
-                                },
-                                "Frame_Size": {
-                                    "x": 12,
-                                    "y": 16
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Elite_Enemy_Fire_SpriteSheet.png"
-                            },
-                            "State::State": {
-                                "State": "EnemyChase"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -542.4006958007813,
-                                    "y": -93.09700012207031
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 104.92821502685547,
-                                    "y": 107.68949127197266
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 36,
-                            "Name": "entity_0036",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": [
-                                "enemy"
                             ]
                         }
                     }
