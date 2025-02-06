@@ -1635,7 +1635,6 @@ namespace NIKE {
 		Vector2f world_mouse = e_transform.use_screen_pos ? Vector2f(mouse_pos.x - window_size.x * 0.5f, -(mouse_pos.y - window_size.y * 0.5f)) :
 			game_panel.lock()->getWorldMousePos();
 
-
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
@@ -2929,14 +2928,26 @@ namespace NIKE {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0, 0, 0, 1);
 
+		//!!!Prefab preview to be rendered
+
 		//Unbind frame buffer
 		NIKE_RENDER_SERVICE->unbindFrameBuffer();
 
 		//Begin window for rendering
 		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str());
 
+		//Prefab preview
+		ImGui::Text("Preview to be implemented.");
+
 		//Render game to viewport
 		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(500, 500));
+
+		//Close prefab preview
+		if (ImGui::Button("Close##PrefabPreview")) {
+			prefab_id.clear();
+			prefab_comps.clear();
+			meta_data = NIKE::MetaData::EntityData();
+		}
 
 		ImGui::End();
 	}
@@ -5098,7 +5109,7 @@ namespace NIKE {
 					static int trigger_index = 0;
 					trigger_index = static_cast<int>(button.second.input_state);
 					ImGui::Text("Button Input State: ");
-					if (ImGui::Combo("##BtnInputState", &trigger_index, "Pressed\0Triggered\0Released\0")) {
+					if (ImGui::Combo(std::string("##ButtonInput" + button.first).c_str(), &trigger_index, "Pressed\0Triggered\0Released\0")) {
 						button.second.input_state = static_cast<UI::InputStates>(trigger_index);
 					}
 				}
@@ -5119,7 +5130,7 @@ namespace NIKE {
 
 					//Display combo box for script selection
 					ImGui::Text("Button Script: ");
-					if (ImGui::Combo("##BtnScript", &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+					if (ImGui::Combo(std::string("##ButtonScript" + button.first).c_str(), &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
 						// Validate the selected index and get the new font ID
 						if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
 							button.second.script.script_id = get_load_scripts[script_index];
@@ -5149,7 +5160,7 @@ namespace NIKE {
 
 						//Display combo box for script function selection
 						ImGui::Text("Button Script Function: ");
-						if (ImGui::Combo("##BtnScriptFunc", &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+						if (ImGui::Combo(std::string("##ButtonScriptFunc" + button.first).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
 							// Validate the selected index and get the new font ID
 							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
 								button.second.script.function = funcs[script_func_index];
@@ -5173,7 +5184,7 @@ namespace NIKE {
 						const auto& value = it->second;
 
 						//Display arguments
-						if (ImGui::CollapsingHeader(std::string("Key: " + key).c_str(), ImGuiTreeNodeFlags_Bullet)) {
+						if (ImGui::CollapsingHeader(std::string("Key: " + key + "##" + button.first).c_str(), ImGuiTreeNodeFlags_Bullet)) {
 
 							//Display value based on its type
 							std::visit(
