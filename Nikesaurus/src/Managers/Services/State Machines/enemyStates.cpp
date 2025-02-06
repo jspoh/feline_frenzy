@@ -174,26 +174,22 @@ namespace NIKE {
 		if (get_last_direction == 0)
 		{
 			// Attack right
-			animationStart(entity, 0, 5);
-			animationEnd(entity, 5, 5);
+			animationSet(entity, 0, 5, 5, 5);
 			flipX(entity, false);
 		}
 		else if (get_last_direction == 2) {
 			// Attack up
-			animationStart(entity, 0, 7);
-			animationEnd(entity, 5, 7);
+			animationSet(entity, 0, 7, 5, 7);
 			flipX(entity, false);
 		}
 		else if (get_last_direction == 5) {
 			// Attack down
-			animationStart(entity, 0, 4);
-			animationEnd(entity, 5, 4);
+			animationSet(entity, 0, 4, 5, 4);
 			flipX(entity, false);
 		}
 		else {
 			// Attack left
-			animationStart(entity, 0, 5);
-			animationEnd(entity, 5, 5);
+			animationSet(entity, 0, 5, 5, 5);
 			flipX(entity, true);
 		}
 	}
@@ -306,57 +302,49 @@ namespace NIKE {
 	{
 		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 			// Moving right
-			animationStart(entity, 0, 1);
-			animationEnd(entity, 9, 1);
+			animationSet(entity, 0, 1, 9, 1);
 			flipX(entity, false);
 			setLastDirection(entity, 0);
 		}
 		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
 			// Moving up-right (diagonal)
-			animationStart(entity, 0, 2);
-			animationEnd(entity, 9, 2);
+			animationSet(entity, 0, 2, 9, 2);
 			flipX(entity, false);
 			setLastDirection(entity, 1);
 		}
 		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Moving up
-			animationStart(entity, 0, 3);
-			animationEnd(entity, 9, 3);
+			animationSet(entity, 0, 3, 9, 3);
 			flipX(entity, false);
 			setLastDirection(entity, 2);
 		}
 		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
 			// Moving up-left (diagonal)
-			animationStart(entity, 0, 2);
-			animationEnd(entity, 9, 2);
+			animationSet(entity, 0, 2, 9, 2);
 			flipX(entity, true);
 			setLastDirection(entity, 3);
 		}
 		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
 			// Moving down-right (diagonal)
-			animationStart(entity, 0, 1);
-			animationEnd(entity, 9, 1);
+			animationSet(entity, 0, 1, 9, 1);
 			flipX(entity, false);
 			setLastDirection(entity, 4);
 		}
 		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Moving down
-			animationStart(entity, 0, 0);
-			animationEnd(entity, 9, 0);
+			animationSet(entity, 0, 0, 9, 0);
 			flipX(entity, false);
 			setLastDirection(entity, 5);
 		}
 		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
 			// Moving down-left (diagonal)
-			animationStart(entity, 0, 1);
-			animationEnd(entity, 9, 1);
+			animationSet(entity, 0, 1, 9, 1);
 			flipX(entity, true);
 			setLastDirection(entity, 6);
 		}
 		else {
 			// Moving left
-			animationStart(entity, 0, 1);
-			animationEnd(entity, 9, 1);
+			animationSet(entity, 0, 1, 9, 1);
 			flipX(entity, true);
 			setLastDirection(entity, 7);
 		}
@@ -373,8 +361,7 @@ namespace NIKE {
 
 	void State::EnemyDeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
 		// Play EnemyDeathState animation
-		animationStart(entity, 0, 8);
-		animationEnd(entity, 10, 8);
+		animationSet(entity, 0, 8, 10, 8);
 		flipX(entity, false);
 		playSFX(entity, true);
 	}
@@ -421,8 +408,7 @@ namespace NIKE {
 
 	void State::EnemyHurtState::onEnter([[maybe_unused]] Entity::Type& entity) {
 		// Play Enemy Hurt animation
-		animationStart(entity, 0, 12);
-		animationEnd(entity, 1, 12);
+		animationSet(entity, 0, 12, 1, 12);
 		flipX(entity, false);
 		playSFX(entity, true);
 	}

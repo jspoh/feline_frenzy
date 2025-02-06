@@ -107,46 +107,6 @@ namespace NIKE {
             }
         }
 
-        void animationHurtStart(Entity::Type& entity, int start_x, int start_y)
-        {
-            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-            if (e_animate_comp.has_value()) {
-                static Vector2i prev_start = e_animate_comp.value().get().start_index;
-
-                if (prev_start != Vector2i(start_x, start_y)) {
-                    e_animate_comp.value().get().start_index.x = start_x;
-                    e_animate_comp.value().get().start_index.y = start_y;
-                    prev_start = e_animate_comp.value().get().start_index;
-
-                    //Restart animation
-                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-                    if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-                    }
-                }
-            }
-        }
-
-        void animationHurtEnd(Entity::Type& entity, int end_x, int end_y)
-        {
-            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-            if (e_animate_comp.has_value()) {
-                static Vector2i prev_end = e_animate_comp.value().get().end_index;
-
-                if (prev_end != Vector2i(end_x, end_y)) {
-                    e_animate_comp.value().get().end_index.x = end_x;
-                    e_animate_comp.value().get().end_index.y = end_y;
-                    prev_end = e_animate_comp.value().get().end_index;
-
-                    //Restart animation
-                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-                    if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-                    }
-                }
-            }
-        }
-
         void flipX(Entity::Type& entity, bool yes_or_no)
         {
             auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
@@ -353,6 +313,22 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
 
+            //Apply hurt animation
+            auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
+            auto sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(target);
+            if (base_comp.has_value() && sprite_comp.has_value()) {
+                auto& base = base_comp.value().get();
+                auto& sprite = sprite_comp.value().get();
+
+                //Set base
+                base.animations_to_complete = 3;
+                base.animation_mode = Animation::Mode::RESTART;
+
+                //Set sprite
+                sprite.start_index = { 0, 12 };
+                sprite.end_index = { 1, 12 };
+                sprite.curr_index = sprite.start_index;
+            }
 
             // Check if target health drops to zero or below
             if (target_health.health <= 0) {
