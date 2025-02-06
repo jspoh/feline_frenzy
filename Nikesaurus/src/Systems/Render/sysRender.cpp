@@ -320,7 +320,9 @@ namespace NIKE {
 
 			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
 
-			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), static_cast<int>(particles.size()));
+			const int num_particles = max(1, static_cast<int>(particles.size()));
+
+			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles);
 		}
 
 		// mouse particles
