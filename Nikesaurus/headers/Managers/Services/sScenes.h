@@ -20,13 +20,15 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		const int MAXLAYERS = 64;
+
 		//Forward declaration of Scene service for friending layer
 		class Service;
 
 		//Layer class
 		class NIKE_API Layer {
 		public:
-			using LayerMask = std::bitset<64>;
+			using LayerMask = std::bitset<MAXLAYERS>;
 		private:
 			
 			//Friend of layer class

@@ -663,7 +663,7 @@ namespace NIKE {
 			ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, Scenes::MAXLAYERS));
 
 			//If enter or ok button is pressed
 			if (!entity_name.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
@@ -2870,7 +2870,7 @@ namespace NIKE {
 			ImGui::InputInt("##PrefabEntityLayerIDInput", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, Scenes::MAXLAYERS));
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
@@ -6119,7 +6119,7 @@ namespace NIKE {
 
 		// Create layer button
 		if (ImGui::Button("Create Layer")) {
-			if (layer_count < 64) {
+			if (layer_count < Scenes::MAXLAYERS) {
 				Action create_layer_action;
 
 				// Capture the state before adding the new layer

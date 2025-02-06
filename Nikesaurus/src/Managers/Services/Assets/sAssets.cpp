@@ -644,6 +644,11 @@ namespace NIKE {
 				switch (asset_data.second.type) {
 				case Assets::Types::Prefab: {
 
+					//Create maximum number of layers
+					while (NIKE_SCENES_SERVICE->getLayerCount() < Scenes::MAXLAYERS) {
+						NIKE_SCENES_SERVICE->createLayer();
+					}
+
 					//Create tempe entity
 					auto temp = NIKE_ECS_MANAGER->createEntity();
 
