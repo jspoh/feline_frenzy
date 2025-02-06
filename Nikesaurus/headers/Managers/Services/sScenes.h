@@ -1,10 +1,10 @@
 /*****************************************************************//**
- * \file   mScene.h
+ * \file   sScene.h
  * \brief  
  * 
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once

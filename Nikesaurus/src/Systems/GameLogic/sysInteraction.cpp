@@ -288,11 +288,14 @@ namespace NIKE {
             auto& target_health = target_health_comp.value().get().health;
             const auto& target_max_health = target_health_comp.value().get().max_health;
 
+
+
             // Heal Target
             // (The check might be redundant now as there is another check in sysCollision)
             if (target_health < target_max_health) {
                 target_health += healer_heal;
-                // !TODO: Add healing sound here
+                // Temporary hardcoded SFX
+                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", 1.0f, 1.0f);
             }
         }
 

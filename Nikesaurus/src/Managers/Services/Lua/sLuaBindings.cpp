@@ -251,6 +251,8 @@ namespace NIKE {
     void Lua::luaSceneBinds(sol::state& lua_state) {
 
         lua_state.set_function("ChangeScene", [&](std::string const& scene) {
+            // Wait for 900 miliseconds before changing the scene. (TODO, optimise if possible)
+            std::this_thread::sleep_for(std::chrono::milliseconds(900));
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene));
             });
 

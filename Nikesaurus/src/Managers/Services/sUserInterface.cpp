@@ -11,6 +11,8 @@
 #include "Managers/Services/sUserInterface.h"
 #include "Core/Engine.h"
 
+#include "Systems/GameLogic/sysInteraction.h"
+
 namespace NIKE {
 
 	nlohmann::json UI::UIBtn::serialize() const {
@@ -462,6 +464,12 @@ namespace NIKE {
 
 			//Check if button is hovered
 			if (buttonHovered(entity.second.entity_id)) {
+
+				// Temporary hardcoded SFX (for main menu buttons)
+				if (!entity.second.b_hovered) {
+					Interaction::playOneShotSFX(entity.second.entity_id, "MenuHoverOverSFX.wav", "SFX", 1.0f, 1.0f);
+				}
+
 				entity.second.b_hovered = true;
 
 				//Save data before hover
@@ -486,6 +494,11 @@ namespace NIKE {
 
 				//Execute script for trigger
 				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
+					// Temporary hardcoded SFX (for main menu buttons)
+					// Get button ID
+					//...
+					Interaction::playOneShotSFX(entity.second.entity_id, "UI_Select.wav", "SFX", 1.0f, 1.0f);
+
 					NIKE_LUA_SERVICE->executeScript(entity.second.script);
 				}
 			}
