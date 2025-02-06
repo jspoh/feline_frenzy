@@ -77,6 +77,7 @@ namespace NIKE {
             }
         }
 
+        /* TODO, remove or edit call */
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
         {
             auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
@@ -334,9 +335,9 @@ namespace NIKE {
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
             target_health.taken_damage = true;
-            // Play SFX when apply damage
-            playSFX(target, true);
-            // Play animation when taken damage
+            // Play SFX when apply damage (currently hardcoded)
+            //playSFX(target, true); // Specific for taking damage and changes component
+            playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
             // Play animation when taken damage
             static float deathAnimationTimer = 0.0f;
             static const float deathAnimationDuration = 1.5f;
