@@ -80,6 +80,15 @@ namespace NIKE {
             bool detectSATCollision(const Physics::Collider& colliderA, const Physics::Collider& colliderB,
                 const std::string& model_idA, const std::string& model_idB, CollisionInfo& info);
 
+            //Apply slide correction
+            void applySlideCorrection(Physics::Dynamics& dynamics, const Vector2f& normal);
+
+            //Resolve slide collision
+            void resolveSlideCollision(
+                Transform::Transform& a, Physics::Dynamics& dynamics_a,
+                Transform::Transform& b, Physics::Dynamics& dynamics_b,
+                const CollisionInfo& info);
+
             // Collision resolution
             void collisionResolution(Entity::Type entity_a, Transform::Transform& transform_a,
                 Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,

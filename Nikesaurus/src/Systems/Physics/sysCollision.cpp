@@ -363,6 +363,38 @@ namespace NIKE {
         return collisionDetected;
     }
 
+    void Collision::System::applySlideCorrection(Physics::Dynamics& dynamics, const Vector2f& normal) {
+        // Project velocity onto the collision normal
+        float velocityIntoSurface = dynamics.velocity.dot(normal);
+
+        // Remove velocity component into the surface
+        if (velocityIntoSurface < 0) {
+            dynamics.velocity -= normal * velocityIntoSurface;
+        }
+    }
+
+    void Collision::System::resolveSlideCollision(
+        Transform::Transform& a, Physics::Dynamics& dynamics_a,
+        Transform::Transform& b, Physics::Dynamics& dynamics_b,
+        const CollisionInfo& info) {
+
+        //Calculate mass
+        float mass_a = (dynamics_a.mass == 0.0f) ? 1.0f : dynamics_a.mass;
+        float mass_b = (dynamics_b.mass == 0.0f) ? 1.0f : dynamics_b.mass;
+        float total_mass = mass_a + mass_b;
+
+        //Caluculate mtv correction based on mass
+        Vector2f correction_a = (info.mtv * (mass_b / total_mass));
+        Vector2f correction_b = (info.mtv * (mass_a / total_mass));
+
+        //Apply position corrections
+        a.position += correction_a;
+        b.position -= correction_b;
+
+        // Apply velocity corrections (slide effect)
+        applySlideCorrection(dynamics_a, info.collision_normal);
+        applySlideCorrection(dynamics_b, -info.collision_normal);
+    }
 
     void Collision::System::collisionResolution(
         Entity::Type entity_a, Transform::Transform& transform_a, Physics::Dynamics& dynamics_a, Physics::Collider& collider_a,
@@ -415,20 +447,26 @@ namespace NIKE {
             return;
         }
 
+        //Penetration threshold
+        constexpr float PENETRATION_THRESHOLD = 0.05f;
+
         // Slide Resolution
         if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::SLIDE) {
-            transform_a.position += info.mtv * 0.5f;
-            transform_b.position -= info.mtv * 0.5f;
+            resolveSlideCollision(transform_a, dynamics_a, transform_b, dynamics_b, info);
             return;
         }
 
         // Default Resolutions
-        if (collider_a.resolution == Physics::Resolution::SLIDE) {
-            transform_a.position += info.mtv;
+        if (collider_a.resolution == Physics::Resolution::SLIDE && collider_b.resolution == Physics::Resolution::NONE) {
+            if (info.mtv.length() > PENETRATION_THRESHOLD) {
+                transform_a.position += info.mtv;
+            }
         }
 
-        if (collider_b.resolution == Physics::Resolution::SLIDE) {
-            transform_b.position -= info.mtv;
+        if (collider_b.resolution == Physics::Resolution::SLIDE && collider_a.resolution == Physics::Resolution::NONE) {
+            if (info.mtv.length() > PENETRATION_THRESHOLD) {
+                transform_b.position -= info.mtv;
+            }
         }
     }
 

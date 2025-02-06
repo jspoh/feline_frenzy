@@ -76,6 +76,11 @@ inline bool NIKE::Math::Vector2<T>::operator<(const Vector2& rhs) const
 }
 
 template<typename T>
+inline Vector2<T> NIKE::Math::Vector2<T>::operator-() const {
+	return { -x, -y };
+}
+
+template<typename T>
 inline typename Vector2<T>::type Vector2<T>::dot(const Vector2<T>& rhs) const {
 	return x * rhs.x + y * rhs.y;
 }

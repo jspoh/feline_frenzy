@@ -130,9 +130,6 @@ namespace NIKE {
 
 		//Set texture frame index
 		sprite_texture.frame_index = sprite_component.curr_index;
-		
-		////Calculate Time Before Next Animation
-		//float timePerAnimation{ base_component.animation_duration / frameCount(sprite_component) };
 
 		//Increment timer with delta time
 		base_component.timer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();

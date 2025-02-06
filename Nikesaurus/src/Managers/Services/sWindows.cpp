@@ -524,7 +524,7 @@ namespace NIKE {
 
 	void Windows::Service::calculateDeltaTime() {
 		// Cap at 50ms (prevents big jumps)
-		constexpr float MAX_DELTA_TIME = 0.05f; // For smoother gameplay higher (0.1), For responsive gameplay lower (0.05)
+		constexpr float MAX_DELTA_TIME = 0.1f; // For smoother gameplay higher (0.1), For responsive gameplay lower (0.05)
 
 		//Static prev time
 		static double prev_time = glfwGetTime();

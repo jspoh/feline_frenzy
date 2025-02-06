@@ -41,8 +41,11 @@ namespace NIKE {
             return static_cast<int>(std::hash<int>()(x) ^ (std::hash<int>()(y) << 1));
             };
 
+        //Maximum physics steps
+        constexpr int MAX_PHYSICS_STEPS = 5;
+
         //Iteration every fixed step for fixed delta time
-        for (int step = 0; step < NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(); ++step) {
+        for (int step = 0; step < min(NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(), MAX_PHYSICS_STEPS); ++step) {
 
             //Broad-phase collision detection
             std::unordered_map<int, std::vector<Entity::Type>> spatial_grid;
