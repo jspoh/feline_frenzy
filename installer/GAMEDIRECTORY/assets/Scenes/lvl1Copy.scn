@@ -107,8 +107,8 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
-                                "EnemyLimit": 2,
-                                "LastSpawnTime": 3.016664505004883
+                                "EnemyLimit": 4,
+                                "LastSpawnTime": 2.2333319187164307
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -181,15 +181,6 @@
                                     "y": 0
                                 }
                             },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "preset": 2,
-                                "render_type": 1
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -204,8 +195,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -275,7 +266,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -346,7 +337,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -417,7 +408,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -488,8 +479,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -559,8 +550,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -630,8 +621,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
+                                    "x": 2,
+                                    "y": 1
                                 },
                                 "Frame_Size": {
                                     "x": 4,
@@ -865,7 +856,7 @@
                             "Animation::Sprite": {
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 0
+                                    "y": 2
                                 },
                                 "Sheet_Size": {
                                     "x": 10,
@@ -873,7 +864,7 @@
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 2
                                 }
                             },
                             "Audio::SFX": {
@@ -898,7 +889,7 @@
                             "GameLogic::ILogic": {
                                 "Function": "update",
                                 "Named_Args": {
-                                    "entity": 90
+                                    "entity": 56
                                 },
                                 "Script_ID": "player.lua"
                             },
@@ -909,8 +900,8 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -233.34902954101563,
-                                    "y": -48.91523361206055
+                                    "x": 33.05697250366211,
+                                    "y": 315.63555908203125
                                 },
                                 "Resolution": 1,
                                 "Rotation": 0.0,
@@ -928,25 +919,16 @@
                                 "Mass": 0.5,
                                 "Max_Speed": 3000.0,
                                 "Velocity": {
-                                    "x": 0.00817176979035139,
-                                    "y": -23.305368423461914
+                                    "x": 3.1348044872283936,
+                                    "y": 2.0842814445495605
                                 }
                             },
                             "Render::Cam": {
                                 "Position": {
-                                    "x": -233.34902954101563,
-                                    "y": -48.91523361206055
+                                    "x": 33.05697250366211,
+                                    "y": 315.63555908203125
                                 },
-                                "Zoom": 0.9723707437515259
-                            },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 64.30000305175781
-                                },
-                                "preset": 2,
-                                "render_type": 1
+                                "Zoom": 1.285545825958252
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -962,8 +944,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 1,
-                                    "y": 0
+                                    "x": 3,
+                                    "y": 2
                                 },
                                 "Frame_Size": {
                                     "x": 10,
@@ -977,8 +959,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -233.34902954101563,
-                                    "y": -48.91523361206055
+                                    "x": 33.05697250366211,
+                                    "y": 315.63555908203125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1022,7 +1004,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 0.00046020871377550066,
+                                    "w": 1.0,
                                     "x": 0.9489796161651611,
                                     "y": 0.2614535689353943,
                                     "z": 0.0
@@ -1083,7 +1065,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.401298464324817e-45,
+                                    "w": 0.0,
                                     "x": 0.0,
                                     "y": 0.90816330909729,
                                     "z": 1.0
@@ -1144,7 +1126,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.401298464324817e-45,
+                                    "w": 0.0,
                                     "x": 0.17211580276489258,
                                     "y": 0.8877550959587097,
                                     "z": 0.0
@@ -1362,15 +1344,6 @@
                                         "invulnerable_flag": false
                                     },
                                     "Physics::Collider": null,
-                                    "Render::ParticleEmitter": {
-                                        "duration": -1.0,
-                                        "offset": {
-                                            "x": 0.0,
-                                            "y": 0.0
-                                        },
-                                        "preset": 1,
-                                        "render_type": 1
-                                    },
                                     "Render::Texture": {
                                         "Color": {
                                             "w": 1.0,
@@ -1382,7 +1355,12 @@
                                     "State::State": {
                                         "State": "Idle"
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -277.64605712890625,
+                                            "y": 220.67849731445313
+                                        }
+                                    }
                                 },
                                 "MetaData": {
                                     "Tags": [
@@ -1411,15 +1389,6 @@
                                             "x": -720.812255859375,
                                             "y": 33.9788818359375
                                         }
-                                    },
-                                    "Render::ParticleEmitter": {
-                                        "duration": -1.0,
-                                        "offset": {
-                                            "x": 0.0,
-                                            "y": 0.0
-                                        },
-                                        "preset": 0,
-                                        "render_type": 1
                                     },
                                     "Render::Texture": {
                                         "Color": {
@@ -1934,7 +1903,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 4,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2024,7 +1993,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2080,8 +2049,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": -233.3495330810547,
-                                            "y": 44.65862274169922
+                                            "x": 32.66817855834961,
+                                            "y": 407.5370788574219
                                         },
                                         "Scale": {
                                             "x": 75.0,
