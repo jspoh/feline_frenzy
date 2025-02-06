@@ -430,31 +430,7 @@ namespace NIKE {
 
 	void State::EnemyHurtState::playSFX(Entity::Type& entity, bool play_or_no)
 	{
-		auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-		if (e_sfx_comp.has_value()) {
-			auto& e_sfx = e_sfx_comp.value().get();
-
-			//Check if group exists
-			auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
-			e_sfx.audio_id = "EnemyGetHit2.wav";
-
-			if (!group) {
-				e_sfx.b_play_sfx = play_or_no;
-				return;
-			}
-			else {
-				//Play sound
-				if (play_or_no && !group->isPlaying()) {
-					e_sfx.b_play_sfx = play_or_no;
-					return;
-				}
-			}
-
-			//stop sfx
-			if (!play_or_no) {
-				group->stop();
-			}
-		}
+		Interaction::playOneShotSFX(entity, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
 	}
 }
 
