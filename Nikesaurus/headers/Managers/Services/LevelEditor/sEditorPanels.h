@@ -484,8 +484,25 @@ namespace NIKE {
 		};
 
 		//Debug Management Panel
-		class DebugPanel : public IPanel {
+		class DebugPanel : public IPanel, public std::streambuf {
 		private:
+
+			//Log input
+			std::string currentLine;
+
+		protected:
+
+			//Old streams
+			std::streambuf* oldcout = nullptr;
+			std::streambuf* oldcerr = nullptr;
+
+			//Logs
+			std::vector<std::string> console_logs;
+			std::mutex buff_mutex;
+
+			//Stream
+			int overflow(int c) override;
+
 		public:
 			DebugPanel() = default;
 			~DebugPanel() = default;
@@ -505,6 +522,12 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			//Bind to editor
+			void coutToEditor();
+
+			//Restore cout
+			void restoreCout();
 		};
 
 		//Audio Management Panel

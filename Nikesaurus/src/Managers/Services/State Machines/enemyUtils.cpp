@@ -120,33 +120,37 @@ namespace NIKE {
 		const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		// Get enemy transform
 		const auto enemy_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
-		// Get enemy range
+		// Get enemy attack range (in grid cells)
 		const auto enemy_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+
 		if (player_transform_comp.has_value() && enemy_transform_comp.has_value() && enemy_attack_comp.has_value()) {
 			const Vector2f player_pos = player_transform_comp.value().get().position;
-			const Vector2f player_scale = player_transform_comp.value().get().scale;
-
 			const Vector2f enemy_pos = enemy_transform_comp.value().get().position;
-			const Vector2f enemy_scale = enemy_transform_comp.value().get().scale;
 
-			const float enemy_range = enemy_attack_comp.value().get().range;
+			// Range in grid cells
+			const float enemy_range = enemy_attack_comp.value().get().range;  
 
-			// Calculations
-			const float avg_scale_x = (enemy_scale.x + player_scale.x) / 2;
-			const float avg_scale_y = (enemy_scale.y + player_scale.y) / 2;
+			// Convert player and enemy positions to grid cell indexes
+			auto player_cell = NIKE_MAP_SERVICE->getCellIndexFromCords(player_pos);
+			auto enemy_cell = NIKE_MAP_SERVICE->getCellIndexFromCords(enemy_pos);
 
-			const float dist_x = (enemy_pos.x - player_pos.x) / avg_scale_x;
-			const float dist_y = (enemy_pos.y - player_pos.y) / avg_scale_y;
+			if (player_cell.has_value() && enemy_cell.has_value()) {
+				// Calculate the distance between player and enemy in grid cells
+				const int dist_x = std::abs(player_cell.value().x - enemy_cell.value().x);
+				const int dist_y = std::abs(player_cell.value().y - enemy_cell.value().y);
 
-			const float distance = (dist_x * dist_x) + (dist_y * dist_y);
+				// Calculate the Manhattan distance (or use Euclidean if desired)
+				const int distance = dist_x + dist_y;
 
-			//NIKEE_CORE_INFO("Distance = {}, Enemy Range = {}", distance, enemy_range);
-
-			// It is recommended to use enemy_range^2, but it's probably easier this way
-			return distance < enemy_range;
+				// Check if within the specified range (in grid cells)
+				return distance <= enemy_range;
+			}
 		}
+
 		return false;
 	}
+
+
 
 	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform component

@@ -261,6 +261,8 @@ namespace NIKE {
             });
 
         lua_state.set_function("PreviousScene", [&]() {
+            // Wait for 400 miliseconds before changing the scene. (TODO, optimise if possible)
+            std::this_thread::sleep_for(std::chrono::milliseconds(400));
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PREVIOUS, ""));
             });
 
@@ -316,41 +318,46 @@ namespace NIKE {
         );
 
         //Change animation start & end
-        lua_state.set_function("AnimationStart", [&](Entity::Type entity, int start_x, int start_y) {
+        lua_state.set_function("AnimationSet", [&](Entity::Type entity, int start_x, int start_y, int end_x, int end_y) {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-            if (e_animate_comp.has_value()) {
-                static Vector2i prev_start = e_animate_comp.value().get().start_index;
+            auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+            if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+                auto& e_animate = e_animate_comp.value().get();
+                auto& e_base = e_base_comp.value().get();
 
-                if (prev_start != Vector2i(start_x, start_y)) {
-                    e_animate_comp.value().get().start_index.x = start_x;
-                    e_animate_comp.value().get().start_index.y = start_y;
-                    prev_start = e_animate_comp.value().get().start_index;
+                //Boolean to check for changes
+                bool changed = false;
 
-                    //Restart animation
-                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-                    if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-                    }
+                //Save prev start
+                static Vector2i prev_start = e_animate.start_index;
+
+                //Change animation
+                if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
+                    e_animate.start_index.x = start_x;
+                    e_animate.start_index.y = start_y;
+                    prev_start = e_animate.start_index;
+
+                    changed = true;
                 }
-            }
-            });
 
-        //Change animation start & end
-        lua_state.set_function("AnimationEnd", [&](Entity::Type entity, int end_x, int end_y) {
-            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-            if (e_animate_comp.has_value()) {
-                static Vector2i prev_end = e_animate_comp.value().get().end_index;
+                //Save prev end
+                static Vector2i prev_end = e_animate.end_index;
 
-                if (prev_end != Vector2i(end_x, end_y)) {
-                    e_animate_comp.value().get().end_index.x = end_x;
-                    e_animate_comp.value().get().end_index.y = end_y;
-                    prev_end = e_animate_comp.value().get().end_index;
+                //Change animation
+                if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
+                    e_animate.end_index.x = end_x;
+                    e_animate.end_index.y = end_y;
+                    prev_end = e_animate.end_index;
+
+                    changed = true;
+                }
+
+                //If variables changed
+                if (changed) {
 
                     //Restart animation
-                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-                    if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-                    }
+                    e_base.animations_to_complete = 0;
+                    e_base.animation_mode = Animation::Mode::RESTART;
                 }
             }
             });
@@ -543,15 +550,45 @@ namespace NIKE {
                 e_trans_comp.value().get().position.x = x;
                 e_trans_comp.value().get().position.y = y;
             }
+            // Temporary hardcoded SFX
+            Interaction::playOneShotSFX(entity, "EnemySpawn1.wav", "EnemySFX", 1.0f, 1.0f);
+
             });
 
         // Player EnemyDeathState annimation function
         lua_state.set_function("CheckDeath", [&](Entity::Type entity) -> bool {
             auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
             if (health_comp.has_value()) {
+
+                // Temporary method to store static map for health (TODO, remove after optimising another way)
+                auto& health = health_comp.value().get();
+
+                // Note static
+                static float prevHealth = health.health;
+
+                // If health has decreased, play the damage-taken SFX and update prevHealth.
+                if (health.health < prevHealth) {
+                    Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
+                    prevHealth = health.health;
+                }
+                else {
+                    // If health has increased (e.g., healing) update prevHealth.
+                    prevHealth = health.health;
+                }
+
                 // When player do not have any health
                 if (health_comp.value().get().lives <= 0)
                 {
+                    // Temporary hardcoded SFX
+                    Interaction::playOneShotSFX(entity, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
+
+                    // Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
+                    float secondsToDelay = 0.5f;
+                    float currentDelay = 0.0f;
+                    while (currentDelay < secondsToDelay) {
+                        currentDelay += NIKE_WINDOWS_SERVICE->getDeltaTime();
+                    }
+
                     NIKE_METADATA_SERVICE->destroyEntity(entity);
                     return true;
                 }

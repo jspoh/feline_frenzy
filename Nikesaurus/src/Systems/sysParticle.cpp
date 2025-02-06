@@ -55,6 +55,13 @@ NSPM::Manager() {
 
 NSPM::~Manager() {
 	active_particle_systems.clear();
+
+	for (auto& [preset, vao] : vao_map) {
+		glDeleteVertexArrays(1, &vao);
+	}
+	for (auto& [preset, vbo] : vbo_map) {
+		glDeleteBuffers(1, &vbo);
+	}
 }
 
 
@@ -221,18 +228,16 @@ void NSPM::update() {
 			static float time_since_last_spawn = 0.f;
 			time_since_last_spawn += dt;
 
-			int particles_to_spawn = static_cast<int>(time_since_last_spawn * NEW_PARTICLES_PER_SECOND);
+			static float particles_to_spawn = 0.f;
+			particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
 
 			if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-				particles_to_spawn = 0;
+				particles_to_spawn = 0.f;
 				time_since_last_spawn = 0.f;
 			}
 
-			if (ps.is_alive && particles_to_spawn > 0) {
-				// reset state
-				time_since_last_spawn = 0.f;
-
-				for (int _{}; _ < particles_to_spawn; _++) {
+			if (ps.is_alive && particles_to_spawn >= 1) {
+				for (int _{}; static_cast<float>(_) < particles_to_spawn; _++) {
 					Particle new_particle;
 					new_particle.preset = ps.preset;
 					new_particle.pos = PARTICLE_ORIGIN;
@@ -248,7 +253,9 @@ void NSPM::update() {
 					ps.particles.push_back(new_particle);
 				}
 
-
+				// reset state
+				time_since_last_spawn = 0.f;
+				particles_to_spawn -= std::floor(particles_to_spawn);
 			}
 
 			// end update particles

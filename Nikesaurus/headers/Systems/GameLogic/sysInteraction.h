@@ -38,14 +38,12 @@ namespace NIKE {
         bool withinRange(Entity::Type source, Entity::Type player);
 
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
-        // Test
+        // Play SFX once
         void playOneShotSFX(Entity::Type& entity, const std::string& custom_audio_id, const std::string& custom_channel_group_id, float custom_volume, float custom_pitch);
 
         /***********************
         * Animation handling
         ************************/
-        void animationHurtStart(Entity::Type& entity, int start_x, int start_y);
-        void animationHurtEnd(Entity::Type& entity, int end_x, int end_y);
         void flipX(Entity::Type& entity, bool yes_or_no);
         void flipY(Entity::Type& entity, bool yes_or_no);
         void setLastDirection(Entity::Type& entity, int dir);

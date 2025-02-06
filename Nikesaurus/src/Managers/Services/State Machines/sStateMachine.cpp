@@ -39,42 +39,47 @@ namespace NIKE {
 			return (transitions.find(transition_id) != transitions.end());
 		}
 
-		void Istate::animationStart(Entity::Type& entity, int start_x, int start_y)
+		void Istate::animationSet(Entity::Type& entity, int start_x, int start_y, int end_x, int end_y)
 		{
 			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-			if (e_animate_comp.has_value()) {
-				static Vector2i prev_start = e_animate_comp.value().get().start_index;
+			auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+			if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+				auto& e_animate = e_animate_comp.value().get();
+				auto& e_base = e_base_comp.value().get();
 
-				if (prev_start != Vector2i(start_x, start_y)) {
-					e_animate_comp.value().get().start_index.x = start_x;
-					e_animate_comp.value().get().start_index.y = start_y;
-					prev_start = e_animate_comp.value().get().start_index;
+				//Boolean to check for changes
+				bool changed = false;
 
-					//Restart animation
-					auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-					if (e_base_comp.has_value()) {
-						e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-					}
+				//Save prev start
+				static Vector2i prev_start = e_animate.start_index;
+
+				//Change animation
+				if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
+					e_animate.start_index.x = start_x;
+					e_animate.start_index.y = start_y;
+					prev_start = e_animate.start_index;
+
+					changed = true;
 				}
-			}
-		}
 
-		void Istate::animationEnd(Entity::Type& entity, int end_x, int end_y)
-		{
-			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-			if (e_animate_comp.has_value()) {
-				static Vector2i prev_end = e_animate_comp.value().get().end_index;
+				//Save prev end
+				static Vector2i prev_end = e_animate.end_index;
 
-				if (prev_end != Vector2i(end_x, end_y)) {
-					e_animate_comp.value().get().end_index.x = end_x;
-					e_animate_comp.value().get().end_index.y = end_y;
-					prev_end = e_animate_comp.value().get().end_index;
+				//Change animation
+				if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
+					e_animate.end_index.x = end_x;
+					e_animate.end_index.y = end_y;
+					prev_end = e_animate.end_index;
+
+					changed = true;
+				}
+
+				//If variables changed
+				if (changed) {
 
 					//Restart animation
-					auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-					if (e_base_comp.has_value()) {
-						e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-					}
+					e_base.animations_to_complete = 0;
+					e_base.animation_mode = Animation::Mode::RESTART;
 				}
 			}
 		}
@@ -188,6 +193,7 @@ namespace NIKE {
 			registerState("Idle", std::make_shared<State::IdleState>());
 			registerState("EnemyAttack", std::make_shared<State::EnemyAttackState>());
 			registerState("EnemyChase", std::make_shared<State::EnemyChaseState>());
+			//registerState("EnemyHurt", std::make_shared<State::EnemyHurtState>());
 			registerState("EnemyDeath", std::make_shared<State::EnemyDeathState>());
 			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
 		}
@@ -202,7 +208,10 @@ namespace NIKE {
 				auto& state_comp = e_state_comp.value().get();
 				state_comp.entity_ref = entity;
 				// Lock the weak pointer to the current state
-				current_state = state_comp.current_state.lock();
+				if (current_state != state_comp.current_state.lock())
+				{
+					current_state = state_comp.current_state.lock();
+				}
 				if (current_state)
 				{
 					current_state->onUpdate(entity);

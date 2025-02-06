@@ -26,7 +26,7 @@ layout(location=3) flat out float f_rotation;
 
 uniform vec2 iResolution;   // Viewport resolution (in pixels)
 uniform float iTime;        // Shader playback time (in seconds)
-uniform vec2 particleOrigin;
+uniform vec2 particleScreenOrigin;
 
 
 void main() {

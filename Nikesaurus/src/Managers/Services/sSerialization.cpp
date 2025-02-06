@@ -293,6 +293,12 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadEntityFromFile(Entity::Type entity, std::string const& file_path) {
+		//Prefab check
+		if (std::filesystem::path(file_path).extension().string() == "prefab") {
+			NIKEE_CORE_WARN("Use load entity from prefab instead!");
+			return;
+		}
+
 		//Json Data
 		nlohmann::json data;
 
@@ -322,6 +328,13 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadEntityFromPrefab(Entity::Type entity, std::string const& prefab_id) {
+
+		//Prefab check
+		if (prefab_id.find(".prefab") == std::string::npos) {
+			NIKEE_CORE_WARN("Not a valid prefab id!");
+			return;
+		}
+
 		//Json Data
 		nlohmann::json data;
 
