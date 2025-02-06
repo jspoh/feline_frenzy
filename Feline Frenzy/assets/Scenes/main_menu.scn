@@ -160,7 +160,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 2,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -220,7 +220,7 @@
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 6,
+                                    "x": 7,
                                     "y": 1
                                 },
                                 "Start_Index": {
