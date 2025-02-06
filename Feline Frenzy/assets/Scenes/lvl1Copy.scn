@@ -937,7 +937,7 @@
                                     "x": -233.34902954101563,
                                     "y": -48.91523361206055
                                 },
-                                "Zoom": 2.027451515197754
+                                "Zoom": 0.9723707437515259
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -946,7 +946,7 @@
                                     "y": 64.30000305175781
                                 },
                                 "preset": 2,
-                                "render_type": 0
+                                "render_type": 1
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1362,6 +1362,15 @@
                                         "invulnerable_flag": false
                                     },
                                     "Physics::Collider": null,
+                                    "Render::ParticleEmitter": {
+                                        "duration": -1.0,
+                                        "offset": {
+                                            "x": 0.0,
+                                            "y": 0.0
+                                        },
+                                        "preset": 1,
+                                        "render_type": 1
+                                    },
                                     "Render::Texture": {
                                         "Color": {
                                             "w": 1.0,

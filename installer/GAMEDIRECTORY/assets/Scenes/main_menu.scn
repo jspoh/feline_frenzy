@@ -81,7 +81,7 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "entity_0000",
@@ -90,10 +90,39 @@
                             "Tags": []
                         }
                     }
-                },
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "Entities": [
                 {
                     "Entity": {
                         "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 5,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 1,
+                                    "y": 0
+                                }
+                            },
                             "Audio::SFX": {
                                 "Audio_ID": "MenuYesOpen.wav",
                                 "B_Play_SFX": false,
@@ -101,30 +130,45 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square.model"
-                            },
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
+                                    "x": 1.9303920269012451,
+                                    "y": 1.899019479751587,
+                                    "z": 2.2009804248809814
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 0.9025270342826843,
+                                "Scale": 10.0,
                                 "Size": {
-                                    "x": 249.99996948242188,
-                                    "y": 35.19855499267578
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "Text": "START GAME"
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "UI_PlayGame_spritesheet_updated.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -133,17 +177,17 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 500.0,
-                                    "y": 90.0
+                                    "x": 489.8549499511719,
+                                    "y": 93.25690460205078
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Layer_ID": 0,
+                            "Layer_ID": 1,
                             "Layer_Order": 0,
-                            "Name": "entity_0001",
+                            "Name": "play_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -164,6 +208,129 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 6,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuNoClose.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.3303921222686768,
+                                    "y": 1.2990195751190186,
+                                    "z": 1.600980281829834
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 10.0,
+                                "Size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 6,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "UI_QuitGame_spritesheet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 28.508544921875,
+                                    "y": -336.0472412109375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 353.40863037109375,
+                                    "y": 72.47637939453125
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "quit_game_btn",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Function": "Quit",
+                                "Named_Args": {},
+                                "Script_ID": "ChangeScene.lua"
+                            }
+                        },
+                        "UI ID": "quit_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 6,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
                             "Audio::SFX": {
                                 "Audio_ID": "MenuYesOpen.wav",
                                 "B_Play_SFX": false,
@@ -171,49 +338,64 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square.model"
-                            },
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
+                                    "x": 0.45000001788139343,
+                                    "y": 0.45000001788139343,
+                                    "z": 0.45000001788139343
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 0.9026729464530945,
+                                "Scale": 10.0,
                                 "Size": {
-                                    "x": 287.04998779296875,
-                                    "y": 33.39889907836914
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "Text": "HOW TO PLAY"
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 6,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "UI_HowToPlay_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 21.399999618530273,
-                                    "y": -236.6999969482422
+                                    "x": 31.9111328125,
+                                    "y": -239.07183837890625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 574.0999755859375,
-                                    "y": 90.0
+                                    "x": 413.7682800292969,
+                                    "y": 70.30827331542969
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 0,
-                            "Name": "entity_0002",
+                            "Layer_ID": 1,
+                            "Layer_Order": 2,
+                            "Name": "how_to_play_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -230,84 +412,8 @@
                         },
                         "UI ID": "how_to_play_btn"
                     }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "SFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square.model"
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 0.9294871687889099,
-                                "Size": {
-                                    "x": 238.87820434570313,
-                                    "y": 36.25
-                                },
-                                "Text": "QUIT GAME"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 22.899999618530273,
-                                    "y": -328.29998779296875
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 572.6699829101563,
-                                    "y": 72.5
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 0,
-                            "Name": "entity_0003",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Quit",
-                                "Named_Args": {},
-                                "Script_ID": "ChangeScene.lua"
-                            }
-                        },
-                        "UI ID": "quit_btn"
-                    }
                 }
             ],
-            "ID": 0,
-            "Mask": 1
-        }
-    },
-    {
-        "Layer": {
-            "B_State": true,
-            "Entities": [],
             "ID": 1,
             "Mask": 2
         }

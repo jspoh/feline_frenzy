@@ -14,7 +14,7 @@ layout(location=0) out vec4 f_color;
 
 uniform vec2 iResolution;   // Viewport resolution (in pixels)
 uniform float iTime;        // Shader playback time (in seconds)
-uniform vec2 particleOrigin;
+uniform vec2 particleScreenOrigin;
 
 
 void main() {
@@ -23,7 +23,7 @@ void main() {
   float particle_radius = 5.0;
 
   // make spinning lol
-  vec2 particle_pos = particleOrigin;
+  vec2 particle_pos = particleScreenOrigin;
   particle_pos.x += 50.0 * sin(iTime * 3);
   particle_pos.y += 50.0 * cos(iTime * 3);
 

@@ -51,11 +51,14 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 256.0,
-                "y": 256.0
+                "x": 64.0,
+                "y": 64.0
             },
             "Screen Position": false
         }
     },
-    "Layer ID": 0
+    "MetaData": {
+        "Layer ID": 4,
+        "Tags": []
+    }
 }
