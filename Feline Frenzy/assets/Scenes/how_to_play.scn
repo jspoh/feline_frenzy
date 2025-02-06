@@ -209,16 +209,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 0,
-                                "Frame_Duration": 0.20000000298023224,
-                                "Mode": 0,
-                                "Timer": 0.0
+                                "Frame_Duration": 0.20000000298023224
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 0,
                                     "y": 0
@@ -231,6 +224,13 @@
                                     "x": 0,
                                     "y": 0
                                 }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuNoClose.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
                             },
                             "Render::Text": {
                                 "Color": {
