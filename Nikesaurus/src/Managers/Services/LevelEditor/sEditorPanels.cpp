@@ -1133,8 +1133,11 @@ namespace NIKE {
 					//Show number of entities in the level
 					ImGui::Text("Number of entities in layer: %d", layer->getEntitiesSize());
 
+					// Create a unique button label using the layer ID
+					std::string button_label = "Create##Entity" + std::to_string(layer->getLayerID());
+
 					// Button to create an entity, which triggers the popup
-					if (ImGui::Button("Create##Entity")) {
+					if (ImGui::Button(button_label.c_str())) {
 						openPopUp("Create Entity");
 					}
 
