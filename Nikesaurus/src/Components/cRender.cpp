@@ -33,6 +33,18 @@ namespace NIKE {
 					{ "render_type", static_cast<int>(comp.render_type) },
 					{ "offset", comp.offset.toJson() },
 					{ "duration", comp.duration },
+					{ "num_new_particles_per_second", comp.num_new_particles_per_second },
+					{ "particle_lifespan", comp.particle_lifespan },
+					{ "particle_velocity_range", comp.particle_velocity_range.toJson() },
+					{ "particle_color_is_random", comp.particle_color_is_random },
+					{ "particle_color", comp.particle_color.toJson()},
+					{ "particle_rand_x_offset_range", comp.particle_rand_x_offset_range.toJson()},
+					{ "particle_rand_y_offset_range", comp.particle_rand_y_offset_range.toJson()},
+					{ "particle_rotation", comp.particle_rotation },
+					{ "particle_rand_width_range", comp.particle_rand_width_range.toJson()},
+					{ "particle_rand_height_range", comp.particle_rand_height_range.toJson()},
+
+
 					//{ "ref", comp.ref }
 				};
 			},
@@ -45,6 +57,20 @@ namespace NIKE {
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
 				comp.ref = particle_emitter_ref;
+
+				comp.num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
+				comp.particle_lifespan = data.at("particle_lifespan").get<float>();
+				comp.particle_acceleration = data.at("particle_acceleration").get<float>();
+				comp.particle_velocity_range.fromJson(data.at("particle_velocity_range"));
+				comp.particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
+				comp.particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
+				comp.particle_color_is_random = data.at("particle_color_is_random").get<bool>();
+				comp.particle_color.fromJson(data.at("particle_color"));
+				comp.particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
+				comp.particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
+				comp.particle_rotation = data.at("particle_rotation").get<float>();
+				comp.particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
+				comp.particle_rand_height_range.fromJson(data.at("particle_rand_height_range"));
 
 				// add particle system
 				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
@@ -68,6 +94,47 @@ namespace NIKE {
 				//if (comp.ref != other_comp.ref) {
 				//	delta["ref"] = comp.ref;
 				//}
+
+				if (comp.num_new_particles_per_second != other_comp.num_new_particles_per_second) {
+					delta["num_new_particles_per_second"] = comp.num_new_particles_per_second;
+				}
+				if (comp.particle_lifespan != other_comp.particle_lifespan) {
+					delta["particle_lifespan"] = comp.particle_lifespan;
+				}
+				if (comp.particle_acceleration != other_comp.particle_acceleration) {
+					delta["particle_acceleration"] = comp.particle_acceleration;
+				}
+				if (comp.particle_velocity_range != other_comp.particle_velocity_range) {
+					delta["particle_velocity_range"] = comp.particle_velocity_range.toJson();
+				}
+				if (comp.particle_vector_x_range != other_comp.particle_vector_x_range) {
+					delta["particle_vector_x_range"] = comp.particle_vector_x_range.toJson();
+				}
+				if (comp.particle_vector_y_range != other_comp.particle_vector_y_range) {
+					delta["particle_vector_y_range"] = comp.particle_vector_y_range.toJson();
+				}
+				if (comp.particle_color_is_random != other_comp.particle_color_is_random) {
+					delta["particle_color_is_random"] = comp.particle_color_is_random;
+				}
+				if (comp.particle_color != other_comp.particle_color) {
+					delta["particle_color"] = comp.particle_color.toJson();
+				}
+				if (comp.particle_rand_x_offset_range != other_comp.particle_rand_x_offset_range) {
+					delta["particle_rand_x_offset_range"] = comp.particle_rand_x_offset_range.toJson();
+				}
+				if (comp.particle_rand_y_offset_range != other_comp.particle_rand_y_offset_range) {
+					delta["particle_rand_y_offset_range"] = comp.particle_rand_y_offset_range.toJson();
+				}
+				if (comp.particle_rotation != other_comp.particle_rotation) {
+					delta["particle_rotation"] = comp.particle_rotation;
+				}
+				if (comp.particle_rand_width_range != other_comp.particle_rand_width_range) {
+					delta["particle_rand_width_range"] = comp.particle_rand_width_range.toJson();
+				}
+				if (comp.particle_rand_height_range != other_comp.particle_rand_height_range) {
+					delta["particle_rand_height_range"] = comp.particle_rand_height_range.toJson();
+				}
+
 				return delta;
 			},
 			// Override Deserialize
@@ -87,6 +154,46 @@ namespace NIKE {
 					comp.duration = delta["duration"];
 				}
 				comp.ref = particle_emitter_ref;
+
+				if (delta.contains("num_new_particles_per_second")) {
+					comp.num_new_particles_per_second = delta["num_new_particles_per_second"];
+				}
+				if (delta.contains("particle_lifespan")) {
+					comp.particle_lifespan = delta["particle_lifespan"];
+				}
+				if (delta.contains("particle_acceleration")) {
+					comp.particle_acceleration = delta["particle_acceleration"];
+				}
+				if (delta.contains("particle_velocity_range")) {
+					comp.particle_velocity_range.fromJson(delta["particle_velocity_range"]);
+				}
+				if (delta.contains("particle_vector_x_range")) {
+					comp.particle_vector_x_range.fromJson(delta["particle_vector_x_range"]);
+				}
+				if (delta.contains("particle_vector_y_range")) {
+					comp.particle_vector_y_range.fromJson(delta["particle_vector_y_range"]);
+				}
+				if (delta.contains("particle_color_is_random")) {
+					comp.particle_color_is_random = delta["particle_color_is_random"];
+				}
+				if (delta.contains("particle_color")) {
+					comp.particle_color.fromJson(delta["particle_color"]);
+				}
+				if (delta.contains("particle_rand_x_offset_range")) {
+					comp.particle_rand_x_offset_range.fromJson(delta["particle_rand_x_offset_range"]);
+				}
+				if (delta.contains("particle_rand_y_offset_range")) {
+					comp.particle_rand_y_offset_range.fromJson(delta["particle_rand_y_offset_range"]);
+				}
+				if (delta.contains("particle_rotation")) {
+					comp.particle_rotation = delta["particle_rotation"];
+				}
+				if (delta.contains("particle_rand_width_range")) {
+					comp.particle_rand_width_range.fromJson(delta["particle_rand_width_range"]);
+				}
+				if (delta.contains("particle_rand_height_range")) {
+					comp.particle_rand_height_range.fromJson(delta["particle_rand_height_range"]);
+				}
 
 				// add particle system
 				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
