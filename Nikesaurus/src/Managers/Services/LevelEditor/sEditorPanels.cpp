@@ -770,6 +770,13 @@ namespace NIKE {
 					//Check if entity is still alive
 					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
 
+					//Remove active particle system if exists
+					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity);
+					if (comps.find("Render::ParticleEmitter") != comps.end()) {
+						auto comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+						NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(comp->ref);
+					}
+
 					if (entity.has_value()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(entity.value());

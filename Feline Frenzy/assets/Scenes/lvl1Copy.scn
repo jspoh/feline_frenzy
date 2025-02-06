@@ -2173,7 +2173,59 @@
     {
         "Layer": {
             "B_State": true,
-            "Entities": [],
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Normal_Enemy_Idle_Front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 156.96878051757813,
+                                    "y": 160.18360900878906
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 113.99999237060547,
+                                    "y": 128.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 0,
+                            "Name": "entity_0036",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                }
+            ],
             "ID": 4,
             "Mask": 16
         }
