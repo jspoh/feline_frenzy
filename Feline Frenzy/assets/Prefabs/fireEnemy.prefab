@@ -4,18 +4,11 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 106,
-            "Frame_Duration": 0.054999999701976776,
-            "Mode": 0,
-            "Timer": 0.03333333507180214
+            "Frame_Duration": 0.054999999701976776
         },
         "Animation::Sprite": {
-            "Curr_Index": {
-                "x": 0,
-                "y": 0
-            },
             "End_Index": {
-                "x": 9,
+                "x": 4,
                 "y": 3
             },
             "Sheet_Size": {
@@ -106,7 +99,7 @@
                 "y": 4
             },
             "Frame_Size": {
-                "x": 10,
+                "x": 12,
                 "y": 16
             },
             "Intensity": 0.0,
@@ -129,7 +122,7 @@
         }
     },
     "MetaData": {
-        "Layer ID": 1,
+        "Layer ID": 0,
         "Tags": []
     }
 }

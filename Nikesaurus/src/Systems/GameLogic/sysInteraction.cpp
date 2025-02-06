@@ -334,27 +334,9 @@ namespace NIKE {
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+
+            // When target minus, boolean here will set to true
             target_health.taken_damage = true;
-            // Play SFX when apply damage (currently hardcoded)
-            //playSFX(target, true); // Specific for taking damage and changes component
-            playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
-            // Play animation when taken damage
-            static float deathAnimationTimer = 0.0f;
-            static const float deathAnimationDuration = 1.5f;
-            // Handle death animation
-            animationHurtStart(target, 0, 12);
-            flipX(target, false);
-
-            // Slow down transition from frame 0 to frame 1
-            deathAnimationTimer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-
-            // If timer reaches the desired duration, proceed to frame 1
-            if (deathAnimationTimer >= deathAnimationDuration) {
-                animationHurtEnd(target, 1, 12);
-                // Reset timer
-                deathAnimationTimer = 0.0f;
-            }
-
 
 			// Check if target health drops to zero or below
 			if (target_health.health <= 0) {

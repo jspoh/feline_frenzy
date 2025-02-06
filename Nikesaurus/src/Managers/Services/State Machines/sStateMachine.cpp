@@ -188,6 +188,7 @@ namespace NIKE {
 			registerState("Idle", std::make_shared<State::IdleState>());
 			registerState("EnemyAttack", std::make_shared<State::EnemyAttackState>());
 			registerState("EnemyChase", std::make_shared<State::EnemyChaseState>());
+			registerState("EnemyHurt", std::make_shared<State::EnemyHurtState>());
 			registerState("EnemyDeath", std::make_shared<State::EnemyDeathState>());
 			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
 		}
