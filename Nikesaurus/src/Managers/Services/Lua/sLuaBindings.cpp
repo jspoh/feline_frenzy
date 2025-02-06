@@ -563,7 +563,7 @@ namespace NIKE {
 
                 // If health has decreased, play the damage-taken SFX and update prevHealth.
                 if (health.health < prevHealth) {
-                    Interaction::playOneShotSFX(entity, "TakeDamageMeow1.wav", "PlayerSFX", 1.0f, 1.0f);
+                    Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
                     prevHealth = health.health;
                 }
                 else {
