@@ -1,5 +1,14 @@
 #version 450 core
 
+/*****************************************************************//**
+ * \file   circle_particle.vert
+ * \brief
+ *
+ * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
+ * \date   31 Jan 2024
+ * All content Copyright 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *********************************************************************/
+
 // 2d passthrough vertex shader
 
 // layout(location=0) in vec2 a_position;
