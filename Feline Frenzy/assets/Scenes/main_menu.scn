@@ -177,8 +177,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 408.4991455078125,
-                                    "y": 77.61483001708984
+                                    "x": 408.4993591308594,
+                                    "y": 77.61487579345703
                                 },
                                 "Screen Position": true
                             }
@@ -197,7 +197,7 @@
                             "Script": {
                                 "Function": "Change",
                                 "Named_Args": {
-                                    "scene": "lvl1Copy.scn"
+                                    "scene": "cut_scene_1.scn"
                                 },
                                 "Script_ID": "ChangeScene.lua"
                             }
