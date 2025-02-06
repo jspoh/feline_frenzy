@@ -165,7 +165,7 @@ namespace NIKE {
 			worldToScreen(ImVec2(corners[0].x, corners[0].y), render_size, e_transform.use_screen_pos),
 			worldToScreen(ImVec2(corners[1].x, corners[1].y), render_size, e_transform.use_screen_pos),
 			worldToScreen(ImVec2(corners[2].x, corners[2].y), render_size, e_transform.use_screen_pos),
-			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size, e_transform.use_screen_pos), 
+			worldToScreen(ImVec2(corners[3].x, corners[3].y), render_size, e_transform.use_screen_pos),
 			color, thickness / zoom * fullscreen_scale.x
 		);
 	}
@@ -525,7 +525,7 @@ namespace NIKE {
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
 			NIKEE_CORE_WARN("Editor config invalid!");
-			
+
 		}
 	}
 
@@ -994,7 +994,7 @@ namespace NIKE {
 							LevelEditor::Action select_tag_action;
 
 							// Define the do action for selecting the new tag
-							select_tag_action.do_action = [&, new_tag  = tag]() {
+							select_tag_action.do_action = [&, new_tag = tag]() {
 								selected_tag = new_tag;
 
 								};
@@ -2050,8 +2050,14 @@ namespace NIKE {
 						// get entity position
 						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
 
+						if (comps.find("Transform::Transform") == comps.end()) {
+							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
+							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
+						}
+						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
+
 						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
-						
+
 						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 						// update default particle system config
@@ -4098,7 +4104,7 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ResourcePanel::render() {
-		
+
 		//Update resource panel with file change events
 		while (!file_event_queue.empty()) {
 
@@ -4454,7 +4460,7 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Camera Management Panel
 	*********************************************************************/
-	
+
 	void LevelEditor::CameraPanel::cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change) {
 
 		if (ImGui::IsItemActivated()) {
@@ -4573,14 +4579,14 @@ namespace NIKE {
 				dispatchCameraChange(cam, name);
 				combo_index = index;
 				last_dispatched_index = index;
-			};
+				};
 
 			//Change cam undo action
 			change_cam_action.undo_action = [&, cam = before_it->first, name = before_it->second, index = last_dispatched_index]() {
 				dispatchCameraChange(cam, name);
 				combo_index = index;
 				last_dispatched_index = index;
-			};
+				};
 
 			//Execute action
 			NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_cam_action));
