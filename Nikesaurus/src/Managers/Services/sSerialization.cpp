@@ -9,6 +9,7 @@
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/sSerialization.h"
+#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
