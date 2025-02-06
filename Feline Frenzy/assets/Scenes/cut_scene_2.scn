@@ -85,6 +85,26 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.0
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
                             "Render::Shape": {
                                 "Color": {
                                     "w": 1.0,
@@ -97,16 +117,16 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.49515870213508606,
-                                    "y": 0.07521138340234756,
-                                    "z": 0.8508287072181702
+                                    "x": 0.47513771057128906,
+                                    "y": 0.0,
+                                    "z": 1.0
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 1.0,
+                                "Scale": 0.9580000042915344,
                                 "Size": {
-                                    "x": 100.0,
-                                    "y": 37.0
+                                    "x": 95.80000305175781,
+                                    "y": 35.44599914550781
                                 },
                                 "Text": "Next"
                             },
@@ -117,8 +137,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1.0,
-                                    "y": 1.0
+                                    "x": 191.60000610351563,
+                                    "y": 78.5
                                 },
                                 "Screen Position": false
                             }

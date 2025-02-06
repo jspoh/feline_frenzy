@@ -428,7 +428,7 @@ namespace NIKE {
 		playSFX(entity, false);
 	}
 
-	void State::EnemyHurtState::playSFX(Entity::Type& entity, bool play_or_no)
+	void State::EnemyHurtState::playSFX(Entity::Type& entity, [[maybe_unused]] bool play_or_no)
 	{
 		Interaction::playOneShotSFX(entity, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
 	}
