@@ -47,7 +47,7 @@ namespace NIKE {
 
 			//Constructor
 			Base() : animation_mode{ Mode::PLAYING }, animations_to_complete{ 0 }, completed_animations{ 0 },
-				 b_pingpong{ false }, b_reverse{ false }, frame_duration{ 0.0f }, timer() {}
+				 b_pingpong{ false }, b_reverse{ false }, frame_duration{ 0.2f }, timer() {}
 
 			//Arguement constructor
 			Base(int animations_to_complete, float frame_duration, bool pingpong_mode = false)

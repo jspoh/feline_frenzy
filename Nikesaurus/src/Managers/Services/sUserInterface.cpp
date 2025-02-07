@@ -224,7 +224,7 @@ namespace NIKE {
 		return (intersectCount % 2) == 1;
 	}
 
-	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape) {
+	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape, Animation::Sprite&& sprite) {
 
 		//Create an extra layer if there is only 1 layer
 		if (NIKE_SCENES_SERVICE->getLayerCount() <= 1) {
@@ -236,12 +236,14 @@ namespace NIKE {
 		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
 		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
-		ui_entities.emplace(btn_id, btn);
+		ui_entities[btn_id] = btn;
 
 		//Add components for UI
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(trans));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(shape));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(sprite));
+		NIKE_ECS_MANAGER->addDefEntityComponent(ui_entities.at(btn_id).entity_id, NIKE_ECS_MANAGER->getComponentType<Animation::Base>());
 
 		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).entity_id);
 		auto btn_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(ui_entities.at(btn_id).entity_id);
@@ -256,7 +258,7 @@ namespace NIKE {
 		return ui_entities.at(btn_id).entity_id;
 	}
 
-	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture) {
+	Entity::Type UI::Service::createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture, Animation::Sprite&& sprite) {
 
 		//Create an extra layer if there is only 1 layer
 		if (NIKE_SCENES_SERVICE->getLayerCount() <= 1) {
@@ -268,12 +270,14 @@ namespace NIKE {
 		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
 		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
-		ui_entities.emplace(btn_id, btn);
+		ui_entities[btn_id] = btn;
 
 		//Add components for UI
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(trans));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(text));
 		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(texture));
+		NIKE_ECS_MANAGER->addEntityComponent(ui_entities.at(btn_id).entity_id, std::move(sprite));
+		NIKE_ECS_MANAGER->addDefEntityComponent(ui_entities.at(btn_id).entity_id, NIKE_ECS_MANAGER->getComponentType<Animation::Base>());
 
 		auto btn_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(ui_entities.at(btn_id).entity_id);
 		auto btn_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(ui_entities.at(btn_id).entity_id);
@@ -501,8 +505,9 @@ namespace NIKE {
 				e_text.color.g = hover_container[entity.first].btn_text.color.g + 0.15f;
 				e_text.color.b = hover_container[entity.first].btn_text.color.b + 0.15f;
 
+				//Set start and end index ( ! TO BE MOVED OUT )
 				e_animate.start_index = Vector2i(1, 0);
-				e_animate.end_index = Vector2i(5,0);
+				e_animate.end_index = Vector2i(6, 0);
 
 				//Execute script for trigger
 				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
