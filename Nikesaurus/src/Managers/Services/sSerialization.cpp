@@ -120,6 +120,14 @@ namespace NIKE {
 
 				//Deserialize data into component
 				comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+
+				if (comp_name == "Render::ParticleEmitter") {
+					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+					auto comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+
+					// add particle system
+					NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(comp->ref, NIKE::SysParticle::Data::ParticlePresets(comp->preset), comp->offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp->render_type), comp->duration);
+				}
 			}
 			else {
 				success = false;
@@ -137,6 +145,10 @@ namespace NIKE {
 		//Iterate through all comp
 		for (auto const& comp : comps) {
 			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
+
+			if (comp.first == "Render::ParticleEmitter") {
+				NIKE::SysParticle::Manager::getInstance().instantlyRemoveActiveParticleSystem(reinterpret_cast<Render::ParticleEmitter*>(comp.second.get())->ref);
+			}
 		}
 
 		//Serialize prefab metadata

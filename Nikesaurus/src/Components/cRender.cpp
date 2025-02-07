@@ -47,7 +47,7 @@ namespace NIKE {
 				comp.ref = particle_emitter_ref;
 
 				// add particle system
-				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
@@ -89,7 +89,7 @@ namespace NIKE {
 				comp.ref = particle_emitter_ref;
 
 				// add particle system
-				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			}
 		);
 

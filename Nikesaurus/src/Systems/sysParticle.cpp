@@ -94,6 +94,15 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 
 
 bool NSPM::removeActiveParticleSystem(const std::string& ref) {
+	auto it = active_particle_systems.find(ref);
+	if (it == active_particle_systems.end()) {
+		return false;
+	}
+	it->second.is_alive = false;
+	return true;
+}
+
+bool NSPM::instantlyRemoveActiveParticleSystem(const std::string& ref) {
 	if (active_particle_systems.find(ref) == active_particle_systems.end()) {
 		return false;
 	}
@@ -104,6 +113,23 @@ bool NSPM::removeActiveParticleSystem(const std::string& ref) {
 
 void NSPM::update() {
 	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+	// debug to check entities
+	{
+		const auto entities_id = NIKE_ECS_MANAGER->getAllEntities();
+		std::vector<std::unordered_map<std::string, std::shared_ptr<void>>> entities;
+		std::vector<std::unordered_map<std::string, std::shared_ptr<void>>> entities_with_pe;
+		for (const auto entity_id : entities_id) {
+			const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity_id);
+			entities.emplace_back(comps);
+
+			if (comps.find("Render::ParticleEmitter") != comps.end()) {
+				entities_with_pe.emplace_back(comps);
+			}
+		}
+
+
+	}
 
 	for (auto& [ref, ps] : active_particle_systems) {
 		// Update particle system

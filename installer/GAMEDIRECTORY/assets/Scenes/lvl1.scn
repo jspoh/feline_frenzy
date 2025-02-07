@@ -89,7 +89,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 1,
                             "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -160,7 +160,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 2,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -231,7 +231,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 3,
                             "Name": "entity_0003",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -275,7 +275,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 4,
                             "Name": "entity_0004",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -319,7 +319,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 5,
                             "Name": "entity_0005",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -376,7 +376,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 6,
                             "Name": "entity_0006",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -420,7 +420,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 7,
                             "Name": "entity_0007",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -435,16 +435,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 0,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.01666666753590107
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 6,
-                                    "y": 5
-                                },
                                 "End_Index": {
                                     "x": 9,
                                     "y": 5
@@ -555,7 +548,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 8,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -572,16 +565,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 2,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.05000000447034836
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 9,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 9,
                                     "y": 0
@@ -689,7 +675,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 9,
                             "Name": "entity_0009",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -760,7 +746,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 10,
                             "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -775,16 +761,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 1,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 9,
                                     "y": 0
@@ -892,7 +871,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 11,
                             "Name": "entity_0011",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -907,16 +886,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 1,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 1,
-                                    "y": 1
-                                },
                                 "End_Index": {
                                     "x": 9,
                                     "y": 1
@@ -1024,7 +996,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 12,
                             "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1039,16 +1011,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 0,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 7,
-                                    "y": 1
-                                },
                                 "End_Index": {
                                     "x": 9,
                                     "y": 1
@@ -1156,7 +1121,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 13,
                             "Name": "entity_0013",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
