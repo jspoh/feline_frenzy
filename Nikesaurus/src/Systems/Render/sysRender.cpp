@@ -334,7 +334,7 @@ namespace NIKE {
 		}
 
 		// mouse particles
-		NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps1", mouse_particle_pos);
+		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps1", mouse_particle_pos);
 		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps2", mouse_particle_pos);
 		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps3", mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);

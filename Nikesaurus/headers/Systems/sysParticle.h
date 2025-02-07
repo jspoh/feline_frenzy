@@ -57,14 +57,14 @@ namespace NIKE {
 			enum class ParticleRenderType {
 				QUAD = 0,
 				CIRCLE,
-				TEXTURE,
+				//TEXTURE,
 				NUM_PARTICLE_RENDER_TYPES
 			};
 
 			static inline std::unordered_map<ParticleRenderType, std::string> particle_render_type_map{
 				{ ParticleRenderType::QUAD, "quad" },
 				{ ParticleRenderType::CIRCLE, "circle" },
-				{ ParticleRenderType::TEXTURE, "texture" }
+				//{ ParticleRenderType::TEXTURE, "texture" }
 			};
 		};
 
@@ -139,6 +139,8 @@ namespace NIKE {
 				void setParticleSystemOrigin(const std::string& ref, const Vector2f& origin);
 				void setParticleSystemPreset(const std::string& ref, Data::ParticlePresets preset);
 				void setParticleSystemDuration(const std::string& ref, float duration);
+
+				void resetParticleSystemParticles(const std::string& ref);
 
 				// get modifiable particle system
 				ParticleSystem& getParticleSystem(const std::string& ref);

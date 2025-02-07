@@ -370,3 +370,11 @@ void NSPM::resetEntityParticleSystems() {
 
 	next_ps_id = 0;
 }
+
+void NSPM::resetParticleSystemParticles(const std::string& ref) {
+	if (active_particle_systems.find(ref) == active_particle_systems.end()) {
+		throw std::runtime_error("Particle system does not exist");
+	}
+
+	active_particle_systems.at(ref).particles.clear();
+}

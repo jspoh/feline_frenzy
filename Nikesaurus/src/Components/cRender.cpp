@@ -379,11 +379,13 @@ namespace NIKE {
 							// Store the value before the change
 							change_preset.do_action = [&, preset = selected_preset]() {
 								comp.preset = preset;
+								NIKE::SysParticle::Manager::getInstance().resetParticleSystemParticles(comp.ref);
 								};
 
 							// Store the undo action
 							change_preset.undo_action = [&, preset = previous_preset]() {
 								comp.preset = preset;
+								NIKE::SysParticle::Manager::getInstance().resetParticleSystemParticles(comp.ref);
 								};
 
 							// Execute the action

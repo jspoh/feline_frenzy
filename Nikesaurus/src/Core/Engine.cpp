@@ -335,7 +335,7 @@ namespace NIKE {
 		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
 		using namespace NIKE::SysParticle;
-		NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps1", Data::ParticlePresets::BASE, {window_size.x / 2.f, window_size.y / 2.f}, Data::ParticleRenderType::CIRCLE, -1.f, false);
+		//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps1", Data::ParticlePresets::BASE, {window_size.x / 2.f, window_size.y / 2.f}, Data::ParticleRenderType::CIRCLE, -1.f, false);
 		//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps2", Data::ParticlePresets::CLUSTER, { window_size.x / 2.f, window_size.y / 2.f }, Data::ParticleRenderType::CIRCLE, -1.f, false);
 		//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps3", Data::ParticlePresets::FIRE, { window_size.x / 2.f, window_size.y / 2.f }, Data::ParticleRenderType::CIRCLE, -1.f, false);
 
