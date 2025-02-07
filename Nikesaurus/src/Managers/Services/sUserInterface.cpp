@@ -104,8 +104,11 @@ namespace NIKE {
 
 	void UI::Service::onEvent(std::shared_ptr<Input::MouseMovedEvent> event) {
 
+		//Get screen gap
+		auto gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+
 		//Get mouse position
-		mouse_pos = event->window_pos;
+		mouse_pos = event->window_pos - (gaps / 2);
 
 		//Check if mouse is over any entity currently
 		std::for_each(ui_entities.begin(), ui_entities.end(), 
@@ -135,7 +138,7 @@ namespace NIKE {
 		auto world_size = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
 
 		//Get window size
-		auto window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		auto window_size = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
 
 		//Calculate scale factor
 		Vector2f scale_factor = { static_cast<float>(window_size.x) / static_cast<float>(world_size.x), static_cast<float>(window_size.y) / static_cast<float>(world_size.y) };
