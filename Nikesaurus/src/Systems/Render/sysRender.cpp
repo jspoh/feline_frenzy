@@ -318,7 +318,15 @@ namespace NIKE {
 				});
 			}
 
+			err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
+			}
 			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
+			err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
+			}
 
 			const int num_particles = max(1, static_cast<int>(particles.size()));
 

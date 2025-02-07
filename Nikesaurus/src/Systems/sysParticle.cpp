@@ -193,6 +193,20 @@ void NSPM::update() {
 			Vector2f PARTICLE_ORIGIN{};
 
 			switch (ps.preset) {
+			case Data::ParticlePresets::BASE: {
+				PARTICLE_ORIGIN = ps.origin;
+				LIFESPAN = -1.f;
+				ACCELERATION = 0.f;
+				NEW_PARTICLES_PER_SECOND = 0;
+				PARTICLE_VELOCITY_RANGE = { 0.f, 0.f };
+				VECTOR = { 0.f, 0.f };
+				//VECTOR.normalize();
+				VELOCITY = 0.f;
+				COLOR = { 0.f, 0.f, 0.f, 1.f };
+				ROTATION = 0.f;
+				SIZE = { 5.f, 5.f };
+				break;
+			}
 			case Data::ParticlePresets::CLUSTER: {
 				PARTICLE_ORIGIN = ps.origin;
 				LIFESPAN = 5.f;
@@ -247,6 +261,9 @@ void NSPM::update() {
 				SIZE = { 5.f, 5.f };
 				break;
 			}
+			default: {
+				throw std::runtime_error("Invalid particle preset");
+			}
 			}
 
 			// spawn new particles
@@ -254,16 +271,15 @@ void NSPM::update() {
 			static float time_since_last_spawn = 0.f;
 			time_since_last_spawn += dt;
 
-			static float particles_to_spawn = 0.f;
-			particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
+			ps.particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
 
 			if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-				particles_to_spawn = 0.f;
+				ps.particles_to_spawn = 0.f;
 				time_since_last_spawn = 0.f;
 			}
 
-			if (ps.is_alive && particles_to_spawn >= 1) {
-				for (int _{}; static_cast<float>(_) < particles_to_spawn; _++) {
+			if (ps.is_alive && ps.particles_to_spawn >= 1) {
+				for (int _{}; static_cast<float>(_) < ps.particles_to_spawn; _++) {
 					Particle new_particle;
 					new_particle.preset = ps.preset;
 					new_particle.pos = PARTICLE_ORIGIN;
@@ -281,7 +297,7 @@ void NSPM::update() {
 
 				// reset state
 				time_since_last_spawn = 0.f;
-				particles_to_spawn -= std::floor(particles_to_spawn);
+				ps.particles_to_spawn -= std::floor(ps.particles_to_spawn);
 			}
 
 			// end update particles
