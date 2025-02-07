@@ -156,7 +156,7 @@ namespace NIKE {
 		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
-		// Randomly offset from spawner position
+		// Randomly offset from spawner position		
 		float offset_x = getRandomNumber(-20.f, 20.f);
 		float offset_y = getRandomNumber(-20.f, 20.f);
 
