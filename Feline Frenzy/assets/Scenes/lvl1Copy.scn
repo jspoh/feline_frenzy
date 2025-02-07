@@ -991,6 +991,15 @@
                                 },
                                 "Zoom": 1.4857617616653442
                             },
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "preset": 0,
+                                "render_type": 1
+                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -1880,15 +1889,6 @@
                                     "x": 92.30000305175781,
                                     "y": 27.399999618530273
                                 }
-                            },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "preset": 2,
-                                "render_type": 1
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
