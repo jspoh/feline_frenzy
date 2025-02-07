@@ -15,47 +15,79 @@
 #include "Systems/Physics/sysCollision.h"
 #include "Managers/ECS/mSystem.h"
 #include "Components/cPhysics.h"
+#include "Managers/Services/sMap.h"
 
 namespace NIKE {
-	namespace Physics {
+    namespace Physics {
 
-		class Manager : 
-			public System::ISystem,
-			public Events::IEventListener<Physics::ChangePhysicsEvent> {
-		private:
-			//Delete Copy Constructor & Copy Assignment
-			Manager(Manager const& copy) = delete;
-			void operator=(Manager const& copy) = delete;
+        //--------------------------------------------------------------------------
+        // NEW Multi-Cell Broad Phase with Hard-coded "Wall" collision hack
+        //
+        // Instead of the old single-cell approach, we store the set of grid cells
+        // occupied by each entity. Then build potential collision pairs from any
+        // overlap in those cell sets. We add an extra hack: if an entity is named
+        // "left_wall","right_wall","top_wall","bottom_wall", we forcibly pair it
+        // with all other colliders.
+        //
+        // The old single-cell approach is commented out at the bottom for reference.
+        //--------------------------------------------------------------------------
+        class Manager :
+            public System::ISystem,
+            public Events::IEventListener<Physics::ChangePhysicsEvent>
+        {
+        private:
+            // Delete Copy Constructor & Copy Assignment
+            Manager(Manager const& copy) = delete;
+            void operator=(Manager const& copy) = delete;
 
-			//Collision sub system
-			std::unique_ptr<Collision::System> collision_system;
+            // Collision sub system
+            std::unique_ptr<Collision::System> collision_system;
 
-			////Apply forces
-			//void applyXForce(Entity::Type entity, float force);
-			//void applyYForce(Entity::Type entity, float force);
-		public:
-			//Default Constructor
-			Manager() = default;
+            // Map each entity to the set of grid cells it occupies
+            std::unordered_map<Entity::Type, std::vector<Vector2i>> entity_occupied_cells;
 
-			//Default Destructor
-			~Manager() = default;
+            // Keep track of how many collision checks each entity does, for logging
+            std::unordered_map<Entity::Type, int> collision_checks_count;
 
-			//Init
-			void init() override;
+            // Calculate which cells an entity occupies (plus a margin of 1 cell)
+            std::vector<Vector2i> calculateOccupiedCells(const Transform::Transform& transform);
 
-			//System name
-			std::string getSysName() override
-			{
-				return "Physics System";
-			}
+            // Update one entity's physics (forces, velocity) and occupied cells
+            void updateEntityPhysics(Entity::Type entity, float dt);
 
-			//Update
-			void update() override;
+            // Return potential collision pairs by checking overlap in cell sets
+            std::vector<std::pair<Entity::Type, Entity::Type>> getPotentialCollisions();
 
-			//On change physics event
-			void onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) override;
-		};
-	}
-}
+            // Actually do collision detection/resolution for each pair
+            void processCollisions(const std::vector<std::pair<Entity::Type, Entity::Type>>& collision_pairs);
 
-#endif //!INPUT_HPP
+            //// OLD CODE: Single-cell approach - commented out
+            //void applyXForce(Entity::Type entity, float force);
+            //void applyYForce(Entity::Type entity, float force);
+
+        public:
+            // Default Constructor
+            Manager() = default;
+
+            // Default Destructor
+            ~Manager() = default;
+
+            // Init
+            void init() override;
+
+            // System name
+            std::string getSysName() override {
+                return "Physics System";
+            }
+
+            // Update
+            void update() override;
+
+            // On change physics event
+            void onEvent(std::shared_ptr<Physics::ChangePhysicsEvent> event) override;
+        };
+
+    } // namespace Physics
+} // namespace NIKE
+
+#endif //!PHYSICS_HPP
