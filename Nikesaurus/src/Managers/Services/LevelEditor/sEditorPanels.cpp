@@ -1911,16 +1911,16 @@ namespace NIKE {
 				float prev_angle = e_transform.rotation;
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2((world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x + gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2((world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), (world_mouse.x - gizmo.objects["Rot Circle"].first.position.x));
 
-				//Wrap angle
-				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
-
-				//Convert angle from radians to degrees
+				//Convert to degree
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
-				//Update the entity's rotation angle
-				e_transform.rotation = std::clamp(angle_deg, 0.0f, 360.0f);
+				//Ensure a proper angle range
+				if (angle_deg < 0.0f) angle_deg += 360.0f;
+
+				//Wrap rotation
+				e_transform.rotation = fmod(angle_deg, 360.0f);
 
 				//Apply action
 				LevelEditor::Action change_rotation;
@@ -1961,16 +1961,16 @@ namespace NIKE {
 				}
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2((world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x + gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2((world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), (world_mouse.x - gizmo.objects["Rot Circle"].first.position.x));
 
-				//Wrap angle
-				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
-
-				//Convert angle from radians to degrees
+				//Convert to degree
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
-				//Update the entity's rotation angle
-				e_transform.rotation = std::clamp(angle_deg, 0.0f, 360.0f);
+				//Ensure a proper angle range
+				if (angle_deg < 0.0f) angle_deg += 360.0f;
+
+				//Wrap rotation
+				e_transform.rotation = fmod(angle_deg, 360.0f);
 			}
 
 			//Dragging stopped
