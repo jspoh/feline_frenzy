@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   October 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #pragma once
@@ -58,6 +58,13 @@ namespace NIKE {
 		T getMin(const T a, const T b) {
 			return (((a) < (b)) ? (a) : (b));
 		}
+
+		template <typename T>
+		std::pair<T, T> getMinMax(const T a, const T b) {
+			return (a < b) ? std::make_pair(a, b)
+				: std::make_pair(b, a);
+		}
+
 
 		std::vector<Vector2f> convertTransformToVert(Transform::Transform const& e_transform);
 
