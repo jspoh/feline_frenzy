@@ -847,6 +847,9 @@ namespace NIKE {
 			//Delete scene popup
 			std::function<void()> deleteScenePopup(std::string const& popup_id);
 
+			//Save scene as
+			std::function<void()> saveSceneAsPopup(std::string const& popup_id);
+
 			//Edit Mask popup
 			std::function<void()> editBitMaskPopup(std::string const& popup_id);
 

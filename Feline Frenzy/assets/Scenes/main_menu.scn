@@ -18,7 +18,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "background"
+            "Active Cam ID": "entity_0000"
         }
     },
     {
@@ -41,7 +41,7 @@
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Zoom": 0.9809603095054626
+                                "Zoom": 0.9827823638916016
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

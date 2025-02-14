@@ -92,7 +92,7 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "background",
@@ -989,7 +989,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 1.4857617616653442
+                                "Zoom": 1.0015980005264282
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -1754,6 +1754,12 @@
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
                                 "Components": {
+                                    "Animation::Base": {
+                                        "Animation_Count": 0,
+                                        "B_PingPong": false,
+                                        "B_Reverse": false,
+                                        "Frame_Duration": 0.20000000298023224
+                                    },
                                     "Combat::Health": {
                                         "Health": 100.0,
                                         "Lives": 1,
@@ -1807,6 +1813,12 @@
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
                                 "Components": {
+                                    "Animation::Base": {
+                                        "Animation_Count": 0,
+                                        "B_PingPong": false,
+                                        "B_Reverse": false,
+                                        "Frame_Duration": 0.20000000298023224
+                                    },
                                     "Combat::Health": {
                                         "Health": 100.0,
                                         "Lives": 1,

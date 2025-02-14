@@ -5815,16 +5815,12 @@ namespace NIKE {
 				//Get selected asset path
 				auto path = NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID());
 
-				// Clear containers containing entities string refs
-				NIKE_ECS_MANAGER->destroyAllEntities();
-
 				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
 
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
 
-				// Reset grid here
-				// NIKE_MAP_SERVICE->resetGrid();
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, ""));
 
 				//Close popup
 				closePopUp(popup_id);
@@ -6001,6 +5997,81 @@ namespace NIKE {
 			};
 	}
 
+	std::function<void()> LevelEditor::ScenesPanel::saveSceneAsPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string scn_id;
+
+			//Get Scene text
+			ImGui::Text("Enter a name for the scene without .scn:");
+			if (ImGui::InputText("##Scene Name", scn_id.data(), scn_id.capacity() + 1)) {
+				scn_id.resize(strlen(scn_id.c_str()));
+			}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Ok") && !scn_id.empty() && (scn_id.find(".scn") == scn_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(scn_id)) {
+
+				//Craft file path from name
+				std::filesystem::path scenes_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
+
+				if (!std::filesystem::exists(scenes_path)) {
+					std::filesystem::create_directories(scenes_path); // Create the directory if it doesn't exist
+				}
+
+				//Craft file path from name
+				std::filesystem::path grids_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
+
+				if (!std::filesystem::exists(grids_path)) {
+					std::filesystem::create_directories(grids_path); // Create the directory if it doesn't exist
+				}
+
+				//Scn path
+				std::filesystem::path scn_path = scenes_path / std::string(scn_id + ".scn");
+
+				//Grid path
+				std::filesystem::path grid_path = grids_path / std::string(scn_id + ".grid");
+
+				//When user click save/create scene, grid is saved together
+				tile_panel.lock()->saveGrid(scn_id);
+
+				//Serialize new empty scene
+				NIKE_SERIALIZE_SERVICE->saveSceneToFile(scn_path.string());
+
+				//Register grid
+				NIKE_ASSETS_SERVICE->registerAsset(grid_path.string(), false);
+
+				//Register scn
+				NIKE_ASSETS_SERVICE->registerAsset(scn_path.string(), false);
+
+				//Queue new scene
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, std::string(scn_id + ".scn")));
+
+				//Reset scene id buffer
+				scn_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Reset scene id buffer
+				scn_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
 	void LevelEditor::ScenesPanel::updateLayerNames() {
 		layer_names.clear();
 		for (const auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
@@ -6014,13 +6085,18 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ScenesPanel::saveScene() {
-		std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
 
-		// When user click save scene, grid is saved together
-		tile_panel.lock()->saveGrid(scn_id);
+		if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+			std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
+			// When user click save scene, grid is saved together
+			tile_panel.lock()->saveGrid(scn_id);
 
-		//Save scene
-		NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+			//Save scene
+			NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+		}
+		else {
+			NIKEE_CORE_INFO("Current SceneID is empty");
+		}
 	}
 
 	void LevelEditor::ScenesPanel::init()
@@ -6031,6 +6107,7 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Scene", deleteScenePopup("Delete Scene"));
 		registerPopUp("Create Scene", createScenePopup("Create Scene"));
+		registerPopUp("Save Scene As", saveSceneAsPopup("Save Scene As"));
 		registerPopUp("Edit Layer Bit Mask", editBitMaskPopup("Edit Layer Bit Mask"));
 
 		// Weak ptr ref to tile panel
@@ -6059,42 +6136,52 @@ namespace NIKE {
 
 		//Create new scene
 		{
-			if (ImGui::Button("Create Scene")) {
+			if (ImGui::Button("Create New Scene")) {
 				openPopUp("Create Scene");
 			}
 		}
 
-		ImGui::SameLine();
+		if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
 
-		//Delete curr scene
-		{
-			if (ImGui::Button("Delete Scene")) {
-				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
-					openPopUp("Delete Scene");
-				}
-				else {
-					err_msg->assign("No scene attached, unable to delete anything.");
-					openPopUp("Error");
+			ImGui::SameLine();
+
+			//Delete curr scene
+			{
+				if (ImGui::Button("Delete Scene")) {
+					if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+						openPopUp("Delete Scene");
+					}
+					else {
+						err_msg->assign("No scene attached, unable to delete anything.");
+						openPopUp("Error");
+					}
 				}
 			}
-		}
 
-		ImGui::SameLine();
-
-		//Save curr scene
-		{
-			if (ImGui::Button("Save Scene")) {
-				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
-
-					//Save scene
-					saveScene();
-
-					success_msg->assign("Scene successfully saved.");
-					openPopUp("Success");
+			//Save curr scene as
+			{
+				if (ImGui::Button("Save Scene As")) {
+					openPopUp("Save Scene As");
 				}
-				else {
-					err_msg->assign("No scene attached, create a scene before saving.");
-					openPopUp("Error");
+			}
+
+			ImGui::SameLine();
+
+			//Save curr scene
+			{
+				if (ImGui::Button("Save Curr Scene")) {
+					if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+
+						//Save scene
+						saveScene();
+
+						success_msg->assign("Scene successfully saved.");
+						openPopUp("Success");
+					}
+					else {
+						err_msg->assign("No scene attached, create a scene before saving.");
+						openPopUp("Error");
+					}
 				}
 			}
 		}
