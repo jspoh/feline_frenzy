@@ -44,6 +44,11 @@ namespace NIKE {
 
 			//Map of popups
 			std::unordered_map<std::string, PopUp> popups;
+
+		protected:
+
+			//Panel dock ID
+			unsigned int dock_id = 0;
 			
 		public:
 			virtual ~IPanel() = default;
@@ -75,10 +80,14 @@ namespace NIKE {
 			//Check if popup is showing
 			static bool checkPopUpShowing();
 
+			//Get panel dock ID
+			virtual unsigned int getDockID();
+
 			//Default Popup
 			std::function<void()> defPopUp(std::string const& id, std::shared_ptr<std::string> msg);
 
 			#ifdef NIKE_BUILD_DLL
+
 			//World to screen
 			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size, bool use_screen_pos=false);
 
@@ -425,6 +434,9 @@ namespace NIKE {
 
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			//Reference to main panel
+			std::weak_ptr<GameWindowPanel> game_panel;
 
 			//Prefab layer ID
 			MetaData::EntityData meta_data;

@@ -77,6 +77,9 @@ namespace NIKE {
 				//Map of framebuffer
 				std::unordered_map<unsigned int, FramebufferTexture> frame_buffers;
 
+				//Queue of text to render
+				std::queue<std::function<void()>> text_render_queue;
+
 			public:
 
 				//Rendering constants
@@ -140,6 +143,9 @@ namespace NIKE {
 				//Render text
 				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
+				//Render entity
+				void renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug = false);
+
 				// render particle system
 
 				/**
@@ -176,6 +182,11 @@ namespace NIKE {
 
 				// batch render texture (uses renderObject)
 				void batchRenderTextures();
+
+				/*****************************************************************//**
+				* RENDER COMPLETION CALL
+				*********************************************************************/
+				void completeRender();
 		};
 	}
 }

@@ -211,88 +211,22 @@ namespace NIKE {
 				//Skip entity not registered to this system
 				if (entities.find(entity) == entities.end()) continue;
 
-				//Skip entity if no transform is present
-				if (!NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity))
-					continue;
-
-				// skip entity if is hidden
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
-					continue;
-
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Texture>(entity) || NIKE_ECS_MANAGER->checkEntityComponent<Render::Shape>(entity)) {
 #ifndef NDEBUG
-					transformAndRenderEntity(entity, NIKE_LVLEDITOR_SERVICE->getDebugState());
-#else
-					transformAndRenderEntity(entity, false);
+				//Render call for all entity
+				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), NIKE_LVLEDITOR_SERVICE->getDebugState());
 #endif
-					// !TODO: jspoh move this code to entity update
-					// update entity particles
-					if (NIKE_ECS_MANAGER->checkEntityComponent<Render::ParticleEmitter>(entity)) {
 
-						const std::unordered_map<std::string, std::shared_ptr<void>> comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
-
-						// get particle emitter component
-						const Render::ParticleEmitter* pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-
-						// get transform component
-						const Transform::Transform* transform_comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
-
-						// get particle location in screen coords
-						const Vector2f world_particle_origin = transform_comp->position + pe_comp->offset;
-
-						NIKE::SysParticle::ParticleSystem& ps = NIKE::SysParticle::Manager::getInstance().getParticleSystem(pe_comp->ref);
-
-						// update particle location
-						if (ps.origin != world_particle_origin) {
-							NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin(pe_comp->ref, world_particle_origin);
-						}
-
-						// update changes to particle preset
-						if (static_cast<int>(ps.preset) != pe_comp->preset) {
-							NIKE::SysParticle::Manager::getInstance().setParticleSystemPreset(pe_comp->ref, static_cast<SysParticle::Data::ParticlePresets>(pe_comp->preset));
-						}
-
-						// update changes to particle render type
-						if (static_cast<int>(ps.render_type) != pe_comp->render_type) {
-							ps.render_type = static_cast<SysParticle::Data::ParticleRenderType>(pe_comp->render_type);
-						}
-
-						// update particle duration
-						if (ps.duration != pe_comp->duration) {
-							NIKE::SysParticle::Manager::getInstance().setParticleSystemDuration(pe_comp->ref, pe_comp->duration);
-						}
-					}
-				}
+#ifdef NDEBUG
+				//Render call for all enttity
+				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), false);
+#endif
 			}
 		}
 
-		if (NIKE_RENDER_SERVICE->BATCHED_RENDERING) {
-			NIKE_RENDER_SERVICE->batchRenderTextures();	// at least 1 call to this is required every frame at the very end
-			NIKE_RENDER_SERVICE->batchRenderObject();		// at least 1 call to this is required every frame at the very end
-			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
-		}
+		//Complete rendering process
+		NIKE_RENDER_SERVICE->completeRender();
 
-		// render text
-		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
-			if (!layer->getLayerState())
-				continue;
-			for (auto& entity : layer->getEntitites()) {
-				
-				//Skip entity not registered to this system
-				if (entities.find(entity) == entities.end()) continue;
-
-				// skip entity if is hidden
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Hidden>(entity))
-					continue;
-				if (NIKE_ECS_MANAGER->checkEntityComponent<Render::Text>(entity) && NIKE_ECS_MANAGER->checkEntityComponent<Transform::Transform>(entity)) {
-					transformAndRenderText(entity);
-				}
-			}
-		}
-
-		// render particles
-		// for non entity related particles
-
+		//!!! RENDER UI HERE - SH
 
 		// !TODO: jspoh move this update function
 		NIKE::SysParticle::Manager::getInstance().update();
