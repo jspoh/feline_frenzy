@@ -211,8 +211,15 @@ namespace NIKE {
 				//Skip entity not registered to this system
 				if (entities.find(entity) == entities.end()) continue;
 
+#ifndef NDEBUG
+				//Render call for all entity
+				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), NIKE_LVLEDITOR_SERVICE->getDebugState());
+#endif
+
+#ifdef NDEBUG
 				//Render call for all enttity
-				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity));
+				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), false);
+#endif
 			}
 		}
 
