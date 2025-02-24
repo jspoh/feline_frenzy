@@ -575,6 +575,146 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	void Render::Service::renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug) {
+
+		//Get transform
+		auto trans_it = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+		if (trans_it == comps.end()) {
+			return;
+		}
+		auto& e_transform = *std::static_pointer_cast<Transform::Transform>(trans_it->second);
+
+		//Camera matrix
+		Matrix_33 cam_ndcx = NIKE_CAMERA_SERVICE->getWorldToNDCXform();
+		if (e_transform.use_screen_pos) {
+			cam_ndcx = NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform();
+		}
+
+		//Matrix used for rendering
+		Matrix_33 matrix;
+
+		//Get Texture
+		auto tex_it = comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
+		if (tex_it != comps.end()) {
+
+			//Texture component
+			auto& e_texture = *std::static_pointer_cast<Render::Texture>(tex_it->second);
+
+			//Check if texture is loaded
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
+
+				//Allow stretching of texture
+				if (!e_texture.b_stretch) {
+					//Copy transform for texture mapping ( Locks the transformation of a texture )
+					Vector2f tex_size{ 
+						static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x,
+						static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y 
+					};
+
+					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+				}
+
+				// Transform matrix here
+				NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
+
+				// Render Texture
+				NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
+			}
+		}
+
+		//Get Shape
+		auto shape_it = comps.find(Utility::convertTypeString(typeid(Render::Shape).name()));
+		if (shape_it != comps.end()) {
+
+			//Shape component
+			auto& e_shape = *std::static_pointer_cast<Render::Shape>(shape_it->second);
+
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
+				// Transform matrix here
+				NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+
+				//Render Shape
+				NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
+			}
+		}
+
+		//Debug mode rendering
+		if (debug) {
+			// Render debugging bounding box
+			Vector4f bounding_box_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+
+			//Get Collider
+			auto collider_it = comps.find(Utility::convertTypeString(typeid(Physics::Collider).name()));
+			if (collider_it != comps.end()) {
+
+				//Collider comp
+				auto& e_collider = *std::static_pointer_cast<Physics::Collider>(collider_it->second);
+
+				if (e_collider.b_collided) {
+					bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
+				}
+
+				//Calculate bounding box matrix
+				NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
+				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+			}
+			else {
+				//Calculate bounding box matrix
+				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+			}
+
+			//Get Dynamics
+			auto dynamics_it = comps.find(Utility::convertTypeString(typeid(Physics::Dynamics).name()));
+			if (dynamics_it != comps.end()) {
+
+				//Collider comp
+				auto& e_dynamics = *std::static_pointer_cast<Physics::Dynamics>(dynamics_it->second);
+
+				if (e_dynamics.velocity.x != 0.0f || e_dynamics.velocity.y != 0.0f) {
+					Transform::Transform dir_transform = e_transform;
+					dir_transform.scale.x = 1.0f;
+					dir_transform.rotation = -atan2(e_dynamics.velocity.x, e_dynamics.velocity.y) * static_cast<float>(180.0f / M_PI);
+					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
+					NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
+					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+				}
+			}
+		}
+
+		//Get Text
+		auto text_it = comps.find(Utility::convertTypeString(typeid(Render::Text).name()));
+		if (text_it != comps.end()) {
+
+			//Text component
+			auto& e_text = *std::static_pointer_cast<Render::Text>(text_it->second);
+
+			//Check if font exists
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
+
+				//Wrap text rendering queue within lamda
+				auto text_render = [e_transform, &e_text]() {
+
+					//Transform matrix
+					Matrix_33 matrix;
+
+					//Make copy of transform, scale to 1.0f for calculating matrix
+					Transform::Transform copy = e_transform;
+					copy.scale = { 1.0f, 1.0f };
+
+					//Transform text matrix
+					NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+
+					//Render text
+					NIKE_RENDER_SERVICE->renderText(matrix, e_text);
+					};
+
+				//Push into text render queue
+				text_render_queue.push(text_render);
+			}
+		}
+	}
+
 	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
@@ -887,6 +1027,25 @@ namespace NIKE {
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderTextures: {0}", err);
+		}
+	}
+
+	/*****************************************************************//**
+	* RENDER COMPLETION CALL
+	*********************************************************************/
+	void Render::Service::completeRender() {
+
+		//Batch render
+		if (NIKE_RENDER_SERVICE->BATCHED_RENDERING) {
+			NIKE_RENDER_SERVICE->batchRenderTextures();
+			NIKE_RENDER_SERVICE->batchRenderObject();
+			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
+		}
+
+		//Render text last
+		while (!text_render_queue.empty()) {
+			text_render_queue.front()();
+			text_render_queue.pop();
 		}
 	}
 }

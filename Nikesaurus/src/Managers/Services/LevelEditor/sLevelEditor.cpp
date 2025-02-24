@@ -165,7 +165,7 @@ namespace NIKE {
 			auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
 
 			//Check if current mouse pos is within game window
-			if (!game_panel->isMouseInWindow() || game_panel->checkPopUpShowing()) {
+			if (!getGameState() || !game_panel->isMouseInWindow() || game_panel->checkPopUpShowing()) {
 				event->setEventProcessed(true);
 			}
 		}

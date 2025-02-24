@@ -91,6 +91,10 @@ namespace NIKE {
 		return b_popup_showing;
 	}
 
+	unsigned int LevelEditor::IPanel::getDockID() {
+		return dock_id;
+	}
+
 	std::function<void()> LevelEditor::IPanel::defPopUp(std::string const& id, std::shared_ptr<std::string> msg) {
 		return [this, id, msg]() {
 			//Show error message
@@ -317,6 +321,9 @@ namespace NIKE {
 
 		//Begin Frame
 		ImGui::Begin(getName().c_str(), nullptr, static_cast<ImGuiWindowFlags>(window_flags));
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Start Main Panel Menu Bar
 		if (ImGui::BeginMenuBar()) {
@@ -973,6 +980,9 @@ namespace NIKE {
 
 	void LevelEditor::EntitiesPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Reset entity changed flag
 		b_entity_changed = false;
@@ -2202,6 +2212,9 @@ namespace NIKE {
 		//Begin render
 		ImGui::Begin(getName().c_str());
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Reset gizmo interaction
 		gizmo.b_interacting = false;
 
@@ -2928,19 +2941,16 @@ namespace NIKE {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0, 0, 0, 1);
 
-		//!!!Prefab preview to be rendered
+		//Render prefab preview
+		NIKE_RENDER_SERVICE->renderComponents(prefab_comps);
+		NIKE_RENDER_SERVICE->completeRender();
 
 		//Unbind frame buffer
 		NIKE_RENDER_SERVICE->unbindFrameBuffer();
 
 		//Begin window for rendering
-		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str());
-
-		//Prefab preview
-		ImGui::Text("Preview to be implemented.");
-
-		//Render game to viewport
-		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(500, 500));
+		ImGui::SetNextWindowDockID(game_panel.lock()->getDockID(), ImGuiCond_Once);
+		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
 
 		//Close prefab preview
 		if (ImGui::Button("Close##PrefabPreview")) {
@@ -2948,6 +2958,33 @@ namespace NIKE {
 			prefab_comps.clear();
 			meta_data = NIKE::MetaData::EntityData();
 		}
+
+		//Configure viewport size
+		ImVec2 window_size = ImGui::GetContentRegionAvail();
+		float aspect_ratio = NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio();
+		float viewport_width = window_size.x;
+		float viewport_height = window_size.x / aspect_ratio;
+		if (viewport_height > window_size.y) {
+			viewport_height = window_size.y;
+			viewport_width = window_size.y * aspect_ratio;
+		}
+
+		//Get window size
+		auto win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		//Calculate UV coordinates for cropping when there are gaps
+		Vector2f gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		float u_min = gaps.x / 2.0f / win_size.x;
+		float u_max = 1.0f - u_min;
+		float v_min = gaps.y / 2.0f / win_size.y;
+		float v_max = 1.0f - v_min;
+
+		//Configure UV Offsets
+		ImVec2 uv0(u_min, -v_min); // Bottom-left
+		ImVec2 uv1(u_max, -v_max); // Top-right
+
+		//Render game to viewport
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		ImGui::End();
 	}
@@ -2998,8 +3035,11 @@ namespace NIKE {
 		//Main panel reference
 		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 
+		//Game panel reference
+		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+
 		//Init frame buffer name
-		preview_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(500, 500));
+		preview_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(), true);
 
 		//Popups registration
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
@@ -3015,6 +3055,9 @@ namespace NIKE {
 
 	void LevelEditor::PrefabsPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Dummy For accepting payload
 		ImVec2 pos = ImGui::GetCursorPos();
@@ -3244,10 +3287,16 @@ namespace NIKE {
 
 	void LevelEditor::DebugPanel::render() {
 		if (!ImGui::Begin(getName().c_str())) {
+			//Set window dock id
+			dock_id = ImGui::GetWindowDockID();
+
 			//Return if window is not being shown
 			ImGui::End();
 			return;
 		}
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Begin tab bar
 		if (ImGui::BeginTabBar("TabBar")) {
@@ -3526,6 +3575,9 @@ namespace NIKE {
 
 	void LevelEditor::AudioPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		if (ImGui::Button("Add New Channel")) {
 			openPopUp("Add New Channel");
@@ -4413,6 +4465,9 @@ namespace NIKE {
 			renderAssetsBrowser(current_path);
 		}
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Render selected asset options
 		if (!selected_asset_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(selected_asset_id)) {
 
@@ -4676,6 +4731,9 @@ namespace NIKE {
 
 		//Begin camera panel
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Get cam entities
 		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
@@ -5078,6 +5136,9 @@ namespace NIKE {
 	void LevelEditor::UIPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Create button
 		{
 			if (ImGui::Button("Create Button")) {
@@ -5333,6 +5394,9 @@ namespace NIKE {
 
 		//Begin Render
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		ImGui::Spacing();
 
@@ -6118,6 +6182,9 @@ namespace NIKE {
 	{
 		ImGui::Begin(getName().c_str());
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Scene ref
 		ImGui::Text("Scene ID: %s", NIKE_SCENES_SERVICE->getCurrSceneID().c_str());
 
@@ -6579,6 +6646,9 @@ namespace NIKE {
 	void LevelEditor::GameWindowPanel::render()
 	{
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Get Imgui input
 		ImGuiIO& io = ImGui::GetIO();
