@@ -273,6 +273,47 @@ namespace NIKE {
 		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps3", mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 
+		//FPS Rendering variables
+		static auto worldsize = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
+		static Render::Text fps = { "Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f , TextOrigin::LEFT };
+
+		//Calculate avg FPS
+		static std::vector<float> fps_history(300);
+		static float elapsed_time = 0.0f;
+		elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+		float curr_fps = NIKE_WINDOWS_SERVICE->getCurrentFPS();
+		if (fps_history.empty() || std::abs(curr_fps - fps_history.back()) < 10000) { //Ignore outlier FPS jumps of by 10000
+			fps_history.push_back(curr_fps);
+		}
+
+		//Update avg fps every second
+		if (elapsed_time > 1.f) {
+
+			//Calculate average fps
+			elapsed_time = 0.f;
+			float sum_fps = 0.f;
+			std::for_each(fps_history.begin(), fps_history.end(), [&sum_fps](float& fps) { sum_fps += fps; });
+			const float avg_fps = sum_fps / fps_history.size();
+			fps_history.clear();
+
+			//Update fps
+			std::stringstream ss;
+			ss << "FPS: " << std::round(avg_fps);
+			fps.text = ss.str();
+		}
+
+		//Render FPS Display
+		Matrix_33 matrix;
+		static bool show_fps = true;
+		static Transform::Transform fps_transform = { Vector2f((worldsize.x / 2.0f) - 200.0f, (worldsize.y / 2.0f) - 30.0f), Vector2f(1.0f, 1.0f), 0.0f};
+		fps_transform.use_screen_pos = true;
+
+		//Toggle showing of FPS
+		show_fps = NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1) ? !show_fps : show_fps;
+		if (show_fps) {
+			NIKE_RENDER_SERVICE->transformMatrix(fps_transform, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+			NIKE_RENDER_SERVICE->renderText(matrix, fps);
+		}
 
 #ifndef NDEBUG
 		//Unbind when editor is active for rendering
