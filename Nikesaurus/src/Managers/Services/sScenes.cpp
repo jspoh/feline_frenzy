@@ -10,7 +10,6 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/sScenes.h"
 #include "Core/Engine.h"
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -256,9 +255,6 @@ namespace NIKE {
 
 		//Reset Camera
 		NIKE_CAMERA_SERVICE->clearCameraEntities();
-
-		// Reset particle systems
-		NIKE::SysParticle::Manager::getInstance().resetEntityParticleSystems();
 
 		//Clear layers
 		layers.clear();

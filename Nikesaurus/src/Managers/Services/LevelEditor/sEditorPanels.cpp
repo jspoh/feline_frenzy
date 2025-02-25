@@ -13,7 +13,6 @@
 #include "Core/Engine.h"
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -786,13 +785,6 @@ namespace NIKE {
 
 					//Check if entity is still alive
 					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
-
-					//Remove active particle system if exists
-					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity);
-					if (comps.find("Render::ParticleEmitter") != comps.end()) {
-						auto comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-						NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(comp->ref);
-					}
 
 					if (entity.has_value()) {
 						//Destroy new entity
@@ -2086,33 +2078,33 @@ namespace NIKE {
 					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
 
-					// add active particle system if particle emitter is added
-					if (component.first == "Render::ParticleEmitter") {
-						using namespace NIKE::SysParticle;
+					//// add active particle system if particle emitter is added
+					//if (component.first == "Render::ParticleEmitter") {
+					//	using namespace NIKE::SysParticle;
 
-						// get entity position
-						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					//	// get entity position
+					//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
 
-						if (comps.find("Transform::Transform") == comps.end()) {
-							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-						}
-						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
+					//	if (comps.find("Transform::Transform") == comps.end()) {
+					//		NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
+					//		NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
+					//	}
+					//	NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
 
-						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+					//	const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
 
-						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+					//	const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
-						// update default particle system config
-						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-						pe_comp->ref = particle_emitter_ref;
-						pe_comp->offset = { 0.f, 0.f };
-						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
+					//	// update default particle system config
+					//	auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					//	pe_comp->duration = -1.f;
+					//	pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
+					//	pe_comp->ref = particle_emitter_ref;
+					//	pe_comp->offset = { 0.f, 0.f };
+					//	pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
 
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					}
+					//	NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
+					//}
 
 					//	};
 
@@ -2151,15 +2143,15 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
-				if (comp_string_ref == "Render::ParticleEmitter") {
-					// get entity position
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					if (!success) {
-						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-					}
-				}
+				//if (comp_string_ref == "Render::ParticleEmitter") {
+				//	// get entity position
+				//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+				//	const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+				//	bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+				//	if (!success) {
+				//		throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+				//	}
+				//}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2687,33 +2679,6 @@ namespace NIKE {
 
 					//Close popup
 					closePopUp(popup_id);
-
-					// add active particle system if particle emitter is added
-					if (component.first == "Render::ParticleEmitter") {
-						using namespace NIKE::SysParticle;
-
-						// get entity position
-
-						if (prefab_comps.find("Transform::Transform") == prefab_comps.end()) {
-							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-						}
-						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
-
-						const auto comp = reinterpret_cast<Transform::Transform*>(prefab_comps.at("Transform::Transform").get());
-
-						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
-						// update default particle system config
-						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(prefab_comps.at("Render::ParticleEmitter").get());
-						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-						pe_comp->ref = particle_emitter_ref;
-						pe_comp->offset = { 0.f, 0.f };
-						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
-
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					}
 				}
 
 			}
@@ -2750,16 +2715,6 @@ namespace NIKE {
 
 				// Close popup
 				closePopUp(popup_id);
-
-				if (comp_ref == "Render::ParticleEmitter") {
-					// get entity position
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					if (!success) {
-						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-					}
-				}
 			}
 
 			ImGui::SameLine();

@@ -11,7 +11,6 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/Render/sRender.h"
-#include "Systems/sysParticle.h"
 
  // !TODO: jspoh reorg
 namespace {
@@ -177,6 +176,9 @@ namespace NIKE {
 
 		// Shader
 		shader_manager = std::make_unique<Shader::ShaderManager>();
+
+		//Particle manager
+		particle_manager = std::make_unique<SysParticle::Manager>();
 
 		if (!shader_manager) {
 			NIKEE_CORE_ERROR("Failed to initialize Shader Manager.");
@@ -787,6 +789,65 @@ namespace NIKE {
 				}
 			}
 		}
+
+		//Get particle emitter
+		auto particle_it = comps.find(Utility::convertTypeString(typeid(Render::ParticleEmitter).name()));
+		if (particle_it != comps.end()) {
+
+			//Particle component
+			auto& e_particle = *std::static_pointer_cast<Render::ParticleEmitter>(particle_it->second);
+
+			//Get particle system
+			auto& particle_sys = *e_particle.p_system;
+
+			//Update particle system with updated particle emitter data
+			particle_sys.preset = static_cast<SysParticle::Data::ParticlePresets>(e_particle.preset);
+			particle_sys.origin = e_transform.position + e_particle.offset;
+			particle_sys.duration = e_particle.duration;
+			particle_sys.render_type = static_cast<SysParticle::Data::ParticleRenderType>(e_particle.render_type);
+
+			//Update particle system
+			particle_manager->updateParticleSystem(particle_sys);
+
+			//const unsigned int vao = PM.getVAO(ps.preset);
+			const unsigned int vbo = particle_manager->getVBO(particle_sys.preset);
+
+			//Particles to render
+			auto particles = particle_sys.particles;
+
+			// assume world pos
+			if (particle_sys.using_world_pos) {
+				std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
+					p.pos = worldToScreen(p.pos);
+				});
+			}
+
+			//Bind buffer
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
+			}
+			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(SysParticle::Particle), particles.data());
+			err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
+			}
+			const int num_particles = max(1, static_cast<int>(particles.size()));
+
+			//Particle render function
+			auto particle_render = [num_particles, &particle_sys, ref = e_particle.ref]() {
+
+				NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(particle_sys.preset), particle_sys.origin, static_cast<int>(particle_sys.render_type), num_particles, ref == "mouseps1");
+			};
+
+			//Check for screen position !!!More work to be done here to ensure screen particles are rendered correctly
+			if (e_transform.use_screen_pos) {
+				screen_particle_render_queue.push(particle_render);
+			}
+			else {
+				world_particle_render_queue.push(particle_render);
+			}
+		}
 	}
 
 	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos) {
@@ -822,8 +883,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
-
-		const unsigned int vao = NIKE::SysParticle::Manager::getInstance().getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
+		const unsigned int vao = particle_manager->getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
 		glBindVertexArray(vao);
 
 		err = glGetError();
@@ -1109,6 +1169,9 @@ namespace NIKE {
 	*********************************************************************/
 	void Render::Service::completeRender() {
 
+		//Update particle manager
+		particle_manager->update();
+
 		//Render world elements
 		while (!world_render_queue.empty()) {
 			world_render_queue.front()();
@@ -1128,6 +1191,12 @@ namespace NIKE {
 			world_text_render_queue.pop();
 		}
 
+		//Render world particle elements
+		while (!world_particle_render_queue.empty()) {
+			world_particle_render_queue.front()();
+			world_particle_render_queue.pop();
+		}
+
 		//Render screen elements
 		while (!screen_render_queue.empty()) {
 			screen_render_queue.front()();
@@ -1145,6 +1214,12 @@ namespace NIKE {
 		while (!screen_text_render_queue.empty()) {
 			screen_text_render_queue.front()();
 			screen_text_render_queue.pop();
+		}
+
+		//Render screen particle elements
+		while (!screen_particle_render_queue.empty()) {
+			screen_particle_render_queue.front()();
+			screen_particle_render_queue.pop();
 		}
 	}
 }

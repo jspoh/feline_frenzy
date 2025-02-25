@@ -10,7 +10,6 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/sMetaData.h"
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 
@@ -120,15 +119,6 @@ namespace NIKE {
 		if (!entities_to_destroy.empty()) {
 			for (auto entity : entities_to_destroy) {
 				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-					// delete active particle system if deleted entity has particle emitter component
-					if (NIKE_ECS_MANAGER->checkEntityComponent<Render::ParticleEmitter>(entity)) {
-						const std::unordered_map<std::string, std::shared_ptr<void>> comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
-
-						// get particle emitter component
-						const Render::ParticleEmitter* pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-
-						NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					}
 
 					NIKE_ECS_MANAGER->destroyEntity(entity);
 				}

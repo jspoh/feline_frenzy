@@ -18,7 +18,6 @@
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 

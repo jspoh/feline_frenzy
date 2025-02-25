@@ -15,6 +15,13 @@
 #include "Managers/Services/sEvents.h"
 
 namespace NIKE {
+
+	namespace SysParticle {
+		struct ParticleSystem;
+		class Data;
+		class Manager;
+	}
+
 	namespace Render {
 		enum class CamPosition {
 			UP = 0,
@@ -108,6 +115,11 @@ namespace NIKE {
 			int preset;			// ParticlePresets type
 			std::string ref;		// reference to particle system
 			float duration;		// -1 for infinite
+
+			//Particle system
+			std::shared_ptr<SysParticle::ParticleSystem> p_system;
+
+			ParticleEmitter();
 		};
 
 		void registerComponents();

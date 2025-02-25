@@ -8,11 +8,10 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Systems/sysParticle.h"
+#include "Managers/Services/Render/sParticle.h"
 
  // !NOTE: jspoh. future - add texture support for particles
  // !NOTE: jspoh. future - add lua support for particles
-
 
 using namespace NIKE::SysParticle;
 using NSPM = NIKE::SysParticle::Manager;
@@ -62,12 +61,6 @@ NSPM::~Manager() {
 	for (auto& [preset, vbo] : vbo_map) {
 		glDeleteBuffers(1, &vbo);
 	}
-}
-
-
-NSPM& NSPM::getInstance() {
-	static Manager instance;
-	return instance;
 }
 
 bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, Data::ParticleRenderType particle_render_type, float duration, bool using_world_pos) {
@@ -127,8 +120,6 @@ void NSPM::update() {
 				entities_with_pe.emplace_back(comps);
 			}
 		}
-
-
 	}
 
 	for (auto& [ref, ps] : active_particle_systems) {
@@ -312,6 +303,179 @@ void NSPM::update() {
 		}
 		else {
 			++it;
+		}
+	}
+}
+
+void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
+	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+	// Update particle system
+	if (ps.duration != -1 && ps.time_alive >= ps.duration) {
+		ps.is_alive = false;
+	}
+
+	if (!ps.is_alive && ps.particles.size() == 0) {
+		return; //Can choose to erase component instead of returning
+	}
+
+	ps.time_alive += dt;
+
+	// update particles
+	{
+		for (auto& p : ps.particles) {
+			// Update particle
+			p.pos += p.vector * p.velocity * dt;
+			p.velocity += p.acceleration * dt;
+			p.time_alive += dt;
+
+			if (p.lifespan != -1.f) {
+				// fade out
+				p.color.a -= dt / p.lifespan;
+
+				// darken
+				p.color.r -= dt / p.lifespan;
+				p.color.g -= dt / p.lifespan;
+				p.color.b -= dt / p.lifespan;
+			}
+
+			// particle EnemyDeathState
+
+			if (p.size.x <= 0 || p.size.y <= 0) {
+				p.is_alive = false;
+			}
+
+			if (p.color.a <= 0) {
+				p.is_alive = false;
+			}
+
+			if (p.lifespan != -1 && p.time_alive > p.lifespan) {
+				p.is_alive = false;
+			}
+		}
+
+		// remove dead particles
+		ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
+
+		// spawn new particles
+		float LIFESPAN{};
+		float ACCELERATION{};
+		int NEW_PARTICLES_PER_SECOND{};
+		Vector2f PARTICLE_VELOCITY_RANGE{};
+		int MAX_OFFSET{};
+		Vector2f VECTOR{};
+		float VELOCITY{};
+		Vector4f COLOR{};
+		float ROTATION{};
+		Vector2f SIZE{};
+		Vector2f PARTICLE_ORIGIN{};
+
+		switch (ps.preset) {
+		case Data::ParticlePresets::BASE: {
+			PARTICLE_ORIGIN = ps.origin;
+			LIFESPAN = -1.f;
+			ACCELERATION = 0.f;
+			NEW_PARTICLES_PER_SECOND = 0;
+			PARTICLE_VELOCITY_RANGE = { 0.f, 0.f };
+			VECTOR = { 0.f, 0.f };
+			//VECTOR.normalize();
+			VELOCITY = 0.f;
+			COLOR = { 0.f, 0.f, 0.f, 1.f };
+			ROTATION = 0.f;
+			SIZE = { 5.f, 5.f };
+			break;
+		}
+		case Data::ParticlePresets::CLUSTER: {
+			PARTICLE_ORIGIN = ps.origin;
+			LIFESPAN = 5.f;
+			ACCELERATION = 0.f;
+			NEW_PARTICLES_PER_SECOND = 50;
+			PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+			VECTOR = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
+			VECTOR.normalize();
+			VELOCITY = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
+			COLOR = {
+					rand() % 255 / 255.f,
+					rand() % 255 / 255.f,
+					rand() % 255 / 255.f,
+					1.f
+			};
+			ROTATION = 0.f;
+			SIZE = { 5.f, 5.f };
+			break;
+		}
+		case Data::ParticlePresets::FIRE: {
+			LIFESPAN = 3.f;
+			ACCELERATION = 10.f;
+			NEW_PARTICLES_PER_SECOND = 100;
+			PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
+			MAX_OFFSET = 10;
+
+			const float offset = static_cast<float>(rand() % MAX_OFFSET);
+			float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+			float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+			float len = sqrtf(rx * rx + ry * ry);
+			if (len == 0) len = 1;  // Prevent division by zero
+			rx /= len;
+			ry /= len;
+			const float x_offset = rx * offset;
+			const float y_offset = ry * offset;
+			PARTICLE_ORIGIN = {
+				ps.origin.x + x_offset,
+				ps.origin.y + y_offset
+			};
+
+			VECTOR = { 0.f, static_cast<float>(rand() % 100) / 100.f };
+			VECTOR.normalize();
+			VELOCITY = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
+			LIFESPAN = LIFESPAN - (x_offset / MAX_OFFSET);
+			COLOR = {
+				(rand() % 100 + 155.f) / 255.f ,
+				0.f,
+				0.f,
+				1.f
+			};
+			ROTATION = 0.f;
+			SIZE = { 5.f, 5.f };
+			break;
+		}
+		default: {
+			throw std::runtime_error("Invalid particle preset");
+		}
+		}
+
+		// spawn new particles
+
+		static float time_since_last_spawn = 0.f;
+		time_since_last_spawn += dt;
+
+		ps.particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
+
+		if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
+			ps.particles_to_spawn = 0.f;
+			time_since_last_spawn = 0.f;
+		}
+
+		if (ps.is_alive && ps.particles_to_spawn >= 1) {
+			for (int _{}; static_cast<float>(_) < ps.particles_to_spawn; _++) {
+				Particle new_particle;
+				new_particle.preset = ps.preset;
+				new_particle.pos = PARTICLE_ORIGIN;
+				new_particle.vector = VECTOR;
+				new_particle.velocity = VELOCITY;
+				new_particle.acceleration = ACCELERATION;
+				new_particle.lifespan = LIFESPAN;
+				new_particle.color = COLOR;
+				new_particle.rotation = ROTATION;
+				new_particle.is_alive = true;
+				new_particle.size = SIZE;
+
+				ps.particles.push_back(new_particle);
+			}
+
+			// reset state
+			time_since_last_spawn = 0.f;
+			ps.particles_to_spawn -= std::floor(ps.particles_to_spawn);
 		}
 	}
 }
