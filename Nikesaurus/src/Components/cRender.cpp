@@ -21,8 +21,6 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
-		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
 		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
 
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(

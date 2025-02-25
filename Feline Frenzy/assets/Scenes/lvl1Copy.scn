@@ -36,6 +36,7 @@
     {
         "MetaData": {
             "Entity_Tags": [
+                "elementui",
                 "enemy",
                 "healthbar",
                 "hpcontainer",
@@ -2340,6 +2341,59 @@
                             "Prefab_Override": null,
                             "Tags": [
                                 "hpcontainer"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Water icon grey.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -711.6787719726563,
+                                    "y": 356.9342956542969
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 199.99996948242188,
+                                    "y": 199.99996948242188
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 2,
+                            "Name": "elementui",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "elementui"
                             ]
                         }
                     }

@@ -105,6 +105,27 @@ namespace NIKE {
 
 				// Check if player tag exists
 				std::set<Entity::Type> playerEntities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+
+				// Elemental UI 
+				for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
+					// If player not dead
+					if (playerEntities.empty()) {
+						continue;
+					}
+
+					// Look for player
+					for (auto& player : playerEntities) {
+						const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+						const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
+						
+						// Set element ui to player's element
+						elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+					}
+
+
+				}
+
 				for (auto& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
 					// If no player exists, destroy the health bar
 					if (playerEntities.empty()) {

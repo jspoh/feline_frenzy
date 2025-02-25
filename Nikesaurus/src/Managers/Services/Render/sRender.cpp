@@ -585,13 +585,7 @@ namespace NIKE {
 		auto& e_transform = *std::static_pointer_cast<Transform::Transform>(trans_it->second);
 
 		//Camera matrix
-		Matrix_33 cam_ndcx = NIKE_CAMERA_SERVICE->getWorldToNDCXform();
-		if (e_transform.use_screen_pos) {
-			cam_ndcx = NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform();
-		}
-
-		//Matrix used for rendering
-		Matrix_33 matrix;
+		Matrix_33 cam_ndcx = e_transform.use_screen_pos ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
 
 		//Get Texture
 		auto tex_it = comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
@@ -614,11 +608,25 @@ namespace NIKE {
 					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
 				}
 
-				// Transform matrix here
-				NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
+				//Texture render function
+				auto texture_render = [cam_ndcx, e_texture, e_transform]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
 
-				// Render Texture
-				NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
+					// Transform matrix here
+					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
+
+					// Render Texture
+					NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
+				};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(texture_render);
+				}
+				else {
+					world_render_queue.push(texture_render);
+				}
 			}
 		}
 
@@ -631,11 +639,26 @@ namespace NIKE {
 
 			//Check if model exists
 			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
-				// Transform matrix here
-				NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
 
-				//Render Shape
-				NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
+				//Shape render function
+				auto shape_render = [e_shape, e_transform, cam_ndcx]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					// Transform matrix here
+					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+
+					//Render Shape
+					NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
+				};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(shape_render);
+				}
+				else {
+					world_render_queue.push(shape_render);
+				}
 			}
 		}
 
@@ -651,17 +674,48 @@ namespace NIKE {
 				//Collider comp
 				auto& e_collider = *std::static_pointer_cast<Physics::Collider>(collider_it->second);
 
+				//Change color of bounding box on collision
 				if (e_collider.b_collided) {
 					bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
 				}
 
-				//Calculate bounding box matrix
-				NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
-				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+				//Shape render function
+				auto collider_render = [e_collider, bounding_box_color, cam_ndcx]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					//Calculate bounding box matrix
+					NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
+					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+				};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(collider_render);
+				}
+				else {
+					world_render_queue.push(collider_render);
+				}
 			}
 			else {
-				//Calculate bounding box matrix
-				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+
+				//Shape render function
+				auto collider_render = [bounding_box_color, e_transform, cam_ndcx]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					//Calculate bounding box matrix
+					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+				};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(collider_render);
+				}
+				else {
+					world_render_queue.push(collider_render);
+				}
 			}
 
 			//Get Dynamics
@@ -672,12 +726,27 @@ namespace NIKE {
 				auto& e_dynamics = *std::static_pointer_cast<Physics::Dynamics>(dynamics_it->second);
 
 				if (e_dynamics.velocity.x != 0.0f || e_dynamics.velocity.y != 0.0f) {
-					Transform::Transform dir_transform = e_transform;
-					dir_transform.scale.x = 1.0f;
-					dir_transform.rotation = -atan2(e_dynamics.velocity.x, e_dynamics.velocity.y) * static_cast<float>(180.0f / M_PI);
-					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-					NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
-					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+
+					//Shape render function
+					auto dir_render = [e_transform, e_dynamics, cam_ndcx, bounding_box_color]() {
+						//Matrix used for rendering
+						Matrix_33 matrix;
+
+						Transform::Transform dir_transform = e_transform;
+						dir_transform.scale.x = 1.0f;
+						dir_transform.rotation = -atan2(e_dynamics.velocity.x, e_dynamics.velocity.y) * static_cast<float>(180.0f / M_PI);
+						dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
+						NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
+						NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+					};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(dir_render);
+					}
+					else {
+						world_render_queue.push(dir_render);
+					}
 				}
 			}
 		}
@@ -692,8 +761,8 @@ namespace NIKE {
 			//Check if font exists
 			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
 
-				//Wrap text rendering queue within lamda
-				auto text_render = [e_transform, &e_text]() {
+				//Text render function
+				auto text_render = [e_transform, cam_ndcx, &e_text]() {
 
 					//Transform matrix
 					Matrix_33 matrix;
@@ -703,14 +772,19 @@ namespace NIKE {
 					copy.scale = { 1.0f, 1.0f };
 
 					//Transform text matrix
-					NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+					NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, cam_ndcx);
 
 					//Render text
 					NIKE_RENDER_SERVICE->renderText(matrix, e_text);
-					};
+				};
 
-				//Push into text render queue
-				text_render_queue.push(text_render);
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_text_render_queue.push(text_render);
+				}
+				else {
+					world_text_render_queue.push(text_render);
+				}
 			}
 		}
 	}
@@ -1035,6 +1109,12 @@ namespace NIKE {
 	*********************************************************************/
 	void Render::Service::completeRender() {
 
+		//Render world elements
+		while (!world_render_queue.empty()) {
+			world_render_queue.front()();
+			world_render_queue.pop();
+		}
+
 		//Batch render
 		if (NIKE_RENDER_SERVICE->BATCHED_RENDERING) {
 			NIKE_RENDER_SERVICE->batchRenderTextures();
@@ -1042,10 +1122,29 @@ namespace NIKE {
 			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
 		}
 
-		//Render text last
-		while (!text_render_queue.empty()) {
-			text_render_queue.front()();
-			text_render_queue.pop();
+		//Render world text elements
+		while (!world_text_render_queue.empty()) {
+			world_text_render_queue.front()();
+			world_text_render_queue.pop();
+		}
+
+		//Render screen elements
+		while (!screen_render_queue.empty()) {
+			screen_render_queue.front()();
+			screen_render_queue.pop();
+		}
+
+		//Batch render
+		if (NIKE_RENDER_SERVICE->BATCHED_RENDERING) {
+			NIKE_RENDER_SERVICE->batchRenderTextures();
+			NIKE_RENDER_SERVICE->batchRenderObject();
+			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
+		}
+
+		//Render screen text elements
+		while (!screen_text_render_queue.empty()) {
+			screen_text_render_queue.front()();
+			screen_text_render_queue.pop();
 		}
 	}
 }

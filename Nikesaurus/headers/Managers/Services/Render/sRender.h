@@ -77,8 +77,17 @@ namespace NIKE {
 				//Map of framebuffer
 				std::unordered_map<unsigned int, FramebufferTexture> frame_buffers;
 
-				//Queue of text to render
-				std::queue<std::function<void()>> text_render_queue;
+				//Queue of world render
+				std::queue<std::function<void()>> world_render_queue;
+
+				//Queue of world text render
+				std::queue<std::function<void()>> world_text_render_queue;
+
+				//Queue of screen render
+				std::queue<std::function<void()>> screen_render_queue;
+
+				//Queue of screen text render
+				std::queue<std::function<void()>> screen_text_render_queue;
 
 			public:
 
