@@ -16,6 +16,22 @@
  // !NOTE: jspoh. future - add texture support for particles
  // !NOTE: jspoh. future - add lua support for particles
 
+namespace {
+	/**
+	 * .
+	 *
+	 * \param x	min
+	 * \param y	max
+	 * \param dp	decimal places
+	 * \return float
+	 */
+	float rand_float(const Vector2f& range, const int dp) {
+		const int multiplier = pow(10, dp);
+		const int rand_int = rand() % (static_cast<int>((range.y - range.x) * multiplier) + 1) + static_cast<int>(range.x * multiplier);
+		return static_cast<float>(rand_int) / multiplier;
+	}
+}
+
 
 using namespace NIKE::SysParticle;
 using NSPM = NIKE::SysParticle::Manager;
@@ -27,6 +43,18 @@ NSPM::Manager() {
 	}
 
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
+
+	// creaet vao and vbo for NONE particle preset
+	vao_map[Data::ParticlePresets::NONE] = 0;
+	vbo_map[Data::ParticlePresets::NONE] = 0;
+	glCreateVertexArrays(1, &vao_map[Data::ParticlePresets::NONE]);
+	glCreateBuffers(1, &vbo_map[Data::ParticlePresets::NONE]);
+	glVertexArrayVertexBuffer(vao_map[Data::ParticlePresets::NONE], 0, vbo_map[Data::ParticlePresets::NONE], 0, 0);
+
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		NIKEE_CORE_ERROR("OpenGL error after creating empty vao and vbo in {0}: {1}", __FUNCTION__, err);
+	}
 
 	// create vao and vbo for BASE particle preset
 	vao_map[Data::ParticlePresets::BASE] = 0;
@@ -171,8 +199,25 @@ void NSPM::update() {
 
 			switch (ps.preset) {
 			case Data::ParticlePresets::NONE: {
-				LIFESPAN = 5.f;
-				//ACCELERATION = ps.
+				LIFESPAN = ps.particle_lifespan;
+				ACCELERATION = ps.particle_acceleration;
+				NEW_PARTICLES_PER_SECOND = ps.num_new_particles_per_second;
+				PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
+				MAX_OFFSET = 0;
+				VECTOR = { ps.particle_vector_x_range.x, ps.particle_vector_y_range.x };
+				VELOCITY = rand_float(ps.particle_velocity_range, 1);
+				COLOR = ps.particle_color_is_random 
+					? Vector4f{ static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, 1.f } 
+					: ps.particle_color;
+				ROTATION = ps.particle_rotation;
+				SIZE = { 
+					rand_float(ps.particle_rand_width_range, 1),
+					rand_float(ps.particle_rand_height_range, 1)
+				};
+				PARTICLE_ORIGIN = {
+					ps.origin.x + (MAX_OFFSET ? static_cast<float>(rand() % MAX_OFFSET) : 0),
+					ps.origin.y + (MAX_OFFSET ? static_cast<float>(rand() % MAX_OFFSET) : 0)
+				};
 				break;
 			}
 			case Data::ParticlePresets::CLUSTER: {
