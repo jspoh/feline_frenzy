@@ -206,6 +206,11 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 			
+			if (layer->getLayerYSort()) {
+				layer->sortEntitiesBasedOnYPosition();
+			}
+
+
 			for (auto& entity : layer->getEntitites()) {
 
 				//Skip entity not registered to this system

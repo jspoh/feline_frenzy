@@ -28,6 +28,14 @@ namespace NIKE {
 		return b_state;
 	}
 
+	void Scenes::Layer::setLayerYSort(bool y_sort_state) {
+		b_ysort = y_sort_state;
+	}
+
+	bool Scenes::Layer::getLayerYSort() const{
+		return b_ysort;
+	}
+
 	void Scenes::Layer::setLayerMask(unsigned int mask_id, bool state) {
 		mask.set(mask_id, state);
 	}
@@ -69,6 +77,41 @@ namespace NIKE {
 			return NIKE_METADATA_SERVICE->getEntityLayerOrder(a) < NIKE_METADATA_SERVICE->getEntityLayerOrder(b);
 			});
 	}
+
+	void Scenes::Layer::sortEntitiesBasedOnYPosition() {
+		if (entities.empty()) {
+			return;
+		}
+
+		// Copy the entities to avoid modifying the list while iterating
+		std::vector<Entity::Type> sortedEntities = entities;
+
+		std::sort(sortedEntities.begin(), sortedEntities.end(), [](Entity::Type a, Entity::Type b) {
+			size_t orderA = NIKE_METADATA_SERVICE->getEntityLayerOrder(a);
+			size_t orderB = NIKE_METADATA_SERVICE->getEntityLayerOrder(b);
+
+			const auto& transformA = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(a);
+			const auto& transformB = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(b);
+
+			// Ensure components exist
+			if (!transformA || !transformB) return orderA < orderB;
+
+			const auto& tA = transformA.value().get();
+			const auto& tB = transformB.value().get();
+
+			// Sort by Y-position (lower Y is in front)
+			float bottomA = tA.position.y - (tA.scale.y * 0.5f);
+			float bottomB = tB.position.y - (tB.scale.y * 0.5f);
+
+			return bottomA > bottomB; // Higher bottom Y should render behind lower bottom Y
+			});
+
+		// Update entity order IDs after sorting
+		for (size_t i = 0; i < sortedEntities.size(); ++i) {
+			setEntityOrder(sortedEntities[i], i);
+		}
+	}
+
 
 	void Scenes::Layer::setEntityOrder(Entity::Type entity, size_t order_in_layer) {
 
@@ -121,7 +164,8 @@ namespace NIKE {
 		return	{
 				{"ID", id},
 				{"Mask", mask.to_ulong()},
-				{"B_State", b_state}
+				{"B_State", b_state},
+				{"B_YSort", b_ysort}
 				};
 	}
 
@@ -129,6 +173,7 @@ namespace NIKE {
 		id = data.value("ID", static_cast<unsigned int>(0));
 		mask = LayerMask(data.value("Mask", static_cast<unsigned long>(0)));
 		b_state = data.value("B_State", true);
+		b_ysort = data.value("B_YSort", false);
 	}
 
 	/*****************************************************************//**
