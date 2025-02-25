@@ -553,7 +553,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 0.9915323257446289
+                                "Zoom": 0.8968538045883179
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -1996,7 +1996,7 @@
                                         }
                                     },
                                     "State::State": {
-                                        "State": "Idle"
+                                        "State": "Default"
                                     },
                                     "Transform::Transform": {
                                         "Position": {

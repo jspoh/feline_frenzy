@@ -5129,6 +5129,14 @@ namespace NIKE {
 			ImGui::Text("Active Buttons: ");
 		}
 
+		// Temporary map to store UI state per button
+		static std::unordered_map<std::string, int> val_type_map;
+		static std::unordered_map<std::string, std::string> named_key_map;
+		static std::unordered_map<std::string, std::string> str_val_map;
+		static std::unordered_map<std::string, int> int_val_map;
+		static std::unordered_map<std::string, float> float_val_map;
+		static std::unordered_map<std::string, bool> bool_val_map;
+
 		//Show all active buttons
 		for (auto& button : buttons) {
 			ImGui::Spacing();
@@ -5217,7 +5225,7 @@ namespace NIKE {
 						const auto& value = it->second;
 
 						//Display arguments
-						if (ImGui::CollapsingHeader(std::string("Key: " + key + "##" + button.first).c_str(), ImGuiTreeNodeFlags_Bullet)) {
+						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button.first).c_str())) {
 
 							//Display value based on its type
 							std::visit(
@@ -5242,50 +5250,50 @@ namespace NIKE {
 							//Remove argument button
 							if (ImGui::Button("Remove Argument")) {
 								it = args.erase(it);
+								ImGui::TreePop();
 								break;
 							}
+							ImGui::TreePop();
 						}
 					}
 
 					//Seperator
-					ImGui::Separator();
+					ImGui::Spacing();
 
-					//Static variables
-					static int val_type_index = 0;
-					static std::string named_key = "";
-					named_key.reserve(64);
-					static std::string str_val = "";
-					str_val.reserve(64);
-					static int int_val = 0;
-					static float float_val = 0.0f;
-					static bool bool_val = false;
+					//Input Variables
+					int& val_type_index = val_type_map[button.first];
+					std::string& named_key = named_key_map[button.first];
+					std::string& str_val = str_val_map[button.first];
+					int& int_val = int_val_map[button.first];
+					float& float_val = float_val_map[button.first];
+					bool& bool_val = bool_val_map[button.first];
 
 					//Set arguments
-					if (ImGui::InputText("Input Key", named_key.data(), named_key.capacity() + 1)) {
+					if (ImGui::InputText(std::string("Input Key##" + button.first).c_str(), named_key.data(), named_key.capacity() + 1)) {
 						named_key.resize(strlen(named_key.c_str()));
 					}
 
 					//Select value type
-					ImGui::Combo("Value Type", &val_type_index, "Int\0Float\0String\0Bool\0");
+					ImGui::Combo(std::string("Value Type##" + button.first).c_str(), &val_type_index, "Int\0Float\0String\0Bool\0");
 
 					//Take in input based on selected combo
 					switch (val_type_index) {
 					case 0: {
-						ImGui::InputInt("Value (int)", &int_val);
+						ImGui::InputInt(std::string("Value (int)##" + button.first).c_str(), &int_val);
 						break;
 					}
 					case 1: {
-						ImGui::InputFloat("Value (float)", &float_val);
+						ImGui::InputFloat(std::string("Value (float)##" + button.first).c_str(), &float_val);
 						break;
 					}
 					case 2: {
-						if (ImGui::InputText("Value (string)", str_val.data(), str_val.capacity() + 1)) {
+						if (ImGui::InputText(std::string("Value (string)##" + button.first).c_str(), str_val.data(), str_val.capacity() + 1)) {
 							str_val.resize(strlen(str_val.c_str()));
 						}
 						break;
 					}
 					case 3: {
-						ImGui::Checkbox("Value (bool)", &bool_val);
+						ImGui::Checkbox(std::string("Value (bool)##" + button.first).c_str(), &bool_val);
 						break;
 					}
 					default: {
@@ -5294,25 +5302,29 @@ namespace NIKE {
 					}
 
 					//Add argument button
-					if (ImGui::Button("Add Argument")) {
+					if (ImGui::Button(std::string("Add Argument##" + button.first).c_str())) {
 
 						//Check if named key is correct
 						if (!named_key.empty() && args.find(named_key) == args.end()) {
 							switch (val_type_index) {
 							case 0: {
 								args[named_key] = int_val;
+								named_key.clear();
 								break;
 							}
 							case 1: {
 								args[named_key] = float_val;
+								named_key.clear();
 								break;
 							}
 							case 2: {
 								args[named_key] = str_val;
+								named_key.clear();
 								break;
 							}
 							case 3: {
 								args[named_key] = bool_val;
+								named_key.clear();
 								break;
 							}
 							default: {
@@ -5327,7 +5339,7 @@ namespace NIKE {
 				ImGui::Spacing();
 
 				//Delete Button
-				if (ImGui::Button("Delete Button")) {
+				if (ImGui::Button(std::string("Delete Button##" + button.first).c_str())) {
 					NIKE_UI_SERVICE->destroyButton(button.first);
 					break;
 				}
@@ -6500,6 +6512,11 @@ namespace NIKE {
 	}
 
 	bool LevelEditor::GameWindowPanel::isMouseInWindow() const {
+
+		if (!window_is_selected) {
+			return false;
+		}
+
 		//Get window size
 		Vector2i window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
@@ -6566,6 +6583,8 @@ namespace NIKE {
 
 		//World Scale Factor
 		Vector2f scale{ NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x / (viewport_width / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),  NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y / (viewport_height / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+
+		window_is_selected = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
 
 		//Calculate world mouse position
 		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x, (io.MousePos.y - window_pos.y) * scale.y };
