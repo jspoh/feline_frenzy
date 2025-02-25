@@ -32,13 +32,15 @@ namespace NIKE {
 			~Data() = default;
 		public:
 			enum class ParticlePresets {
-				BASE = 0,
+				NONE = 0,
+				BASE,
 				CLUSTER,
 				FIRE,
 				NUM_PARTICLE_PRESETS
 			};
 
 			static inline std::unordered_map<ParticlePresets, std::string> particle_preset_map{
+				{ ParticlePresets::NONE, "none" },
 				{ ParticlePresets::BASE, "base" },
 				{ ParticlePresets::CLUSTER, "cluster" },
 				{ ParticlePresets::FIRE, "fire"}
@@ -98,6 +100,24 @@ namespace NIKE {
 				float duration{};		// in seconds. -1 for infinite. how long particle system should last
 				float time_alive{};		// in seconds. how long particle system has been alive
 				bool is_alive{};
+
+				// new particle traits
+				int num_new_particles_per_second{};
+				float particle_lifespan{};
+				float particle_acceleration{};
+				Vector2f particle_velocity_range{};
+				Vector2f particle_vector_x_range{};
+				Vector2f particle_vector_y_range{};
+				bool particle_color_is_random{};
+				Vector4f particle_color{};
+				Vector2f particle_rand_x_offset_range{};
+				Vector2f particle_rand_y_offset_range{};
+				float particle_rotation{};
+				Vector2f particle_rand_width_range{};
+				Vector2f particle_rand_height_range{};
+				Vector2f particle_final_size{};
+				Vector4f particle_final_color{};
+				float particle_rotation_speed{};
 			};
 
 			class Manager {
@@ -136,6 +156,26 @@ namespace NIKE {
 				void setParticleSystemOrigin(const std::string& ref, const Vector2f& origin);
 				void setParticleSystemPreset(const std::string& ref, Data::ParticlePresets preset);
 				void setParticleSystemDuration(const std::string& ref, float duration);
+
+				// set particle system new particle traits
+				// could use unordered_map here, easier but more prone to errors
+				void setParticleSystemNumNewParticlesPerSecond(const std::string& ref, int num_new_particles_per_second);
+				void setParticleSystemParticleLifespan(const std::string& ref, float particle_lifespan);
+				void setParticleSystemParticleAcceleration(const std::string& ref, float particle_acceleration);
+				void setParticleSystemParticleVelocityRange(const std::string& ref, const Vector2f& particle_velocity_range);
+				void setParticleSystemParticleVectorXRange(const std::string& ref, const Vector2f& particle_vector_x_range);
+				void setParticleSystemParticleVectorYRange(const std::string& ref, const Vector2f& particle_vector_y_range);
+				void setParticleSystemParticleColorIsRandom(const std::string& ref, bool particle_color_is_random);
+				void setParticleSystemParticleColor(const std::string& ref, const Vector4f& particle_color);
+				void setParticleSystemParticleRandXOffsetRange(const std::string& ref, const Vector2f& particle_rand_x_offset_range);
+				void setParticleSystemParticleRandYOffsetRange(const std::string& ref, const Vector2f& particle_rand_y_offset_range);
+				void setParticleSystemParticleRotation(const std::string& ref, float particle_rotation);
+				void setParticleSystemParticleRandWidthRange(const std::string& ref, const Vector2f& particle_rand_width_range);
+				void setParticleSystemParticleRandHeightRange(const std::string& ref, const Vector2f& particle_rand_height_range);
+				void setParticleSystemParticleFinalSize(const std::string& ref, const Vector2f& particle_final_size);
+				void setParticleSystemParticleFinalColor(const std::string& ref, const Vector4f& particle_final_color);
+				void setParticleSystemParticleRotationSpeed(const std::string& ref, float particle_rotation_speed);
+
 
 				// get modifiable particle system
 				ParticleSystem& getParticleSystem(const std::string& ref);

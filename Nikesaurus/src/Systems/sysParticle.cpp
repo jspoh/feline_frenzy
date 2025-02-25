@@ -170,6 +170,11 @@ void NSPM::update() {
 			Vector2f PARTICLE_ORIGIN{};
 
 			switch (ps.preset) {
+			case Data::ParticlePresets::NONE: {
+				LIFESPAN = 5.f;
+				//ACCELERATION = ps.
+				break;
+			}
 			case Data::ParticlePresets::CLUSTER: {
 				PARTICLE_ORIGIN = ps.origin;
 				LIFESPAN = 5.f;
@@ -331,3 +336,72 @@ void NSPM::resetEntityParticleSystems() {
 
 	next_ps_id = 0;
 }
+
+
+// setters for particle system new particle traits
+
+void NSPM::setParticleSystemNumNewParticlesPerSecond(const std::string& ref, int num_new_particles_per_second) {
+	active_particle_systems.at(ref).num_new_particles_per_second = num_new_particles_per_second;
+}
+
+void NSPM::setParticleSystemParticleLifespan(const std::string& ref, float particle_lifespan) {
+	active_particle_systems.at(ref).particle_lifespan = particle_lifespan;
+}
+
+void NSPM::setParticleSystemParticleAcceleration(const std::string& ref, float particle_acceleration) {
+	active_particle_systems.at(ref).particle_acceleration = particle_acceleration;
+}
+
+void NSPM::setParticleSystemParticleVelocityRange(const std::string& ref, const Vector2f& particle_velocity_range) {
+	active_particle_systems.at(ref).particle_velocity_range = particle_velocity_range;
+}
+
+void NSPM::setParticleSystemParticleVectorXRange(const std::string& ref, const Vector2f& particle_vector_x_range) {
+	active_particle_systems.at(ref).particle_vector_x_range = particle_vector_x_range;
+}
+
+void NSPM::setParticleSystemParticleVectorYRange(const std::string& ref, const Vector2f& particle_vector_y_range) {
+	active_particle_systems.at(ref).particle_vector_y_range = particle_vector_y_range;
+}
+
+void NSPM::setParticleSystemParticleColorIsRandom(const std::string& ref, bool particle_color_is_random) {
+	active_particle_systems.at(ref).particle_color_is_random = particle_color_is_random;
+}
+
+void NSPM::setParticleSystemParticleColor(const std::string& ref, const Vector4f& particle_color) {
+	active_particle_systems.at(ref).particle_color = particle_color;
+}
+
+void NSPM::setParticleSystemParticleRandXOffsetRange(const std::string& ref, const Vector2f& particle_rand_x_offset_range) {
+	active_particle_systems.at(ref).particle_rand_x_offset_range = particle_rand_x_offset_range;
+}
+
+void NSPM::setParticleSystemParticleRandYOffsetRange(const std::string& ref, const Vector2f& particle_rand_y_offset_range) {
+	active_particle_systems.at(ref).particle_rand_y_offset_range = particle_rand_y_offset_range;
+}
+
+void NSPM::setParticleSystemParticleRotation(const std::string& ref, float particle_rotation) {
+	active_particle_systems.at(ref).particle_rotation = particle_rotation;
+}
+
+void NSPM::setParticleSystemParticleRandWidthRange(const std::string& ref, const Vector2f& particle_rand_width_range) {
+	active_particle_systems.at(ref).particle_rand_width_range = particle_rand_width_range;
+}
+
+void NSPM::setParticleSystemParticleRandHeightRange(const std::string& ref, const Vector2f& particle_rand_height_range) {
+	active_particle_systems.at(ref).particle_rand_height_range = particle_rand_height_range;
+}
+
+void NSPM::setParticleSystemParticleFinalSize(const std::string& ref, const Vector2f& particle_final_size) {
+	active_particle_systems.at(ref).particle_final_size = particle_final_size;
+}
+
+void NSPM::setParticleSystemParticleFinalColor(const std::string& ref, const Vector4f& particle_final_color) {
+	active_particle_systems.at(ref).particle_final_color = particle_final_color;
+}
+
+void NSPM::setParticleSystemParticleRotationSpeed(const std::string& ref, float particle_rotation_speed) {
+	active_particle_systems.at(ref).particle_rotation_speed = particle_rotation_speed;
+}
+
+

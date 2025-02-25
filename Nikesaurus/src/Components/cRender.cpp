@@ -495,6 +495,22 @@ namespace NIKE {
 					// Before change
 					static int before_change_preset;
 					static Vector2f before_change_offset;
+					static int before_change_num_new_particles_per_second;
+					static float before_change_particle_lifespan;
+					static float before_change_particle_acceleration;
+					static Vector2f before_change_particle_velocity_range;
+					static Vector2f before_change_particle_vector_x_range;
+					static Vector2f before_change_particle_vector_y_range;
+					static bool before_change_particle_color_is_random;
+					static Vector4f before_change_particle_color;
+					static Vector2f before_change_particle_rand_x_offset_range;
+					static Vector2f before_change_particle_rand_y_offset_range;
+					static float before_change_particle_rotation;
+					static Vector2f before_change_particle_rand_width_range;
+					static Vector2f before_change_particle_rand_height_range;
+					static Vector2f before_change_particle_final_size;
+					static Vector4f before_change_particle_final_color;
+					static float before_change_particle_rotation_speed;
 
 					// Preset
 					ImGui::Text("Particle Preset:");
@@ -586,21 +602,78 @@ namespace NIKE {
 
 					// Num new particles per second
 					ImGui::Text("Num New Particles Per Second:");
-					ImGui::DragInt("##Num New Particles Per Second", &comp.num_new_particles_per_second, 1, 0, 1000, "%d", ImGuiSliderFlags_AlwaysClamp);
+					ImGui::DragInt("##Num New Particles Per Second", &comp.num_new_particles_per_second, 1, 0, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_num_new_particles_per_second = comp.num_new_particles_per_second;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_num_new_particles_per_second;
+						change_num_new_particles_per_second.do_action = [&, num_new_particles_per_second = comp.num_new_particles_per_second]() {
+							comp.num_new_particles_per_second = num_new_particles_per_second;
+							};
+						change_num_new_particles_per_second.undo_action = [&, num_new_particles_per_second = before_change_num_new_particles_per_second]() {
+							comp.num_new_particles_per_second = num_new_particles_per_second;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_num_new_particles_per_second));
+					}
 
 					// Particle Lifespan
 					ImGui::Text("Particle Lifespan:");
 					ImGui::DragFloat("##Particle Lifespan", &comp.particle_lifespan, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_lifespan = comp.particle_lifespan;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_lifespan;
+						change_particle_lifespan.do_action = [&, particle_lifespan = comp.particle_lifespan]() {
+							comp.particle_lifespan = particle_lifespan;
+							};
+						change_particle_lifespan.undo_action = [&, particle_lifespan = before_change_particle_lifespan]() {
+							comp.particle_lifespan = particle_lifespan;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_lifespan));
+					}
 
 					// Particle Velocity Range
 					ImGui::Text("Particle Velocity Range:");
 					ImGui::DragFloat2("##Particle Velocity Range", &comp.particle_velocity_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_velocity_range = comp.particle_velocity_range;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_velocity_range;
+						change_particle_velocity_range.do_action = [&, particle_velocity_range = comp.particle_velocity_range]() {
+							comp.particle_velocity_range = particle_velocity_range;
+							};
+						change_particle_velocity_range.undo_action = [&, particle_velocity_range = before_change_particle_velocity_range]() {
+							comp.particle_velocity_range = particle_velocity_range;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_velocity_range));
+					}
+
 					ImGui::SameLine();
+
 					ImGui::DragFloat2("##Particle Velocity Range", &comp.particle_velocity_range.y, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_velocity_range = comp.particle_velocity_range;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_velocity_range;
+						change_particle_velocity_range.do_action = [&, particle_velocity_range = comp.particle_velocity_range]() {
+							comp.particle_velocity_range = particle_velocity_range;
+							};
+						change_particle_velocity_range.undo_action = [&, particle_velocity_range = before_change_particle_velocity_range]() {
+							comp.particle_velocity_range = particle_velocity_range;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_velocity_range));
+					}
 
 					// Particle Color
 					ImGui::Text("Particle color is random:");
 					ImGui::Checkbox("##Particle Color Is Random", &comp.particle_color_is_random);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_color_is_random = comp.particle_color_is_random;
+					}
 
 					ImGui::BeginDisabled(!comp.particle_color_is_random);
 					{
@@ -615,18 +688,87 @@ namespace NIKE {
 					// Particle Rand Offset Range
 					ImGui::Text("Particle Rand Offset Range:");
 					ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rand_x_offset_range = comp.particle_rand_x_offset_range;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rand_x_offset_range;
+						change_particle_rand_x_offset_range.do_action = [&, particle_rand_x_offset_range = comp.particle_rand_x_offset_range]() {
+							comp.particle_rand_x_offset_range = particle_rand_x_offset_range;
+							};
+						change_particle_rand_x_offset_range.undo_action = [&, particle_rand_x_offset_range = before_change_particle_rand_x_offset_range]() {
+							comp.particle_rand_x_offset_range = particle_rand_x_offset_range;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_x_offset_range));
+					}
+
 					ImGui::SameLine();
+
 					ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rand_y_offset_range = comp.particle_rand_y_offset_range;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rand_y_offset_range;
+						change_particle_rand_y_offset_range.do_action = [&, particle_rand_y_offset_range = comp.particle_rand_y_offset_range]() {
+							comp.particle_rand_y_offset_range = particle_rand_y_offset_range;
+							};
+						change_particle_rand_y_offset_range.undo_action = [&, particle_rand_y_offset_range = before_change_particle_rand_y_offset_range]() {
+							comp.particle_rand_y_offset_range = particle_rand_y_offset_range;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_y_offset_range));
+					}
 
 					// Particle Rand Width Range
 					ImGui::Text("Particle Rand Size Range:");
 					ImGui::DragFloat2("##Particle Rand Size Range", &comp.particle_rand_width_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rand_width_range = comp.particle_rand_width_range;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rand_width_range;
+						change_particle_rand_width_range.do_action = [&, particle_rand_width_range = comp.particle_rand_width_range]() {
+							comp.particle_rand_width_range = particle_rand_width_range;
+							};
+						change_particle_rand_width_range.undo_action = [&, particle_rand_width_range = before_change_particle_rand_width_range]() {
+							comp.particle_rand_width_range = particle_rand_width_range;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_width_range));
+					}
+
 					ImGui::SameLine();
+
 					ImGui::DragFloat2("##Particle Rand Size Range", &comp.particle_rand_height_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rand_height_range = comp.particle_rand_height_range;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rand_height_range;
+						change_particle_rand_height_range.do_action = [&, particle_rand_height_range = comp.particle_rand_height_range]() {
+							comp.particle_rand_height_range = particle_rand_height_range;
+							};
+						change_particle_rand_height_range.undo_action = [&, particle_rand_height_range = before_change_particle_rand_height_range]() {
+							comp.particle_rand_height_range = particle_rand_height_range;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_height_range));
+					}
 
 					// Particle Rotation
 					ImGui::Text("Particle Rotation:");
 					ImGui::DragFloat("##Particle Rotation", &comp.particle_rotation, 0.1f, 0.f, 359.9f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rotation = comp.particle_rotation;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rotation;
+						change_particle_rotation.do_action = [&, particle_rotation = comp.particle_rotation]() {
+							comp.particle_rotation = particle_rotation;
+							};
+						change_particle_rotation.undo_action = [&, particle_rotation = before_change_particle_rotation]() {
+							comp.particle_rotation = particle_rotation;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rotation));
+					}
 
 					ImGui::Spacing();
 					ImGui::Text("Particle behaviour over time");
@@ -635,8 +777,35 @@ namespace NIKE {
 					// Particle Final Size
 					ImGui::Text("Particle Final Size:");
 					ImGui::DragFloat2("##Particle Final Size", &comp.particle_final_size.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_final_size = comp.particle_final_size;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_final_size;
+						change_particle_final_size.do_action = [&, particle_final_size = comp.particle_final_size]() {
+							comp.particle_final_size = particle_final_size;
+							};
+						change_particle_final_size.undo_action = [&, particle_final_size = before_change_particle_final_size]() {
+							comp.particle_final_size = particle_final_size;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_final_size));
+					}
+
 					ImGui::SameLine();
 					ImGui::DragFloat2("##Particle Final Size", &comp.particle_final_size.y, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_final_size = comp.particle_final_size;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_final_size;
+						change_particle_final_size.do_action = [&, particle_final_size = comp.particle_final_size]() {
+							comp.particle_final_size = particle_final_size;
+							};
+						change_particle_final_size.undo_action = [&, particle_final_size = before_change_particle_final_size]() {
+							comp.particle_final_size = particle_final_size;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_final_size));
+					}
 
 					// Particle Final Color
 					ImGui::Text("Particle Final Color:");
@@ -648,6 +817,19 @@ namespace NIKE {
 					// Particle rotation speed
 					ImGui::Text("Particle Rotation Speed(degrees anticlockwise / second):");
 					ImGui::DragFloat("##Particle Rotation Speed", &comp.particle_rotation_speed, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rotation_speed = comp.particle_rotation_speed;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rotation_speed;
+						change_particle_rotation_speed.do_action = [&, particle_rotation_speed = comp.particle_rotation_speed]() {
+							comp.particle_rotation_speed = particle_rotation_speed;
+							};
+						change_particle_rotation_speed.undo_action = [&, particle_rotation_speed = before_change_particle_rotation_speed]() {
+							comp.particle_rotation_speed = particle_rotation_speed;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rotation_speed));
+					}
 
 					// advanced options (for programmatic usage only)
 
