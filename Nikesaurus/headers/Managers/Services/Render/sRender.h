@@ -13,6 +13,7 @@
 #include "Components/cTransform.h"
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
+#include "Managers/Services/Render/sParticle.h"
 
 #ifndef RENDER_SERVICE_HPP
 #define RENDER_SERVICE_HPP
@@ -68,6 +69,9 @@ namespace NIKE {
 				//Shader system
 				std::unique_ptr<Shader::ShaderManager> shader_manager;
 
+				//Particle system
+				std::unique_ptr<SysParticle::Manager> particle_manager;
+
 				//Text buffer for rendering text
 				TextBuffer text_buffer;
 
@@ -83,11 +87,17 @@ namespace NIKE {
 				//Queue of world text render
 				std::queue<std::function<void()>> world_text_render_queue;
 
+				//Queue of world particle render
+				std::queue<std::function<void()>> world_particle_render_queue;
+
 				//Queue of screen render
 				std::queue<std::function<void()>> screen_render_queue;
 
 				//Queue of screen text render
 				std::queue<std::function<void()>> screen_text_render_queue;
+
+				//Queue of screen particle render
+				std::queue<std::function<void()>> screen_particle_render_queue;
 
 			public:
 

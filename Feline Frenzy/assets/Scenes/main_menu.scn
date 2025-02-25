@@ -32,6 +32,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -99,6 +100,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -133,9 +135,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 2.830392599105835,
-                                    "y": 2.7990200519561768,
-                                    "z": 3.1009809970855713
+                                    "x": 2.9803926944732666,
+                                    "y": 2.9490201473236084,
+                                    "z": 3.250981092453003
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -177,8 +179,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 372.18670654296875,
-                                    "y": 70.71546936035156
+                                    "x": 390.79632568359375,
+                                    "y": 74.25130462646484
                                 },
                                 "Screen Position": true
                             }

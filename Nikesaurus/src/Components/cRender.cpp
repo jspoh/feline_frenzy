@@ -11,9 +11,15 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Components/cRender.h"
-#include "Systems/sysParticle.h"
+#include "Managers/Services/Render/sParticle.h"
 
 namespace NIKE {
+
+	//Construct particle emitter
+	Render::ParticleEmitter::ParticleEmitter() : offset{ 0.f, 0.f }, render_type{ 0 }, preset{ 0 }, ref{ "" }, duration{ -1.f } {
+		p_system = std::make_shared<SysParticle::ParticleSystem>();
+	}
+
 	void Render::registerComponents() {
 
 		//Register render components
@@ -21,8 +27,6 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
-		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
 		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
 
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
@@ -38,16 +42,22 @@ namespace NIKE {
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
-				const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				comp.preset = static_cast<int>(data.at("preset").get<int>());
 				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
-				comp.ref = particle_emitter_ref;
 
-				// add particle system
-				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
+				//Initialize particle system
+				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
+				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
+				comp.p_system->is_alive = true;
+				comp.p_system->duration = comp.duration;
+				comp.p_system->time_alive = 0.f;
+				comp.p_system->using_world_pos = true; // Temporary set to true
+				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
@@ -72,7 +82,7 @@ namespace NIKE {
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
-				const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				if (delta.contains("preset")) {
 					comp.preset = delta["preset"];
@@ -86,10 +96,16 @@ namespace NIKE {
 				if (delta.contains("duration")) {
 					comp.duration = delta["duration"];
 				}
-				comp.ref = particle_emitter_ref;
 
-				// add particle system
-				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
+				//Initialize particle system
+				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
+				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
+				comp.p_system->is_alive = true;
+				comp.p_system->duration = comp.duration;
+				comp.p_system->time_alive = 0.f;
+				comp.p_system->using_world_pos = true; // Temporary set to true
+				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
 			}
 		);
 
@@ -379,13 +395,17 @@ namespace NIKE {
 							// Store the value before the change
 							change_preset.do_action = [&, preset = selected_preset]() {
 								comp.preset = preset;
-								NIKE::SysParticle::Manager::getInstance().resetParticleSystemParticles(comp.ref);
+								
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 
 							// Store the undo action
 							change_preset.undo_action = [&, preset = previous_preset]() {
 								comp.preset = preset;
-								NIKE::SysParticle::Manager::getInstance().resetParticleSystemParticles(comp.ref);
+
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 
 							// Execute the action
@@ -411,10 +431,16 @@ namespace NIKE {
 							// Store the value before the change
 							change_render_type.do_action = [&, render_type = selected_render_type]() {
 								comp.render_type = render_type;
+
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 							// Store the undo action
 							change_render_type.undo_action = [&, render_type = previous_render_type]() {
 								comp.render_type = render_type;
+
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 							// Execute the action
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));

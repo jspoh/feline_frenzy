@@ -15,7 +15,6 @@
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
 #include "Math/Mtx33.h"
-#include "Systems/sysParticle.h"
 
 
 // !TODO: jspoh reorg
@@ -59,122 +58,6 @@ namespace {
 
 namespace NIKE {
 
-	void Render::Manager::transformAndRenderEntity(Entity::Type entity, bool debugMode) {
-		//Matrix used for rendering
-		Matrix_33 matrix;
-
-		//Get transform
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-		if (!e_transform_comp.has_value()) return; //Handling no value scenarios
-		auto& e_transform = e_transform_comp.value().get();
-
-		Matrix_33 cam_ndcx = NIKE_UI_SERVICE->checkEntity(entity) ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
-		if (e_transform.use_screen_pos) {
-			cam_ndcx = NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform();
-		}
-
-		//Check If Texture
-		if (auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);  e_texture_comp.has_value()) {
-			auto& e_texture = e_texture_comp.value().get();
-
-			//Check if texture is loaded
-			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
-
-
-				//Allow stretching of texture
-				if (!e_texture.b_stretch) {
-					//Copy transform for texture mapping ( Locks the transformation of a texture )
-					Vector2f tex_size{ static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x, static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y };
-					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
-				}
-
-				// Transform matrix here
-				NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
-
-				// Render Texture
-				NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
-			}
-		}
-		else if (auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);  e_shape_comp.has_value()) {
-			auto& e_shape = e_shape_comp.value().get();
-
-			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
-				// Transform matrix here
-				NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
-
-				//Render Shape
-				NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
-			}
-		}
-
-		if (debugMode) {
-			// Render debugging bounding box
-			Vector4f bounding_box_color{ 1.0f, 0.0f, 0.0f, 1.0f };
-
-			//Check for collider component
-			if (auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);  e_collider_comp.has_value()) {
-				// Make a copy of collider comp
-				auto e_collider = e_collider_comp.value().get();
-				e_collider.transform.position = e_transform.position + e_collider.pos_offset;
-				if (e_collider.b_collided) {
-					bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
-				}
-
-				//Calculate bounding box matrix
-				NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
-				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
-			}
-			else {
-				//Calculate bounding box matrix
-				NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
-			}
-
-			//Calculate direction matrix
-			if (auto e_velo_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);  e_velo_comp.has_value()) {
-				auto const& e_velo = e_velo_comp.value().get();
-
-				if (e_velo.velocity.x != 0.0f || e_velo.velocity.y != 0.0f) {
-					Transform::Transform dir_transform = e_transform;
-					dir_transform.scale.x = 1.0f;
-					dir_transform.rotation = -atan2(e_velo.velocity.x, e_velo.velocity.y) * static_cast<float>(180.0f / M_PI);
-					dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-					NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
-					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
-				}
-			}
-		}
-	}
-
-	void Render::Manager::transformAndRenderText(Entity::Type entity) {
-
-		//Matrix used for rendering
-		Matrix_33 matrix;
-
-		//Get transform
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-		if (!e_transform_comp.has_value()) return;
-		auto& e_transform = e_transform_comp.value().get();
-
-		//Get Text
-		auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity);
-		if (!e_text_comp.has_value()) return;
-		auto& e_text = e_text_comp.value().get();
-
-		//Check if font exists
-		if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
-			//Make copy of transform, scale to 1.0f for calculating matrix
-			Transform::Transform copy = e_transform;
-			copy.scale = { 1.0f, 1.0f };
-
-			//Transform text matrix
-			NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
-
-			//Render text
-			NIKE_RENDER_SERVICE->renderText(matrix, e_text);
-		}
-	}
-
 	void Render::Manager::init() {
 
 		NIKE_RENDER_SERVICE->init();
@@ -206,6 +89,11 @@ namespace NIKE {
 			if (!layer->getLayerState())
 				continue;
 			
+			if (layer->getLayerYSort()) {
+				layer->sortEntitiesBasedOnYPosition();
+			}
+
+
 			for (auto& entity : layer->getEntitites()) {
 
 				//Skip entity not registered to this system
@@ -228,44 +116,44 @@ namespace NIKE {
 
 		//!!! RENDER UI HERE - SH
 
-		// !TODO: jspoh move this update function
-		NIKE::SysParticle::Manager::getInstance().update();
+		//// !TODO: jspoh move this update function
+		//NIKE::SysParticle::Manager::getInstance().update();
 
-		Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
-		Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
-		Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
+		//Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
+		//Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		//Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
 
-		using namespace NIKE::SysParticle;
+		//using namespace NIKE::SysParticle;
 		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
 
-		auto& PM = NIKE::SysParticle::Manager::getInstance();
-		for (const auto& [ref, ps] : PM.getActiveParticleSystemsMap()) {
-			//const unsigned int vao = PM.getVAO(ps.preset);
-			const unsigned int vbo = PM.getVBO(ps.preset);
+		//auto& PM = NIKE::SysParticle::Manager::getInstance();
+		//for (const auto& [ref, ps] : PM.getActiveParticleSystemsMap()) {
+		//	//const unsigned int vao = PM.getVAO(ps.preset);
+		//	const unsigned int vbo = PM.getVBO(ps.preset);
 
-			std::vector<Particle> particles = ps.particles;
+		//	std::vector<Particle> particles = ps.particles;
 
-			// assume world pos
-			if (ps.using_world_pos) {
-				std::for_each(particles.begin(), particles.end(), [&](Particle& p) {
-					p.pos = worldToScreen(p.pos);
-				});
-			}
+		//	// assume world pos
+		//	if (ps.using_world_pos) {
+		//		std::for_each(particles.begin(), particles.end(), [&](Particle& p) {
+		//			p.pos = worldToScreen(p.pos);
+		//		});
+		//	}
 
-			err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
-			}
-			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
-			err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
-			}
+		//	err = glGetError();
+		//	if (err != GL_NO_ERROR) {
+		//		NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
+		//	}
+		//	glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
+		//	err = glGetError();
+		//	if (err != GL_NO_ERROR) {
+		//		NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
+		//	}
 
-			const int num_particles = max(1, static_cast<int>(particles.size()));
+		//	const int num_particles = max(1, static_cast<int>(particles.size()));
 
-			NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles, ref == "mouseps1");
-		}
+		//	NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles, ref == "mouseps1");
+		//}
 
 		// mouse particles
 		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps1", mouse_particle_pos);
@@ -273,6 +161,47 @@ namespace NIKE {
 		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps3", mouse_particle_pos);
 		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 
+		//FPS Rendering variables
+		static auto worldsize = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
+		static Render::Text fps = { "Skranji-Bold.ttf", "FPS:", { 1.f, 1.f, 1.f, 1.f }, 1.0f , TextOrigin::LEFT };
+
+		//Calculate avg FPS
+		static std::vector<float> fps_history(300);
+		static float elapsed_time = 0.0f;
+		elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+		float curr_fps = NIKE_WINDOWS_SERVICE->getCurrentFPS();
+		if (fps_history.empty() || std::abs(curr_fps - fps_history.back()) < 10000) { //Ignore outlier FPS jumps of by 10000
+			fps_history.push_back(curr_fps);
+		}
+
+		//Update avg fps every second
+		if (elapsed_time > 1.f) {
+
+			//Calculate average fps
+			elapsed_time = 0.f;
+			float sum_fps = 0.f;
+			std::for_each(fps_history.begin(), fps_history.end(), [&sum_fps](float& fps) { sum_fps += fps; });
+			const float avg_fps = sum_fps / fps_history.size();
+			fps_history.clear();
+
+			//Update fps
+			std::stringstream ss;
+			ss << "FPS: " << std::round(avg_fps);
+			fps.text = ss.str();
+		}
+
+		//Render FPS Display
+		Matrix_33 matrix;
+		static bool show_fps = true;
+		static Transform::Transform fps_transform = { Vector2f((worldsize.x / 2.0f) - 200.0f, (worldsize.y / 2.0f) - 30.0f), Vector2f(1.0f, 1.0f), 0.0f};
+		fps_transform.use_screen_pos = true;
+
+		//Toggle showing of FPS
+		show_fps = NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_F1) ? !show_fps : show_fps;
+		if (show_fps) {
+			NIKE_RENDER_SERVICE->transformMatrix(fps_transform, matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+			NIKE_RENDER_SERVICE->renderText(matrix, fps);
+		}
 
 #ifndef NDEBUG
 		//Unbind when editor is active for rendering

@@ -13,7 +13,6 @@
 #include "Core/Engine.h"
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -787,13 +786,6 @@ namespace NIKE {
 					//Check if entity is still alive
 					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
 
-					//Remove active particle system if exists
-					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity);
-					if (comps.find("Render::ParticleEmitter") != comps.end()) {
-						auto comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-						NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(comp->ref);
-					}
-
 					if (entity.has_value()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(entity.value());
@@ -1143,9 +1135,24 @@ namespace NIKE {
 					//Show number of entities in the level
 					ImGui::Text("Number of entities in layer: %d", layer->getEntitiesSize());
 
+					ImGui::Spacing();
+
+					// Create a unique checkbox label using the layer ID
+					std::string checkbox_label = "Enable Y Sorting##Checkbox" + std::to_string(layer->getLayerID());
+
+					bool y_sort = layer->getLayerYSort();
+
+					if (ImGui::Checkbox(checkbox_label.c_str(), &y_sort)) {
+						layer->setLayerYSort(y_sort);
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Enable this to sort entities by their Y position. (Overrides Order ID)");
+					}
+					ImGui::Spacing();
+
 					// Create a unique button label using the layer ID
 					std::string button_label = "Create##Entity" + std::to_string(layer->getLayerID());
-
+					
 					// Button to create an entity, which triggers the popup
 					if (ImGui::Button(button_label.c_str())) {
 						openPopUp("Create Entity");
@@ -1167,7 +1174,6 @@ namespace NIKE {
 						openPopUp("Clone Entity");
 					}
 
-					//Add Spacing
 					ImGui::Spacing();
 
 					//Iterate through entities within layer
@@ -2072,33 +2078,33 @@ namespace NIKE {
 					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
 
-					// add active particle system if particle emitter is added
-					if (component.first == "Render::ParticleEmitter") {
-						using namespace NIKE::SysParticle;
+					//// add active particle system if particle emitter is added
+					//if (component.first == "Render::ParticleEmitter") {
+					//	using namespace NIKE::SysParticle;
 
-						// get entity position
-						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					//	// get entity position
+					//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
 
-						if (comps.find("Transform::Transform") == comps.end()) {
-							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-						}
-						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
+					//	if (comps.find("Transform::Transform") == comps.end()) {
+					//		NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
+					//		NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
+					//	}
+					//	NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
 
-						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+					//	const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
 
-						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+					//	const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
-						// update default particle system config
-						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-						pe_comp->ref = particle_emitter_ref;
-						pe_comp->offset = { 0.f, 0.f };
-						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
+					//	// update default particle system config
+					//	auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					//	pe_comp->duration = -1.f;
+					//	pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
+					//	pe_comp->ref = particle_emitter_ref;
+					//	pe_comp->offset = { 0.f, 0.f };
+					//	pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
 
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					}
+					//	NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
+					//}
 
 					//	};
 
@@ -2137,15 +2143,15 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
-				if (comp_string_ref == "Render::ParticleEmitter") {
-					// get entity position
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					if (!success) {
-						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-					}
-				}
+				//if (comp_string_ref == "Render::ParticleEmitter") {
+				//	// get entity position
+				//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+				//	const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+				//	bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+				//	if (!success) {
+				//		throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+				//	}
+				//}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2673,33 +2679,6 @@ namespace NIKE {
 
 					//Close popup
 					closePopUp(popup_id);
-
-					// add active particle system if particle emitter is added
-					if (component.first == "Render::ParticleEmitter") {
-						using namespace NIKE::SysParticle;
-
-						// get entity position
-
-						if (prefab_comps.find("Transform::Transform") == prefab_comps.end()) {
-							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-						}
-						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
-
-						const auto comp = reinterpret_cast<Transform::Transform*>(prefab_comps.at("Transform::Transform").get());
-
-						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
-						// update default particle system config
-						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(prefab_comps.at("Render::ParticleEmitter").get());
-						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-						pe_comp->ref = particle_emitter_ref;
-						pe_comp->offset = { 0.f, 0.f };
-						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
-
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					}
 				}
 
 			}
@@ -2736,16 +2715,6 @@ namespace NIKE {
 
 				// Close popup
 				closePopUp(popup_id);
-
-				if (comp_ref == "Render::ParticleEmitter") {
-					// get entity position
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					if (!success) {
-						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-					}
-				}
 			}
 
 			ImGui::SameLine();
@@ -5061,6 +5030,9 @@ namespace NIKE {
 				Transform::Transform trans_copy = btn_transform;
 				Render::Text txt_copy = btn_text;
 
+				//Set screem pos to center
+				trans_copy.use_screen_pos = true;
+
 				//Create button based on mode
 				if (b_model) {
 					//Create button
@@ -5968,86 +5940,6 @@ namespace NIKE {
 
 				ImGui::EndTable();
 			}
-
-			//if (!layers.empty()) {
-			//	ImGui::Text("Edit Layer Bit Mask");
-			//	if (ImGui::BeginCombo("##Select Layer",
-			//		(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
-			//		for (unsigned int i = 0; i < layers.size(); ++i) {
-			//			const bool is_selected = (selected_layer_index == i);
-			//			if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
-
-			//				Action select_layer_action;
-
-			//				// Capture the previous and new layer indices
-			//				unsigned int prev_layer_index = selected_layer_index;
-			//				unsigned int new_layer_index = i;
-
-			//				// Do action
-			//				select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
-			//					selected_layer_index = new_layer_index;
-			//					// Reset bit position
-			//					bit_position = 0;
-			//					edit_mask_id = static_cast<unsigned int>(
-			//						layers[selected_layer_index]->getLayerMask().to_ulong());
-			//					};
-
-			//				// Undo action
-			//				select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
-			//					selected_layer_index = prev_layer_index;
-			//					// Reset bit position
-			//					bit_position = 0;
-			//					edit_mask_id = static_cast<unsigned int>(
-			//						layers[selected_layer_index]->getLayerMask().to_ulong());
-			//					};
-
-			//				// Execute the action
-			//				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
-			//			}
-			//			if (is_selected) ImGui::SetItemDefaultFocus();
-			//		}
-			//		ImGui::EndCombo();
-			//	}
-			//}
-			//else {
-			//	ImGui::Text("No layers available.");
-			//}
-
-
-			//// Show layer editing options
-			//if (selected_layer_index < layers.size()) {
-			//	ImGui::Text("Edit Layer Mask");
-
-			//	// Layer mask editing
-			//	if (layers.size() > 1) {
-
-			//		// For ensuring bit_position does not default to the newly created layer
-			//		if (bit_position >= layers.size() || bit_position == selected_layer_index) {
-			//			bit_position = (selected_layer_index == 0) ? 1 : 0;
-			//		}
-
-			//		if (ImGui::BeginCombo("##Select Mask Layer", layer_names[bit_position].c_str())) {
-			//			for (unsigned int i = 0; i < layers.size(); ++i) {
-			//				if (i == selected_layer_index) continue;
-
-			//				const bool mask_selected = (bit_position == i);
-			//				if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
-			//					bit_position = i;
-			//				}
-			//				if (mask_selected) ImGui::SetItemDefaultFocus();
-			//			}
-			//			ImGui::EndCombo();
-			//		}
-
-			//		bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
-			//		if (ImGui::Checkbox("Set Bit State", &bit_state)) {
-			//			layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
-			//		}
-			//	}
-			//	else {
-			//		ImGui::Text("No mask layers available.");
-			//	}
-			//}
 
 			//Add spacing
 			ImGui::Spacing();

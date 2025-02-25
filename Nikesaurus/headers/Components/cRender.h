@@ -15,6 +15,13 @@
 #include "Managers/Services/sEvents.h"
 
 namespace NIKE {
+
+	namespace SysParticle {
+		struct ParticleSystem;
+		class Data;
+		class Manager;
+	}
+
 	namespace Render {
 		enum class CamPosition {
 			UP = 0,
@@ -102,21 +109,17 @@ namespace NIKE {
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
 
-		struct Hidden {
-		};
-
-		/**
-		 * built in components will not be saved to scene files.
-		 */
-		struct BuiltIn {
-		};
-
 		struct ParticleEmitter {
 			Vector2f offset;		// offset from entity position
 			int render_type;	// ParticleRenderType type
 			int preset;			// ParticlePresets type
 			std::string ref;		// reference to particle system
 			float duration;		// -1 for infinite
+
+			//Particle system
+			std::shared_ptr<SysParticle::ParticleSystem> p_system;
+
+			ParticleEmitter();
 		};
 
 		void registerComponents();
