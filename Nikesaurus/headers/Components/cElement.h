@@ -53,6 +53,7 @@ namespace NIKE {
 
 		const std::string playerBullet[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
 		const std::string enemyBullet[4] = { "enemyBullet.prefab", "enemyFireBullet.prefab", "enemyWaterBullet.prefab", "enemyGrassBullet.prefab" };
+		const std::string elementUI[4] = { "Water icon grey.png", "Fire icon.png", "Water icon.png", "Grass icon.png" };
 
 
 		void registerComponents();
