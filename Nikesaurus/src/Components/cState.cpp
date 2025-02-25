@@ -17,11 +17,11 @@ namespace NIKE {
 		State::State()
 		{
 			// Default init of entity's state to idle
-			auto const& idle_state = NIKE_FSM_SERVICE->getStateByID("Idle");
-			if (idle_state)
+			auto const& default_state = NIKE_FSM_SERVICE->getStateByID("Default");
+			if (default_state)
 			{
-				current_state = idle_state;
-				state_id = "Idle";
+				current_state = default_state;
+				state_id = "Default";
 			}
 		}
 
@@ -64,7 +64,8 @@ namespace NIKE {
 				// Override Deserialize
 				[](State& comp, nlohmann::json const& delta) {
 					if (delta.contains("State")) {
-						comp.state_id = delta["State"].get<std::string>();
+						// comp.state_id = delta["State"].get<std::string>();
+						comp.state_id = "Default";
 						// Reassign the current state based on the new state_id
 						comp.current_state = NIKE_FSM_SERVICE->getStateByID(comp.state_id);
 					}
@@ -80,67 +81,10 @@ namespace NIKE {
 	NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<State>(
 		[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, State& comp) {
 
-			// For current state
+			// To display current state only
 			{
-				ImGui::Text("Adjust State:");
-
-				// List of available states
-				static const char* state_names[] = { "Idle", "EnemyAttack", "EnemyChase", "EnemyHurt", "EnemyDeath"};
-
-				// Current and previous state tracking
-				static std::string before_select_state = comp.state_id;
-				int current_state_index = -1;
-
-				// Find the current state index
-				for (int i = 0; i < IM_ARRAYSIZE(state_names); ++i) {
-					if (comp.state_id == state_names[i]) {
-						current_state_index = i;
-						break;
-					}
-				}
-
-				// Handle combo box selection
-				if (ImGui::Combo("##State", &current_state_index, state_names, IM_ARRAYSIZE(state_names))) {
-					std::string new_state = state_names[current_state_index];
-					if (new_state != comp.state_id) {
-						// Save action
-						LevelEditor::Action save_state;
-						save_state.do_action = [&, state = new_state]() {
-							auto prev_state_ptr = comp.current_state.lock();
-							auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
-							if (new_state_ptr) {
-								NIKE_FSM_SERVICE->changeState(new_state_ptr, comp.entity_ref);
-
-								// Update the component's state information
-								comp.state_id = new_state;
-								comp.current_state = NIKE_FSM_SERVICE->getStateByID(new_state);
-
-							}
-						};
-
-						// Undo action
-						save_state.undo_action = [&, state = before_select_state]() {
-							auto prev_state_ptr = comp.current_state.lock();
-							auto new_state_ptr = NIKE_FSM_SERVICE->getStateByID(new_state);
-							if (new_state_ptr) {
-								NIKE_FSM_SERVICE->changeState(new_state_ptr, comp.entity_ref);
-
-								// Update the component's state information
-								comp.state_id = new_state;
-								comp.current_state = NIKE_FSM_SERVICE->getStateByID(new_state);
-							}
-						};
-
-						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_state));
-
-						// Update the previous value
-						before_select_state = comp.state_id;
-
-						// Apply the new state
-						comp.state_id = new_state;
-						comp.current_state = NIKE_FSM_SERVICE->getStateByID(new_state);
-					}
-				}
+				ImGui::Text("Current State:");
+				ImGui::Text("%s", comp.state_id.c_str());
 			}
 		}
 	);

@@ -106,7 +106,7 @@
             "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
         },
         "State::State": {
-            "State": "Idle"
+            "State": "Default"
         },
         "Transform::Transform": {
             "Position": {
@@ -122,7 +122,7 @@
         }
     },
     "MetaData": {
-        "Layer ID": 1,
+        "Layer ID": 0,
         "Tags": []
     }
 }

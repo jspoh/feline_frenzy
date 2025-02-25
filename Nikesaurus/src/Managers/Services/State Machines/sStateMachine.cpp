@@ -189,12 +189,17 @@ namespace NIKE {
 		}
 
 		void Service::init() {
-			// Regiser states
-			registerState("Idle", std::make_shared<State::IdleState>());
+
+			// Register default state
+			registerState("Default", std::make_shared<State::DefaultState>());
+
+			// Regiser enemy states
+			registerState("EnemyIdle", std::make_shared<State::EnemyIdleState>());
 			registerState("EnemyAttack", std::make_shared<State::EnemyAttackState>());
 			registerState("EnemyChase", std::make_shared<State::EnemyChaseState>());
-			//registerState("EnemyHurt", std::make_shared<State::EnemyHurtState>());
 			registerState("EnemyDeath", std::make_shared<State::EnemyDeathState>());
+
+			// Register destructable states
 			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
 		}
 
@@ -208,7 +213,7 @@ namespace NIKE {
 				auto& state_comp = e_state_comp.value().get();
 				state_comp.entity_ref = entity;
 				// Lock the weak pointer to the current state
-				if (current_state != state_comp.current_state.lock())
+				if (!state_comp.current_state.expired())
 				{
 					current_state = state_comp.current_state.lock();
 				}

@@ -16,9 +16,9 @@
 namespace NIKE {
 	namespace Transition {
 		/****************************
-		* Idle To Destructable EnemyDeathState Transition
+		* Default To Destructable death Transition
 		 *****************************/
-		class IdleToDestructableDeathState : public StateMachine::Itransition {
+		class DefaultToDestructableDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 

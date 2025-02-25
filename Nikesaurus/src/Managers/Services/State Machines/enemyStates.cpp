@@ -20,19 +20,48 @@
 namespace NIKE {
 
 	/*******************************
+	* Default State functions
+	*****************************/
+
+	State::DefaultState::DefaultState()
+	{
+		// Add transitions here
+		addTransition("DefaultToEnemyIdle", std::make_shared<Transition::DefaultToEnemyIdle>());
+		addTransition("DefaultToDestructableDeath", std::make_shared<Transition::DefaultToDestructableDeath>());
+	}
+
+	void State::DefaultState::onEnter([[maybe_unused]] Entity::Type& entity)
+	{
+		//cout << "enter idle state" << endl;
+	}
+
+	void State::DefaultState::onUpdate([[maybe_unused]] Entity::Type& entity)
+	{
+		// cout << "update Idle State" << endl;
+	}
+
+	void State::DefaultState::onExit([[maybe_unused]] Entity::Type& entity)
+	{
+		//cout << "exit idle state" << endl;
+	}
+
+	void State::DefaultState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	{
+	}
+
+	/*******************************
 	* Idle State functions
 	*****************************/
 
-	State::IdleState::IdleState()
+	State::EnemyIdleState::EnemyIdleState()
 	{
 		// Add transitions here
 		addTransition("IdleToAttack", std::make_shared<Transition::IdleToEnemyAttack>());
 		addTransition("IdleToEnemyChase", std::make_shared<Transition::IdleToEnemyChase>());
 		addTransition("IdleToEnemyDeath", std::make_shared<Transition::IdleToEnemyDeath>());
-		addTransition("IdleToDestructableDeath", std::make_shared<Transition::IdleToDestructableDeathState>());
 	}
 
-	void State::IdleState::onEnter([[maybe_unused]] Entity::Type& entity)
+	void State::EnemyIdleState::onEnter([[maybe_unused]] Entity::Type& entity)
 	{
 		//cout << "enter idle state" << endl;
 		//if (!checkTransitionExist("IdleToAttack"))
@@ -41,18 +70,18 @@ namespace NIKE {
 		//}
 	}
 
-	void State::IdleState::onUpdate([[maybe_unused]] Entity::Type& entity)
+	void State::EnemyIdleState::onUpdate([[maybe_unused]] Entity::Type& entity)
 	{
 		// cout << "update Idle State" << endl;
 	}
 
-	void State::IdleState::onExit([[maybe_unused]] Entity::Type& entity)
+	void State::EnemyIdleState::onExit([[maybe_unused]] Entity::Type& entity)
 	{
 		//cout << "exit idle state" << endl;
 		// removeTransition("IdleToAttack");
 	}
 
-	void State::IdleState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	void State::EnemyIdleState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
 	{
 	}
 
@@ -398,40 +427,40 @@ namespace NIKE {
 	* Enemy Hurt State functions
 	*****************************/
 
-	State::EnemyHurtState::EnemyHurtState()
-	{
-		// Add transitions here
-		addTransition("EnemyHurtToEnemyChase", std::make_shared<Transition::EnemyHurtToEnemyChase>());
-		addTransition("EnemyHurtToEnemyAttack", std::make_shared<Transition::EnemyHurtToEnemyAttack>());
-		addTransition("EnemyHurtToEnemyDeath", std::make_shared<Transition::EnemyHurtToEnemyDeath>());
-	}
+	//State::EnemyHurtState::EnemyHurtState()
+	//{
+	//	// Add transitions here
+	//	addTransition("EnemyHurtToEnemyChase", std::make_shared<Transition::EnemyHurtToEnemyChase>());
+	//	addTransition("EnemyHurtToEnemyAttack", std::make_shared<Transition::EnemyHurtToEnemyAttack>());
+	//	addTransition("EnemyHurtToEnemyDeath", std::make_shared<Transition::EnemyHurtToEnemyDeath>());
+	//}
 
-	void State::EnemyHurtState::onEnter([[maybe_unused]] Entity::Type& entity) {
-		// Play Enemy Hurt animation
-		animationSet(entity, 0, 12, 1, 12);
-		flipX(entity, false);
-		playSFX(entity, true);
-	}
-	void State::EnemyHurtState::onUpdate([[maybe_unused]] Entity::Type& entity) {
-		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-		playSFX(entity, true);
-		if (animation_comp.has_value() && health_comp.has_value())
-		{
-			if (animation_comp.value().get().completed_animations >= 1) {
-				playSFX(entity, false);
-				NIKE_METADATA_SERVICE->destroyEntity(entity);
-			}
-		}
-	}
-	void State::EnemyHurtState::onExit([[maybe_unused]] Entity::Type& entity) {
-		playSFX(entity, false);
-	}
+	//void State::EnemyHurtState::onEnter([[maybe_unused]] Entity::Type& entity) {
+	//	// Play Enemy Hurt animation
+	//	animationSet(entity, 0, 12, 1, 12);
+	//	flipX(entity, false);
+	//	playSFX(entity, true);
+	//}
+	//void State::EnemyHurtState::onUpdate([[maybe_unused]] Entity::Type& entity) {
+	//	auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+	//	auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+	//	playSFX(entity, true);
+	//	if (animation_comp.has_value() && health_comp.has_value())
+	//	{
+	//		if (animation_comp.value().get().completed_animations >= 1) {
+	//			playSFX(entity, false);
+	//			NIKE_METADATA_SERVICE->destroyEntity(entity);
+	//		}
+	//	}
+	//}
+	//void State::EnemyHurtState::onExit([[maybe_unused]] Entity::Type& entity) {
+	//	playSFX(entity, false);
+	//}
 
-	void State::EnemyHurtState::playSFX(Entity::Type& entity, [[maybe_unused]] bool play_or_no)
-	{
-		Interaction::playOneShotSFX(entity, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
-	}
+	//void State::EnemyHurtState::playSFX(Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	//{
+	//	Interaction::playOneShotSFX(entity, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
+	//}
 }
 
 
