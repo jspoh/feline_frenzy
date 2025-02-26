@@ -28,6 +28,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
 		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Batch>();
 
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
 			//Serialize
@@ -272,7 +273,7 @@ namespace NIKE {
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Shape>();
 
-		//Register shape for serialization
+		//Register texture for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
 			//Serialize
 			[](Render::Texture const& comp) -> nlohmann::json {
@@ -362,6 +363,210 @@ namespace NIKE {
 		);
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Texture>();
+
+		//Register Batch for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Batch>(
+			//Serialize
+			[](Render::Batch const& comp) -> nlohmann::json {
+				nlohmann::json batch_json;
+
+				//Storage of multiple renders
+				batch_json["RenderQueue"] = nlohmann::json::array();
+
+				for (auto const& render : comp.render_queue) {
+					nlohmann::json render_json;
+
+					//Get text variant
+					if (auto* e_text = std::get_if<Render::Text>(&render.render_type)) {
+						render_json["Type"] = "Text";
+						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Text).name()), e_text);
+					}
+					//Get shape variant
+					else if (auto* e_shape = std::get_if<Render::Shape>(&render.render_type)) {
+						render_json["Type"] = "Shape";
+						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Shape).name()), e_shape);
+					}
+					//Get texture variant
+					else if (auto* e_texture = std::get_if<Render::Texture>(&render.render_type)) {
+						render_json["Type"] = "Texture";
+						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Texture).name()), e_texture);
+					}
+
+					//Serialize transform
+					render_json["Transform"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &render.transform);
+
+					//Add to batch render queue
+					batch_json["RenderQueue"].push_back(render_json);
+				}
+
+				return batch_json;
+			},
+
+			//Deserialize
+			[](Render::Batch& comp, nlohmann::json const& data) {
+
+				//Clear the render queue
+				comp.render_queue.clear();
+
+				//Double check if there is valid data
+				if (!data.contains("RenderQueue") || !data["RenderQueue"].is_array()) return;
+
+				//Iterate through data
+				for (const auto& render_json : data["RenderQueue"]) {
+					Render::Batch::Renderable item;
+
+					//Get data type
+					std::string type = render_json.value("Type", "");
+
+					//Deserialize renders
+					if (type == "Text") {
+						Render::Text text;
+						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Render::Text).name()), &text, render_json["Data"]);
+						item.render_type = text;
+					}
+					else if (type == "Shape") {
+						Render::Shape shape;
+						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &shape, render_json["Data"]);
+						item.render_type = shape;
+					}
+					else if (type == "Texture") {
+						Render::Texture texture;
+						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &texture, render_json["Data"]);
+						item.render_type = texture;
+					}
+
+					//Deserialize transform
+					if (render_json.contains("Transform")) {
+						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &item.transform, render_json["Transform"]);
+					}
+
+					//Insert into render queue
+					comp.render_queue.push_back(item);
+				}
+			},
+
+			// Override Serialize
+			[](Render::Batch const& comp, Render::Batch const& other_comp) -> nlohmann::json {
+				nlohmann::json batch_json;
+
+				//Storage of multiple renders
+				batch_json["RenderQueue"] = nlohmann::json::array();
+
+				//Iterate through
+				for (size_t i = 0; i < comp.render_queue.size(); ++i) {
+					nlohmann::json render_json;
+
+					const auto& render = comp.render_queue[i];
+
+					//Get text variant
+					auto* e_text = std::get_if<Render::Text>(&render.render_type);
+					if (e_text) {
+						render_json["Type"] = "Text";
+
+						if (i < other_comp.render_queue.size()) {
+							auto* other_text = std::get_if<Render::Text>(&other_comp.render_queue[i].render_type);
+							if (other_text) {
+								render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Render::Text).name()), &e_text, &other_text);
+								continue;
+							}
+						}
+
+						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Text).name()), &e_text);
+						continue;
+					}
+
+					//Get shape variant
+					auto* e_shape = std::get_if<Render::Shape>(&render.render_type);
+					if (e_shape) {
+						render_json["Type"] = "Shape";
+
+						if (i < other_comp.render_queue.size()) {
+							auto* other_shape = std::get_if<Render::Shape>(&other_comp.render_queue[i].render_type);
+							if (other_shape) {
+								render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &e_shape, &other_shape);
+								continue;
+							}
+						}
+
+						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &e_shape);
+						continue;
+					}
+
+					//Get texture variant
+					auto* e_texture = std::get_if<Render::Texture>(&render.render_type);
+					if (e_texture) {
+						render_json["Type"] = "Texture";
+
+						if (i < other_comp.render_queue.size()) {
+							auto* other_texture = std::get_if<Render::Texture>(&other_comp.render_queue[i].render_type);
+							if (other_texture) {
+								render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &e_texture, &other_texture);
+								continue;
+							}
+						}
+
+						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &e_texture);
+						continue;
+					}
+
+					if (i < other_comp.render_queue.size()) {
+						render_json["Transform"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &render.transform, &other_comp.render_queue[i].transform);
+					}
+					else {
+						render_json["Transform"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &render.transform);
+					}
+
+					//Add to batch render queue
+					batch_json["RenderQueue"].push_back(render_json);
+				}
+
+				return batch_json;
+			},
+
+			// Override Deserialize
+			[](Render::Batch& comp, nlohmann::json const& data) {
+				//Clear the render queue
+				comp.render_queue.clear();
+
+				//Double check if there is valid data
+				if (!data.contains("RenderQueue") || !data["RenderQueue"].is_array()) return;
+
+				//Iterate through data
+				for (const auto& render_json : data["RenderQueue"]) {
+					Render::Batch::Renderable item;
+
+					//Get data type
+					std::string type = render_json.value("Type", "");
+
+					//Deserialize renders
+					if (type == "Text") {
+						Render::Text text;
+						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Render::Text).name()), &text, render_json["Data"]);
+						item.render_type = text;
+					}
+					else if (type == "Shape") {
+						Render::Shape shape;
+						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &shape, render_json["Data"]);
+						item.render_type = shape;
+					}
+					else if (type == "Texture") {
+						Render::Texture texture;
+						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &texture, render_json["Data"]);
+						item.render_type = texture;
+					}
+
+					//Deserialize transform
+					if (render_json.contains("Transform")) {
+						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &item.transform, render_json["Transform"]);
+					}
+
+					//Insert into render queue
+					comp.render_queue.push_back(item);
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Batch>();
 	}
 
 	void Render::registerEditorComponents() {
@@ -1157,6 +1362,137 @@ namespace NIKE {
 
 				}
 
+			}
+		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Batch>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Batch& comp) {
+				//Get components ui for render;
+				auto& comps_ui = NIKE_LVLEDITOR_SERVICE->getComponentsUI();
+
+				//Combo selector
+				static int select_render_comp = 0;
+
+				//Comp names
+				static std::vector<std::string> comp_names = {
+					Utility::convertTypeString(typeid(Render::Text).name()),
+					Utility::convertTypeString(typeid(Render::Shape).name()),
+					Utility::convertTypeString(typeid(Render::Texture).name())
+				};
+
+				//Store char* pointers for ImGui::Combo
+				static std::vector<const char*> comp_container;
+				comp_container.clear();
+				for (const auto& name : comp_names) {
+					comp_container.push_back(name.c_str());
+				}
+
+				//Select render component to add
+				ImGui::Text("Add To Render Queue");
+				ImGui::Combo("##TagDropDown", &select_render_comp, comp_container.data(), static_cast<int>(comp_container.size()));
+				ImGui::SameLine();
+				if (ImGui::Button("Add##RenderComp")) {
+
+					//Create render component
+					Render::Batch::Renderable render;
+
+					//Component to add
+					switch (select_render_comp) {
+					case 0:
+						render.render_type = Render::Text();
+						break;
+					case 1:
+						render.render_type = Render::Shape();
+						break;
+					case 2:
+						render.render_type = Render::Texture();
+						break;
+					default:
+						break;
+					}
+
+					comp.render_queue.push_back(render);
+				}
+
+				//Separators
+				ImGui::Spacing();
+				ImGui::SeparatorText("Render Queue");
+				ImGui::Spacing();
+
+				//Empty queue
+				if (comp.render_queue.empty()) {
+					ImGui::Text("Render Queue Empty.");
+				}
+
+				//Iterate through render queue
+				for (auto& render : comp.render_queue) {
+					//Get text variant
+					if (auto* e_text = std::get_if<Render::Text>(&render.render_type)) {
+						//Create a collapsible header for the component
+						if (ImGui::TreeNode((Utility::convertTypeString(typeid(Render::Text).name()) + "##BatchedRender").c_str())) {
+							auto it = comps_ui.find(Utility::convertTypeString(typeid(Render::Text).name()));
+							if (it != comps_ui.end()) {
+								it->second(comp_panel, e_text);
+							}
+
+							//Render transform
+							auto trans_it = comps_ui.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (trans_it != comps_ui.end()) {
+								trans_it->second(comp_panel, &render.transform);
+							}
+
+							if(ImGui::SmallButton("Remove##RenderText")) {
+
+							}
+
+							ImGui::TreePop();
+						}
+					}
+					//Get shape variant
+					else if (auto* e_shape = std::get_if<Render::Shape>(&render.render_type)) {
+						//Create a collapsible header for the component
+						if (ImGui::TreeNode((Utility::convertTypeString(typeid(Render::Shape).name()) + "##BatchedRender").c_str())) {
+							auto it = comps_ui.find(Utility::convertTypeString(typeid(Render::Shape).name()));
+							if (it != comps_ui.end()) {
+								it->second(comp_panel, e_shape);
+							}
+
+							//Render transform
+							auto trans_it = comps_ui.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (trans_it != comps_ui.end()) {
+								trans_it->second(comp_panel, &render.transform);
+							}
+
+							if (ImGui::SmallButton("Remove##RenderText")) {
+
+							}
+
+							ImGui::TreePop();
+						}
+					}
+					//Get texture variant
+					else if (auto* e_texture = std::get_if<Render::Texture>(&render.render_type)) {
+						//Create a collapsible header for the component
+						if (ImGui::TreeNode((Utility::convertTypeString(typeid(Render::Texture).name()) + "##BatchedRender").c_str())) {
+							auto it = comps_ui.find(Utility::convertTypeString(typeid(Render::Texture).name()));
+							if (it != comps_ui.end()) {
+								it->second(comp_panel, e_texture);
+							}
+
+							//Render transform
+							auto trans_it = comps_ui.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (trans_it != comps_ui.end()) {
+								trans_it->second(comp_panel, &render.transform);
+							}
+
+							if (ImGui::SmallButton("Remove##RenderText")) {
+
+							}
+
+							ImGui::TreePop();
+						}
+					}
+				}
 			}
 		);
 #endif
