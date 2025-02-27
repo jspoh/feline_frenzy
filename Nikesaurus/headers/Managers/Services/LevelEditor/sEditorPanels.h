@@ -920,6 +920,9 @@ namespace NIKE {
 			//Render accept payload
 			void renderAcceptPayload();
 
+			//Window selected
+			bool window_is_selected;
+
 		public:
 			GameWindowPanel() = default;
 			~GameWindowPanel() = default;

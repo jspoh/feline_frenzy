@@ -99,6 +99,18 @@ namespace NIKE {
 				comp_registry->registerComponent<T>(serialize, deserialize, override_serialize, override_deserialize);
 			}
 
+			//Serialize component
+			nlohmann::json serializeComponent(std::string const& comp_name, const void* comp) const;
+
+			//Deserialize component
+			void deserializeComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const;
+
+			//Serialize override component
+			nlohmann::json serializeOverrideComponent(std::string const& comp_name, const void* comp, const void* other_comp) const;
+
+			//Deserialize Override component
+			void deserializeOverrideComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const;
+
 			//Register component adding
 			template<typename T>
 			void registerComponentAdding() {

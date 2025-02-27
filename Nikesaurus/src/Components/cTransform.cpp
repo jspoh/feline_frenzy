@@ -195,7 +195,7 @@ namespace NIKE {
 					}
 				}
 
-				ImGui::Checkbox("Fixed To Screen Position", &comp.use_screen_pos);
+				ImGui::Checkbox("Fixed To Screen Position##", &comp.use_screen_pos);
 			}
 		);
 #endif

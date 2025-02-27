@@ -127,6 +127,8 @@ namespace NIKE {
 				std::dynamic_pointer_cast<ComponentsPanel>(panels_map.at(ComponentsPanel::getStaticName()))->registerCompUIFunc<T>(comp_func);
 			}
 
+			std::unordered_map<std::string, std::function<void(ComponentsPanel&, void*)>>& getComponentsUI();
+
 			// Deserialize editor config (required as level editor is init before systems are created)
 			void deserializeConfig(nlohmann::json const& config);
 		};

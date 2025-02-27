@@ -93,7 +93,6 @@ namespace NIKE {
 				layer->sortEntitiesBasedOnYPosition();
 			}
 
-
 			for (auto& entity : layer->getEntitites()) {
 
 				//Skip entity not registered to this system

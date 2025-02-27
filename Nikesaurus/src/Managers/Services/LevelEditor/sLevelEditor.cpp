@@ -519,6 +519,10 @@ namespace NIKE {
 		action_manager->executeAction(std::move(action));
 	}
 
+	std::unordered_map<std::string, std::function<void(LevelEditor::ComponentsPanel&, void*)>>& LevelEditor::Service::getComponentsUI() {
+		return std::dynamic_pointer_cast<LevelEditor::ComponentsPanel> (panels_map.at(LevelEditor::ComponentsPanel::getStaticName()))->getCompsUI();
+	}
+
 	void LevelEditor::Service::deserializeConfig(nlohmann::json const& config) {
 		try {
 			// Set editor active state
