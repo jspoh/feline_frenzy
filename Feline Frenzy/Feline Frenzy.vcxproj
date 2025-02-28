@@ -178,6 +178,8 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\Player.lua" />
     <None Include="assets\Scripts\ChangeScene.lua" />
+    <None Include="assets\Scripts\UISlider.lua" />
+    <None Include="assets\Scripts\UISliderBar.lua" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
     <None Include="assets\Shaders\batched_base.frag" />

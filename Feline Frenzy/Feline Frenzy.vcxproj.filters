@@ -69,5 +69,7 @@
     <None Include="assets\Engine\Shaders\quad_particle.frag" />
     <None Include="assets\Engine\Shaders\quad_particle.vert" />
     <None Include="assets\Scenes\SettingsTest.scn" />
+    <None Include="assets\Scripts\UISlider.lua" />
+    <None Include="assets\Scripts\UISliderBar.lua" />
   </ItemGroup>
 </Project>

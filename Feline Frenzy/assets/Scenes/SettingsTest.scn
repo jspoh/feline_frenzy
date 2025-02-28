@@ -14,7 +14,7 @@
         }
     },
     {
-        "Grid ID": "how_to_play.grid"
+        "Grid ID": "SettingsTest.grid"
     },
     {
         "Camera": {
@@ -32,6 +32,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -92,7 +93,7 @@
                                     "x": 0.0,
                                     "y": 12.650634765625
                                 },
-                                "Zoom": 0.8721715807914734
+                                "Zoom": 0.8044978976249695
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -141,57 +142,6 @@
                             "Tags": []
                         }
                     }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Tutorial.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 0.0,
-                                    "y": 9.0361328125
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 2163.261962890625,
-                                    "y": 1216.8348388671875
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": true,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "entity_0002",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
                 }
             ],
             "ID": 0,
@@ -201,6 +151,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -303,6 +254,126 @@
                             }
                         },
                         "UI ID": "back_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "SliderBar_bar.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 46.0,
+                                    "y": 119.0999984741211
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 499.9970703125,
+                                    "y": 40.38438034057617
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "BGMSliderBar",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "SliderBar_slider.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 48.0,
+                                    "y": 119.0999984741211
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 29.99999237060547,
+                                    "y": 69.3749771118164
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 2,
+                            "Name": "BGMSlider",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
                     }
                 }
             ],
