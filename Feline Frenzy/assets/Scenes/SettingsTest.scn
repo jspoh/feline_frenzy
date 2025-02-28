@@ -59,17 +59,17 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Main_Menu_BG.png"
+                                "Texture_ID": "AudioMenu_UI.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 33.645477294921875,
+                                    "y": 13.1536865234375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1600.0,
-                                    "y": 900.0
+                                    "x": 1920.0,
+                                    "y": 1080.0
                                 },
                                 "Screen Position": false
                             }
@@ -117,19 +117,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "How_to_play.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 0.0,
-                                    "y": 12.650634765625
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 2183.107177734375,
-                                    "y": 1227.9976806640625
-                                },
-                                "Screen Position": false
+                                "Texture_ID": "AudioMenu_UI.png"
                             }
                         },
                         "MetaData": {
@@ -225,8 +213,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 14.371826171875,
-                                    "y": -379.513916015625
+                                    "x": 16.255462646484375,
+                                    "y": -272.3450012207031
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -294,13 +282,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 46.0,
-                                    "y": 119.0999984741211
+                                    "x": 70.8219985961914,
+                                    "y": 139.548828125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 499.9970703125,
-                                    "y": 40.38438034057617
+                                    "x": 300.0,
+                                    "y": 24.23076820373535
                                 },
                                 "Screen Position": false
                             }
@@ -354,13 +342,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 48.0,
-                                    "y": 119.0999984741211
+                                    "x": 76.1500015258789,
+                                    "y": 139.548828125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 29.99999237060547,
-                                    "y": 69.3749771118164
+                                    "x": 19.9999942779541,
+                                    "y": 46.24998474121094
                                 },
                                 "Screen Position": false
                             }
@@ -370,6 +358,100 @@
                             "Layer_ID": 1,
                             "Layer_Order": 2,
                             "Name": "BGMSlider",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "SliderBar_arrow.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 226.0679931640625,
+                                    "y": 143.90728759765625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 63.99999237060547,
+                                    "y": 63.99999237060547
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 3,
+                            "Name": "BGMArrow",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.5803921818733215,
+                                    "y": 0.5490196347236633,
+                                    "z": 0.8509804010391235
+                                },
+                                "Font_ID": "Skranji-Bold.ttf",
+                                "Origin": 0,
+                                "Scale": 1.0,
+                                "Size": {
+                                    "x": 116.0,
+                                    "y": 38.0
+                                },
+                                "Text": "BGM"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -154.8699951171875,
+                                    "y": 141.00164794921875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1.0,
+                                    "y": 1.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 4,
+                            "Name": "BGMLabel",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
