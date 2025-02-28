@@ -1,8 +1,11 @@
--- UISliderBar.lua
-function OnInit()
-    RegisterUIEntity("BGMSliderBar", entity)
+UISliderBar = {}
+
+function UISliderBar:OnInit()
+    -- RegisterUIEntity("BGMSliderBar", entity)
 end
 
-function OnUpdate()
-    -- No per–frame code needed.
+function UISliderBar:OnUpdate()
+    -- Done in C++ user interface update
 end
+
+return UISliderBar

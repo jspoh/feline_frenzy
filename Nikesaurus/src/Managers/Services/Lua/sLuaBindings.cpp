@@ -446,6 +446,12 @@ namespace NIKE {
             }
             });
 
+        // Manually register UI entity
+        lua_state.set_function("RegisterUIEntity", [&](std::string id, Entity::Type entity) {
+            NIKE_UI_SERVICE->registerUIEntity(id, entity);
+            });
+
+
         //Get SFX
         lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
             auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
