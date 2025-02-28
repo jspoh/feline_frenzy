@@ -31,6 +31,10 @@ namespace NIKE {
 
 		//Lua game binds
 		void luaGameBinds(sol::state& lua_state);
+
+		// Player cooldown
+		extern const float player_shot_cooldown;
+		extern float player_last_shot_time;
 	}
 }
 

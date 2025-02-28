@@ -156,7 +156,23 @@ end
 
 -- Player shoot function
 function Player:Shoot(entity)
+    local lastShotTime = GetLastShotTime()
+    local shotCooldown = GetShotCooldown()
+    local deltaTime = GetDeltaTime()
+
+    -- Accumulate elapsed time
+    lastShotTime = lastShotTime + deltaTime
+    SetLastShotTime(lastShotTime)
+
+    -- If not enough time has passed, prevent shooting
+    if lastShotTime < shotCooldown then
+        return
+    end
+
     if IsMouseTriggered(Key.MOUSE_LEFT) then
+        -- Reset cooldown timer
+        SetLastShotTime(0.0)
+
         -- Get direction based on last direction
         local direction = LastDirection(entity)
 
