@@ -4,7 +4,7 @@
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/sCamera.h"
