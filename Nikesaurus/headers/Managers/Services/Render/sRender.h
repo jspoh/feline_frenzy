@@ -6,7 +6,7 @@
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \date   September 2024
  *
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Managers/Services/Render/sShader.h"
