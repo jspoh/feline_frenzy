@@ -16,6 +16,181 @@ namespace NIKE {
 
 	}
 
+	void GameLogic::Manager::gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
+	{
+		// Destroy the player's health UI container if applicable
+		NIKE_ECS_MANAGER->destroyEntity(entity);
+
+		// Create the overlay entity
+		auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
+			overlay_entity, Render::Texture(background_texture, Vector4f()));
+
+		// Get viewport size and adjust transform
+		auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
+			overlay_entity, Transform::Transform(
+				Vector2f(0.0f, 0.0f),
+				viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
+				0.0f,
+				true));
+
+		// Create Play Again button
+		NIKE_UI_SERVICE->createButton(play_again,
+			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f),
+			Render::Text(),
+			Render::Texture("UI_PlayGame_spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+		// Create Quit button
+		NIKE_UI_SERVICE->createButton(quit_game_text,
+			Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f),
+			Render::Text(),
+			Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+		// Set button input states
+		NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
+		NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
+
+		// Assign Lua scripts to buttons
+		auto play_again_script = Lua::Script();
+		play_again_script.script_id = "ChangeScene.lua";
+		play_again_script.function = "Restart";
+		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script);
+
+		auto quit_script = Lua::Script();
+		quit_script.script_id = "ChangeScene.lua";
+		quit_script.function = "Quit";
+		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script);
+	}
+
+	void GameLogic::Manager::flipX(Entity::Type const& entity, bool flip)
+	{
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		if (e_texture_comp.has_value()) {
+			if (e_texture_comp.value().get().b_flip.x != flip)
+			{
+				e_texture_comp.value().get().b_flip.x = flip;
+			}
+		}
+	}
+
+	void GameLogic::Manager::flipY(Entity::Type const& entity, bool flip)
+	{
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		if (e_texture_comp.has_value()) {
+			if (e_texture_comp.value().get().b_flip.y != flip)
+			{
+				e_texture_comp.value().get().b_flip.y = flip;
+			}
+		}
+	}
+
+	void GameLogic::Manager::animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y)
+	{
+		auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+		auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+			auto& e_animate = e_animate_comp.value().get();
+			auto& e_base = e_base_comp.value().get();
+
+			//Boolean to check for changes
+			bool changed = false;
+
+			//Save prev start
+			static Vector2i prev_start = e_animate.start_index;
+
+			//Change animation
+			if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
+				e_animate.start_index.x = start_x;
+				e_animate.start_index.y = start_y;
+				prev_start = e_animate.start_index;
+
+				changed = true;
+			}
+
+			//Save prev end
+			static Vector2i prev_end = e_animate.end_index;
+
+			//Change animation
+			if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
+				e_animate.end_index.x = end_x;
+				e_animate.end_index.y = end_y;
+				prev_end = e_animate.end_index;
+
+				changed = true;
+			}
+
+			//If variables changed
+			if (changed) {
+
+				//Restart animation
+				e_base.animations_to_complete = 0;
+				e_base.animation_mode = Animation::Mode::RESTART;
+			}
+		}
+	}
+
+	bool GameLogic::Manager::withinRange(Entity::Type source, Entity::Type player) {
+		// Get player transform
+		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		Vector2f player_pos = player_transform_comp.value().get().position;
+		Vector2f player_scale = player_transform_comp.value().get().scale;
+
+		// Get source transform
+		auto source_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(source);
+		Vector2f source_pos = source_transform_comp.value().get().position;
+		Vector2f source_scale = source_transform_comp.value().get().scale;
+
+		// Set source range
+		float source_range = 1;
+
+		// Calculations
+		float avg_scale_x = (source_scale.x + player_scale.x) / 2;
+		float avg_scale_y = (source_scale.y + player_scale.y) / 2;
+
+		float dist_x = (source_pos.x - player_pos.x) / avg_scale_x;
+		float dist_y = (source_pos.y - player_pos.y) / avg_scale_y;
+
+		float distance = (dist_x * dist_x) + (dist_y * dist_y);
+
+		//NIKEE_CORE_INFO("Distance = {}, source Range = {}", distance, source_range);
+
+		// It is recommended to use source_range^2, but it's probably easier this way
+		return distance < source_range;
+	}
+
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
+		for (const Entity::Type& vent : vents_entities) {
+			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
+			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
+			const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
+
+			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
+				// Change the sprite to be the animation sprite
+				entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				entity_texture.value().get().frame_size = { 5, 1 };
+				entity_texture.value().get().frame_index = { 0, 0 };
+
+				// Set Animation
+				animationSet(vent, 0, 0, 4, 0);
+				flipX(vent, false);
+
+				// Check player interaction
+				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+					if (withinRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+						// Handle change scene 
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
+
+					}
+				}
+			}
+		}
+	}
+
+
+
+
 	void GameLogic::Manager::update() {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
@@ -74,85 +249,53 @@ namespace NIKE {
 
 					// Check if enemies are all dead
 					std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
-					if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) {
-
-						//Destroy health
-						NIKE_ECS_MANAGER->destroyEntity(entity);
-
-						//Create win overlay
-						auto death_overlay = NIKE_ECS_MANAGER->createEntity();
-						NIKE_METADATA_SERVICE->setEntityLayerID(death_overlay, NIKE_SCENES_SERVICE->getLayerCount() - 1);
-						NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(death_overlay, Render::Texture("You_Win_bg.png", Vector4f()));
-						auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
-						NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(death_overlay, Transform::Transform(Vector2f(0.0f, 0.0f), viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y), 0.0f, true));
-
-						//Create button
-						NIKE_UI_SERVICE->createButton("Play Again", Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f), Render::Text(), Render::Texture("UI_PlayGame_spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-						NIKE_UI_SERVICE->createButton("Quit", Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f), Render::Text(), Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-						NIKE_UI_SERVICE->setButtonInputState("Play Again", UI::InputStates::TRIGGERED);
-						NIKE_UI_SERVICE->setButtonInputState("Quit", UI::InputStates::TRIGGERED);
-						auto play_again = Lua::Script();
-						play_again.script_id = "ChangeScene.lua";
-						play_again.function = "Restart";
-						NIKE_UI_SERVICE->setButtonScript("Play Again", play_again);
-						auto quit = Lua::Script();
-						quit.script_id = "ChangeScene.lua";
-						quit.function = "Quit";
-						NIKE_UI_SERVICE->setButtonScript("Quit", quit);
+					// Check if entities with vent tag exists
+					std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
+					// Win whole game overlay
+					if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit && 
+						NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
+						gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
 						return;
+					}
+					
+					// Portal animations and interactions
+					if(enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
+					{
+						handlePortalInteractions(vents_entities);
 					}
 				}
 
 				// Check if player tag exists
-				std::set<Entity::Type> playerEntities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
 
 				// Elemental UI 
 				for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
 					// If player not dead
-					if (playerEntities.empty()) {
+					if (player_entities.empty()) {
 						continue;
 					}
 
 					// Look for player
-					for (auto& player : playerEntities) {
+					for (auto& player : player_entities) {
 						const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
 						const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
 						
 						// Set element ui to player's element
-						elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+						if (elementui_texture.has_value())
+						{
+							elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+						}
 					}
 
 
 				}
 
-				for (auto& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
+				for (Entity::Type const& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
 					// If no player exists, destroy the health bar
-					if (playerEntities.empty()) {
+					if (player_entities.empty()) {
 
-						//Destroy health
-						NIKE_ECS_MANAGER->destroyEntity(hp_container);
-
-						//Create death overlay
-						auto death_overlay = NIKE_ECS_MANAGER->createEntity();
-						NIKE_METADATA_SERVICE->setEntityLayerID(death_overlay, NIKE_SCENES_SERVICE->getLayerCount()-1);
-						NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(death_overlay, Render::Texture("Defeat_screen_bg.png", Vector4f()));
-						auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
-						NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(death_overlay, Transform::Transform(Vector2f(0.0f, 0.0f), viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y), 0.0f, true));
-
-						//Create button
-						NIKE_UI_SERVICE->createButton("Play Again", Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f), Render::Text(), Render::Texture("UI_PlayGame_spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-						NIKE_UI_SERVICE->createButton("Quit", Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f), Render::Text(), Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-						NIKE_UI_SERVICE->setButtonInputState("Play Again", UI::InputStates::TRIGGERED);
-						NIKE_UI_SERVICE->setButtonInputState("Quit", UI::InputStates::TRIGGERED);
-						auto play_again = Lua::Script();
-						play_again.script_id = "ChangeScene.lua";
-						play_again.function = "Restart";
-						NIKE_UI_SERVICE->setButtonScript("Play Again", play_again);
-						auto quit = Lua::Script();
-						quit.script_id = "ChangeScene.lua";
-						quit.function = "Quit";
-						NIKE_UI_SERVICE->setButtonScript("Quit", quit);
+						gameOverlay(hp_container, "Defeat_screen_bg.png", "Play Again", "Quit");
 						return;
 					}
 				}
@@ -160,13 +303,13 @@ namespace NIKE {
 				// Health bar logic
 				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
 					// If no player exists, destroy the health bar
-					if (playerEntities.empty()) {
+					if (player_entities.empty()) {
 						NIKE_ECS_MANAGER->destroyEntity(healthbar);
 						return;
 					}
 
 					// Look for player
-					for (auto& player : playerEntities) {
+					for (auto& player : player_entities) {
 						const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 						const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
 						const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);

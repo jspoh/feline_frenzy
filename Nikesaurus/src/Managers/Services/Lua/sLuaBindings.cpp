@@ -13,6 +13,9 @@
 #include "Systems/GameLogic/sysInteraction.h"
 
 namespace NIKE {
+    const float Lua::player_shot_cooldown = 0.1f; 
+    float Lua::player_last_shot_time = player_shot_cooldown;
+
 
     void Lua::luaKeyBinds(sol::state& lua_state) {
 
@@ -677,6 +680,26 @@ namespace NIKE {
                     cout << "Damage set default 1" << endl;
                 }
             }
+            });
+
+        // Bind player shot cooldown
+        lua_state.set_function("GetShotCooldown", []() {
+            return player_shot_cooldown;
+            });
+
+        // Bind last shot time getter
+        lua_state.set_function("GetLastShotTime", []() {
+            return player_last_shot_time;
+            });
+
+        // Bind last shot time setter
+        lua_state.set_function("SetLastShotTime", [](float time) {
+            player_last_shot_time = time;
+            });
+
+        // Bind delta time getter (if needed)
+        lua_state.set_function("GetDeltaTime", []() {
+            return NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
             });
 
         //Path finding
