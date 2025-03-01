@@ -36,7 +36,6 @@ namespace NIKE {
                     if (entities.find(entity) == entities.end()) continue;
 
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-
                         // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {

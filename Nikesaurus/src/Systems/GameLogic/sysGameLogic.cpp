@@ -131,6 +131,64 @@ namespace NIKE {
 		}
 	}
 
+	bool GameLogic::Manager::withinRange(Entity::Type source, Entity::Type player) {
+		// Get player transform
+		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		Vector2f player_pos = player_transform_comp.value().get().position;
+		Vector2f player_scale = player_transform_comp.value().get().scale;
+
+		// Get source transform
+		auto source_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(source);
+		Vector2f source_pos = source_transform_comp.value().get().position;
+		Vector2f source_scale = source_transform_comp.value().get().scale;
+
+		// Set source range
+		float source_range = 1;
+
+		// Calculations
+		float avg_scale_x = (source_scale.x + player_scale.x) / 2;
+		float avg_scale_y = (source_scale.y + player_scale.y) / 2;
+
+		float dist_x = (source_pos.x - player_pos.x) / avg_scale_x;
+		float dist_y = (source_pos.y - player_pos.y) / avg_scale_y;
+
+		float distance = (dist_x * dist_x) + (dist_y * dist_y);
+
+		//NIKEE_CORE_INFO("Distance = {}, source Range = {}", distance, source_range);
+
+		// It is recommended to use source_range^2, but it's probably easier this way
+		return distance < source_range;
+	}
+
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
+		for (const Entity::Type& vent : vents_entities) {
+			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
+			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
+			const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
+
+			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
+				// Change the sprite to be the animation sprite
+				entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				entity_texture.value().get().frame_size = { 5, 1 };
+				entity_texture.value().get().frame_index = { 0, 0 };
+
+				// Set Animation
+				animationSet(vent, 0, 0, 4, 0);
+				flipX(vent, false);
+
+				// Check player interaction
+				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+					if (withinRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+						// Handle change scene 
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
+
+					}
+				}
+			}
+		}
+	}
+
+
 
 
 	void GameLogic::Manager::update() {
@@ -200,29 +258,10 @@ namespace NIKE {
 						return;
 					}
 					
-					// Portal animations
+					// Portal animations and interactions
 					if(enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
 					{
-						// Iterate through entitys with vents tag
-						for (Entity::Type const& vent : vents_entities)
-						{
-							const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
-							const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
-							const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
-							if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value())
-							{
-								// Change the sprite to be the animation sprite
-								// This approach due to lack of time, might change to a better approach... - lim
-								entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
-								entity_texture.value().get().frame_size = { 5, 1 };
-								entity_texture.value().get().frame_index = { 0, 0 };
-
-								// Set Animation 
-								animationSet(vent,0,0,4,0);
-								flipX(vent, false);
-							}
-							
-						}
+						handlePortalInteractions(vents_entities);
 					}
 				}
 

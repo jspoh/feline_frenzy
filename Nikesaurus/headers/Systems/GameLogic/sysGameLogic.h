@@ -33,6 +33,12 @@ namespace NIKE {
 			// Set Animation
 			void animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y);
 
+			// Within range function
+			bool withinRange(Entity::Type source, Entity::Type player);
+
+			// Portal interactions
+			void handlePortalInteractions(const std::set<Entity::Type>& vents_entities);
+
 			//Internal script management
 			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
