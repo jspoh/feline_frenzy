@@ -64,6 +64,73 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script);
 	}
 
+	void GameLogic::Manager::flipX(Entity::Type const& entity, bool flip)
+	{
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		if (e_texture_comp.has_value()) {
+			if (e_texture_comp.value().get().b_flip.x != flip)
+			{
+				e_texture_comp.value().get().b_flip.x = flip;
+			}
+		}
+	}
+
+	void GameLogic::Manager::flipY(Entity::Type const& entity, bool flip)
+	{
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		if (e_texture_comp.has_value()) {
+			if (e_texture_comp.value().get().b_flip.y != flip)
+			{
+				e_texture_comp.value().get().b_flip.y = flip;
+			}
+		}
+	}
+
+	void GameLogic::Manager::animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y)
+	{
+		auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+		auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+			auto& e_animate = e_animate_comp.value().get();
+			auto& e_base = e_base_comp.value().get();
+
+			//Boolean to check for changes
+			bool changed = false;
+
+			//Save prev start
+			static Vector2i prev_start = e_animate.start_index;
+
+			//Change animation
+			if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
+				e_animate.start_index.x = start_x;
+				e_animate.start_index.y = start_y;
+				prev_start = e_animate.start_index;
+
+				changed = true;
+			}
+
+			//Save prev end
+			static Vector2i prev_end = e_animate.end_index;
+
+			//Change animation
+			if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
+				e_animate.end_index.x = end_x;
+				e_animate.end_index.y = end_y;
+				prev_end = e_animate.end_index;
+
+				changed = true;
+			}
+
+			//If variables changed
+			if (changed) {
+
+				//Restart animation
+				e_base.animations_to_complete = 0;
+				e_base.animation_mode = Animation::Mode::RESTART;
+			}
+		}
+	}
+
 
 
 	void GameLogic::Manager::update() {
@@ -124,11 +191,38 @@ namespace NIKE {
 
 					// Check if enemies are all dead
 					std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
+					// Check if entities with vent tag exists
+					std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
 					// Win whole game overlay
-					if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) {
-
+					if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit && 
+						NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
 						gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
 						return;
+					}
+					
+					// Portal animations
+					if(enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
+					{
+						// Iterate through entitys with vents tag
+						for (Entity::Type const& vent : vents_entities)
+						{
+							const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
+							const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
+							const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
+							if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value())
+							{
+								// Change the sprite to be the animation sprite
+								// This approach due to lack of time, might change to a better approach... - lim
+								entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+								entity_texture.value().get().frame_size = { 5, 1 };
+								entity_texture.value().get().frame_index = { 0, 0 };
+
+								// Set Animation 
+								animationSet(vent,0,0,4,0);
+								flipX(vent, false);
+							}
+							
+						}
 					}
 				}
 
@@ -149,7 +243,10 @@ namespace NIKE {
 						const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
 						
 						// Set element ui to player's element
-						elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+						if (elementui_texture.has_value())
+						{
+							elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+						}
 					}
 
 

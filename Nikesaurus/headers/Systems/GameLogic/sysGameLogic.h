@@ -26,6 +26,13 @@ namespace NIKE {
 			// Win overlay
 			void gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 
+			// Whether to flip the texture
+			void flipX(Entity::Type const& entity, bool flip);
+			void flipY(Entity::Type const& entity, bool flip);
+
+			// Set Animation
+			void animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y);
+
 			//Internal script management
 			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
 
