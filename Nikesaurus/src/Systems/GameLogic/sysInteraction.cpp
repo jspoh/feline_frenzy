@@ -274,16 +274,16 @@ namespace NIKE {
             auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
             // Check if target is in HurtState
-            auto state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(target);
-            if (state_comp.has_value()) {
-                auto& state = state_comp.value().get();
-                auto current_state = state.current_state.lock();
+            //auto state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(target);
+            //if (state_comp.has_value()) {
+            //    auto& state = state_comp.value().get();
+            //    auto current_state = state.current_state.lock();
 
-                // If entity is already in HurtState, skip damage application
-                if (current_state == NIKE_FSM_SERVICE->getStateByID("EnemyHurt")) {
-                    return;  // Skip applying damage if in HurtState
-                }
-            }
+            //    // If entity is already in HurtState, skip damage application
+            //    if (current_state == NIKE_FSM_SERVICE->getStateByID("EnemyHurt")) {
+            //        return;  // Skip applying damage if in HurtState
+            //    }
+            //}
 
             // Check invulnerability flag
             if (target_health.invulnerable_flag) {
