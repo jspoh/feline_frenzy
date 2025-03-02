@@ -224,6 +224,32 @@ namespace NIKE {
 					NIKE_LUA_SERVICE->executeScript(e_logic.script);
 				}
 
+				// Check for Elemental Stack comp
+				const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
+				if (e_combo_comp.has_value()) {
+					auto& e_combo = e_combo_comp.value().get();
+
+					// Exit if no status
+					if (e_combo.status_effect == Element::Status::NONE || e_combo.status_timer <= 0.0f) {
+						return;
+					}
+
+					// Entity has status effect
+					
+					// !TODO: Add status effect interaction here
+					
+					// Decrease status time
+					e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+					// Remove status effect if timer expires
+					if (e_combo.status_timer <= 0.0f) {
+						e_combo.status_effect = Element::Status::NONE;
+					}
+
+					NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
+
+				}
+
 				// Check for Spawner comp
 				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 				if (e_spawner_comp.has_value()) {
