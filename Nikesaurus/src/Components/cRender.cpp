@@ -1071,9 +1071,11 @@ namespace NIKE {
 
 					// Display combo box for texture selection
 					if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+
 						// Validate the selected index and get the new texture
 						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
 							std::string new_texture = all_loaded_textures[current_index];
+
 							if (new_texture != comp.texture_id) {
 								// Save action
 								LevelEditor::Action change_font_action;
@@ -1093,6 +1095,33 @@ namespace NIKE {
 								previous_texture = new_texture;
 							}
 						}
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select a texture or drag & drop a texture file.");
+					}
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+							const char* dropped_file = static_cast<const char*>(payload->Data);
+							if (dropped_file) {
+								std::string new_texture = dropped_file;
+
+								// Ensure it's a valid texture format
+								
+									LevelEditor::Action change_texture_action;
+									change_texture_action.do_action = [&, texture_id = new_texture]() {
+										comp.texture_id = texture_id;
+										};
+
+									change_texture_action.undo_action = [&, texture_id = previous_texture]() {
+										comp.texture_id = texture_id;
+										};
+
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_texture_action));
+									previous_texture = new_texture;
+								
+							}
+						}
+						ImGui::EndDragDropTarget();
 					}
 				}
 
