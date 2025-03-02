@@ -1841,10 +1841,95 @@
             "Entities": [
                 {
                     "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "Lives": 1,
+                                "MaxHealth": 100.0,
+                                "invulnerable_flag": false
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": false,
+                                "Pos_Offset": {
+                                    "x": 6.900000095367432,
+                                    "y": -100.0
+                                },
+                                "Position": {
+                                    "x": 894.181396484375,
+                                    "y": 465.755126953125
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 163.0,
+                                    "y": 34.0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Barrel_highlighted.png"
+                            },
+                            "State::State": {
+                                "State": "Default"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -288.69256591796875,
+                                    "y": 199.73574829101563
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 2,
                             "Layer_Order": 0,
+                            "Name": "barrel_1",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 2,
+                            "Layer_Order": 1,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1904,7 +1989,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 2,
-                            "Layer_Order": 1,
+                            "Layer_Order": 2,
                             "Name": "barrel_3",
                             "Prefab_ID": "barrel.prefab",
                             "Prefab_Override": {
@@ -1943,65 +2028,6 @@
                                         "Position": {
                                             "x": -230.2243194580078,
                                             "y": -135.79641723632813
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 2,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 2,
-                            "Layer_Order": 2,
-                            "Name": "barrel_1",
-                            "Prefab_ID": "barrel.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Animation::Base": {
-                                        "Animation_Count": 0,
-                                        "B_PingPong": false,
-                                        "B_Reverse": false,
-                                        "Frame_Duration": 0.0
-                                    },
-                                    "Combat::Health": {
-                                        "Health": 80.0,
-                                        "Lives": 1,
-                                        "MaxHealth": 100.0,
-                                        "invulnerable_flag": false
-                                    },
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": -270.7460632324219,
-                                            "y": 120.67849731445313
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "State::State": {
-                                        "State": "Default"
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -277.64605712890625,
-                                            "y": 220.67849731445313
                                         }
                                     }
                                 },
