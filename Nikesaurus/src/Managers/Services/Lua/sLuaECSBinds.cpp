@@ -10,10 +10,24 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/Lua/sLuaECSBinds.h"
+#include "Components/cTransform.h"
 
 namespace NIKE {
 
     void Lua::luaECSBinds(sol::state& lua_state) {
+
+        lua_state.new_usertype<Transform::Transform>("Transform",
+            "position", sol::property(
+                [](Transform::Transform& t) { return t.position; },
+                [](Transform::Transform& t, Vector2f val) { t.position = val; }
+                ),
+            "scale", sol::property(
+                [](Transform::Transform& t) { return t.scale; },
+                [](Transform::Transform& t, Vector2f val) { t.scale = val; }
+                ),
+            "rotation", &Transform::Transform::rotation,
+            "use_screen_pos", &Transform::Transform::use_screen_pos
+        );
 
         //Register create entity
         lua_state.set_function("NewEntity", [&]() -> Entity::Type {
@@ -30,12 +44,47 @@ namespace NIKE {
             NIKE_METADATA_SERVICE->destroyEntity(entity);
             });
 
-        //Register destroy entity
-        lua_state.set_function("HasComponent", [&](Entity::Type entity, const std::string& componentName) -> bool {
-            auto type = NIKE_ECS_MANAGER->getComponentType(componentName);
-            return NIKE_ECS_MANAGER->checkEntityComponent(entity, type);
+        //Check if entity has component
+        lua_state.set_function("HasComponent", [&](Entity::Type entity, const std::string& componentName) -> sol::optional<bool> {
+            try {
+                // Get the component type for the given name
+                auto type = NIKE_ECS_MANAGER->getComponentType(componentName);
+
+                // If the component type is valid (not -1)
+                if (type != -1) {
+                    bool hasComponent = NIKE_ECS_MANAGER->checkEntityComponent(entity, type);
+                    return sol::make_optional(hasComponent);  // Return an optional with the result
+                }
+                else {
+                    // Return an empty optional if the type is invalid
+                    return sol::optional<bool>{};  // Explicitly return an empty optional
+                }
+            }
+            catch (const std::runtime_error& e) {
+                // Catch the error when the component is not registered or invalid
+                NIKEE_ERROR("LUA: Invalid component name");
+                // Return an empty optional, signaling an error in Lua without crashing
+                return sol::optional<bool>{};  // Return an empty optional
+            }
             });
 
+
+        lua_state.set_function("GetComponent", [&](Entity::Type entity, std::string componentName) -> sol::object {
+            auto type = NIKE_ECS_MANAGER->getComponentType(componentName);
+            if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, type)) {
+                    return sol::nil;
+            }
+
+            // Use a template function to handle different component types
+            if (componentName == "Transform::Transform") {
+                    auto component = std::static_pointer_cast<Transform::Transform>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
+
+            return sol::nil; // Component type not registered for Lua exposure
+            });
     }
 
 }

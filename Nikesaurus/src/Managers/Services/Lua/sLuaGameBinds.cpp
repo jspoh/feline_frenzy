@@ -204,14 +204,6 @@ namespace NIKE {
                 NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity, "bullet.prefab");
             }
 
-            // Set/Teleport entity position
-            lua_state.set_function("setPosition", [&](Entity::Type entity, float x, float y) {
-                auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-                if (transform.has_value()) {
-                    transform.value().get().position = { x, y };
-                }
-                });
-
             //Player position
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (!player_transform_comp.has_value()) {
