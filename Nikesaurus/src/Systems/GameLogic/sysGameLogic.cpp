@@ -330,7 +330,7 @@ namespace NIKE {
 				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
 					// If no player exists, destroy the health bar
 					if (player_entities.empty()) {
-						NIKE_ECS_MANAGER->destroyEntity(healthbar);
+						//NIKE_ECS_MANAGER->destroyEntity(healthbar);
 						return;
 					}
 

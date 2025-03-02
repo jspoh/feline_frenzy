@@ -576,7 +576,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 2.7204413414001465
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -1852,8 +1852,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 887.2813720703125,
-                                            "y": 565.755126953125
+                                            "x": -201.02999877929688,
+                                            "y": -193.64007568359375
                                         }
                                     }
                                 },
@@ -1872,58 +1872,83 @@
                 },
                 {
                     "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "Lives": 1,
+                                "MaxHealth": 100.0,
+                                "invulnerable_flag": false
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1.0,
+                                    "y": 1.0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Barrel_highlighted.png"
+                            },
+                            "State::State": {
+                                "State": "Default"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 892.8406372070313,
+                                    "y": 559.4981079101563
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 2,
                             "Layer_Order": 2,
                             "Name": "barrel_3",
-                            "Prefab_ID": "barrel.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Animation::Base": {
-                                        "Animation_Count": 0,
-                                        "B_PingPong": false,
-                                        "B_Reverse": false,
-                                        "Frame_Duration": 0.20000000298023224
-                                    },
-                                    "Combat::Health": {
-                                        "Health": 100.0,
-                                        "Lives": 1,
-                                        "MaxHealth": 100.0,
-                                        "invulnerable_flag": false
-                                    },
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": -223.32432556152344,
-                                            "y": -235.79641723632813
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        },
-                                        "Texture_ID": "Barrel_highlighted.png"
-                                    },
-                                    "State::State": {
-                                        "State": "Default"
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -230.2243194580078,
-                                            "y": -135.79641723632813
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 2,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
                             "Tags": [
                                 "objects"
                             ]
