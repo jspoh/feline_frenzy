@@ -9,7 +9,9 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/Lua/sLua.h"
-#include "Managers/Services/Lua/sLuaBindings.h"
+#include "Managers/Services/Lua/sLuaCoreBinds.h"
+#include "Managers/Services/Lua/sLuaECSBinds.h"
+#include "Managers/Services/Lua/sLuaGameBinds.h"
 
 namespace NIKE {
 

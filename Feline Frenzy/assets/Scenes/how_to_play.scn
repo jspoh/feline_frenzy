@@ -32,6 +32,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -201,6 +202,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -213,7 +215,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 6,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -221,7 +223,7 @@
                                     "y": 1
                                 },
                                 "Start_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 }
                             },
@@ -235,9 +237,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
+                                    "x": 0.7303922176361084,
+                                    "y": 0.6990196704864502,
+                                    "z": 1.0009803771972656
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -279,8 +281,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 217.6465606689453,
-                                    "y": 87.05862426757813
+                                    "x": 228.52890014648438,
+                                    "y": 91.41156005859375
                                 },
                                 "Screen Position": true
                             }

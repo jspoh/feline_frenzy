@@ -52,6 +52,8 @@
     <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaECSBinds.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaGameBinds.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sParticle.cpp" />
     <ClCompile Include="src\Components\cState.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
@@ -72,7 +74,7 @@
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaCoreBinds.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />
     <ClCompile Include="src\Managers\Services\sMetaData.cpp" />
@@ -145,6 +147,8 @@
     <ClInclude Include="headers\Components\cDespawn.h" />
     <ClInclude Include="headers\Components\cElement.h" />
     <ClInclude Include="headers\Components\cEnemy.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaECSBinds.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaGameBinds.h" />
     <ClInclude Include="headers\Managers\Services\Render\sParticle.h" />
     <ClInclude Include="headers\Components\cState.h" />
     <ClInclude Include="headers\Components\cGameLogic.h" />
@@ -163,7 +167,7 @@
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaCoreBinds.h" />
     <ClInclude Include="headers\Managers\Services\Render\sShader.h" />
     <ClInclude Include="headers\Managers\Services\sAudio.h" />
     <ClInclude Include="headers\Managers\Services\sMetaData.h" />

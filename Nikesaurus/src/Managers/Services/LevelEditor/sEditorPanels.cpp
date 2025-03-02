@@ -841,6 +841,7 @@ namespace NIKE {
 					if (NIKE_ECS_MANAGER->checkEntity(clone_entity)) {
 						//Clone entity 
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
+						NIKE_METADATA_SERVICE->setEntityLayerID(new_id, NIKE_METADATA_SERVICE->getEntityLayerID(clone_entity));
 
 						//If entity name is valid
 						if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
@@ -1162,7 +1163,7 @@ namespace NIKE {
 					ImGui::SameLine();
 
 					// Button to remove an entity, which triggers the popup
-					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
+					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[NIKE_KEY_DELETE])) {
 						openPopUp("Remove Entity");
 					}
 
@@ -1580,6 +1581,11 @@ namespace NIKE {
 				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
 					//Get mouse pos
 					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
+				}
+
+				// Delete Entity popup
+				if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::GetIO().KeysDown[NIKE_KEY_DELETE]) {
+					openPopUp("Remove Entity");
 				}
 			}
 		}

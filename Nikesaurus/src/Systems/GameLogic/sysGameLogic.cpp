@@ -38,13 +38,13 @@ namespace NIKE {
 
 		// Create Play Again button
 		NIKE_UI_SERVICE->createButton(play_again,
-			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f),
+			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
 			Render::Text(),
 			Render::Texture("UI_PlayGame_spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
 
 		// Create Quit button
 		NIKE_UI_SERVICE->createButton(quit_game_text,
-			Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f),
+			Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
 			Render::Text(),
 			Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
 
@@ -188,9 +188,6 @@ namespace NIKE {
 		}
 	}
 
-
-
-
 	void GameLogic::Manager::update() {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
@@ -327,11 +324,6 @@ namespace NIKE {
 						//const float offset_y = player_scale.y * 0.9f;
 
 						// Set healthbar to player health
-			
-						// Update healthbar location
-						// !TODO: Offset the healthbar to the left
-						//healthbar_pos.x = player_pos.x;
-						//healthbar_pos.y = player_pos.y + offset_y * 0.8f;
 
 						// Constants
 						static float original_healthbar_width = healthbar_scale.x;
