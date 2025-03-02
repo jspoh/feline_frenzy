@@ -248,8 +248,6 @@ namespace NIKE {
             auto& target_health = target_health_comp.value().get().health;
             const auto& target_max_health = target_health_comp.value().get().max_health;
 
-
-
             // Heal Target
             // (The check might be redundant now as there is another check in sysCollision)
             if (target_health < target_max_health) {
@@ -300,11 +298,22 @@ namespace NIKE {
             float multiplier = 1.f;
 
             // Apply elemental damage multiplier
-            if (attacker_element_comp && target_element_comp) {
+            if (attacker_element_comp) {
                 const auto attacker_element = attacker_element_comp.value().get().element;
-                const auto target_element = target_element_comp.value().get().element;
 
-                multiplier = getElementMultiplier(attacker_element, target_element);
+                if (target_element_comp) {
+                    const auto target_element = target_element_comp.value().get().element;
+
+                    // Set multiplier
+                    multiplier = Element::getElementMultiplier(attacker_element, target_element);
+                }
+
+                // If damage dealer has element comp & target has combo comp
+                const auto target_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(target);
+                if (target_combo_comp) {
+                    // Update combo component
+                    target_combo_comp.value().get().registerHit(attacker_element);
+                }
             }
 
             // Apply damage
@@ -359,9 +368,6 @@ namespace NIKE {
             }
         }
 
-        float getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
-            return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
-        }
 
         bool withinRange(Entity::Type source, Entity::Type player) {
             // Get player transform
