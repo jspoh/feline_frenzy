@@ -122,17 +122,6 @@ namespace NIKE {
 			ParticleEmitter();
 		};
 
-		struct Batch {
-			struct Renderable {
-				std::variant<Text, Shape, Texture> render_type;
-				Transform::Transform transform;
-
-				Renderable() : render_type{Texture()}, transform() {}
-			};
-
-			std::vector<Renderable> render_queue;
-		};
-
 		void registerComponents();
 
 		void registerEditorComponents();
