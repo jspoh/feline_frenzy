@@ -27,6 +27,7 @@ namespace NIKE {
 	{
 		// Add transitions here
 		addTransition("DefaultToEnemyIdle", std::make_shared<Transition::DefaultToEnemyIdle>());
+		addTransition("DefaultToBossIdle", std::make_shared<Transition::DefaultToBossIdle>());
 		addTransition("DefaultToDestructableDeath", std::make_shared<Transition::DefaultToDestructableDeath>());
 	}
 

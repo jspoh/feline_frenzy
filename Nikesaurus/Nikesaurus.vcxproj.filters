@@ -67,6 +67,8 @@
     <ClCompile Include="src\Managers\Services\State Machines\destructableTransitions.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLuaECSBinds.cpp" />
     <ClCompile Include="src\Managers\Services\Lua\sLuaGameBinds.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\bossEnemyStates.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\bossEnemyTransitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -146,6 +148,8 @@
     <ClInclude Include="headers\Managers\Services\State Machine\destructableTransitions.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaECSBinds.h" />
     <ClInclude Include="headers\Managers\Services\Lua\sLuaGameBinds.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\bossEnemyStates.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\bossEnemyTransitions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

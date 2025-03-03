@@ -13,6 +13,7 @@
 
  // States
 #include "Managers/Services/State Machine/enemyStates.h"
+#include "Managers/Services/State Machine/bossEnemyStates.h"
 #include "Managers/Services/State Machine/destructableStates.h"
 
 namespace NIKE {
@@ -198,6 +199,11 @@ namespace NIKE {
 			registerState("EnemyAttack", std::make_shared<State::EnemyAttackState>());
 			registerState("EnemyChase", std::make_shared<State::EnemyChaseState>());
 			registerState("EnemyDeath", std::make_shared<State::EnemyDeathState>());
+
+			// Register boss enemy states
+			registerState("BossIdle", std::make_shared<State::BossIdleState>());
+			registerState("BossAttack", std::make_shared<State::BossAttackState>());
+			registerState("BossDeath", std::make_shared<State::BossDeathState>());
 
 			// Register destructable states
 			registerState("DestructableDeath", std::make_shared<State::DestructableDeathState>());
