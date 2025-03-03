@@ -60,7 +60,7 @@ namespace NIKE {
                     return sol::optional<bool>{};  // Explicitly return an empty optional
                 }
             }
-            catch (const std::runtime_error& e) {
+            catch ([[maybe_unused]] const std::runtime_error& e) {
                 // Catch the error when the component is not registered or invalid
                 NIKEE_ERROR("LUA: Invalid component name");
                 // Return an empty optional, signaling an error in Lua without crashing

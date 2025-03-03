@@ -86,6 +86,8 @@
     <ClCompile Include="src\Managers\Services\sPath.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sRender.cpp" />
     <ClCompile Include="src\Managers\Services\sSerialization.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\bossEnemyStates.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\bossEnemyTransitions.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\destructableStates.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\destructableTransitions.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\sStateMachine.cpp" />
@@ -177,6 +179,8 @@
     <ClInclude Include="headers\Managers\Services\sPath.h" />
     <ClInclude Include="headers\Managers\Services\Render\sRender.h" />
     <ClInclude Include="headers\Managers\Services\sSerialization.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\bossEnemyStates.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\bossEnemyTransitions.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\destructableStates.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\destructableTransitions.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\sStateMachine.h" />
