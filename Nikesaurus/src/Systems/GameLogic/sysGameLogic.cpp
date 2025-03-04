@@ -209,7 +209,7 @@ namespace NIKE {
 				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
-					
+
 					//Check if script is active
 					if (e_logic.script.script_id == "")
 						continue;
@@ -223,150 +223,172 @@ namespace NIKE {
 
 				// Check for Elemental Stack comp
 				const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
-				if (e_combo_comp.has_value()) {
+				const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+				if (e_combo_comp.has_value() && e_health_comp.has_value()) {
 					auto& e_combo = e_combo_comp.value().get();
+					auto& e_health = e_health_comp.value().get();
 
 					// Entity has status effect
 					if (e_combo.status_effect != Element::Status::NONE && e_combo.status_timer > 0.0f) {
 
-						// !TODO: Add status effect interaction here
-
-						// Decrease status time
-						e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
-
-						// Remove status effect if timer expires
-						if (e_combo.status_timer <= 0.0f) {
-							e_combo.status_effect = Element::Status::NONE;
-						}
-
-						NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
-					}
-				}
-
-				// Check for Spawner comp
-				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
-				if (e_spawner_comp.has_value()) {
-					auto& e_spawner = e_spawner_comp.value().get();
-
-					// If spawn on cooldown
-					if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
-						// Accumulate time since last shot
-						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-					}
-					
-					// If enemies spawned less than spawn limit
-					if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
-						// If spawn on not cooldown
-						if(e_spawner.last_spawn_time >= e_spawner.cooldown) {
-							// Spawn enemy
-							spawnEnemy(entity);
-
-							// Reset last time spawned
-							e_spawner.last_spawn_time = 0.f;
-						}
-					}
-
-					// Check if enemies are all dead
-					std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
-					// Check if entities with vent tag exists
-					std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
-					// Win whole game overlay
-					if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit && 
-						NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
-						gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
-						return;
-					}
-					
-					// Portal animations and interactions
-					if(enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
-					{
-						handlePortalInteractions(vents_entities);
-					}
-				}
-
-				// Check if player tag exists
-				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
-
-
-				// Elemental UI 
-				for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
-					// If player not dead
-					if (player_entities.empty()) {
-						continue;
-					}
-
-					// Look for player
-					for (auto& player : player_entities) {
-						const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
-						const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
+						// Decrease tick timer
+						e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
 						
-						// Set element ui to player's element
-						if (elementui_texture.has_value())
-						{
-							elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+						// Applying status effect
+						if (e_combo.tick_timer <= 0.0f) {
+							switch (e_combo.status_effect) {
+							case Element::Status::BURN:
+								NIKEE_CORE_INFO("BURN TICK: -1 HP");
+								e_health.health = max(0.0f, e_health.health - 1.0f); // Apply burn damage
+								break;
+							case Element::Status::FROSTBITE:
+								NIKEE_CORE_INFO("FROSTBITE TICK:  -1 HP");
+								e_health.health = max(0.0f, e_health.health - 1.0f); // Apply poison damage
+								break;
+							case Element::Status::POISON:
+								NIKEE_CORE_INFO("POISON TICK: -1 HP");
+								e_health.health = max(0.0f, e_health.health - 1.0f); // Apply poison damage
+								break;
+							}
+
+							// Reset tick timer
+							e_combo.tick_timer = Element::Combo::tick_interval;
+						}
+
+							// Decrease status time
+							e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+							// Remove status effect if timer expires
+							if (e_combo.status_timer <= 0.0f) {
+								e_combo.status_effect = Element::Status::NONE;
+							}
+
+							NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
 						}
 					}
 
+					// Check for Spawner comp
+					const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
+					if (e_spawner_comp.has_value()) {
+						auto& e_spawner = e_spawner_comp.value().get();
 
-				}
+						// If spawn on cooldown
+						if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
+							// Accumulate time since last shot
+							e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						}
 
-				for (Entity::Type const& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
-					// If no player exists, destroy the health bar
-					if (player_entities.empty()) {
+						// If enemies spawned less than spawn limit
+						if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
+							// If spawn on not cooldown
+							if (e_spawner.last_spawn_time >= e_spawner.cooldown) {
+								// Spawn enemy
+								spawnEnemy(entity);
 
-						gameOverlay(hp_container, "Defeat_screen_bg.png", "Play Again", "Quit");
-						return;
+								// Reset last time spawned
+								e_spawner.last_spawn_time = 0.f;
+							}
+						}
+
+						// Check if enemies are all dead
+						std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
+						// Check if entities with vent tag exists
+						std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
+						// Win whole game overlay
+						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
+							NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
+							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
+							return;
+						}
+
+						// Portal animations and interactions
+						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
+						{
+							handlePortalInteractions(vents_entities);
+						}
 					}
-				}
 
-				// Health bar logic
-				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
-					// If no player exists, destroy the health bar
-					if (player_entities.empty()) {
-						//NIKE_ECS_MANAGER->destroyEntity(healthbar);
-						return;
-					}
+					// Check if player tag exists
+					std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
-					// Look for player
-					for (auto& player : player_entities) {
-						const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-						const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
-						const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
 
-						// Check for missing component
-						if (e_player_health.has_value() == false || e_player_transform.has_value() == false || e_healthbar_transform.has_value() == false) {
-							NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
+					// Elemental UI 
+					for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
+						// If player not dead
+						if (player_entities.empty()) {
 							continue;
 						}
 
-						//const auto& player_pos = e_player_transform.value().get().position;
-						//const auto& player_scale = e_player_transform.value().get().scale;
-						auto& healthbar_pos = e_healthbar_transform.value().get().position;
-						auto& healthbar_scale = e_healthbar_transform.value().get().scale;
-						//const float offset_y = player_scale.y * 0.9f;
+						// Look for player
+						for (auto& player : player_entities) {
+							const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+							const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
 
-						// Set healthbar to player health
-
-						// Constants
-						static float original_healthbar_width = healthbar_scale.x;
-						static float original_healthbar_x = healthbar_pos.x;  // Store original X position once
-
-						// Get health percentage
-						float health_percentage = e_player_health.value().get().health / e_player_health.value().get().max_health;
-
-						// Update health bar scale
-						healthbar_scale.x = health_percentage * original_healthbar_width;
-
-						// Offset the health bar so it shrinks from right to left
-						healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
+							// Set element ui to player's element
+							if (elementui_texture.has_value())
+							{
+								elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+							}
+						}
 					}
-				}
 
-				// Update of FSM will be called here
-				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
+					for (Entity::Type const& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
+						// If no player exists, destroy the health bar
+						if (player_entities.empty()) {
+
+							gameOverlay(hp_container, "Defeat_screen_bg.png", "Play Again", "Quit");
+							return;
+						}
+					}
+
+					// Health bar logic
+					for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
+						// If no player exists, destroy the health bar
+						if (player_entities.empty()) {
+							//NIKE_ECS_MANAGER->destroyEntity(healthbar);
+							return;
+						}
+
+						// Look for player
+						for (auto& player : player_entities) {
+							const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+							const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
+							const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+
+							// Check for missing component
+							if (e_player_health.has_value() == false || e_player_transform.has_value() == false || e_healthbar_transform.has_value() == false) {
+								NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
+								continue;
+							}
+
+							//const auto& player_pos = e_player_transform.value().get().position;
+							//const auto& player_scale = e_player_transform.value().get().scale;
+							auto& healthbar_pos = e_healthbar_transform.value().get().position;
+							auto& healthbar_scale = e_healthbar_transform.value().get().scale;
+							//const float offset_y = player_scale.y * 0.9f;
+
+							// Set healthbar to player health
+
+							// Constants
+							static float original_healthbar_width = healthbar_scale.x;
+							static float original_healthbar_x = healthbar_pos.x;  // Store original X position once
+
+							// Get health percentage
+							float health_percentage = e_player_health.value().get().health / e_player_health.value().get().max_health;
+
+							// Update health bar scale
+							healthbar_scale.x = health_percentage * original_healthbar_width;
+
+							// Offset the health bar so it shrinks from right to left
+							healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
+						}
+					}
+
+					// Update of FSM will be called here
+					NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
+				}
 			}
 		}
-	}
 
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
 		// Get spawner position
