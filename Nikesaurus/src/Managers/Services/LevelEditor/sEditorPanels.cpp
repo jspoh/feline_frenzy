@@ -4969,12 +4969,6 @@ namespace NIKE {
 					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, 0.f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 				}
 
-				////Edit Rotation ( Temporarily Disabled )
-				//{
-				//	//Change rotation
-				//	ImGui::Text("Rotation");
-				//	ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
-				//}
 			}
 
 			ImGui::Separator();
@@ -5199,7 +5193,7 @@ namespace NIKE {
 						// Find the index of the currently selected script id in the list
 						int script_func_index = -1;
 						for (size_t i = 0; i < funcs.size(); ++i) {
-							if (button.second.script.function == funcs[i]) {
+							if (button.second.script.update_function == funcs[i]) {
 								script_func_index = static_cast<int>(i);
 								break;
 							}
@@ -5210,7 +5204,7 @@ namespace NIKE {
 						if (ImGui::Combo(std::string("##ButtonScriptFunc" + button.first).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
 							// Validate the selected index and get the new font ID
 							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
-								button.second.script.function = funcs[script_func_index];
+								button.second.script.update_function = funcs[script_func_index];
 							}
 						}
 					}
@@ -5232,6 +5226,10 @@ namespace NIKE {
 
 						//Display arguments
 						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button.first).c_str())) {
+
+							ImGui::Text("Input State: %s", UI::inputStateToString(button.second.input_state));
+							ImGui::Text("Script ID: %s", button.second.script.script_id.c_str());
+							ImGui::Text("Function: %s", button.second.script.update_function.c_str());
 
 							//Display value based on its type
 							std::visit(

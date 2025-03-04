@@ -535,17 +535,18 @@
                                 "Element": 2
                             },
                             "GameLogic::ILogic": {
-                                "Function": "update",
                                 "Named_Args": {
                                     "entity": 408
                                 },
-                                "Script_ID": "player.lua"
+                                "Script_ID": "player.lua",
+                                "Start_Function": "Test",
+                                "Update_Function": "update"
                             },
                             "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
+                                "B_Bind_To_Entity": false,
                                 "Pos_Offset": {
                                     "x": 0.0,
-                                    "y": 0.0
+                                    "y": -20.0
                                 },
                                 "Position": {
                                     "x": 101.10623168945313,
@@ -554,8 +555,8 @@
                                 "Resolution": 1,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 88.9101791381836,
-                                    "y": 127.99999237060547
+                                    "x": 50.0,
+                                    "y": 80.0
                                 }
                             },
                             "Physics::Dynamics": {
@@ -576,7 +577,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 3.0542685985565186
+                                "Zoom": 1.325977087020874
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -896,6 +897,10 @@
                                         "Position": {
                                             "x": 572.375244140625,
                                             "y": 498.9881591796875
+                                        },
+                                        "Scale": {
+                                            "x": 50.0,
+                                            "y": 100.0
                                         }
                                     },
                                     "Render::Texture": {
@@ -1918,7 +1923,7 @@
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 163.0,
-                                    "y": 163.0
+                                    "y": 34.0
                                 }
                             },
                             "Render::Texture": {

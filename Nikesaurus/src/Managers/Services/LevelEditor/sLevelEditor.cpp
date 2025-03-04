@@ -246,9 +246,10 @@ namespace NIKE {
 
 	void LevelEditor::Service::updateShortCuts() {
 		ImGuiIO& io = ImGui::GetIO();
+		auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
 
 		//Toggle Level Editor On & Off ( Use Global NIKE input to toggle on and off )
-		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB) && game_panel->isMouseInWindow()) {
 
 			//Toggle editor mode
 			b_editor_active = !b_editor_active;

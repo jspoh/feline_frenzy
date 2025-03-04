@@ -36,6 +36,15 @@ namespace NIKE {
 			RELEASED
 		};
 
+		inline const char* inputStateToString(InputStates state) {
+			switch (state) {
+			case InputStates::PRESSED:   return "Pressed";
+			case InputStates::TRIGGERED: return "Triggered";
+			case InputStates::RELEASED:  return "Released";
+			default: return "Unknown";
+			}
+		}
+
 		//UI Data Structure
 		struct UIBtn {
 			Entity::Type entity_id;

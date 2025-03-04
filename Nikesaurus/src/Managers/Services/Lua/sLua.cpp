@@ -18,14 +18,16 @@ namespace NIKE {
     nlohmann::json Lua::Script::serialize() const {
         return	{
         {"Script_ID", script_id},
-        {"Function", function},
+        {"Start_Function", start_function},
+        {"Update_Function", update_function},
         {"Named_Args", named_args}
         };
     }
 
     void Lua::Script::deserialize(nlohmann::json const& data) {
         script_id = data.value("Script_ID", "");
-        function = data.value("Function", "");
+        start_function = data.value("Start_Function", "");
+        update_function = data.value("Update_Function", "");
 
         if (data.contains("Named_Args")) {
             for (const auto& [key, value] : data.at("Named_Args").items()) {
@@ -40,8 +42,11 @@ namespace NIKE {
         if (script_id != other_script.script_id) {
             delta["Script_ID"] = script_id;
         }
-        if (function != other_script.function) {
-            delta["Function"] = function;
+        if (start_function != other_script.start_function) {
+            delta["Start_Function"] = start_function;
+        }
+        if (update_function != other_script.update_function) {
+            delta["Update_Function"] = update_function;
         }
         if (named_args != other_script.named_args) {
             delta["Named_Args"] = named_args;
@@ -55,8 +60,12 @@ namespace NIKE {
             script_id = data["Script_ID"];
         }
 
-        if (data.contains("Function")) {
-            script_id = data["Function"];
+        if (data.contains("Start_Function")) {
+            start_function = data["Start_Function"];
+        }
+
+        if (data.contains("Update_Function")) {
+            update_function = data["Update_Function"];
         }
 
         if (data.contains("Named_Args")) {
