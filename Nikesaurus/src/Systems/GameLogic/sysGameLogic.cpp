@@ -213,14 +213,15 @@ namespace NIKE {
 						const auto background_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(background);
 
 						if (background_transform_comp) {
-							const float scroll_speed = 0.5f;
+							// Scroll background
+							const float scroll_speed = .2f;
 
 							auto& background_transform_x = background_transform_comp.value().get().position.x;
 							background_transform_x += scroll_speed;
 
 							// Loop back
-							const float start_pos = -400.f;
-							const float reset_pos = 400.f;
+							const float start_pos = -1599.f;
+							const float reset_pos = 1600.f;
 
 							if (background_transform_x >= reset_pos) {
 								background_transform_x = start_pos;

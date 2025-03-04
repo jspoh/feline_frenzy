@@ -72,22 +72,82 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -400.0,
-                                    "y": -223.18545532226563
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 2399.999755859375,
-                                    "y": 1349.9998779296875
+                                    "x": 1600.0,
+                                    "y": 900.0
                                 },
                                 "Screen Position": false
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "Background"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Cam": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Zoom": 0.9950000047683716
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Main_Menu_sky.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -1599.0,
+                                    "y": 0.0
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1600.0,
+                                    "y": 900.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": true,
+                            "Layer_ID": 0,
+                            "Layer_Order": 1,
+                            "Name": "Background 2",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
@@ -144,9 +204,9 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
-                            "Layer_Order": 1,
+                            "Layer_Order": 2,
                             "Name": "Title",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -330,7 +390,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 3,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -436,7 +496,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
+                                    "x": 6,
                                     "y": 0
                                 },
                                 "Frame_Size": {
