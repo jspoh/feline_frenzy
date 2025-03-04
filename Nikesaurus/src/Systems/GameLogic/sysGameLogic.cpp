@@ -226,25 +226,21 @@ namespace NIKE {
 				if (e_combo_comp.has_value()) {
 					auto& e_combo = e_combo_comp.value().get();
 
-					// Exit if no status
-					if (e_combo.status_effect == Element::Status::NONE || e_combo.status_timer <= 0.0f) {
-						return;
-					}
-
 					// Entity has status effect
-					
-					// !TODO: Add status effect interaction here
-					
-					// Decrease status time
-					e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+					if (e_combo.status_effect != Element::Status::NONE && e_combo.status_timer > 0.0f) {
 
-					// Remove status effect if timer expires
-					if (e_combo.status_timer <= 0.0f) {
-						e_combo.status_effect = Element::Status::NONE;
+						// !TODO: Add status effect interaction here
+
+						// Decrease status time
+						e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+						// Remove status effect if timer expires
+						if (e_combo.status_timer <= 0.0f) {
+							e_combo.status_effect = Element::Status::NONE;
+						}
+
+						NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
 					}
-
-					NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
-
 				}
 
 				// Check for Spawner comp

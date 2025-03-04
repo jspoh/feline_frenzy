@@ -70,7 +70,7 @@ namespace NIKE {
 			Combo() : last_hits{}, status_effect(Status::NONE), status_timer(0.f) {};
 
 			void registerHit(Elements element) {
-				// If queue is full
+				// If queue is full (queue full of random elements)
 				if (last_hits.size() == max_size) {
 					NIKEE_CORE_INFO("queue full, {} popped", static_cast<int>(last_hits.front()));
 					// Remove the oldest hit
@@ -108,11 +108,18 @@ namespace NIKE {
 						break;
 					}
 
+					NIKEE_CORE_INFO("{} status applied", static_cast<int>(status_effect));
+
+					// Clear queue after inflicting status
+					while (!last_hits.empty()) {
+						last_hits.pop_back();
+						NIKEE_CORE_INFO("Queue popped");
+					}
+
 					// Reset status effect duration
 					status_timer = status_duration;  
 				}
 			}
-
 		};
 
 		const std::string playerBullet[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
