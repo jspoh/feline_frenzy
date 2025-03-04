@@ -28,6 +28,7 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
 		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Video>();
 
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
 			//Serialize
@@ -362,6 +363,41 @@ namespace NIKE {
 		);
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Texture>();
+
+		//Register texture for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Video>(
+			//Serialize
+			[](Render::Video const& comp) -> nlohmann::json {
+				return	{
+						{ "Video_ID", comp.video_id },
+				};
+			},
+
+			//Deserialize
+			[](Render::Video& comp, nlohmann::json const& data) {
+				comp.video_id = data.value("Video_ID", "");
+			},
+
+			// Override Serialize
+			[](Render::Video const& comp, Render::Video const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.video_id != other_comp.video_id) {
+					delta["Video_ID"] = comp.video_id;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Video& comp, nlohmann::json const& delta) {
+				if (delta.contains("Video_ID")) {
+					comp.video_id = delta["Video_ID"];
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Video>();
 	}
 
 	void Render::registerEditorComponents() {
@@ -1185,6 +1221,100 @@ namespace NIKE {
 					}
 
 				}
+
+			}
+		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Video>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Video& comp) {
+
+				ImGui::Text("Edit Video variables");
+
+				ImGui::Spacing();
+
+				// For Video id
+				{
+					// Hold the current and previous video selection
+					static std::string prev_video = comp.video_id;
+					std::string current_video = comp.video_id;
+
+					ImGui::Text("Select Video");
+
+					auto const& all_loaded_video = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Video);
+
+					// Find the index of the currently selected video in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_video.size(); ++i) {
+						if (current_video == all_loaded_video[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
+					}
+
+					// Display combo box for video selection
+					if (ImGui::Combo("##SelectVideo", &current_index, all_loaded_video.data(), static_cast<int>(all_loaded_video.size()))) {
+
+						// Validate the selected index and get the new video
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_video.size())) {
+							std::string new_video = all_loaded_video[current_index];
+
+							if (new_video != comp.video_id) {
+								// Save action
+								LevelEditor::Action change_video_action;
+								change_video_action.do_action = [&, video_id = new_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Undo action
+								change_video_action.undo_action = [&, video_id = prev_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_video_action));
+
+								// Update the previous texture
+								prev_video = new_video;
+							}
+						}
+					}
+
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select a video or drag & drop a video file.");
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Video_FILE")) {
+							const char* dropped_file = static_cast<const char*>(payload->Data);
+							if (dropped_file) {
+								std::string new_video = dropped_file;
+
+								// Save action
+								LevelEditor::Action change_video_action;
+								change_video_action.do_action = [&, video_id = new_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								change_video_action.undo_action = [&, video_id = prev_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_video_action));
+
+								// Update the previous texture
+								prev_video = new_video;
+
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+				}
+
 
 			}
 		);
