@@ -221,7 +221,7 @@ namespace NIKE {
 
 							// Loop back
 							const float start_pos = -1599.f;
-							const float reset_pos = 1600.f;
+							const float reset_pos = 1599.f;
 
 							if (background_transform_x >= reset_pos) {
 								background_transform_x = start_pos;
