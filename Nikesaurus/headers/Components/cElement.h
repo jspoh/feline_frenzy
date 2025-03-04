@@ -61,16 +61,19 @@ namespace NIKE {
 		struct Combo {
 			std::deque<Elements> last_hits;			// Last 3 elements that hit the entity
 			static constexpr size_t max_size = 3;	// Max number of hits we are tracking
+
 			Status status_effect;					// Whether affected by status effect
 			float status_timer;						// Current status effect duration
+			float tick_timer;						// Timer for status effect tick
 
-			// !TODO: Replace this status duration placeholder
-			static constexpr float status_duration = 2.f;
+			static constexpr int ticks_per_status = 4;		 // Number of ticks per status application
+			static constexpr float status_duration = 2.f;	 // Total status effect time
+			static constexpr float tick_interval = status_duration/ticks_per_status;     // Time between ticks
 
-			Combo() : last_hits{}, status_effect(Status::NONE), status_timer(0.f) {};
+			Combo() : last_hits{}, status_effect(Status::NONE), status_timer(0.f), tick_timer(0.f) {};
 
 			void registerHit(Elements element) {
-				// If queue is full
+				// If queue is full (queue full of random elements)
 				if (last_hits.size() == max_size) {
 					NIKEE_CORE_INFO("queue full, {} popped", static_cast<int>(last_hits.front()));
 					// Remove the oldest hit
@@ -108,11 +111,18 @@ namespace NIKE {
 						break;
 					}
 
+					NIKEE_CORE_INFO("{} status applied", static_cast<int>(status_effect));
+
+					// Clear queue after inflicting status
+					while (!last_hits.empty()) {
+						last_hits.pop_back();
+						NIKEE_CORE_INFO("Queue popped");
+					}
+
 					// Reset status effect duration
 					status_timer = status_duration;  
 				}
 			}
-
 		};
 
 		const std::string playerBullet[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
