@@ -20,6 +20,9 @@ namespace NIKE {
 		p_system = std::make_shared<SysParticle::ParticleSystem>();
 	}
 
+	//Definition for video component static channel group
+	std::shared_ptr<Audio::IChannelGroup> Render::Video::channel_group = nullptr;
+
 	void Render::registerComponents() {
 
 		//Register render components

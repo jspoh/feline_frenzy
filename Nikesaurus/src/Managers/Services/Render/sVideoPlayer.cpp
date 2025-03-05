@@ -56,6 +56,41 @@ void NIKE::VideoPlayer::Manager::init(Render::Video& video) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    //Get audio sample rate from video
+    int sample_rate = plm_audio_get_samplerate(video.mpeg->audio_decoder);
+    if (sample_rate == 0) {
+        sample_rate = 44100; //Default to 44.1kHz if unknown
+    }
+
+    //Configure FMOD sound buffer
+    FMOD_CREATESOUNDEXINFO sound_info = {};
+    sound_info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+    sound_info.format = FMOD_SOUND_FORMAT_PCMFLOAT;
+    sound_info.defaultfrequency = sample_rate;
+    sound_info.numchannels = 2;
+    sound_info.length = sample_rate * 2 * sizeof(float);
+
+    //Create channel group if not created yet
+    if (!video.channel_group) {
+        video.channel_group = NIKE_AUDIO_SERVICE->getAudioSystem()->createChannelGroup("Video Channels");
+    }
+
+    //Create stream
+    video.audio = NIKE_AUDIO_SERVICE->getAudioSystem()->createStream(nullptr, NIKE_AUDIO_OPENUSER | NIKE_AUDIO_LOOP_OFF | NIKE_AUDIO_2D, &sound_info);
+
+    //Buffer initial audio
+    plm_samples_t* audio_frame = plm_decode_audio(video.mpeg);
+    if (audio_frame) {
+        void* buffer;
+        unsigned int length;
+        video.audio->lock(0, audio_frame->count * sizeof(float) * 2, &buffer, nullptr, &length, nullptr);
+        memcpy(buffer, audio_frame->interleaved, length);
+        video.audio->unlock(buffer, nullptr, length, length);
+    }
+
+    //Play audio
+    video.channel = NIKE_AUDIO_SERVICE->getAudioSystem()->playSound(video.audio, video.channel_group);
+
     //Set init flag to false
     video.b_init = false;
 }
@@ -73,6 +108,21 @@ void NIKE::VideoPlayer::Manager::update(Render::Video& video) {
     
     //Calulate frame rate
     float frame_rate = 1.0f / static_cast<float>(plm_get_framerate(video.mpeg));
+
+    //Get current video time
+    float video_time_stamp = static_cast<float>(plm_get_time(video.mpeg));
+
+    //Get current audio time from for audio synchronization
+    if (video.channel) {
+        unsigned int audio_time = video.channel->getPosition(NIKE_AUDIO_TIMEUNIT_MS);
+        float audio_time_stamp = static_cast<float>(audio_time) / 1000.0f; // Convert ms to seconds
+
+        //Synchronize audio
+        float sync_treshold = 0.1f;
+        if (fabs(video_time_stamp - audio_time_stamp) > sync_treshold) {
+            video.channel->setPosition(static_cast<unsigned int>(video_time_stamp * 1000.0f), FMOD_TIMEUNIT_MS);
+        }
+    }
 
     //Decode only when necessary
     while (video.timer >= frame_rate) {

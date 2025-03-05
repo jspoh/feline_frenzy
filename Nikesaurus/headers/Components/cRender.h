@@ -13,6 +13,7 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sEvents.h"
+#include "Managers/Services/sAudio.h"
 
 namespace NIKE {
 
@@ -135,6 +136,11 @@ namespace NIKE {
 			//Texture ID
 			unsigned int texture_id;
 			Vector2f texture_size;
+
+			//Audio
+			std::shared_ptr<Audio::IAudio> audio;
+			std::shared_ptr<Audio::IChannel> channel;
+			static std::shared_ptr<Audio::IChannelGroup> channel_group;
 
 			//Video variables
 			bool b_is_playing;
