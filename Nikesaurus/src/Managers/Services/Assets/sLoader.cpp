@@ -11,7 +11,6 @@
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
 #include "Systems/Render/sysRender.h"
-#include "./Systems/sysParticle.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "data/stb_image.h"

@@ -18,7 +18,6 @@
 
 #include "Managers/Services/Render/sShader.h"
 
-#include "Components/cRender.h"
 #include "Components/cTransform.h"
 #include "Core/Engine.h"
 
@@ -32,12 +31,6 @@ namespace NIKE {
 			//Delete Copy Constructor & Copy Assignment
 			Manager(Manager const& copy) = delete;
 			void operator=(Manager const& copy) = delete;
-
-			//Helper function to encapsulate rendering entities
-			void transformAndRenderEntity(Entity::Type entity, bool debugMode);
-
-			//Helper function to encapsulate rendering text
-			void transformAndRenderText(Entity::Type entity);
 		public:
 
 

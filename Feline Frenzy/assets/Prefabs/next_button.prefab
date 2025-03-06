@@ -1,0 +1,89 @@
+{
+    "Components": {
+        "Animation::Base": {
+            "Animation_Count": 0,
+            "B_PingPong": false,
+            "B_Reverse": false,
+            "Frame_Duration": 0.0
+        },
+        "Animation::Sprite": {
+            "End_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Sheet_Size": {
+                "x": 0,
+                "y": 0
+            },
+            "Start_Index": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "Render::Shape": {
+            "Color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "Model_ID": "square-texture.model"
+        },
+        "Render::Text": {
+            "Color": {
+                "w": 1.0,
+                "x": 0.47513771057128906,
+                "y": 0.0,
+                "z": 1.0
+            },
+            "Font_ID": "Skranji-Regular.ttf",
+            "Origin": 0,
+            "Scale": 0.005000000353902578,
+            "Size": {
+                "x": 0.5,
+                "y": 0.18500001728534698
+            },
+            "Text": "Next"
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.0,
+            "Texture_ID": ""
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": -12.45989990234375,
+                "y": -396.0364990234375
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "Screen Position": false
+        }
+    },
+    "MetaData": {
+        "Layer ID": 1,
+        "Tags": []
+    }
+}

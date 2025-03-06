@@ -16,6 +16,26 @@ namespace NIKE {
 	namespace Transition {
 
 		/****************************
+		* Default State Transitions
+		*****************************/
+
+		class DefaultToEnemyIdle : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class DefaultToBossIdle : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		/****************************
 		* Idle Transitions
 		*****************************/
 		class IdleToEnemyAttack : public StateMachine::Itransition {
@@ -61,6 +81,14 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
+		//class EnemyAttackToEnemyHurt : public StateMachine::Itransition {
+		//	// Determines if the transition to the next state is valid.
+		//	bool isValid(Entity::Type& entity) const override;
+
+		//	// Returns the state that should be transitioned to, if valid.
+		//	std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		//};
+
 		class EnemyAttackToEnemyDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
@@ -70,7 +98,7 @@ namespace NIKE {
 		};
 
 		/****************************
-		* EnemyChaseState Transitions
+		* Enemy Chase State Transitions
 		*****************************/
 		class EnemyChaseToEnemyAttack : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
@@ -88,6 +116,14 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
+		//class EnemyChaseToEnemyHurt : public StateMachine::Itransition {
+		//	// Determines if the transition to the next state is valid.
+		//	bool isValid(Entity::Type& entity) const override;
+
+		//	// Returns the state that should be transitioned to, if valid.
+		//	std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		//};
+
 		class EnemyChaseToEnemyDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
@@ -95,6 +131,33 @@ namespace NIKE {
 			// Returns the state that should be transitioned to, if valid.
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
+
+		/****************************
+		* Enemy Hurt State Transitions
+		*****************************/
+		//class EnemyHurtToEnemyAttack : public StateMachine::Itransition {
+		//	// Determines if the transition to the next state is valid.
+		//	bool isValid(Entity::Type& entity) const override;
+
+		//	// Returns the state that should be transitioned to, if valid.
+		//	std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		//};
+
+		//class EnemyHurtToEnemyChase : public StateMachine::Itransition {
+		//	// Determines if the transition to the next state is valid.
+		//	bool isValid(Entity::Type& entity) const override;
+
+		//	// Returns the state that should be transitioned to, if valid.
+		//	std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		//};
+
+		//class EnemyHurtToEnemyDeath : public StateMachine::Itransition {
+		//	// Determines if the transition to the next state is valid.
+		//	bool isValid(Entity::Type& entity) const override;
+
+		//	// Returns the state that should be transitioned to, if valid.
+		//	std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		//};
 
 		/************************************************************************************
 		* Enemy Death State Transitions (No transitions for now unless theres gonna be a revivie or sum)

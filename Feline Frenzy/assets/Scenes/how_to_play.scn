@@ -32,6 +32,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -201,6 +202,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -217,7 +219,7 @@
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 6,
+                                    "x": 7,
                                     "y": 1
                                 },
                                 "Start_Index": {
@@ -235,9 +237,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
+                                    "x": 0.8803921937942505,
+                                    "y": 0.8490196466445923,
+                                    "z": 1.1509803533554077
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -266,7 +268,7 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 6,
+                                    "x": 7,
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
@@ -274,13 +276,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -9.443603515625,
-                                    "y": -359.83270263671875
+                                    "x": 14.371826171875,
+                                    "y": -379.513916015625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 167.35284423828125,
-                                    "y": 66.9411392211914
+                                    "x": 239.95643615722656,
+                                    "y": 95.98257446289063
                                 },
                                 "Screen Position": true
                             }
@@ -297,9 +299,10 @@
                         "UI Btn": {
                             "Input_State": 1,
                             "Script": {
-                                "Function": "Previous",
                                 "Named_Args": {},
-                                "Script_ID": "ChangeScene.lua"
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": "Previous"
                             }
                         },
                         "UI ID": "back_btn"

@@ -27,19 +27,23 @@ namespace NIKE {
 
 	void State::DestructableDeathState::onUpdate([[maybe_unused]] Entity::Type& entity)
 	{
-		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		if (animation_comp.has_value())
+		// Somehow this fixes barrel bug?
+		for (auto& tag : NIKE_METADATA_SERVICE->getEntityTags(entity))
 		{
-			// Use delta time to let animation play before deleting entity
-			//static float dt = 0.0f;
-			//dt += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-			//if (dt >= 0.2f) {
+			if (tag == "objects")
+			{
 				spawnHealthDrop(entity);
+				spawnBrokenBarrel(entity);
+				// Play Barrel Destroy sound here
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
-				// Reset delta time
-				//dt = 0.f;
-			//}
+			}
+			else {
+				// Continue iteration when tag is not objects
+				continue;
+			}
+
 		}
+
 	}
 
 	void State::DestructableDeathState::onExit([[maybe_unused]] Entity::Type& entity)
@@ -56,7 +60,7 @@ namespace NIKE {
 		// Get entity position
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value()) {
-			NIKEE_CORE_WARN("spawnHealthDrop: Entity missing Transform Component, enemy not spawned");
+			NIKEE_CORE_WARN("spawnHealthDrop: Entity missing Transform Component, health not spawned");
 			return;
 		}
 
@@ -64,7 +68,7 @@ namespace NIKE {
 		Entity::Type drop_entity = NIKE_ECS_MANAGER->createEntity();
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromFile(drop_entity, NIKE_ASSETS_SERVICE->getAssetPath("healthDrop.prefab").string());
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(drop_entity, "healthDrop.prefab");
 
 		// Set health drop location
 		auto drop_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(drop_entity);
@@ -72,4 +76,27 @@ namespace NIKE {
 			drop_transform_comp.value().get().position = e_transform_comp.value().get().position;
 		}
 	}
+
+	void State::DestructableDeathState::spawnBrokenBarrel(Entity::Type entity) {
+		// Get entity position
+		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("spawnBrokenBarrel: Entity missing Transform Component, barrel not spawned");
+			return;
+		}
+
+		// Create broken barrel entity
+		Entity::Type barrel_entity = NIKE_ECS_MANAGER->createEntity();
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(barrel_entity, "brokenBarrel.prefab");
+
+		// Set health drop location
+		auto drop_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(barrel_entity);
+		if (drop_transform_comp.has_value()) {
+			drop_transform_comp.value().get().position = e_transform_comp.value().get().position;
+		}
+	}
+
+	
 }

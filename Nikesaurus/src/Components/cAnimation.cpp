@@ -98,6 +98,8 @@ namespace NIKE {
 				comp.sheet_size.fromJson(data.value("Sheet_Size", Vector2f::def_json));
 				comp.start_index.fromJson(data.value("Start_Index", Vector2f::def_json));
 				comp.end_index.fromJson(data.value("End_Index", Vector2f::def_json));
+
+				comp.curr_index = comp.start_index;
 			}, 
 
 			// Override Serialize
@@ -128,6 +130,8 @@ namespace NIKE {
 				if (delta.contains("End_Index")) {
 					comp.end_index.fromJson(delta["End_Index"]);
 				}
+
+				comp.curr_index = comp.start_index;
 			}
 		);
 

@@ -13,7 +13,6 @@
 #include "Core/Engine.h"
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -89,6 +88,10 @@ namespace NIKE {
 
 	bool LevelEditor::IPanel::checkPopUpShowing() {
 		return b_popup_showing;
+	}
+
+	unsigned int LevelEditor::IPanel::getDockID() {
+		return dock_id;
 	}
 
 	std::function<void()> LevelEditor::IPanel::defPopUp(std::string const& id, std::shared_ptr<std::string> msg) {
@@ -317,6 +320,9 @@ namespace NIKE {
 
 		//Begin Frame
 		ImGui::Begin(getName().c_str(), nullptr, static_cast<ImGuiWindowFlags>(window_flags));
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Start Main Panel Menu Bar
 		if (ImGui::BeginMenuBar()) {
@@ -663,7 +669,7 @@ namespace NIKE {
 			ImGui::InputInt("##EntityLayerIDInput", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, Scenes::MAXLAYERS));
 
 			//If enter or ok button is pressed
 			if (!entity_name.empty() && (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER])) {
@@ -780,13 +786,6 @@ namespace NIKE {
 					//Check if entity is still alive
 					auto entity = NIKE_METADATA_SERVICE->getEntityByName(*shared_id);
 
-					//Remove active particle system if exists
-					auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(selected_entity);
-					if (comps.find("Render::ParticleEmitter") != comps.end()) {
-						auto comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-						NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(comp->ref);
-					}
-
 					if (entity.has_value()) {
 						//Destroy new entity
 						NIKE_ECS_MANAGER->destroyEntity(entity.value());
@@ -842,6 +841,7 @@ namespace NIKE {
 					if (NIKE_ECS_MANAGER->checkEntity(clone_entity)) {
 						//Clone entity 
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
+						NIKE_METADATA_SERVICE->setEntityLayerID(new_id, NIKE_METADATA_SERVICE->getEntityLayerID(clone_entity));
 
 						//If entity name is valid
 						if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
@@ -973,6 +973,9 @@ namespace NIKE {
 
 	void LevelEditor::EntitiesPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Reset entity changed flag
 		b_entity_changed = false;
@@ -1133,8 +1136,26 @@ namespace NIKE {
 					//Show number of entities in the level
 					ImGui::Text("Number of entities in layer: %d", layer->getEntitiesSize());
 
+					ImGui::Spacing();
+
+					// Create a unique checkbox label using the layer ID
+					std::string checkbox_label = "Enable Y Sorting##Checkbox" + std::to_string(layer->getLayerID());
+
+					bool y_sort = layer->getLayerYSort();
+
+					if (ImGui::Checkbox(checkbox_label.c_str(), &y_sort)) {
+						layer->setLayerYSort(y_sort);
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Enable this to sort entities by their Y position. (Overrides Order ID)");
+					}
+					ImGui::Spacing();
+
+					// Create a unique button label using the layer ID
+					std::string button_label = "Create##Entity" + std::to_string(layer->getLayerID());
+					
 					// Button to create an entity, which triggers the popup
-					if (ImGui::Button("Create##Entity")) {
+					if (ImGui::Button(button_label.c_str())) {
 						openPopUp("Create Entity");
 					}
 
@@ -1142,7 +1163,7 @@ namespace NIKE {
 					ImGui::SameLine();
 
 					// Button to remove an entity, which triggers the popup
-					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
+					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[NIKE_KEY_DELETE])) {
 						openPopUp("Remove Entity");
 					}
 
@@ -1154,7 +1175,6 @@ namespace NIKE {
 						openPopUp("Clone Entity");
 					}
 
-					//Add Spacing
 					ImGui::Spacing();
 
 					//Iterate through entities within layer
@@ -1562,6 +1582,11 @@ namespace NIKE {
 					//Get mouse pos
 					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
 				}
+
+				// Delete Entity popup
+				if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::GetIO().KeysDown[NIKE_KEY_DELETE]) {
+					openPopUp("Remove Entity");
+				}
 			}
 		}
 
@@ -1631,7 +1656,6 @@ namespace NIKE {
 		//Get mouse pos
 		Vector2f world_mouse = e_transform.use_screen_pos ? Vector2f(mouse_pos.x - window_size.x * 0.5f, -(mouse_pos.y - window_size.y * 0.5f)) :
 			game_panel.lock()->getWorldMousePos();
-
 
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
@@ -1909,16 +1933,16 @@ namespace NIKE {
 				float prev_angle = e_transform.rotation;
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2((world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x + gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2((world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), (world_mouse.x - gizmo.objects["Rot Circle"].first.position.x));
 
-				//Wrap angle
-				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
-
-				//Convert angle from radians to degrees
+				//Convert to degree
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
-				//Update the entity's rotation angle
-				e_transform.rotation = std::clamp(angle_deg, 0.0f, 360.0f);
+				//Ensure a proper angle range
+				if (angle_deg < 0.0f) angle_deg += 360.0f;
+
+				//Wrap rotation
+				e_transform.rotation = fmod(angle_deg, 360.0f);
 
 				//Apply action
 				LevelEditor::Action change_rotation;
@@ -1959,16 +1983,16 @@ namespace NIKE {
 				}
 
 				//Calculate mouse angle relative to the circle's center
-				float angle = atan2((world_mouse.y + gizmo.objects["Rot Circle"].first.position.y), world_mouse.x + gizmo.objects["Rot Circle"].first.position.x);
+				float angle = atan2((world_mouse.y - gizmo.objects["Rot Circle"].first.position.y), (world_mouse.x - gizmo.objects["Rot Circle"].first.position.x));
 
-				//Wrap angle
-				if (angle < 0.0f) angle += 2.0f * static_cast<float>(M_PI);
-
-				//Convert angle from radians to degrees
+				//Convert to degree
 				float angle_deg = angle * (180.0f / static_cast<float>(M_PI));
 
-				//Update the entity's rotation angle
-				e_transform.rotation = std::clamp(angle_deg, 0.0f, 360.0f);
+				//Ensure a proper angle range
+				if (angle_deg < 0.0f) angle_deg += 360.0f;
+
+				//Wrap rotation
+				e_transform.rotation = fmod(angle_deg, 360.0f);
 			}
 
 			//Dragging stopped
@@ -2060,33 +2084,33 @@ namespace NIKE {
 					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
 
-					// add active particle system if particle emitter is added
-					if (component.first == "Render::ParticleEmitter") {
-						using namespace NIKE::SysParticle;
+					//// add active particle system if particle emitter is added
+					//if (component.first == "Render::ParticleEmitter") {
+					//	using namespace NIKE::SysParticle;
 
-						// get entity position
-						const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+					//	// get entity position
+					//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
 
-						if (comps.find("Transform::Transform") == comps.end()) {
-							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-						}
-						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
+					//	if (comps.find("Transform::Transform") == comps.end()) {
+					//		NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
+					//		NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
+					//	}
+					//	NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
 
-						const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+					//	const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
 
-						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+					//	const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
-						// update default particle system config
-						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-						pe_comp->ref = particle_emitter_ref;
-						pe_comp->offset = { 0.f, 0.f };
-						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
+					//	// update default particle system config
+					//	auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+					//	pe_comp->duration = -1.f;
+					//	pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
+					//	pe_comp->ref = particle_emitter_ref;
+					//	pe_comp->offset = { 0.f, 0.f };
+					//	pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
 
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					}
+					//	NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
+					//}
 
 					//	};
 
@@ -2125,15 +2149,15 @@ namespace NIKE {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
 
-				if (comp_string_ref == "Render::ParticleEmitter") {
-					// get entity position
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					if (!success) {
-						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-					}
-				}
+				//if (comp_string_ref == "Render::ParticleEmitter") {
+				//	// get entity position
+				//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
+				//	const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+				//	bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
+				//	if (!success) {
+				//		throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
+				//	}
+				//}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2199,6 +2223,9 @@ namespace NIKE {
 
 		//Begin render
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Reset gizmo interaction
 		gizmo.b_interacting = false;
@@ -2658,33 +2685,6 @@ namespace NIKE {
 
 					//Close popup
 					closePopUp(popup_id);
-
-					// add active particle system if particle emitter is added
-					if (component.first == "Render::ParticleEmitter") {
-						using namespace NIKE::SysParticle;
-
-						// get entity position
-
-						if (prefab_comps.find("Transform::Transform") == prefab_comps.end()) {
-							NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-							NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-						}
-						NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
-
-						const auto comp = reinterpret_cast<Transform::Transform*>(prefab_comps.at("Transform::Transform").get());
-
-						const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
-						// update default particle system config
-						auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(prefab_comps.at("Render::ParticleEmitter").get());
-						pe_comp->duration = -1.f;
-						pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-						pe_comp->ref = particle_emitter_ref;
-						pe_comp->offset = { 0.f, 0.f };
-						pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
-
-						NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					}
 				}
 
 			}
@@ -2721,16 +2721,6 @@ namespace NIKE {
 
 				// Close popup
 				closePopUp(popup_id);
-
-				if (comp_ref == "Render::ParticleEmitter") {
-					// get entity position
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-					const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-					if (!success) {
-						throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-					}
-				}
 			}
 
 			ImGui::SameLine();
@@ -2868,7 +2858,7 @@ namespace NIKE {
 			ImGui::InputInt("##PrefabEntityLayerIDInput", &layer_id, 1);
 
 			//Clamp layer ID
-			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, 64));
+			layer_id = std::clamp(layer_id, 0, std::clamp(static_cast<int>(NIKE_SCENES_SERVICE->getLayerCount() - 1), 0, Scenes::MAXLAYERS));
 
 			//If enter or ok button is pressed
 			if (ImGui::Button("OK") || ImGui::GetIO().KeysDown[NIKE_KEY_ENTER]) {
@@ -2926,14 +2916,50 @@ namespace NIKE {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0, 0, 0, 1);
 
+		//Render prefab preview
+		NIKE_RENDER_SERVICE->renderComponents(prefab_comps);
+		NIKE_RENDER_SERVICE->completeRender();
+
 		//Unbind frame buffer
 		NIKE_RENDER_SERVICE->unbindFrameBuffer();
 
 		//Begin window for rendering
-		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str());
+		ImGui::SetNextWindowDockID(game_panel.lock()->getDockID(), ImGuiCond_Once);
+		ImGui::Begin(("Prefab Preview: " + prefab_id).c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
+
+		//Close prefab preview
+		if (ImGui::Button("Close##PrefabPreview")) {
+			prefab_id.clear();
+			prefab_comps.clear();
+			meta_data = NIKE::MetaData::EntityData();
+		}
+
+		//Configure viewport size
+		ImVec2 window_size = ImGui::GetContentRegionAvail();
+		float aspect_ratio = NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio();
+		float viewport_width = window_size.x;
+		float viewport_height = window_size.x / aspect_ratio;
+		if (viewport_height > window_size.y) {
+			viewport_height = window_size.y;
+			viewport_width = window_size.y * aspect_ratio;
+		}
+
+		//Get window size
+		auto win_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		//Calculate UV coordinates for cropping when there are gaps
+		Vector2f gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		float u_min = gaps.x / 2.0f / win_size.x;
+		float u_max = 1.0f - u_min;
+		float v_min = gaps.y / 2.0f / win_size.y;
+		float v_max = 1.0f - v_min;
+
+		//Configure UV Offsets
+		ImVec2 uv0(u_min, -v_min); // Bottom-left
+		ImVec2 uv1(u_max, -v_max); // Top-right
 
 		//Render game to viewport
-		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(500, 500));
+		ImGui::Image(static_cast<ImTextureID>(NIKE_RENDER_SERVICE->getFrameBuffer(preview_buffer_id).texture_color_buffer), ImVec2(viewport_width, viewport_height), uv0, uv1);
 
 		ImGui::End();
 	}
@@ -2984,8 +3010,11 @@ namespace NIKE {
 		//Main panel reference
 		main_panel = std::dynamic_pointer_cast<MainPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(MainPanel::getStaticName()));
 
+		//Game panel reference
+		game_panel = std::dynamic_pointer_cast<GameWindowPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(GameWindowPanel::getStaticName()));
+
 		//Init frame buffer name
-		preview_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(500, 500));
+		preview_buffer_id = NIKE_RENDER_SERVICE->createFrameBuffer(Vector2i(), true);
 
 		//Popups registration
 		registerPopUp("Add Component", addComponentPopUp("Add Component"));
@@ -3001,6 +3030,9 @@ namespace NIKE {
 
 	void LevelEditor::PrefabsPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Dummy For accepting payload
 		ImVec2 pos = ImGui::GetCursorPos();
@@ -3216,12 +3248,30 @@ namespace NIKE {
 
 	}
 
+	int LevelEditor::DebugPanel::overflow(int c) {
+		if (c == '\n') {
+			std::lock_guard<std::mutex> lock(buff_mutex);
+			console_logs.push_back(currentLine);
+			currentLine.clear();
+		}
+		else {
+			currentLine += static_cast<char>(c);
+		}
+		return c;
+	}
+
 	void LevelEditor::DebugPanel::render() {
 		if (!ImGui::Begin(getName().c_str())) {
+			//Set window dock id
+			dock_id = ImGui::GetWindowDockID();
+
 			//Return if window is not being shown
 			ImGui::End();
 			return;
 		}
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Begin tab bar
 		if (ImGui::BeginTabBar("TabBar")) {
@@ -3295,6 +3345,52 @@ namespace NIKE {
 				ImGui::EndTabItem();
 			}
 
+			// Console tab
+			if (ImGui::BeginTabItem("Console Log")) {
+
+				//Static boolean for console state
+				static bool b_editor_log = false;
+
+				//Trigger redirect
+				ImGui::Text("Cout:");
+				ImGui::SameLine();
+				if (ImGui::Button(b_editor_log ? "Editor##Log" : "Console##Log")) {
+					b_editor_log = !b_editor_log;
+
+					if (b_editor_log) {
+						coutToEditor();
+					}
+					else {
+						restoreCout();
+					}
+				}
+
+				//Scroll logs
+				ImGui::SameLine();
+				static bool autoScroll = true;
+				ImGui::Checkbox("Auto-scroll", &autoScroll);
+
+				ImGui::Separator();
+
+				//Display console messages
+				std::lock_guard<std::mutex> lock(buff_mutex);
+				for (const auto& message : console_logs) {
+					ImGui::TextUnformatted(message.c_str());
+				}
+
+				//Clear console
+				if (ImGui::Button("Clear")) {
+					console_logs.clear();
+				}
+
+				//Scroll
+				if (autoScroll) {
+					ImGui::SetScrollHereY(1.0f);
+				}
+
+				ImGui::EndTabItem();
+			}
+
 			ImGui::EndTabBar();
 		}
 
@@ -3302,6 +3398,16 @@ namespace NIKE {
 		renderPopUps();
 
 		ImGui::End();
+	}
+
+	void LevelEditor::DebugPanel::coutToEditor() {
+		oldcout = cout.rdbuf(this);
+		oldcerr = cerr.rdbuf(this);
+	}
+
+	void LevelEditor::DebugPanel::restoreCout() {
+		cout.rdbuf(oldcout);
+		cerr.rdbuf(oldcerr);
 	}
 
 	/*****************************************************************//**
@@ -3444,6 +3550,9 @@ namespace NIKE {
 
 	void LevelEditor::AudioPanel::render() {
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		if (ImGui::Button("Add New Channel")) {
 			openPopUp("Add New Channel");
@@ -4331,6 +4440,9 @@ namespace NIKE {
 			renderAssetsBrowser(current_path);
 		}
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Render selected asset options
 		if (!selected_asset_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(selected_asset_id)) {
 
@@ -4595,6 +4707,9 @@ namespace NIKE {
 		//Begin camera panel
 		ImGui::Begin(getName().c_str());
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Get cam entities
 		const auto& cam_entities = NIKE_CAMERA_SERVICE->getCameraEntities();
 
@@ -4854,12 +4969,6 @@ namespace NIKE {
 					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, 0.f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 				}
 
-				////Edit Rotation ( Temporarily Disabled )
-				//{
-				//	//Change rotation
-				//	ImGui::Text("Rotation");
-				//	ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
-				//}
 			}
 
 			ImGui::Separator();
@@ -4920,6 +5029,9 @@ namespace NIKE {
 				//Make copies
 				Transform::Transform trans_copy = btn_transform;
 				Render::Text txt_copy = btn_text;
+
+				//Set screem pos to center
+				trans_copy.use_screen_pos = true;
 
 				//Create button based on mode
 				if (b_model) {
@@ -4996,6 +5108,9 @@ namespace NIKE {
 	void LevelEditor::UIPanel::render() {
 		ImGui::Begin(getName().c_str());
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Create button
 		{
 			if (ImGui::Button("Create Button")) {
@@ -5014,6 +5129,14 @@ namespace NIKE {
 			ImGui::Text("Active Buttons: ");
 		}
 
+		// Temporary map to store UI state per button
+		static std::unordered_map<std::string, int> val_type_map;
+		static std::unordered_map<std::string, std::string> named_key_map;
+		static std::unordered_map<std::string, std::string> str_val_map;
+		static std::unordered_map<std::string, int> int_val_map;
+		static std::unordered_map<std::string, float> float_val_map;
+		static std::unordered_map<std::string, bool> bool_val_map;
+
 		//Show all active buttons
 		for (auto& button : buttons) {
 			ImGui::Spacing();
@@ -5027,7 +5150,7 @@ namespace NIKE {
 					static int trigger_index = 0;
 					trigger_index = static_cast<int>(button.second.input_state);
 					ImGui::Text("Button Input State: ");
-					if (ImGui::Combo("##BtnInputState", &trigger_index, "Pressed\0Triggered\0Released\0")) {
+					if (ImGui::Combo(std::string("##ButtonInput" + button.first).c_str(), &trigger_index, "Pressed\0Triggered\0Released\0")) {
 						button.second.input_state = static_cast<UI::InputStates>(trigger_index);
 					}
 				}
@@ -5048,7 +5171,7 @@ namespace NIKE {
 
 					//Display combo box for script selection
 					ImGui::Text("Button Script: ");
-					if (ImGui::Combo("##BtnScript", &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+					if (ImGui::Combo(std::string("##ButtonScript" + button.first).c_str(), &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
 						// Validate the selected index and get the new font ID
 						if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
 							button.second.script.script_id = get_load_scripts[script_index];
@@ -5070,7 +5193,7 @@ namespace NIKE {
 						// Find the index of the currently selected script id in the list
 						int script_func_index = -1;
 						for (size_t i = 0; i < funcs.size(); ++i) {
-							if (button.second.script.function == funcs[i]) {
+							if (button.second.script.update_function == funcs[i]) {
 								script_func_index = static_cast<int>(i);
 								break;
 							}
@@ -5078,10 +5201,10 @@ namespace NIKE {
 
 						//Display combo box for script function selection
 						ImGui::Text("Button Script Function: ");
-						if (ImGui::Combo("##BtnScriptFunc", &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+						if (ImGui::Combo(std::string("##ButtonScriptFunc" + button.first).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
 							// Validate the selected index and get the new font ID
 							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
-								button.second.script.function = funcs[script_func_index];
+								button.second.script.update_function = funcs[script_func_index];
 							}
 						}
 					}
@@ -5102,7 +5225,11 @@ namespace NIKE {
 						const auto& value = it->second;
 
 						//Display arguments
-						if (ImGui::CollapsingHeader(std::string("Key: " + key).c_str(), ImGuiTreeNodeFlags_Bullet)) {
+						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button.first).c_str())) {
+
+							ImGui::Text("Input State: %s", UI::inputStateToString(button.second.input_state));
+							ImGui::Text("Script ID: %s", button.second.script.script_id.c_str());
+							ImGui::Text("Function: %s", button.second.script.update_function.c_str());
 
 							//Display value based on its type
 							std::visit(
@@ -5127,50 +5254,50 @@ namespace NIKE {
 							//Remove argument button
 							if (ImGui::Button("Remove Argument")) {
 								it = args.erase(it);
+								ImGui::TreePop();
 								break;
 							}
+							ImGui::TreePop();
 						}
 					}
 
 					//Seperator
-					ImGui::Separator();
+					ImGui::Spacing();
 
-					//Static variables
-					static int val_type_index = 0;
-					static std::string named_key = "";
-					named_key.reserve(64);
-					static std::string str_val = "";
-					str_val.reserve(64);
-					static int int_val = 0;
-					static float float_val = 0.0f;
-					static bool bool_val = false;
+					//Input Variables
+					int& val_type_index = val_type_map[button.first];
+					std::string& named_key = named_key_map[button.first];
+					std::string& str_val = str_val_map[button.first];
+					int& int_val = int_val_map[button.first];
+					float& float_val = float_val_map[button.first];
+					bool& bool_val = bool_val_map[button.first];
 
 					//Set arguments
-					if (ImGui::InputText("Input Key", named_key.data(), named_key.capacity() + 1)) {
+					if (ImGui::InputText(std::string("Input Key##" + button.first).c_str(), named_key.data(), named_key.capacity() + 1)) {
 						named_key.resize(strlen(named_key.c_str()));
 					}
 
 					//Select value type
-					ImGui::Combo("Value Type", &val_type_index, "Int\0Float\0String\0Bool\0");
+					ImGui::Combo(std::string("Value Type##" + button.first).c_str(), &val_type_index, "Int\0Float\0String\0Bool\0");
 
 					//Take in input based on selected combo
 					switch (val_type_index) {
 					case 0: {
-						ImGui::InputInt("Value (int)", &int_val);
+						ImGui::InputInt(std::string("Value (int)##" + button.first).c_str(), &int_val);
 						break;
 					}
 					case 1: {
-						ImGui::InputFloat("Value (float)", &float_val);
+						ImGui::InputFloat(std::string("Value (float)##" + button.first).c_str(), &float_val);
 						break;
 					}
 					case 2: {
-						if (ImGui::InputText("Value (string)", str_val.data(), str_val.capacity() + 1)) {
+						if (ImGui::InputText(std::string("Value (string)##" + button.first).c_str(), str_val.data(), str_val.capacity() + 1)) {
 							str_val.resize(strlen(str_val.c_str()));
 						}
 						break;
 					}
 					case 3: {
-						ImGui::Checkbox("Value (bool)", &bool_val);
+						ImGui::Checkbox(std::string("Value (bool)##" + button.first).c_str(), &bool_val);
 						break;
 					}
 					default: {
@@ -5179,25 +5306,29 @@ namespace NIKE {
 					}
 
 					//Add argument button
-					if (ImGui::Button("Add Argument")) {
+					if (ImGui::Button(std::string("Add Argument##" + button.first).c_str())) {
 
 						//Check if named key is correct
 						if (!named_key.empty() && args.find(named_key) == args.end()) {
 							switch (val_type_index) {
 							case 0: {
 								args[named_key] = int_val;
+								named_key.clear();
 								break;
 							}
 							case 1: {
 								args[named_key] = float_val;
+								named_key.clear();
 								break;
 							}
 							case 2: {
 								args[named_key] = str_val;
+								named_key.clear();
 								break;
 							}
 							case 3: {
 								args[named_key] = bool_val;
+								named_key.clear();
 								break;
 							}
 							default: {
@@ -5212,7 +5343,7 @@ namespace NIKE {
 				ImGui::Spacing();
 
 				//Delete Button
-				if (ImGui::Button("Delete Button")) {
+				if (ImGui::Button(std::string("Delete Button##" + button.first).c_str())) {
 					NIKE_UI_SERVICE->destroyButton(button.first);
 					break;
 				}
@@ -5251,6 +5382,9 @@ namespace NIKE {
 
 		//Begin Render
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		ImGui::Spacing();
 
@@ -5733,16 +5867,12 @@ namespace NIKE {
 				//Get selected asset path
 				auto path = NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID());
 
-				// Clear containers containing entities string refs
-				NIKE_ECS_MANAGER->destroyAllEntities();
-
 				tile_panel.lock()->removeGrid(NIKE_SCENES_SERVICE->getCurrSceneID());
 
 				//Remove path and clear selected asset text buffer
 				std::filesystem::remove(path);
 
-				// Reset grid here
-				// NIKE_MAP_SERVICE->resetGrid();
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, ""));
 
 				//Close popup
 				closePopUp(popup_id);
@@ -5827,91 +5957,86 @@ namespace NIKE {
 				ImGui::EndTable();
 			}
 
-			//if (!layers.empty()) {
-			//	ImGui::Text("Edit Layer Bit Mask");
-			//	if (ImGui::BeginCombo("##Select Layer",
-			//		(selected_layer_index < layers.size() ? layer_names[selected_layer_index].c_str() : "None"))) {
-			//		for (unsigned int i = 0; i < layers.size(); ++i) {
-			//			const bool is_selected = (selected_layer_index == i);
-			//			if (ImGui::Selectable(layer_names[i].c_str(), is_selected)) {
-
-			//				Action select_layer_action;
-
-			//				// Capture the previous and new layer indices
-			//				unsigned int prev_layer_index = selected_layer_index;
-			//				unsigned int new_layer_index = i;
-
-			//				// Do action
-			//				select_layer_action.do_action = [&, prev_layer_index, new_layer_index]() {
-			//					selected_layer_index = new_layer_index;
-			//					// Reset bit position
-			//					bit_position = 0;
-			//					edit_mask_id = static_cast<unsigned int>(
-			//						layers[selected_layer_index]->getLayerMask().to_ulong());
-			//					};
-
-			//				// Undo action
-			//				select_layer_action.undo_action = [&, prev_layer_index, new_layer_index]() {
-			//					selected_layer_index = prev_layer_index;
-			//					// Reset bit position
-			//					bit_position = 0;
-			//					edit_mask_id = static_cast<unsigned int>(
-			//						layers[selected_layer_index]->getLayerMask().to_ulong());
-			//					};
-
-			//				// Execute the action
-			//				NIKE_LVLEDITOR_SERVICE->executeAction(std::move(select_layer_action));
-			//			}
-			//			if (is_selected) ImGui::SetItemDefaultFocus();
-			//		}
-			//		ImGui::EndCombo();
-			//	}
-			//}
-			//else {
-			//	ImGui::Text("No layers available.");
-			//}
-
-
-			//// Show layer editing options
-			//if (selected_layer_index < layers.size()) {
-			//	ImGui::Text("Edit Layer Mask");
-
-			//	// Layer mask editing
-			//	if (layers.size() > 1) {
-
-			//		// For ensuring bit_position does not default to the newly created layer
-			//		if (bit_position >= layers.size() || bit_position == selected_layer_index) {
-			//			bit_position = (selected_layer_index == 0) ? 1 : 0;
-			//		}
-
-			//		if (ImGui::BeginCombo("##Select Mask Layer", layer_names[bit_position].c_str())) {
-			//			for (unsigned int i = 0; i < layers.size(); ++i) {
-			//				if (i == selected_layer_index) continue;
-
-			//				const bool mask_selected = (bit_position == i);
-			//				if (ImGui::Selectable(layer_names[i].c_str(), mask_selected)) {
-			//					bit_position = i;
-			//				}
-			//				if (mask_selected) ImGui::SetItemDefaultFocus();
-			//			}
-			//			ImGui::EndCombo();
-			//		}
-
-			//		bit_state = layers[selected_layer_index]->getLayerMask().test(bit_position);
-			//		if (ImGui::Checkbox("Set Bit State", &bit_state)) {
-			//			layers[selected_layer_index]->setLayerMask(bit_position, bit_state);
-			//		}
-			//	}
-			//	else {
-			//		ImGui::Text("No mask layers available.");
-			//	}
-			//}
-
 			//Add spacing
 			ImGui::Spacing();
 
 			//Done Editing
 			if (ImGui::Button("Done")) {
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+			};
+	}
+
+	std::function<void()> LevelEditor::ScenesPanel::saveSceneAsPopup(std::string const& popup_id) {
+		return [this, popup_id]() {
+
+			//Static entity name input buffer
+			static std::string scn_id;
+
+			//Get Scene text
+			ImGui::Text("Enter a name for the scene without .scn:");
+			if (ImGui::InputText("##Scene Name", scn_id.data(), scn_id.capacity() + 1)) {
+				scn_id.resize(strlen(scn_id.c_str()));
+			}
+
+			//Add spacing
+			ImGui::Spacing();
+
+			//Display each component as a button
+			if (ImGui::Button("Ok") && !scn_id.empty() && (scn_id.find(".scn") == scn_id.npos) && !NIKE_ASSETS_SERVICE->isAssetRegistered(scn_id)) {
+
+				//Craft file path from name
+				std::filesystem::path scenes_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Scenes");
+
+				if (!std::filesystem::exists(scenes_path)) {
+					std::filesystem::create_directories(scenes_path); // Create the directory if it doesn't exist
+				}
+
+				//Craft file path from name
+				std::filesystem::path grids_path = NIKE_PATH_SERVICE->resolvePath("Game_Assets:/Grids");
+
+				if (!std::filesystem::exists(grids_path)) {
+					std::filesystem::create_directories(grids_path); // Create the directory if it doesn't exist
+				}
+
+				//Scn path
+				std::filesystem::path scn_path = scenes_path / std::string(scn_id + ".scn");
+
+				//Grid path
+				std::filesystem::path grid_path = grids_path / std::string(scn_id + ".grid");
+
+				//When user click save/create scene, grid is saved together
+				tile_panel.lock()->saveGrid(scn_id);
+
+				//Serialize new empty scene
+				NIKE_SERIALIZE_SERVICE->saveSceneToFile(scn_path.string());
+
+				//Register grid
+				NIKE_ASSETS_SERVICE->registerAsset(grid_path.string(), false);
+
+				//Register scn
+				NIKE_ASSETS_SERVICE->registerAsset(scn_path.string(), false);
+
+				//Queue new scene
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, std::string(scn_id + ".scn")));
+
+				//Reset scene id buffer
+				scn_id.clear();
+
+				//Close popup
+				closePopUp(popup_id);
+			}
+
+			//Same line
+			ImGui::SameLine();
+
+			//Cancel deleting asset
+			if (ImGui::Button("Cancel")) {
+
+				//Reset scene id buffer
+				scn_id.clear();
 
 				//Close popup
 				closePopUp(popup_id);
@@ -5932,13 +6057,18 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ScenesPanel::saveScene() {
-		std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
 
-		// When user click save scene, grid is saved together
-		tile_panel.lock()->saveGrid(scn_id);
+		if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+			std::filesystem::path scn_id = NIKE_SCENES_SERVICE->getCurrSceneID();
+			// When user click save scene, grid is saved together
+			tile_panel.lock()->saveGrid(scn_id);
 
-		//Save scene
-		NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+			//Save scene
+			NIKE_SERIALIZE_SERVICE->saveSceneToFile(NIKE_ASSETS_SERVICE->getAssetPath(NIKE_SCENES_SERVICE->getCurrSceneID()).string());
+		}
+		else {
+			NIKEE_CORE_INFO("Current SceneID is empty");
+		}
 	}
 
 	void LevelEditor::ScenesPanel::init()
@@ -5949,6 +6079,7 @@ namespace NIKE {
 		registerPopUp("Success", defPopUp("Success", success_msg));
 		registerPopUp("Delete Scene", deleteScenePopup("Delete Scene"));
 		registerPopUp("Create Scene", createScenePopup("Create Scene"));
+		registerPopUp("Save Scene As", saveSceneAsPopup("Save Scene As"));
 		registerPopUp("Edit Layer Bit Mask", editBitMaskPopup("Edit Layer Bit Mask"));
 
 		// Weak ptr ref to tile panel
@@ -5958,6 +6089,9 @@ namespace NIKE {
 	void LevelEditor::ScenesPanel::render()
 	{
 		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
 
 		//Scene ref
 		ImGui::Text("Scene ID: %s", NIKE_SCENES_SERVICE->getCurrSceneID().c_str());
@@ -5977,42 +6111,52 @@ namespace NIKE {
 
 		//Create new scene
 		{
-			if (ImGui::Button("Create Scene")) {
+			if (ImGui::Button("Create New Scene")) {
 				openPopUp("Create Scene");
 			}
 		}
 
-		ImGui::SameLine();
+		if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
 
-		//Delete curr scene
-		{
-			if (ImGui::Button("Delete Scene")) {
-				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
-					openPopUp("Delete Scene");
-				}
-				else {
-					err_msg->assign("No scene attached, unable to delete anything.");
-					openPopUp("Error");
+			ImGui::SameLine();
+
+			//Delete curr scene
+			{
+				if (ImGui::Button("Delete Scene")) {
+					if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+						openPopUp("Delete Scene");
+					}
+					else {
+						err_msg->assign("No scene attached, unable to delete anything.");
+						openPopUp("Error");
+					}
 				}
 			}
-		}
 
-		ImGui::SameLine();
-
-		//Save curr scene
-		{
-			if (ImGui::Button("Save Scene")) {
-				if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
-
-					//Save scene
-					saveScene();
-
-					success_msg->assign("Scene successfully saved.");
-					openPopUp("Success");
+			//Save curr scene as
+			{
+				if (ImGui::Button("Save Scene As")) {
+					openPopUp("Save Scene As");
 				}
-				else {
-					err_msg->assign("No scene attached, create a scene before saving.");
-					openPopUp("Error");
+			}
+
+			ImGui::SameLine();
+
+			//Save curr scene
+			{
+				if (ImGui::Button("Save Curr Scene")) {
+					if (!NIKE_SCENES_SERVICE->getCurrSceneID().empty()) {
+
+						//Save scene
+						saveScene();
+
+						success_msg->assign("Scene successfully saved.");
+						openPopUp("Success");
+					}
+					else {
+						err_msg->assign("No scene attached, create a scene before saving.");
+						openPopUp("Error");
+					}
 				}
 			}
 		}
@@ -6037,7 +6181,7 @@ namespace NIKE {
 
 		// Create layer button
 		if (ImGui::Button("Create Layer")) {
-			if (layer_count < 64) {
+			if (layer_count < Scenes::MAXLAYERS) {
 				Action create_layer_action;
 
 				// Capture the state before adding the new layer
@@ -6372,6 +6516,11 @@ namespace NIKE {
 	}
 
 	bool LevelEditor::GameWindowPanel::isMouseInWindow() const {
+
+		if (!window_is_selected) {
+			return false;
+		}
+
 		//Get window size
 		Vector2i window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
@@ -6411,6 +6560,9 @@ namespace NIKE {
 	{
 		ImGui::Begin(getName().c_str());
 
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
 		//Get Imgui input
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -6435,6 +6587,8 @@ namespace NIKE {
 
 		//World Scale Factor
 		Vector2f scale{ NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().x / (viewport_width / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),  NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize().y / (viewport_height / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
+
+		window_is_selected = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
 
 		//Calculate world mouse position
 		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x, (io.MousePos.y - window_pos.y) * scale.y };

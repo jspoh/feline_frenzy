@@ -46,15 +46,6 @@
                 "y": 0.0
             }
         },
-        "Render::ParticleEmitter": {
-            "duration": -1.0,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0
-            },
-            "preset": 2,
-            "render_type": 1
-        },
         "Render::Texture": {
             "B_Blend": false,
             "B_Flip": {

@@ -11,7 +11,6 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/Render/sRender.h"
-#include "Systems/sysParticle.h"
 
  // !TODO: jspoh reorg
 namespace {
@@ -178,6 +177,12 @@ namespace NIKE {
 		// Shader
 		shader_manager = std::make_unique<Shader::ShaderManager>();
 
+		//Particle manager
+		particle_manager = std::make_unique<SysParticle::Manager>();
+
+		//Video manager
+		video_manager = std::make_unique<VideoPlayer::Manager>();
+
 		if (!shader_manager) {
 			NIKEE_CORE_ERROR("Failed to initialize Shader Manager.");
 			return;
@@ -193,6 +198,14 @@ namespace NIKE {
 
 		//Start counter
 		counter = 0;
+	}
+
+	void Render::Service::bindShader(std::string const& shader_ref) {
+		shader_manager->useShader(shader_ref);
+	}
+
+	void Render::Service::unbindShader() {
+		shader_manager->unuseShader();
 	}
 
 	/*****************************************************************//**
@@ -430,6 +443,95 @@ namespace NIKE {
 		}
 	}
 
+	void Render::Service::renderObject(Matrix_33 const& x_form, Render::Video const& e_video) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+		// !TODO: batched rendering for texture incomplete
+
+		//Render variables
+		const Vector2f framesize{ 1.0f, 1.0f };
+		Vector2f uv_offset{ 1.0f, 1.0f };
+		Vector4f color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		bool blend_mode = false;
+		float intensity = 1.0f;
+
+		const unsigned int tex_hdl = e_video.texture_id;
+
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			//glPolygonMode(GL_FRONT, GL_FILL);			// do not use this, 1280: invalid enum
+
+			// use shader
+			shader_manager->useShader("texture");
+
+			//Texture unit
+			static constexpr int texture_unit = 6;
+
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				tex_hdl
+			);
+
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			//Set uniforms for texture rendering
+			shader_manager->setUniform("texture", "u_tex2d", texture_unit);
+			shader_manager->setUniform("texture", "u_opacity", color.a);
+			shader_manager->setUniform("texture", "u_transform", x_form);
+			shader_manager->setUniform("texture", "uvOffset", uv_offset);
+			shader_manager->setUniform("texture", "frameSize", framesize);
+
+			//Blending options for texture
+			shader_manager->setUniform("texture", "u_color", Vector3f(color.r, color.g, color.b));
+			shader_manager->setUniform("texture", "u_blend",blend_mode);
+			shader_manager->setUniform("texture", "u_intensity", intensity);
+
+			//Flip texture options
+			//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+
+			//Get model
+			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
+
+			//Draw
+			glBindVertexArray(model.vaoid);
+			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_manager->unuseShader();
+		}
+		else {
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.tex = tex_hdl;
+			instance.framesize = framesize;
+			instance.uv_offset = uv_offset;
+			instance.to_blend_color = blend_mode;
+			instance.color = color;
+			instance.blend_intensity = intensity;
+
+			render_instances_texture.push_back(instance);
+
+			// used to track number of unique texture handles
+			// system can only handle max 32 unique texture binding units, hence have to clear texture render instances or not all textures will render properly.
+			curr_instance_unique_tex_hdls.insert(tex_hdl);
+
+			if (render_instances_texture.size() >= MAX_INSTANCES || curr_instance_unique_tex_hdls.size() >= MAX_UNIQUE_TEX_HDLS) {
+				batchRenderTextures();
+			}
+		}
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
 	void Render::Service::renderBoundingBox(Matrix_33 const& x_form, Vector4f const& e_color) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
@@ -608,8 +710,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
-
-		const unsigned int vao = NIKE::SysParticle::Manager::getInstance().getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
+		const unsigned int vao = particle_manager->getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
 		glBindVertexArray(vao);
 
 		err = glGetError();
@@ -625,6 +726,322 @@ namespace NIKE {
 
 		while ((err = glGetError()) != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Render::Service::renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug) {
+
+		//Get transform
+		auto trans_it = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+		if (trans_it == comps.end()) {
+			return;
+		}
+		auto& e_transform = *std::static_pointer_cast<Transform::Transform>(trans_it->second);
+
+		//Camera matrix
+		Matrix_33 cam_ndcx = e_transform.use_screen_pos ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
+
+		//Get Texture
+		auto tex_it = comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
+		if (tex_it != comps.end()) {
+
+			//Texture component
+			auto& e_texture = *std::static_pointer_cast<Render::Texture>(tex_it->second);
+
+			//Check if texture is loaded
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
+
+				//Allow stretching of texture
+				if (!e_texture.b_stretch) {
+					//Copy transform for texture mapping ( Locks the transformation of a texture )
+					Vector2f tex_size{
+						static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x,
+						static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y
+					};
+
+					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+				}
+
+				//Texture render function
+				auto texture_render = [cam_ndcx, e_texture, e_transform]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					// Transform matrix here
+					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
+
+					// Render Texture
+					NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
+					};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(texture_render);
+				}
+				else {
+					world_render_queue.push(texture_render);
+				}
+			}
+		}
+
+		//Get Shape
+		auto shape_it = comps.find(Utility::convertTypeString(typeid(Render::Shape).name()));
+		if (shape_it != comps.end()) {
+
+			//Shape component
+			auto& e_shape = *std::static_pointer_cast<Render::Shape>(shape_it->second);
+
+			//Check if model exists
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
+
+				//Shape render function
+				auto shape_render = [e_shape, e_transform, cam_ndcx]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					// Transform matrix here
+					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+
+					//Render Shape
+					NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
+					};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(shape_render);
+				}
+				else {
+					world_render_queue.push(shape_render);
+				}
+			}
+		}
+
+		//Debug mode rendering
+		if (debug) {
+			// Render debugging bounding box
+			Vector4f bounding_box_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+
+			//Get Collider
+			auto collider_it = comps.find(Utility::convertTypeString(typeid(Physics::Collider).name()));
+			if (collider_it != comps.end()) {
+
+				//Collider comp
+				auto& e_collider = *std::static_pointer_cast<Physics::Collider>(collider_it->second);
+
+				//Change color of bounding box on collision
+				if (e_collider.b_collided) {
+					bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
+				}
+
+				//Shape render function
+				auto collider_render = [e_collider, bounding_box_color, cam_ndcx]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					//Calculate bounding box matrix
+					NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
+					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+					};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(collider_render);
+				}
+				else {
+					world_render_queue.push(collider_render);
+				}
+			}
+			else {
+
+				//Shape render function
+				auto collider_render = [bounding_box_color, e_transform, cam_ndcx]() {
+					//Matrix used for rendering
+					Matrix_33 matrix;
+
+					//Calculate bounding box matrix
+					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+					};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_render_queue.push(collider_render);
+				}
+				else {
+					world_render_queue.push(collider_render);
+				}
+			}
+
+			//Get Dynamics
+			auto dynamics_it = comps.find(Utility::convertTypeString(typeid(Physics::Dynamics).name()));
+			if (dynamics_it != comps.end()) {
+
+				//Collider comp
+				auto& e_dynamics = *std::static_pointer_cast<Physics::Dynamics>(dynamics_it->second);
+
+				if (e_dynamics.velocity.x != 0.0f || e_dynamics.velocity.y != 0.0f) {
+
+					//Shape render function
+					auto dir_render = [e_transform, e_dynamics, cam_ndcx, bounding_box_color]() {
+						//Matrix used for rendering
+						Matrix_33 matrix;
+
+						Transform::Transform dir_transform = e_transform;
+						dir_transform.scale.x = 1.0f;
+						dir_transform.rotation = -atan2(e_dynamics.velocity.x, e_dynamics.velocity.y) * static_cast<float>(180.0f / M_PI);
+						dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
+						NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
+						NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(dir_render);
+					}
+					else {
+						world_render_queue.push(dir_render);
+					}
+				}
+			}
+		}
+
+		//Get Text
+		auto text_it = comps.find(Utility::convertTypeString(typeid(Render::Text).name()));
+		if (text_it != comps.end()) {
+
+			//Text component
+			auto& e_text = *std::static_pointer_cast<Render::Text>(text_it->second);
+
+			//Check if font exists
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
+
+				//Text render function
+				auto text_render = [e_transform, cam_ndcx, &e_text]() {
+
+					//Transform matrix
+					Matrix_33 matrix;
+
+					//Make copy of transform, scale to 1.0f for calculating matrix
+					Transform::Transform copy = e_transform;
+					copy.scale = { 1.0f, 1.0f };
+
+					//Transform text matrix
+					NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, cam_ndcx);
+
+					//Render text
+					NIKE_RENDER_SERVICE->renderText(matrix, e_text);
+					};
+
+				//Check for screen position
+				if (e_transform.use_screen_pos) {
+					screen_text_render_queue.push(text_render);
+				}
+				else {
+					world_text_render_queue.push(text_render);
+				}
+			}
+		}
+
+		//Get particle emitter
+		auto particle_it = comps.find(Utility::convertTypeString(typeid(Render::ParticleEmitter).name()));
+		if (particle_it != comps.end()) {
+
+			//Particle component
+			auto& e_particle = *std::static_pointer_cast<Render::ParticleEmitter>(particle_it->second);
+
+			//Get particle system
+			auto& particle_sys = *e_particle.p_system;
+
+			//Update particle system with updated particle emitter data
+			particle_sys.preset = static_cast<SysParticle::Data::ParticlePresets>(e_particle.preset);
+			particle_sys.origin = e_transform.position + e_particle.offset;
+			particle_sys.duration = e_particle.duration;
+			particle_sys.render_type = static_cast<SysParticle::Data::ParticleRenderType>(e_particle.render_type);
+
+			//Update particle system
+			particle_manager->updateParticleSystem(particle_sys);
+
+			//const unsigned int vao = PM.getVAO(ps.preset);
+			const unsigned int vbo = particle_manager->getVBO(particle_sys.preset);
+
+			//Particles to render
+			auto particles = particle_sys.particles;
+
+			// assume world pos
+			if (particle_sys.using_world_pos) {
+				std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
+					p.pos = worldToScreen(p.pos);
+					});
+			}
+
+			//Bind buffer
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
+			}
+			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(SysParticle::Particle), particles.data());
+			err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
+			}
+			const int num_particles = max(1, static_cast<int>(particles.size()));
+
+			//Particle render function
+			auto particle_render = [num_particles, &particle_sys, ref = e_particle.ref]() {
+
+				NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(particle_sys.preset), particle_sys.origin, static_cast<int>(particle_sys.render_type), num_particles, ref == "mouseps1");
+				};
+
+			//Check for screen position !!!More work to be done here to ensure screen particles are rendered correctly
+			if (e_transform.use_screen_pos) {
+				screen_particle_render_queue.push(particle_render);
+			}
+			else {
+				world_particle_render_queue.push(particle_render);
+			}
+		}
+
+		//Get video
+		auto video_it = comps.find(Utility::convertTypeString(typeid(Render::Video).name()));
+		if (video_it != comps.end()) {
+
+			//Video component
+			auto& e_video = *std::static_pointer_cast<Render::Video>(video_it->second);
+
+			//Check if video exists
+			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_video.video_id)) {
+
+				//Update video player
+				video_manager->update(e_video);
+
+				//Check for valid mpeg
+				if (e_video.mpeg) {
+					
+					//Clamp aspect ratio of texture
+					e_transform.scale = e_video.texture_size.normalized() * e_transform.scale.length();
+
+					//Text render function
+					auto video_render = [e_transform, cam_ndcx, &e_video]() {
+
+						//Transform matrix
+						Matrix_33 matrix;
+
+						//Transform video matrix
+						NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+
+						//Render video
+						NIKE_RENDER_SERVICE->renderObject(matrix, e_video);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(video_render);
+					}
+					else {
+						world_render_queue.push(video_render);
+					}
+				}
+			}
 		}
 	}
 
@@ -887,6 +1304,65 @@ namespace NIKE {
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of batchRenderTextures: {0}", err);
+		}
+	}
+
+	/*****************************************************************//**
+	* RENDER COMPLETION CALL
+	*********************************************************************/
+	void Render::Service::completeRender() {
+
+		//Update particle manager
+		particle_manager->update();
+
+		//Render world elements
+		while (!world_render_queue.empty()) {
+			world_render_queue.front()();
+			world_render_queue.pop();
+		}
+
+		//Batch render
+		if (NIKE_RENDER_SERVICE->BATCHED_RENDERING) {
+			NIKE_RENDER_SERVICE->batchRenderTextures();
+			NIKE_RENDER_SERVICE->batchRenderObject();
+			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
+		}
+
+		//Render world text elements
+		while (!world_text_render_queue.empty()) {
+			world_text_render_queue.front()();
+			world_text_render_queue.pop();
+		}
+
+		//Render world particle elements
+		while (!world_particle_render_queue.empty()) {
+			world_particle_render_queue.front()();
+			world_particle_render_queue.pop();
+		}
+
+		//Render screen elements
+		while (!screen_render_queue.empty()) {
+			screen_render_queue.front()();
+			screen_render_queue.pop();
+		}
+
+		//Batch render
+		if (NIKE_RENDER_SERVICE->BATCHED_RENDERING) {
+			NIKE_RENDER_SERVICE->batchRenderTextures();
+			NIKE_RENDER_SERVICE->batchRenderObject();
+			NIKE_RENDER_SERVICE->batchRenderBoundingBoxes();
+		}
+
+		//Render screen text elements
+		while (!screen_text_render_queue.empty()) {
+			screen_text_render_queue.front()();
+			screen_text_render_queue.pop();
+		}
+
+		//Render screen particle elements
+		while (!screen_particle_render_queue.empty()) {
+			screen_particle_render_queue.front()();
+			screen_particle_render_queue.pop();
 		}
 	}
 }

@@ -66,5 +66,8 @@
             "Screen Position": false
         }
     },
-    "Layer ID": 0
+    "MetaData": {
+        "Layer ID": 0,
+        "Tags": []
+    }
 }

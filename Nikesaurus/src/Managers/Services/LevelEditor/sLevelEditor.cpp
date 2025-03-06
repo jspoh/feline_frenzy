@@ -165,7 +165,7 @@ namespace NIKE {
 			auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
 
 			//Check if current mouse pos is within game window
-			if (!game_panel->isMouseInWindow() || game_panel->checkPopUpShowing()) {
+			if (!getGameState() || !game_panel->isMouseInWindow() || game_panel->checkPopUpShowing()) {
 				event->setEventProcessed(true);
 			}
 		}
@@ -246,9 +246,10 @@ namespace NIKE {
 
 	void LevelEditor::Service::updateShortCuts() {
 		ImGuiIO& io = ImGui::GetIO();
+		auto game_panel = std::dynamic_pointer_cast<GameWindowPanel>(panels_map.at(GameWindowPanel::getStaticName()));
 
 		//Toggle Level Editor On & Off ( Use Global NIKE input to toggle on and off )
-		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB)) {
+		if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_TAB) && game_panel->isMouseInWindow()) {
 
 			//Toggle editor mode
 			b_editor_active = !b_editor_active;
@@ -517,6 +518,10 @@ namespace NIKE {
 
 	void LevelEditor::Service::executeAction(Action&& action) {
 		action_manager->executeAction(std::move(action));
+	}
+
+	std::unordered_map<std::string, std::function<void(LevelEditor::ComponentsPanel&, void*)>>& LevelEditor::Service::getComponentsUI() {
+		return std::dynamic_pointer_cast<LevelEditor::ComponentsPanel> (panels_map.at(LevelEditor::ComponentsPanel::getStaticName()))->getCompsUI();
 	}
 
 	void LevelEditor::Service::deserializeConfig(nlohmann::json const& config) {

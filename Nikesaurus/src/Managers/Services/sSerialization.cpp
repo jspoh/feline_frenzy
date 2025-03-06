@@ -9,7 +9,6 @@
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/sSerialization.h"
-#include "Systems/sysParticle.h"
 
 namespace NIKE {
 	/*****************************************************************//**
@@ -34,6 +33,22 @@ namespace NIKE {
 	/*****************************************************************//**
 	* Serialization Services
 	*********************************************************************/
+
+	nlohmann::json Serialization::Service::serializeComponent(std::string const& comp_name, const void* comp) const {
+		return comp_registry->serializeComponent(comp_name, comp);
+	}
+
+	void Serialization::Service::deserializeComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const {
+		comp_registry->deserializeComponent(comp_name, comp, data);
+	}
+
+	nlohmann::json Serialization::Service::serializeOverrideComponent(std::string const& comp_name, const void* comp, const void* other_comp) const {
+		return comp_registry->serializeOverrideComponent(comp_name, comp, other_comp);
+	}
+
+	void Serialization::Service::deserializeOverrideComponent(std::string const& comp_name, void* comp, nlohmann::json const& data) const {
+		comp_registry->deserializeOverrideComponent(comp_name, comp, data);
+	}
 
 	std::unordered_map<std::string, std::function<std::shared_ptr<void>()>>const& Serialization::Service::getCompFuncs() const {
 		return comp_funcs;
@@ -293,6 +308,12 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadEntityFromFile(Entity::Type entity, std::string const& file_path) {
+		//Prefab check
+		if (std::filesystem::path(file_path).extension().string() == "prefab") {
+			NIKEE_CORE_WARN("Use load entity from prefab instead!");
+			return;
+		}
+
 		//Json Data
 		nlohmann::json data;
 
@@ -322,6 +343,13 @@ namespace NIKE {
 	}
 
 	void Serialization::Service::loadEntityFromPrefab(Entity::Type entity, std::string const& prefab_id) {
+
+		//Prefab check
+		if (prefab_id.find(".prefab") == std::string::npos) {
+			NIKEE_CORE_WARN("Not a valid prefab id!");
+			return;
+		}
+
 		//Json Data
 		nlohmann::json data;
 

@@ -4,16 +4,9 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 106,
-            "Frame_Duration": 0.054999999701976776,
-            "Mode": 0,
-            "Timer": 0.03333333507180214
+            "Frame_Duration": 0.054999999701976776
         },
         "Animation::Sprite": {
-            "Curr_Index": {
-                "x": 0,
-                "y": 0
-            },
             "End_Index": {
                 "x": 9,
                 "y": 3
@@ -53,7 +46,7 @@
             "Layer": 1,
             "Offset": 100.0,
             "PrefabPath": "bullet.prefab",
-            "Range": 10.0,
+            "Range": 3.0,
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
@@ -113,7 +106,7 @@
             "Texture_ID": "Elite_Enemy_Grass_SpriteSheet.png"
         },
         "State::State": {
-            "State": "Idle"
+            "State": "Default"
         },
         "Transform::Transform": {
             "Position": {
@@ -129,7 +122,7 @@
         }
     },
     "MetaData": {
-        "Layer ID": 1,
+        "Layer ID": 0,
         "Tags": []
     }
 }

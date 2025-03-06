@@ -44,6 +44,11 @@ namespace NIKE {
 
 			//Map of popups
 			std::unordered_map<std::string, PopUp> popups;
+
+		protected:
+
+			//Panel dock ID
+			unsigned int dock_id = 0;
 			
 		public:
 			virtual ~IPanel() = default;
@@ -75,10 +80,14 @@ namespace NIKE {
 			//Check if popup is showing
 			static bool checkPopUpShowing();
 
+			//Get panel dock ID
+			virtual unsigned int getDockID();
+
 			//Default Popup
 			std::function<void()> defPopUp(std::string const& id, std::shared_ptr<std::string> msg);
 
 			#ifdef NIKE_BUILD_DLL
+
 			//World to screen
 			ImVec2 worldToScreen(ImVec2 const& pos, ImVec2 const& render_size, bool use_screen_pos=false);
 
@@ -426,6 +435,9 @@ namespace NIKE {
 			// Reference to entities panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
 
+			//Reference to main panel
+			std::weak_ptr<GameWindowPanel> game_panel;
+
 			//Prefab layer ID
 			MetaData::EntityData meta_data;
 
@@ -484,8 +496,25 @@ namespace NIKE {
 		};
 
 		//Debug Management Panel
-		class DebugPanel : public IPanel {
+		class DebugPanel : public IPanel, public std::streambuf {
 		private:
+
+			//Log input
+			std::string currentLine;
+
+		protected:
+
+			//Old streams
+			std::streambuf* oldcout = nullptr;
+			std::streambuf* oldcerr = nullptr;
+
+			//Logs
+			std::vector<std::string> console_logs;
+			std::mutex buff_mutex;
+
+			//Stream
+			int overflow(int c) override;
+
 		public:
 			DebugPanel() = default;
 			~DebugPanel() = default;
@@ -505,6 +534,12 @@ namespace NIKE {
 
 			//Render
 			void render() override;
+
+			//Bind to editor
+			void coutToEditor();
+
+			//Restore cout
+			void restoreCout();
 		};
 
 		//Audio Management Panel
@@ -824,6 +859,9 @@ namespace NIKE {
 			//Delete scene popup
 			std::function<void()> deleteScenePopup(std::string const& popup_id);
 
+			//Save scene as
+			std::function<void()> saveSceneAsPopup(std::string const& popup_id);
+
 			//Edit Mask popup
 			std::function<void()> editBitMaskPopup(std::string const& popup_id);
 
@@ -881,6 +919,9 @@ namespace NIKE {
 
 			//Render accept payload
 			void renderAcceptPayload();
+
+			//Window selected
+			bool window_is_selected;
 
 		public:
 			GameWindowPanel() = default;

@@ -36,6 +36,15 @@ namespace NIKE {
 			RELEASED
 		};
 
+		inline const char* inputStateToString(InputStates state) {
+			switch (state) {
+			case InputStates::PRESSED:   return "Pressed";
+			case InputStates::TRIGGERED: return "Triggered";
+			case InputStates::RELEASED:  return "Released";
+			default: return "Unknown";
+			}
+		}
+
 		//UI Data Structure
 		struct UIBtn {
 			Entity::Type entity_id;
@@ -121,10 +130,10 @@ namespace NIKE {
 			~Service() = default;
 
 			//Create Shaped button
-			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape);
+			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape, Animation::Sprite&& sprite = Animation::Sprite());
 
 			//Create texture button
-			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture);
+			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture, Animation::Sprite&& sprite = Animation::Sprite());
 
 			//Destroy button
 			void destroyButton(std::string const& btn_id);

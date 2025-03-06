@@ -13,8 +13,16 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sEvents.h"
+#include "Managers/Services/sAudio.h"
 
 namespace NIKE {
+
+	namespace SysParticle {
+		struct ParticleSystem;
+		class Data;
+		class Manager;
+	}
+
 	namespace Render {
 		enum class CamPosition {
 			UP = 0,
@@ -102,21 +110,15 @@ namespace NIKE {
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
 
-		struct Hidden {
-		};
-
-		/**
-		 * built in components will not be saved to scene files.
-		 */
-		struct BuiltIn {
-		};
-
 		struct ParticleEmitter {
 			Vector2f offset{};		// offset from entity position
 			int render_type{};	// ParticleRenderType type
 			int preset{};			// ParticlePresets type
 			std::string ref{};		// reference to particle system
 			float duration{};		// -1 for infinite
+
+			//Particle system
+			std::shared_ptr<SysParticle::ParticleSystem> p_system;
 
 			// particle
 			int num_new_particles_per_second{10};
@@ -138,6 +140,35 @@ namespace NIKE {
 			bool particle_color_changes_over_time{false};
 			Vector4f particle_final_color{};
 			float particle_rotation_speed{};		// in degrees (anticlockwise) per second !NOTE: rmb to convert to radians lol
+
+			ParticleEmitter();
+		};
+		struct Video {
+
+			//Video ID
+			std::string video_id;
+
+			//Mpeg object
+			plm_t* mpeg;
+			uint8_t* rgb_data;
+			bool b_init;
+
+			//Texture ID
+			unsigned int texture_id;
+			Vector2f texture_size;
+
+			//Audio
+			std::shared_ptr<Audio::IAudio> audio;
+			std::shared_ptr<Audio::IChannel> channel;
+			static std::shared_ptr<Audio::IChannelGroup> channel_group;
+
+			//Video variables
+			bool b_is_playing;
+
+			//Video update timer
+			float timer;
+
+			Video() : video_id{ "" }, mpeg{ nullptr }, rgb_data{ nullptr }, b_init { true }, texture_id{ 0 }, texture_size(), b_is_playing{ false }, timer{ 0.0f } {}
 		};
 
 		void registerComponents();

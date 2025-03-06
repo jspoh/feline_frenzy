@@ -47,6 +47,9 @@ namespace NIKE {
 		case Types::Script:
 			return "Script";
 			break;
+		case Types::Video:
+			return "Video";
+			break;
 		default:
 			return "Unknown";
 			break;
@@ -65,6 +68,7 @@ namespace NIKE {
 		asset_types[Types::Music].set(Modes::Loadable, true);
 		asset_types[Types::Sound].set(Modes::Loadable, true);
 		asset_types[Types::Script].set(Modes::Loadable, true);
+		asset_types[Types::Video].set(Modes::Loadable, true);
 
 		//Set executables
 		asset_types[Types::Scene].set(Modes::Executable, true);
@@ -91,6 +95,9 @@ namespace NIKE {
 
 		//Audio extension
 		addValidExtensions(".wav");
+
+		//Video extension
+		addValidExtensions(".mpg");
 
 		//Other extension
 		addValidExtensions(".prefab");
@@ -341,6 +348,9 @@ namespace NIKE {
 		}
 		else if (ext == ".lua") {
 			return Assets::Types::Script;
+		}
+		else if (ext == ".mpg") {
+			return Assets::Types::Video;
 		}
 		else {
 			return Assets::Types::None;
@@ -644,6 +654,11 @@ namespace NIKE {
 				switch (asset_data.second.type) {
 				case Assets::Types::Prefab: {
 
+					//Create maximum number of layers
+					while (NIKE_SCENES_SERVICE->getLayerCount() < Scenes::MAXLAYERS) {
+						NIKE_SCENES_SERVICE->createLayer();
+					}
+
 					//Create tempe entity
 					auto temp = NIKE_ECS_MANAGER->createEntity();
 
@@ -651,7 +666,8 @@ namespace NIKE {
 					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(temp, asset_data.first);
 
 					//Serialize
-					NIKE_SERIALIZE_SERVICE->savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(temp), asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(temp).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(temp).value() : NIKE::MetaData::EntityData());
+					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(temp);
+					NIKE_SERIALIZE_SERVICE->savePrefab(comps, asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(temp).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(temp).value() : NIKE::MetaData::EntityData());
 
 					break;
 				}

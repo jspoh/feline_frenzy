@@ -87,7 +87,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 1,
                             "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -102,16 +102,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 325,
-                                "Frame_Duration": 0.30000001192092896,
-                                "Mode": 0,
-                                "Timer": 0.23333333432674408
+                                "Frame_Duration": 0.30000001192092896
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 3,
                                     "y": 1
@@ -165,7 +158,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 2,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -180,16 +173,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 325,
-                                "Frame_Duration": 0.30000001192092896,
-                                "Mode": 0,
-                                "Timer": 0.23333333432674408
+                                "Frame_Duration": 0.30000001192092896
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 3,
                                     "y": 1
@@ -243,7 +229,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 3,
                             "Name": "entity_0003",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -258,16 +244,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 325,
-                                "Frame_Duration": 0.30000001192092896,
-                                "Mode": 0,
-                                "Timer": 0.23333333432674408
+                                "Frame_Duration": 0.30000001192092896
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 3,
                                     "y": 1
@@ -321,7 +300,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 4,
                             "Name": "entity_0004",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -336,16 +315,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 325,
-                                "Frame_Duration": 0.30000001192092896,
-                                "Mode": 0,
-                                "Timer": 0.23333333432674408
+                                "Frame_Duration": 0.30000001192092896
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 3,
                                     "y": 1
@@ -399,7 +371,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 5,
                             "Name": "entity_0005",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -450,7 +422,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 6,
                             "Name": "entity_0006",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -501,7 +473,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 7,
                             "Name": "entity_0007",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -552,7 +524,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 8,
                             "Name": "entity_0008",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -603,7 +575,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 9,
                             "Name": "entity_0009",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -654,7 +626,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 10,
                             "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -705,7 +677,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 11,
                             "Name": "entity_0011",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -756,7 +728,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 12,
                             "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -807,7 +779,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 13,
                             "Name": "entity_0013",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -858,7 +830,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 14,
                             "Name": "entity_0014",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -909,7 +881,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 15,
                             "Name": "entity_0015",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -960,7 +932,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 16,
                             "Name": "entity_0016",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1011,7 +983,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 17,
                             "Name": "entity_0017",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1062,7 +1034,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 18,
                             "Name": "entity_0018",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1113,7 +1085,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 19,
                             "Name": "entity_0019",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1164,7 +1136,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 20,
                             "Name": "entity_0020",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1215,7 +1187,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 21,
                             "Name": "entity_0021",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1259,7 +1231,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 22,
                             "Name": "entity_0022",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1303,7 +1275,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 23,
                             "Name": "entity_0023",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1360,7 +1332,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 24,
                             "Name": "entity_0024",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1404,7 +1376,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 25,
                             "Name": "entity_0025",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1419,16 +1391,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 3,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.03333333507180214
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 2,
-                                    "y": 1
-                                },
                                 "End_Index": {
                                     "x": 5,
                                     "y": 1
@@ -1536,7 +1501,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 26,
                             "Name": "entity_0026",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1551,16 +1516,9 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Completed_Animations": 2,
-                                "Frame_Duration": 0.054999999701976776,
-                                "Mode": 0,
-                                "Timer": 0.01666666753590107
+                                "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
-                                "Curr_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
                                 "End_Index": {
                                     "x": 9,
                                     "y": 0
@@ -1668,7 +1626,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 27,
                             "Name": "entity_0027",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1773,7 +1731,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 28,
                             "Name": "entity_0028",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1878,7 +1836,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 29,
                             "Name": "entity_0029",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1983,7 +1941,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 30,
                             "Name": "entity_0030",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2054,7 +2012,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 31,
                             "Name": "entity_0031",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2125,7 +2083,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 32,
                             "Name": "entity_0032",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2196,7 +2154,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 33,
                             "Name": "entity_0033",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2247,7 +2205,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 34,
                             "Name": "entity_0034",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2315,7 +2273,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 35,
                             "Name": "entity_0035",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2383,7 +2341,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 36,
                             "Name": "entity_0036",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2451,7 +2409,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 37,
                             "Name": "entity_0037",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2519,7 +2477,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 38,
                             "Name": "entity_0038",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2587,7 +2545,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 39,
                             "Name": "entity_0039",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2638,7 +2596,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 0,
+                            "Layer_Order": 40,
                             "Name": "entity_0040",
                             "Prefab_ID": "",
                             "Prefab_Override": null,

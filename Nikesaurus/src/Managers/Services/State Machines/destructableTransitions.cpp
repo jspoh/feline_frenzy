@@ -17,19 +17,30 @@
 
 namespace NIKE {
 
-	bool Transition::IdleToDestructableDeathState::isValid(Entity::Type& entity) const {
-		const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-		if (target_health_comp.has_value())
-		{
-			if (target_health_comp.value().get().lives <= 0) {
-				return true;
-			}
-		}
-		return false;
-	}
+    bool Transition::DefaultToDestructableDeath::isValid(Entity::Type& entity) const {
+        const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+        
+        // Checks
+        if (!target_health_comp.has_value()) {
+            return false;
+        }
+
+        const auto& health = target_health_comp.value().get();
+        if (health.lives > 0) {
+            return false;
+        }
+
+        const auto& tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
+        if (tags.find("objects") != tags.end() && health.lives <= 0) {
+            return true;
+        }
+
+        return false;
+    }
 
 
-	std::shared_ptr<StateMachine::Istate> NIKE::Transition::IdleToDestructableDeathState::getNextState() const
+
+	std::shared_ptr<StateMachine::Istate> NIKE::Transition::DefaultToDestructableDeath::getNextState() const
 	{
 		return NIKE_FSM_SERVICE->getStateByID<State::DestructableDeathState>("DestructableDeath");
 	}

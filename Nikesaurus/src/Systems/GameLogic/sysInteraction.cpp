@@ -36,7 +36,6 @@ namespace NIKE {
                     if (entities.find(entity) == entities.end()) continue;
 
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
-
                         // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {
@@ -103,46 +102,6 @@ namespace NIKE {
                 //stop sfx
                 if (!play_or_no) {
                     group->stop();
-                }
-            }
-        }
-
-        void animationHurtStart(Entity::Type& entity, int start_x, int start_y)
-        {
-            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-            if (e_animate_comp.has_value()) {
-                static Vector2i prev_start = e_animate_comp.value().get().start_index;
-
-                if (prev_start != Vector2i(start_x, start_y)) {
-                    e_animate_comp.value().get().start_index.x = start_x;
-                    e_animate_comp.value().get().start_index.y = start_y;
-                    prev_start = e_animate_comp.value().get().start_index;
-
-                    //Restart animation
-                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-                    if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-                    }
-                }
-            }
-        }
-
-        void animationHurtEnd(Entity::Type& entity, int end_x, int end_y)
-        {
-            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-            if (e_animate_comp.has_value()) {
-                static Vector2i prev_end = e_animate_comp.value().get().end_index;
-
-                if (prev_end != Vector2i(end_x, end_y)) {
-                    e_animate_comp.value().get().end_index.x = end_x;
-                    e_animate_comp.value().get().end_index.y = end_y;
-                    prev_end = e_animate_comp.value().get().end_index;
-
-                    //Restart animation
-                    auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-                    if (e_base_comp.has_value()) {
-                        e_base_comp.value().get().animation_mode = Animation::Mode::RESTART;
-                    }
                 }
             }
         }
@@ -289,8 +248,6 @@ namespace NIKE {
             auto& target_health = target_health_comp.value().get().health;
             const auto& target_max_health = target_health_comp.value().get().max_health;
 
-
-
             // Heal Target
             // (The check might be redundant now as there is another check in sysCollision)
             if (target_health < target_max_health) {
@@ -314,55 +271,80 @@ namespace NIKE {
             auto& target_health = target_health_comp.value().get();
             auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
+            // Check if target is in HurtState
+            //auto state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(target);
+            //if (state_comp.has_value()) {
+            //    auto& state = state_comp.value().get();
+            //    auto current_state = state.current_state.lock();
+
+            //    // If entity is already in HurtState, skip damage application
+            //    if (current_state == NIKE_FSM_SERVICE->getStateByID("EnemyHurt")) {
+            //        return;  // Skip applying damage if in HurtState
+            //    }
+            //}
+
             // Check invulnerability flag
             if (target_health.invulnerable_flag) {
                 return; // Skip damage
+            }
+
+            // When target minus, boolean here will set to true
+            if (!target_health.taken_damage)
+            {
+                target_health.taken_damage = true;
             }
 
             // Default dmg multiplier
             float multiplier = 1.f;
 
             // Apply elemental damage multiplier
-            if (attacker_element_comp && target_element_comp) {
+            if (attacker_element_comp) {
                 const auto attacker_element = attacker_element_comp.value().get().element;
-                const auto target_element = target_element_comp.value().get().element;
 
-                multiplier = getElementMultiplier(attacker_element, target_element);
+                if (target_element_comp) {
+                    const auto target_element = target_element_comp.value().get().element;
+
+                    // Set multiplier
+                    multiplier = Element::getElementMultiplier(attacker_element, target_element);
+                }
+
+                // If damage dealer has element comp & target has combo comp
+                const auto target_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(target);
+                if (target_combo_comp) {
+                    // Update combo component
+                    target_combo_comp.value().get().registerHit(attacker_element);
+                }
             }
 
             // Apply damage
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
-            target_health.taken_damage = true;
-            // Play SFX when apply damage (currently hardcoded)
-            //playSFX(target, true); // Specific for taking damage and changes component
-            playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
-            // Play animation when taken damage
-            static float deathAnimationTimer = 0.0f;
-            static const float deathAnimationDuration = 1.5f;
-            // Handle death animation
-            animationHurtStart(target, 0, 12);
-            flipX(target, false);
 
-            // Slow down transition from frame 0 to frame 1
-            deathAnimationTimer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+            //Apply hurt animation
+            auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
+            auto sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(target);
+            if (base_comp.has_value() && sprite_comp.has_value()) {
+                auto& base = base_comp.value().get();
+                auto& sprite = sprite_comp.value().get();
 
-            // If timer reaches the desired duration, proceed to frame 1
-            if (deathAnimationTimer >= deathAnimationDuration) {
-                animationHurtEnd(target, 1, 12);
-                // Reset timer
-                deathAnimationTimer = 0.0f;
+                //Set base
+                base.animations_to_complete = 3;
+                base.animation_mode = Animation::Mode::RESTART;
+
+                //Set sprite
+                sprite.start_index = { 0, 12 };
+                sprite.end_index = { 1, 12 };
+                sprite.curr_index = sprite.start_index;
             }
 
-
-			// Check if target health drops to zero or below
-			if (target_health.health <= 0) {
-				// Target has more than 1 life
-				--target_health.lives;
-				target_health.health = target_health.max_health;
-				NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
-			}
+            // Check if target health drops to zero or below
+            if (target_health.health <= 0) {
+                // Target has more than 1 life
+                --target_health.lives;
+                target_health.health = target_health.max_health;
+                NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+            }
         }
 
         void changeElement(Entity::Type player, Entity::Type source) {
@@ -386,9 +368,6 @@ namespace NIKE {
             }
         }
 
-        float getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
-            return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
-        }
 
         bool withinRange(Entity::Type source, Entity::Type player) {
             // Get player transform

@@ -129,8 +129,6 @@ namespace NIKE {
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_pos));
 					}
-
-					ImGui::Checkbox("Screen Position", &comp.use_screen_pos);
 				}
 
 				//Edit Scale
@@ -196,6 +194,8 @@ namespace NIKE {
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_rotation));
 					}
 				}
+
+				ImGui::Checkbox("Fixed To Screen Position##", &comp.use_screen_pos);
 			}
 		);
 #endif

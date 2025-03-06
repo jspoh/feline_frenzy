@@ -106,20 +106,37 @@ namespace NIKE {
 							});
 
 						// Find the index of the currently selected script id in the list
-						int script_func_index = -1;
+						int start_func_index = -1;
 						for (size_t i = 0; i < funcs.size(); ++i) {
-							if (comp.script.function == funcs[i]) {
-								script_func_index = static_cast<int>(i);
+							if (comp.script.start_function == funcs[i]) {
+								start_func_index = static_cast<int>(i);
+								break;
+							}
+						}
+						// Display combo box for script start function selection
+						ImGui::Text("Script Start Function: ");
+						if (ImGui::Combo("##CompScriptStartFunc", &start_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+							// Validate the selected index and set the new start function
+							if (start_func_index >= 0 && start_func_index < static_cast<int>(funcs.size())) {
+								comp.script.start_function = funcs[start_func_index];
+							}
+						}
+
+				// Find the index of the currently selected update function in the list
+						int update_func_index = -1;
+						for (size_t i = 0; i < funcs.size(); ++i) {
+							if (comp.script.update_function == funcs[i]) {
+								update_func_index = static_cast<int>(i);
 								break;
 							}
 						}
 
-						//Display combo box for script function selection
-						ImGui::Text("Component Script Function: ");
-						if (ImGui::Combo("##CompScriptFunc", &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
-							// Validate the selected index and get the new font ID
-							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
-								comp.script.function = funcs[script_func_index];
+						// Display combo box for script update function selection
+						ImGui::Text("Script Update Function: ");
+						if (ImGui::Combo("##CompScriptUpdateFunc", &update_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+							// Validate the selected index and set the new update function
+							if (update_func_index >= 0 && update_func_index < static_cast<int>(funcs.size())) {
+								comp.script.update_function = funcs[update_func_index];
 							}
 						}
 					}
@@ -252,7 +269,7 @@ namespace NIKE {
 
 
 					// Show the extracted function input
-					ImGui::Text("Function: %s", comp.script.function.c_str());
+					ImGui::Text("Function: %s", comp.script.update_function.c_str());
 				}
 			}
 		);

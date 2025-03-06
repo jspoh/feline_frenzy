@@ -17,10 +17,29 @@
 
 namespace NIKE {
 	namespace State {
-		class IdleState : public StateMachine::Istate
+
+		class DefaultState : public StateMachine::Istate
 		{
 		public:
-			IdleState();
+			DefaultState();
+
+			void onEnter(Entity::Type& entity) override;
+			void onUpdate(Entity::Type& entity) override;
+			void onExit(Entity::Type& entity) override;
+
+			/***********************
+			* SFX handling
+			************************/
+			void playSFX(Entity::Type& entity, bool play_or_no) override;
+
+		private:
+
+		};
+
+		class EnemyIdleState : public StateMachine::Istate
+		{
+		public:
+			EnemyIdleState();
 
 			void onEnter(Entity::Type& entity) override;
 			void onUpdate(Entity::Type& entity) override;
@@ -55,7 +74,6 @@ namespace NIKE {
 
 		private:
 			void updateEnemyAttackAnimation(Entity::Type& entity);
-			void updateEnemyHurtAnimation(Entity::Type& entity);
 		};
 
 		class EnemyChaseState : public StateMachine::Istate
@@ -78,7 +96,6 @@ namespace NIKE {
 			float enemy_speed;
 
 			void updateEnemyChaseAnimation(Entity::Type& entity, float& dir);
-			void updateEnemyHurtAnimation(Entity::Type& entity);
 
 		};
 
@@ -99,6 +116,25 @@ namespace NIKE {
 		private:
 
 		};
+
+
+		//class EnemyHurtState : public StateMachine::Istate
+		//{
+		//public:
+		//	EnemyHurtState();
+
+		//	void onEnter(Entity::Type& entity) override;
+		//	void onUpdate(Entity::Type& entity) override;
+		//	void onExit(Entity::Type& entity) override;
+
+		//	/***********************
+		//	* SFX handling
+		//	************************/
+		//	void playSFX(Entity::Type& entity, bool play_or_no) override;
+
+		//private:
+
+		//};
 	}
 }
 

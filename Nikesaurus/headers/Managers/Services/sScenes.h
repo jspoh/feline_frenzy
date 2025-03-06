@@ -20,13 +20,15 @@ namespace NIKE {
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
 
+		const int MAXLAYERS = 64;
+
 		//Forward declaration of Scene service for friending layer
 		class Service;
 
 		//Layer class
 		class NIKE_API Layer {
 		public:
-			using LayerMask = std::bitset<64>;
+			using LayerMask = std::bitset<MAXLAYERS>;
 		private:
 			
 			//Friend of layer class
@@ -40,6 +42,9 @@ namespace NIKE {
 
 			//Layer state
 			bool b_state;
+
+			//Y Sorting on layer
+			bool b_ysort;
 
 			//Vector of entity in order
 			std::vector<Entity::Type> entities;
@@ -55,6 +60,12 @@ namespace NIKE {
 
 			//Get layer state
 			bool getLayerState() const;
+
+			//Set Y Sort state
+			void setLayerYSort(bool y_sort_state);
+
+			//Get Y Sort state
+			bool getLayerYSort() const;
 
 			//Set layer mask
 			void setLayerMask(unsigned int mask_id, bool state);
@@ -73,6 +84,9 @@ namespace NIKE {
 
 			//Sort entities
 			void sortEntitiesBasedOnMetaData();
+
+			//Sort entities Y
+			void sortEntitiesBasedOnYPosition();
 
 			//Set entity order in layer
 			void setEntityOrder(Entity::Type entity, size_t order_in_layer);

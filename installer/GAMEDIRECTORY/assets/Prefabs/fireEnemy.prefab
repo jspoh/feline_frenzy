@@ -4,18 +4,11 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Completed_Animations": 106,
-            "Frame_Duration": 0.054999999701976776,
-            "Mode": 0,
-            "Timer": 0.03333333507180214
+            "Frame_Duration": 0.054999999701976776
         },
         "Animation::Sprite": {
-            "Curr_Index": {
-                "x": 0,
-                "y": 0
-            },
             "End_Index": {
-                "x": 9,
+                "x": 4,
                 "y": 3
             },
             "Sheet_Size": {
@@ -53,7 +46,7 @@
             "Layer": 1,
             "Offset": 100.0,
             "PrefabPath": "bullet.prefab",
-            "Range": 10.0,
+            "Range": 3.0,
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"

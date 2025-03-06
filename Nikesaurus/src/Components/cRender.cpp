@@ -11,9 +11,18 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Components/cRender.h"
-#include "Systems/sysParticle.h"
+#include "Managers/Services/Render/sParticle.h"
 
 namespace NIKE {
+
+	//Construct particle emitter
+	Render::ParticleEmitter::ParticleEmitter() : offset{ 0.f, 0.f }, render_type{ 0 }, preset{ 0 }, ref{ "" }, duration{ -1.f } {
+		p_system = std::make_shared<SysParticle::ParticleSystem>();
+	}
+
+	//Definition for video component static channel group
+	std::shared_ptr<Audio::IChannelGroup> Render::Video::channel_group = nullptr;
+
 	void Render::registerComponents() {
 
 		//Register render components
@@ -21,9 +30,8 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Text>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Hidden>();
-		NIKE_ECS_MANAGER->registerComponent<Render::BuiltIn>();
 		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Video>();
 
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
 			//Serialize
@@ -58,13 +66,22 @@ namespace NIKE {
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
-				const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				comp.preset = static_cast<int>(data.at("preset").get<int>());
 				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
-				comp.ref = particle_emitter_ref;
+
+				//Initialize particle system
+				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
+				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
+				comp.p_system->is_alive = true;
+				comp.p_system->duration = comp.duration;
+				comp.p_system->time_alive = 0.f;
+				comp.p_system->using_world_pos = true; // Temporary set to true
+				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
 
 				comp.num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
 				comp.particle_lifespan = data.at("particle_lifespan").get<float>();
@@ -178,7 +195,7 @@ namespace NIKE {
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
-				const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
+				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				if (delta.contains("preset")) {
 					comp.preset = delta["preset"];
@@ -192,7 +209,6 @@ namespace NIKE {
 				if (delta.contains("duration")) {
 					comp.duration = delta["duration"];
 				}
-				comp.ref = particle_emitter_ref;
 
 				if (delta.contains("num_new_particles_per_second")) {
 					comp.num_new_particles_per_second = delta["num_new_particles_per_second"];
@@ -415,7 +431,7 @@ namespace NIKE {
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Shape>();
 
-		//Register shape for serialization
+		//Register texture for serialization
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Texture>(
 			//Serialize
 			[](Render::Texture const& comp) -> nlohmann::json {
@@ -505,6 +521,41 @@ namespace NIKE {
 		);
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Texture>();
+
+		//Register texture for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Video>(
+			//Serialize
+			[](Render::Video const& comp) -> nlohmann::json {
+				return	{
+						{ "Video_ID", comp.video_id },
+				};
+			},
+
+			//Deserialize
+			[](Render::Video& comp, nlohmann::json const& data) {
+				comp.video_id = data.value("Video_ID", "");
+			},
+
+			// Override Serialize
+			[](Render::Video const& comp, Render::Video const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+
+				if (comp.video_id != other_comp.video_id) {
+					delta["Video_ID"] = comp.video_id;
+				}
+
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Render::Video& comp, nlohmann::json const& delta) {
+				if (delta.contains("Video_ID")) {
+					comp.video_id = delta["Video_ID"];
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Video>();
 	}
 
 	void Render::registerEditorComponents() {
@@ -555,11 +606,17 @@ namespace NIKE {
 							// Store the value before the change
 							change_preset.do_action = [&, preset = selected_preset]() {
 								comp.preset = preset;
+								
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 
 							// Store the undo action
 							change_preset.undo_action = [&, preset = previous_preset]() {
 								comp.preset = preset;
+
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 
 							// Execute the action
@@ -585,10 +642,16 @@ namespace NIKE {
 							// Store the value before the change
 							change_render_type.do_action = [&, render_type = selected_render_type]() {
 								comp.render_type = render_type;
+
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 							// Store the undo action
 							change_render_type.undo_action = [&, render_type = previous_render_type]() {
 								comp.render_type = render_type;
+
+								//Clear all particles
+								comp.p_system->particles.clear();
 								};
 							// Execute the action
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
@@ -1299,9 +1362,11 @@ namespace NIKE {
 
 					// Display combo box for texture selection
 					if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+
 						// Validate the selected index and get the new texture
 						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
 							std::string new_texture = all_loaded_textures[current_index];
+
 							if (new_texture != comp.texture_id) {
 								// Save action
 								LevelEditor::Action change_font_action;
@@ -1321,6 +1386,33 @@ namespace NIKE {
 								previous_texture = new_texture;
 							}
 						}
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select a texture or drag & drop a texture file.");
+					}
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+							const char* dropped_file = static_cast<const char*>(payload->Data);
+							if (dropped_file) {
+								std::string new_texture = dropped_file;
+
+								// Ensure it's a valid texture format
+								
+									LevelEditor::Action change_texture_action;
+									change_texture_action.do_action = [&, texture_id = new_texture]() {
+										comp.texture_id = texture_id;
+										};
+
+									change_texture_action.undo_action = [&, texture_id = previous_texture]() {
+										comp.texture_id = texture_id;
+										};
+
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_texture_action));
+									previous_texture = new_texture;
+								
+							}
+						}
+						ImGui::EndDragDropTarget();
 					}
 				}
 
@@ -1589,6 +1681,100 @@ namespace NIKE {
 					}
 
 				}
+
+			}
+		);
+
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Video>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Video& comp) {
+
+				ImGui::Text("Edit Video variables");
+
+				ImGui::Spacing();
+
+				// For Video id
+				{
+					// Hold the current and previous video selection
+					static std::string prev_video = comp.video_id;
+					std::string current_video = comp.video_id;
+
+					ImGui::Text("Select Video");
+
+					auto const& all_loaded_video = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Video);
+
+					// Find the index of the currently selected video in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_video.size(); ++i) {
+						if (current_video == all_loaded_video[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
+					}
+
+					// Display combo box for video selection
+					if (ImGui::Combo("##SelectVideo", &current_index, all_loaded_video.data(), static_cast<int>(all_loaded_video.size()))) {
+
+						// Validate the selected index and get the new video
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_video.size())) {
+							std::string new_video = all_loaded_video[current_index];
+
+							if (new_video != comp.video_id) {
+								// Save action
+								LevelEditor::Action change_video_action;
+								change_video_action.do_action = [&, video_id = new_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Undo action
+								change_video_action.undo_action = [&, video_id = prev_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_video_action));
+
+								// Update the previous texture
+								prev_video = new_video;
+							}
+						}
+					}
+
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select a video or drag & drop a video file.");
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Video_FILE")) {
+							const char* dropped_file = static_cast<const char*>(payload->Data);
+							if (dropped_file) {
+								std::string new_video = dropped_file;
+
+								// Save action
+								LevelEditor::Action change_video_action;
+								change_video_action.do_action = [&, video_id = new_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								change_video_action.undo_action = [&, video_id = prev_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_video_action));
+
+								// Update the previous texture
+								prev_video = new_video;
+
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+				}
+
 
 			}
 		);
