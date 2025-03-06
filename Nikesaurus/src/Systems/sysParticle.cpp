@@ -26,10 +26,18 @@ namespace {
 	 * \return float
 	 */
 	float rand_float(const Vector2f& range, const int dp) {
+		if (dp < 0) return 0.0f; // Prevent invalid decimal places
+
 		const int multiplier = static_cast<int>(powf(10, dp));
-		const int rand_int = rand() % (static_cast<int>((range.y - range.x) * multiplier) + 1) + static_cast<int>(range.x * multiplier);
+		if (multiplier == 0) return range.x; // Avoid division by zero, return min range
+
+		const int range_scaled = static_cast<int>((range.y - range.x) * multiplier);
+		if (range_scaled < 0) return range.x; // Handle invalid range
+
+		const int rand_int = rand() % (range_scaled + 1) + static_cast<int>(range.x * multiplier);
 		return static_cast<float>(rand_int) / multiplier;
 	}
+
 
 	float lerp(float a, float b, float t) {
 		return a + t * (b - a);

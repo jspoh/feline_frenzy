@@ -47,7 +47,9 @@ namespace NIKE {
 					{ "particle_rotation", comp.particle_rotation },
 					{ "particle_rand_width_range", comp.particle_rand_width_range.toJson()},
 
+					{ "particle_size_changes_over_time", comp.particle_size_changes_over_time },
 					{ "particle_final_size", comp.particle_final_size.toJson()},
+					{ "particle_color_changes_over_time", comp.particle_color_changes_over_time },
 					{ "particle_final_color", comp.particle_final_color.toJson()},
 					{ "particle_rotation_speed", comp.particle_rotation_speed }
 
@@ -77,7 +79,22 @@ namespace NIKE {
 				comp.particle_rotation = data.at("particle_rotation").get<float>();
 				comp.particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
 
+				try {
+					comp.particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
+				}
+				catch(std::exception& e) {
+					(void)e;
+					comp.particle_color_changes_over_time = false;
+				}
 				comp.particle_final_size.fromJson(data.at("particle_final_size"));
+
+				try {
+					comp.particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
+				}
+				catch (std::exception& e) {
+					(void)e;
+					comp.particle_color_changes_over_time = false;
+				}
 				comp.particle_final_color.fromJson(data.at("particle_final_color"));
 				comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
 
@@ -141,8 +158,14 @@ namespace NIKE {
 					delta["particle_rand_width_range"] = comp.particle_rand_width_range.toJson();
 				}
 
+				if (comp.particle_size_changes_over_time != other_comp.particle_size_changes_over_time) {
+					delta["particle_size_changes_over_time"] = comp.particle_size_changes_over_time;
+				}
 				if (comp.particle_final_size != other_comp.particle_final_size) {
 					delta["particle_final_size"] = comp.particle_final_size.toJson();
+				}
+				if (comp.particle_color_changes_over_time != other_comp.particle_color_changes_over_time) {
+					delta["particle_color_changes_over_time"] = comp.particle_color_changes_over_time;
 				}
 				if (comp.particle_final_color != other_comp.particle_final_color) {
 					delta["particle_final_color"] = comp.particle_final_color.toJson();
@@ -208,8 +231,14 @@ namespace NIKE {
 					comp.particle_rand_width_range.fromJson(delta["particle_rand_width_range"]);
 				}
 
+				if (delta.contains("particle_size_changes_over_time")) {
+					comp.particle_size_changes_over_time = delta["particle_size_changes_over_time"];
+				}
 				if (delta.contains("particle_final_size")) {
 					comp.particle_final_size.fromJson(delta["particle_final_size"]);
+				}
+				if (delta.contains("particle_color_changes_over_time")) {
+					comp.particle_color_changes_over_time = delta["particle_color_changes_over_time"];
 				}
 				if (delta.contains("particle_final_color")) {
 					comp.particle_final_color.fromJson(delta["particle_final_color"]);
@@ -803,6 +832,25 @@ namespace NIKE {
 					ImGui::Spacing();
 					ImGui::Text("Particle behaviour over time");
 					ImGui::Spacing();
+
+					// Particle acceleration
+					{
+						ImGui::Text("Particle Acceleration:");
+						ImGui::DragFloat("##Particle Acceleration", &comp.particle_acceleration, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_acceleration = comp.particle_acceleration;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_acceleration;
+							change_particle_acceleration.do_action = [&, particle_acceleration = comp.particle_acceleration]() {
+								comp.particle_acceleration = particle_acceleration;
+								};
+							change_particle_acceleration.undo_action = [&, particle_acceleration = before_change_particle_acceleration]() {
+								comp.particle_acceleration = particle_acceleration;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_acceleration));
+						}
+					}
 
 					// particle size changes over time
 					{

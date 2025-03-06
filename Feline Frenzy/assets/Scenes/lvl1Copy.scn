@@ -1891,22 +1891,23 @@
                                     "x": 73.5,
                                     "y": 70.30000305175781
                                 },
-                                "particle_acceleration": 0.0,
+                                "particle_acceleration": 510.20001220703125,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.3374905288219452,
-                                    "y": 0.3692096173763275,
-                                    "z": 0.5595238208770752
+                                    "x": 0.9365079402923584,
+                                    "y": 0.9365079402923584,
+                                    "z": 0.9365079402923584
                                 },
-                                "particle_color_is_random": true,
+                                "particle_color_changes_over_time": true,
+                                "particle_color_is_random": false,
                                 "particle_final_color": {
-                                    "w": 0.0,
+                                    "w": 0.05158728361129761,
                                     "x": 0.0,
                                     "y": 0.0,
                                     "z": 0.0
                                 },
                                 "particle_final_size": {
-                                    "x": 141.89999389648438,
+                                    "x": 0.0,
                                     "y": 0.0
                                 },
                                 "particle_lifespan": 1.0,
@@ -1924,13 +1925,14 @@
                                 },
                                 "particle_rotation": 0.0,
                                 "particle_rotation_speed": 0.0,
+                                "particle_size_changes_over_time": true,
                                 "particle_vector_x_range": {
                                     "x": -1.0,
                                     "y": 1.0
                                 },
                                 "particle_vector_y_range": {
                                     "x": -1.0,
-                                    "y": 0.800000011920929
+                                    "y": -0.6000000238418579
                                 },
                                 "particle_velocity_range": {
                                     "x": 5.0,
