@@ -194,7 +194,10 @@ void NSPM::update() {
 						p.color.r -= dt / p.lifespan;
 						p.color.g -= dt / p.lifespan;
 						p.color.b -= dt / p.lifespan;
+
 					}
+					// rotate
+					p.rotation += ps.particle_rotation_speed * dt;
 				}
 
 				// particle EnemyDeathState

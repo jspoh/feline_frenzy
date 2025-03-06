@@ -1923,8 +1923,8 @@
                                     "x": 5.0,
                                     "y": 25.899999618530273
                                 },
-                                "particle_rotation": 0.0,
-                                "particle_rotation_speed": 0.0,
+                                "particle_rotation": 5.900000095367432,
+                                "particle_rotation_speed": 36.900001525878906,
                                 "particle_size_changes_over_time": false,
                                 "particle_vector_x_range": {
                                     "x": -1.0,
@@ -1967,7 +1967,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -97.94677734375,
+                                    "x": -100.01873779296875,
                                     "y": 78.78334045410156
                                 },
                                 "Rotation": 0.0,
