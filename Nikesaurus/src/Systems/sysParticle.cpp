@@ -219,7 +219,9 @@ void NSPM::update() {
 				PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
 				int MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
 				int MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
-				VECTOR = { ps.particle_vector_x_range.x, ps.particle_vector_y_range.x };
+				const float vecX = rand_float(ps.particle_vector_x_range, 1);
+				const float vecY = rand_float(ps.particle_vector_y_range, 1);
+				VECTOR = { vecX, vecY };
 				VELOCITY = rand_float(ps.particle_velocity_range, 1);
 				COLOR = ps.particle_color_is_random 
 					? Vector4f{ static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, 1.f } 

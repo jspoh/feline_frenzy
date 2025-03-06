@@ -652,6 +652,41 @@ namespace NIKE {
 						}
 					}
 
+					// Particle directional vector range
+					{
+						ImGui::Text("Particle Directional Vector Range:");
+						ImGui::DragFloat2("##Particle Vector X Range", reinterpret_cast<float*>(&comp.particle_vector_x_range), 0.1f, -1.f, 1.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_vector_x_range = comp.particle_vector_x_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_vector_x_range;
+							change_particle_vector_x_range.do_action = [&, particle_vector_x_range = comp.particle_vector_x_range]() {
+								comp.particle_vector_x_range = particle_vector_x_range;
+								};
+							change_particle_vector_x_range.undo_action = [&, particle_vector_x_range = before_change_particle_vector_x_range]() {
+								comp.particle_vector_x_range = particle_vector_x_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_vector_x_range));
+						}
+
+						ImGui::Text("##Particle Vector Y Range");
+						ImGui::DragFloat2("##Particle Vector Y Range", reinterpret_cast<float*>(&comp.particle_vector_y_range), 0.1f, -1.f, 1.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_vector_y_range = comp.particle_vector_y_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_vector_y_range;
+							change_particle_vector_y_range.do_action = [&, particle_vector_y_range = comp.particle_vector_y_range]() {
+								comp.particle_vector_y_range = particle_vector_y_range;
+								};
+							change_particle_vector_y_range.undo_action = [&, particle_vector_y_range = before_change_particle_vector_y_range]() {
+								comp.particle_vector_y_range = particle_vector_y_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_vector_y_range));
+						}
+					}
+
 					// Particle Color
 					{
 						ImGui::Text("Particle color is random:");
