@@ -928,7 +928,7 @@
                                     "x": -233.34902954101563,
                                     "y": -48.91523361206055
                                 },
-                                "Zoom": 0.9723707437515259
+                                "Zoom": 0.946173906326294
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1886,10 +1886,10 @@
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
-                                "num_new_particles_per_second": 0,
+                                "num_new_particles_per_second": 10,
                                 "offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 35.5,
+                                    "y": 31.200000762939453
                                 },
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
@@ -1898,33 +1898,29 @@
                                     "y": 0.0,
                                     "z": 0.0
                                 },
-                                "particle_color_is_random": false,
+                                "particle_color_is_random": true,
                                 "particle_final_color": {
-                                    "w": 0.0,
-                                    "x": 0.0,
+                                    "w": 1.0,
+                                    "x": 1.0,
                                     "y": 0.0,
-                                    "z": 0.0
+                                    "z": 1.0
                                 },
                                 "particle_final_size": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "particle_lifespan": 0.0,
-                                "particle_rand_height_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
+                                "particle_lifespan": 5.0,
                                 "particle_rand_width_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 5.0,
+                                    "y": 10.0
                                 },
                                 "particle_rand_x_offset_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 4.5,
+                                    "y": 35.70000076293945
                                 },
                                 "particle_rand_y_offset_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 5.0,
+                                    "y": 25.899999618530273
                                 },
                                 "particle_rotation": 0.0,
                                 "particle_rotation_speed": 0.0,
@@ -1937,10 +1933,10 @@
                                     "y": 0.0
                                 },
                                 "particle_velocity_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
+                                    "x": 5.0,
+                                    "y": 10.0
                                 },
-                                "preset": 2,
+                                "preset": 0,
                                 "render_type": 1
                             },
                             "Render::Texture": {
@@ -1969,8 +1965,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -106.26211547851563,
-                                    "y": 95.71563720703125
+                                    "x": -97.94677734375,
+                                    "y": 78.78334045410156
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

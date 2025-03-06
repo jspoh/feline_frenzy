@@ -261,6 +261,23 @@ namespace NIKE {
 						if (ps.duration != pe_comp->duration) {
 							NIKE::SysParticle::Manager::getInstance().setParticleSystemDuration(pe_comp->ref, pe_comp->duration);
 						}
+
+						// update particle new traits
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemNumNewParticlesPerSecond(pe_comp->ref, pe_comp->num_new_particles_per_second);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleLifespan(pe_comp->ref, pe_comp->particle_lifespan);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleAcceleration(pe_comp->ref, pe_comp->particle_acceleration);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleVelocityRange(pe_comp->ref, pe_comp->particle_velocity_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleVectorXRange(pe_comp->ref, pe_comp->particle_vector_x_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleVectorYRange(pe_comp->ref, pe_comp->particle_vector_y_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleColorIsRandom(pe_comp->ref, pe_comp->particle_color_is_random);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleColor(pe_comp->ref, pe_comp->particle_color);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRandXOffsetRange(pe_comp->ref, pe_comp->particle_rand_x_offset_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRandYOffsetRange(pe_comp->ref, pe_comp->particle_rand_y_offset_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRotation(pe_comp->ref, pe_comp->particle_rotation);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRandWidthRange(pe_comp->ref, pe_comp->particle_rand_width_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleFinalSize(pe_comp->ref, pe_comp->particle_final_size);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleFinalColor(pe_comp->ref, pe_comp->particle_final_color);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRotationSpeed(pe_comp->ref, pe_comp->particle_rotation_speed);
 					}
 				}
 			}
@@ -319,6 +336,11 @@ namespace NIKE {
 			}
 
 			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
+
+			err = glGetError();
+			if (err != GL_NO_ERROR) {
+				NIKEE_CORE_ERROR("OpenGL after updating particle vbo in {0}: {1}", __FUNCTION__, err);
+			}
 
 			const int num_particles = max(1, static_cast<int>(particles.size()));
 

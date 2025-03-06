@@ -114,8 +114,9 @@ namespace NIKE {
 				Vector2f particle_rand_y_offset_range{};
 				float particle_rotation{};
 				Vector2f particle_rand_width_range{};
-				Vector2f particle_rand_height_range{};
+				bool particle_size_changes_over_time{};
 				Vector2f particle_final_size{};
+				bool particle_color_changes_over_time{};
 				Vector4f particle_final_color{};
 				float particle_rotation_speed{};
 			};
@@ -171,10 +172,11 @@ namespace NIKE {
 				void setParticleSystemParticleRandYOffsetRange(const std::string& ref, const Vector2f& particle_rand_y_offset_range);
 				void setParticleSystemParticleRotation(const std::string& ref, float particle_rotation);
 				void setParticleSystemParticleRandWidthRange(const std::string& ref, const Vector2f& particle_rand_width_range);
-				void setParticleSystemParticleRandHeightRange(const std::string& ref, const Vector2f& particle_rand_height_range);
 				void setParticleSystemParticleFinalSize(const std::string& ref, const Vector2f& particle_final_size);
 				void setParticleSystemParticleFinalColor(const std::string& ref, const Vector4f& particle_final_color);
 				void setParticleSystemParticleRotationSpeed(const std::string& ref, float particle_rotation_speed);
+				void setParticleSystemParticleColorChangesOverTime(const std::string& ref, bool particle_color_changes_over_time);
+				void setParticleSystemParticleSizeChangesOverTime(const std::string& ref, bool particle_size_changes_over_time);
 
 
 				// get modifiable particle system

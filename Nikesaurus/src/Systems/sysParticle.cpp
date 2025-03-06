@@ -30,6 +30,14 @@ namespace {
 		const int rand_int = rand() % (static_cast<int>((range.y - range.x) * multiplier) + 1) + static_cast<int>(range.x * multiplier);
 		return static_cast<float>(rand_int) / multiplier;
 	}
+
+	float lerp(float a, float b, float t) {
+		return a + t * (b - a);
+	}
+
+	Vector4f lerp(const Vector4f& a, const Vector4f& b, float t) {
+		return Vector4f(lerp(a.r, b.r, t), lerp(a.g, b.g, t), lerp(a.b, b.b, t), lerp(a.a, b.a, t));
+	}
 }
 
 
@@ -43,13 +51,6 @@ NSPM::Manager() {
 	}
 
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
-
-	// creaet vao and vbo for NONE particle preset
-	vao_map[Data::ParticlePresets::NONE] = 0;
-	vbo_map[Data::ParticlePresets::NONE] = 0;
-	glCreateVertexArrays(1, &vao_map[Data::ParticlePresets::NONE]);
-	glCreateBuffers(1, &vbo_map[Data::ParticlePresets::NONE]);
-	glVertexArrayVertexBuffer(vao_map[Data::ParticlePresets::NONE], 0, vbo_map[Data::ParticlePresets::NONE], 0, 0);
 
 	err = glGetError();
 	if (err != GL_NO_ERROR) {
@@ -77,6 +78,12 @@ NSPM::Manager() {
 	// create vao and vbo for FIRE particley preset
 	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
 	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
+
+	// create vao and vbo for NONE particle preset
+	vao_map[Data::ParticlePresets::NONE] = 0;
+	vbo_map[Data::ParticlePresets::NONE] = 0;
+	vao_map[Data::ParticlePresets::NONE] = vao_map[Data::ParticlePresets::CLUSTER];
+	vbo_map[Data::ParticlePresets::NONE] = vbo_map[Data::ParticlePresets::CLUSTER];
 
 	err = glGetError();
 	if (err != GL_NO_ERROR) {
@@ -157,13 +164,21 @@ void NSPM::update() {
 				p.time_alive += dt;
 
 				if (p.lifespan != -1.f) {
-					// fade out
-					p.color.a -= dt / p.lifespan;
+					if (p.preset == Data::ParticlePresets::NONE) {
+						if (ps.particle_color_changes_over_time) {
+							// linearly interpolate color over time
+							p.color = lerp(p.color, ps.particle_final_color, p.time_alive / p.lifespan);
+						}
+					}
+					else {
+						// fade out
+						p.color.a -= dt / p.lifespan;
 
-					// darken
-					p.color.r -= dt / p.lifespan;
-					p.color.g -= dt / p.lifespan;
-					p.color.b -= dt / p.lifespan;
+						// darken
+						p.color.r -= dt / p.lifespan;
+						p.color.g -= dt / p.lifespan;
+						p.color.b -= dt / p.lifespan;
+					}
 				}
 
 				// particle EnemyDeathState
@@ -189,7 +204,6 @@ void NSPM::update() {
 			float ACCELERATION{};
 			int NEW_PARTICLES_PER_SECOND{};
 			Vector2f PARTICLE_VELOCITY_RANGE{};
-			int MAX_OFFSET{};
 			Vector2f VECTOR{};
 			float VELOCITY{};
 			Vector4f COLOR{};
@@ -203,20 +217,19 @@ void NSPM::update() {
 				ACCELERATION = ps.particle_acceleration;
 				NEW_PARTICLES_PER_SECOND = ps.num_new_particles_per_second;
 				PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
-				MAX_OFFSET = 0;
+				int MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
+				int MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
 				VECTOR = { ps.particle_vector_x_range.x, ps.particle_vector_y_range.x };
 				VELOCITY = rand_float(ps.particle_velocity_range, 1);
 				COLOR = ps.particle_color_is_random 
 					? Vector4f{ static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, 1.f } 
 					: ps.particle_color;
 				ROTATION = ps.particle_rotation;
-				SIZE = { 
-					rand_float(ps.particle_rand_width_range, 1),
-					rand_float(ps.particle_rand_height_range, 1)
-				};
+				const float width = rand_float(ps.particle_rand_width_range, 1);
+				SIZE = { width, width };
 				PARTICLE_ORIGIN = {
-					ps.origin.x + (MAX_OFFSET ? static_cast<float>(rand() % MAX_OFFSET) : 0),
-					ps.origin.y + (MAX_OFFSET ? static_cast<float>(rand() % MAX_OFFSET) : 0)
+					ps.origin.x + (MAX_OFFSET_X ? static_cast<float>(rand() % MAX_OFFSET_X) : 0),
+					ps.origin.y + (MAX_OFFSET_Y ? static_cast<float>(rand() % MAX_OFFSET_Y) : 0)
 				};
 				break;
 			}
@@ -244,7 +257,7 @@ void NSPM::update() {
 				ACCELERATION = 10.f;
 				NEW_PARTICLES_PER_SECOND = 100;
 				PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-				MAX_OFFSET = 10;
+				int MAX_OFFSET = 10;
 
 				const float offset = static_cast<float>(rand() % MAX_OFFSET);
 				float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
@@ -433,10 +446,6 @@ void NSPM::setParticleSystemParticleRandWidthRange(const std::string& ref, const
 	active_particle_systems.at(ref).particle_rand_width_range = particle_rand_width_range;
 }
 
-void NSPM::setParticleSystemParticleRandHeightRange(const std::string& ref, const Vector2f& particle_rand_height_range) {
-	active_particle_systems.at(ref).particle_rand_height_range = particle_rand_height_range;
-}
-
 void NSPM::setParticleSystemParticleFinalSize(const std::string& ref, const Vector2f& particle_final_size) {
 	active_particle_systems.at(ref).particle_final_size = particle_final_size;
 }
@@ -449,4 +458,11 @@ void NSPM::setParticleSystemParticleRotationSpeed(const std::string& ref, float 
 	active_particle_systems.at(ref).particle_rotation_speed = particle_rotation_speed;
 }
 
+void NSPM::setParticleSystemParticleColorChangesOverTime(const std::string& ref, bool particle_color_changes_over_time) {
+	active_particle_systems.at(ref).particle_color_changes_over_time = particle_color_changes_over_time;
+}
+
+void NSPM::setParticleSystemParticleSizeChangesOverTime(const std::string& ref, bool particle_size_changes_over_time) {
+	active_particle_systems.at(ref).particle_size_changes_over_time = particle_size_changes_over_time;
+}
 
