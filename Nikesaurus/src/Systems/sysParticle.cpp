@@ -179,11 +179,11 @@ void NSPM::update() {
 					if (p.preset == Data::ParticlePresets::NONE) {
 						if (ps.particle_color_changes_over_time) {
 							// linearly interpolate color over time
-							p.color = lerp(p.color, ps.particle_final_color, p.time_alive / p.lifespan);
+							p.color = lerp(p.original_color, ps.particle_final_color, p.time_alive / p.lifespan);
 						}
 						if (ps.particle_size_changes_over_time) {
 							// linearly interpolate size over time
-							p.size = lerp(p.size, ps.particle_final_size, p.time_alive / p.lifespan);
+							p.size = lerp(p.original_size, ps.particle_final_size, p.time_alive / p.lifespan);
 						}
 					}
 					else {
@@ -227,6 +227,9 @@ void NSPM::update() {
 			Vector2f SIZE{};
 			Vector2f PARTICLE_ORIGIN{};
 
+			// !TODO: use particle pool for better performance
+			// this method of spawning new particles with rand is not the best, since random values should be generated 
+			// for each particle, and we are spawning particles by batches, but its faster than recalculating rand for every particle
 			switch (ps.preset) {
 			case Data::ParticlePresets::NONE: {
 				LIFESPAN = ps.particle_lifespan;
@@ -281,6 +284,7 @@ void NSPM::update() {
 				const float offset = static_cast<float>(rand() % MAX_OFFSET);
 				float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
 				float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+				// !TOOO: jspoh causing performance issues. use lensq
 				float len = sqrtf(rx * rx + ry * ry);
 				if (len == 0) len = 1;  // Prevent division by zero
 				rx /= len;
@@ -334,6 +338,8 @@ void NSPM::update() {
 					new_particle.rotation = ROTATION;
 					new_particle.is_alive = true;
 					new_particle.size = SIZE;
+					new_particle.original_color = COLOR;
+					new_particle.original_size = SIZE;
 
 					ps.particles.push_back(new_particle);
 				}

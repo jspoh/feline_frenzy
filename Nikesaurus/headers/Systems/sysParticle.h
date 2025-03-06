@@ -88,13 +88,16 @@ namespace NIKE {
 				float lifespan{};				// in seconds. -1 for infinite (-1 means particle EnemyDeathState not dependent on time)
 				float rotation{};				// in degrees, anticlockwise
 
+				Vector2f original_size{};		// for lerp
+				Vector4f original_color{};		// for lerp
+
 			};
 
 			struct ParticleSystem {
 				Vector2f origin{};
 				bool using_world_pos{ true };
 				Data::ParticlePresets preset{};
-				std::vector<Particle> particles{};
+				std::vector<Particle> particles{};		// !TODO: jspoh change to queue instead
 				Data::ParticleRenderType render_type{};
 
 				float duration{};		// in seconds. -1 for infinite. how long particle system should last

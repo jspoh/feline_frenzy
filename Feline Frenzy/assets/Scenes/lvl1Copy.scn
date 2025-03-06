@@ -1901,7 +1901,7 @@
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": false,
                                 "particle_final_color": {
-                                    "w": 0.05158728361129761,
+                                    "w": 0.0,
                                     "x": 0.0,
                                     "y": 0.0,
                                     "z": 0.0
@@ -1925,7 +1925,7 @@
                                 },
                                 "particle_rotation": 0.0,
                                 "particle_rotation_speed": 0.0,
-                                "particle_size_changes_over_time": true,
+                                "particle_size_changes_over_time": false,
                                 "particle_vector_x_range": {
                                     "x": -1.0,
                                     "y": 1.0
