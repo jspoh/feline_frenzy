@@ -1910,7 +1910,7 @@
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "particle_lifespan": 1.0,
+                                "particle_lifespan": 1.100000023841858,
                                 "particle_rand_width_range": {
                                     "x": 5.0,
                                     "y": 84.0999984741211
@@ -1938,7 +1938,7 @@
                                     "x": 5.0,
                                     "y": 72.69999694824219
                                 },
-                                "preset": 0,
+                                "preset": 3,
                                 "render_type": 0
                             },
                             "Render::Texture": {

@@ -287,11 +287,24 @@ void NSPM::update() {
 				const float offset = static_cast<float>(rand() % MAX_OFFSET);
 				float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
 				float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-				// !TOOO: jspoh causing performance issues. use lensq
+
+				// could cause performance issues. use lensq (edit: relatively negligible impact?)
 				float len = sqrtf(rx * rx + ry * ry);
 				if (len == 0) len = 1;  // Prevent division by zero
 				rx /= len;
 				ry /= len;
+
+				//float lensq = rx * rx + ry * ry;
+				//if (lensq == 0) lensq = 1;  // Prevent division by zero
+
+				//// fast sqrt approximation (?)
+				//float invLen = lensq;  // Start with lensq (inverse of the square root will be close to this)
+				//invLen = 0.5f * invLen;  // First step of approximation
+				//invLen = invLen * (3.0f - invLen * lensq);  // Second step (Newton-Raphson method)
+
+				//rx *= invLen;
+				//ry *= invLen;
+
 				const float x_offset = rx * offset;
 				const float y_offset = ry * offset;
 				PARTICLE_ORIGIN = {
