@@ -120,9 +120,9 @@ namespace NIKE {
 
 			// particle
 			int num_new_particles_per_second{10};
-			float particle_lifespan{5.f};
+			float particle_lifespan{1.f};
 			float particle_acceleration{};
-			Vector2f particle_velocity_range{5.f, 10.f};
+			Vector2f particle_velocity_range{5.f, 100.f};
 			Vector2f particle_vector_x_range{-1.f, 1.f};
 			Vector2f particle_vector_y_range{-1.f, 1.f};
 			bool particle_color_is_random{true};

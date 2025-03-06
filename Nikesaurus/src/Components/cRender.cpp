@@ -717,7 +717,6 @@ namespace NIKE {
 						ImGui::BeginDisabled(!comp.particle_color_changes_over_time);
 
 						// Particle Final Color
-						comp.particle_final_color = { 1.f, 0.f, 1.f, 1.f };		// default value
 						ImGui::Text("Particle Final Color:");
 						static float particle_final_color[4] = { comp.particle_final_color.x, comp.particle_final_color.y, comp.particle_final_color.z, comp.particle_final_color.w };
 						if (ImGui::ColorPicker4("##Particle Final Color", particle_final_color, ImGuiColorEditFlags_AlphaBar)) {

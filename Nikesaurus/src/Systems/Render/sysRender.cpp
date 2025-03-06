@@ -275,7 +275,9 @@ namespace NIKE {
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRandYOffsetRange(pe_comp->ref, pe_comp->particle_rand_y_offset_range);
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRotation(pe_comp->ref, pe_comp->particle_rotation);
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRandWidthRange(pe_comp->ref, pe_comp->particle_rand_width_range);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleSizeChangesOverTime(pe_comp->ref, pe_comp->particle_size_changes_over_time);
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleFinalSize(pe_comp->ref, pe_comp->particle_final_size);
+						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleColorChangesOverTime(pe_comp->ref, pe_comp->particle_color_changes_over_time);
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleFinalColor(pe_comp->ref, pe_comp->particle_final_color);
 						NIKE::SysParticle::Manager::getInstance().setParticleSystemParticleRotationSpeed(pe_comp->ref, pe_comp->particle_rotation_speed);
 					}

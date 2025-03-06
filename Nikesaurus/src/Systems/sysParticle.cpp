@@ -226,6 +226,7 @@ void NSPM::update() {
 				COLOR = ps.particle_color_is_random 
 					? Vector4f{ static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, 1.f } 
 					: ps.particle_color;
+				ps.particle_color = COLOR;
 				ROTATION = ps.particle_rotation;
 				const float width = rand_float(ps.particle_rand_width_range, 1);
 				SIZE = { width, width };
