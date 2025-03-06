@@ -14,6 +14,7 @@
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
 #include "Managers/Services/Render/sParticle.h"
+#include "Managers/Services/Render/sVideoPlayer.h"
 
 #ifndef RENDER_SERVICE_HPP
 #define RENDER_SERVICE_HPP
@@ -72,6 +73,9 @@ namespace NIKE {
 				//Particle system
 				std::unique_ptr<SysParticle::Manager> particle_manager;
 
+				//Video manager
+				std::unique_ptr<VideoPlayer::Manager> video_manager;
+
 				//Text buffer for rendering text
 				TextBuffer text_buffer;
 
@@ -118,6 +122,16 @@ namespace NIKE {
 				void init();
 
 				/*****************************************************************//**
+				* SHADERS
+				*********************************************************************/
+
+				//Bind shader
+				void bindShader(std::string const& shader_ref);
+
+				//Unbind shader
+				void unbindShader();
+
+				/*****************************************************************//**
 				* FRAME BUFFERS
 				*********************************************************************/
 
@@ -156,26 +170,20 @@ namespace NIKE {
 				//Render Texture
 				void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
+				//Render Video
+				void renderObject(Matrix_33 const& x_form, Render::Video const& e_video);
+
 				//Render Bounding Box
 				void renderBoundingBox(Matrix_33 const& x_form, Vector4f const& e_color);
 
 				//Render text
 				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
+				// render particle system
+				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1, bool use_screen_pos = false);
+
 				//Render entity
 				void renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug = false);
-
-				// render particle system
-
-				/**
-				 * use shader prefix (without '_') as ref.
-				 * 
-				 * preset follows NIKE::SysParticle::Data::particle_preset_map
-				 * render_type follows NIKE::SysParticle::Data::particle_render_type_map
-				 * 
-				 * \param ref
-				 */
-				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1, bool use_screen_pos = false);
 
 				/*****************************************************************//**
 				* BATCH RENDERING

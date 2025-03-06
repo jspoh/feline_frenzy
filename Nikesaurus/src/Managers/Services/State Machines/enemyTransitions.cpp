@@ -12,6 +12,7 @@
 // States and transitions
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/enemyStates.h"
+#include "Managers/Services/State Machine/bossEnemyStates.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
 
 
@@ -33,6 +34,25 @@ namespace NIKE {
 	{
 		return NIKE_FSM_SERVICE->getStateByID<State::EnemyIdleState>("EnemyIdle");
 	}
+
+	/*******************************
+	* Default To Boss Idle transition functions
+	*****************************/
+
+	bool NIKE::Transition::DefaultToBossIdle::isValid(Entity::Type& entity) const
+	{
+		const auto& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
+
+		return entity_tags.find("boss") != entity_tags.end();
+	}
+
+
+	std::shared_ptr<StateMachine::Istate> Transition::DefaultToBossIdle::getNextState() const
+	{
+		return NIKE_FSM_SERVICE->getStateByID<State::BossIdleState>("BossIdle");
+	}
+
+
 
 	/*******************************
 	* Idle To Enemy Attack transition functions

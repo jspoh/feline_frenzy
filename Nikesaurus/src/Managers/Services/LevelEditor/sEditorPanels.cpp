@@ -841,6 +841,7 @@ namespace NIKE {
 					if (NIKE_ECS_MANAGER->checkEntity(clone_entity)) {
 						//Clone entity 
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
+						NIKE_METADATA_SERVICE->setEntityLayerID(new_id, NIKE_METADATA_SERVICE->getEntityLayerID(clone_entity));
 
 						//If entity name is valid
 						if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
@@ -1162,7 +1163,7 @@ namespace NIKE {
 					ImGui::SameLine();
 
 					// Button to remove an entity, which triggers the popup
-					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
+					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[NIKE_KEY_DELETE])) {
 						openPopUp("Remove Entity");
 					}
 
@@ -1580,6 +1581,11 @@ namespace NIKE {
 				if (!entity_clicked && ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle]) {
 					//Get mouse pos
 					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
+				}
+
+				// Delete Entity popup
+				if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::GetIO().KeysDown[NIKE_KEY_DELETE]) {
+					openPopUp("Remove Entity");
 				}
 			}
 		}
@@ -4963,12 +4969,6 @@ namespace NIKE {
 					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, 0.f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 				}
 
-				////Edit Rotation ( Temporarily Disabled )
-				//{
-				//	//Change rotation
-				//	ImGui::Text("Rotation");
-				//	ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
-				//}
 			}
 
 			ImGui::Separator();
@@ -5193,7 +5193,7 @@ namespace NIKE {
 						// Find the index of the currently selected script id in the list
 						int script_func_index = -1;
 						for (size_t i = 0; i < funcs.size(); ++i) {
-							if (button.second.script.function == funcs[i]) {
+							if (button.second.script.update_function == funcs[i]) {
 								script_func_index = static_cast<int>(i);
 								break;
 							}
@@ -5204,7 +5204,7 @@ namespace NIKE {
 						if (ImGui::Combo(std::string("##ButtonScriptFunc" + button.first).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
 							// Validate the selected index and get the new font ID
 							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
-								button.second.script.function = funcs[script_func_index];
+								button.second.script.update_function = funcs[script_func_index];
 							}
 						}
 					}
@@ -5226,6 +5226,10 @@ namespace NIKE {
 
 						//Display arguments
 						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button.first).c_str())) {
+
+							ImGui::Text("Input State: %s", UI::inputStateToString(button.second.input_state));
+							ImGui::Text("Script ID: %s", button.second.script.script_id.c_str());
+							ImGui::Text("Function: %s", button.second.script.update_function.c_str());
 
 							//Display value based on its type
 							std::visit(

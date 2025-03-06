@@ -21,6 +21,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -81,6 +82,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -117,9 +119,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 1.1676470041275024,
-                                    "y": 1.104901909828186,
-                                    "z": 1.4499999284744263
+                                    "x": 1.4676469564437866,
+                                    "y": 1.4049018621444702,
+                                    "z": 1.7499998807907104
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -161,8 +163,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1543.499755859375,
-                                    "y": 810.3373413085938
+                                    "x": 1679.9998779296875,
+                                    "y": 893.3968505859375
                                 },
                                 "Screen Position": false
                             }
@@ -179,11 +181,12 @@
                         "UI Btn": {
                             "Input_State": 1,
                             "Script": {
-                                "Function": "Change",
                                 "Named_Args": {
                                     "scene": "cut_scene_2.scn"
                                 },
-                                "Script_ID": "ChangeScene.lua"
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": "Change"
                             }
                         },
                         "UI ID": "next_button"
@@ -262,11 +265,12 @@
                         "UI Btn": {
                             "Input_State": 1,
                             "Script": {
-                                "Function": "Change",
                                 "Named_Args": {
                                     "scene": "main_menu.scn"
                                 },
-                                "Script_ID": "ChangeScene.lua"
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": ""
                             }
                         },
                         "UI ID": "back_button"
@@ -283,7 +287,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 6,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -291,7 +295,7 @@
                                     "y": 0
                                 },
                                 "Start_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 }
                             },
@@ -307,16 +311,16 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.7176470756530762,
-                                    "y": 0.6549019813537598,
-                                    "z": 1.0
+                                    "x": 0.8676470518112183,
+                                    "y": 0.8049019575119019,
+                                    "z": 1.149999976158142
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 0.9660493731498718,
+                                "Scale": 1.0143518447875977,
                                 "Size": {
-                                    "x": 78.25,
-                                    "y": 37.675926208496094
+                                    "x": 82.1624984741211,
+                                    "y": 39.559722900390625
                                 },
                                 "Text": "Skip"
                             },
@@ -327,8 +331,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 156.5,
-                                    "y": 100.0
+                                    "x": 164.3249969482422,
+                                    "y": 104.99999237060547
                                 },
                                 "Screen Position": false
                             }
@@ -345,11 +349,12 @@
                         "UI Btn": {
                             "Input_State": 1,
                             "Script": {
-                                "Function": "Change",
                                 "Named_Args": {
                                     "scene": "lvl1Copy.scn"
                                 },
-                                "Script_ID": "ChangeScene.lua"
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": ""
                             }
                         },
                         "UI ID": "skip_button"

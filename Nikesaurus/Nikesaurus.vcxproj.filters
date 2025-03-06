@@ -52,7 +52,7 @@
     <ClCompile Include="src\Components\cEnemy.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\enemyUtils.cpp" />
     <ClCompile Include="src\Components\cDespawn.cpp" />
-    <ClCompile Include="src\Managers\Services\Lua\sLuaBindings.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaCoreBinds.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cCombat.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sParticle.cpp" />
@@ -65,6 +65,11 @@
     <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\destructableStates.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\destructableTransitions.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaECSBinds.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaGameBinds.cpp" />
+    <ClCompile Include="src\Managers\Services\Render\sVideoPlayer.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\bossEnemyStates.cpp" />
+    <ClCompile Include="src\Managers\Services\State Machines\bossEnemyTransitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Components\cAudio.h" />
@@ -126,7 +131,7 @@
     <ClInclude Include="headers\Components\cEnemy.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\enemyUtils.h" />
     <ClInclude Include="headers\Components\cDespawn.h" />
-    <ClInclude Include="headers\Managers\Services\Lua\sLuaBindings.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaCoreBinds.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorActions.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sEditorPanels.h" />
     <ClInclude Include="headers\Managers\Services\LevelEditor\sLevelEditor.h" />
@@ -142,6 +147,11 @@
     <ClInclude Include="headers\Managers\Services\Render\sShader.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\destructableStates.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\destructableTransitions.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaECSBinds.h" />
+    <ClInclude Include="headers\Managers\Services\Lua\sLuaGameBinds.h" />
+    <ClInclude Include="headers\Managers\Services\Render\sVideoPlayer.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\bossEnemyStates.h" />
+    <ClInclude Include="headers\Managers\Services\State Machine\bossEnemyTransitions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="db\data.json" />

@@ -12,8 +12,13 @@
 #include "Components/cElement.h"
 
 namespace NIKE {
+	float Element::getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
+		return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
+	}
+
 	void Element::registerComponents() {
 		// Register components
+		NIKE_ECS_MANAGER->registerComponent<Combo>();
 		NIKE_ECS_MANAGER->registerComponent<Entity>();
 		NIKE_ECS_MANAGER->registerComponent<Source>();
 
@@ -129,9 +134,7 @@ namespace NIKE {
 				}
 			}
 		);
-#endif
 
-#ifndef NDEBUG
 		// UI Registration for Source
 		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Source>(
 			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Source& comp) {
@@ -167,6 +170,38 @@ namespace NIKE {
 							comp.element = new_element;
 						}
 					}
+				}
+			}
+		);
+
+		NIKE_SERIALIZE_SERVICE->registerComponent<Combo>(
+			// Serialize
+			[](Combo const& comp) -> nlohmann::json {
+				return {
+					{ "LastHits", comp.last_hits }
+				};
+			},
+
+			// Deserialize
+			[](Combo& comp, nlohmann::json const& data) {
+				if (data.contains("LastHits")) {
+					comp.last_hits = data["LastHits"].get<std::deque<Elements>>();
+				}
+			},
+
+			// Override Serialize
+			[](Combo const& comp, Combo const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+				if (comp.last_hits != other_comp.last_hits) {
+					delta["LastHits"] = comp.last_hits;
+				}
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Combo& comp, nlohmann::json const& delta) {
+				if (delta.contains("LastHits")) {
+					comp.last_hits = delta["LastHits"].get<std::deque<Elements>>();
 				}
 			}
 		);

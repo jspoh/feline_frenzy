@@ -366,7 +366,9 @@ namespace NIKE {
 		//Return state & if button hovered
 		switch (ui_entities.at(btn_id).input_state) {
 		case InputStates::PRESSED:
-			return input_checks[keyorbtn_code].second.pressed;
+			return_state = input_checks[keyorbtn_code].second.pressed;
+			input_checks[keyorbtn_code].second.pressed = false;
+			return return_state;
 			break;
 		case InputStates::TRIGGERED:
 			return_state = input_checks[keyorbtn_code].second.triggered;

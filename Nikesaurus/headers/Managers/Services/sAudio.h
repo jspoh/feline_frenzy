@@ -33,6 +33,12 @@ namespace NIKE {
 			IAudio() = default;
 			virtual ~IAudio() = default;
 
+			//Lock audio
+			virtual void lock(unsigned int offset, unsigned int length, void** ptr1, void** ptr2, unsigned int* len1, unsigned int* len2) = 0;
+
+			//Unlock audio
+			virtual void unlock(void* ptr1, void* ptr2, unsigned int len1, unsigned int len2) = 0;
+
 			//Release Audio
 			virtual void release() = 0;
 
@@ -178,6 +184,12 @@ namespace NIKE {
 			//Get channel mode
 			virtual NIKE_AUDIO_MODE getMode() const = 0;
 
+			//Set channel position
+			virtual void setPosition(unsigned int position, NIKE_AUDIO_TIMEUNIT time_unit) = 0;
+
+			//Get channel position
+			virtual unsigned int getPosition(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
+
 			//Get sound in channel
 			virtual std::shared_ptr<IAudio> getSound() const = 0;
 
@@ -199,8 +211,14 @@ namespace NIKE {
 			//Create Sound Audio
 			virtual std::shared_ptr<Audio::IAudio> createSound(std::string const& file_path) = 0;
 
+			//Create Sound audio ( Manual )
+			virtual std::shared_ptr<Audio::IAudio> createSound(const char* name_or_data, unsigned int mode, void* exinfo) = 0;
+
 			//Create Stream Audio ( For music )
 			virtual std::shared_ptr<Audio::IAudio> createStream(std::string const& file_path) = 0;
+
+			//Create stream audio ( Manual )
+			virtual std::shared_ptr<Audio::IAudio> createStream(const char* name_or_data, unsigned int mode, void* exinfo) = 0;
 
 			//Create channel group
 			virtual std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) = 0;
@@ -231,6 +249,10 @@ namespace NIKE {
 			~NIKEAudio() = default;
 
 			FMOD::Sound* getAudio();
+
+			void lock(unsigned int offset, unsigned int length, void** ptr1, void** ptr2, unsigned int* len1, unsigned int* len2) override;
+
+			void unlock(void* ptr1, void* ptr2, unsigned int len1, unsigned int len2) override;
 
 			void release() override;
 
@@ -341,6 +363,10 @@ namespace NIKE {
 
 			NIKE_AUDIO_MODE getMode() const override;
 
+			void setPosition(unsigned int position, NIKE_AUDIO_TIMEUNIT time_unit) override;
+
+			unsigned int getPosition(NIKE_AUDIO_TIMEUNIT time_unit) const override;
+
 			std::shared_ptr<IAudio> getSound() const override;
 
 			void setChannelGroup(std::shared_ptr<Audio::IChannelGroup> group) override;
@@ -362,7 +388,11 @@ namespace NIKE {
 
 			std::shared_ptr<Audio::IAudio> createSound(std::string const& file_path) override;
 
+			std::shared_ptr<Audio::IAudio> createSound(const char* name_or_data, unsigned int mode, void* exinfo) override;
+
 			std::shared_ptr<Audio::IAudio> createStream(std::string const& file_path) override;
+
+			std::shared_ptr<Audio::IAudio> createStream(const char* name_or_data, unsigned int mode, void* exinfo) override;
 
 			std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) override;
 

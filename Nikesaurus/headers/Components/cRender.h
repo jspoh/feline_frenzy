@@ -13,6 +13,7 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sEvents.h"
+#include "Managers/Services/sAudio.h"
 
 namespace NIKE {
 
@@ -122,15 +123,32 @@ namespace NIKE {
 			ParticleEmitter();
 		};
 
-		struct Batch {
-			struct Renderable {
-				std::variant<Text, Shape, Texture> render_type;
-				Transform::Transform transform;
+		struct Video {
 
-				Renderable() : render_type{Texture()}, transform() {}
-			};
+			//Video ID
+			std::string video_id;
 
-			std::vector<Renderable> render_queue;
+			//Mpeg object
+			plm_t* mpeg;
+			uint8_t* rgb_data;
+			bool b_init;
+
+			//Texture ID
+			unsigned int texture_id;
+			Vector2f texture_size;
+
+			//Audio
+			std::shared_ptr<Audio::IAudio> audio;
+			std::shared_ptr<Audio::IChannel> channel;
+			static std::shared_ptr<Audio::IChannelGroup> channel_group;
+
+			//Video variables
+			bool b_is_playing;
+
+			//Video update timer
+			float timer;
+
+			Video() : video_id{ "" }, mpeg{ nullptr }, rgb_data{ nullptr }, b_init { true }, texture_id{ 0 }, texture_size(), b_is_playing{ false }, timer{ 0.0f } {}
 		};
 
 		void registerComponents();
