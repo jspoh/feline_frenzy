@@ -97,7 +97,7 @@ namespace NIKE {
 				Vector2f origin{};
 				bool using_world_pos{ true };
 				Data::ParticlePresets preset{};
-				std::vector<Particle> particles{};		// !TODO: jspoh change to queue instead
+				std::vector<Particle> particles{};		// considered changing to deque instead, but ended up to be slower
 				Data::ParticleRenderType render_type{};
 
 				float duration{};		// in seconds. -1 for infinite. how long particle system should last
