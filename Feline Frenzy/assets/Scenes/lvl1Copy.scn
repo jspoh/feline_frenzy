@@ -1900,13 +1900,13 @@
                                 },
                                 "particle_color_is_random": true,
                                 "particle_final_color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
+                                    "w": 0.0,
+                                    "x": 0.0,
                                     "y": 0.0,
-                                    "z": 1.0
+                                    "z": 0.0
                                 },
                                 "particle_final_size": {
-                                    "x": 0.0,
+                                    "x": 141.89999389648438,
                                     "y": 0.0
                                 },
                                 "particle_lifespan": 1.0,

@@ -26,13 +26,17 @@ namespace {
 	 * \return float
 	 */
 	float rand_float(const Vector2f& range, const int dp) {
-		const int multiplier = pow(10, dp);
+		const int multiplier = static_cast<int>(powf(10, dp));
 		const int rand_int = rand() % (static_cast<int>((range.y - range.x) * multiplier) + 1) + static_cast<int>(range.x * multiplier);
 		return static_cast<float>(rand_int) / multiplier;
 	}
 
 	float lerp(float a, float b, float t) {
 		return a + t * (b - a);
+	}
+
+	Vector2f lerp(const Vector2f& a, const Vector2f& b, float t) {
+		return Vector2f(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
 	}
 
 	Vector4f lerp(const Vector4f& a, const Vector4f& b, float t) {
@@ -169,6 +173,10 @@ void NSPM::update() {
 							// linearly interpolate color over time
 							p.color = lerp(p.color, ps.particle_final_color, p.time_alive / p.lifespan);
 						}
+						if (ps.particle_size_changes_over_time) {
+							// linearly interpolate size over time
+							p.size = lerp(p.size, ps.particle_final_size, p.time_alive / p.lifespan);
+						}
 					}
 					else {
 						// fade out
@@ -217,8 +225,8 @@ void NSPM::update() {
 				ACCELERATION = ps.particle_acceleration;
 				NEW_PARTICLES_PER_SECOND = ps.num_new_particles_per_second;
 				PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
-				int MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
-				int MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
+				float MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
+				float MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
 				const float vecX = rand_float(ps.particle_vector_x_range, 1);
 				const float vecY = rand_float(ps.particle_vector_y_range, 1);
 				VECTOR = { vecX, vecY };
@@ -231,8 +239,8 @@ void NSPM::update() {
 				const float width = rand_float(ps.particle_rand_width_range, 1);
 				SIZE = { width, width };
 				PARTICLE_ORIGIN = {
-					ps.origin.x + (MAX_OFFSET_X ? static_cast<float>(rand() % MAX_OFFSET_X) : 0),
-					ps.origin.y + (MAX_OFFSET_Y ? static_cast<float>(rand() % MAX_OFFSET_Y) : 0)
+					ps.origin.x + (static_cast<int>(MAX_OFFSET_X) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_X)) : 0),
+					ps.origin.y + (static_cast<int>(MAX_OFFSET_Y) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_Y)) : 0)
 				};
 				break;
 			}

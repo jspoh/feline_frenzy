@@ -500,7 +500,7 @@ namespace NIKE {
 					static float before_change_particle_rotation;
 					static Vector2f before_change_particle_rand_width_range;
 					static bool before_change_particle_final_size_changes_over_time;
-					static Vector2f before_change_particle_final_size;
+					static float before_change_particle_final_size;
 					static bool before_particle_color_changes_over_time;
 					static Vector4f before_change_particle_final_color;
 					static float before_change_particle_rotation_speed;
@@ -806,7 +806,6 @@ namespace NIKE {
 
 					// particle size changes over time
 					{
-						comp.particle_size_changes_over_time = false;
 						ImGui::Text("Particle size changes over time:");
 						ImGui::Checkbox("##Particle size changes over time", &comp.particle_size_changes_over_time);
 						if (ImGui::IsItemActivated()) {
@@ -817,9 +816,9 @@ namespace NIKE {
 
 						// Particle Final Size
 						ImGui::Text("Particle Final Size:");
-						ImGui::DragFloat2("##Particle Final Size", &comp.particle_final_size.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						ImGui::DragFloat2("##Particle Final Size", reinterpret_cast<float*>(& comp.particle_final_size), 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 						if (ImGui::IsItemActivated()) {
-							before_change_particle_final_size = comp.particle_final_size;
+							before_change_particle_final_size = comp.particle_final_size.x;
 						}
 						if (ImGui::IsItemDeactivatedAfterEdit()) {
 							LevelEditor::Action change_particle_final_size;
@@ -827,23 +826,8 @@ namespace NIKE {
 								comp.particle_final_size = particle_final_size;
 								};
 							change_particle_final_size.undo_action = [&, particle_final_size = before_change_particle_final_size]() {
-								comp.particle_final_size = particle_final_size;
-								};
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_final_size));
-						}
-
-						ImGui::SameLine();
-						ImGui::DragFloat2("##Particle Final Size", &comp.particle_final_size.y, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
-						if (ImGui::IsItemActivated()) {
-							before_change_particle_final_size = comp.particle_final_size;
-						}
-						if (ImGui::IsItemDeactivatedAfterEdit()) {
-							LevelEditor::Action change_particle_final_size;
-							change_particle_final_size.do_action = [&, particle_final_size = comp.particle_final_size]() {
-								comp.particle_final_size = particle_final_size;
-								};
-							change_particle_final_size.undo_action = [&, particle_final_size = before_change_particle_final_size]() {
-								comp.particle_final_size = particle_final_size;
+								comp.particle_final_size.x = particle_final_size;
+								comp.particle_final_size.y = particle_final_size;
 								};
 							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_final_size));
 						}
