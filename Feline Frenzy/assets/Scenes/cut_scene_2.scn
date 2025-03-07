@@ -1,6 +1,17 @@
 [
     {
-        "Channels": null
+        "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
+            "VFX": {
+                "loop": false,
+                "tracks": []
+            }
+        }
     },
     {
         "Grid ID": "cut_scene_2.grid"

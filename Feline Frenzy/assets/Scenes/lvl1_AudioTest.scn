@@ -1,6 +1,12 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
@@ -10,6 +16,10 @@
                 "tracks": []
             },
             "PlayerSFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
                 "loop": false,
                 "tracks": []
             }
@@ -37,6 +47,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -473,11 +484,12 @@
                                 "Element": 0
                             },
                             "GameLogic::ILogic": {
-                                "Function": "update",
                                 "Named_Args": {
                                     "entity": 118
                                 },
-                                "Script_ID": "player.lua"
+                                "Script_ID": "player.lua",
+                                "Start_Function": "",
+                                "Update_Function": ""
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -1187,6 +1199,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [],
             "ID": 1,
             "Mask": 2
