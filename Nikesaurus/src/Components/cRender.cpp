@@ -68,127 +68,117 @@ namespace NIKE {
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
 				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
-				comp.preset = static_cast<int>(data.at("preset").get<int>());
-				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
 
 				//Initialize particle system
-				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
-				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
-				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
-				comp.p_system->is_alive = true;
-				comp.p_system->duration = comp.duration;
-				comp.p_system->time_alive = 0.f;
-				comp.p_system->using_world_pos = true; // Temporary set to true
-				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
-
-				comp.num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
-				comp.particle_lifespan = data.at("particle_lifespan").get<float>();
-				comp.particle_acceleration = data.at("particle_acceleration").get<float>();
-				comp.particle_velocity_range.fromJson(data.at("particle_velocity_range"));
-				comp.particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
-				comp.particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
-				comp.particle_color_is_random = data.at("particle_color_is_random").get<bool>();
-				comp.particle_color.fromJson(data.at("particle_color"));
-				comp.particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
-				comp.particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
-				comp.particle_rotation = data.at("particle_rotation").get<float>();
-				comp.particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
-
 				try {
-					comp.particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
-				}
-				catch(std::exception& e) {
-					(void)e;
-					comp.particle_color_changes_over_time = false;
-				}
-				comp.particle_final_size.fromJson(data.at("particle_final_size"));
+					comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+					comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
+					comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
+					comp.p_system->is_alive = true;
+					comp.p_system->duration = comp.duration;
+					comp.p_system->time_alive = 0.f;
+					comp.p_system->using_world_pos = true; // Temporary set to true
+					comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
 
-				try {
-					comp.particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
+					comp.p_system->num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
+					comp.p_system->particle_lifespan = data.at("particle_lifespan").get<float>();
+					comp.p_system->particle_acceleration = data.at("particle_acceleration").get<float>();
+					comp.p_system->particle_velocity_range.fromJson(data.at("particle_velocity_range"));
+					comp.p_system->particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
+					comp.p_system->particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
+					comp.p_system->particle_color_is_random = data.at("particle_color_is_random").get<bool>();
+					comp.p_system->particle_color.fromJson(data.at("particle_color"));
+					comp.p_system->particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
+					comp.p_system->particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
+					comp.p_system->particle_rotation = data.at("particle_rotation").get<float>();
+					comp.p_system->particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
+					comp.p_system->particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
+					comp.p_system->particle_final_size.fromJson(data.at("particle_final_size"));
+					comp.p_system->particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
+					comp.p_system->particle_color_changes_over_time = false;
+					comp.p_system->particle_final_color.fromJson(data.at("particle_final_color"));
+					comp.p_system->particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
 				}
 				catch (std::exception& e) {
 					(void)e;
-					comp.particle_color_changes_over_time = false;
 				}
-				comp.particle_final_color.fromJson(data.at("particle_final_color"));
-				comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
 
 				// add particle system
-				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
 
-				if (comp.preset != other_comp.preset) {
-					delta["preset"] = comp.preset;
+				if (comp.p_system->preset != other_comp.p_system->preset) {
+					delta["preset"] = comp.p_system->preset;
 				}
-				if (comp.render_type != other_comp.render_type) {
-					delta["render_type"] = comp.render_type;
+				if (comp.p_system->render_type != other_comp.p_system->render_type) {
+					delta["render_type"] = comp.p_system->render_type;
 				}
 				if (comp.offset != other_comp.offset) {
 					delta["offset"] = comp.offset.toJson();
 				}
-				if (comp.duration != other_comp.duration) {
-					delta["duration"] = comp.duration;
+				if (comp.p_system->duration != other_comp.p_system->duration) {
+					delta["duration"] = comp.p_system->duration;
 				}
-				//if (comp.ref != other_comp.ref) {
-				//	delta["ref"] = comp.ref;
+				//if (comp.p_system->ref != other_comp.p_system->ref) {
+				//	delta["ref"] = comp.p_system->ref;
 				//}
 
-				if (comp.num_new_particles_per_second != other_comp.num_new_particles_per_second) {
-					delta["num_new_particles_per_second"] = comp.num_new_particles_per_second;
+				if (comp.p_system->num_new_particles_per_second != other_comp.p_system->num_new_particles_per_second) {
+					delta["num_new_particles_per_second"] = comp.p_system->num_new_particles_per_second;
 				}
-				if (comp.particle_lifespan != other_comp.particle_lifespan) {
-					delta["particle_lifespan"] = comp.particle_lifespan;
+				if (comp.p_system->particle_lifespan != other_comp.p_system->particle_lifespan) {
+					delta["particle_lifespan"] = comp.p_system->particle_lifespan;
 				}
-				if (comp.particle_acceleration != other_comp.particle_acceleration) {
-					delta["particle_acceleration"] = comp.particle_acceleration;
+				if (comp.p_system->particle_acceleration != other_comp.p_system->particle_acceleration) {
+					delta["particle_acceleration"] = comp.p_system->particle_acceleration;
 				}
-				if (comp.particle_velocity_range != other_comp.particle_velocity_range) {
-					delta["particle_velocity_range"] = comp.particle_velocity_range.toJson();
+				if (comp.p_system->particle_velocity_range != other_comp.p_system->particle_velocity_range) {
+					delta["particle_velocity_range"] = comp.p_system->particle_velocity_range.toJson();
 				}
-				if (comp.particle_vector_x_range != other_comp.particle_vector_x_range) {
-					delta["particle_vector_x_range"] = comp.particle_vector_x_range.toJson();
+				if (comp.p_system->particle_vector_x_range != other_comp.p_system->particle_vector_x_range) {
+					delta["particle_vector_x_range"] = comp.p_system->particle_vector_x_range.toJson();
 				}
-				if (comp.particle_vector_y_range != other_comp.particle_vector_y_range) {
-					delta["particle_vector_y_range"] = comp.particle_vector_y_range.toJson();
+				if (comp.p_system->particle_vector_y_range != other_comp.p_system->particle_vector_y_range) {
+					delta["particle_vector_y_range"] = comp.p_system->particle_vector_y_range.toJson();
 				}
-				if (comp.particle_color_is_random != other_comp.particle_color_is_random) {
-					delta["particle_color_is_random"] = comp.particle_color_is_random;
+				if (comp.p_system->particle_color_is_random != other_comp.p_system->particle_color_is_random) {
+					delta["particle_color_is_random"] = comp.p_system->particle_color_is_random;
 				}
-				if (comp.particle_color != other_comp.particle_color) {
-					delta["particle_color"] = comp.particle_color.toJson();
+				if (comp.p_system->particle_color != other_comp.p_system->particle_color) {
+					delta["particle_color"] = comp.p_system->particle_color.toJson();
 				}
-				if (comp.particle_rand_x_offset_range != other_comp.particle_rand_x_offset_range) {
-					delta["particle_rand_x_offset_range"] = comp.particle_rand_x_offset_range.toJson();
+				if (comp.p_system->particle_rand_x_offset_range != other_comp.p_system->particle_rand_x_offset_range) {
+					delta["particle_rand_x_offset_range"] = comp.p_system->particle_rand_x_offset_range.toJson();
 				}
-				if (comp.particle_rand_y_offset_range != other_comp.particle_rand_y_offset_range) {
-					delta["particle_rand_y_offset_range"] = comp.particle_rand_y_offset_range.toJson();
+				if (comp.p_system->particle_rand_y_offset_range != other_comp.p_system->particle_rand_y_offset_range) {
+					delta["particle_rand_y_offset_range"] = comp.p_system->particle_rand_y_offset_range.toJson();
 				}
-				if (comp.particle_rotation != other_comp.particle_rotation) {
-					delta["particle_rotation"] = comp.particle_rotation;
+				if (comp.p_system->particle_rotation != other_comp.p_system->particle_rotation) {
+					delta["particle_rotation"] = comp.p_system->particle_rotation;
 				}
-				if (comp.particle_rand_width_range != other_comp.particle_rand_width_range) {
-					delta["particle_rand_width_range"] = comp.particle_rand_width_range.toJson();
+				if (comp.p_system->particle_rand_width_range != other_comp.p_system->particle_rand_width_range) {
+					delta["particle_rand_width_range"] = comp.p_system->particle_rand_width_range.toJson();
 				}
 
-				if (comp.particle_size_changes_over_time != other_comp.particle_size_changes_over_time) {
-					delta["particle_size_changes_over_time"] = comp.particle_size_changes_over_time;
+				if (comp.p_system->particle_size_changes_over_time != other_comp.p_system->particle_size_changes_over_time) {
+					delta["particle_size_changes_over_time"] = comp.p_system->particle_size_changes_over_time;
 				}
-				if (comp.particle_final_size != other_comp.particle_final_size) {
-					delta["particle_final_size"] = comp.particle_final_size.toJson();
+				if (comp.p_system->particle_final_size != other_comp.p_system->particle_final_size) {
+					delta["particle_final_size"] = comp.p_system->particle_final_size.toJson();
 				}
-				if (comp.particle_color_changes_over_time != other_comp.particle_color_changes_over_time) {
-					delta["particle_color_changes_over_time"] = comp.particle_color_changes_over_time;
+				if (comp.p_system->particle_color_changes_over_time != other_comp.p_system->particle_color_changes_over_time) {
+					delta["particle_color_changes_over_time"] = comp.p_system->particle_color_changes_over_time;
 				}
-				if (comp.particle_final_color != other_comp.particle_final_color) {
-					delta["particle_final_color"] = comp.particle_final_color.toJson();
+				if (comp.p_system->particle_final_color != other_comp.p_system->particle_final_color) {
+					delta["particle_final_color"] = comp.p_system->particle_final_color.toJson();
 				}
-				if (comp.particle_rotation_speed != other_comp.particle_rotation_speed) {
-					delta["particle_rotation_speed"] = comp.particle_rotation_speed;
+				if (comp.p_system->particle_rotation_speed != other_comp.p_system->particle_rotation_speed) {
+					delta["particle_rotation_speed"] = comp.p_system->particle_rotation_speed;
 				}
 
 				return delta;
@@ -198,73 +188,73 @@ namespace NIKE {
 				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				if (delta.contains("preset")) {
-					comp.preset = delta["preset"];
+					comp.p_system->preset = delta["preset"];
 				}
 				if (delta.contains("render_type")) {
-					comp.render_type = delta["render_type"];
+					comp.p_system->render_type = delta["render_type"];
 				}
 				if (delta.contains("offset")) {
 					comp.offset.fromJson(delta["offset"]);
 				}
 				if (delta.contains("duration")) {
-					comp.duration = delta["duration"];
+					comp.p_system->duration = delta["duration"];
 				}
 
 				if (delta.contains("num_new_particles_per_second")) {
-					comp.num_new_particles_per_second = delta["num_new_particles_per_second"];
+					comp.p_system->num_new_particles_per_second = delta["num_new_particles_per_second"];
 				}
 				if (delta.contains("particle_lifespan")) {
-					comp.particle_lifespan = delta["particle_lifespan"];
+					comp.p_system->particle_lifespan = delta["particle_lifespan"];
 				}
 				if (delta.contains("particle_acceleration")) {
-					comp.particle_acceleration = delta["particle_acceleration"];
+					comp.p_system->particle_acceleration = delta["particle_acceleration"];
 				}
 				if (delta.contains("particle_velocity_range")) {
-					comp.particle_velocity_range.fromJson(delta["particle_velocity_range"]);
+					comp.p_system->particle_velocity_range.fromJson(delta["particle_velocity_range"]);
 				}
 				if (delta.contains("particle_vector_x_range")) {
-					comp.particle_vector_x_range.fromJson(delta["particle_vector_x_range"]);
+					comp.p_system->particle_vector_x_range.fromJson(delta["particle_vector_x_range"]);
 				}
 				if (delta.contains("particle_vector_y_range")) {
-					comp.particle_vector_y_range.fromJson(delta["particle_vector_y_range"]);
+					comp.p_system->particle_vector_y_range.fromJson(delta["particle_vector_y_range"]);
 				}
 				if (delta.contains("particle_color_is_random")) {
-					comp.particle_color_is_random = delta["particle_color_is_random"];
+					comp.p_system->particle_color_is_random = delta["particle_color_is_random"];
 				}
 				if (delta.contains("particle_color")) {
-					comp.particle_color.fromJson(delta["particle_color"]);
+					comp.p_system->particle_color.fromJson(delta["particle_color"]);
 				}
 				if (delta.contains("particle_rand_x_offset_range")) {
-					comp.particle_rand_x_offset_range.fromJson(delta["particle_rand_x_offset_range"]);
+					comp.p_system->particle_rand_x_offset_range.fromJson(delta["particle_rand_x_offset_range"]);
 				}
 				if (delta.contains("particle_rand_y_offset_range")) {
-					comp.particle_rand_y_offset_range.fromJson(delta["particle_rand_y_offset_range"]);
+					comp.p_system->particle_rand_y_offset_range.fromJson(delta["particle_rand_y_offset_range"]);
 				}
 				if (delta.contains("particle_rotation")) {
-					comp.particle_rotation = delta["particle_rotation"];
+					comp.p_system->particle_rotation = delta["particle_rotation"];
 				}
 				if (delta.contains("particle_rand_width_range")) {
-					comp.particle_rand_width_range.fromJson(delta["particle_rand_width_range"]);
+					comp.p_system->particle_rand_width_range.fromJson(delta["particle_rand_width_range"]);
 				}
 
 				if (delta.contains("particle_size_changes_over_time")) {
-					comp.particle_size_changes_over_time = delta["particle_size_changes_over_time"];
+					comp.p_system->particle_size_changes_over_time = delta["particle_size_changes_over_time"];
 				}
 				if (delta.contains("particle_final_size")) {
-					comp.particle_final_size.fromJson(delta["particle_final_size"]);
+					comp.p_system->particle_final_size.fromJson(delta["particle_final_size"]);
 				}
 				if (delta.contains("particle_color_changes_over_time")) {
-					comp.particle_color_changes_over_time = delta["particle_color_changes_over_time"];
+					comp.p_system->particle_color_changes_over_time = delta["particle_color_changes_over_time"];
 				}
 				if (delta.contains("particle_final_color")) {
-					comp.particle_final_color.fromJson(delta["particle_final_color"]);
+					comp.p_system->particle_final_color.fromJson(delta["particle_final_color"]);
 				}
 				if (delta.contains("particle_rotation_speed")) {
-					comp.particle_rotation_speed = delta["particle_rotation_speed"];
+					comp.p_system->particle_rotation_speed = delta["particle_rotation_speed"];
 				}
 
 				// add particle system
-				NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.p_system->preset), comp.p_system->offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.p_system->render_type), comp.p_system->duration);
 			}
 		);
 

@@ -8,6 +8,7 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
+ // #include "Systems/sysParticle.h"
 #include "Managers/Services/Render/sParticle.h"
 
 // !TODO: jspoh add auto init values for entity and prefabs
@@ -80,7 +81,7 @@ NSPM::Manager() {
 	if (err != GL_NO_ERROR) {
 		NIKEE_CORE_ERROR("OpenGL error after creating empty vao and vbo in {0}: {1}", __FUNCTION__, err);
 	}
-	
+
 
 	// create vao and vbo for CLUSTER particle preset
 	vao_map[Data::ParticlePresets::CLUSTER] = 0;
@@ -114,6 +115,12 @@ NSPM::~Manager() {
 	}
 }
 
+
+// NSPM& NSPM::getInstance() {
+// 	static Manager instance;
+// 	return instance;
+// }
+
 bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets preset, const Vector2f& origin, Data::ParticleRenderType particle_render_type, float duration, bool using_world_pos) {
 	if (active_particle_systems.size() >= MAX_ACTIVE_PARTICLE_SYSTEMS) {
 		return false;
@@ -138,15 +145,6 @@ bool NSPM::addActiveParticleSystem(const std::string& ref, Data::ParticlePresets
 
 
 bool NSPM::removeActiveParticleSystem(const std::string& ref) {
-	auto it = active_particle_systems.find(ref);
-	if (it == active_particle_systems.end()) {
-		return false;
-	}
-	it->second.is_alive = false;
-	return true;
-}
-
-bool NSPM::instantlyRemoveActiveParticleSystem(const std::string& ref) {
 	if (active_particle_systems.find(ref) == active_particle_systems.end()) {
 		return false;
 	}
@@ -155,280 +153,21 @@ bool NSPM::instantlyRemoveActiveParticleSystem(const std::string& ref) {
 }
 
 
-void NSPM::update() {
+void NSPM::updateParticleSystem(ParticleSystem& ps) {
 	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
-	// debug to check entities
+	// Update particle system
 	{
-		const auto entities_id = NIKE_ECS_MANAGER->getAllEntities();
-		std::vector<std::unordered_map<std::string, std::shared_ptr<void>>> entities;
-		std::vector<std::unordered_map<std::string, std::shared_ptr<void>>> entities_with_pe;
-		for (const auto entity_id : entities_id) {
-			const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity_id);
-			entities.emplace_back(comps);
-
-			if (comps.find("Render::ParticleEmitter") != comps.end()) {
-				entities_with_pe.emplace_back(comps);
-			}
-		}
-	}
-
-	for (auto& [ref, ps] : active_particle_systems) {
-		// Update particle system
 		if (ps.duration != -1 && ps.time_alive >= ps.duration) {
 			ps.is_alive = false;
 		}
 
 		if (!ps.is_alive && ps.particles.size() == 0) {
-			continue;
+			return;
 		}
 
 		ps.time_alive += dt;
-
-		// update particles
-		{
-			for (auto& p : ps.particles) {
-				// Update particle
-				p.pos += p.vector * p.velocity * dt;
-				p.velocity += p.acceleration * dt;
-				p.time_alive += dt;
-
-				if (p.lifespan != -1.f) {
-					if (p.preset == Data::ParticlePresets::NONE) {
-						if (ps.particle_color_changes_over_time) {
-							// linearly interpolate color over time
-							p.color = lerp(p.original_color, ps.particle_final_color, p.time_alive / p.lifespan);
-						}
-						if (ps.particle_size_changes_over_time) {
-							// linearly interpolate size over time
-							p.size = lerp(p.original_size, ps.particle_final_size, p.time_alive / p.lifespan);
-						}
-					}
-					else {
-						// fade out
-						p.color.a -= dt / p.lifespan;
-
-						// darken
-						p.color.r -= dt / p.lifespan;
-						p.color.g -= dt / p.lifespan;
-						p.color.b -= dt / p.lifespan;
-
-					}
-					// rotate
-					p.rotation += ps.particle_rotation_speed * dt;
-				}
-
-				// particle EnemyDeathState
-
-				if (p.size.x <= 0 || p.size.y <= 0) {
-					p.is_alive = false;
-				}
-
-				if (p.color.a <= 0) {
-					p.is_alive = false;
-				}
-
-				if (p.lifespan != -1 && p.time_alive > p.lifespan) {
-					p.is_alive = false;
-				}
-			}
-
-			// remove dead particles
-			ps.particles.erase(std::remove_if(ps.particles.begin(), ps.particles.end(), [](const Particle& p) { return !p.is_alive; }), ps.particles.end());
-
-			// spawn new particles
-			float LIFESPAN{};
-			float ACCELERATION{};
-			int NEW_PARTICLES_PER_SECOND{};
-			Vector2f PARTICLE_VELOCITY_RANGE{};
-			Vector2f VECTOR{};
-			float VELOCITY{};
-			Vector4f COLOR{};
-			float ROTATION{};
-			Vector2f SIZE{};
-			Vector2f PARTICLE_ORIGIN{};
-
-			// !TODO: use particle pool for better performance
-			// this method of spawning new particles with rand is not the best, since random values should be generated 
-			// for each particle, and we are spawning particles by batches, but its faster than recalculating rand for every particle
-			switch (ps.preset) {
-			case Data::ParticlePresets::NONE: {
-				LIFESPAN = ps.particle_lifespan;
-				ACCELERATION = ps.particle_acceleration;
-				NEW_PARTICLES_PER_SECOND = ps.num_new_particles_per_second;
-				PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
-				float MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
-				float MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
-				const float vecX = rand_float(ps.particle_vector_x_range, 1);
-				const float vecY = rand_float(ps.particle_vector_y_range, 1);
-				VECTOR = { vecX, vecY };
-				VECTOR.normalize();
-				VELOCITY = rand_float(ps.particle_velocity_range, 1);
-				COLOR = ps.particle_color_is_random 
-					? Vector4f{ static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, 1.f } 
-					: ps.particle_color;
-				ps.particle_color = COLOR;
-				ROTATION = ps.particle_rotation;
-				const float width = rand_float(ps.particle_rand_width_range, 1);
-				SIZE = { width, width };
-				PARTICLE_ORIGIN = {
-					ps.origin.x + (static_cast<int>(MAX_OFFSET_X) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_X)) : 0),
-					ps.origin.y + (static_cast<int>(MAX_OFFSET_Y) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_Y)) : 0)
-				};
-				break;
-			}
-			// case Data::ParticlePresets::BASE: {
-			// 	PARTICLE_ORIGIN = ps.origin;
-			// 	LIFESPAN = -1.f;
-			// 	ACCELERATION = 0.f;
-			// 	NEW_PARTICLES_PER_SECOND = 0;
-			// 	PARTICLE_VELOCITY_RANGE = { 0.f, 0.f };
-			// 	VECTOR = { 0.f, 0.f };
-			// 	//VECTOR.normalize();
-			// 	VELOCITY = 0.f;
-			// 	COLOR = { 0.f, 0.f, 0.f, 1.f };
-			// 	ROTATION = 0.f;
-			// 	SIZE = { 5.f, 5.f };
-			// 	break;
-			// }
-			case Data::ParticlePresets::CLUSTER: {
-				PARTICLE_ORIGIN = ps.origin;
-				LIFESPAN = 5.f;
-				ACCELERATION = 0.f;
-				NEW_PARTICLES_PER_SECOND = 50;
-				PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-				VECTOR = { static_cast<float>(rand() % 200 - 100) / 100.f, static_cast<float>(rand() % 200 - 100) / 100.f };
-				VECTOR.normalize();
-				VELOCITY = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
-				COLOR = {
-						rand() % 255 / 255.f,
-						rand() % 255 / 255.f,
-						rand() % 255 / 255.f,
-						1.f
-				};
-				ROTATION = 0.f;
-				SIZE = { 5.f, 5.f };
-				break;
-			}
-			case Data::ParticlePresets::FIRE: {
-				LIFESPAN = 3.f;
-				ACCELERATION = 10.f;
-				NEW_PARTICLES_PER_SECOND = 100;
-				PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-				int MAX_OFFSET = 10;
-
-				const float offset = static_cast<float>(rand() % MAX_OFFSET);
-				float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-				float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
-
-				// could cause performance issues. use lensq (edit: relatively negligible impact?)
-				float len = sqrtf(rx * rx + ry * ry);
-				if (len == 0) len = 1;  // Prevent division by zero
-				rx /= len;
-				ry /= len;
-
-				//float lensq = rx * rx + ry * ry;
-				//if (lensq == 0) lensq = 1;  // Prevent division by zero
-
-				//// fast sqrt approximation (?)
-				//float invLen = lensq;  // Start with lensq (inverse of the square root will be close to this)
-				//invLen = 0.5f * invLen;  // First step of approximation
-				//invLen = invLen * (3.0f - invLen * lensq);  // Second step (Newton-Raphson method)
-
-				//rx *= invLen;
-				//ry *= invLen;
-
-				const float x_offset = rx * offset;
-				const float y_offset = ry * offset;
-				PARTICLE_ORIGIN = {
-					ps.origin.x + x_offset,
-					ps.origin.y + y_offset
-				};
-
-				VECTOR = { 0.f, static_cast<float>(rand() % 100) / 100.f };
-				VECTOR.normalize();
-				VELOCITY = PARTICLE_VELOCITY_RANGE.x + static_cast<float>(rand() % static_cast<int>(PARTICLE_VELOCITY_RANGE.y - PARTICLE_VELOCITY_RANGE.x));
-				LIFESPAN = LIFESPAN - (x_offset / MAX_OFFSET);
-				COLOR = {
-					(rand() % 100 + 155.f) / 255.f ,
-					0.f,
-					0.f,
-					1.f
-				};
-				ROTATION = 0.f;
-				SIZE = { 5.f, 5.f };
-				break;
-			}
-			default: {
-				throw std::runtime_error("Invalid particle preset");
-			}
-			}
-
-			// spawn new particles
-
-			static float time_since_last_spawn = 0.f;
-			time_since_last_spawn += dt;
-
-			ps.particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
-
-			if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-				ps.particles_to_spawn = 0.f;
-				time_since_last_spawn = 0.f;
-			}
-
-			if (ps.is_alive && ps.particles_to_spawn >= 1) {
-				for (int _{}; static_cast<float>(_) < ps.particles_to_spawn; _++) {
-					Particle new_particle;
-					new_particle.preset = ps.preset;
-					new_particle.pos = PARTICLE_ORIGIN;
-					new_particle.vector = VECTOR;
-					new_particle.velocity = VELOCITY;
-					new_particle.acceleration = ACCELERATION;
-					new_particle.lifespan = LIFESPAN;
-					new_particle.color = COLOR;
-					new_particle.rotation = ROTATION;
-					new_particle.is_alive = true;
-					new_particle.size = SIZE;
-					new_particle.original_color = COLOR;
-					new_particle.original_size = SIZE;
-
-					ps.particles.push_back(new_particle);
-				}
-
-				// reset state
-				time_since_last_spawn = 0.f;
-				ps.particles_to_spawn -= std::floor(ps.particles_to_spawn);
-			}
-
-			// end update particles
-		}
-
 	}
-
-	// remove dead particle systems
-	for (auto it = active_particle_systems.begin(); it != active_particle_systems.end();) {
-		if (!it->second.is_alive && it->second.particles.size() == 0) {
-			it = active_particle_systems.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-}
-
-void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
-	const float dt = NIKE_WINDOWS_SERVICE->getDeltaTime();
-
-	// Update particle system
-	if (ps.duration != -1 && ps.time_alive >= ps.duration) {
-		ps.is_alive = false;
-	}
-
-	if (!ps.is_alive && ps.particles.size() == 0) {
-		return; //Can choose to erase component instead of returning
-	}
-
-	ps.time_alive += dt;
 
 	// update particles
 	{
@@ -439,13 +178,28 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 			p.time_alive += dt;
 
 			if (p.lifespan != -1.f) {
-				// fade out
-				p.color.a -= dt / p.lifespan;
+				if (p.preset == Data::ParticlePresets::NONE) {
+					if (ps.particle_color_changes_over_time) {
+						// linearly interpolate color over time
+						p.color = lerp(p.original_color, ps.particle_final_color, p.time_alive / p.lifespan);
+					}
+					if (ps.particle_size_changes_over_time) {
+						// linearly interpolate size over time
+						p.size = lerp(p.original_size, ps.particle_final_size, p.time_alive / p.lifespan);
+					}
+				}
+				else {
+					// fade out
+					p.color.a -= dt / p.lifespan;
 
-				// darken
-				p.color.r -= dt / p.lifespan;
-				p.color.g -= dt / p.lifespan;
-				p.color.b -= dt / p.lifespan;
+					// darken
+					p.color.r -= dt / p.lifespan;
+					p.color.g -= dt / p.lifespan;
+					p.color.b -= dt / p.lifespan;
+
+				}
+				// rotate
+				p.rotation += ps.particle_rotation_speed * dt;
 			}
 
 			// particle EnemyDeathState
@@ -471,7 +225,6 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 		float ACCELERATION{};
 		int NEW_PARTICLES_PER_SECOND{};
 		Vector2f PARTICLE_VELOCITY_RANGE{};
-		int MAX_OFFSET{};
 		Vector2f VECTOR{};
 		float VELOCITY{};
 		Vector4f COLOR{};
@@ -479,19 +232,33 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 		Vector2f SIZE{};
 		Vector2f PARTICLE_ORIGIN{};
 
+		// !TODO: use particle pool for better performance
+		// this method of spawning new particles with rand is not the best, since random values should be generated 
+		// for each particle, and we are spawning particles by batches, but its faster than recalculating rand for every particle
 		switch (ps.preset) {
-		case Data::ParticlePresets::BASE: {
-			PARTICLE_ORIGIN = ps.origin;
-			LIFESPAN = -1.f;
-			ACCELERATION = 0.f;
-			NEW_PARTICLES_PER_SECOND = 0;
-			PARTICLE_VELOCITY_RANGE = { 0.f, 0.f };
-			VECTOR = { 0.f, 0.f };
-			//VECTOR.normalize();
-			VELOCITY = 0.f;
-			COLOR = { 0.f, 0.f, 0.f, 1.f };
-			ROTATION = 0.f;
-			SIZE = { 5.f, 5.f };
+		case Data::ParticlePresets::NONE: {
+			LIFESPAN = ps.particle_lifespan;
+			ACCELERATION = ps.particle_acceleration;
+			NEW_PARTICLES_PER_SECOND = ps.num_new_particles_per_second;
+			PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
+			float MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
+			float MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
+			const float vecX = rand_float(ps.particle_vector_x_range, 1);
+			const float vecY = rand_float(ps.particle_vector_y_range, 1);
+			VECTOR = { vecX, vecY };
+			VECTOR.normalize();
+			VELOCITY = rand_float(ps.particle_velocity_range, 1);
+			COLOR = ps.particle_color_is_random
+				? Vector4f{ static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, static_cast<float>(rand() % 255) / 255.f, 1.f }
+			: ps.particle_color;
+			ps.particle_color = COLOR;
+			ROTATION = ps.particle_rotation;
+			const float width = rand_float(ps.particle_rand_width_range, 1);
+			SIZE = { width, width };
+			PARTICLE_ORIGIN = {
+				ps.origin.x + (static_cast<int>(MAX_OFFSET_X) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_X)) : 0),
+				ps.origin.y + (static_cast<int>(MAX_OFFSET_Y) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_Y)) : 0)
+			};
 			break;
 		}
 		case Data::ParticlePresets::CLUSTER: {
@@ -518,15 +285,29 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 			ACCELERATION = 10.f;
 			NEW_PARTICLES_PER_SECOND = 100;
 			PARTICLE_VELOCITY_RANGE = { 1.f, 10.f };
-			MAX_OFFSET = 10;
+			int MAX_OFFSET = 10;
 
 			const float offset = static_cast<float>(rand() % MAX_OFFSET);
 			float rx = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
 			float ry = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+
+			// could cause performance issues. use lensq (edit: relatively negligible impact?)
 			float len = sqrtf(rx * rx + ry * ry);
 			if (len == 0) len = 1;  // Prevent division by zero
 			rx /= len;
 			ry /= len;
+
+			//float lensq = rx * rx + ry * ry;
+			//if (lensq == 0) lensq = 1;  // Prevent division by zero
+
+			//// fast sqrt approximation (?)
+			//float invLen = lensq;  // Start with lensq (inverse of the square root will be close to this)
+			//invLen = 0.5f * invLen;  // First step of approximation
+			//invLen = invLen * (3.0f - invLen * lensq);  // Second step (Newton-Raphson method)
+
+			//rx *= invLen;
+			//ry *= invLen;
+
 			const float x_offset = rx * offset;
 			const float y_offset = ry * offset;
 			PARTICLE_ORIGIN = {
@@ -548,9 +329,6 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 			SIZE = { 5.f, 5.f };
 			break;
 		}
-		default: {
-			throw std::runtime_error("Invalid particle preset");
-		}
 		}
 
 		// spawn new particles
@@ -558,15 +336,16 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 		static float time_since_last_spawn = 0.f;
 		time_since_last_spawn += dt;
 
-		ps.particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
+		static float particles_to_spawn = 0.f;
+		particles_to_spawn += time_since_last_spawn * NEW_PARTICLES_PER_SECOND;
 
 		if (ps.is_alive && ps.particles.size() > MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES) {
-			ps.particles_to_spawn = 0.f;
+			particles_to_spawn = 0.f;
 			time_since_last_spawn = 0.f;
 		}
 
-		if (ps.is_alive && ps.particles_to_spawn >= 1) {
-			for (int _{}; static_cast<float>(_) < ps.particles_to_spawn; _++) {
+		if (ps.is_alive && particles_to_spawn >= 1) {
+			for (int _{}; static_cast<float>(_) < particles_to_spawn; _++) {
 				Particle new_particle;
 				new_particle.preset = ps.preset;
 				new_particle.pos = PARTICLE_ORIGIN;
@@ -578,15 +357,29 @@ void NSPM::updateParticleSystem(SysParticle::ParticleSystem& ps) {
 				new_particle.rotation = ROTATION;
 				new_particle.is_alive = true;
 				new_particle.size = SIZE;
+				new_particle.original_color = COLOR;
+				new_particle.original_size = SIZE;
 
 				ps.particles.push_back(new_particle);
 			}
 
 			// reset state
 			time_since_last_spawn = 0.f;
-			ps.particles_to_spawn -= std::floor(ps.particles_to_spawn);
+			particles_to_spawn -= std::floor(particles_to_spawn);
 		}
+
+		// end update particles
 	}
+
+	// remove dead particle systems
+	//for (auto it = active_particle_systems.begin(); it != active_particle_systems.end();) {
+	//	if (!it->second.is_alive && it->second.particles.size() == 0) {
+	//		it = active_particle_systems.erase(it);
+	//	}
+	//	else {
+	//		++it;
+	//	}
+	//}
 }
 
 std::vector<ParticleSystem>NSPM::getActiveParticleSystems() const {
@@ -713,12 +506,4 @@ void NSPM::setParticleSystemParticleColorChangesOverTime(const std::string& ref,
 
 void NSPM::setParticleSystemParticleSizeChangesOverTime(const std::string& ref, bool particle_size_changes_over_time) {
 	active_particle_systems.at(ref).particle_size_changes_over_time = particle_size_changes_over_time;
-}
-
-void NSPM::resetParticleSystemParticles(const std::string& ref) {
-	if (active_particle_systems.find(ref) == active_particle_systems.end()) {
-		throw std::runtime_error("Particle system does not exist");
-	}
-
-	active_particle_systems.at(ref).particles.clear();
 }
