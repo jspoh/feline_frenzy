@@ -40,6 +40,7 @@
                     "Entity": {
                         "Components": {
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 0.0,
                                     "y": 0.0
@@ -100,6 +101,7 @@
                     "Entity": {
                         "Components": {
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 0.0,
                                     "y": 0.0
@@ -160,11 +162,12 @@
                     "Entity": {
                         "Components": {
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 0.9693794846534729
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -235,7 +238,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 6,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -243,7 +246,7 @@
                                     "y": 1
                                 },
                                 "Start_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 }
                             },
@@ -257,9 +260,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 3.28039288520813,
-                                    "y": 3.2490203380584717,
-                                    "z": 3.550981283187866
+                                    "x": 3.580393075942993,
+                                    "y": 3.549020528793335,
+                                    "z": 3.8509814739227295
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -301,8 +304,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 359.8105773925781,
-                                    "y": 68.36400604248047
+                                    "x": 396.69122314453125,
+                                    "y": 75.37133026123047
                                 },
                                 "Screen Position": true
                             }
@@ -341,7 +344,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 6,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -349,7 +352,7 @@
                                     "y": 1
                                 },
                                 "Start_Index": {
-                                    "x": 1,
+                                    "x": 0,
                                     "y": 0
                                 }
                             },
@@ -390,7 +393,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 3,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -447,7 +450,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 6,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -455,7 +458,7 @@
                                     "y": 1
                                 },
                                 "Start_Index": {
-                                    "x": 1,
+                                    "x": 0,
                                     "y": 0
                                 }
                             },
@@ -496,7 +499,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 6,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {

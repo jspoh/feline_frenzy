@@ -535,11 +535,12 @@
                                 "Element": 2
                             },
                             "GameLogic::ILogic": {
-                                "Function": "update",
                                 "Named_Args": {
                                     "entity": 408
                                 },
-                                "Script_ID": "player.lua"
+                                "Script_ID": "player.lua",
+                                "Start_Function": "",
+                                "Update_Function": ""
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -572,6 +573,7 @@
                                 }
                             },
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
