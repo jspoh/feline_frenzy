@@ -29,6 +29,34 @@ namespace NIKE {
                 if (!(*layer)->getLayerState())
                     continue;
 
+                // Update heal animation
+                for (auto& heal_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("healAnimation")) {
+                   
+                    // Updating to player location
+                    std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+                    if (!player_entities.empty()) {
+                        // Get heal animation position
+                        auto heal_animation_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(heal_entity).value().get().position;
+
+                        // Get player position
+                        for (auto& player : player_entities) {
+                            const auto player_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player).value().get().position;
+
+                            // Set heal animation to player position
+                            heal_animation_pos = player_pos;
+                        }
+                    }
+
+                    // Delete animation when done playing
+                    auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(heal_entity);
+                    if (animation_comp.has_value())
+                    {
+                        if (animation_comp.value().get().completed_animations >= 1) {
+                            NIKE_METADATA_SERVICE->destroyEntity(heal_entity);
+                        }
+                    }
+                }
+
                 // Iterate through all entities
                 for (auto& entity : (*layer)->getEntitites()) {
 
@@ -251,6 +279,11 @@ namespace NIKE {
             // Heal Target
             // (The check might be redundant now as there is another check in sysCollision)
             if (target_health < target_max_health) {
+                // Spawn health animation
+                // Check no health animation tag exists
+                // If no health animation tag
+                spawnHealAnimation(target);
+
                 target_health += healer_heal;
                 // Temporary hardcoded SFX
                 playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", 1.0f, 1.0f);
@@ -344,6 +377,34 @@ namespace NIKE {
                 --target_health.lives;
                 target_health.health = target_health.max_health;
                 NIKEE_CORE_INFO("Entity {} lost 1 life.", target);
+            }
+        }
+
+        void spawnHealAnimation(const Entity::Type player) {
+            // Get player position
+            const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+            if (!player_transform_comp.has_value()) {
+                NIKEE_CORE_WARN("spawnEnemy: PLAYER missing Transform Component, heal animation not playing");
+                return;
+            }
+
+            const Vector2f& player_pos = player_transform_comp.value().get().position;
+
+            // Create heal animation entity
+            Entity::Type anim_entity = NIKE_ECS_MANAGER->createEntity();
+
+            // Load from prefab
+            NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(anim_entity, "healAnimation.prefab");
+
+            // Add tag to animation
+            if (NIKE_METADATA_SERVICE->isTagValid("healAnimation")) {
+                NIKE_METADATA_SERVICE->addEntityTag(anim_entity, "healAnimation");
+            }
+
+            // Set animation position to player position
+            auto anim_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(anim_entity);
+            if (anim_transform_comp.has_value()) {
+                anim_transform_comp.value().get().position = { player_pos };
             }
         }
 
