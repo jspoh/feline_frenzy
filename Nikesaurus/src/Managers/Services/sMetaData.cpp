@@ -14,15 +14,33 @@
 namespace NIKE {
 
 	nlohmann::json MetaData::EntityData::serialize() const {
-		return {
-			{"Name", name},
-			{"Prefab_ID", prefab_id},
-			{"Prefab_Override", prefab_override},
-			{"B_Locked", b_locked},
-			{"Layer_ID", layer_id},
-			{"Layer_Order", layer_order},
-			{"Tags", tags}
-		};
+		auto* parent = std::get_if<Parent>(&relation);
+		auto* child = std::get_if<Child>(&relation);
+
+		if (parent) {
+			return {
+				{"Name", name},
+				{"Prefab_ID", prefab_id},
+				{"Prefab_Override", prefab_override},
+				{"B_Locked", b_locked},
+				{"Layer_ID", layer_id},
+				{"Layer_Order", layer_order},
+				{"Tags", tags},
+				{"Childrens", parent ? parent->childrens : std::set<std::string>() },
+			};
+		}
+		else {
+			return {
+				{"Name", name},
+				{"Prefab_ID", prefab_id},
+				{"Prefab_Override", prefab_override},
+				{"B_Locked", b_locked},
+				{"Layer_ID", layer_id},
+				{"Layer_Order", layer_order},
+				{"Tags", tags},
+				{"Parent", child ? child->parent : "" }
+			};
+		}
 	}
 
 	void MetaData::EntityData::deserialize(nlohmann::json const& data) {
@@ -42,6 +60,20 @@ namespace NIKE {
 		//Get tags
 		if (data.contains("Tags") && data["Tags"].is_array()) {
 			tags = data["Tags"].get<std::set<std::string>>();
+		}
+
+		//Get childrens
+		if (data.contains("Childrens")) {
+			Parent temp_parent;
+			temp_parent.childrens = data["Childrens"].get<std::set<std::string>>();
+			relation = temp_parent;
+		}
+
+		//Get Parent
+		if (data.contains("Parent")) {
+			Child temp_child;
+			temp_child.parent = data["Parent"].get<std::string>();
+			relation = temp_child;
 		}
 	}
 
@@ -394,6 +426,28 @@ namespace NIKE {
 
 		//Return layer ID
 		return entities.at(entity).layer_order;
+	}
+
+	void MetaData::Service::setEntityRelation(Entity::Type entity, std::variant<Parent, Child>&& relation) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Set relation
+		entities.at(entity).relation = relation;
+	}
+
+	std::variant<MetaData::Parent, MetaData::Child> MetaData::Service::getEntityRelation(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return Parent();
+		}
+
+		//Return relation
+		return entities.at(entity).relation;
 	}
 
 	std::set<std::string> MetaData::Service::getEntityTags(Entity::Type entity) {

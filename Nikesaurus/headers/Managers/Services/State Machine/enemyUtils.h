@@ -27,6 +27,9 @@ namespace NIKE {
 		// Shoot bullet
 		void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
 
+		// Boss shoot
+		void bossShoot(const Entity::Type& enemy, const Entity::Type& player);
+
 		// Standard enemy moving function
 		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset);
 

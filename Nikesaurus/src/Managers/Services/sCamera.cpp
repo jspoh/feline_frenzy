@@ -43,12 +43,15 @@ namespace NIKE {
 		std::shared_ptr<Camera::Service> cam_sys_wrapped(this, [](Camera::Service*){});
 		NIKE_EVENTS_SERVICE->addEventListeners<Render::ChangeCamEvent>(cam_sys_wrapped);
 
+
+		// Camera config
 		try {
 			auto const& data = config.at("CameraConfig");
 			cam_height = data.at("Height").get<float>();
 			Vector2f pos;
 			pos.fromJson(data.at("Position"));
 			def_cam = std::make_shared<Render::Cam>(pos, data.at("Zoom").get<float>());
+			
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -121,6 +124,37 @@ namespace NIKE {
 			0, 2.0f / (cam_height * cam.zoom), 0,
 			0, 0, 1
 		};
+
+		#ifndef NDEBUG
+				if (!NIKE_LVLEDITOR_SERVICE->getGameState()) {
+					return cam_to_ndc_xform * view_xform;
+				}
+		#endif
+
+		// Apply mouse offset only if its not free cam
+		if (cam_name != "Free Cam" && cam.mouse_offset != 0.f) { 
+			Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
+			Vector2f screen_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+			Vector2f mouse_move_offset = {
+				(mouse_pos.x / screen_size.x - 0.5f) * -2.0f,
+				(mouse_pos.y / screen_size.y - 0.5f) * 2.0f
+			};
+
+			// Scale down the effect 
+			mouse_move_offset *= cam.mouse_offset;
+
+			// Create a translation matrix for the offset
+			Matrix_33 mouse_offset_matrix{
+				1, 0, mouse_move_offset.x,
+				0, 1, mouse_move_offset.y,
+				0, 0, 1
+			};
+
+			// Apply the offset
+			return mouse_offset_matrix * cam_to_ndc_xform * view_xform;
+		}
+
 
 		return cam_to_ndc_xform * view_xform;
 	};
@@ -249,6 +283,15 @@ namespace NIKE {
 	float Camera::Service::getCameraHeight() const {
 		return cam_height;
 	}
+
+	void Camera::Service::setMouseOffset(float offset) {
+		mouse_offset = offset;
+	}
+
+	float Camera::Service::getMouseOffset() const {
+		return mouse_offset;
+	}
+
 
 	/*****************************************************************//**
 	* CAMERA ENTITIES

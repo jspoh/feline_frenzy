@@ -16,6 +16,20 @@
 namespace NIKE {
 	namespace MetaData {
 
+		//Parent entity
+		struct Parent {
+			std::set<std::string> childrens;
+
+			Parent() {};
+		};
+
+		//Children entity
+		struct Child {
+			std::string parent;
+
+			Child() : parent{ "" } {}
+		};
+
 		//Data Type
 		struct EntityData {
 
@@ -40,10 +54,13 @@ namespace NIKE {
 			//Dynamic tagging
 			std::set<std::string> tags;
 
+			//Parent or child
+			std::variant<Parent, Child> relation;
+
 			//Constructors
-			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
+			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
 			EntityData(std::string const& name)
-				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
+				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
 
 			//Serialize data
 			nlohmann::json serialize() const;
@@ -173,6 +190,12 @@ namespace NIKE {
 
 			//Get Entity layer order
 			size_t getEntityLayerOrder(Entity::Type entity) const;
+
+			//Set Entity Relation
+			void setEntityRelation(Entity::Type entity, std::variant<Parent, Child>&& relation);
+
+			//Get Entity Relation
+			std::variant<Parent, Child> getEntityRelation(Entity::Type entity) const;
 
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);

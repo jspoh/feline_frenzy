@@ -1,11 +1,21 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
             },
             "PlayerSFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
                 "loop": false,
                 "tracks": []
             }
@@ -30,11 +40,13 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "entity_0000",
@@ -86,6 +98,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "entity_0001",
@@ -157,6 +170,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "entity_0002",
@@ -228,6 +242,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 3,
                             "Name": "entity_0003",
@@ -299,6 +314,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 4,
                             "Name": "entity_0004",
@@ -370,6 +386,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 5,
                             "Name": "entity_0005",
@@ -421,6 +438,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 6,
                             "Name": "entity_0006",
@@ -472,6 +490,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 7,
                             "Name": "entity_0007",
@@ -523,6 +542,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 8,
                             "Name": "entity_0008",
@@ -574,6 +594,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 9,
                             "Name": "entity_0009",
@@ -625,6 +646,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 10,
                             "Name": "entity_0010",
@@ -676,6 +698,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 11,
                             "Name": "entity_0011",
@@ -727,6 +750,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 12,
                             "Name": "entity_0012",
@@ -778,6 +802,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 13,
                             "Name": "entity_0013",
@@ -829,6 +854,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 14,
                             "Name": "entity_0014",
@@ -880,6 +906,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 15,
                             "Name": "entity_0015",
@@ -931,6 +958,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 16,
                             "Name": "entity_0016",
@@ -982,6 +1010,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 17,
                             "Name": "entity_0017",
@@ -1033,6 +1062,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 18,
                             "Name": "entity_0018",
@@ -1084,6 +1114,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 19,
                             "Name": "entity_0019",
@@ -1135,6 +1166,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 20,
                             "Name": "entity_0020",
@@ -1186,6 +1218,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 21,
                             "Name": "entity_0021",
@@ -1230,6 +1263,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 22,
                             "Name": "entity_0022",
@@ -1274,6 +1308,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 23,
                             "Name": "entity_0023",
@@ -1331,6 +1366,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 24,
                             "Name": "entity_0024",
@@ -1375,6 +1411,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 25,
                             "Name": "entity_0025",
@@ -1418,11 +1455,12 @@
                                 "Element": 0
                             },
                             "GameLogic::ILogic": {
-                                "Function": "update",
                                 "Named_Args": {
                                     "entity": 41
                                 },
-                                "Script_ID": "player.lua"
+                                "Script_ID": "player.lua",
+                                "Start_Function": "",
+                                "Update_Function": ""
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -1455,6 +1493,7 @@
                                 }
                             },
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 64.0,
                                     "y": -64.0
@@ -1500,6 +1539,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 26,
                             "Name": "entity_0026",
@@ -1625,6 +1665,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 27,
                             "Name": "entity_0027",
@@ -1730,6 +1771,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 28,
                             "Name": "entity_0028",
@@ -1835,6 +1877,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 29,
                             "Name": "entity_0029",
@@ -1940,6 +1983,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 30,
                             "Name": "entity_0030",
@@ -2011,6 +2055,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 31,
                             "Name": "entity_0031",
@@ -2082,6 +2127,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 32,
                             "Name": "entity_0032",
@@ -2153,6 +2199,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 33,
                             "Name": "entity_0033",
@@ -2204,6 +2251,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 34,
                             "Name": "entity_0034",
@@ -2272,6 +2320,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 35,
                             "Name": "entity_0035",
@@ -2340,6 +2389,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 36,
                             "Name": "entity_0036",
@@ -2408,6 +2458,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 37,
                             "Name": "entity_0037",
@@ -2476,6 +2527,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 38,
                             "Name": "entity_0038",
@@ -2544,6 +2596,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 39,
                             "Name": "entity_0039",
@@ -2595,6 +2648,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 40,
                             "Name": "entity_0040",
@@ -2612,6 +2666,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [],
             "ID": 1,
             "Mask": 6
@@ -2620,6 +2675,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [],
             "ID": 2,
             "Mask": 6

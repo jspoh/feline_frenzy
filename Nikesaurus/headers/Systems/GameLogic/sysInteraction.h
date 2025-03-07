@@ -31,8 +31,8 @@ namespace NIKE {
         // Change element
         void changeElement(Entity::Type player, Entity::Type source);
 
-        // Get Elemental Multiplier for Elements
-        float getElementMultiplier(Element::Elements attacker, Element::Elements target);
+        // Spawn Heal Animation
+        void spawnHealAnimation(Entity::Type player);
 
         // Check if player is within range
         bool withinRange(Entity::Type source, Entity::Type player);

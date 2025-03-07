@@ -68,8 +68,6 @@ namespace NIKE {
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
-				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
 
 				//Initialize particle system
 				try {
@@ -131,9 +129,6 @@ namespace NIKE {
 				catch (std::exception& e) {
 					(void)e;
 				}
-
-				// add particle system
-				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
@@ -215,8 +210,6 @@ namespace NIKE {
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
-				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
 				if (delta.contains("preset")) {
 					comp.p_system->preset = delta["preset"];
 				}
@@ -299,7 +292,8 @@ namespace NIKE {
 			[](Render::Cam const& comp) -> nlohmann::json {
 				return	{
 						{ "Position", comp.position.toJson() },
-						{ "Zoom", comp.zoom }
+						{ "Zoom", comp.zoom },
+						{ "Mouse_Offset", comp.mouse_offset}
 				};
 			},
 
@@ -307,6 +301,7 @@ namespace NIKE {
 			[](Render::Cam& comp, nlohmann::json const& data) {
 				comp.position.fromJson(data.value("Position", Vector2f::def_json));
 				comp.zoom = data.value("Zoom", 1.0f);
+				comp.mouse_offset = data.value("Mouse_Offset", 0.f);
 			},
 
 			// Override Serialize
@@ -319,6 +314,9 @@ namespace NIKE {
 				if (comp.zoom != other_comp.zoom) {
 					delta["Zoom"] = comp.zoom;
 				}
+				if (comp.mouse_offset != other_comp.mouse_offset) {
+					delta["Mouse_Offset"] = comp.mouse_offset;
+				}
 
 				return delta;
 			},
@@ -330,6 +328,9 @@ namespace NIKE {
 				}
 				if (delta.contains("Zoom")) {
 					comp.zoom = delta["Zoom"];
+				}
+				if (delta.contains("Mouse_Offset")) {
+					comp.mouse_offset = delta["Mouse_Offset"];
 				}
 			}
 		);
@@ -1132,6 +1133,38 @@ namespace NIKE {
 
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_zoom));
+					}
+
+				}
+
+				// For cam offset
+				{
+					//Position before change
+					static float before_move_offset;
+
+					ImGui::DragFloat("Camera move offset", &comp.mouse_offset, 0.005f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					//Check if position has begun editing
+					if (ImGui::IsItemActivated()) {
+						before_move_offset = comp.mouse_offset;
+					}
+
+					//Check if position has finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_mouse_offset;
+
+						//Change pos do action
+						change_mouse_offset.do_action = [&, mouse_offset = comp.mouse_offset]() {
+							comp.mouse_offset = mouse_offset;
+							};
+
+						//Change pos undo action
+						change_mouse_offset.undo_action = [&, mouse_offset = before_move_offset]() {
+							comp.mouse_offset = mouse_offset;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_mouse_offset));
 					}
 
 				}
