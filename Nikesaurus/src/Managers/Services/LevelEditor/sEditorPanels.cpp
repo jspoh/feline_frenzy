@@ -4472,7 +4472,7 @@ namespace NIKE {
 					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music)) {
 
 					//Show audio length
-					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength();
+					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength(NIKE_AUDIO_TIMEUNIT_MS);
 					ImGui::Text("Length:");
 					ImGui::Text("%d ms", length);
 					ImGui::Text("%.2f s", length / 1000.0f);

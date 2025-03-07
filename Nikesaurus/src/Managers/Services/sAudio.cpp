@@ -25,6 +25,20 @@ namespace NIKE {
 		return sound;
 	}
 
+	void Audio::NIKEAudio::lock(unsigned int offset, unsigned int length, void** ptr1, void** ptr2, unsigned int* len1, unsigned int* len2) {
+		auto result = sound->lock(offset, length, ptr1, ptr2, len1, len2);
+		if (result != FMOD_OK) {
+			NIKEE_CORE_WARN("Error with locking audio!");
+		}
+	}
+
+	void Audio::NIKEAudio::unlock(void* ptr1, void* ptr2, unsigned int len1, unsigned int len2) {
+		auto result = sound->unlock(ptr1, ptr2, len1, len2);
+		if (result != FMOD_OK) {
+			NIKEE_CORE_WARN("Error with unlocking audio!");
+		}
+	}
+
 	void Audio::NIKEAudio::release() {
 		sound->release();
 	}
@@ -33,9 +47,9 @@ namespace NIKE {
 		return file_path;
 	}
 
-	unsigned int Audio::NIKEAudio::getLength() const {
+	unsigned int Audio::NIKEAudio::getLength(NIKE_AUDIO_TIMEUNIT time_unit) const {
 		unsigned int length;
-		sound->getLength(&length, NIKE_AUDIO_TIMEUNIT_MS);
+		sound->getLength(&length, time_unit);
 		return length;
 	}
 
@@ -129,13 +143,13 @@ namespace NIKE {
 		return count;
 	}
 
-	void Audio::NIKEChannel::setLoopPoints(unsigned int start, unsigned int end) {
-		channel->setLoopPoints(start, NIKE_AUDIO_TIMEUNIT_MS, end, NIKE_AUDIO_TIMEUNIT_MS);
+	void Audio::NIKEChannel::setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) {
+		channel->setLoopPoints(start, time_unit, end, time_unit);
 	}
 
-	Vector2<unsigned int> Audio::NIKEChannel::getLoopPoints() const {
+	Vector2<unsigned int> Audio::NIKEChannel::getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const {
 		Vector2<unsigned int> points;
-		channel->getLoopPoints(&points.x, NIKE_AUDIO_TIMEUNIT_MS, &points.y, NIKE_AUDIO_TIMEUNIT_MS);
+		channel->getLoopPoints(&points.x, time_unit, &points.y, time_unit);
 		return points;
 	}
 
@@ -161,6 +175,16 @@ namespace NIKE {
 		NIKE_AUDIO_MODE mode;
 		channel->getMode(&mode);
 		return mode;
+	}
+
+	void Audio::NIKEChannel::setPosition(unsigned int position, NIKE_AUDIO_TIMEUNIT time_unit) {
+		channel->setPosition(position, time_unit);
+	}
+
+	unsigned int Audio::NIKEChannel::getPosition(NIKE_AUDIO_TIMEUNIT time_unit) const {
+		unsigned int pos;
+		channel->getPosition(&pos, time_unit);
+		return pos;
 	}
 
 	void Audio::NIKEChannel::setChannelGroup(std::shared_ptr<Audio::IChannelGroup> group) {
@@ -320,6 +344,23 @@ namespace NIKE {
 		return std::make_shared<Audio::NIKEAudio>(temp_audio, file_path);
 	}
 
+	std::shared_ptr<Audio::IAudio> Audio::NIKEAudioSystem::createSound(const char* name_or_data, unsigned int mode, void* exinfo) {
+		//FMOD Loading Variables
+		FMOD::Sound* temp_audio = nullptr;
+		FMOD_RESULT result;
+
+		// Create sound to be pushed into container
+		result = fmod_system->createSound(name_or_data, mode, static_cast<FMOD_CREATESOUNDEXINFO*>(exinfo), &temp_audio);
+
+		// Check for audio file validadity
+		if (result != FMOD_OK)
+		{
+			LOG_CRASH("INVALID FILE PATH.");
+		}
+
+		return std::make_shared<Audio::NIKEAudio>(temp_audio, "");
+	}
+
 	std::shared_ptr<Audio::IAudio> Audio::NIKEAudioSystem::createStream(std::string const& file_path) {
 		//FMOD Loading Variables
 		FMOD::Sound* temp_audio = nullptr;
@@ -338,6 +379,26 @@ namespace NIKE {
 		NIKEE_CORE_INFO("Sucessfully loaded music from " + file_path);
 
 		return std::make_shared<Audio::NIKEAudio>(temp_audio, file_path);
+	}
+
+	std::shared_ptr<Audio::IAudio> Audio::NIKEAudioSystem::createStream(const char* name_or_data, unsigned int mode, void* exinfo) {
+		//FMOD Loading Variables
+		FMOD::Sound* temp_audio = nullptr;
+		FMOD_RESULT result;
+
+		//Cast audio info
+		auto audio_info = static_cast<FMOD_CREATESOUNDEXINFO*>(exinfo);
+
+		// Create sound to be pushed into container
+		result = fmod_system->createStream(name_or_data, mode, audio_info, &temp_audio);
+
+		// Check for audio file validadity
+		if (result != FMOD_OK)
+		{
+			LOG_CRASH("FAILED TO CREATE STREAM");
+		}
+
+		return std::make_shared<Audio::NIKEAudio>(temp_audio, "");
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::NIKEAudioSystem::createChannelGroup(std::string const& identifier) {
