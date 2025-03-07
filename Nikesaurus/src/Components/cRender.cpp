@@ -37,29 +37,29 @@ namespace NIKE {
 			//Serialize
 			[](Render::ParticleEmitter const& comp) -> nlohmann::json {
 				return	{
-					{ "preset", static_cast<int>(comp.preset) },
-					{ "render_type", static_cast<int>(comp.render_type) },
+					{ "preset", static_cast<int>(comp.p_system->preset) },
+					{ "render_type", static_cast<int>(comp.p_system->render_type) },
 					{ "offset", comp.offset.toJson() },
-					{ "duration", comp.duration },
+					{ "duration", comp.p_system->duration },
 
-					{ "num_new_particles_per_second", comp.num_new_particles_per_second },
-					{ "particle_lifespan", comp.particle_lifespan },
-					{ "particle_acceleration", comp.particle_acceleration },
-					{ "particle_velocity_range", comp.particle_velocity_range.toJson() },
-					{ "particle_vector_x_range", comp.particle_vector_x_range.toJson() },
-					{ "particle_vector_y_range", comp.particle_vector_y_range.toJson() },
-					{ "particle_color_is_random", comp.particle_color_is_random },
-					{ "particle_color", comp.particle_color.toJson()},
-					{ "particle_rand_x_offset_range", comp.particle_rand_x_offset_range.toJson()},
-					{ "particle_rand_y_offset_range", comp.particle_rand_y_offset_range.toJson()},
-					{ "particle_rotation", comp.particle_rotation },
-					{ "particle_rand_width_range", comp.particle_rand_width_range.toJson()},
+					{ "num_new_particles_per_second", comp.p_system->num_new_particles_per_second },
+					{ "particle_lifespan", comp.p_system->particle_lifespan },
+					{ "particle_acceleration", comp.p_system->particle_acceleration },
+					{ "particle_velocity_range", comp.p_system->particle_velocity_range.toJson() },
+					{ "particle_vector_x_range", comp.p_system->particle_vector_x_range.toJson() },
+					{ "particle_vector_y_range", comp.p_system->particle_vector_y_range.toJson() },
+					{ "particle_color_is_random", comp.p_system->particle_color_is_random },
+					{ "particle_color", comp.p_system->particle_color.toJson()},
+					{ "particle_rand_x_offset_range", comp.p_system->particle_rand_x_offset_range.toJson()},
+					{ "particle_rand_y_offset_range", comp.p_system->particle_rand_y_offset_range.toJson()},
+					{ "particle_rotation", comp.p_system->particle_rotation },
+					{ "particle_rand_width_range", comp.p_system->particle_rand_width_range.toJson()},
 
-					{ "particle_size_changes_over_time", comp.particle_size_changes_over_time },
-					{ "particle_final_size", comp.particle_final_size.toJson()},
-					{ "particle_color_changes_over_time", comp.particle_color_changes_over_time },
-					{ "particle_final_color", comp.particle_final_color.toJson()},
-					{ "particle_rotation_speed", comp.particle_rotation_speed }
+					{ "particle_size_changes_over_time", comp.p_system->particle_size_changes_over_time },
+					{ "particle_final_size", comp.p_system->particle_final_size.toJson()},
+					{ "particle_color_changes_over_time", comp.p_system->particle_color_changes_over_time },
+					{ "particle_final_color", comp.p_system->particle_final_color.toJson()},
+					{ "particle_rotation_speed", comp.p_system->particle_rotation_speed }
 
 					//{ "ref", comp.ref }
 				};
@@ -68,12 +68,35 @@ namespace NIKE {
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
 				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
-				comp.offset.fromJson(data.at("offset"));
-				comp.duration = data.at("duration").get<float>();
 
 				//Initialize particle system
 				try {
+					comp.offset.fromJson(data.at("offset"));
+					comp.duration = data.at("duration").get<float>();
+					comp.preset = comp.preset;
+					comp.duration = data.at("duration").get<float>();
+					comp.render_type = data.at("render_type").get<int>();
+
+					comp.num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
+					comp.particle_lifespan = data.at("particle_lifespan").get<float>();
+					comp.particle_acceleration = data.at("particle_acceleration").get<float>();
+					comp.particle_velocity_range.fromJson(data.at("particle_velocity_range"));
+					comp.particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
+					comp.particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
+					comp.particle_color_is_random = data.at("particle_color_is_random").get<bool>();
+					comp.particle_color.fromJson(data.at("particle_color"));
+					comp.particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
+					comp.particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
+					comp.particle_rotation = data.at("particle_rotation").get<float>();
+					comp.particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
+					comp.particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
+					comp.particle_final_size.fromJson(data.at("particle_final_size"));
+					comp.particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
+					comp.particle_final_color.fromJson(data.at("particle_final_color"));
+					comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
+					
 					comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+
 					comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
 					comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
 					comp.p_system->is_alive = true;
@@ -82,24 +105,25 @@ namespace NIKE {
 					comp.p_system->using_world_pos = true; // Temporary set to true
 					comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
 
-					comp.p_system->num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
-					comp.p_system->particle_lifespan = data.at("particle_lifespan").get<float>();
-					comp.p_system->particle_acceleration = data.at("particle_acceleration").get<float>();
-					comp.p_system->particle_velocity_range.fromJson(data.at("particle_velocity_range"));
-					comp.p_system->particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
-					comp.p_system->particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
-					comp.p_system->particle_color_is_random = data.at("particle_color_is_random").get<bool>();
-					comp.p_system->particle_color.fromJson(data.at("particle_color"));
-					comp.p_system->particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
-					comp.p_system->particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
-					comp.p_system->particle_rotation = data.at("particle_rotation").get<float>();
-					comp.p_system->particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
-					comp.p_system->particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
-					comp.p_system->particle_final_size.fromJson(data.at("particle_final_size"));
-					comp.p_system->particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
-					comp.p_system->particle_color_changes_over_time = false;
-					comp.p_system->particle_final_color.fromJson(data.at("particle_final_color"));
-					comp.p_system->particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
+					//	comp.p_system->num_new_particles_per_second
+					//	comp.p_system->particle_lifespan
+					//	comp.p_system->particle_acceleration
+					//	comp.p_system->particle_velocity_range
+					//	comp.p_system->particle_vector_x_range
+					//	comp.p_system->particle_vector_y_range
+					//	comp.p_system->particle_color_is_random
+					//	comp.p_system->particle_color
+					//	comp.p_system->particle_rand_x_offset_range
+					//	comp.p_system->particle_rand_y_offset_range
+					//	comp.p_system->particle_rotation
+					//	comp.p_system->particle_rand_width_range
+					//	comp.p_system->particle_size_changes_over_time
+					//	comp.p_system->particle_final_size
+					//	comp.p_system->particle_color_changes_over_time
+					//	comp.p_system->particle_color_changes_over_time
+					//	comp.p_system->particle_final_color
+					//	comp.p_system->particle_rotation_speed
+
 				}
 				catch (std::exception& e) {
 					(void)e;
