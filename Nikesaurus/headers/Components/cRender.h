@@ -141,6 +141,9 @@ namespace NIKE {
 			bool particle_color_changes_over_time{false};
 			Vector4f particle_final_color{};
 			float particle_rotation_speed{};		// in degrees (anticlockwise) per second !NOTE: rmb to convert to radians lol
+			
+			// texture
+			std::string texture_ref{};
 
 			ParticleEmitter();
 		};

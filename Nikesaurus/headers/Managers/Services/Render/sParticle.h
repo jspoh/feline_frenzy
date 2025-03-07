@@ -58,14 +58,14 @@ namespace NIKE {
 			enum class ParticleRenderType {
 				QUAD = 0,
 				CIRCLE,
-				// TEXTURE,
+				 TEXTURED,
 				NUM_PARTICLE_RENDER_TYPES
 			};
 
 			static inline std::unordered_map<ParticleRenderType, std::string> particle_render_type_map{
 				{ ParticleRenderType::QUAD, "quad" },
 				{ ParticleRenderType::CIRCLE, "circle" },
-				// { ParticleRenderType::TEXTURE, "texture" }
+				{ ParticleRenderType::TEXTURED, "textured" }
 			};
 		};
 
@@ -121,6 +121,9 @@ namespace NIKE {
 				bool particle_color_changes_over_time{};
 				Vector4f particle_final_color{};
 				float particle_rotation_speed{};
+
+				// texture
+				std::string texture_ref{};
 			};
 
 			class Manager {

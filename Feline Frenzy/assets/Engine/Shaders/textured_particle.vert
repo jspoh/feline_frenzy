@@ -1,11 +1,11 @@
 #version 450 core
 
 /*****************************************************************//**
- * \file   quad_particle.vert
+ * \file   textured_particle.vert
  * \brief
  *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
- * \date   31 Jan 2024
+ * \date   7 March 2024
  * All content Copyright 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
@@ -23,6 +23,7 @@ layout(location=0) flat out vec2 f_particle_position;     // screen pos
 layout(location=1) flat out vec4 f_particle_color;
 layout(location=2) flat out vec2 f_particle_size;
 layout(location=3) flat out float f_rotation;
+layout(location=4) out vec2 f_texcoord;
 
 uniform vec2 iResolution;   // Viewport resolution (in pixels)
 uniform float iTime;        // Shader playback time (in seconds)
@@ -60,4 +61,14 @@ void main() {
   f_particle_color = a_particle_color;
   f_particle_size = a_particle_size;
   f_rotation = a_rotation;
+
+  vec2 texCoords[6] = vec2[6](
+    vec2(1.0, 0.0),  // bottom-right
+    vec2(1.0, 1.0),  // top-right
+    vec2(0.0, 1.0),  // top-left
+    vec2(0.0, 1.0),  // top-left
+    vec2(0.0, 0.0),  // bottom-left
+    vec2(1.0, 0.0)   // bottom-right
+  );
+  f_texcoord = texCoords[gl_VertexID % 6];
 }

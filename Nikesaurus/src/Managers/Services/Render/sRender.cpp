@@ -677,7 +677,7 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos) {
+	void Render::Service::renderParticleSystem(const NIKE::SysParticle::ParticleSystem& ps, bool use_screen_pos, const std::string& texture_ref) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -686,8 +686,8 @@ namespace NIKE {
 		int NUM_VERTICES = 6;		// defined in vertex shader
 		GLenum PRIMITIVE = GL_TRIANGLES;
 
-		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type));
-		if (preset == static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::BASE)) {
+		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(ps.render_type));
+		if (ps.preset == NIKE::SysParticle::Data::ParticlePresets::BASE) {
 			ref = "base";
 			NUM_VERTICES = 4;
 			PRIMITIVE = GL_TRIANGLE_STRIP;
@@ -699,10 +699,25 @@ namespace NIKE {
 
 		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
 		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
-		shader_manager->setUniform(shader_name, "particleScreenOrigin", worldToScreen(origin));			// particle screen pos
+		shader_manager->setUniform(shader_name, "particleScreenOrigin", worldToScreen(ps.origin));			// particle screen pos
 
 		if (use_screen_pos) {
-			shader_manager->setUniform(shader_name, "particleScreenOrigin", origin);
+			shader_manager->setUniform(shader_name, "particleScreenOrigin", ps.origin);
+		}
+
+		if (static_cast<NIKE::SysParticle::Data::ParticleRenderType>(ps.render_type) == NIKE::SysParticle::Data::ParticleRenderType::TEXTURED) {
+			unsigned int tex_hdl;
+			try {
+				// using texture
+				tex_hdl = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(texture_ref)->gl_data;
+			}
+			catch (...) {
+				NIKEE_CORE_ERROR("Error: Texture {0} not found in {1}: {2}", texture_ref, __FUNCTION__, "");
+				return;
+			}
+			const int tex_binding_unit = 6;
+			glBindTextureUnit(tex_binding_unit, tex_hdl);
+			shader_manager->setUniform(shader_name, "u_tex2d", tex_binding_unit);
 		}
 
 		err = glGetError();
@@ -710,13 +725,38 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
-		const unsigned int vao = particle_manager->getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
+		//Particles to render (transform positions)
+		// USE THIS PARTICLE BUFFER TO RENDER, NOT ps.particles
+		auto particles = ps.particles;
+
+		// assume world pos
+		if (ps.using_world_pos) {
+			std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
+				p.pos = worldToScreen(p.pos);
+				});
+		}
+
+		//Bind buffer
+		const unsigned int vbo = particle_manager->getVBO(ps.preset);
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
+		}
+		glNamedBufferSubData(vbo, 0, particles.size() * sizeof(SysParticle::Particle), particles.data());
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
+		}
+
+		const unsigned int vao = particle_manager->getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(ps.preset));
 		glBindVertexArray(vao);
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL after binding vao in {0}: {1}", __FUNCTION__, err);
 		}
+
+		const int draw_count = max(1, static_cast<int>(particles.size()));	// number of objects to draw, min 1
 
 		glDrawArraysInstanced(PRIMITIVE, 0, NUM_VERTICES, draw_count);
 
@@ -975,40 +1015,16 @@ namespace NIKE {
 			particle_sys.particle_color_changes_over_time = e_particle.particle_color_changes_over_time;
 			particle_sys.particle_final_color = e_particle.particle_final_color;
 			particle_sys.particle_rotation_speed = e_particle.particle_rotation_speed;
+			particle_sys.texture_ref= e_particle.texture_ref;
 
 			//Update particle system
 			particle_manager->updateParticleSystem(particle_sys);
 
-			//const unsigned int vao = PM.getVAO(ps.preset);
-			const unsigned int vbo = particle_manager->getVBO(particle_sys.preset);
-
-			//Particles to render
-			auto particles = particle_sys.particles;
-
-			// assume world pos
-			if (particle_sys.using_world_pos) {
-				std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
-					p.pos = worldToScreen(p.pos);
-					});
-			}
-
-			//Bind buffer
-			GLenum err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
-			}
-			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(SysParticle::Particle), particles.data());
-			err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
-			}
-			const int num_particles = max(1, static_cast<int>(particles.size()));
-
 			//Particle render function
-			auto particle_render = [num_particles, &particle_sys, ref = e_particle.ref]() {
+			auto particle_render = [&particle_sys, ref = e_particle.ref]() {
 
-				NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(particle_sys.preset), particle_sys.origin, static_cast<int>(particle_sys.render_type), num_particles, ref == "mouseps1");
-				};
+				NIKE_RENDER_SERVICE->renderParticleSystem(particle_sys, ref == "mouseps1", particle_sys.texture_ref);
+			};
 
 			//Check for screen position !!!More work to be done here to ensure screen particles are rendered correctly
 			if (e_transform.use_screen_pos) {

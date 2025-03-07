@@ -26,18 +26,17 @@ namespace {
 	 * \param dp	decimal places
 	 * \return float
 	 */
-	float rand_float(const Vector2f& range, const int dp) {
+	float rand_float(const Vector2f& range, int dp) {
 		if (dp < 0) return 0.0f; // Prevent invalid decimal places
+		if (range.x > range.y) return range.x; // Handle invalid range
 
-		const int multiplier = static_cast<int>(powf(10, static_cast<float>(dp)));
-		if (multiplier == 0) return range.x; // Avoid division by zero, return min range
+		// !TODO: jspoh gotta check if this is randomizing correctly, make sure its not returning int but a float
+		//float multiplier = powf(10.f, static_cast<float>(dp));
+		float rand_val = static_cast<float>(rand()) / RAND_MAX; // Random value in [0, 1]
 
-		const int range_scaled = static_cast<int>((range.y - range.x) * multiplier);
-		if (range_scaled < 0) return range.x; // Handle invalid range
-
-		const int rand_int = rand() % (range_scaled + 1) + static_cast<int>(range.x * multiplier);
-		return static_cast<float>(rand_int) / multiplier;
+		return (range.x + rand_val * (range.y - range.x));
 	}
+
 
 
 	float lerp(float a, float b, float t) {
@@ -83,14 +82,17 @@ NSPM::Manager() {
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::CLUSTER], vbo_map[Data::ParticlePresets::CLUSTER]);
 
 	// create vao and vbo for FIRE particley preset
-	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
-	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
+	vao_map[Data::ParticlePresets::FIRE] = 0;
+	vbo_map[Data::ParticlePresets::FIRE] = 0;
+	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::FIRE], vbo_map[Data::ParticlePresets::FIRE]);
 
 	// create vao and vbo for NONE particle preset
 	vao_map[Data::ParticlePresets::NONE] = 0;
 	vbo_map[Data::ParticlePresets::NONE] = 0;
-	vao_map[Data::ParticlePresets::NONE] = vao_map[Data::ParticlePresets::CLUSTER];
-	vbo_map[Data::ParticlePresets::NONE] = vbo_map[Data::ParticlePresets::CLUSTER];
+	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::NONE], vbo_map[Data::ParticlePresets::NONE]);
+
+
+	
 
 	err = glGetError();
 	if (err != GL_NO_ERROR) {
@@ -235,8 +237,8 @@ void NSPM::updateParticleSystem(ParticleSystem& ps) {
 			ACCELERATION = ps.particle_acceleration;
 			NEW_PARTICLES_PER_SECOND = ps.num_new_particles_per_second;
 			PARTICLE_VELOCITY_RANGE = ps.particle_velocity_range;
-			float MAX_OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
-			float MAX_OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
+			float OFFSET_X = rand_float(ps.particle_rand_x_offset_range, 1);
+			float OFFSET_Y = rand_float(ps.particle_rand_y_offset_range, 1);
 			const float vecX = rand_float(ps.particle_vector_x_range, 1);
 			const float vecY = rand_float(ps.particle_vector_y_range, 1);
 			VECTOR = { vecX, vecY };
@@ -250,8 +252,8 @@ void NSPM::updateParticleSystem(ParticleSystem& ps) {
 			const float width = rand_float(ps.particle_rand_width_range, 1);
 			SIZE = { width, width };
 			PARTICLE_ORIGIN = {
-				ps.origin.x + (static_cast<int>(MAX_OFFSET_X) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_X)) : 0),
-				ps.origin.y + (static_cast<int>(MAX_OFFSET_Y) ? static_cast<float>(rand() % static_cast<int>(MAX_OFFSET_Y)) : 0)
+				ps.origin.x + OFFSET_X,
+				ps.origin.y + OFFSET_Y
 			};
 			break;
 		}
@@ -323,6 +325,8 @@ void NSPM::updateParticleSystem(ParticleSystem& ps) {
 			SIZE = { 5.f, 5.f };
 			break;
 		}
+		case Data::ParticlePresets::BASE:
+			break;
 		default: {
 			throw std::runtime_error("Invalid particle preset");
 		}
