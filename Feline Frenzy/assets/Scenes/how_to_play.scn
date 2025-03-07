@@ -1,6 +1,12 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
             "Menu_BGM": {
                 "loop": true,
                 "tracks": [
@@ -8,6 +14,10 @@
                 ]
             },
             "SFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
                 "loop": false,
                 "tracks": []
             }

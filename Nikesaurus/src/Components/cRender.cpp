@@ -66,8 +66,6 @@ namespace NIKE {
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
-				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
 
 				//Initialize particle system
 				try {
@@ -128,9 +126,6 @@ namespace NIKE {
 				catch (std::exception& e) {
 					(void)e;
 				}
-
-				// add particle system
-				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
@@ -209,8 +204,6 @@ namespace NIKE {
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
-				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
 				if (delta.contains("preset")) {
 					comp.p_system->preset = delta["preset"];
 				}
@@ -276,9 +269,6 @@ namespace NIKE {
 				if (delta.contains("particle_rotation_speed")) {
 					comp.p_system->particle_rotation_speed = delta["particle_rotation_speed"];
 				}
-
-				// add particle system
-				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.p_system->preset), comp.p_system->offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.p_system->render_type), comp.p_system->duration);
 			}
 		);
 

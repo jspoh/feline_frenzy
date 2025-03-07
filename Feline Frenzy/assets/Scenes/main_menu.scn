@@ -1,6 +1,10 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": false,
+                "tracks": []
+            },
             "Menu_BGM": {
                 "loop": true,
                 "tracks": [
@@ -8,6 +12,10 @@
                 ]
             },
             "SFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
                 "loop": false,
                 "tracks": []
             }
