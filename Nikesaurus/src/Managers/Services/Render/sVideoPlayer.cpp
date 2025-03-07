@@ -56,43 +56,71 @@ void NIKE::VideoPlayer::Manager::init(Render::Video& video) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    //Get audio sample rate from video
-    int sample_rate = plm_audio_get_samplerate(video.mpeg->audio_decoder);
-    if (sample_rate == 0) {
-        sample_rate = 44100; //Default to 44.1kHz if unknown
-    }
-
-    //Configure FMOD sound buffer
-    FMOD_CREATESOUNDEXINFO sound_info = {};
-    sound_info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-    sound_info.format = FMOD_SOUND_FORMAT_PCMFLOAT;
-    sound_info.defaultfrequency = sample_rate;
-    sound_info.numchannels = 2;
-    sound_info.length = sample_rate * 2 * sizeof(float);
-
-    //Create channel group if not created yet
-    if (!video.channel_group) {
-        video.channel_group = NIKE_AUDIO_SERVICE->getAudioSystem()->createChannelGroup("Video Channels");
-    }
-
-    //Create stream
-    video.audio = NIKE_AUDIO_SERVICE->getAudioSystem()->createStream(nullptr, NIKE_AUDIO_OPENUSER | NIKE_AUDIO_LOOP_OFF | NIKE_AUDIO_2D, &sound_info);
-
-    //Buffer initial audio
+    //Init audio frame data
     plm_samples_t* audio_frame = plm_decode_audio(video.mpeg);
     if (audio_frame) {
-        void* buffer;
-        unsigned int length;
-        video.audio->lock(0, audio_frame->count * sizeof(float) * 2, &buffer, nullptr, &length, nullptr);
-        memcpy(buffer, audio_frame->interleaved, length);
-        video.audio->unlock(buffer, nullptr, length, length);
-    }
 
-    //Play audio
-    video.channel = NIKE_AUDIO_SERVICE->getAudioSystem()->playSound(video.audio, video.channel_group);
+        //Gather audio/video info from plmpeg
+        int channels = 2;
+        int sample_rate = plm_get_samplerate(video.mpeg);
+        double fps = plm_get_framerate(video.mpeg);
+
+        //Calculate samples per frame
+        unsigned int samples_per_frame = (unsigned int)ceil((sample_rate / fps) * channels);
+
+        //Configure FMOD sound buffer
+        FMOD_CREATESOUNDEXINFO sound_info = FMOD_CREATESOUNDEXINFO();
+        sound_info.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+        sound_info.format = FMOD_SOUND_FORMAT_PCMFLOAT;
+        sound_info.defaultfrequency = sample_rate;
+        sound_info.numchannels = channels;
+        sound_info.decodebuffersize = samples_per_frame;
+        sound_info.length = audio_frame->count * sizeof(float) * channels;
+
+        //Create channel group if not created yet
+        if (!video.channel_group) {
+            video.channel_group = NIKE_AUDIO_SERVICE->getAudioSystem()->createChannelGroup("Video Channels");
+            NIKE_AUDIO_SERVICE->createChannelPlaylist("Video Channels");
+        }
+
+        //Check if there is a previous audio
+        if (video.audio) {
+            if (video.channel) {
+                if (video.channel->isPlaying()) {
+                    video.channel->stop();
+                }
+
+                video.channel = nullptr;
+            }
+            
+            video.audio->release();
+            video.audio = nullptr;
+        }
+
+        //Create stream
+        video.audio = NIKE_AUDIO_SERVICE->getAudioSystem()->createSound(nullptr, NIKE_AUDIO_OPENUSER | NIKE_AUDIO_LOOP_NORMAL | NIKE_AUDIO_2D, &sound_info);
+
+        //Play audio
+        video.channel = NIKE_AUDIO_SERVICE->getAudioSystem()->playSound(video.audio, video.channel_group);
+
+        //Buffer audio
+        void* buffer1 = nullptr;
+        void* buffer2 = nullptr;
+        unsigned int length1 = 0;
+        unsigned int length2 = 0;
+        video.audio->lock(0, sound_info.length, &buffer1, &buffer2, &length1, &length2);
+        memcpy(buffer1, audio_frame->interleaved, length1);
+        if (buffer2 && length2 > 0) {
+            memcpy(buffer2, audio_frame->interleaved + (length1 / sizeof(float)), length2);
+        }
+        video.audio->unlock(buffer1, buffer2, length1, length2);
+    }
 
     //Set init flag to false
     video.b_init = false;
+
+    //Update video data
+    video.duration = static_cast<float>(plm_get_duration(video.mpeg));
 }
 
 void NIKE::VideoPlayer::Manager::update(Render::Video& video) {
@@ -103,60 +131,110 @@ void NIKE::VideoPlayer::Manager::update(Render::Video& video) {
     //Return if mpeg is still not set
     if (!video.mpeg) return;
 
-    //Increment timer
-    video.timer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-    
-    //Calulate frame rate
-    float frame_rate = 1.0f / static_cast<float>(plm_get_framerate(video.mpeg));
+    //Get if video is playing
+    video.b_is_playing = !plm_has_ended(video.mpeg);
 
-    //Get current video time
-    float video_time_stamp = static_cast<float>(plm_get_time(video.mpeg));
-
-    //Get current audio time from for audio synchronization
-    if (video.channel) {
-        unsigned int audio_time = video.channel->getPosition(NIKE_AUDIO_TIMEUNIT_MS);
-        float audio_time_stamp = static_cast<float>(audio_time) / 1000.0f; // Convert ms to seconds
-
-        //Synchronize audio
-        float sync_treshold = 0.1f;
-        if (fabs(video_time_stamp - audio_time_stamp) > sync_treshold) {
-            video.channel->setPosition(static_cast<unsigned int>(video_time_stamp * 1000.0f), FMOD_TIMEUNIT_MS);
-        }
+    //Update loop mode
+    if (video.b_loop != static_cast<bool>(plm_get_loop(video.mpeg))) {
+        plm_set_loop(video.mpeg, video.b_loop);
     }
 
-    //Decode only when necessary
-    while (video.timer >= frame_rate) {
-        auto* frame = plm_decode_video(video.mpeg);
-        if (frame) {
-            video.texture_size = { static_cast<float>(frame->width) , static_cast<float>(frame->height) };
+    //Check if video is active
+    if (video.b_is_playing || video.b_loop) {
 
-            //Bind texture and update texture
-            if (frame->y.data) {
+        //Update video data
+        video.curr_time = static_cast<float>(plm_get_time(video.mpeg));
 
-                //Convert plane to rgb
-                plm_frame_to_rgb(frame, video.rgb_data, frame->width * 3);
+        //Get delta time
+        auto delta_time = NIKE_WINDOWS_SERVICE->getDeltaTime();
 
-                //Flip RGB Buffer (Manually Swap Rows)
-                int row_size = frame->width * 3;
-                uint8_t* temp_row = new uint8_t[row_size];
+        //Increment timer
+        video.frame_timer += delta_time;
 
-                for (unsigned int y = 0; y < frame->height / 2; ++y) {
-                    uint8_t* top_row = video.rgb_data + (y * row_size);
-                    uint8_t* bottom_row = video.rgb_data + ((frame->height - 1 - y) * row_size);
+        //Calulate frame rate
+        float frame_rate = 1.0f / static_cast<float>(plm_get_framerate(video.mpeg));
 
-                    // Swap rows
-                    memcpy(temp_row, top_row, row_size);
-                    memcpy(top_row, bottom_row, row_size);
-                    memcpy(bottom_row, temp_row, row_size);
+        //Decode frame only when necessary
+        if (video.frame_timer >= frame_rate) {
+
+            //Decode new video frame
+            auto* frame = plm_decode_video(video.mpeg);
+            if (frame) {
+                video.texture_size = { static_cast<float>(frame->width) , static_cast<float>(frame->height) };
+
+                //Bind texture and update texture
+                if (frame->y.data) {
+
+                    //Convert plane to rgb
+                    plm_frame_to_rgb(frame, video.rgb_data, frame->width * 3);
+
+                    //Flip RGB Buffer (Manually Swap Rows)
+                    int row_size = frame->width * 3;
+                    uint8_t* temp_row = new uint8_t[row_size];
+
+                    for (unsigned int y = 0; y < frame->height / 2; ++y) {
+                        uint8_t* top_row = video.rgb_data + (y * row_size);
+                        uint8_t* bottom_row = video.rgb_data + ((frame->height - 1 - y) * row_size);
+
+                        // Swap rows
+                        memcpy(temp_row, top_row, row_size);
+                        memcpy(top_row, bottom_row, row_size);
+                        memcpy(bottom_row, temp_row, row_size);
+                    }
+                    delete[] temp_row;// Free temp buffer
+
+                    //Bind texture & generate sub image
+                    glBindTexture(GL_TEXTURE_2D, video.texture_id);
+                    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height, GL_RGB, GL_UNSIGNED_BYTE, video.rgb_data);
                 }
-                delete[] temp_row;// Free temp buffer
-
-                //Bind texture & generate sub image
-                glBindTexture(GL_TEXTURE_2D, video.texture_id);
-                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height, GL_RGB, GL_UNSIGNED_BYTE, video.rgb_data);
             }
+
+            video.frame_timer = 0.0f;
         }
-        video.timer -= frame_rate;
+
+        //Increment timer
+        video.audio_timer += delta_time;
+
+        //Adjust playback speed
+        float play_back_speed = 1.0f + delta_time;
+        if(video.channel) video.channel->setPitch(play_back_speed);
+
+        //Get sample rate
+        int sample_rate = plm_get_samplerate(video.mpeg);
+
+        //Calulate frame rate
+        float audio_rate = static_cast<float>(PLM_AUDIO_SAMPLES_PER_FRAME) / static_cast<float>(sample_rate);
+
+        //Decode new audio frame only when needed
+        if (video.audio_timer >= audio_rate) {
+
+            //Decode new audio frame
+            auto* audio_frame = plm_decode_audio(video.mpeg);
+            if (!video.channel->getPaused() && audio_frame) {
+
+                //Get current FMOD playback position (in PCM bytes)
+                unsigned int play_position = video.channel->getPosition(NIKE_AUDIO_TIMEUNIT_PCMBYTES) * sizeof(float) * 2;
+
+                //Check if we need to write more PCM data
+                unsigned int buffer_size = video.audio->getLength(FMOD_TIMEUNIT_PCMBYTES);
+                unsigned int write_position = (play_position + buffer_size / 2) % buffer_size;
+
+                //Buffer audio
+                void* buffer1 = nullptr;
+                void* buffer2 = nullptr;
+                unsigned int length1 = 0;
+                unsigned int length2 = 0;
+                unsigned int audio_frame_size = audio_frame->count * sizeof(float) * 2;
+                video.audio->lock(write_position, audio_frame_size, &buffer1, &buffer2, &length1, &length2);
+                memcpy(buffer1, audio_frame->interleaved, length1);
+                if (buffer2 && length2 > 0) {
+                    memcpy(buffer2, audio_frame->interleaved + (length1 / sizeof(float)), length2);
+                }
+                video.audio->unlock(buffer1, buffer2, length1, length2);
+            }
+
+            video.audio_timer = 0.0f;
+        }
     }
 }
 

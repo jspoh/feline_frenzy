@@ -41,6 +41,26 @@ namespace NIKE {
 					{ "render_type", static_cast<int>(comp.render_type) },
 					{ "offset", comp.offset.toJson() },
 					{ "duration", comp.duration },
+
+					{ "num_new_particles_per_second", comp.num_new_particles_per_second },
+					{ "particle_lifespan", comp.particle_lifespan },
+					{ "particle_acceleration", comp.particle_acceleration },
+					{ "particle_velocity_range", comp.particle_velocity_range.toJson() },
+					{ "particle_vector_x_range", comp.particle_vector_x_range.toJson() },
+					{ "particle_vector_y_range", comp.particle_vector_y_range.toJson() },
+					{ "particle_color_is_random", comp.particle_color_is_random },
+					{ "particle_color", comp.particle_color.toJson()},
+					{ "particle_rand_x_offset_range", comp.particle_rand_x_offset_range.toJson()},
+					{ "particle_rand_y_offset_range", comp.particle_rand_y_offset_range.toJson()},
+					{ "particle_rotation", comp.particle_rotation },
+					{ "particle_rand_width_range", comp.particle_rand_width_range.toJson()},
+
+					{ "particle_size_changes_over_time", comp.particle_size_changes_over_time },
+					{ "particle_final_size", comp.particle_final_size.toJson()},
+					{ "particle_color_changes_over_time", comp.particle_color_changes_over_time },
+					{ "particle_final_color", comp.particle_final_color.toJson()},
+					{ "particle_rotation_speed", comp.particle_rotation_speed }
+
 					//{ "ref", comp.ref }
 				};
 			},
@@ -48,40 +68,119 @@ namespace NIKE {
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
 				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
-				comp.preset = static_cast<int>(data.at("preset").get<int>());
-				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
 				comp.offset.fromJson(data.at("offset"));
 				comp.duration = data.at("duration").get<float>();
 
 				//Initialize particle system
-				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
-				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
-				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
-				comp.p_system->is_alive = true;
-				comp.p_system->duration = comp.duration;
-				comp.p_system->time_alive = 0.f;
-				comp.p_system->using_world_pos = true; // Temporary set to true
-				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
+				try {
+					comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+					comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
+					comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
+					comp.p_system->is_alive = true;
+					comp.p_system->duration = comp.duration;
+					comp.p_system->time_alive = 0.f;
+					comp.p_system->using_world_pos = true; // Temporary set to true
+					comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
+
+					comp.p_system->num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
+					comp.p_system->particle_lifespan = data.at("particle_lifespan").get<float>();
+					comp.p_system->particle_acceleration = data.at("particle_acceleration").get<float>();
+					comp.p_system->particle_velocity_range.fromJson(data.at("particle_velocity_range"));
+					comp.p_system->particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
+					comp.p_system->particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
+					comp.p_system->particle_color_is_random = data.at("particle_color_is_random").get<bool>();
+					comp.p_system->particle_color.fromJson(data.at("particle_color"));
+					comp.p_system->particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
+					comp.p_system->particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
+					comp.p_system->particle_rotation = data.at("particle_rotation").get<float>();
+					comp.p_system->particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
+					comp.p_system->particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
+					comp.p_system->particle_final_size.fromJson(data.at("particle_final_size"));
+					comp.p_system->particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
+					comp.p_system->particle_color_changes_over_time = false;
+					comp.p_system->particle_final_color.fromJson(data.at("particle_final_color"));
+					comp.p_system->particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
+				}
+				catch (std::exception& e) {
+					(void)e;
+				}
+
+				// add particle system
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.preset), comp.offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.render_type), comp.duration);
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
 
-				if (comp.preset != other_comp.preset) {
-					delta["preset"] = comp.preset;
+				if (comp.p_system->preset != other_comp.p_system->preset) {
+					delta["preset"] = comp.p_system->preset;
 				}
-				if (comp.render_type != other_comp.render_type) {
-					delta["render_type"] = comp.render_type;
+				if (comp.p_system->render_type != other_comp.p_system->render_type) {
+					delta["render_type"] = comp.p_system->render_type;
 				}
 				if (comp.offset != other_comp.offset) {
 					delta["offset"] = comp.offset.toJson();
 				}
-				if (comp.duration != other_comp.duration) {
-					delta["duration"] = comp.duration;
+				if (comp.p_system->duration != other_comp.p_system->duration) {
+					delta["duration"] = comp.p_system->duration;
 				}
-				//if (comp.ref != other_comp.ref) {
-				//	delta["ref"] = comp.ref;
+				//if (comp.p_system->ref != other_comp.p_system->ref) {
+				//	delta["ref"] = comp.p_system->ref;
 				//}
+
+				if (comp.p_system->num_new_particles_per_second != other_comp.p_system->num_new_particles_per_second) {
+					delta["num_new_particles_per_second"] = comp.p_system->num_new_particles_per_second;
+				}
+				if (comp.p_system->particle_lifespan != other_comp.p_system->particle_lifespan) {
+					delta["particle_lifespan"] = comp.p_system->particle_lifespan;
+				}
+				if (comp.p_system->particle_acceleration != other_comp.p_system->particle_acceleration) {
+					delta["particle_acceleration"] = comp.p_system->particle_acceleration;
+				}
+				if (comp.p_system->particle_velocity_range != other_comp.p_system->particle_velocity_range) {
+					delta["particle_velocity_range"] = comp.p_system->particle_velocity_range.toJson();
+				}
+				if (comp.p_system->particle_vector_x_range != other_comp.p_system->particle_vector_x_range) {
+					delta["particle_vector_x_range"] = comp.p_system->particle_vector_x_range.toJson();
+				}
+				if (comp.p_system->particle_vector_y_range != other_comp.p_system->particle_vector_y_range) {
+					delta["particle_vector_y_range"] = comp.p_system->particle_vector_y_range.toJson();
+				}
+				if (comp.p_system->particle_color_is_random != other_comp.p_system->particle_color_is_random) {
+					delta["particle_color_is_random"] = comp.p_system->particle_color_is_random;
+				}
+				if (comp.p_system->particle_color != other_comp.p_system->particle_color) {
+					delta["particle_color"] = comp.p_system->particle_color.toJson();
+				}
+				if (comp.p_system->particle_rand_x_offset_range != other_comp.p_system->particle_rand_x_offset_range) {
+					delta["particle_rand_x_offset_range"] = comp.p_system->particle_rand_x_offset_range.toJson();
+				}
+				if (comp.p_system->particle_rand_y_offset_range != other_comp.p_system->particle_rand_y_offset_range) {
+					delta["particle_rand_y_offset_range"] = comp.p_system->particle_rand_y_offset_range.toJson();
+				}
+				if (comp.p_system->particle_rotation != other_comp.p_system->particle_rotation) {
+					delta["particle_rotation"] = comp.p_system->particle_rotation;
+				}
+				if (comp.p_system->particle_rand_width_range != other_comp.p_system->particle_rand_width_range) {
+					delta["particle_rand_width_range"] = comp.p_system->particle_rand_width_range.toJson();
+				}
+
+				if (comp.p_system->particle_size_changes_over_time != other_comp.p_system->particle_size_changes_over_time) {
+					delta["particle_size_changes_over_time"] = comp.p_system->particle_size_changes_over_time;
+				}
+				if (comp.p_system->particle_final_size != other_comp.p_system->particle_final_size) {
+					delta["particle_final_size"] = comp.p_system->particle_final_size.toJson();
+				}
+				if (comp.p_system->particle_color_changes_over_time != other_comp.p_system->particle_color_changes_over_time) {
+					delta["particle_color_changes_over_time"] = comp.p_system->particle_color_changes_over_time;
+				}
+				if (comp.p_system->particle_final_color != other_comp.p_system->particle_final_color) {
+					delta["particle_final_color"] = comp.p_system->particle_final_color.toJson();
+				}
+				if (comp.p_system->particle_rotation_speed != other_comp.p_system->particle_rotation_speed) {
+					delta["particle_rotation_speed"] = comp.p_system->particle_rotation_speed;
+				}
+
 				return delta;
 			},
 			// Override Deserialize
@@ -89,27 +188,73 @@ namespace NIKE {
 				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
 
 				if (delta.contains("preset")) {
-					comp.preset = delta["preset"];
+					comp.p_system->preset = delta["preset"];
 				}
 				if (delta.contains("render_type")) {
-					comp.render_type = delta["render_type"];
+					comp.p_system->render_type = delta["render_type"];
 				}
 				if (delta.contains("offset")) {
 					comp.offset.fromJson(delta["offset"]);
 				}
 				if (delta.contains("duration")) {
-					comp.duration = delta["duration"];
+					comp.p_system->duration = delta["duration"];
 				}
 
-				//Initialize particle system
-				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
-				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
-				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
-				comp.p_system->is_alive = true;
-				comp.p_system->duration = comp.duration;
-				comp.p_system->time_alive = 0.f;
-				comp.p_system->using_world_pos = true; // Temporary set to true
-				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
+				if (delta.contains("num_new_particles_per_second")) {
+					comp.p_system->num_new_particles_per_second = delta["num_new_particles_per_second"];
+				}
+				if (delta.contains("particle_lifespan")) {
+					comp.p_system->particle_lifespan = delta["particle_lifespan"];
+				}
+				if (delta.contains("particle_acceleration")) {
+					comp.p_system->particle_acceleration = delta["particle_acceleration"];
+				}
+				if (delta.contains("particle_velocity_range")) {
+					comp.p_system->particle_velocity_range.fromJson(delta["particle_velocity_range"]);
+				}
+				if (delta.contains("particle_vector_x_range")) {
+					comp.p_system->particle_vector_x_range.fromJson(delta["particle_vector_x_range"]);
+				}
+				if (delta.contains("particle_vector_y_range")) {
+					comp.p_system->particle_vector_y_range.fromJson(delta["particle_vector_y_range"]);
+				}
+				if (delta.contains("particle_color_is_random")) {
+					comp.p_system->particle_color_is_random = delta["particle_color_is_random"];
+				}
+				if (delta.contains("particle_color")) {
+					comp.p_system->particle_color.fromJson(delta["particle_color"]);
+				}
+				if (delta.contains("particle_rand_x_offset_range")) {
+					comp.p_system->particle_rand_x_offset_range.fromJson(delta["particle_rand_x_offset_range"]);
+				}
+				if (delta.contains("particle_rand_y_offset_range")) {
+					comp.p_system->particle_rand_y_offset_range.fromJson(delta["particle_rand_y_offset_range"]);
+				}
+				if (delta.contains("particle_rotation")) {
+					comp.p_system->particle_rotation = delta["particle_rotation"];
+				}
+				if (delta.contains("particle_rand_width_range")) {
+					comp.p_system->particle_rand_width_range.fromJson(delta["particle_rand_width_range"]);
+				}
+
+				if (delta.contains("particle_size_changes_over_time")) {
+					comp.p_system->particle_size_changes_over_time = delta["particle_size_changes_over_time"];
+				}
+				if (delta.contains("particle_final_size")) {
+					comp.p_system->particle_final_size.fromJson(delta["particle_final_size"]);
+				}
+				if (delta.contains("particle_color_changes_over_time")) {
+					comp.p_system->particle_color_changes_over_time = delta["particle_color_changes_over_time"];
+				}
+				if (delta.contains("particle_final_color")) {
+					comp.p_system->particle_final_color.fromJson(delta["particle_final_color"]);
+				}
+				if (delta.contains("particle_rotation_speed")) {
+					comp.p_system->particle_rotation_speed = delta["particle_rotation_speed"];
+				}
+
+				// add particle system
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.p_system->preset), comp.p_system->offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.p_system->render_type), comp.p_system->duration);
 			}
 		);
 
@@ -373,12 +518,14 @@ namespace NIKE {
 			[](Render::Video const& comp) -> nlohmann::json {
 				return	{
 						{ "Video_ID", comp.video_id },
+						{ "B_Loop", comp.b_loop }
 				};
 			},
 
 			//Deserialize
 			[](Render::Video& comp, nlohmann::json const& data) {
 				comp.video_id = data.value("Video_ID", "");
+				comp.b_loop = data.value("B_Loop", true);
 			},
 
 			// Override Serialize
@@ -389,13 +536,17 @@ namespace NIKE {
 					delta["Video_ID"] = comp.video_id;
 				}
 
+				if (comp.b_loop != other_comp.b_loop) {
+					delta["B_Loop"] = comp.b_loop;
+				}
+
 				return delta;
 			},
 
 			// Override Deserialize
 			[](Render::Video& comp, nlohmann::json const& delta) {
-				if (delta.contains("Video_ID")) {
-					comp.video_id = delta["Video_ID"];
+				if (delta.contains("B_Loop")) {
+					comp.b_loop = delta["B_Loop"];
 				}
 			}
 		);
@@ -412,6 +563,23 @@ namespace NIKE {
 					// Before change
 					static int before_change_preset;
 					static Vector2f before_change_offset;
+					static int before_change_num_new_particles_per_second;
+					static float before_change_particle_lifespan;
+					static float before_change_particle_acceleration;
+					static Vector2f before_change_particle_velocity_range;
+					static Vector2f before_change_particle_vector_x_range;
+					static Vector2f before_change_particle_vector_y_range;
+					static bool before_change_particle_color_is_random;
+					static Vector4f before_change_particle_color;
+					static Vector2f before_change_particle_rand_x_offset_range;
+					static Vector2f before_change_particle_rand_y_offset_range;
+					static float before_change_particle_rotation;
+					static Vector2f before_change_particle_rand_width_range;
+					static bool before_change_particle_final_size_changes_over_time;
+					static float before_change_particle_final_size;
+					static bool before_particle_color_changes_over_time;
+					static Vector4f before_change_particle_final_color;
+					static float before_change_particle_rotation_speed;
 
 					// Preset
 					ImGui::Text("Particle Preset:");
@@ -507,6 +675,291 @@ namespace NIKE {
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
 					}
+
+					ImGui::BeginDisabled(comp.preset != static_cast<int>(SysParticle::Data::ParticlePresets::NONE));
+
+					// particle settings
+					ImGui::Spacing();
+					ImGui::Text("Custom particle settings:");
+					ImGui::Spacing();
+
+					// Num new particles per second
+					{
+						ImGui::Text("Num New Particles Per Second:");
+						ImGui::DragInt("##Num New Particles Per Second", &comp.num_new_particles_per_second, 1, 0, 20, "%d", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_num_new_particles_per_second = comp.num_new_particles_per_second;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_num_new_particles_per_second;
+							change_num_new_particles_per_second.do_action = [&, num_new_particles_per_second = comp.num_new_particles_per_second]() {
+								comp.num_new_particles_per_second = num_new_particles_per_second;
+								};
+							change_num_new_particles_per_second.undo_action = [&, num_new_particles_per_second = before_change_num_new_particles_per_second]() {
+								comp.num_new_particles_per_second = num_new_particles_per_second;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_num_new_particles_per_second));
+						}
+					}
+
+					// Particle Lifespan
+					{
+						ImGui::Text("Particle Lifespan:");
+						ImGui::DragFloat("##Particle Lifespan", &comp.particle_lifespan, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_lifespan = comp.particle_lifespan;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_lifespan;
+							change_particle_lifespan.do_action = [&, particle_lifespan = comp.particle_lifespan]() {
+								comp.particle_lifespan = particle_lifespan;
+								};
+							change_particle_lifespan.undo_action = [&, particle_lifespan = before_change_particle_lifespan]() {
+								comp.particle_lifespan = particle_lifespan;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_lifespan));
+						}
+					}
+
+					// Particle Velocity Range
+					{
+						ImGui::Text("Particle Velocity Range:");
+						ImGui::DragFloat2("##Particle Velocity Range", reinterpret_cast<float*>(&comp.particle_velocity_range), 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_velocity_range = comp.particle_velocity_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_velocity_range;
+							change_particle_velocity_range.do_action = [&, particle_velocity_range = comp.particle_velocity_range]() {
+								comp.particle_velocity_range = particle_velocity_range;
+								};
+							change_particle_velocity_range.undo_action = [&, particle_velocity_range = before_change_particle_velocity_range]() {
+								comp.particle_velocity_range = particle_velocity_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_velocity_range));
+						}
+					}
+
+					// Particle directional vector range
+					{
+						ImGui::Text("Particle Directional Vector Range:");
+						ImGui::DragFloat2("##Particle Vector X Range", reinterpret_cast<float*>(&comp.particle_vector_x_range), 0.1f, -1.f, 1.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_vector_x_range = comp.particle_vector_x_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_vector_x_range;
+							change_particle_vector_x_range.do_action = [&, particle_vector_x_range = comp.particle_vector_x_range]() {
+								comp.particle_vector_x_range = particle_vector_x_range;
+								};
+							change_particle_vector_x_range.undo_action = [&, particle_vector_x_range = before_change_particle_vector_x_range]() {
+								comp.particle_vector_x_range = particle_vector_x_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_vector_x_range));
+						}
+
+						ImGui::Text("##Particle Vector Y Range");
+						ImGui::DragFloat2("##Particle Vector Y Range", reinterpret_cast<float*>(&comp.particle_vector_y_range), 0.1f, -1.f, 1.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_vector_y_range = comp.particle_vector_y_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_vector_y_range;
+							change_particle_vector_y_range.do_action = [&, particle_vector_y_range = comp.particle_vector_y_range]() {
+								comp.particle_vector_y_range = particle_vector_y_range;
+								};
+							change_particle_vector_y_range.undo_action = [&, particle_vector_y_range = before_change_particle_vector_y_range]() {
+								comp.particle_vector_y_range = particle_vector_y_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_vector_y_range));
+						}
+					}
+
+					// Particle Color
+					{
+						ImGui::Text("Particle color is random:");
+						ImGui::Checkbox("##Particle Color Is Random", &comp.particle_color_is_random);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_color_is_random = comp.particle_color_is_random;
+						}
+
+						ImGui::BeginDisabled(comp.particle_color_is_random);
+						{
+							static float particle_color[4] = { comp.particle_color.x, comp.particle_color.y, comp.particle_color.z, comp.particle_color.w };
+							ImGui::Text("Particle Color:");
+							if (ImGui::ColorPicker4("##Particle Color", particle_color, ImGuiColorEditFlags_AlphaBar)) {
+								comp.particle_color = { particle_color[0], particle_color[1], particle_color[2], particle_color[3] };
+							}
+						}
+						ImGui::EndDisabled();
+					}
+
+					// Particle Color Changes Over Time
+					{
+						ImGui::Text("Particle color changes over time:");
+						ImGui::Checkbox("##Particle color changes over time", &comp.particle_color_changes_over_time);
+						if (ImGui::IsItemActivated()) {
+							before_particle_color_changes_over_time = comp.particle_color_changes_over_time;
+						}
+
+						ImGui::BeginDisabled(!comp.particle_color_changes_over_time);
+
+						// Particle Final Color
+						ImGui::Text("Particle Final Color:");
+						static float particle_final_color[4] = { comp.particle_final_color.x, comp.particle_final_color.y, comp.particle_final_color.z, comp.particle_final_color.w };
+						if (ImGui::ColorPicker4("##Particle Final Color", particle_final_color, ImGuiColorEditFlags_AlphaBar)) {
+							comp.particle_final_color = { particle_final_color[0], particle_final_color[1], particle_final_color[2], particle_final_color[3] };
+						}
+
+						ImGui::EndDisabled();
+					}
+
+					// Particle Rand Offset Range
+					{
+						ImGui::Text("Particle Rand Offset Range:");
+						ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rand_x_offset_range = comp.particle_rand_x_offset_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rand_x_offset_range;
+							change_particle_rand_x_offset_range.do_action = [&, particle_rand_x_offset_range = comp.particle_rand_x_offset_range]() {
+								comp.particle_rand_x_offset_range = particle_rand_x_offset_range;
+								};
+							change_particle_rand_x_offset_range.undo_action = [&, particle_rand_x_offset_range = before_change_particle_rand_x_offset_range]() {
+								comp.particle_rand_x_offset_range = particle_rand_x_offset_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_x_offset_range));
+						}
+
+						//ImGui::SameLine();
+
+						ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rand_y_offset_range = comp.particle_rand_y_offset_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rand_y_offset_range;
+							change_particle_rand_y_offset_range.do_action = [&, particle_rand_y_offset_range = comp.particle_rand_y_offset_range]() {
+								comp.particle_rand_y_offset_range = particle_rand_y_offset_range;
+								};
+							change_particle_rand_y_offset_range.undo_action = [&, particle_rand_y_offset_range = before_change_particle_rand_y_offset_range]() {
+								comp.particle_rand_y_offset_range = particle_rand_y_offset_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_y_offset_range));
+						}
+					}
+
+					// Particle Rand Width Range
+					{
+						ImGui::Text("Particle Rand Size Range:");
+						ImGui::DragFloat2("##Particle Rand Size Range", &comp.particle_rand_width_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rand_width_range = comp.particle_rand_width_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rand_width_range;
+							change_particle_rand_width_range.do_action = [&, particle_rand_width_range = comp.particle_rand_width_range]() {
+								comp.particle_rand_width_range = particle_rand_width_range;
+								};
+							change_particle_rand_width_range.undo_action = [&, particle_rand_width_range = before_change_particle_rand_width_range]() {
+								comp.particle_rand_width_range = particle_rand_width_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_width_range));
+						}
+					}
+
+					// Particle Rotation
+					{
+						ImGui::Text("Particle Rotation:");
+						ImGui::DragFloat("##Particle Rotation", &comp.particle_rotation, 0.1f, 0.f, 359.9f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rotation = comp.particle_rotation;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rotation;
+							change_particle_rotation.do_action = [&, particle_rotation = comp.particle_rotation]() {
+								comp.particle_rotation = particle_rotation;
+								};
+							change_particle_rotation.undo_action = [&, particle_rotation = before_change_particle_rotation]() {
+								comp.particle_rotation = particle_rotation;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rotation));
+						}
+					}
+
+					ImGui::Spacing();
+					ImGui::Text("Particle behaviour over time");
+					ImGui::Spacing();
+
+					// Particle acceleration
+					{
+						ImGui::Text("Particle Acceleration:");
+						ImGui::DragFloat("##Particle Acceleration", &comp.particle_acceleration, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_acceleration = comp.particle_acceleration;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_acceleration;
+							change_particle_acceleration.do_action = [&, particle_acceleration = comp.particle_acceleration]() {
+								comp.particle_acceleration = particle_acceleration;
+								};
+							change_particle_acceleration.undo_action = [&, particle_acceleration = before_change_particle_acceleration]() {
+								comp.particle_acceleration = particle_acceleration;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_acceleration));
+						}
+					}
+
+					// particle size changes over time
+					{
+						ImGui::Text("Particle size changes over time:");
+						ImGui::Checkbox("##Particle size changes over time", &comp.particle_size_changes_over_time);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_final_size_changes_over_time = comp.particle_size_changes_over_time;
+						}
+
+						ImGui::BeginDisabled(!comp.particle_size_changes_over_time);
+
+						// Particle Final Size
+						ImGui::Text("Particle Final Size:");
+						ImGui::DragFloat2("##Particle Final Size", reinterpret_cast<float*>(& comp.particle_final_size), 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_final_size = comp.particle_final_size.x;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_final_size;
+							change_particle_final_size.do_action = [&, particle_final_size = comp.particle_final_size]() {
+								comp.particle_final_size = particle_final_size;
+								};
+							change_particle_final_size.undo_action = [&, particle_final_size = before_change_particle_final_size]() {
+								comp.particle_final_size.x = particle_final_size;
+								comp.particle_final_size.y = particle_final_size;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_final_size));
+						}
+
+						ImGui::EndDisabled();
+					}
+
+					// Particle rotation speed
+					ImGui::Text("Particle Rotation Speed(degrees anticlockwise / second):");
+					ImGui::DragFloat("##Particle Rotation Speed", &comp.particle_rotation_speed, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rotation_speed = comp.particle_rotation_speed;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rotation_speed;
+						change_particle_rotation_speed.do_action = [&, particle_rotation_speed = comp.particle_rotation_speed]() {
+							comp.particle_rotation_speed = particle_rotation_speed;
+							};
+						change_particle_rotation_speed.undo_action = [&, particle_rotation_speed = before_change_particle_rotation_speed]() {
+							comp.particle_rotation_speed = particle_rotation_speed;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rotation_speed));
+					}
+
+					ImGui::EndDisabled();		// end custom particle settings
 
 					// advanced options (for programmatic usage only)
 
@@ -1318,6 +1771,20 @@ namespace NIKE {
 					}
 				}
 
+				//To control video
+				{
+					ImGui::Text("Video Duration: %.3f secs / %.3f secs", comp.curr_time, comp.duration);
+
+					ImGui::Text("Video Playing: %s", comp.b_is_playing ? "True" : "False");
+
+					ImGui::Text("Video Looping:");
+
+					ImGui::SameLine();
+
+					if (ImGui::SmallButton(comp.b_loop ? "True" : "False")) {
+						comp.b_loop = !comp.b_loop;
+					}
+				}
 
 			}
 		);

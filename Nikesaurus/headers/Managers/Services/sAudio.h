@@ -45,8 +45,8 @@ namespace NIKE {
 			//Get audio file path
 			virtual std::string getFilePath() const = 0;
 
-			//Get length of audio ( Milliseconds )
-			virtual unsigned int getLength() const = 0;
+			//Get length of audio
+			virtual unsigned int getLength(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Set audio mode
 			virtual void setMode(NIKE_AUDIO_MODE mode) = 0;
@@ -167,10 +167,10 @@ namespace NIKE {
 			virtual int getLoopCount() const = 0;
 
 			//Set channel loop point ( Milliseconds )
-			virtual void setLoopPoints(unsigned int start, unsigned int end) = 0;
+			virtual void setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) = 0;
 
 			//Get audio loop point ( Milliseconds )
-			virtual Vector2<unsigned int> getLoopPoints() const = 0;
+			virtual Vector2<unsigned int> getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Set channel mute
 			virtual void setMute(bool state) = 0;
@@ -258,7 +258,7 @@ namespace NIKE {
 
 			std::string getFilePath() const override;
 
-			unsigned int getLength() const override;
+			unsigned int getLength(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			void setMode(NIKE_AUDIO_MODE) override;
 
@@ -351,9 +351,9 @@ namespace NIKE {
 
 			int getLoopCount() const override;
 
-			void setLoopPoints(unsigned int start, unsigned int end) override;
+			void setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) override;
 
-			Vector2<unsigned int> getLoopPoints() const override;
+			Vector2<unsigned int> getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			void setMute(bool state) override;
 
