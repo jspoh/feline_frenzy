@@ -31,7 +31,7 @@ namespace NIKE {
 			if (start.has_value()) {
 
 				// Get start index
-				auto start_index = start.value();
+				auto& start_index = start.value();
 
 				static float path_recalc_timer = 0.0f;
 				path_recalc_timer += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
@@ -246,7 +246,7 @@ namespace NIKE {
 		// Get player transform component
 		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		if (!p_transform_comp.has_value()) {
-			NIKEE_CORE_WARN("shootBullet: PLAYER missing TRANSFORM component!");
+			NIKEE_CORE_WARN("PLAYER missing TRANSFORM component!");
 			return;
 		}
 		const Vector2f& player_pos = p_transform_comp.value().get().position;
@@ -254,7 +254,7 @@ namespace NIKE {
 		// Get enemy components
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
 		if (!e_transform_comp.has_value()) {
-			NIKEE_CORE_WARN("shootBullet: ENEMY missing TRANSFORM component!");
+			NIKEE_CORE_WARN("ENEMY missing TRANSFORM component!");
 			return;
 		}
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
@@ -262,7 +262,7 @@ namespace NIKE {
 		// Attack Comp
 		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
 		if (!e_attack_comp.has_value()) {
-			NIKEE_CORE_WARN("shootBullet: ENEMY missing ATTACK component!");
+			NIKEE_CORE_WARN("ENEMY missing ATTACK component!");
 			return;
 		}
 		const auto& enemy_attack_comp = e_attack_comp.value().get();
@@ -281,27 +281,28 @@ namespace NIKE {
 			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_right, Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]);
 		}
 		else {
-			NIKEE_CORE_WARN("shootBullet: ENEMY missing Elemental Component");
+			NIKEE_CORE_WARN("ENEMY missing Elemental Component");
 			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_left, "bullet.prefab");
 			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_right, "bullet.prefab");
 		}
 
-		// Calculate direction for bullet (Enemy Pos - Player Pos)
+		// Calculate direction for bullet 
 		Vector2f direction = player_pos - enemy_pos;
 		direction.normalize();
 
-		// Calculate spread angle for bullet
-		float spreadAngle = 0.2f;  // Adjust for bullet spread distance
-		float angle_offset_left = -spreadAngle;  // To shoot left
-		float angle_offset_right = spreadAngle;  // To shoot right
+		// Adjust for bullet spread distance
+		float spread_angle = 0.2f;  
+		// Shoot left
+		float angle_offset_left = -spread_angle; 
+		// Shoot right
+		float angle_offset_right = spread_angle;  
 
-		// Apply sin/cos to split the direction of bullets
-		// Left Bullet:
+		// Left Bullet
 		Vector2f direction_left = direction;
 		direction_left.x = direction.x * std::cos(angle_offset_left) - direction.y * std::sin(angle_offset_left);
 		direction_left.y = direction.x * std::sin(angle_offset_left) + direction.y * std::cos(angle_offset_left);
 
-		// Right Bullet:
+		// Right Bullet
 		Vector2f direction_right = direction;
 		direction_right.x = direction.x * std::cos(angle_offset_right) - direction.y * std::sin(angle_offset_right);
 		direction_right.y = direction.x * std::sin(angle_offset_right) + direction.y * std::cos(angle_offset_right);
