@@ -13,7 +13,6 @@
 #ifndef _SYS_PARTICLE_H_
 #define _SYS_PARTICLE_H_
 
-
 #include "Core/stdafx.h"
 #include "Managers/Services/Assets/sLoader.h"
 #include "Core/Engine.h"

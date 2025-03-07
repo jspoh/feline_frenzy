@@ -88,7 +88,6 @@ namespace NIKE {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
-
 			if (layer->getLayerYSort()) {
 				layer->sortEntitiesBasedOnYPosition();
 			}

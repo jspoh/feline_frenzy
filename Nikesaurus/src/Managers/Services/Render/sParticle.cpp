@@ -65,11 +65,6 @@ NSPM::Manager() {
 
 	active_particle_systems.reserve(MAX_ACTIVE_PARTICLE_SYSTEMS);
 
-	err = glGetError();
-	if (err != GL_NO_ERROR) {
-		NIKEE_CORE_ERROR("OpenGL error after creating empty vao and vbo in {0}: {1}", __FUNCTION__, err);
-	}
-
 	// create vao and vbo for BASE particle preset
 	vao_map[Data::ParticlePresets::BASE] = 0;
 	vbo_map[Data::ParticlePresets::BASE] = 0;
@@ -81,7 +76,6 @@ NSPM::Manager() {
 	if (err != GL_NO_ERROR) {
 		NIKEE_CORE_ERROR("OpenGL error after creating empty vao and vbo in {0}: {1}", __FUNCTION__, err);
 	}
-
 
 	// create vao and vbo for CLUSTER particle preset
 	vao_map[Data::ParticlePresets::CLUSTER] = 0;
@@ -328,6 +322,9 @@ void NSPM::updateParticleSystem(ParticleSystem& ps) {
 			ROTATION = 0.f;
 			SIZE = { 5.f, 5.f };
 			break;
+		}
+		default: {
+			throw std::runtime_error("Invalid particle preset");
 		}
 		}
 
