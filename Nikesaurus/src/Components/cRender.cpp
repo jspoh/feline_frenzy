@@ -653,6 +653,81 @@ namespace NIKE {
 						}
 					}
 
+					// For texture id
+					{
+						// Hold the current and previous texture selection
+						static std::string previous_texture = comp.texture_ref;
+						std::string current_texture = comp.texture_ref;
+
+						ImGui::Text("Select Texture");
+
+						auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
+
+						// Find the index of the currently selected texture in the list
+						int current_index = -1;
+						for (size_t i = 0; i < all_loaded_textures.size(); ++i) {
+							if (current_texture == all_loaded_textures[i]) {
+								current_index = static_cast<int>(i);
+								break;
+							}
+						}
+
+						// Display combo box for texture selection
+						if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+
+							// Validate the selected index and get the new texture
+							if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
+								std::string new_texture = all_loaded_textures[current_index];
+
+								if (new_texture != comp.texture_ref) {
+									// Save action
+									LevelEditor::Action change_font_action;
+									change_font_action.do_action = [&, texture_ref = new_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									// Undo action
+									change_font_action.undo_action = [&, texture_ref = previous_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									// Execute the action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
+
+									// Update the previous texture
+									previous_texture = new_texture;
+								}
+							}
+						}
+						if (ImGui::IsItemHovered()) {
+							ImGui::SetTooltip("Select a texture or drag & drop a texture file.");
+						}
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+								const char* dropped_file = static_cast<const char*>(payload->Data);
+								if (dropped_file) {
+									std::string new_texture = dropped_file;
+
+									// Ensure it's a valid texture format
+
+									LevelEditor::Action change_texture_action;
+									change_texture_action.do_action = [&, texture_ref = new_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									change_texture_action.undo_action = [&, texture_ref = previous_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_texture_action));
+									previous_texture = new_texture;
+
+								}
+							}
+							ImGui::EndDragDropTarget();
+						}
+					}
+
 					// render type
 					ImGui::Text("Particle Render Type:");
 					std::string render_type_options{};

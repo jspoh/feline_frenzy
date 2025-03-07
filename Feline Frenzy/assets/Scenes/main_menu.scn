@@ -264,9 +264,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.6901960968971252,
-                                    "y": 0.3294117748737335,
-                                    "z": 0.6431372761726379
+                                    "x": 0.05098039284348488,
+                                    "y": 0.8549019694328308,
+                                    "z": 0.9019607901573181
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
