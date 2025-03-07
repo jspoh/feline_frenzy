@@ -35,6 +35,9 @@ namespace NIKE {
 			//Camera height
 			float cam_height;
 
+			//Camera movement offset
+			float mouse_offset;
+
 			//On change camera event
 			void onEvent(std::shared_ptr<Render::ChangeCamEvent> event) override;
 
@@ -88,6 +91,12 @@ namespace NIKE {
 
 			//Get camera height
 			float getCameraHeight() const;
+
+			//Set mouse offset
+			void setMouseOffset(float offset);
+
+			//Get camera offest
+			float getMouseOffset() const;
 			
 
 			/*****************************************************************//**

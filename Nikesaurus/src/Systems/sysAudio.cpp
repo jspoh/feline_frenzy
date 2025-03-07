@@ -62,7 +62,7 @@ namespace NIKE {
 			if (!channels.second->isPlaying() && !channels.second->getPaused()) {
 				const auto& playlist = NIKE_AUDIO_SERVICE->getChannelPlaylist(channels.first);
 				if (!playlist.tracks.empty()) {
-					const std::string& audio_id = std::move(playlist.tracks.front());
+					const std::string& audio_id = playlist.tracks.front();
 					
 					NIKE_AUDIO_SERVICE->playAudio(audio_id, "", channels.first, 1.f, 1.f, false, true);
 
