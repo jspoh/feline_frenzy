@@ -1507,12 +1507,74 @@ namespace NIKE {
 
 			//Add Children
 			if (parent) {
+
+				//List childrens
 				ImGui::Text("Children: ");
+
+				//Iterate through children
+				for (auto const& child_name : parent->childrens) {
+
+					//List entity name
+					if (ImGui::Button(child_name.c_str())) {
+						auto c_entity = NIKE_METADATA_SERVICE->getEntityByName(child_name);
+						selected_entity = c_entity.has_value() ? c_entity.value() : selected_entity;
+					}
+				}
 			}
 
 			//Change Parent
 			if (child) {
 				ImGui::Text("Parent: %s", child->parent.c_str());
+				std::vector<const char*> entities_name;
+
+				//Static prev parent
+				static std::string prev_parent = "";
+
+				//Get all entities name
+				for (auto const& entity : NIKE_METADATA_SERVICE->getEntitiesData()) {
+					entities_name.push_back(entity.second.name.c_str());
+				}
+
+				//Find the index of the currently selected parent entity in the list
+				int current_index = -1;
+				for (size_t i = 0; i < entities_name.size(); ++i) {
+					if (child->parent == entities_name[i]) {
+						current_index = static_cast<int>(i);
+						break;
+					}
+				}
+
+				// Display combo box for video selection
+				if (ImGui::Combo("##SelectParent", &current_index, entities_name.data(), static_cast<int>(entities_name.size()))) {
+
+					//Validate the selected index and get the new video
+					if (current_index >= 0 && current_index < static_cast<int>(entities_name.size())) {
+						std::string new_parent = entities_name[current_index];
+
+						if (new_parent != child->parent) {
+							// Save action
+							LevelEditor::Action change_parent_action;
+							change_parent_action.do_action = [&, parent = new_parent]() {
+								auto temp_child = MetaData::Child();
+								temp_child.parent = parent;
+								NIKE_METADATA_SERVICE->setEntityRelation(selected_entity, std::move(temp_child));
+								};
+
+							// Undo action
+							change_parent_action.undo_action = [&, parent = prev_parent]() {
+								auto temp_child = MetaData::Child();
+								temp_child.parent = parent;
+								NIKE_METADATA_SERVICE->setEntityRelation(selected_entity, std::move(temp_child));
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_parent_action));
+
+							//Update the previous parent
+							prev_parent = new_parent;
+						}
+					}
+				}
 			}
 
 			//Render popups
