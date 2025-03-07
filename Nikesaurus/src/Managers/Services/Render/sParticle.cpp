@@ -29,7 +29,7 @@ namespace {
 	float rand_float(const Vector2f& range, const int dp) {
 		if (dp < 0) return 0.0f; // Prevent invalid decimal places
 
-		const int multiplier = static_cast<int>(powf(10, dp));
+		const int multiplier = static_cast<int>(powf(10.0f, dp));
 		if (multiplier == 0) return range.x; // Avoid division by zero, return min range
 
 		const int range_scaled = static_cast<int>((range.y - range.x) * multiplier);

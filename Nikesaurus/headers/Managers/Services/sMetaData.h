@@ -16,6 +16,16 @@
 namespace NIKE {
 	namespace MetaData {
 
+		//Parent entity
+		struct Parent {
+			std::set<std::string> children;
+		};
+
+		//Children entity
+		struct Children {
+			std::string parent;
+		};
+
 		//Data Type
 		struct EntityData {
 
