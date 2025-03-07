@@ -653,6 +653,44 @@ namespace NIKE {
 						}
 					}
 
+					// render type
+					{
+						ImGui::Text("Particle Render Type:");
+						std::string render_type_options{};
+						for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
+							render_type_options += render_type_ref + '\0';
+						}
+						render_type_options += '\0';
+
+						int selected_render_type = static_cast<int>(comp.render_type);
+						static int previous_render_type = selected_render_type;
+						if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
+							// If the value changed, process the change
+							if (selected_render_type != previous_render_type) {
+								previous_render_type = selected_render_type;
+								LevelEditor::Action change_render_type;
+								// Store the value before the change
+								change_render_type.do_action = [&, render_type = selected_render_type]() {
+									comp.render_type = render_type;
+
+									//Clear all particles
+									comp.p_system->particles.clear();
+									};
+								// Store the undo action
+								change_render_type.undo_action = [&, render_type = previous_render_type]() {
+									comp.render_type = render_type;
+
+									//Clear all particles
+									comp.p_system->particles.clear();
+									};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
+							}
+						}
+					}
+
+					ImGui::BeginDisabled(comp.render_type != static_cast<int>(NIKE::SysParticle::Data::ParticleRenderType::TEXTURED));
+
 					// For texture id
 					{
 						// Hold the current and previous texture selection
@@ -728,39 +766,9 @@ namespace NIKE {
 						}
 					}
 
-					// render type
-					ImGui::Text("Particle Render Type:");
-					std::string render_type_options{};
-					for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
-						render_type_options += render_type_ref + '\0';
-					}
-					render_type_options += '\0';
+					ImGui::EndDisabled();
 
-					int selected_render_type = static_cast<int>(comp.render_type);
-					static int previous_render_type = selected_render_type;
-					if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
-						// If the value changed, process the change
-						if (selected_render_type != previous_render_type) {
-							previous_render_type = selected_render_type;
-							LevelEditor::Action change_render_type;
-							// Store the value before the change
-							change_render_type.do_action = [&, render_type = selected_render_type]() {
-								comp.render_type = render_type;
-
-								//Clear all particles
-								comp.p_system->particles.clear();
-								};
-							// Store the undo action
-							change_render_type.undo_action = [&, render_type = previous_render_type]() {
-								comp.render_type = render_type;
-
-								//Clear all particles
-								comp.p_system->particles.clear();
-								};
-							// Execute the action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
-						}
-					}
+					// !TODO: jspoh add fadeout option, considering color change over time, and texture fadeout. but only if required lol
 
 					// Offset
 					ImGui::Text("Particle Offset:");

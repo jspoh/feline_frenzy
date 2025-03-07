@@ -30,7 +30,8 @@ namespace {
 		if (dp < 0) return 0.0f; // Prevent invalid decimal places
 		if (range.x > range.y) return range.x; // Handle invalid range
 
-		float multiplier = powf(10.0f, dp);
+		// !TODO: jspoh gotta check if this is randomizing correctly, make sure its not returning int but a float
+		//float multiplier = powf(10.f, static_cast<float>(dp));
 		float rand_val = static_cast<float>(rand()) / RAND_MAX; // Random value in [0, 1]
 
 		return (range.x + rand_val * (range.y - range.x));
