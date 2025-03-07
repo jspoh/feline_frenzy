@@ -321,6 +321,8 @@ void NSPM::updateParticleSystem(ParticleSystem& ps) {
 			SIZE = { 5.f, 5.f };
 			break;
 		}
+		case Data::ParticlePresets::BASE:
+			break;
 		default: {
 			throw std::runtime_error("Invalid particle preset");
 		}

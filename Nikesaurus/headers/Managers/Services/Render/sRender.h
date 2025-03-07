@@ -180,7 +180,7 @@ namespace NIKE {
 				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
 				// render particle system
-				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1, bool use_screen_pos = false);
+				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count = 1, bool use_screen_pos = false, const std::string& texture_ref = std::string{});
 
 				//Render entity
 				void renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug = false);

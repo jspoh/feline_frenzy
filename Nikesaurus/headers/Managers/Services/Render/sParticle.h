@@ -58,14 +58,14 @@ namespace NIKE {
 			enum class ParticleRenderType {
 				QUAD = 0,
 				CIRCLE,
-				// TEXTURE,
+				 TEXTURED,
 				NUM_PARTICLE_RENDER_TYPES
 			};
 
 			static inline std::unordered_map<ParticleRenderType, std::string> particle_render_type_map{
 				{ ParticleRenderType::QUAD, "quad" },
 				{ ParticleRenderType::CIRCLE, "circle" },
-				// { ParticleRenderType::TEXTURE, "texture" }
+				{ ParticleRenderType::TEXTURED, "textured" }
 			};
 		};
 

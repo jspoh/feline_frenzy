@@ -677,7 +677,7 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos) {
+	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos, const std::string& texture_ref) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -703,6 +703,21 @@ namespace NIKE {
 
 		if (use_screen_pos) {
 			shader_manager->setUniform(shader_name, "particleScreenOrigin", origin);
+		}
+
+		if (static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type) == NIKE::SysParticle::Data::ParticleRenderType::TEXTURED) {
+			unsigned int tex_hdl;
+			try {
+				// using texture
+				tex_hdl = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(texture_ref)->gl_data;
+			}
+			catch (...) {
+				NIKEE_CORE_ERROR("Error: Texture {0} not found in {1}: {2}", texture_ref, __FUNCTION__, "");
+				return;
+			}
+			const int tex_binding_unit = 6;
+			glBindTextureUnit(tex_binding_unit, tex_hdl);
+			shader_manager->setUniform(shader_name, "u_tex2d", tex_binding_unit);
 		}
 
 		err = glGetError();
@@ -975,6 +990,7 @@ namespace NIKE {
 			particle_sys.particle_color_changes_over_time = e_particle.particle_color_changes_over_time;
 			particle_sys.particle_final_color = e_particle.particle_final_color;
 			particle_sys.particle_rotation_speed = e_particle.particle_rotation_speed;
+			particle_sys.texture_ref= e_particle.texture_ref;
 
 			//Update particle system
 			particle_manager->updateParticleSystem(particle_sys);
@@ -1007,8 +1023,8 @@ namespace NIKE {
 			//Particle render function
 			auto particle_render = [num_particles, &particle_sys, ref = e_particle.ref]() {
 
-				NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(particle_sys.preset), particle_sys.origin, static_cast<int>(particle_sys.render_type), num_particles, ref == "mouseps1");
-				};
+				NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(particle_sys.preset), particle_sys.origin, static_cast<int>(particle_sys.render_type), num_particles, ref == "mouseps1", particle_sys.texture_ref);
+			};
 
 			//Check for screen position !!!More work to be done here to ensure screen particles are rendered correctly
 			if (e_transform.use_screen_pos) {
