@@ -240,4 +240,121 @@ namespace NIKE {
 			bullet_sfx.value().get().pitch = rand_pitch;
 		}
 	}
+
+	void Enemy::bossShoot(const Entity::Type& enemy, const Entity::Type& player)
+	{
+		// Get player transform component
+		const auto p_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+		if (!p_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: PLAYER missing TRANSFORM component!");
+			return;
+		}
+		const Vector2f& player_pos = p_transform_comp.value().get().position;
+
+		// Get enemy components
+		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(enemy);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing TRANSFORM component!");
+			return;
+		}
+		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
+
+		// Attack Comp
+		const auto e_attack_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Attack>(enemy);
+		if (!e_attack_comp.has_value()) {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing ATTACK component!");
+			return;
+		}
+		const auto& enemy_attack_comp = e_attack_comp.value().get();
+
+		// Element comp
+		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
+
+		// Create bullets for left and right streams
+		Entity::Type bullet_entity_left = NIKE_ECS_MANAGER->createEntity();
+		Entity::Type bullet_entity_right = NIKE_ECS_MANAGER->createEntity();
+
+		// Load entity from prefab
+		if (e_element_comp.has_value()) {
+			// Shoot elemental bullets
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_left, Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]);
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_right, Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]);
+		}
+		else {
+			NIKEE_CORE_WARN("shootBullet: ENEMY missing Elemental Component");
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_left, "bullet.prefab");
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_right, "bullet.prefab");
+		}
+
+		// Calculate direction for bullet (Enemy Pos - Player Pos)
+		Vector2f direction = player_pos - enemy_pos;
+		direction.normalize();
+
+		// Calculate spread angle for bullet
+		float spreadAngle = 0.2f;  // Adjust for bullet spread distance
+		float angle_offset_left = -spreadAngle;  // To shoot left
+		float angle_offset_right = spreadAngle;  // To shoot right
+
+		// Apply sin/cos to split the direction of bullets
+		// Left Bullet:
+		Vector2f direction_left = direction;
+		direction_left.x = direction.x * std::cos(angle_offset_left) - direction.y * std::sin(angle_offset_left);
+		direction_left.y = direction.x * std::sin(angle_offset_left) + direction.y * std::cos(angle_offset_left);
+
+		// Right Bullet:
+		Vector2f direction_right = direction;
+		direction_right.x = direction.x * std::cos(angle_offset_right) - direction.y * std::sin(angle_offset_right);
+		direction_right.y = direction.x * std::sin(angle_offset_right) + direction.y * std::cos(angle_offset_right);
+
+		// Set bullet positions for left and right streams (use offset from enemy)
+		Vector2f bullet_pos_left = enemy_pos + direction_left * enemy_attack_comp.offset;
+		Vector2f bullet_pos_right = enemy_pos + direction_right * enemy_attack_comp.offset;
+
+		// Set bullet's position for left stream
+		auto bullet_transform_left = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity_left);
+		if (bullet_transform_left.has_value()) {
+			auto& transform_left = bullet_transform_left.value().get();
+			transform_left.position = bullet_pos_left;
+
+			// Calculate rotation angle in radians for left stream
+			float angle_left = std::atan2(direction_left.y, direction_left.x);
+			transform_left.rotation = (angle_left * (180.0f / static_cast<float>(M_PI))) - 90.0f;
+		}
+
+		// Set bullet's position for right stream
+		auto bullet_transform_right = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity_right);
+		if (bullet_transform_right.has_value()) {
+			auto& transform_right = bullet_transform_right.value().get();
+			transform_right.position = bullet_pos_right;
+
+			// Calculate rotation angle in radians for right stream
+			float angle_right = std::atan2(direction_right.y, direction_right.x);
+			transform_right.rotation = (angle_right * (180.0f / static_cast<float>(M_PI))) - 90.0f;
+		}
+
+		// Set bullet physics for left stream
+		auto bullet_physics_left = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity_left);
+		if (bullet_physics_left.has_value()) {
+			bullet_physics_left.value().get().force = { direction_left.x, direction_left.y };
+		}
+
+		// Set bullet physics for right stream
+		auto bullet_physics_right = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(bullet_entity_right);
+		if (bullet_physics_right.has_value()) {
+			bullet_physics_right.value().get().force = { direction_right.x, direction_right.y };
+		}
+
+		// Set bullet SFX for both streams
+		auto bullet_sfx_left = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity_left);
+		if (bullet_sfx_left.has_value()) {
+			bullet_sfx_left.value().get().b_play_sfx = true;
+			bullet_sfx_left.value().get().pitch = GameLogic::getRandomNumber(0.5f, 2.0f);
+		}
+
+		auto bullet_sfx_right = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity_right);
+		if (bullet_sfx_right.has_value()) {
+			bullet_sfx_right.value().get().b_play_sfx = true;
+			bullet_sfx_right.value().get().pitch = GameLogic::getRandomNumber(0.5f, 2.0f);
+		}
+	}
 }
