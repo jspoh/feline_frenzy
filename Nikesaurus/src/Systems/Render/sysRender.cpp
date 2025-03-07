@@ -105,33 +105,11 @@ namespace NIKE {
 				//Render call for all entity
 				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), false);
 #endif
-
-				//const std::unordered_map<std::string, std::shared_ptr<void>> comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
-
-				//// get particle emitter component
-				//const Render::ParticleEmitter* pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-
-				//// get transform component
-				//const Transform::Transform* transform_comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
-
-
-				//const std::shared_ptr<NIKE::SysParticle::ParticleSystem> ps = pe_comp->p_system;
 			}
 		}
 
 		//Complete rendering process
 		NIKE_RENDER_SERVICE->completeRender();
-
-		//!!! RENDER UI HERE - SH
-
-		//	NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles, ref == "mouseps1");
-		//}
-
-		// mouse particles
-		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps1", mouse_particle_pos);
-		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps2", mouse_particle_pos);
-		//NIKE::SysParticle::Manager::getInstance().setParticleSystemOrigin("mouseps3", mouse_particle_pos);
-		//NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(Data::ParticlePresets::BASE), mouse_particle_pos);
 
 		//FPS Rendering variables
 		static auto worldsize = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();

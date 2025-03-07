@@ -22,6 +22,10 @@
             "PlayerSFX": {
                 "loop": false,
                 "tracks": []
+            },
+            "VFX": {
+                "loop": false,
+                "tracks": []
             }
         }
     },
@@ -585,13 +589,61 @@
                                 "Zoom": 1.4254194498062134
                             },
                             "Render::ParticleEmitter": {
-                                "duration": -1.0,
+                                "duration": 0.0,
+                                "num_new_particles_per_second": 0,
                                 "offset": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
+                                "particle_acceleration": 0.0,
+                                "particle_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_color_changes_over_time": false,
+                                "particle_color_is_random": false,
+                                "particle_final_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_final_size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_lifespan": 0.0,
+                                "particle_rand_width_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_x_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_y_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rotation": 0.0,
+                                "particle_rotation_speed": 0.0,
+                                "particle_size_changes_over_time": false,
+                                "particle_vector_x_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_vector_y_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_velocity_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
                                 "preset": 0,
-                                "render_type": 1
+                                "render_type": 0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

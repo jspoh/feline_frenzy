@@ -22,6 +22,10 @@
             "PlayerSFX": {
                 "loop": false,
                 "tracks": []
+            },
+            "VFX": {
+                "loop": false,
+                "tracks": []
             }
         }
     },
@@ -581,19 +585,19 @@
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
-                                "num_new_particles_per_second": 20,
+                                "num_new_particles_per_second": 0,
                                 "offset": {
                                     "x": 32.5,
                                     "y": 64.0
                                 },
-                                "particle_acceleration": 485.5,
+                                "particle_acceleration": 0.0,
                                 "particle_color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
+                                    "w": 0.0,
+                                    "x": 0.0,
                                     "y": 0.0,
-                                    "z": 0.5654454231262207
+                                    "z": 0.0
                                 },
-                                "particle_color_changes_over_time": true,
+                                "particle_color_changes_over_time": false,
                                 "particle_color_is_random": false,
                                 "particle_final_color": {
                                     "w": 0.0,
@@ -602,36 +606,36 @@
                                     "z": 0.0
                                 },
                                 "particle_final_size": {
-                                    "x": 21.200000762939453,
-                                    "y": 0.800000011920929
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "particle_lifespan": 1.100000023841858,
+                                "particle_lifespan": 0.0,
                                 "particle_rand_width_range": {
-                                    "x": 8.899999618530273,
-                                    "y": 15.100000381469727
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "particle_rand_x_offset_range": {
-                                    "x": 0.699999988079071,
-                                    "y": 2.5
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "particle_rand_y_offset_range": {
-                                    "x": 0.20000000298023224,
-                                    "y": 2.299999952316284
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "particle_rotation": 1.2999999523162842,
-                                "particle_rotation_speed": 95.30000305175781,
-                                "particle_size_changes_over_time": true,
+                                "particle_rotation": 0.0,
+                                "particle_rotation_speed": 0.0,
+                                "particle_size_changes_over_time": false,
                                 "particle_vector_x_range": {
-                                    "x": -1.0,
-                                    "y": 1.0
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "particle_vector_y_range": {
-                                    "x": -1.0,
-                                    "y": -1.0
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "particle_velocity_range": {
-                                    "x": 5.0,
-                                    "y": 100.0
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "preset": 0,
                                 "render_type": 0
