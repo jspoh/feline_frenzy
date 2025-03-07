@@ -235,7 +235,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 6,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -243,7 +243,7 @@
                                     "y": 1
                                 },
                                 "Start_Index": {
-                                    "x": 0,
+                                    "x": 1,
                                     "y": 0
                                 }
                             },
@@ -257,9 +257,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 3.28039288520813,
-                                    "y": 3.2490203380584717,
-                                    "z": 3.550981283187866
+                                    "x": 3.4303929805755615,
+                                    "y": 3.3990204334259033,
+                                    "z": 3.700981378555298
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -301,8 +301,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 359.8105773925781,
-                                    "y": 68.36400604248047
+                                    "x": 377.8011169433594,
+                                    "y": 71.7822036743164
                                 },
                                 "Screen Position": true
                             }
@@ -527,17 +527,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {},
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": "Change"
-                            }
-                        },
-                        "UI ID": "quit_btn"
+                        }
                     }
                 },
                 {
@@ -626,7 +616,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 3,
                             "Name": "quit_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
