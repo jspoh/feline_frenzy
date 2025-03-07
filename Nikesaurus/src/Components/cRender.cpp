@@ -59,7 +59,9 @@ namespace NIKE {
 					{ "particle_final_size", comp.p_system->particle_final_size.toJson()},
 					{ "particle_color_changes_over_time", comp.p_system->particle_color_changes_over_time },
 					{ "particle_final_color", comp.p_system->particle_final_color.toJson()},
-					{ "particle_rotation_speed", comp.p_system->particle_rotation_speed }
+					{ "particle_rotation_speed", comp.p_system->particle_rotation_speed },
+
+					{ "texture_ref", comp.p_system->texture_ref }
 
 					//{ "ref", comp.ref }
 				};
@@ -94,6 +96,7 @@ namespace NIKE {
 					comp.particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
 					comp.particle_final_color.fromJson(data.at("particle_final_color"));
 					comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
+					comp.texture_ref = data.at("texture_ref").get<std::string>();
 					
 					comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
 
@@ -204,6 +207,9 @@ namespace NIKE {
 				if (comp.p_system->particle_rotation_speed != other_comp.p_system->particle_rotation_speed) {
 					delta["particle_rotation_speed"] = comp.p_system->particle_rotation_speed;
 				}
+				if (comp.p_system->texture_ref != other_comp.p_system->texture_ref) {
+					delta["texture_ref"] = comp.p_system->texture_ref;
+				}
 
 				return delta;
 			},
@@ -275,6 +281,9 @@ namespace NIKE {
 				}
 				if (delta.contains("particle_rotation_speed")) {
 					comp.p_system->particle_rotation_speed = delta["particle_rotation_speed"];
+				}
+				if (delta.contains("texture_ref")) {
+					comp.p_system->texture_ref = delta["texture_ref"];
 				}
 
 				// add particle system
@@ -841,7 +850,7 @@ namespace NIKE {
 					// Particle Rand Offset Range
 					{
 						ImGui::Text("Particle Rand Offset Range:");
-						ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 						if (ImGui::IsItemActivated()) {
 							before_change_particle_rand_x_offset_range = comp.particle_rand_x_offset_range;
 						}
@@ -858,7 +867,7 @@ namespace NIKE {
 
 						//ImGui::SameLine();
 
-						ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 						if (ImGui::IsItemActivated()) {
 							before_change_particle_rand_y_offset_range = comp.particle_rand_y_offset_range;
 						}

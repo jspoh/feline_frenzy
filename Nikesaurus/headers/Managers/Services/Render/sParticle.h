@@ -121,6 +121,9 @@ namespace NIKE {
 				bool particle_color_changes_over_time{};
 				Vector4f particle_final_color{};
 				float particle_rotation_speed{};
+
+				// texture
+				std::string texture_ref{};
 			};
 
 			class Manager {
