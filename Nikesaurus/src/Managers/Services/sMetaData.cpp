@@ -75,6 +75,9 @@ namespace NIKE {
 			temp_child.parent = data["Parent"].get<std::string>();
 			relation = temp_child;
 		}
+
+		//Update relation
+		NIKE_METADATA_SERVICE->updateRelation();
 	}
 
 	void MetaData::Service::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
@@ -213,7 +216,16 @@ namespace NIKE {
 
 	std::optional<Entity::Type> MetaData::Service::getEntityByName(std::string const& name) const {
 		if (entity_names.find(name) == entity_names.end()) {
-			return  std::nullopt;
+			if (name.find(def_name) != std::string::npos) {
+				for (auto const& data : entities) {
+					if (data.second.name == name) return data.first;
+				}
+
+				return std::nullopt;
+			}
+			else {
+				return std::nullopt;
+			}
 		}
 
 		return entity_names.at(name);
@@ -428,15 +440,102 @@ namespace NIKE {
 		return entities.at(entity).layer_order;
 	}
 
-	void MetaData::Service::setEntityRelation(Entity::Type entity, std::variant<Parent, Child>&& relation) {
+	void MetaData::Service::updateRelation() {
+
+		//Set of parents & childrens
+		std::unordered_map<std::string, Parent*> parents;
+		std::unordered_map<std::string, Child*> childs;
+
+		//Iterate through entities
+		for (auto& data : entities) {
+
+			//Get parent
+			auto* parent = std::get_if<Parent>(&data.second.relation);
+			if (parent) {
+				parent->childrens.clear();
+				parents[data.second.name] = parent;
+			}
+
+			//Get child
+			auto* child = std::get_if<Child>(&data.second.relation);
+			if (child) {
+				childs[data.second.name] = child;
+			}
+		}
+
+		//Update each set properly
+		for (auto& child : childs) {
+			auto parent_it = parents.find(child.second->parent);
+			if (parent_it != parents.end()) {
+				parent_it->second->childrens.insert(child.first);
+			}
+			else {
+				child.second->parent = "";
+			}
+		}
+	}
+
+	void MetaData::Service::setEntityParentRelation(Entity::Type entity) {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
 			NIKEE_CORE_WARN("Entity does not exist");
 			return;
 		}
 
+		//Get child
+		auto* child = std::get_if<Child>(&entities.at(entity).relation);
+
+		//Skip if relation is not a child
+		if (!child) return;
+
 		//Set relation
-		entities.at(entity).relation = relation;
+		entities.at(entity).relation = Parent();
+
+		//Update relation
+		updateRelation();
+	}
+
+	void MetaData::Service::setEntityChildRelation(Entity::Type entity) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Get parent
+		auto* parent = std::get_if<Parent>(&entities.at(entity).relation);
+
+		//Skip if relation is not a parent
+		if (!parent) return;
+
+		//Set relation to child
+		entities.at(entity).relation = Child();
+
+		//Update relation
+		updateRelation();
+	}
+
+	void MetaData::Service::setEntityChildRelationParent(Entity::Type entity, std::string const& parent_name) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Get child
+		auto* child = std::get_if<Child>(&entities.at(entity).relation);
+
+		//Skip if relation is not child
+		if (!child) return;
+
+		//Check if parent is valid
+		if (!checkParent(parent_name)) return;
+
+		//Set child's parent
+		child->parent = parent_name;
+
+		//Update relation
+		updateRelation();
 	}
 
 	std::variant<MetaData::Parent, MetaData::Child> MetaData::Service::getEntityRelation(Entity::Type entity) const {
@@ -448,6 +547,61 @@ namespace NIKE {
 
 		//Return relation
 		return entities.at(entity).relation;
+	}
+
+	std::vector<const char*> MetaData::Service::getAllParents() const {
+		std::vector<const char*> parents;
+		for (auto const& data : entities) {
+			auto* parent = std::get_if<Parent>(&data.second.relation);
+
+			if (parent) {
+				parents.push_back(data.second.name.c_str());
+			}
+		}
+
+		return parents;
+	}
+
+	bool MetaData::Service::checkParent(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return false;
+		}
+
+		//Get parent
+		auto* parent = std::get_if<Parent>(&entities.at(entity).relation);
+
+		//Check if relation is parent
+		if (parent) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	bool MetaData::Service::checkParent(std::string const& parent_name) const {
+
+		//Get entity
+		auto entity = getEntityByName(parent_name);
+
+		//Check if entity is valid
+		if (entity.has_value()) {
+			//Get parent
+			auto* parent = std::get_if<Parent>(&entities.at(entity.value()).relation);
+
+			//Check if relation is parent
+			if (parent) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
 	}
 
 	std::set<std::string> MetaData::Service::getEntityTags(Entity::Type entity) {
