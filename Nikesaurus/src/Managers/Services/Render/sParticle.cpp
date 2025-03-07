@@ -81,14 +81,17 @@ NSPM::Manager() {
 	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::CLUSTER], vbo_map[Data::ParticlePresets::CLUSTER]);
 
 	// create vao and vbo for FIRE particley preset
-	vao_map[Data::ParticlePresets::FIRE] = vao_map[Data::ParticlePresets::CLUSTER];
-	vbo_map[Data::ParticlePresets::FIRE] = vbo_map[Data::ParticlePresets::CLUSTER];
+	vao_map[Data::ParticlePresets::FIRE] = 0;
+	vbo_map[Data::ParticlePresets::FIRE] = 0;
+	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::FIRE], vbo_map[Data::ParticlePresets::FIRE]);
 
 	// create vao and vbo for NONE particle preset
 	vao_map[Data::ParticlePresets::NONE] = 0;
 	vbo_map[Data::ParticlePresets::NONE] = 0;
-	vao_map[Data::ParticlePresets::NONE] = vao_map[Data::ParticlePresets::CLUSTER];
-	vbo_map[Data::ParticlePresets::NONE] = vbo_map[Data::ParticlePresets::CLUSTER];
+	NIKE::Assets::RenderLoader::RenderLoader::createClusterParticleBuffers(vao_map[Data::ParticlePresets::NONE], vbo_map[Data::ParticlePresets::NONE]);
+
+
+	
 
 	err = glGetError();
 	if (err != GL_NO_ERROR) {

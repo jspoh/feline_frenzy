@@ -264,9 +264,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.27843138575553894,
-                                    "y": 0.5058823823928833,
-                                    "z": 0.01568627543747425
+                                    "x": 0.4470588266849518,
+                                    "y": 0.23137255012989044,
+                                    "z": 0.7921568751335144
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -309,7 +309,7 @@
                                     "y": 114.9000015258789
                                 },
                                 "preset": 0,
-                                "render_type": 0,
+                                "render_type": 1,
                                 "texture_ref": ""
                             },
                             "Render::Text": {
@@ -705,9 +705,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.7882353067398071,
-                                    "y": 0.7137255072593689,
-                                    "z": 0.6274510025978088
+                                    "x": 0.05882352963089943,
+                                    "y": 0.5607843399047852,
+                                    "z": 0.3607843220233917
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
@@ -751,7 +751,7 @@
                                 },
                                 "preset": 0,
                                 "render_type": 2,
-                                "texture_ref": "Icon_32x32.png"
+                                "texture_ref": "Bottom_Corner_256px.png"
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
