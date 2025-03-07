@@ -89,6 +89,7 @@
                     "Entity": {
                         "Components": {
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 0.0,
                                     "y": 12.650634765625

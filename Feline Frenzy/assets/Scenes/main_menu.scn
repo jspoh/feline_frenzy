@@ -238,112 +238,6 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 6,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 7,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 1,
-                                    "y": 0
-                                }
-                            },
-                            "Audio::SFX": {
-                                "Audio_ID": "MenuYesOpen.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "SFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 3.580393075942993,
-                                    "y": 3.549020528793335,
-                                    "z": 3.8509814739227295
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Text": ""
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 7,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "UI_PlayGame_spritesheet.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 23.757349014282227,
-                                    "y": -141.08544921875
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 396.69122314453125,
-                                    "y": 75.37133026123047
-                                },
-                                "Screen Position": true
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 0,
-                            "Name": "play_game_btn",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {
-                                    "scene": "cut_scene_1.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": "Change"
-                            }
-                        },
-                        "UI ID": "start_game_btn"
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.20000000298023224
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
                                     "x": 0,
                                     "y": 0
                                 },
@@ -406,7 +300,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 24.5968017578125,
-                                    "y": -239.07183837890625
+                                    "y": -242.70086669921875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -419,7 +313,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
+                            "Layer_Order": 0,
                             "Name": "how_to_play_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -463,7 +357,7 @@
                                 }
                             },
                             "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
+                                "Audio_ID": "MenuYesOpen.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
@@ -472,9 +366,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 1.630392074584961,
-                                    "y": 1.5990195274353027,
-                                    "z": 1.9009802341461182
+                                    "x": 3.580393075942993,
+                                    "y": 3.549020528793335,
+                                    "z": 3.8509814739227295
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -507,17 +401,17 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "UI_QuitButton_Spritesheet.png"
+                                "Texture_ID": "UI_PlayGame_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 28.508544921875,
-                                    "y": -336.0472412109375
+                                    "x": 23.757349014282227,
+                                    "y": -141.08544921875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 343.1644592285156,
-                                    "y": 70.8250961303711
+                                    "x": 396.6917724609375,
+                                    "y": 75.3714370727539
                                 },
                                 "Screen Position": true
                             }
@@ -525,12 +419,24 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
-                            "Name": "quit_game_btn",
+                            "Layer_Order": 1,
+                            "Name": "play_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        }
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Named_Args": {
+                                    "scene": "cut_scene_1.scn"
+                                },
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": "Change"
+                            }
+                        },
+                        "UI ID": "start_game_btn"
                     }
                 },
                 {
@@ -593,7 +499,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 6,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -606,12 +512,12 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 28.508544921875,
-                                    "y": -336.0472412109375
+                                    "y": -345.119873046875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 343.1644592285156,
-                                    "y": 70.8250961303711
+                                    "x": 366.90283203125,
+                                    "y": 75.72441101074219
                                 },
                                 "Screen Position": true
                             }
@@ -619,7 +525,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 3,
+                            "Layer_Order": 2,
                             "Name": "quit_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -631,7 +537,7 @@
                                 "Named_Args": {},
                                 "Script_ID": "ChangeScene.lua",
                                 "Start_Function": "",
-                                "Update_Function": "Change"
+                                "Update_Function": "Quit"
                             }
                         },
                         "UI ID": "quit_btn"
