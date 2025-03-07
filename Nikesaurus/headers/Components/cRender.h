@@ -111,18 +111,38 @@ namespace NIKE {
 		};
 
 		struct ParticleEmitter {
-			Vector2f offset;		// offset from entity position
-			int render_type;	// ParticleRenderType type
-			int preset;			// ParticlePresets type
-			std::string ref;		// reference to particle system
-			float duration;		// -1 for infinite
+			Vector2f offset{};		// offset from entity position
+			int render_type{};	// ParticleRenderType type
+			int preset{};			// ParticlePresets type
+			std::string ref{};		// reference to particle system
+			float duration{};		// -1 for infinite
 
 			//Particle system
 			std::shared_ptr<SysParticle::ParticleSystem> p_system;
 
+			// particle
+			int num_new_particles_per_second{10};
+			float particle_lifespan{1.f};
+			float particle_acceleration{};
+			Vector2f particle_velocity_range{5.f, 100.f};
+			Vector2f particle_vector_x_range{-1.f, 1.f};
+			Vector2f particle_vector_y_range{-1.f, 1.f};
+			bool particle_color_is_random{true};
+			Vector4f particle_color{1.f, 1.f, 1.f, 1.f};
+			Vector2f particle_rand_x_offset_range{0.f, 0.f};
+			Vector2f particle_rand_y_offset_range{0.f, 0.f};
+			float particle_rotation{};
+			Vector2f particle_rand_width_range{5.f, 10.f};
+
+			// particle behaviour over time
+			bool particle_size_changes_over_time{false};
+			Vector2f particle_final_size{};
+			bool particle_color_changes_over_time{false};
+			Vector4f particle_final_color{};
+			float particle_rotation_speed{};		// in degrees (anticlockwise) per second !NOTE: rmb to convert to radians lol
+
 			ParticleEmitter();
 		};
-
 		struct Video {
 
 			//Video ID

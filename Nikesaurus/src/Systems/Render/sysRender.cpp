@@ -17,7 +17,7 @@
 #include "Math/Mtx33.h"
 
 
-// !TODO: jspoh reorg
+ // !TODO: jspoh reorg
 namespace {
 
 	Matrix_33 getWorldToScreenMtx() {
@@ -88,7 +88,6 @@ namespace NIKE {
 			//SKip inactive layer
 			if (!layer->getLayerState())
 				continue;
-			
 			if (layer->getLayerYSort()) {
 				layer->sortEntitiesBasedOnYPosition();
 			}
@@ -102,11 +101,21 @@ namespace NIKE {
 				//Render call for all entity
 				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), NIKE_LVLEDITOR_SERVICE->getDebugState());
 #endif
-
 #ifdef NDEBUG
-				//Render call for all enttity
+				//Render call for all entity
 				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), false);
 #endif
+
+				//const std::unordered_map<std::string, std::shared_ptr<void>> comps = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+
+				//// get particle emitter component
+				//const Render::ParticleEmitter* pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
+
+				//// get transform component
+				//const Transform::Transform* transform_comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
+
+
+				//const std::shared_ptr<NIKE::SysParticle::ParticleSystem> ps = pe_comp->p_system;
 			}
 		}
 
@@ -114,42 +123,6 @@ namespace NIKE {
 		NIKE_RENDER_SERVICE->completeRender();
 
 		//!!! RENDER UI HERE - SH
-
-		//// !TODO: jspoh move this update function
-		//NIKE::SysParticle::Manager::getInstance().update();
-
-		//Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
-		//Vector2f window_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
-		//Vector2f mouse_particle_pos = { mouse_pos.x, window_size.y - mouse_pos.y };
-
-		//using namespace NIKE::SysParticle;
-		//NIKE_RENDER_SERVICE->renderParticleSystem("cluster", mouse_particle_pos);
-
-		//auto& PM = NIKE::SysParticle::Manager::getInstance();
-		//for (const auto& [ref, ps] : PM.getActiveParticleSystemsMap()) {
-		//	//const unsigned int vao = PM.getVAO(ps.preset);
-		//	const unsigned int vbo = PM.getVBO(ps.preset);
-
-		//	std::vector<Particle> particles = ps.particles;
-
-		//	// assume world pos
-		//	if (ps.using_world_pos) {
-		//		std::for_each(particles.begin(), particles.end(), [&](Particle& p) {
-		//			p.pos = worldToScreen(p.pos);
-		//		});
-		//	}
-
-		//	err = glGetError();
-		//	if (err != GL_NO_ERROR) {
-		//		NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
-		//	}
-		//	glNamedBufferSubData(vbo, 0, particles.size() * sizeof(Particle), particles.data());
-		//	err = glGetError();
-		//	if (err != GL_NO_ERROR) {
-		//		NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
-		//	}
-
-		//	const int num_particles = max(1, static_cast<int>(particles.size()));
 
 		//	NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(ps.preset), ps.origin, static_cast<int>(ps.render_type), num_particles, ref == "mouseps1");
 		//}
@@ -192,7 +165,7 @@ namespace NIKE {
 		//Render FPS Display
 		Matrix_33 matrix;
 		static bool show_fps = true;
-		static Transform::Transform fps_transform = { Vector2f((worldsize.x / 2.0f) - 200.0f, (worldsize.y / 2.0f) - 30.0f), Vector2f(1.0f, 1.0f), 0.0f};
+		static Transform::Transform fps_transform = { Vector2f((worldsize.x / 2.0f) - 200.0f, (worldsize.y / 2.0f) - 30.0f), Vector2f(1.0f, 1.0f), 0.0f };
 		fps_transform.use_screen_pos = true;
 
 		//Toggle showing of FPS

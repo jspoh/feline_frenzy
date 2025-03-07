@@ -958,6 +958,24 @@ namespace NIKE {
 			particle_sys.duration = e_particle.duration;
 			particle_sys.render_type = static_cast<SysParticle::Data::ParticleRenderType>(e_particle.render_type);
 
+			particle_sys.num_new_particles_per_second = e_particle.num_new_particles_per_second;
+			particle_sys.particle_lifespan = e_particle.particle_lifespan;
+			particle_sys.particle_acceleration = e_particle.particle_acceleration;
+			particle_sys.particle_velocity_range = e_particle.particle_velocity_range;
+			particle_sys.particle_vector_x_range = e_particle.particle_vector_x_range;
+			particle_sys.particle_vector_y_range = e_particle.particle_vector_y_range;
+			particle_sys.particle_color_is_random = e_particle.particle_color_is_random;
+			particle_sys.particle_color = e_particle.particle_color;
+			particle_sys.particle_rand_x_offset_range = e_particle.particle_rand_x_offset_range;
+			particle_sys.particle_rand_y_offset_range = e_particle.particle_rand_y_offset_range;
+			particle_sys.particle_rotation = e_particle.particle_rotation;
+			particle_sys.particle_rand_width_range = e_particle.particle_rand_width_range;
+			particle_sys.particle_size_changes_over_time = e_particle.particle_size_changes_over_time;
+			particle_sys.particle_final_size = e_particle.particle_final_size;
+			particle_sys.particle_color_changes_over_time = e_particle.particle_color_changes_over_time;
+			particle_sys.particle_final_color = e_particle.particle_final_color;
+			particle_sys.particle_rotation_speed = e_particle.particle_rotation_speed;
+
 			//Update particle system
 			particle_manager->updateParticleSystem(particle_sys);
 
@@ -1171,7 +1189,7 @@ namespace NIKE {
 
 		// Draw all bounding box instances
 		glDrawElements(GL_LINES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
-
+		
 		// Cleanup
 		glBindVertexArray(0);
 		shader_manager->unuseShader();
@@ -1313,7 +1331,7 @@ namespace NIKE {
 	void Render::Service::completeRender() {
 
 		//Update particle manager
-		particle_manager->update();
+		//particle_manager->update();
 
 		//Render world elements
 		while (!world_render_queue.empty()) {
