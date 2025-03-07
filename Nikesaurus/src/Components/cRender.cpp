@@ -373,12 +373,14 @@ namespace NIKE {
 			[](Render::Video const& comp) -> nlohmann::json {
 				return	{
 						{ "Video_ID", comp.video_id },
+						{ "B_Loop", comp.b_loop }
 				};
 			},
 
 			//Deserialize
 			[](Render::Video& comp, nlohmann::json const& data) {
 				comp.video_id = data.value("Video_ID", "");
+				comp.b_loop = data.value("B_Loop", true);
 			},
 
 			// Override Serialize
@@ -389,13 +391,17 @@ namespace NIKE {
 					delta["Video_ID"] = comp.video_id;
 				}
 
+				if (comp.b_loop != other_comp.b_loop) {
+					delta["B_Loop"] = comp.b_loop;
+				}
+
 				return delta;
 			},
 
 			// Override Deserialize
 			[](Render::Video& comp, nlohmann::json const& delta) {
-				if (delta.contains("Video_ID")) {
-					comp.video_id = delta["Video_ID"];
+				if (delta.contains("B_Loop")) {
+					comp.b_loop = delta["B_Loop"];
 				}
 			}
 		);
@@ -1318,6 +1324,20 @@ namespace NIKE {
 					}
 				}
 
+				//To control video
+				{
+					ImGui::Text("Video Duration: %.3f secs / %.3f secs", comp.curr_time, comp.duration);
+
+					ImGui::Text("Video Playing: %s", comp.b_is_playing ? "True" : "False");
+
+					ImGui::Text("Video Looping:");
+
+					ImGui::SameLine();
+
+					if (ImGui::SmallButton(comp.b_loop ? "True" : "False")) {
+						comp.b_loop = !comp.b_loop;
+					}
+				}
 
 			}
 		);
