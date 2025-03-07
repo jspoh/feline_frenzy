@@ -195,6 +195,10 @@ void NIKE::VideoPlayer::Manager::update(Render::Video& video) {
         //Increment timer
         video.audio_timer += delta_time;
 
+        //Adjust playback speed
+        float play_back_speed = 1.0f + delta_time;
+        if(video.channel) video.channel->setPitch(play_back_speed);
+
         //Get sample rate
         int sample_rate = plm_get_samplerate(video.mpeg);
 
