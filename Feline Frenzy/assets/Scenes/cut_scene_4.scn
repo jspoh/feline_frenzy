@@ -76,6 +76,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "cut_scene_png",
@@ -158,6 +159,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "next_button",
@@ -242,6 +244,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "back_button",

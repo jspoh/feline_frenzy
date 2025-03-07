@@ -94,6 +94,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
@@ -155,6 +156,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "Background 2",
@@ -216,6 +218,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "Title",
@@ -320,6 +323,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "how_to_play_btn",
@@ -426,6 +430,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "play_game_btn",
@@ -532,6 +537,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 2,
                             "Name": "quit_game_btn",

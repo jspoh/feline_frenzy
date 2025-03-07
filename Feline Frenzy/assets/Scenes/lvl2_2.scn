@@ -100,6 +100,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "background",
@@ -157,6 +158,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "entity_0001",
@@ -228,6 +230,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "vent_1",
@@ -330,6 +333,7 @@
                                 }
                             },
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
@@ -435,6 +439,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "player",
@@ -508,6 +513,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "grass_02",
@@ -565,6 +571,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 2,
                             "Name": "top_wall",
@@ -609,6 +616,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 3,
                             "Name": "right_wall",
@@ -653,6 +661,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 4,
                             "Name": "left_wall",
@@ -697,6 +706,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 5,
                             "Name": "bottom_wall",
@@ -777,6 +787,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 3,
                             "Layer_Order": 0,
                             "Name": "fire_elem",
@@ -838,6 +849,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 3,
                             "Layer_Order": 1,
                             "Name": "grass_elem",
@@ -861,6 +873,7 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 4,
                             "Layer_Order": 0,
                             "Name": "healthbar",
@@ -942,6 +955,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 4,
                             "Layer_Order": 1,
                             "Name": "hp_container",
@@ -995,6 +1009,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 4,
                             "Layer_Order": 2,
                             "Name": "elementui",

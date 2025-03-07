@@ -78,6 +78,7 @@
             }
         },
         "Render::Cam": {
+            "Mouse_Offset": 0.0,
             "Position": {
                 "x": 0.0,
                 "y": 0.0

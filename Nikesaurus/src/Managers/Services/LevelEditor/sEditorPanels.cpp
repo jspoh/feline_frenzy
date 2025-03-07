@@ -1477,6 +1477,44 @@ namespace NIKE {
 				ImGui::Text("No Tags Exists.");
 			}
 
+			//Add Spacing
+			ImGui::Spacing();
+
+			ImGui::SeparatorText("Relation");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+
+			//Get entity relation
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(selected_entity);
+			auto* parent = std::get_if<MetaData::Parent>(&relation);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			//Toggle between parent & child
+			ImGui::Text("Relation: ");
+			ImGui::SameLine();
+			if (ImGui::SmallButton(parent ? "Parent" : "Child")) {
+				if (parent) {
+					auto temp_child = MetaData::Child();
+					NIKE_METADATA_SERVICE->setEntityRelation(selected_entity, std::move(temp_child));
+				}
+				else {
+					auto temp_parent = MetaData::Parent();
+					NIKE_METADATA_SERVICE->setEntityRelation(selected_entity, std::move(temp_parent));
+				}
+			}
+
+			//Add Children
+			if (parent) {
+				ImGui::Text("Children: ");
+			}
+
+			//Change Parent
+			if (child) {
+				ImGui::Text("Parent: %s", child->parent.c_str());
+			}
+
 			//Render popups
 			renderPopUps();
 
