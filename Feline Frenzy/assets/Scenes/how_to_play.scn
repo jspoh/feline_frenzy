@@ -86,6 +86,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
@@ -145,6 +146,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "entity_0001",
@@ -196,6 +198,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "entity_0002",
@@ -300,6 +303,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "back_btn",

@@ -59,7 +59,9 @@ namespace NIKE {
 					{ "particle_final_size", comp.p_system->particle_final_size.toJson()},
 					{ "particle_color_changes_over_time", comp.p_system->particle_color_changes_over_time },
 					{ "particle_final_color", comp.p_system->particle_final_color.toJson()},
-					{ "particle_rotation_speed", comp.p_system->particle_rotation_speed }
+					{ "particle_rotation_speed", comp.p_system->particle_rotation_speed },
+
+					{ "texture_ref", comp.p_system->texture_ref }
 
 					//{ "ref", comp.ref }
 				};
@@ -92,6 +94,7 @@ namespace NIKE {
 					comp.particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
 					comp.particle_final_color.fromJson(data.at("particle_final_color"));
 					comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
+					comp.texture_ref = data.at("texture_ref").get<std::string>();
 					
 					comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
 
@@ -199,6 +202,9 @@ namespace NIKE {
 				if (comp.p_system->particle_rotation_speed != other_comp.p_system->particle_rotation_speed) {
 					delta["particle_rotation_speed"] = comp.p_system->particle_rotation_speed;
 				}
+				if (comp.p_system->texture_ref != other_comp.p_system->texture_ref) {
+					delta["texture_ref"] = comp.p_system->texture_ref;
+				}
 
 				return delta;
 			},
@@ -269,6 +275,12 @@ namespace NIKE {
 				if (delta.contains("particle_rotation_speed")) {
 					comp.p_system->particle_rotation_speed = delta["particle_rotation_speed"];
 				}
+				if (delta.contains("texture_ref")) {
+					comp.p_system->texture_ref = delta["texture_ref"];
+				}
+
+				// add particle system
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.p_system->preset), comp.p_system->offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.p_system->render_type), comp.p_system->duration);
 			}
 		);
 
@@ -643,38 +655,121 @@ namespace NIKE {
 					}
 
 					// render type
-					ImGui::Text("Particle Render Type:");
-					std::string render_type_options{};
-					for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
-						render_type_options += render_type_ref + '\0';
-					}
-					render_type_options += '\0';
+					{
+						ImGui::Text("Particle Render Type:");
+						std::string render_type_options{};
+						for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
+							render_type_options += render_type_ref + '\0';
+						}
+						render_type_options += '\0';
 
-					int selected_render_type = static_cast<int>(comp.render_type);
-					static int previous_render_type = selected_render_type;
-					if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
-						// If the value changed, process the change
-						if (selected_render_type != previous_render_type) {
-							previous_render_type = selected_render_type;
-							LevelEditor::Action change_render_type;
-							// Store the value before the change
-							change_render_type.do_action = [&, render_type = selected_render_type]() {
-								comp.render_type = render_type;
+						int selected_render_type = static_cast<int>(comp.render_type);
+						static int previous_render_type = selected_render_type;
+						if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
+							// If the value changed, process the change
+							if (selected_render_type != previous_render_type) {
+								previous_render_type = selected_render_type;
+								LevelEditor::Action change_render_type;
+								// Store the value before the change
+								change_render_type.do_action = [&, render_type = selected_render_type]() {
+									comp.render_type = render_type;
 
-								//Clear all particles
-								comp.p_system->particles.clear();
-								};
-							// Store the undo action
-							change_render_type.undo_action = [&, render_type = previous_render_type]() {
-								comp.render_type = render_type;
+									//Clear all particles
+									comp.p_system->particles.clear();
+									};
+								// Store the undo action
+								change_render_type.undo_action = [&, render_type = previous_render_type]() {
+									comp.render_type = render_type;
 
-								//Clear all particles
-								comp.p_system->particles.clear();
-								};
-							// Execute the action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
+									//Clear all particles
+									comp.p_system->particles.clear();
+									};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
+							}
 						}
 					}
+
+					ImGui::BeginDisabled(comp.render_type != static_cast<int>(NIKE::SysParticle::Data::ParticleRenderType::TEXTURED));
+
+					// For texture id
+					{
+						// Hold the current and previous texture selection
+						static std::string previous_texture = comp.texture_ref;
+						std::string current_texture = comp.texture_ref;
+
+						ImGui::Text("Select Texture");
+
+						auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
+
+						// Find the index of the currently selected texture in the list
+						int current_index = -1;
+						for (size_t i = 0; i < all_loaded_textures.size(); ++i) {
+							if (current_texture == all_loaded_textures[i]) {
+								current_index = static_cast<int>(i);
+								break;
+							}
+						}
+
+						// Display combo box for texture selection
+						if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+
+							// Validate the selected index and get the new texture
+							if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
+								std::string new_texture = all_loaded_textures[current_index];
+
+								if (new_texture != comp.texture_ref) {
+									// Save action
+									LevelEditor::Action change_font_action;
+									change_font_action.do_action = [&, texture_ref = new_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									// Undo action
+									change_font_action.undo_action = [&, texture_ref = previous_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									// Execute the action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
+
+									// Update the previous texture
+									previous_texture = new_texture;
+								}
+							}
+						}
+						if (ImGui::IsItemHovered()) {
+							ImGui::SetTooltip("Select a texture or drag & drop a texture file.");
+						}
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+								const char* dropped_file = static_cast<const char*>(payload->Data);
+								if (dropped_file) {
+									std::string new_texture = dropped_file;
+
+									// Ensure it's a valid texture format
+
+									LevelEditor::Action change_texture_action;
+									change_texture_action.do_action = [&, texture_ref = new_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									change_texture_action.undo_action = [&, texture_ref = previous_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_texture_action));
+									previous_texture = new_texture;
+
+								}
+							}
+							ImGui::EndDragDropTarget();
+						}
+					}
+
+					ImGui::EndDisabled();
+
+					// !TODO: jspoh add fadeout option, considering color change over time, and texture fadeout. but only if required lol
 
 					// Offset
 					ImGui::Text("Particle Offset:");
@@ -839,7 +934,7 @@ namespace NIKE {
 					// Particle Rand Offset Range
 					{
 						ImGui::Text("Particle Rand Offset Range:");
-						ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 						if (ImGui::IsItemActivated()) {
 							before_change_particle_rand_x_offset_range = comp.particle_rand_x_offset_range;
 						}
@@ -856,7 +951,7 @@ namespace NIKE {
 
 						//ImGui::SameLine();
 
-						ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 						if (ImGui::IsItemActivated()) {
 							before_change_particle_rand_y_offset_range = comp.particle_rand_y_offset_range;
 						}

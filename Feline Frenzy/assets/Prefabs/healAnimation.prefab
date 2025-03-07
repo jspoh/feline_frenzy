@@ -1,15 +1,15 @@
 {
     "Components": {
         "Animation::Base": {
-            "Animation_Count": 0,
+            "Animation_Count": 1,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Frame_Duration": 0.20000000298023224
+            "Frame_Duration": 0.10000000149011612
         },
         "Animation::Sprite": {
             "End_Index": {
-                "x": 0,
-                "y": 0
+                "x": 4,
+                "y": 1
             },
             "Sheet_Size": {
                 "x": 0,
@@ -38,21 +38,21 @@
                 "y": 0
             },
             "Frame_Size": {
-                "x": 1,
-                "y": 1
+                "x": 5,
+                "y": 2
             },
-            "Intensity": 0.5,
-            "Texture_ID": "Gate_front.png"
+            "Intensity": 0.0,
+            "Texture_ID": "Health_animation_sprite.png"
         },
         "Transform::Transform": {
             "Position": {
-                "x": 88.62216186523438,
-                "y": 851.3267822265625
+                "x": 0.0,
+                "y": 0.0
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 255.99996948242188,
-                "y": 255.99996948242188
+                "x": 89.99998474121094,
+                "y": 92.102783203125
             },
             "Screen Position": false
         }
