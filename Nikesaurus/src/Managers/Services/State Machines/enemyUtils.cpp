@@ -269,10 +269,12 @@ namespace NIKE {
 		static bool move_left = true;
 		float move_force = 50.0f;
 		if (move_left) {
-			e_physics_comp.value().get().force.x -= move_force;  // Move left
+			// Move left
+			e_physics_comp.value().get().force.x -= move_force;  
 		}
 		else {
-			e_physics_comp.value().get().force.x += move_force;  // Move right
+			// Move right
+			e_physics_comp.value().get().force.x += move_force;  
 		}
 
 		// Flip direction 
@@ -326,7 +328,7 @@ namespace NIKE {
 		direction_right.x = direction.x * std::cos(angle_offset_right) - direction.y * std::sin(angle_offset_right);
 		direction_right.y = direction.x * std::sin(angle_offset_right) + direction.y * std::cos(angle_offset_right);
 
-		// Set bullet positions for left and right streams (use offset from enemy)
+		// Set bullet positions for left and right streams 
 		Vector2f bullet_pos_left = enemy_pos + direction_left * enemy_attack_comp.offset;
 		Vector2f bullet_pos_right = enemy_pos + direction_right * enemy_attack_comp.offset;
 
@@ -365,16 +367,17 @@ namespace NIKE {
 		}
 
 		// Set bullet SFX for both streams
+		// Play sound once is fine, if right bullet played too it will be funny
 		auto bullet_sfx_left = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity_left);
 		if (bullet_sfx_left.has_value()) {
 			bullet_sfx_left.value().get().b_play_sfx = true;
 			bullet_sfx_left.value().get().pitch = GameLogic::getRandomNumber(0.5f, 2.0f);
 		}
 
-		auto bullet_sfx_right = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity_right);
-		if (bullet_sfx_right.has_value()) {
-			bullet_sfx_right.value().get().b_play_sfx = true;
-			bullet_sfx_right.value().get().pitch = GameLogic::getRandomNumber(0.5f, 2.0f);
-		}
+		//auto bullet_sfx_right = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity_right);
+		//if (bullet_sfx_right.has_value()) {
+		//	bullet_sfx_right.value().get().b_play_sfx = true;
+		//	bullet_sfx_right.value().get().pitch = GameLogic::getRandomNumber(0.5f, 2.0f);
+		//}
 	}
 }
