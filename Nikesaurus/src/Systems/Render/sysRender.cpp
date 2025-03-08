@@ -97,6 +97,44 @@ namespace NIKE {
 				//Skip entity not registered to this system
 				if (entities.find(entity) == entities.end()) continue;
 
+				//Get relation
+				auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+
+				//Storage of previous
+				std::optional<Vector2f> child_pos_offset = std::nullopt;
+
+				//Check if its a child relation
+				auto* child = std::get_if<MetaData::Child>(&relation);
+				if (child) {
+
+					//Get child & parent entity
+					auto child_entity = entity;
+					auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+
+					//child transform
+					auto c_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(child_entity);
+					if (c_trans.has_value() && parent_entity.has_value()) {
+
+						//Get child transform reference
+						auto& c_transform = c_trans.value().get();
+
+						//Get parent transform
+						auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+						if (p_trans.has_value()) {
+
+							//Get parent transform reference
+							auto const& p_transform = p_trans.value().get();
+
+							//Old child transform
+							child_pos_offset = c_transform.position;
+
+							//Update child entity with parents transform data
+							c_transform.use_screen_pos = p_transform.use_screen_pos;
+							c_transform.position = p_transform.position + c_transform.position;
+						}
+					}
+				}
+
 #ifndef NDEBUG
 				//Render call for all entity
 				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), NIKE_LVLEDITOR_SERVICE->getDebugState());
@@ -105,6 +143,19 @@ namespace NIKE {
 				//Render call for all entity
 				NIKE_RENDER_SERVICE->renderComponents(NIKE_ECS_MANAGER->getAllEntityComponents(entity), false);
 #endif
+
+				//Update old child position offset
+				if (child_pos_offset.has_value()) {
+					auto c_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+					if (c_trans.has_value()) {
+
+						//Get child transform reference
+						auto& c_transform = c_trans.value().get();
+
+						//update old child position offset back
+						c_transform.position = child_pos_offset.value();
+					}
+				}
 			}
 		}
 
