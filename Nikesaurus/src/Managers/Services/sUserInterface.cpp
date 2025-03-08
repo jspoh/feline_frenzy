@@ -438,10 +438,10 @@ namespace NIKE {
 		//Iterate through active entities
 		for (auto& entity : ui_entities) {
 
-			//Always set UI layer entity to the last layer
-			if (NIKE_METADATA_SERVICE->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
-				NIKE_METADATA_SERVICE->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
-			}
+			////Always set UI layer entity to the last layer
+			//if (NIKE_METADATA_SERVICE->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+			//	NIKE_METADATA_SERVICE->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			//}
 
 			//Reset all input checks to false
 			for (auto& input : input_checks) {
