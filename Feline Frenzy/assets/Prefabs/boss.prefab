@@ -40,10 +40,10 @@
             "Element": 0
         },
         "Enemy::Attack": {
-            "Cooldown": 10.0,
+            "Cooldown": 0.5,
             "Function": "enemyBullet",
             "LastShotTime": 10.0,
-            "Layer": 0,
+            "Layer": 1,
             "Offset": 100.0,
             "PrefabPath": "bullet.prefab",
             "Range": 10.0,
@@ -61,7 +61,7 @@
                 "x": 0.0,
                 "y": 0.0
             },
-            "Resolution": 0,
+            "Resolution": 1,
             "Rotation": 0.0,
             "Scale": {
                 "x": 1.0,
@@ -71,14 +71,14 @@
         "Physics::Dynamics": {
             "Drag": 0.0,
             "Force": {
-                "x": 0.0,
-                "y": 0.0
+                "x": 100.0,
+                "y": 100.0
             },
             "Mass": 9.999999747378752e-05,
-            "Max_Speed": 0.0,
+            "Max_Speed": 200.0,
             "Velocity": {
-                "x": 0.0,
-                "y": 0.0
+                "x": -98.16500091552734,
+                "y": -19.069000244140625
             }
         },
         "Render::Texture": {
@@ -115,8 +115,8 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 1.0,
-                "y": 1.0
+                "x": 250.0,
+                "y": 250.0
             },
             "Screen Position": false
         }

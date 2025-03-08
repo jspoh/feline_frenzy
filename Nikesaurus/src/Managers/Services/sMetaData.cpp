@@ -14,10 +14,11 @@
 namespace NIKE {
 
 	nlohmann::json MetaData::EntityData::serialize() const {
-		auto* parent = std::get_if<Parent>(&relation);
+
+		//Get child
 		auto* child = std::get_if<Child>(&relation);
 
-		if (parent) {
+		if (!child) {
 			return {
 				{"Name", name},
 				{"Prefab_ID", prefab_id},
@@ -25,8 +26,7 @@ namespace NIKE {
 				{"B_Locked", b_locked},
 				{"Layer_ID", layer_id},
 				{"Layer_Order", layer_order},
-				{"Tags", tags},
-				{"Childrens", parent ? parent->childrens : std::set<std::string>() },
+				{"Tags", tags}
 			};
 		}
 		else {
@@ -38,7 +38,7 @@ namespace NIKE {
 				{"Layer_ID", layer_id},
 				{"Layer_Order", layer_order},
 				{"Tags", tags},
-				{"Parent", child ? child->parent : "" }
+				{"Parent", child->parent }
 			};
 		}
 	}
@@ -62,18 +62,14 @@ namespace NIKE {
 			tags = data["Tags"].get<std::set<std::string>>();
 		}
 
-		//Get childrens
-		if (data.contains("Childrens")) {
-			Parent temp_parent;
-			temp_parent.childrens = data["Childrens"].get<std::set<std::string>>();
-			relation = temp_parent;
-		}
-
 		//Get Parent
 		if (data.contains("Parent")) {
 			Child temp_child;
 			temp_child.parent = data["Parent"].get<std::string>();
 			relation = temp_child;
+		}
+		else {
+			relation = Parent();
 		}
 
 		//Update relation
@@ -672,6 +668,12 @@ namespace NIKE {
 		//Serialize tags
 		data["Tags"] = metadata.tags;
 
+		//Serialize parent
+		auto* child = std::get_if<Child>(&metadata.relation);
+		if (child) {
+			data["Parent"] = child->parent;
+		}
+
 		return data;
 	}
 
@@ -686,6 +688,20 @@ namespace NIKE {
 		//Check if tags is the same as prefab
 		if (entity_data.tags != prefab_data.tags) {
 			data["Tags"] = entity_data.tags;
+		}
+
+		//Serialize parent
+		auto* e_child = std::get_if<Child>(&entity_data.relation);
+		auto* p_child = std::get_if<Child>(&prefab_data.relation);
+		if (e_child) {
+			if (!p_child || (p_child && (p_child->parent != e_child->parent))) {
+				data["Parent"] = e_child->parent;
+			}
+		}
+		else {
+			if (p_child) {
+				data["Not Child"] = true;
+			}
 		}
 
 		return data;
@@ -714,6 +730,20 @@ namespace NIKE {
 			success = false;
 		}
 
+		//Get Parent
+		if (data.contains("Parent")) {
+			NIKE_METADATA_SERVICE->setEntityChildRelation(entity);
+			NIKE_METADATA_SERVICE->setEntityChildRelationParent(entity, data["Parent"].get<std::string>());
+		}
+		else {
+			NIKE_METADATA_SERVICE->setEntityParentRelation(entity);
+		}
+
+		//Check for prefab overriders
+		if (data.contains("Not Child")) {
+			NIKE_METADATA_SERVICE->setEntityParentRelation(entity);
+		}
+
 		return success;
 	}
 
@@ -738,6 +768,21 @@ namespace NIKE {
 		}
 		else {
 			success = false;
+		}
+
+		//Get Parent
+		if (data.contains("Parent")) {
+			Child temp_child;
+			temp_child.parent = data["Parent"].get<std::string>();
+			metadata.relation = temp_child;
+		}
+		else {
+			metadata.relation = Parent();
+		}
+
+		//Check for prefab overriders
+		if (data.contains("Not Child")) {
+			metadata.relation = Parent();
 		}
 
 		return success;

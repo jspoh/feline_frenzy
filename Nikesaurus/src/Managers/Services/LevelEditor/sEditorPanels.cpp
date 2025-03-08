@@ -1485,7 +1485,6 @@ namespace NIKE {
 			//Add Spacing
 			ImGui::Spacing();
 
-
 			//Get entity relation
 			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(selected_entity);
 			auto* parent = std::get_if<MetaData::Parent>(&relation);
@@ -1706,7 +1705,26 @@ namespace NIKE {
 		if (e_transform_comp.has_value()) {
 
 			//Get transform
-			const auto& e_transform = e_transform_comp.value().get();
+			Transform::Transform e_transform = e_transform_comp.value().get();
+
+			//Check if child
+			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+			if (child) {
+
+				//Get parent entity
+				auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+				if (parent_entity.has_value()) {
+
+					//Get parent transform
+					auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+					if (p_trans.has_value()) {
+
+						//Get parent transform reference
+						e_transform.position += p_trans.value().get().position;
+					}
+				}
+			}
 
 			// Retrieve the cursor position in world space
 			Vector2f cursorWorldPos = game_panel.lock()->getWorldMousePos();
@@ -1723,13 +1741,16 @@ namespace NIKE {
 	* Components Panel
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::interactGizmo() {
+		//Selected entity
+		auto entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if entity is locked or game is playing
-		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entity)) {
 			return;
 		}
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
 		if (!e_transform_comp.has_value())
 			return;
@@ -1750,11 +1771,34 @@ namespace NIKE {
 		Vector2f world_mouse = e_transform.use_screen_pos ? Vector2f(mouse_pos.x - window_size.x * 0.5f, -(mouse_pos.y - window_size.y * 0.5f)) :
 			game_panel.lock()->getWorldMousePos();
 
+		//Get parent position
+		Vector2f parent_pos = { 0.0f, 0.0f };
+
+		//Check if child
+		auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		auto* child = std::get_if<MetaData::Child>(&relation);
+		if (child) {
+
+			//Get parent entity
+			auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+			if (parent_entity.has_value()) {
+
+				//Get parent transform
+				auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+				if (p_trans.has_value()) {
+
+					//Get parent transform reference
+					parent_pos = p_trans.value().get().position;
+				}
+			}
+		}
+
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
+
 			//Extra object for translate ( Move box )
-			gizmo.objects["Move Box"].first.position = { e_transform.position.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Move Box"].first.position = { e_transform.position.x + parent_pos.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + parent_pos.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
 			gizmo.objects["Move Box"].first.scale = { gizmo_scale, gizmo_scale };
 			gizmo.objects["Move Box"].second = { 100, 100, 100, 255 };
 
@@ -1772,15 +1816,16 @@ namespace NIKE {
 
 				//Apply transformation
 				e_transform.position = { world_mouse.x - (gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom),  world_mouse.y - (gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom) };
+				e_transform.position = e_transform.position - parent_pos;
 			}
 
 			//Add gizmo up
-			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up"].first.position = { e_transform.position.x + parent_pos.x, e_transform.position.y + parent_pos.y + gizmo.y_axis_offset * cam_zoom };
 			gizmo.objects["Up"].first.scale = { gizmo_scale * 0.3f , gizmo_scale * 4 };
 			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x + parent_pos.x, e_transform.position.y + parent_pos.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
 			gizmo.objects["Up Point"].first.scale = { gizmo_scale * 0.7f, gizmo_scale };
 			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
@@ -1811,12 +1856,12 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset * cam_zoom , e_transform.position.y };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + parent_pos.x + gizmo.x_axis_offset * cam_zoom , e_transform.position.y + parent_pos.y };
 			gizmo.objects["Right"].first.scale = { gizmo_scale * 4, gizmo_scale * 0.3f };
 			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + parent_pos.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + parent_pos.y };
 			gizmo.objects["Right Point"].first.scale = { gizmo_scale, gizmo_scale * 0.7f };
 			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
@@ -1867,7 +1912,7 @@ namespace NIKE {
 					if (cursor_cell.has_value()) {
 
 						//Snap to cell
-						e_transform.position = cursor_cell.value().get().position;
+						e_transform.position = cursor_cell.value().get().position - parent_pos;
 					}
 				}
 
@@ -2016,7 +2061,7 @@ namespace NIKE {
 		case GizmoMode::Rotate: {
 
 			//Add rotation circle
-			gizmo.objects["Rot Circle"].first.position = { e_transform.position.x, e_transform.position.y };
+			gizmo.objects["Rot Circle"].first.position = { e_transform.position.x + parent_pos.x, e_transform.position.y + parent_pos.y };
 			gizmo.objects["Rot Circle"].first.scale = { gizmo_scale * 8, gizmo_scale * 8 };
 			gizmo.objects["Rot Circle"].second = { 255, 255, 255, 255 };
 
@@ -2534,13 +2579,16 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
+		//Selected entity
+		auto entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if entity is locked or game is playing
-		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entity)) {
 			return;
 		}
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value())
 			return;
 
@@ -2558,19 +2606,45 @@ namespace NIKE {
 			worldCircle(draw, rotation_circle.first, rendersize, IM_COL32(rotation_circle.second.r, rotation_circle.second.g, rotation_circle.second.b, rotation_circle.second.a), gizmo.gizmo_scaling * 0.15f);
 		}
 		else {
+			//Get parent position
+			Transform::Transform transform = e_transform;
+
+			//Check if child
+			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+			if (child) {
+
+				//Get parent entity
+				auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+				if (parent_entity.has_value()) {
+
+					//Get parent transform
+					auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+					if (p_trans.has_value()) {
+
+						//Get parent transform reference
+						transform.position = p_trans.value().get().position + e_transform.position;
+					}
+				}
+			}
+
 			//Render rotated rectangle
-			worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (gizmo.gizmo_scaling * 0.05f));
+			worldQuad(draw, transform, rendersize, IM_COL32(255, 255, 255, 255), (gizmo.gizmo_scaling * 0.05f));
 		}
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
+
+		//Selected entity
+		auto entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if entity is locked or game is playing
-		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entity)) {
 			return;
 		}
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value())
 			return;
 
@@ -2593,6 +2667,28 @@ namespace NIKE {
 
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
+
+		//Get parent position
+		Vector2f parent_pos = { 0.0f, 0.0f };
+
+		//Check if child
+		auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		auto* child = std::get_if<MetaData::Child>(&relation);
+		if (child) {
+
+			//Get parent entity
+			auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+			if (parent_entity.has_value()) {
+
+				//Get parent transform
+				auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+				if (p_trans.has_value()) {
+
+					//Get parent transform reference
+					parent_pos = p_trans.value().get().position;
+				}
+			}
+		}
 
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
@@ -2678,7 +2774,7 @@ namespace NIKE {
 			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), rotation_circle.position.y - (rotation_circle.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 		else {
-			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+			draw->AddText(worldToScreen(ImVec2(e_transform.position.x + parent_pos.x - (e_transform.scale.x / 2.0f), e_transform.position.y + parent_pos.y - (e_transform.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 	}
 

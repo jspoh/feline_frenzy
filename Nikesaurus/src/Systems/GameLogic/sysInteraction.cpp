@@ -36,14 +36,15 @@ namespace NIKE {
                     std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
                     if (!player_entities.empty()) {
                         // Get heal animation position
-                        auto heal_animation_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(heal_entity).value().get().position;
+                        auto &heal_animation_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(heal_entity).value().get().position;
 
                         // Get player position
                         for (auto& player : player_entities) {
                             const auto player_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player).value().get().position;
 
                             // Set heal animation to player position
-                            heal_animation_pos = player_pos;
+                            const float offset_y = 17.f;
+                            heal_animation_pos = { player_pos.x, player_pos.y - offset_y };
                         }
                     }
 

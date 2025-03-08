@@ -32,12 +32,13 @@
     {
         "MetaData": {
             "Entity_Tags": [
-                "Background"
+                "Background",
+                "overlay"
             ]
         }
     },
     {
-        "Layer Count": 2
+        "Layer Count": 3
     },
     {
         "Layer": {
@@ -94,7 +95,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
@@ -156,7 +156,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "Background 2",
@@ -218,7 +217,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "Title",
@@ -278,9 +276,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.7254902124404907,
-                                    "y": 0.24705882370471954,
-                                    "z": 0.5176470875740051
+                                    "x": 0.6274510025978088,
+                                    "y": 0.545098066329956,
+                                    "z": 0.615686297416687
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -381,9 +379,8 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
-                            "Layer_Order": 0,
+                            "Layer_Order": 1,
                             "Name": "how_to_play_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -488,9 +485,8 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
+                            "Layer_Order": 2,
                             "Name": "play_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -508,6 +504,115 @@
                             }
                         },
                         "UI ID": "start_game_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "num_new_particles_per_second": 1,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_acceleration": 0.0,
+                                "particle_color": {
+                                    "w": 1.0,
+                                    "x": 0.8627451062202454,
+                                    "y": 0.6117647290229797,
+                                    "z": 0.9098039269447327
+                                },
+                                "particle_color_changes_over_time": false,
+                                "particle_color_is_random": true,
+                                "particle_final_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_final_size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_lifespan": 5.0,
+                                "particle_rand_width_range": {
+                                    "x": 80.0,
+                                    "y": 80.0
+                                },
+                                "particle_rand_x_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_y_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rotation": 0.0,
+                                "particle_rotation_speed": 1.0,
+                                "particle_size_changes_over_time": false,
+                                "particle_vector_x_range": {
+                                    "x": -1.0,
+                                    "y": 1.0
+                                },
+                                "particle_vector_y_range": {
+                                    "x": -1.0,
+                                    "y": 1.0
+                                },
+                                "particle_velocity_range": {
+                                    "x": 5.0,
+                                    "y": 100.0
+                                },
+                                "preset": 0,
+                                "render_type": 2,
+                                "texture_ref": "Bottom_Corner_256px.png"
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Heart.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 17.99249267578125,
+                                    "y": 129.90142822265625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 97.0,
+                                    "y": 83.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 3,
+                            "Name": "entity_0006",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
                     }
                 },
                 {
@@ -595,9 +700,8 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 4,
                             "Name": "quit_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -614,119 +718,58 @@
                         },
                         "UI ID": "quit_btn"
                     }
-                },
+                }
+            ],
+            "ID": 1,
+            "Mask": 2
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "B_YSort": true,
+            "Entities": [
                 {
                     "Entity": {
                         "Components": {
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "num_new_particles_per_second": 1,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_acceleration": 0.0,
-                                "particle_color": {
-                                    "w": 1.0,
-                                    "x": 0.30980393290519714,
-                                    "y": 0.5215686559677124,
-                                    "z": 0.11764705926179886
-                                },
-                                "particle_color_changes_over_time": false,
-                                "particle_color_is_random": true,
-                                "particle_final_color": {
+                            "Render::Shape": {
+                                "Color": {
                                     "w": 0.0,
                                     "x": 0.0,
                                     "y": 0.0,
                                     "z": 0.0
                                 },
-                                "particle_final_size": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_lifespan": 5.0,
-                                "particle_rand_width_range": {
-                                    "x": 80.0,
-                                    "y": 80.0
-                                },
-                                "particle_rand_x_offset_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_rand_y_offset_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_rotation": 0.0,
-                                "particle_rotation_speed": 1.0,
-                                "particle_size_changes_over_time": false,
-                                "particle_vector_x_range": {
-                                    "x": -1.0,
-                                    "y": 1.0
-                                },
-                                "particle_vector_y_range": {
-                                    "x": -1.0,
-                                    "y": 1.0
-                                },
-                                "particle_velocity_range": {
-                                    "x": 5.0,
-                                    "y": 100.0
-                                },
-                                "preset": 0,
-                                "render_type": 2,
-                                "texture_ref": "Bottom_Corner_256px.png"
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Heart.png"
+                                "Model_ID": "square.model"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 17.99249267578125,
-                                    "y": 129.90142822265625
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 97.0,
-                                    "y": 83.0
+                                    "x": 1600.0,
+                                    "y": 900.0
                                 },
                                 "Screen Position": false
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 4,
-                            "Name": "entity_0007",
+                            "Layer_ID": 2,
+                            "Layer_Order": 0,
+                            "Name": "fade_overlay",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
-                            "Tags": []
+                            "Tags": [
+                                "overlay"
+                            ]
                         }
                     }
                 }
             ],
-            "ID": 1,
-            "Mask": 2
+            "ID": 2,
+            "Mask": 4
         }
     }
 ]

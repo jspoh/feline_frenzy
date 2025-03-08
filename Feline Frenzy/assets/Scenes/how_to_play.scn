@@ -33,7 +33,9 @@
     },
     {
         "MetaData": {
-            "Entity_Tags": []
+            "Entity_Tags": [
+                "overlay"
+            ]
         }
     },
     {
@@ -86,7 +88,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
@@ -146,7 +147,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "entity_0001",
@@ -198,7 +198,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "entity_0002",
@@ -303,7 +302,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "back_btn",
@@ -321,6 +319,39 @@
                             }
                         },
                         "UI ID": "back_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "overlay",
+                            "Prefab_ID": "overlay.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Shape": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Layer ID": 1,
+                                    "Tags": [
+                                        "overlay"
+                                    ]
+                                }
+                            },
+                            "Tags": [
+                                "overlay"
+                            ]
+                        }
                     }
                 }
             ],
