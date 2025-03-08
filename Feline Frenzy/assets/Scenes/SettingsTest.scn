@@ -1,6 +1,10 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": false,
+                "tracks": []
+            },
             "Menu_BGM": {
                 "loop": true,
                 "tracks": [
@@ -8,6 +12,10 @@
                 ]
             },
             "SFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
                 "loop": false,
                 "tracks": []
             }
@@ -76,6 +84,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
@@ -89,6 +98,7 @@
                     "Entity": {
                         "Components": {
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 0.0,
                                     "y": 12.650634765625
@@ -122,6 +132,7 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
+                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "entity_0001",
@@ -226,6 +237,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "back_btn",
@@ -236,9 +248,10 @@
                         "UI Btn": {
                             "Input_State": 1,
                             "Script": {
-                                "Function": "Previous",
                                 "Named_Args": {},
-                                "Script_ID": "ChangeScene.lua"
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": "Previous"
                             }
                         },
                         "UI ID": "back_btn"
@@ -295,6 +308,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "BGMSliderBar",
@@ -355,6 +369,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 2,
                             "Name": "BGMSlider",
@@ -406,6 +421,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 3,
                             "Name": "BGMArrow",
@@ -449,6 +465,7 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
+                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 4,
                             "Name": "BGMLabel",

@@ -98,7 +98,7 @@ namespace NIKE {
 				Transform::Transform btn_transform;
 				Render::Text btn_text;
 				Animation::Sprite btn_animate;
-				bool b_hovered;
+				bool b_hovered = false;
 			};
 
 			//Button hovering container
@@ -150,7 +150,7 @@ namespace NIKE {
 
 			// For slider
 			bool sliderHovered(Entity::Type entity) const;
-			// NEW: Custom function to update slider functionality.
+			// Test custom function to update slider functionality.
 			void updateSliders();
 
 			//Check Button Clicked
