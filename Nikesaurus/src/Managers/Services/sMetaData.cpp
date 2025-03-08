@@ -14,10 +14,11 @@
 namespace NIKE {
 
 	nlohmann::json MetaData::EntityData::serialize() const {
-		auto* parent = std::get_if<Parent>(&relation);
+
+		//Get child
 		auto* child = std::get_if<Child>(&relation);
 
-		if (parent) {
+		if (!child) {
 			return {
 				{"Name", name},
 				{"Prefab_ID", prefab_id},
@@ -25,8 +26,7 @@ namespace NIKE {
 				{"B_Locked", b_locked},
 				{"Layer_ID", layer_id},
 				{"Layer_Order", layer_order},
-				{"Tags", tags},
-				{"Childrens", parent ? parent->childrens : std::set<std::string>() },
+				{"Tags", tags}
 			};
 		}
 		else {
@@ -62,18 +62,14 @@ namespace NIKE {
 			tags = data["Tags"].get<std::set<std::string>>();
 		}
 
-		//Get childrens
-		if (data.contains("Childrens")) {
-			Parent temp_parent;
-			temp_parent.childrens = data["Childrens"].get<std::set<std::string>>();
-			relation = temp_parent;
-		}
-
 		//Get Parent
 		if (data.contains("Parent")) {
 			Child temp_child;
 			temp_child.parent = data["Parent"].get<std::string>();
 			relation = temp_child;
+		}
+		else {
+			relation = Parent();
 		}
 
 		//Update relation
