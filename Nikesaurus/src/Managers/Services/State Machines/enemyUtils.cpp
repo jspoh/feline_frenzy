@@ -257,6 +257,27 @@ namespace NIKE {
 			NIKEE_CORE_WARN("ENEMY missing TRANSFORM component!");
 			return;
 		}
+
+		// Get enemy physics component
+		const auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(enemy);
+		if (!e_physics_comp.has_value()) {
+			NIKEE_CORE_WARN("ENEMY missing Physics component!");
+			return;
+		}
+
+		// For boss to move slightly left and right while shooting
+		static bool move_left = true;
+		float move_force = 50.0f;
+		if (move_left) {
+			e_physics_comp.value().get().force.x -= move_force;  // Move left
+		}
+		else {
+			e_physics_comp.value().get().force.x += move_force;  // Move right
+		}
+
+		// Flip direction 
+		move_left = !move_left;
+
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
 
 		// Attack Comp
@@ -267,14 +288,12 @@ namespace NIKE {
 		}
 		const auto& enemy_attack_comp = e_attack_comp.value().get();
 
-		// Element comp
-		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
-
 		// Create bullets for left and right streams
 		Entity::Type bullet_entity_left = NIKE_ECS_MANAGER->createEntity();
 		Entity::Type bullet_entity_right = NIKE_ECS_MANAGER->createEntity();
 
 		// Load entity from prefab
+		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
 		if (e_element_comp.has_value()) {
 			// Shoot elemental bullets
 			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(bullet_entity_left, Element::enemyBullet[static_cast<int>(e_element_comp.value().get().element)]);
