@@ -1853,7 +1853,6 @@ namespace NIKE {
 
 				//Apply the delta to the position
 				e_transform.position.y = initial_position_y + delta_y;
-				e_transform.position = e_transform.position - parent_pos;
 			}
 
 			//Add gizmo right
@@ -1891,7 +1890,6 @@ namespace NIKE {
 
 				//Apply the delta to the position
 				e_transform.position.x = initial_position_x + delta_x;
-				e_transform.position = e_transform.position - parent_pos;
 			}
 
 			//Add gizmo center
