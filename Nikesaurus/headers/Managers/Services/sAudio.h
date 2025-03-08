@@ -45,8 +45,8 @@ namespace NIKE {
 			//Get audio file path
 			virtual std::string getFilePath() const = 0;
 
-			//Get length of audio ( Milliseconds )
-			virtual unsigned int getLength() const = 0;
+			//Get length of audio
+			virtual unsigned int getLength(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Set audio mode
 			virtual void setMode(NIKE_AUDIO_MODE mode) = 0;
@@ -167,10 +167,10 @@ namespace NIKE {
 			virtual int getLoopCount() const = 0;
 
 			//Set channel loop point ( Milliseconds )
-			virtual void setLoopPoints(unsigned int start, unsigned int end) = 0;
+			virtual void setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) = 0;
 
 			//Get audio loop point ( Milliseconds )
-			virtual Vector2<unsigned int> getLoopPoints() const = 0;
+			virtual Vector2<unsigned int> getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Set channel mute
 			virtual void setMute(bool state) = 0;
@@ -258,7 +258,7 @@ namespace NIKE {
 
 			std::string getFilePath() const override;
 
-			unsigned int getLength() const override;
+			unsigned int getLength(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			void setMode(NIKE_AUDIO_MODE) override;
 
@@ -351,9 +351,9 @@ namespace NIKE {
 
 			int getLoopCount() const override;
 
-			void setLoopPoints(unsigned int start, unsigned int end) override;
+			void setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) override;
 
-			Vector2<unsigned int> getLoopPoints() const override;
+			Vector2<unsigned int> getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			void setMute(bool state) override;
 
@@ -429,6 +429,10 @@ namespace NIKE {
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 
+			//Static channel group ID
+			std::string bgm_channel_group_id;
+			std::string vfx_channel_group_id;
+
 			// Playlist Management
 			struct Playlist {
 				std::deque<std::string> tracks;
@@ -447,7 +451,7 @@ namespace NIKE {
 			~Service() = default;
 
 			//Init Audio Service
-			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+			void init(nlohmann::json const& config);
 
 			//Get Audio System
 			std::shared_ptr<Audio::IAudioSystem> getAudioSystem() const;
@@ -476,6 +480,12 @@ namespace NIKE {
 			// Checkers
 			bool checkChannelGroupExist(std::string const& channel_id);
 			bool checkChannelExist(std::string const& channel_id);
+
+			//Get BGM Channel Group
+			std::string getBGMChannelGroupID() const;
+
+			//Get VFX Channel Group
+			std::string getVFXChannelGroupID() const;
 
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )

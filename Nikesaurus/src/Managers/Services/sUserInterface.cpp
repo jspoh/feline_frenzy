@@ -535,6 +535,8 @@ namespace NIKE {
 			}
 		}
 
+
+
 		//Iterate through active entities
 		for (auto& entity : ui_entities) {
 
@@ -547,6 +549,12 @@ namespace NIKE {
 			for (auto& input : input_checks) {
 				input.second.first = false;
 			}
+
+#ifndef NDEBUG
+			if (!NIKE_LVLEDITOR_SERVICE->getGameState()) {
+				return;
+			}
+#endif
 
 			//Get transform comp
 			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.entity_id);

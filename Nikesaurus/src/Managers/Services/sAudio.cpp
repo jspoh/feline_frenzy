@@ -26,11 +26,17 @@ namespace NIKE {
 	}
 
 	void Audio::NIKEAudio::lock(unsigned int offset, unsigned int length, void** ptr1, void** ptr2, unsigned int* len1, unsigned int* len2) {
-		sound->lock(offset, length, ptr1, ptr2, len1, len2);
+		auto result = sound->lock(offset, length, ptr1, ptr2, len1, len2);
+		if (result != FMOD_OK) {
+			NIKEE_CORE_WARN("Error with locking audio!");
+		}
 	}
 
 	void Audio::NIKEAudio::unlock(void* ptr1, void* ptr2, unsigned int len1, unsigned int len2) {
-		sound->unlock(ptr1, ptr2, len1, len2);
+		auto result = sound->unlock(ptr1, ptr2, len1, len2);
+		if (result != FMOD_OK) {
+			NIKEE_CORE_WARN("Error with unlocking audio!");
+		}
 	}
 
 	void Audio::NIKEAudio::release() {
@@ -41,9 +47,9 @@ namespace NIKE {
 		return file_path;
 	}
 
-	unsigned int Audio::NIKEAudio::getLength() const {
+	unsigned int Audio::NIKEAudio::getLength(NIKE_AUDIO_TIMEUNIT time_unit) const {
 		unsigned int length;
-		sound->getLength(&length, NIKE_AUDIO_TIMEUNIT_MS);
+		sound->getLength(&length, time_unit);
 		return length;
 	}
 
@@ -137,13 +143,13 @@ namespace NIKE {
 		return count;
 	}
 
-	void Audio::NIKEChannel::setLoopPoints(unsigned int start, unsigned int end) {
-		channel->setLoopPoints(start, NIKE_AUDIO_TIMEUNIT_MS, end, NIKE_AUDIO_TIMEUNIT_MS);
+	void Audio::NIKEChannel::setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) {
+		channel->setLoopPoints(start, time_unit, end, time_unit);
 	}
 
-	Vector2<unsigned int> Audio::NIKEChannel::getLoopPoints() const {
+	Vector2<unsigned int> Audio::NIKEChannel::getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const {
 		Vector2<unsigned int> points;
-		channel->getLoopPoints(&points.x, NIKE_AUDIO_TIMEUNIT_MS, &points.y, NIKE_AUDIO_TIMEUNIT_MS);
+		channel->getLoopPoints(&points.x, time_unit, &points.y, time_unit);
 		return points;
 	}
 
@@ -380,9 +386,11 @@ namespace NIKE {
 		FMOD::Sound* temp_audio = nullptr;
 		FMOD_RESULT result;
 
+		//Cast audio info
+		auto audio_info = static_cast<FMOD_CREATESOUNDEXINFO*>(exinfo);
+
 		// Create sound to be pushed into container
-		// !!! FMOD will handle the reading from file using createStream function
-		result = fmod_system->createStream(name_or_data, mode, static_cast<FMOD_CREATESOUNDEXINFO*>(exinfo), &temp_audio);
+		result = fmod_system->createStream(name_or_data, mode, audio_info, &temp_audio);
 
 		// Check for audio file validadity
 		if (result != FMOD_OK)
@@ -458,12 +466,28 @@ namespace NIKE {
 		event->setEventProcessed(true);
 	}
 
-	void NIKE::Audio::Service::init(std::shared_ptr<Audio::IAudioSystem> audio_sys) {
+	void NIKE::Audio::Service::init(nlohmann::json const& config) {
+
 		//Setup events listening
 		std::shared_ptr<Audio::Service> audio_sys_wrapped(this, [](Audio::Service*) {});
 		NIKE_EVENTS_SERVICE->addEventListeners<Audio::PausedEvent>(audio_sys_wrapped);
 
-		audio_system = audio_sys;
+		//Create audio system
+		audio_system = std::make_shared<Audio::NIKEAudioSystem>();
+
+		try {
+			auto const& data = config.at("AudioConfig");
+
+			bgm_channel_group_id = data.value("BGM Channel Group", "BGM");
+			vfx_channel_group_id = data.value("VFX Channel Group", "VFX");
+
+			createChannelGroup(bgm_channel_group_id);
+			createChannelGroup(vfx_channel_group_id);
+		}
+		catch (const nlohmann::json::exception& e) {
+			NIKEE_CORE_WARN(e.what());
+			NIKEE_CORE_WARN("Audio config invalid!");
+		}
 	}
 
 	std::shared_ptr<Audio::IAudioSystem> NIKE::Audio::Service::getAudioSystem() const {
@@ -509,16 +533,25 @@ namespace NIKE {
 	void Audio::Service::clearAllChannelGroups() {
 		//Clear channel groups
 		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
+
+			//Skip static channels groups
+			if (it->first == bgm_channel_group_id || it->first == vfx_channel_group_id) {
+				++it;
+				continue;
+			}
+
+			//Get channel group
 			auto channel_group = std::static_pointer_cast<Audio::NIKEChannelGroup>(it->second)->getChannelGroup();
 			if (channel_group) {
 				channel_group->stop();
 				channel_group->release();
 			}
+			//Erase channel playlist
+			channel_playlists.erase(channel_playlists.find(it->first));
+
 			// Erase the channel group from the map
 			it = channel_groups.erase(it);
 		}
-		// Clear playlists associated with the channel groups
-		channel_playlists.clear();
 	}
 
 	std::shared_ptr<Audio::IChannelGroup> Audio::Service::convertChannelGroup(Audio::IChannelGroup*&& group) {
@@ -587,6 +620,14 @@ namespace NIKE {
 		return true;
 	}
 
+	std::string Audio::Service::getBGMChannelGroupID() const {
+		return bgm_channel_group_id;
+	}
+
+	std::string Audio::Service::getVFXChannelGroupID() const {
+		return vfx_channel_group_id;
+	}
+
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
 		
 		//Get assets services
@@ -613,7 +654,6 @@ namespace NIKE {
 		}
 
 	}
-
 
 	void Audio::Service::pauseAllChannels() {
 		for (auto& pair : getAllChannelGroups()) {

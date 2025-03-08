@@ -235,7 +235,7 @@ namespace NIKE {
 		NIKE_PATH_SERVICE->init(json_config);
 
 		//Init Audio
-		NIKE_AUDIO_SERVICE->init(std::make_shared<Audio::NIKEAudioSystem>());
+		NIKE_AUDIO_SERVICE->init(json_config);
 
 		//Initialize assets service
 		NIKE_ASSETS_SERVICE->init(NIKE_AUDIO_SERVICE->getAudioSystem());

@@ -4,7 +4,7 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Frame_Duration": 0.054999999701976776
+            "Frame_Duration": 0.20000000298023224
         },
         "Animation::Sprite": {
             "End_Index": {
@@ -12,8 +12,8 @@
                 "y": 0
             },
             "Sheet_Size": {
-                "x": 10,
-                "y": 16
+                "x": 0,
+                "y": 0
             },
             "Start_Index": {
                 "x": 0,
@@ -21,14 +21,14 @@
             }
         },
         "Audio::SFX": {
-            "Audio_ID": "WalkingNature.wav",
+            "Audio_ID": "",
             "B_Play_SFX": false,
-            "Channel_Group_ID": "PlayerSFX",
+            "Channel_Group_ID": "",
             "Pitch": 1.0,
-            "Volume": 0.5
+            "Volume": 1.0
         },
         "Combat::Faction": {
-            "Faction": 1
+            "Faction": 0
         },
         "Combat::Health": {
             "Health": 100.0,
@@ -39,13 +39,17 @@
         "Element::Entity": {
             "Element": 0
         },
-        "GameLogic::ILogic": {
-            "Named_Args": {
-                "entity": 11
-            },
-            "Script_ID": "player.lua",
-            "Start_Function": "",
-            "Update_Function": ""
+        "Enemy::Attack": {
+            "Cooldown": 10.0,
+            "Function": "enemyBullet",
+            "LastShotTime": 10.0,
+            "Layer": 0,
+            "Offset": 100.0,
+            "PrefabPath": "bullet.prefab",
+            "Range": 10.0,
+            "ScriptID": "",
+            "ScriptLoaded": false,
+            "ScriptPath": "assets/Scripts/enemyBullet.lua"
         },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
@@ -54,36 +58,28 @@
                 "y": 0.0
             },
             "Position": {
-                "x": -198.85702514648438,
-                "y": -215.2398223876953
+                "x": 0.0,
+                "y": 0.0
             },
-            "Resolution": 2,
+            "Resolution": 0,
             "Rotation": 0.0,
             "Scale": {
-                "x": 80.67974090576172,
-                "y": 116.1510009765625
+                "x": 1.0,
+                "y": 1.0
             }
         },
         "Physics::Dynamics": {
-            "Drag": 1.0,
+            "Drag": 0.0,
             "Force": {
                 "x": 0.0,
                 "y": 0.0
             },
-            "Mass": 0.5,
-            "Max_Speed": 150.0,
+            "Mass": 9.999999747378752e-05,
+            "Max_Speed": 0.0,
             "Velocity": {
                 "x": 0.0,
                 "y": 0.0
             }
-        },
-        "Render::Cam": {
-            "Mouse_Offset": 0.0,
-            "Position": {
-                "x": 0.0,
-                "y": 0.0
-            },
-            "Zoom": 1.0
         },
         "Render::Texture": {
             "B_Blend": false,
@@ -99,25 +95,28 @@
                 "z": 0.0
             },
             "Frame_Index": {
-                "x": 5,
-                "y": 1
+                "x": 0,
+                "y": 0
             },
             "Frame_Size": {
-                "x": 10,
-                "y": 16
+                "x": 1,
+                "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Player_animation_sprite.png"
+            "Texture_ID": ""
+        },
+        "State::State": {
+            "State": "Default"
         },
         "Transform::Transform": {
             "Position": {
-                "x": -198.85702514648438,
-                "y": -215.2398223876953
+                "x": 0.0,
+                "y": 0.0
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 80.67974090576172,
-                "y": 116.1510009765625
+                "x": 1.0,
+                "y": 1.0
             },
             "Screen Position": false
         }

@@ -40,7 +40,7 @@ namespace NIKE {
 		NIKE_UI_SERVICE->createButton(play_again,
 			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
 			Render::Text(),
-			Render::Texture("UI_PlayGame_spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+			Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
 
 		// Create Quit button
 		NIKE_UI_SERVICE->createButton(quit_game_text,
@@ -180,8 +180,14 @@ namespace NIKE {
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 					if (withinRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
 						// Handle change scene 
-						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
-
+						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
+						}
+						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
+						}
 					}
 				}
 			}
@@ -352,7 +358,8 @@ namespace NIKE {
 							// Set element ui to player's element
 							if (elementui_texture.has_value())
 							{
-								elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+								//elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+								elementui_texture.value().get().frame_index.x = static_cast<int>(player_element.value().get().element);
 							}
 						}
 					}
@@ -435,6 +442,7 @@ namespace NIKE {
 		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
+
 		// Randomly offset from spawner position		
 		float offset_x = getRandomNumber(-20.f, 20.f);
 		float offset_y = getRandomNumber(-20.f, 20.f);

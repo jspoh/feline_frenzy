@@ -1477,6 +1477,99 @@ namespace NIKE {
 				ImGui::Text("No Tags Exists.");
 			}
 
+			//Add Spacing
+			ImGui::Spacing();
+
+			ImGui::SeparatorText("Relation");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+
+			//Get entity relation
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(selected_entity);
+			auto* parent = std::get_if<MetaData::Parent>(&relation);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			//Toggle between parent & child
+			ImGui::Text("Relation: ");
+			ImGui::SameLine();
+			if (ImGui::SmallButton(parent ? "Parent" : "Child")) {
+				if (parent) {
+					NIKE_METADATA_SERVICE->setEntityChildRelation(selected_entity);
+				}
+				else {
+					NIKE_METADATA_SERVICE->setEntityParentRelation(selected_entity);
+				}
+			}
+
+			//Add Children
+			if (parent) {
+
+				//List childrens
+				ImGui::Text("Children: ");
+
+				//Iterate through children
+				for (auto const& child_name : parent->childrens) {
+
+					//List entity name
+					if (ImGui::Button(child_name.c_str())) {
+						auto c_entity = NIKE_METADATA_SERVICE->getEntityByName(child_name);
+						if (c_entity.has_value()) {
+							selected_entity = c_entity.value();
+						}
+					}
+				}
+			}
+
+			//Change Parent
+			if (child) {
+				ImGui::Text("Parent: ");
+
+				//Entities name
+				auto parents_name = NIKE_METADATA_SERVICE->getAllParents();
+
+				//Static prev parent
+				static std::string prev_parent = "";
+
+				//Find the index of the currently selected parent entity in the list
+				int current_index = -1;
+				for (size_t i = 0; i < parents_name.size(); ++i) {
+					if (child->parent == parents_name[i]) {
+						current_index = static_cast<int>(i);
+						break;
+					}
+				}
+
+				// Display combo box for video selection
+				if (ImGui::Combo("##SelectParent", &current_index, parents_name.data(), static_cast<int>(parents_name.size()))) {
+
+					//Validate the selected index and get the new video
+					if (current_index >= 0 && current_index < static_cast<int>(parents_name.size())) {
+						std::string new_parent = parents_name[current_index];
+
+						if (new_parent != child->parent) {
+							// Save action
+							LevelEditor::Action change_parent_action;
+							change_parent_action.do_action = [&, parent = new_parent]() {
+								NIKE_METADATA_SERVICE->setEntityChildRelationParent(selected_entity, parent);
+								};
+
+							// Undo action
+							change_parent_action.undo_action = [&, parent = prev_parent]() {
+								NIKE_METADATA_SERVICE->setEntityChildRelationParent(selected_entity, parent);
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_parent_action));
+
+							//Update the previous parent
+							prev_parent = new_parent;
+						}
+					}
+				}
+			}
+
 			//Render popups
 			renderPopUps();
 
@@ -2068,54 +2161,8 @@ namespace NIKE {
 				//Display each component as a button
 				if (ImGui::Button(component.first.c_str())) {
 
-					//Temporary add component action
-					//Action add_comp;
-
-					//Setup undo action for add component
-					//add_comp.undo_action = [=]() {
-					//	if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second)) {
-					//		NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
-					//	}
-					//};
-
-					//Setup do action for add component
-					//add_comp.do_action = [=]() {
-
 					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
-
-					//// add active particle system if particle emitter is added
-					//if (component.first == "Render::ParticleEmitter") {
-					//	using namespace NIKE::SysParticle;
-
-					//	// get entity position
-					//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-
-					//	if (comps.find("Transform::Transform") == comps.end()) {
-					//		NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-					//		NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-					//	}
-					//	NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
-
-					//	const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
-
-					//	const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
-					//	// update default particle system config
-					//	auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					//	pe_comp->duration = -1.f;
-					//	pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-					//	pe_comp->ref = particle_emitter_ref;
-					//	pe_comp->offset = { 0.f, 0.f };
-					//	pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
-
-					//	NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					//}
-
-					//	};
-
-					//Execute add component action
-					//NIKE_LVLEDITOR_SERVICE->executeAction(std::move(add_comp));
 
 					//Close popup
 					closePopUp(popup_id);
@@ -2148,16 +2195,6 @@ namespace NIKE {
 			if (ImGui::Button("Ok")) {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
-
-				//if (comp_string_ref == "Render::ParticleEmitter") {
-				//	// get entity position
-				//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-				//	const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-				//	bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-				//	if (!success) {
-				//		throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-				//	}
-				//}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2757,6 +2794,9 @@ namespace NIKE {
 				//Reset prefab comps
 				prefab_comps.clear();
 
+				//Clear prefab meta data
+				meta_data = MetaData::EntityData();
+
 				//Set prefab ID
 				prefab_id = new_prefab_id + ".prefab";
 
@@ -2819,6 +2859,9 @@ namespace NIKE {
 
 						//Clear prefab comps
 						prefab_comps.clear();
+
+						//Clear prefab meta data
+						meta_data = MetaData::EntityData();
 
 						//Reset current index
 						current_index = 0;
@@ -4472,7 +4515,7 @@ namespace NIKE {
 					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music)) {
 
 					//Show audio length
-					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength();
+					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength(NIKE_AUDIO_TIMEUNIT_MS);
 					ImGui::Text("Length:");
 					ImGui::Text("%d ms", length);
 					ImGui::Text("%.2f s", length / 1000.0f);
