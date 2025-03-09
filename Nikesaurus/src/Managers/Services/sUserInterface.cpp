@@ -400,24 +400,24 @@ namespace NIKE {
 		return ui_entities.find(btn_id) != ui_entities.end();
 	}
 
-	void UI::Service::setButtonScript(std::string const& btn_id, Lua::Script const& script) {
+	void UI::Service::setButtonScript(std::string const& btn_id, Lua::Script const& script, std::string const& button_event) {
 		auto it = ui_entities.find(btn_id);
 		if (it == ui_entities.end()) {
 			throw std::runtime_error("Button does not exist");
 		}
 
-		it->second.scripts[btn_id] = script;
+		it->second.scripts[button_event] = script;
 	}
 
-	Lua::Script UI::Service::getButtonScript(std::string const& btn_id) const {
+	Lua::Script UI::Service::getButtonScript(std::string const& btn_id, std::string const& button_event) const {
 		auto it = ui_entities.find(btn_id);
 		if (it == ui_entities.end()) {
 			throw std::runtime_error("Button does not exist");
 		}
 
-		auto script_it = it->second.scripts.find(btn_id);
+		auto script_it = it->second.scripts.find(button_event);
 		if (script_it == it->second.scripts.end()) {
-			throw std::runtime_error("Script for '" + btn_id + "' does not exist");
+			throw std::runtime_error("Script for '" + button_event + "' does not exist");
 		}
 
 		return script_it->second;

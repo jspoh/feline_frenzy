@@ -156,11 +156,13 @@ namespace NIKE {
 			//Check if UI ID has been registered
 			bool checkUIEntity(std::string const& btn_id);
 
-			//Set button script
-			void setButtonScript(std::string const& btn_id, Lua::Script const& script);
+			// Set button script 
+			// button_event is OnClick / OnHover
+			void setButtonScript(std::string const& btn_id, Lua::Script const& script, std::string const& button_event);
 
-			//Get button script
-			Lua::Script getButtonScript(std::string const& btn_id) const;
+			// Get button script
+			// button_event is OnClick / OnHover
+			Lua::Script getButtonScript(std::string const& btn_id, std::string const& button_event) const;
 
 			//Set button input state
 			void setButtonInputState(std::string const& btn_id, InputStates state);
