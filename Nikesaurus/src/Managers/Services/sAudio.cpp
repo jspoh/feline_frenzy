@@ -630,11 +630,18 @@ namespace NIKE {
 
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
 		
-		//Get assets services
-		auto assets_service = NIKE_ASSETS_SERVICE;
+		// Retrieve audio asset
+		std::shared_ptr<Audio::IAudio> audio_asset = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(audio_id);
+
+		// Check if the asset is valid
+		if (!audio_asset) {
+			NIKEE_CORE_ERROR("Failed to retrieve audio asset: {}", audio_id);
+			return;
+		}
+
 
 		//Play sound & get channel that sound is playing under
-		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(is_music ? assets_service->getAsset<Audio::IAudio>(audio_id) : assets_service->getAsset<Audio::IAudio>(audio_id), getChannelGroup(channel_group_id), start_paused);
+		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(is_music ? audio_asset : audio_asset, getChannelGroup(channel_group_id), start_paused);
 
 		//Add channel to the channel map
 		if (new_channel) {

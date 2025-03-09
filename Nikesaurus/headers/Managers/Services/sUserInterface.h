@@ -50,9 +50,9 @@ namespace NIKE {
 			Entity::Type entity_id;
 			bool b_hovered;
 			InputStates input_state;
-			Lua::Script script;
+			std::unordered_map<std::string, Lua::Script> scripts;
 
-			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, script() {};
+			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED } {};
 
 			nlohmann::json serialize() const;
 

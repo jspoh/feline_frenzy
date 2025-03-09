@@ -82,7 +82,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 0.0,
+                                    "x": 87.99980163574219,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -143,7 +143,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -1599.0,
+                                    "x": -1511.021484375,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -176,7 +176,7 @@
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Zoom": 0.9693794846534729
+                                "Zoom": 0.9973893761634827
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -276,9 +276,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.6274510025978088,
-                                    "y": 0.545098066329956,
-                                    "z": 0.615686297416687
+                                    "x": 0.6078431606292725,
+                                    "y": 0.05098039284348488,
+                                    "z": 0.9529411792755127
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -380,21 +380,37 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
+                            "Layer_Order": 0,
                             "Name": "how_to_play_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {
-                                    "scene": "how_to_play.scn"
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "how_to_play.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "Change",
+                                    "Update_Function": ""
                                 },
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": "Change"
+                                "OnHover": {
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "HoverButton"
+                                },
+                                "how_to_play_btn": {
+                                    "Named_Args": {},
+                                    "Script_ID": "",
+                                    "Start_Function": "",
+                                    "Update_Function": ""
+                                }
                             }
                         },
                         "UI ID": "how_to_play_btn"
@@ -486,21 +502,31 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 1,
                             "Name": "play_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {
-                                    "scene": "cut_scene_1.scn"
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "cut_scene_1.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "Change"
                                 },
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": "Change"
+                                "OnHover": {
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "HoverButton"
+                                }
                             }
                         },
                         "UI ID": "start_game_btn"
@@ -519,9 +545,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.8627451062202454,
-                                    "y": 0.6117647290229797,
-                                    "z": 0.9098039269447327
+                                    "x": 0.5882353186607361,
+                                    "y": 0.9019607901573181,
+                                    "z": 0.13725490868091583
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
@@ -607,8 +633,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 3,
-                            "Name": "entity_0006",
+                            "Layer_Order": 2,
+                            "Name": "entity_0005",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -701,19 +727,35 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 4,
+                            "Layer_Order": 3,
                             "Name": "quit_game_btn",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {},
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": "Quit"
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {},
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "Quit",
+                                    "Update_Function": ""
+                                },
+                                "OnHover": {
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "HoverButton"
+                                },
+                                "quit_btn": {
+                                    "Named_Args": {},
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "Quit"
+                                }
                             }
                         },
                         "UI ID": "quit_btn"
@@ -755,7 +797,7 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 2,
                             "Layer_Order": 0,
                             "Name": "fade_overlay",

@@ -169,6 +169,25 @@ namespace NIKE {
 					//Execute script
 					sol::protected_function_result result = (*loaded_script)();
 
+					//Convert result into a table
+					sol::table script_table = result;
+
+					if (!script.start_function.empty() && !script.start_function_executed) {
+						sol::function start_function = script_table[script.start_function];
+						if (start_function.valid()) {
+							NIKEE_CORE_INFO("Executing start function: {}", script.start_function);
+
+							// Execute the start function
+							start_function(script.named_args.size(), convertScriptArgs(script));
+
+							// Mark the start function as executed
+							script.start_function_executed = true;
+						}
+						else {
+							throw std::runtime_error("Start function not found in script table: " + script.start_function);
+						}
+					}
+
 					//No function to be called
 					if (script.update_function.empty()) {
 
@@ -190,25 +209,7 @@ namespace NIKE {
 						throw std::runtime_error("Error! Cant call a function from a function script!");
 					}
 
-					//Convert result into a table
-					sol::table script_table = result;
 
-					// Handle the start function (run it only once)
-					if (!script.start_function.empty() && !script.start_function_executed) {
-						sol::function start_function = script_table[script.start_function];
-						if (start_function.valid()) {
-							NIKEE_CORE_INFO("Executing start function: {}", script.start_function);
-
-							// Execute the start function
-							start_function(script.named_args.size(), convertScriptArgs(script));
-
-							// Mark the start function as executed
-							script.start_function_executed = true;
-						}
-						else {
-							throw std::runtime_error("Start function not found in script table: " + script.start_function);
-						}
-					}
 
 					//Function to be called
 					sol::function script_function = script_table[script.update_function];

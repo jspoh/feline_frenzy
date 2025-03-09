@@ -9,8 +9,9 @@
  *  All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
-#include "Managers/Services/LevelEditor/sEditorPanels.h"
 #include "Core/Engine.h"
+#include "Managers/Services/LevelEditor/sEditorPanels.h"
+
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
 
@@ -5043,6 +5044,13 @@ namespace NIKE {
 	/*****************************************************************//**
 	* User Interface Management Panel
 	*********************************************************************/
+	std::unordered_map<std::string, int> LevelEditor::UIPanel::val_type_map;
+	std::unordered_map<std::string, std::string> LevelEditor::UIPanel::named_key_map;
+	std::unordered_map<std::string, std::string> LevelEditor::UIPanel::str_val_map;
+	std::unordered_map<std::string, int> LevelEditor::UIPanel::int_val_map;
+	std::unordered_map<std::string, float> LevelEditor::UIPanel::float_val_map;
+	std::unordered_map<std::string, bool> LevelEditor::UIPanel::bool_val_map;
+
 	std::function<void()> LevelEditor::UIPanel::createButtonPopup(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -5238,137 +5246,103 @@ namespace NIKE {
 			};
 	}
 
-	void LevelEditor::UIPanel::init() {
-		registerPopUp("Create Button", createButtonPopup("Create Button"));
+	void LevelEditor::UIPanel::renderButtonEvent(const std::string& event_name, const std::string& button_name, NIKE::UI::UIBtn & button) {
+		if (ImGui::TreeNode(std::string(event_name + " Event##" + button_name).c_str())) {
+			auto& button_event = button.scripts[event_name];
 
-		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
-	}
+			//Select script
+			{
+				// Get all loaded scripts
+				const auto& get_load_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
 
-	void LevelEditor::UIPanel::render() {
-		ImGui::Begin(getName().c_str());
-
-		//Set window dock id
-		dock_id = ImGui::GetWindowDockID();
-
-		//Create button
-		{
-			if (ImGui::Button("Create Button")) {
-				openPopUp("Create Button");
-			}
-		}
-
-		ImGui::Separator();
-
-		//List of buttons
-		auto& buttons = NIKE_UI_SERVICE->getAllButtons();
-		if (buttons.empty()) {
-			ImGui::Text("No active buttons.");
-		}
-		else {
-			ImGui::Text("Active Buttons: ");
-		}
-
-		// Temporary map to store UI state per button
-		static std::unordered_map<std::string, int> val_type_map;
-		static std::unordered_map<std::string, std::string> named_key_map;
-		static std::unordered_map<std::string, std::string> str_val_map;
-		static std::unordered_map<std::string, int> int_val_map;
-		static std::unordered_map<std::string, float> float_val_map;
-		static std::unordered_map<std::string, bool> bool_val_map;
-
-		//Show all active buttons
-		for (auto& button : buttons) {
-			ImGui::Spacing();
-
-			//Collapsing button
-			if (ImGui::CollapsingHeader(std::string("Button: " + button.first).c_str(), ImGuiTreeNodeFlags_None)) {
-
-				//Set trigger state
-				{
-					//Select Input State
-					static int trigger_index = 0;
-					trigger_index = static_cast<int>(button.second.input_state);
-					ImGui::Text("Button Input State: ");
-					if (ImGui::Combo(std::string("##ButtonInput" + button.first).c_str(), &trigger_index, "Pressed\0Triggered\0Released\0")) {
-						button.second.input_state = static_cast<UI::InputStates>(trigger_index);
+				// Find the index of the currently selected script id in the list
+				int script_index = -1;
+				for (size_t i = 0; i < get_load_scripts.size(); ++i) {
+					if (button_event.script_id == get_load_scripts[i]) {
+						script_index = static_cast<int>(i);
+						break;
 					}
 				}
 
-				//Select script
-				{
-					// Get all loaded scripts
-					const auto& get_load_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
+				//Display combo box for script selection
+				ImGui::Text("Button Script: ");
+				if (ImGui::Combo(std::string("##ButtonScript" + button_name).c_str(), &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+					// Validate the selected index and get the new font ID
+					if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
+						button_event.script_id = get_load_scripts[script_index];
+					}
+				}
+			}
+
+			//Select script function
+			{
+				if (!button_event.script_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(button_event.script_id)) {
+					// Get all loaded script functions
+					const auto& get_script_functions = NIKE_LUA_SERVICE->getScriptFunctions(NIKE_ASSETS_SERVICE->getAssetPath(button_event.script_id));
+					std::vector<const char*> funcs;
+					funcs.push_back(""); // Add an empty option first
+					//Convert to const char*
+					std::for_each(get_script_functions.begin(), get_script_functions.end(), [&funcs](std::string const& ref) {
+						funcs.push_back(ref.c_str());
+						});
 
 					// Find the index of the currently selected script id in the list
-					int script_index = -1;
-					for (size_t i = 0; i < get_load_scripts.size(); ++i) {
-						if (button.second.script.script_id == get_load_scripts[i]) {
-							script_index = static_cast<int>(i);
+					int start_func_index = -1;
+					for (size_t i = 0; i < funcs.size(); ++i) {
+						if (button_event.start_function == funcs[i]) {
+							start_func_index = static_cast<int>(i);
+							break;
+						}
+					}
+					// Display combo box for script start function selection
+					ImGui::Text("Button OnLoad Function: ");
+					if (ImGui::Combo("##ButtonScriptStartFunc", &start_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+						// Validate the selected index and set the new start function
+						if (start_func_index >= 0 && start_func_index < static_cast<int>(funcs.size())) {
+							button_event.start_function = funcs[start_func_index];
+						}
+					}
+
+					// Find the index of the currently selected script id in the list
+					int script_func_index = -1;
+					for (size_t i = 0; i < funcs.size(); ++i) {
+						if (button_event.update_function == funcs[i]) {
+							script_func_index = static_cast<int>(i);
 							break;
 						}
 					}
 
-					//Display combo box for script selection
-					ImGui::Text("Button Script: ");
-					if (ImGui::Combo(std::string("##ButtonScript" + button.first).c_str(), &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+					//Display combo box for script function selection
+					ImGui::Text("Button OnUpdate Function: ");
+					if (ImGui::Combo(std::string("##ButtonScriptUpdateFunc" + button_name).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
 						// Validate the selected index and get the new font ID
-						if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
-							button.second.script.script_id = get_load_scripts[script_index];
+						if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
+							button_event.update_function = funcs[script_func_index];
 						}
 					}
+
 				}
+			}
 
-				//Select script function
-				{
-					if (!button.second.script.script_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(button.second.script.script_id)) {
-						// Get all loaded script functions
-						const auto& get_script_functions = NIKE_LUA_SERVICE->getScriptFunctions(NIKE_ASSETS_SERVICE->getAssetPath(button.second.script.script_id));
-						std::vector<const char*> funcs;
-						//Convert to const char*
-						std::for_each(get_script_functions.begin(), get_script_functions.end(), [&funcs](std::string const& ref) {
-							funcs.push_back(ref.c_str());
-							});
+			//Set variadic arguements
+			{
+				//Get arguments
+				auto& args = button_event.named_args;
 
-						// Find the index of the currently selected script id in the list
-						int script_func_index = -1;
-						for (size_t i = 0; i < funcs.size(); ++i) {
-							if (button.second.script.update_function == funcs[i]) {
-								script_func_index = static_cast<int>(i);
-								break;
-							}
-						}
-
-						//Display combo box for script function selection
-						ImGui::Text("Button Script Function: ");
-						if (ImGui::Combo(std::string("##ButtonScriptFunc" + button.first).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
-							// Validate the selected index and get the new font ID
-							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
-								button.second.script.update_function = funcs[script_func_index];
-							}
-						}
-					}
+				//Display all arguments
+				ImGui::Text("Arguments:");
+				if (args.empty()) {
+					ImGui::Text("No arguments.");
 				}
-
-				//Set variadic arguements
-				{
-					//Get arguments
-					auto& args = button.second.script.named_args;
-
-					//Display all arguments
-					ImGui::Text("Arguments:");
-					if (args.empty()) {
-						ImGui::Text("No arguments.");
-					}
+				else {
 					for (auto it = args.begin(); it != args.end(); ++it) {
 						const auto& key = it->first;
 						const auto& value = it->second;
 
 						//Display arguments
-						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button.first).c_str())) {
+						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button_name).c_str())) {
 
-							ImGui::Text("Input State: %s", UI::inputStateToString(button.second.input_state));
-							ImGui::Text("Script ID: %s", button.second.script.script_id.c_str());
-							ImGui::Text("Function: %s", button.second.script.update_function.c_str());
+							//ImGui::Text("Function: %s", button_event.update_function.c_str());
 
 							//Display value based on its type
 							std::visit(
@@ -5399,91 +5373,160 @@ namespace NIKE {
 							ImGui::TreePop();
 						}
 					}
+				}
+				//Input Variables
+				int& val_type_index = val_type_map[button_name];
+				std::string& named_key = named_key_map[button_name];
+				const size_t MAX_INPUT_SIZE = 256;
+				if (named_key.capacity() < MAX_INPUT_SIZE) {
+					named_key.reserve(MAX_INPUT_SIZE);
+					named_key.resize(MAX_INPUT_SIZE - 1); // Resize to match reserved capacity
+				}
 
-					//Seperator
-					ImGui::Spacing();
+				std::string& str_val = str_val_map[button_name];
+				if (str_val.capacity() < MAX_INPUT_SIZE) {
+					str_val.reserve(MAX_INPUT_SIZE);
+					str_val.resize(MAX_INPUT_SIZE - 1); // Resize to match reserved capacity
+				}
+				int& int_val = int_val_map[button_name];
+				float& float_val = float_val_map[button_name];
+				bool& bool_val = bool_val_map[button_name];
 
-					//Input Variables
-					int& val_type_index = val_type_map[button.first];
-					std::string& named_key = named_key_map[button.first];
-					std::string& str_val = str_val_map[button.first];
-					int& int_val = int_val_map[button.first];
-					float& float_val = float_val_map[button.first];
-					bool& bool_val = bool_val_map[button.first];
+				//Set arguments
+				if (ImGui::InputText(std::string("Input Key##" + button_name).c_str(), named_key.data(), MAX_INPUT_SIZE)) {
+					named_key.resize(strlen(named_key.c_str())); // Trim to actual input length
+				}
 
-					//Set arguments
-					if (ImGui::InputText(std::string("Input Key##" + button.first).c_str(), named_key.data(), named_key.capacity() + 1)) {
-						named_key.resize(strlen(named_key.c_str()));
+				//Select value type
+				ImGui::Combo(std::string("Value Type##" + button_name).c_str(), &val_type_index, "Int\0Float\0String\0Bool\0");
+
+				//Take in input based on selected combo
+				switch (val_type_index) {
+				case 0: {
+					ImGui::InputInt(std::string("Value (int)##" + button_name).c_str(), &int_val);
+					break;
+				}
+				case 1: {
+					ImGui::InputFloat(std::string("Value (float)##" + button_name).c_str(), &float_val);
+					break;
+				}
+				case 2: {
+					if (ImGui::InputText(std::string("Value (string)##" + button_name).c_str(), str_val.data(), str_val.capacity() + 1)) {
+						str_val.resize(strlen(str_val.c_str()));
 					}
+					break;
+				}
+				case 3: {
+					ImGui::Checkbox(std::string("Value (bool)##" + button_name).c_str(), &bool_val);
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 
-					//Select value type
-					ImGui::Combo(std::string("Value Type##" + button.first).c_str(), &val_type_index, "Int\0Float\0String\0Bool\0");
+				//Add argument button
+				if (ImGui::Button(std::string("Add Argument##" + button_name).c_str())) {
 
-					//Take in input based on selected combo
-					switch (val_type_index) {
-					case 0: {
-						ImGui::InputInt(std::string("Value (int)##" + button.first).c_str(), &int_val);
-						break;
-					}
-					case 1: {
-						ImGui::InputFloat(std::string("Value (float)##" + button.first).c_str(), &float_val);
-						break;
-					}
-					case 2: {
-						if (ImGui::InputText(std::string("Value (string)##" + button.first).c_str(), str_val.data(), str_val.capacity() + 1)) {
-							str_val.resize(strlen(str_val.c_str()));
+					//Check if named key is correct
+					if (!named_key.empty() && args.find(named_key) == args.end()) {
+						switch (val_type_index) {
+						case 0: {
+							args[named_key] = int_val;
+							named_key.clear();
+							break;
 						}
-						break;
-					}
-					case 3: {
-						ImGui::Checkbox(std::string("Value (bool)##" + button.first).c_str(), &bool_val);
-						break;
-					}
-					default: {
-						break;
-					}
-					}
-
-					//Add argument button
-					if (ImGui::Button(std::string("Add Argument##" + button.first).c_str())) {
-
-						//Check if named key is correct
-						if (!named_key.empty() && args.find(named_key) == args.end()) {
-							switch (val_type_index) {
-							case 0: {
-								args[named_key] = int_val;
-								named_key.clear();
-								break;
-							}
-							case 1: {
-								args[named_key] = float_val;
-								named_key.clear();
-								break;
-							}
-							case 2: {
-								args[named_key] = str_val;
-								named_key.clear();
-								break;
-							}
-							case 3: {
-								args[named_key] = bool_val;
-								named_key.clear();
-								break;
-							}
-							default: {
-								break;
-							}
-							}
+						case 1: {
+							args[named_key] = float_val;
+							named_key.clear();
+							break;
+						}
+						case 2: {
+							args[named_key] = str_val;
+							named_key.clear();
+							break;
+						}
+						case 3: {
+							args[named_key] = bool_val;
+							named_key.clear();
+							break;
+						}
+						default: {
+							break;
+						}
 						}
 					}
 				}
 
+				//Seperator
+				ImGui::Spacing();
+
+				
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	void LevelEditor::UIPanel::init() {
+		registerPopUp("Create Button", createButtonPopup("Create Button"));
+
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+	}
+
+	void LevelEditor::UIPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
+		//Create button
+		{
+			if (ImGui::Button("Create Button")) {
+				openPopUp("Create Button");
+			}
+		}
+
+		ImGui::Separator();
+
+		//List of buttons
+		auto& buttons = NIKE_UI_SERVICE->getAllButtons();
+		if (buttons.empty()) {
+			ImGui::Text("No active buttons.");
+		}
+		else {
+			ImGui::Text("Active Buttons: ");
+		}
+
+		//Show all active buttons
+		for (auto& [button_name, button] : buttons) {
+			ImGui::Spacing();
+
+			//Collapsing button
+			if (ImGui::CollapsingHeader(std::string("Button: " + button_name).c_str(), ImGuiTreeNodeFlags_None)) {
+
+				//Set trigger state
+				{
+					//Select Input State
+					static int trigger_index = 0;
+					trigger_index = static_cast<int>(button.input_state);
+					ImGui::Text("Button Input State: ");
+					if (ImGui::Combo(std::string("##ButtonInput" + button_name).c_str(), &trigger_index, "Pressed\0Triggered\0Released\0")) {
+						button.input_state = static_cast<UI::InputStates>(trigger_index);
+					}
+				}
+
+				ImGui::Separator();
+				
+				renderButtonEvent("OnClick", button_name, button);
+				renderButtonEvent("OnHover", button_name, button);
+
+			
 				//Add spacing
 				ImGui::Spacing();
 
 				//Delete Button
-				if (ImGui::Button(std::string("Delete Button##" + button.first).c_str())) {
-					NIKE_UI_SERVICE->destroyButton(button.first);
+				if (ImGui::Button(std::string("Delete Button##" + button_name).c_str())) {
+					NIKE_UI_SERVICE->destroyButton(button_name);
 					break;
 				}
 			}

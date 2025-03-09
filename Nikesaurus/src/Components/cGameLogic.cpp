@@ -122,7 +122,7 @@ namespace NIKE {
 							}
 						}
 
-				// Find the index of the currently selected update function in the list
+						// Find the index of the currently selected update function in the list
 						int update_func_index = -1;
 						for (size_t i = 0; i < funcs.size(); ++i) {
 							if (comp.script.update_function == funcs[i]) {
@@ -233,6 +233,9 @@ namespace NIKE {
 					}
 					}
 
+					//// Show the extracted function input
+					//ImGui::Text("Add Argument For Function: %s", comp.script.update_function.c_str());
+
 					//Add argument button
 					if (ImGui::Button("Add Argument")) {
 
@@ -265,11 +268,6 @@ namespace NIKE {
 						}
 					}
 
-
-
-
-					// Show the extracted function input
-					ImGui::Text("Function: %s", comp.script.update_function.c_str());
 				}
 			}
 		);

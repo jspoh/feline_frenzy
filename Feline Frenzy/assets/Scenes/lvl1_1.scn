@@ -101,7 +101,6 @@
                         },
                         "MetaData": {
                             "B_Locked": true,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "background",
@@ -159,7 +158,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "entity_0001",
@@ -231,7 +229,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "entity_0002",
@@ -303,7 +300,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 3,
                             "Name": "entity_0003",
@@ -375,7 +371,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 4,
                             "Name": "entity_0004",
@@ -447,7 +442,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 5,
                             "Name": "vent_1",
@@ -473,7 +467,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "green_tree4",
@@ -590,7 +583,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 0.9091643691062927
+                                "Zoom": 0.9285830855369568
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -602,9 +595,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.9176470637321472,
-                                    "y": 0.8901960849761963,
-                                    "z": 0.2862745225429535
+                                    "x": 0.05098039284348488,
+                                    "y": 0.3843137323856354,
+                                    "z": 0.2705882489681244
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
@@ -647,7 +640,8 @@
                                     "y": 0.0
                                 },
                                 "preset": 0,
-                                "render_type": 0
+                                "render_type": 0,
+                                "texture_ref": ""
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -691,7 +685,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "player",
@@ -707,7 +700,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 2,
                             "Name": "pink_tree2",
@@ -810,7 +802,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 3,
                             "Name": "grass_03",
@@ -824,7 +815,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 4,
                             "Name": "green_tree2",
@@ -939,7 +929,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 5,
                             "Name": "grass_04",
@@ -953,7 +942,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 6,
                             "Name": "yellow_tree2",
@@ -1002,7 +990,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 7,
                             "Name": "pink_tree1",
@@ -1047,7 +1034,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 8,
                             "Name": "pink_tree3",
@@ -1150,7 +1136,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 9,
                             "Name": "lamp_1",
@@ -1166,7 +1151,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 10,
                             "Name": "yellow_tree1",
@@ -1269,7 +1253,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 11,
                             "Name": "grass_02",
@@ -1283,7 +1266,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 12,
                             "Name": "green_tree1",
@@ -1372,7 +1354,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 13,
                             "Name": "top_wall",
@@ -1444,7 +1425,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 14,
                             "Name": "grass_01",
@@ -1458,7 +1438,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 15,
                             "Name": "yellow_tree3",
@@ -1503,7 +1482,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 16,
                             "Name": "pink_tree4",
@@ -1606,7 +1584,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 17,
                             "Name": "torch_1",
@@ -1622,7 +1599,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 18,
                             "Name": "green_tree3",
@@ -1728,7 +1704,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 19,
                             "Name": "right_wall",
@@ -1773,7 +1748,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 20,
                             "Name": "left_wall",
@@ -1818,7 +1792,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 21,
                             "Name": "bottom_wall",
@@ -1912,7 +1885,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 2,
                             "Layer_Order": 0,
                             "Name": "barrel_1",
@@ -1928,7 +1900,6 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 2,
                             "Layer_Order": 1,
                             "Name": "barrel_2",
@@ -2052,7 +2023,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 2,
                             "Layer_Order": 2,
                             "Name": "barrel_3",
@@ -2126,7 +2096,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 3,
                             "Layer_Order": 0,
                             "Name": "fire_elem",
@@ -2188,7 +2157,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 3,
                             "Layer_Order": 1,
                             "Name": "grass_elem",
@@ -2250,7 +2218,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 3,
                             "Layer_Order": 2,
                             "Name": "water_elem",
@@ -2274,10 +2241,10 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 4,
                             "Layer_Order": 0,
                             "Name": "healthbar",
+                            "Parent": "player",
                             "Prefab_ID": "healthBar.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -2291,18 +2258,18 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 6.806690216064453,
-                                            "y": 95.62039184570313
+                                            "x": 5.5222625732421875,
+                                            "y": 79.60281372070313
                                         },
                                         "Scale": {
-                                            "x": 97.4806137084961,
+                                            "x": 92.98100280761719,
                                             "y": 17.37278175354004
-                                        },
-                                        "Screen Position": true
+                                        }
                                     }
                                 },
                                 "MetaData": {
                                     "Layer ID": 4,
+                                    "Parent": "player",
                                     "Tags": [
                                         "healthbar"
                                     ]
@@ -2343,23 +2310,23 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -5.51824951171875,
-                                    "y": 100.0
+                                    "x": -7.006256103515625,
+                                    "y": 86.80908203125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 150.0,
                                     "y": 128.0
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 4,
                             "Layer_Order": 1,
                             "Name": "hp_container",
+                            "Parent": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
@@ -2410,7 +2377,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 4,
                             "Layer_Order": 2,
                             "Name": "elementui",
