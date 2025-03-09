@@ -4,7 +4,7 @@
 *
 * \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
 * \date   September 2024
-* All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
 *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -72,8 +72,6 @@ namespace NIKE {
         }
     }
 
-
-
     void Collision::System::setRestitution(float val) {
         restitution = val;
     }
@@ -86,7 +84,7 @@ namespace NIKE {
         Physics::Dynamics const& dynamics_a, Physics::Collider const& collider_a,
         Physics::Dynamics const& dynamics_b, Physics::Collider const& collider_b,
         CollisionInfo& info) {
-        
+
         // References to components
         bool a_flip = static_cast<int>(collider_a.transform.rotation) % 90 == 0 && static_cast<int>(collider_a.transform.rotation) % 180 != 0;
         bool b_flip = static_cast<int>(collider_b.transform.rotation) % 90 == 0 && static_cast<int>(collider_b.transform.rotation) % 180 != 0;
@@ -94,101 +92,101 @@ namespace NIKE {
         AABB aabb_a({
             collider_a.transform.position.x - (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
             collider_a.transform.position.y - (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
-        }, {
-            collider_a.transform.position.x + (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
-            collider_a.transform.position.y + (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
-        });
+            }, {
+                collider_a.transform.position.x + (a_flip ? (collider_a.transform.scale.y * 0.5f) : (collider_a.transform.scale.x * 0.5f)),
+                collider_a.transform.position.y + (a_flip ? (collider_a.transform.scale.x * 0.5f) : (collider_a.transform.scale.y * 0.5f))
+            });
 
-        AABB aabb_b({
-            collider_b.transform.position.x - (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
-            collider_b.transform.position.y - (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
-        }, {
-            collider_b.transform.position.x + (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
-            collider_b.transform.position.y + (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
-        });
+            AABB aabb_b({
+                collider_b.transform.position.x - (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
+                collider_b.transform.position.y - (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
+                }, {
+                    collider_b.transform.position.x + (b_flip ? (collider_b.transform.scale.y * 0.5f) : (collider_b.transform.scale.x * 0.5f)),
+                    collider_b.transform.position.y + (b_flip ? (collider_b.transform.scale.x * 0.5f) : (collider_b.transform.scale.y * 0.5f))
+                });
 
-        // Get delta time
-        const float delta_time = NIKE_ENGINE.getService<Windows::Service>()->getFixedDeltaTime();
+                // Get delta time
+                const float delta_time = NIKE_ENGINE.getService<Windows::Service>()->getFixedDeltaTime();
 
-        // Step 1: Static collision detection
-        if (!(aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x ||
-            aabb_a.rect_max.y < aabb_b.rect_min.y || aabb_a.rect_min.y > aabb_b.rect_max.y)) {
+                // Step 1: Static collision detection
+                if (!(aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x ||
+                    aabb_a.rect_max.y < aabb_b.rect_min.y || aabb_a.rect_min.y > aabb_b.rect_max.y)) {
 
-            // Calculate overlaps on each axis
-            float overlapX = Utility::getMin(
-                aabb_a.rect_max.x - aabb_b.rect_min.x, aabb_b.rect_max.x - aabb_a.rect_min.x);
-            float overlapY = Utility::getMin(
-                aabb_a.rect_max.y - aabb_b.rect_min.y, aabb_b.rect_max.y - aabb_a.rect_min.y);
+                    // Calculate overlaps on each axis
+                    float overlapX = Utility::getMin(
+                        aabb_a.rect_max.x - aabb_b.rect_min.x, aabb_b.rect_max.x - aabb_a.rect_min.x);
+                    float overlapY = Utility::getMin(
+                        aabb_a.rect_max.y - aabb_b.rect_min.y, aabb_b.rect_max.y - aabb_a.rect_min.y);
 
-            // Determine MTV direction and smallest overlap
-            Vector2f mtv_dir;
-            if (overlapX < overlapY) {
-                mtv_dir = { (aabb_a.rect_min.x < aabb_b.rect_min.x ? -1.0f : 1.0f), 0.0f };
-            }
-            else {
-                mtv_dir = { 0.0f, (aabb_a.rect_min.y < aabb_b.rect_min.y ? -1.0f : 1.0f) };
-            }
+                    // Determine MTV direction and smallest overlap
+                    Vector2f mtv_dir;
+                    if (overlapX < overlapY) {
+                        mtv_dir = { (aabb_a.rect_min.x < aabb_b.rect_min.x ? -1.0f : 1.0f), 0.0f };
+                    }
+                    else {
+                        mtv_dir = { 0.0f, (aabb_a.rect_min.y < aabb_b.rect_min.y ? -1.0f : 1.0f) };
+                    }
 
-            // Set MTV and collision normal
-            info.mtv = {
-                mtv_dir.x * (overlapX < overlapY ? overlapX : overlapY),
-                mtv_dir.y * (overlapX < overlapY ? overlapX : overlapY)
-            };
-            info.collision_normal = mtv_dir;
+                    // Set MTV and collision normal
+                    info.mtv = {
+                        mtv_dir.x * (overlapX < overlapY ? overlapX : overlapY),
+                        mtv_dir.y * (overlapX < overlapY ? overlapX : overlapY)
+                    };
+                    info.collision_normal = mtv_dir;
 
-            info.t_first = 0.0f; // Static collision occurs
-            return true;
-        }
+                    info.t_first = 0.0f; // Static collision occurs
+                    return true;
+                }
 
-        // Step 2: Dynamic collision detection
-        Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
+                // Step 2: Dynamic collision detection
+                Vector2f vel_rel = dynamics_a.velocity - dynamics_b.velocity;
 
-        // Initialize time of first and last collision along each axis
-        Vector2f t_first = { 0.0f, 0.0f };
-        Vector2f t_last = { delta_time, delta_time };
+                // Initialize time of first and last collision along each axis
+                Vector2f t_first = { 0.0f, 0.0f };
+                Vector2f t_last = { delta_time, delta_time };
 
-        // Check dynamic collision along x-axis
-        if (std::abs(vel_rel.x) > EPSILON) {
-            if (vel_rel.x > 0) {
-                t_first.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / vel_rel.x;
-                t_last.x = (aabb_a.rect_max.x - aabb_b.rect_min.x) / vel_rel.x;
-            }
-            else {
-                t_first.x = (aabb_a.rect_max.x - aabb_b.rect_min.x) / vel_rel.x;
-                t_last.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / vel_rel.x;
-            }
-        }
-        else if (aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x) {
-            return false; // No collision along x-axis
-        }
+                // Check dynamic collision along x-axis
+                if (std::abs(vel_rel.x) > EPSILON) {
+                    if (vel_rel.x > 0) {
+                        t_first.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / vel_rel.x;
+                        t_last.x = (aabb_a.rect_max.x - aabb_b.rect_min.x) / vel_rel.x;
+                    }
+                    else {
+                        t_first.x = (aabb_a.rect_max.x - aabb_b.rect_min.x) / vel_rel.x;
+                        t_last.x = (aabb_a.rect_min.x - aabb_b.rect_max.x) / vel_rel.x;
+                    }
+                }
+                else if (aabb_a.rect_max.x < aabb_b.rect_min.x || aabb_a.rect_min.x > aabb_b.rect_max.x) {
+                    return false; // No collision along x-axis
+                }
 
-        // Check dynamic collision along y-axis
-        if (std::abs(vel_rel.y) > EPSILON) {
-            if (vel_rel.y > 0) {
-                t_first.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / vel_rel.y;
-                t_last.y = (aabb_a.rect_min.y - aabb_b.rect_max.y) / vel_rel.y;
-            }
-            else {
-                t_first.y = (aabb_a.rect_min.y - aabb_b.rect_max.y) / vel_rel.y;
-                t_last.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / vel_rel.y;
-            }
-        }
-        else if (aabb_a.rect_max.y < aabb_b.rect_min.y || aabb_a.rect_min.y > aabb_b.rect_max.y) {
-            return false; // No collision along y-axis
-        }
+                // Check dynamic collision along y-axis
+                if (std::abs(vel_rel.y) > EPSILON) {
+                    if (vel_rel.y > 0) {
+                        t_first.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / vel_rel.y;
+                        t_last.y = (aabb_a.rect_min.y - aabb_b.rect_max.y) / vel_rel.y;
+                    }
+                    else {
+                        t_first.y = (aabb_a.rect_min.y - aabb_b.rect_max.y) / vel_rel.y;
+                        t_last.y = (aabb_a.rect_max.y - aabb_b.rect_min.y) / vel_rel.y;
+                    }
+                }
+                else if (aabb_a.rect_max.y < aabb_b.rect_min.y || aabb_a.rect_min.y > aabb_b.rect_max.y) {
+                    return false; // No collision along y-axis
+                }
 
-        // Verify if collisions occur within the time frame
-        float t_first_overall = Utility::getMax(t_first.x, t_first.y);
-        float t_last_overall = Utility::getMin(t_last.x, t_last.y);
+                // Verify if collisions occur within the time frame
+                float t_first_overall = Utility::getMax(t_first.x, t_first.y);
+                float t_last_overall = Utility::getMin(t_last.x, t_last.y);
 
-        if (t_first_overall > t_last_overall || t_first_overall > delta_time) {
-            return false; // No collision detected
-        }
+                if (t_first_overall > t_last_overall || t_first_overall > delta_time) {
+                    return false; // No collision detected
+                }
 
-        // Update collision info
-        info.t_first = t_first_overall;
-        info.collision_normal = vel_rel.normalize();
-        return true;
+                // Update collision info
+                info.t_first = t_first_overall;
+                info.collision_normal = vel_rel.normalize();
+                return true;
     }
 
     // SAT helper functions
@@ -201,7 +199,7 @@ namespace NIKE {
         std::vector<Vector2f> vertices;
 
         // quad models
-        constexpr std::array<const char*, 4> QUAD_MODELS {
+        constexpr std::array<const char*, 4> QUAD_MODELS{
             "square.model",
             "square-texture.model",
             "batched_square.model",
@@ -258,7 +256,6 @@ namespace NIKE {
         return vertices;
     }
 
-
     // Helper to retrieve separating axes from two sets of vertices
     std::vector<Vector2f> Collision::System::getSeparatingAxes(
         const std::vector<Vector2f>& verticesA, const std::vector<Vector2f>& verticesB)
@@ -306,7 +303,6 @@ namespace NIKE {
             min -= 0.01f; // Slight offset for better edge prioritization
         }
     }
-
 
     // Main detect SAT function
     bool Collision::System::detectSATCollision(
@@ -468,11 +464,32 @@ namespace NIKE {
                 transform_b.position -= info.mtv;
             }
         }
+
+        // NEW: Block movement in the collision direction by zeroing velocity on the axis of collision.
+        // If the collision normal is nearly horizontal, and one entity is moving while the other is nearly static,
+        // then zero the horizontal velocity of the moving entity.
+        if (std::abs(info.collision_normal.x) > 0.9f) {
+            if (std::abs(dynamics_a.velocity.x) > EPSILON && std::abs(dynamics_b.velocity.x) < EPSILON) {
+                dynamics_a.velocity.x = 0;
+            }
+            else if (std::abs(dynamics_b.velocity.x) > EPSILON && std::abs(dynamics_a.velocity.x) < EPSILON) {
+                dynamics_b.velocity.x = 0;
+            }
+        }
+        // Similarly, if the collision normal is nearly vertical, zero the vertical velocity of the moving entity.
+        if (std::abs(info.collision_normal.y) > 0.9f) {
+            if (std::abs(dynamics_a.velocity.y) > EPSILON && std::abs(dynamics_b.velocity.y) < EPSILON) {
+                dynamics_a.velocity.y = 0;
+            }
+            else if (std::abs(dynamics_b.velocity.y) > EPSILON && std::abs(dynamics_a.velocity.y) < EPSILON) {
+                dynamics_b.velocity.y = 0;
+            }
+        }
     }
 
     void Collision::System::clearProcessedCollisions() {
         // To be reset at the start of each frame
-        processed_collisions.clear(); 
+        processed_collisions.clear();
     }
 
     bool Collision::System::healthDropCollisionCheck(Entity::Type entity_a, Entity::Type entity_b) {
@@ -489,7 +506,7 @@ namespace NIKE {
             (health_drop_b.has_value() && (!faction_a.has_value() || faction_a.value().get().faction != Combat::Factions::PLAYER)))
         {
             // Ignore collision
-            return false; 
+            return false;
         }
 
         // Check to see if player is at full health
@@ -530,7 +547,7 @@ namespace NIKE {
                 (factionA == Combat::Factions::ENEMY && factionB == Combat::Factions::ENEMYBULLET))
             {
                 // Ignore collision 
-                return false; 
+                return false;
             }
 
             // Prevent bullets from hitting other bullets
@@ -544,7 +561,7 @@ namespace NIKE {
         }
 
         // Allow collision
-        return true; 
+        return true;
     }
 
 }
