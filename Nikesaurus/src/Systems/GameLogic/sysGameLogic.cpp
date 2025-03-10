@@ -56,12 +56,12 @@ namespace NIKE {
 		auto play_again_script = Lua::Script();
 		play_again_script.script_id = "ChangeScene.lua";
 		play_again_script.update_function = "Restart";
-		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script);
+		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
 
 		auto quit_script = Lua::Script();
 		quit_script.script_id = "ChangeScene.lua";
 		quit_script.update_function = "Quit";
-		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script);
+		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
 	void GameLogic::Manager::flipX(Entity::Type const& entity, bool flip)

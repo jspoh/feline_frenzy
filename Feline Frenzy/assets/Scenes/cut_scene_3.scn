@@ -76,7 +76,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "cut_scene_png",
@@ -159,7 +158,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "next_button",
@@ -169,13 +167,15 @@
                         },
                         "UI Btn": {
                             "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {
-                                    "scene": "cut_scene_4.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": "Change"
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "cut_scene_4.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "Change"
+                                }
                             }
                         },
                         "UI ID": "next_button"
@@ -244,7 +244,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "back_button",
@@ -254,14 +253,7 @@
                         },
                         "UI Btn": {
                             "Input_State": 1,
-                            "Script": {
-                                "Named_Args": {
-                                    "scene": "cut_scene_2.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua",
-                                "Start_Function": "",
-                                "Update_Function": ""
-                            }
+                            "Scripts": null
                         },
                         "UI ID": "back_button"
                     }

@@ -50,9 +50,9 @@ namespace NIKE {
 			Entity::Type entity_id;
 			bool b_hovered;
 			InputStates input_state;
-			Lua::Script script;
+			std::unordered_map<std::string, Lua::Script> scripts;
 
-			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, script() {};
+			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED } {};
 
 			nlohmann::json serialize() const;
 
@@ -168,11 +168,13 @@ namespace NIKE {
 			//Check if UI ID has been registered
 			bool checkUIEntity(std::string const& btn_id);
 
-			//Set button script
-			void setButtonScript(std::string const& btn_id, Lua::Script const& script);
+			// Set button script 
+			// button_event is OnClick / OnHover
+			void setButtonScript(std::string const& btn_id, Lua::Script const& script, std::string const& button_event);
 
-			//Get button script
-			Lua::Script getButtonScript(std::string const& btn_id) const;
+			// Get button script
+			// button_event is OnClick / OnHover
+			Lua::Script getButtonScript(std::string const& btn_id, std::string const& button_event) const;
 
 			//Set button input state
 			void setButtonInputState(std::string const& btn_id, InputStates state);

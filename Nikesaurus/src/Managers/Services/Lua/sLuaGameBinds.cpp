@@ -118,7 +118,24 @@ namespace NIKE {
                     e_base.animation_mode = Animation::Mode::RESTART;
                 }
             }
-            });
+         });
+
+        //Change animation variables
+        lua_state.set_function("SetAnimationVariables", [&](Entity::Type entity, int start_x, int start_y, int end_x, int end_y, int curr_x, int  curr_y) {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+            if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+                auto& e_animate = e_animate_comp.value().get();
+
+                e_animate.start_index.x = start_x;
+                e_animate.start_index.y = start_y;
+                e_animate.end_index.x = end_x;
+                e_animate.end_index.y = end_y;
+                e_animate.curr_index.x = curr_x;
+                e_animate.curr_index.y = curr_y;
+
+            }
+         });
 
         //Get Last Direction (COMPONENT TO BE MOVED ELSE WHERE)
         lua_state.set_function("AnimationCompleted", [&](Entity::Type entity) -> sol::optional<int> {
