@@ -116,7 +116,20 @@ namespace NIKE {
 	}
 
 	Vector2f Input::Service::getMouseWorldPos() const {
-		return mouse.world_pos;
+		auto world_size = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
+		auto viewport_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+
+		Vector2f scale{
+			(float)world_size.x / ((float)viewport_size.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom),
+			(float)world_size.y / ((float)viewport_size.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom)
+		};
+
+		// Recalculate world position using the last known window position
+		Vector2f world_mouse_pos = { mouse.window_pos.x * scale.x , mouse.window_pos.y * scale.y };
+		world_mouse_pos.x = world_mouse_pos.x - ((viewport_size.x * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
+		world_mouse_pos.y = -(world_mouse_pos.y - ((viewport_size.y * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y);
+
+		return world_mouse_pos;
 	}
 
 	Vector2f Input::Service::getMouseScroll() const {

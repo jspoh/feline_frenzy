@@ -17,44 +17,6 @@
 #include "Math/Mtx33.h"
 
 
- // !TODO: jspoh reorg
-namespace {
-
-	Matrix_33 getWorldToScreenMtx() {
-		// transform to screen coords
-		NIKE::Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
-
-		Matrix_33 view_xform{
-			1, 0,  -cam.position.x,
-			0, 1,  -cam.position.y,
-			0, 0, 1
-		};
-
-		const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
-
-		Matrix_33 cam_to_ndc_xform{
-			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
-			0, 2.0f / (cam_height * cam.zoom), 0,
-			0, 0, 1
-		};
-
-		const float screenWidth = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
-		const float screenHeight = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
-
-		Matrix_33 screen_xform = Matrix_33{
-			screenWidth * 0.5f, 0, screenWidth * 0.5f,
-			0, screenHeight * 0.5f, screenHeight * 0.5f,
-			0, 0, 1
-		} *cam_to_ndc_xform * view_xform;
-
-		return screen_xform;
-	};
-
-	Vector2f worldToScreen(const Vector2f& world_pos) {
-		Matrix_33 screen_xform = getWorldToScreenMtx();
-		return screen_xform * world_pos;
-	}
-}
 
 namespace NIKE {
 

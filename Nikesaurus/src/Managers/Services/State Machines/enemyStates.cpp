@@ -390,12 +390,20 @@ namespace NIKE {
 	}
 
 	void State::EnemyDeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
+		// Stop enemy from moving
+		auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		if (dynamics.has_value()) {
+
+			dynamics.value().get().max_speed = { 0.0f };
+		}
+
 		// Play EnemyDeathState animation
 		animationSet(entity, 0, 8, 10, 8);
 		flipX(entity, false);
 		playSFX(entity, true);
 	}
 	void State::EnemyDeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
+
 		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 		if (animation_comp.has_value())
 		{

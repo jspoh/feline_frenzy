@@ -14,41 +14,33 @@
 
  // !TODO: jspoh reorg
 namespace {
-
-	Matrix_33 getWorldToScreenMtx() {
-		// transform to screen coords
+	Vector2f worldToScreen(const Vector2f& world_pos, bool use_world_pos) {
+		// Get the active camera
 		NIKE::Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
 
-		Matrix_33 view_xform{
-			1, 0,  -cam.position.x,
-			0, 1,  -cam.position.y,
-			0, 0, 1
-		};
+		// Get the appropriate world-to-NDC transformation matrix
+		Matrix_33 world_to_ndc_xform = use_world_pos
+			? NIKE_CAMERA_SERVICE->getWorldToNDCXform()
+			: NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform();
 
-		const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
-
-		Matrix_33 cam_to_ndc_xform{
-			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
-			0, 2.0f / (cam_height * cam.zoom), 0,
-			0, 0, 1
-		};
-
+		// Get screen dimensions
 		const float screenWidth = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
 		const float screenHeight = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 
-		Matrix_33 screen_xform = Matrix_33{
+		// Convert NDC (-1 to 1) to screen space (0 to width/height)
+		Matrix_33 screen_xform{
 			screenWidth * 0.5f, 0, screenWidth * 0.5f,
 			0, screenHeight * 0.5f, screenHeight * 0.5f,
 			0, 0, 1
-		} *cam_to_ndc_xform * view_xform;
+		};
 
-		return screen_xform;
-	};
+		// Final transformation
+		Matrix_33 final_xform = screen_xform * world_to_ndc_xform;
 
-	Vector2f worldToScreen(const Vector2f& world_pos) {
-		Matrix_33 screen_xform = getWorldToScreenMtx();
-		return screen_xform * world_pos;
+		// Apply transformation
+		return final_xform * world_pos;
 	}
+
 }
 
 
@@ -699,14 +691,18 @@ namespace NIKE {
 
 		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
 		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
-		shader_manager->setUniform(shader_name, "particleScreenOrigin", worldToScreen(ps.origin));			// particle screen pos
-
-		if (use_screen_pos) {
-			shader_manager->setUniform(shader_name, "particleScreenOrigin", ps.origin);
-		}
+		// Transform origin correctly based on screen position flag
+		Vector2f particle_origin = worldToScreen(ps.origin, ps.using_world_pos);
+		shader_manager->setUniform(shader_name, "particleScreenOrigin", particle_origin);
 
 		if (static_cast<NIKE::SysParticle::Data::ParticleRenderType>(ps.render_type) == NIKE::SysParticle::Data::ParticleRenderType::TEXTURED) {
+			// Check if asset exists
+			if (NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(texture_ref) == nullptr) {
+				return;
+			}
+
 			unsigned int tex_hdl;
+
 			try {
 				// using texture
 				tex_hdl = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(texture_ref)->gl_data;
@@ -729,12 +725,11 @@ namespace NIKE {
 		// USE THIS PARTICLE BUFFER TO RENDER, NOT ps.particles
 		auto particles = ps.particles;
 
-		// assume world pos
-		if (ps.using_world_pos) {
-			std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
-				p.pos = worldToScreen(p.pos);
-				});
-		}
+		// transform each particle
+		std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
+			p.pos = worldToScreen(p.pos, ps.using_world_pos);
+		});
+		
 
 		//Bind buffer
 		const unsigned int vbo = particle_manager->getVBO(ps.preset);
@@ -997,6 +992,8 @@ namespace NIKE {
 			particle_sys.origin = e_transform.position + e_particle.offset;
 			particle_sys.duration = e_particle.duration;
 			particle_sys.render_type = static_cast<SysParticle::Data::ParticleRenderType>(e_particle.render_type);
+
+			particle_sys.using_world_pos = !e_transform.use_screen_pos;
 
 			particle_sys.num_new_particles_per_second = e_particle.num_new_particles_per_second;
 			particle_sys.particle_lifespan = e_particle.particle_lifespan;
