@@ -131,8 +131,10 @@ namespace NIKE {
 				}
 		#endif
 
+
 		// Apply mouse offset only if its not free cam
 		if (cam_name != "Free Cam" && cam.mouse_offset != 0.f) { 
+			NIKE_INPUT_SERVICE->setCrosshair(true);
 			Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
 			Vector2f screen_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
 
@@ -153,6 +155,9 @@ namespace NIKE {
 
 			// Apply the offset
 			return mouse_offset_matrix * cam_to_ndc_xform * view_xform;
+		}
+		else {
+			NIKE_INPUT_SERVICE->setCrosshair(false);
 		}
 
 

@@ -261,6 +261,12 @@ namespace NIKE {
 		return b_debug_mode;
 	}
 
+
+	bool LevelEditor::MainPanel::getGameState() const {
+		return b_game_state;
+	}
+
+
 	void LevelEditor::MainPanel::setGameState(bool state) {
 		b_game_state = state;
 
@@ -287,12 +293,12 @@ namespace NIKE {
 		}
 	}
 
-	bool LevelEditor::MainPanel::getGameState() const {
-		return b_game_state;
-	}
-
 	bool LevelEditor::MainPanel::getGridState() const {
 		return b_grid_state;
+	}
+
+	void LevelEditor::MainPanel::setGridState(bool state) {
+		b_grid_state = state;
 	}
 
 	bool LevelEditor::MainPanel::getGizmoState() const {
@@ -1708,9 +1714,9 @@ namespace NIKE {
 			//Get transform
 			Transform::Transform e_transform = e_transform_comp.value().get();
 
-			//if (e_transform.use_screen_pos) {
-			//	return false;
-			//}
+			if (e_transform.use_screen_pos) {
+				return false;
+			}
 
 			//Check if child
 			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
@@ -5588,6 +5594,8 @@ namespace NIKE {
 				//Do grid mode
 				set_grid_mode.do_action = [&, mode = !b_grid_edit]() {
 					b_grid_edit = mode;
+					// set to grid view
+					main_panel.lock()->setGridState(true);
 					entities_panel.lock()->unselectEntity();
 					};
 

@@ -34,7 +34,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "player"
         }
     },
     {
@@ -584,70 +584,12 @@
                                 }
                             },
                             "Render::Cam": {
-                                "Mouse_Offset": 0.0,
+                                "Mouse_Offset": 0.15000000596046448,
                                 "Position": {
-                                    "x": 101.10623168945313,
-                                    "y": 670.7904663085938
+                                    "x": -32.0977783203125,
+                                    "y": -778.258544921875
                                 },
-                                "Zoom": 1.7867059707641602
-                            },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "num_new_particles_per_second": 0,
-                                "offset": {
-                                    "x": 32.5,
-                                    "y": 64.0
-                                },
-                                "particle_acceleration": 0.0,
-                                "particle_color": {
-                                    "w": 0.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "particle_color_changes_over_time": false,
-                                "particle_color_is_random": false,
-                                "particle_final_color": {
-                                    "w": 0.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "particle_final_size": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_lifespan": 0.0,
-                                "particle_rand_width_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_rand_x_offset_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_rand_y_offset_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_rotation": 0.0,
-                                "particle_rotation_speed": 0.0,
-                                "particle_size_changes_over_time": false,
-                                "particle_vector_x_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_vector_y_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "particle_velocity_range": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "preset": 0,
-                                "render_type": 0,
-                                "texture_ref": ""
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -992,6 +934,7 @@
                             "Layer_ID": 4,
                             "Layer_Order": 0,
                             "Name": "healthbar",
+                            "Parent": "player",
                             "Prefab_ID": "healthBar.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1011,12 +954,12 @@
                                         "Scale": {
                                             "x": 97.4806137084961,
                                             "y": 17.37278175354004
-                                        },
-                                        "Screen Position": true
+                                        }
                                     }
                                 },
                                 "MetaData": {
                                     "Layer ID": 4,
+                                    "Parent": "player",
                                     "Tags": [
                                         "healthbar"
                                     ]
@@ -1057,7 +1000,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -5.51824951171875,
+                                    "x": -9.3304443359375,
                                     "y": 100.0
                                 },
                                 "Rotation": 0.0,
@@ -1065,7 +1008,7 @@
                                     "x": 150.0,
                                     "y": 128.0
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
@@ -1073,6 +1016,7 @@
                             "Layer_ID": 4,
                             "Layer_Order": 1,
                             "Name": "hp_container",
+                            "Parent": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
@@ -1098,15 +1042,15 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 4,
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Water icon grey.png"
+                                "Texture_ID": "ElementalCounter_Spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1115,8 +1059,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 199.99996948242188,
-                                    "y": 199.99996948242188
+                                    "x": 201.6775665283203,
+                                    "y": 198.30824279785156
                                 },
                                 "Screen Position": true
                             }

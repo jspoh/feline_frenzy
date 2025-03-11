@@ -154,14 +154,17 @@ namespace NIKE {
 			//Public get debug state
 			bool getDebugState() const;
 
-			//Set Game State
-			void setGameState(bool state);
-
 			//Public get game state
 			bool getGameState() const;
 
+			//Set Game State
+			void setGameState(bool state);
+
 			//Public get grid state
 			bool getGridState() const;
+
+			//Public set Game State
+			void setGridState(bool state);
 
 			//Public get gizmo state
 			bool getGizmoState() const;

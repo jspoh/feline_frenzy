@@ -79,6 +79,10 @@ namespace NIKE {
 		mouse.offset = event->offset;
 	}
 
+	void Input::Service::onEvent(std::shared_ptr<CursorEnterEvent> event) {
+		cursor.cursor_entered = event->entered;
+	}
+
 	bool Input::Service::isKeyPressed(int key) {
 		return input_events[key].pressed;
 	}
@@ -135,4 +139,17 @@ namespace NIKE {
 	Vector2f Input::Service::getMouseScroll() const {
 		return mouse.offset;
 	}
+
+	int Input::Service::getCursorEntererd() const {
+		return cursor.cursor_entered;
+	}
+
+	int Input::Service::getCrosshair() const {
+		return cursor.is_crosshair;
+	}
+
+	void Input::Service::setCrosshair(bool is_crosshair) {
+		cursor.is_crosshair = is_crosshair;
+	}
+
 }

@@ -669,7 +669,43 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	void Render::Service::renderCursor(bool is_crosshair, bool cursor_entered) {
+		//Render cursor 
+		// FIX CURSOR IN FULLSCREEN, CURSOR OFFSET
+
+#ifndef NDEBUG
+		if (!NIKE_LVLEDITOR_SERVICE->getGameState()) 
+			return;
+#endif
+
+		if (!cursor_entered)
+			return;
+
+
+		auto texture_render = [&]() {
+			static Render::Texture crosshair = { "crosshair.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
+			static Render::Texture cursor = { "cursor.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
+
+			Matrix_33 cur_matrix;
+			static Transform::Transform cur_transform = { Vector2f(0.f, 0.f), Vector2f(50.0f, 50.0f), 0.0f };
+			cur_transform.position.x = NIKE_INPUT_SERVICE->getMouseWindowPos().x - NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x / 2;
+			cur_transform.position.y = -NIKE_INPUT_SERVICE->getMouseWindowPos().y + NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y / 2;
+			cur_transform.use_screen_pos = true;
+
+
+			// Render cursor
+			transformMatrix(cur_transform, cur_matrix, NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform());
+			renderObject(cur_matrix, is_crosshair ? crosshair : cursor);
+		};
+
+		screen_render_queue.push(texture_render);
+		
+	}
+
 	void Render::Service::renderParticleSystem(const NIKE::SysParticle::ParticleSystem& ps, bool use_screen_pos, const std::string& texture_ref) {
+
+		UNREFERENCED_PARAMETER(use_screen_pos);
+
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -807,7 +843,7 @@ namespace NIKE {
 
 					// Render Texture
 					NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
-					};
+				};
 
 				//Check for screen position
 				if (e_transform.use_screen_pos) {

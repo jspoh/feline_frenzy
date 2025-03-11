@@ -61,4 +61,9 @@ namespace NIKE {
 	void Events::Service::dropfile_cb([[maybe_unused]] GLFWwindow* window, int count, const char** paths) {
 		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Assets::FileDropEvent>(count, paths));
 	}
+
+	void Events::Service::cursorenter_cb([[maybe_unused]] GLFWwindow* window, int entered) {
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::CursorEnterEvent>(entered));
+	}
+
 }

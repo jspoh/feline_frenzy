@@ -186,8 +186,14 @@ namespace NIKE {
 		//Set up event callbacks
 		NIKE_WINDOWS_SERVICE->getWindow()->setupEventCallbacks();
 
-		//Setup input modes
+#ifndef NDEBUG
+		//Setup show cursor
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
+#endif
+#ifdef NDEBUG	
+		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_HIDDEN);
+#endif
+
 
 		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
@@ -220,6 +226,7 @@ namespace NIKE {
 		//Add event listeners for mouse event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::CursorEnterEvent>(NIKE_INPUT_SERVICE);
 
 
 		//Add event listeners for mouse move event

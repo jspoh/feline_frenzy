@@ -34,7 +34,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "player"
         }
     },
     {
@@ -230,7 +230,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 4,
+                            "Layer_Order": 2,
                             "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -301,7 +301,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 5,
+                            "Layer_Order": 3,
                             "Name": "vent_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -614,7 +614,7 @@
                                     "x": 89.6829833984375,
                                     "y": 424.81878662109375
                                 },
-                                "Zoom": 2.666734218597412
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1147,7 +1147,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 13,
+                            "Layer_Order": 12,
                             "Name": "grass_01",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1218,8 +1218,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 14,
-                            "Name": "entity_0033",
+                            "Layer_Order": 13,
+                            "Name": "entity_0017",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1275,7 +1275,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 15,
+                            "Layer_Order": 14,
                             "Name": "top_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1288,7 +1288,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 16,
+                            "Layer_Order": 15,
                             "Name": "yellow_tree3",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1332,7 +1332,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 17,
+                            "Layer_Order": 16,
                             "Name": "pink_tree4",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1434,8 +1434,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 18,
-                            "Name": "entity_0032",
+                            "Layer_Order": 17,
+                            "Name": "entity_0021",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1478,7 +1478,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 19,
+                            "Layer_Order": 18,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1522,7 +1522,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 20,
+                            "Layer_Order": 19,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1566,7 +1566,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 21,
+                            "Layer_Order": 20,
                             "Name": "bottom_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
