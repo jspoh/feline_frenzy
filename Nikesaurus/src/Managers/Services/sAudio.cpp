@@ -479,10 +479,10 @@ namespace NIKE {
 			auto const& data = config.at("AudioConfig");
 
 			bgm_channel_group_id = data.value("BGM Channel Group", "BGM");
-			vfx_channel_group_id = data.value("VFX Channel Group", "VFX");
+			sfx_channel_group_id = data.value("SFX Channel Group", "SFX");
 
 			createChannelGroup(bgm_channel_group_id);
-			createChannelGroup(vfx_channel_group_id);
+			createChannelGroup(sfx_channel_group_id);
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -535,7 +535,7 @@ namespace NIKE {
 		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
 
 			//Skip static channels groups
-			if (it->first == bgm_channel_group_id || it->first == vfx_channel_group_id) {
+			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id) {
 				++it;
 				continue;
 			}
@@ -624,8 +624,8 @@ namespace NIKE {
 		return bgm_channel_group_id;
 	}
 
-	std::string Audio::Service::getVFXChannelGroupID() const {
-		return vfx_channel_group_id;
+	std::string Audio::Service::getSFXChannelGroupID() const {
+		return sfx_channel_group_id;
 	}
 
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {

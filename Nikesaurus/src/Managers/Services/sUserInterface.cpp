@@ -122,8 +122,8 @@ namespace NIKE {
 		mouse_pos = event->window_pos - (gaps / 2);
 
 		//Check if mouse is over any entity currently
-		std::for_each(ui_entities.begin(), ui_entities.end(), 
-			[&event](std::pair<std::string, UIBtn> entity){
+		std::for_each(ui_entities.begin(), ui_entities.end(),
+			[&event](std::pair<std::string, UIBtn> entity) {
 				if (entity.second.b_hovered) {
 					event->setEventProcessed(true);
 					return;
@@ -172,19 +172,19 @@ namespace NIKE {
 					vert.push_back(v.pos);
 				}
 				return vert;
-			};
+				};
 
 			vert = getVertices();
-				for (auto& point : vert) {
-					point.x *= (e_transform.scale.x * scale_factor.x);
-					point.y *= (e_transform.scale.y * scale_factor.y);
-					point.x += (e_transform.position.x * scale_factor.x);
-					point.y -= (e_transform.position.y * scale_factor.y);
+			for (auto& point : vert) {
+				point.x *= (e_transform.scale.x * scale_factor.x);
+				point.y *= (e_transform.scale.y * scale_factor.y);
+				point.x += (e_transform.position.x * scale_factor.x);
+				point.y -= (e_transform.position.y * scale_factor.y);
 
-					//Translate model to world coordinates
-					point.x += (window_size.x / 2.0f);
-					point.y += (window_size.y / 2.0f);
-				}
+				//Translate model to world coordinates
+				point.x += (window_size.x / 2.0f);
+				point.y += (window_size.y / 2.0f);
+			}
 		}
 		else {
 			if (!NIKE_ASSETS_SERVICE->isAssetRegistered("square-texture.model")) {
@@ -358,7 +358,7 @@ namespace NIKE {
 		//Return state & if button hovered
 		switch (entity.input_state) {
 		case InputStates::PRESSED:
-			return_state = input_checks[keyorbtn_code].second.pressed;	
+			return_state = input_checks[keyorbtn_code].second.pressed;
 			break;
 		case InputStates::TRIGGERED:
 			return_state = input_checks[keyorbtn_code].second.triggered;
@@ -490,7 +490,7 @@ namespace NIKE {
 			if (!e_animate_comp.has_value()) continue;
 			auto& e_animate = e_animate_comp.value().get();
 
-			
+
 
 			//Clamp rotation ( Disable rotating buttons for now )
 			e_transform.rotation = 0.0f;
@@ -518,13 +518,13 @@ namespace NIKE {
 					it->second.named_args["entity"] = ent.entity_id; // Set entity default
 					NIKE_LUA_SERVICE->executeScript(it->second);
 				}
-			};
+				};
 
 			// Hovering logic
 			if (buttonHovered(entity.entity_id)) {
 
 				entity.b_hovered = true;
-				
+
 				if (!hover_container[entity_name].b_hovered) {
 					// Store original properties BEFORE modifying them
 					hover_container[entity_name].btn_transform.scale = e_transform.scale;
@@ -555,7 +555,7 @@ namespace NIKE {
 					e_transform.scale = hover_container[entity_name].btn_transform.scale;
 					e_text.color = hover_container[entity_name].btn_text.color;
 					e_animate = hover_container[entity_name].btn_animate;
-					hover_container[entity_name].b_hovered = false;				
+					hover_container[entity_name].b_hovered = false;
 				}
 
 				//Reset polling for Mouse left button

@@ -98,7 +98,7 @@ namespace NIKE {
 				Transform::Transform btn_transform;
 				Render::Text btn_text;
 				Animation::Sprite btn_animate;
-				bool b_hovered = false;
+				bool b_hovered;
 			};
 
 			//Button hovering container
@@ -123,10 +123,6 @@ namespace NIKE {
 			//Button Txt Ratio
 			Vector2f btn_ratio;
 		public:
-			// Global UI variables for audio volume
-			float bgmVolume = 0.5f; // Global music volume (0.0 to 1.0)
-			float sfxVolume = 0.5f; // Global SFX volume (0.0 to 1.0)
-
 			//Default constructor
 			Service() = default;
 
@@ -139,19 +135,11 @@ namespace NIKE {
 			//Create texture button
 			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Texture&& texture, Animation::Sprite&& sprite = Animation::Sprite());
 
-			// Manually register UI entity
-			void registerUIEntity(const std::string& id, Entity::Type entity);
-
 			//Destroy button
 			void destroyButton(std::string const& btn_id);
 
 			//Check button hovered
 			bool isButtonHovered(std::string const& btn_id) const;
-
-			// For slider
-			bool sliderHovered(Entity::Type entity) const;
-			// Test custom function to update slider functionality.
-			void updateSliders();
 
 			//Check Button Clicked
 			bool isButtonClicked(std::string const& btn_id, int keyorbtn_code);

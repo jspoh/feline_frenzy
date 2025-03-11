@@ -431,7 +431,7 @@ namespace NIKE {
 
 			//Static channel group ID
 			std::string bgm_channel_group_id;
-			std::string vfx_channel_group_id;
+			std::string sfx_channel_group_id;
 
 			// Playlist Management
 			struct Playlist {
@@ -484,8 +484,8 @@ namespace NIKE {
 			//Get BGM Channel Group
 			std::string getBGMChannelGroupID() const;
 
-			//Get VFX Channel Group
-			std::string getVFXChannelGroupID() const;
+			//Get SFX Channel Group
+			std::string getSFXChannelGroupID() const;
 
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )

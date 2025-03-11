@@ -16,10 +16,6 @@
             "SFX": {
                 "loop": false,
                 "tracks": []
-            },
-            "VFX": {
-                "loop": false,
-                "tracks": []
             }
         }
     },

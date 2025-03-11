@@ -2,20 +2,12 @@
     {
         "Channels": {
             "BGM": {
-                "loop": false,
-                "tracks": []
-            },
-            "Menu_BGM": {
                 "loop": true,
                 "tracks": [
                     "BGM_Menu_v1.wav"
                 ]
             },
             "SFX": {
-                "loop": false,
-                "tracks": []
-            },
-            "VFX": {
                 "loop": false,
                 "tracks": []
             }
@@ -82,7 +74,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 87.99980163574219,
+                                    "x": 648.1248779296875,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -143,7 +135,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -1511.021484375,
+                                    "x": -950.9359130859375,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -276,9 +268,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.12941177189350128,
-                                    "z": 0.04313725605607033
+                                    "x": 0.886274516582489,
+                                    "y": 0.0313725508749485,
+                                    "z": 0.8470588326454163
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -399,7 +391,8 @@
                                 },
                                 "OnHover": {
                                     "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
+                                        "audio": "MenuHoverOverSFX.wav",
+                                        "entity": 19
                                     },
                                     "Script_ID": "menu_button.lua",
                                     "Start_Function": "",
@@ -521,7 +514,8 @@
                                 },
                                 "OnHover": {
                                     "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
+                                        "audio": "MenuHoverOverSFX.wav",
+                                        "entity": 20
                                     },
                                     "Script_ID": "menu_button.lua",
                                     "Start_Function": "",
@@ -545,9 +539,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.05882352963089943,
-                                    "y": 0.6823529601097107,
-                                    "z": 0.34117648005485535
+                                    "x": 0.5921568870544434,
+                                    "y": 0.8313725590705872,
+                                    "z": 0.45490196347236633
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
@@ -744,7 +738,8 @@
                                 },
                                 "OnHover": {
                                     "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
+                                        "audio": "MenuHoverOverSFX.wav",
+                                        "entity": 22
                                     },
                                     "Script_ID": "menu_button.lua",
                                     "Start_Function": "",
