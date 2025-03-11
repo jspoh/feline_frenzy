@@ -61,12 +61,21 @@ namespace NIKE {
 				: offset{ offset } {}
 		};
 
+		//Cursor Enter Event
+		struct NIKE_API CursorEnterEvent : public Events::IEvent {
+			int entered;
+
+			CursorEnterEvent(int entered)
+				: entered{ entered } {}
+		};
+
 		//Input manager for input polling
 		class NIKE_API Service 
 			:	public Events::IEventListener<KeyEvent>,
 				public Events::IEventListener<MouseBtnEvent>,
 				public Events::IEventListener<MouseMovedEvent>,
-				public Events::IEventListener<MouseScrollEvent>
+				public Events::IEventListener<MouseScrollEvent>,
+				public Events::IEventListener<CursorEnterEvent>
 		{
 		private:
 
@@ -79,6 +88,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<MouseBtnEvent> event) override;
 			void onEvent(std::shared_ptr<MouseMovedEvent> event) override;
 			void onEvent(std::shared_ptr<MouseScrollEvent> event) override;
+			void onEvent(std::shared_ptr<CursorEnterEvent> event) override;
 
 			//Data structure of state
 			struct EventStates {
@@ -99,6 +109,14 @@ namespace NIKE {
 
 			//Mouse event
 			Mouse mouse;
+
+			struct Cursor {
+				bool is_crosshair = false;
+				int cursor_entered;
+			};
+
+			Cursor cursor;
+
 		public:
 
 			//Default Constructor
@@ -130,6 +148,15 @@ namespace NIKE {
 
 			//Get Mouse Scroll Offset
 			Vector2f getMouseScroll() const;
+
+			//Get Cursor Entered
+			int getCursorEntererd() const;
+
+			//Get Is Crosshair
+			int getCrosshair() const;
+
+			//Set Crosshair
+			void setCrosshair(bool is_crosshair);
 		};
 
 		//Re-enable DLL Export warning

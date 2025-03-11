@@ -179,7 +179,10 @@ namespace NIKE {
 				//Render text
 				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
-				// render particle system
+				//Render Cursor
+				void renderCursor(bool is_crosshair, bool cursor_entered);
+
+				//Render particle system
 				void renderParticleSystem(const NIKE::SysParticle::ParticleSystem& ps, bool use_screen_pos = false, const std::string& texture_ref = std::string{});
 
 				//Render entity

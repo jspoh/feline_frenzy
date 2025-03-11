@@ -226,8 +226,6 @@ namespace NIKE {
             comp = original;
         }
 
-
-
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);

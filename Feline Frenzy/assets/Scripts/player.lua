@@ -128,31 +128,41 @@ function Player:Animate(entity, args)
     end
 end
 
--- Player movement
 function Player:Move(entity)
-    -- Initialize force variables
-    local fx, fy = 0.0, 0.0
+    -- Initialize direction variables
+    local dx, dy = 0.0, 0.0
 
-    -- Accumulate forces based on key presses
+    -- Determine movement direction
     if IsKeyPressed(Key.W) then
-        fy = fy + PlayerConfig.forces.up
+        dy = dy + 1
     end
 
     if IsKeyPressed(Key.A) then
-        fx = fx + PlayerConfig.forces.left
+        dx = dx - 1
     end
 
     if IsKeyPressed(Key.S) then
-        fy = fy + PlayerConfig.forces.down
+        dy = dy - 1
     end
 
     if IsKeyPressed(Key.D) then
-        fx = fx + PlayerConfig.forces.right
+        dx = dx + 1
     end
 
-    -- Apply the combined force to the entity
+    -- Normalize direction vector if moving diagonally
+    local length = math.sqrt(dx * dx + dy * dy)
+    if length > 0 then
+        dx = dx / length
+        dy = dy / length
+    end
+
+    -- Apply force in normalized direction
+    local fx = dx * PlayerConfig.forces.right  -- 3000
+    local fy = dy * PlayerConfig.forces.up     -- 3000
+
     ApplyForce(entity, fx, fy)
 end
+
 
 -- Player shoot function
 function Player:Shoot(entity)
