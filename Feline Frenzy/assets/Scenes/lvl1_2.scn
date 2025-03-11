@@ -34,7 +34,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "player"
+            "Active Cam ID": "Free Cam"
         }
     },
     {
@@ -83,7 +83,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "room1.png"
+                                "Texture_ID": "room1-2.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -144,8 +144,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -635.339599609375,
-                                    "y": -131.66259765625
+                                    "x": -586.4841918945313,
+                                    "y": 386.75360107421875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -215,150 +215,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 424.09124755859375,
-                                    "y": 230.13421630859375
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 225.785888671875,
-                                    "y": 89.99857330322266
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "entity_0002",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.30000001192092896
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 4,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 4,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Puddle_animation_sprite.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -415.82867431640625,
-                                    "y": 402.263427734375
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 225.785888671875,
-                                    "y": 89.99857330322266
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 3,
-                            "Name": "entity_0003",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.30000001192092896
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 4,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 4,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Puddle_animation_sprite.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 538.2198486328125,
-                                    "y": -435.44085693359375
+                                    "x": 620.4036865234375,
+                                    "y": -402.0339660644531
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -371,8 +229,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 4,
-                            "Name": "entity_0004",
+                            "Layer_Order": 2,
+                            "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -442,7 +300,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 0,
-                            "Layer_Order": 5,
+                            "Layer_Order": 3,
                             "Name": "vent_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -468,11 +326,16 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 0,
-                            "Name": "green_tree4",
-                            "Prefab_ID": "green_tree.prefab",
+                            "Name": "pink_tree2",
+                            "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Physics::Collider": null,
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -885.663330078125,
+                                            "y": 624.3187255859375
+                                        }
+                                    },
                                     "Render::Texture": {
                                         "Color": {
                                             "w": 1.0,
@@ -481,7 +344,100 @@
                                             "z": 0.0
                                         }
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -879.58544921875,
+                                            "y": 826.405517578125
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Layer ID": 1,
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
+                            },
+                            "Tags": [
+                                "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "pink_tree1",
+                            "Prefab_ID": "pink_tree.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -194.65284729003906,
+                                            "y": 443.44580078125
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 547.12841796875,
+                                            "y": 813.474609375
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Layer ID": 1,
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
+                            },
+                            "Tags": [
+                                "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 2,
+                            "Name": "yellow_tree1",
+                            "Prefab_ID": "yellow_tree.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -720.812255859375,
+                                            "y": 33.9788818359375
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -733.0348510742188,
+                                            "y": 766.0611572265625
+                                        }
+                                    }
                                 },
                                 "MetaData": {
                                     "Layer ID": 1,
@@ -582,7 +538,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 0.8573011755943298
+                                "Zoom": 2.578728675842285
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
@@ -685,56 +641,12 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
+                            "Layer_Order": 3,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
                                 "player"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 2,
-                            "Name": "pink_tree2",
-                            "Prefab_ID": "pink_tree.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": -885.663330078125,
-                                            "y": 624.3187255859375
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -885.663330078125,
-                                            "y": 720.3187255859375
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 1,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "objects"
                             ]
                         }
                     }
@@ -788,8 +700,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -545.463623046875,
-                                    "y": 592.1912841796875
+                                    "x": -603.7255859375,
+                                    "y": 567.7864990234375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -802,67 +714,11 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 3,
+                            "Layer_Order": 4,
                             "Name": "grass_03",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 4,
-                            "Name": "green_tree2",
-                            "Prefab_ID": "green_tree.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Enemy::Attack": {
-                                        "Cooldown": 10.0,
-                                        "Function": "enemyBullet",
-                                        "LastShotTime": 10.016666412353516,
-                                        "Layer": 0,
-                                        "Offset": 100.0,
-                                        "PrefabPath": "damageBullet.prefab",
-                                        "Range": 100.0,
-                                        "ScriptID": "",
-                                        "ScriptLoaded": false,
-                                        "ScriptPath": "assets/Scripts/enemyBullet.lua"
-                                    },
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": 728.8015747070313,
-                                            "y": 592.1229858398438
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": 728.8015747070313,
-                                            "y": 688.1229858398438
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 1,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
                         }
                     }
                 },
@@ -915,8 +771,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 270.1314392089844,
-                                    "y": 557.461181640625
+                                    "x": 512.6456298828125,
+                                    "y": 537.6143798828125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -930,7 +786,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 5,
-                            "Name": "grass_04",
+                            "Name": "grass_05",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -963,8 +819,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 572.375244140625,
-                                            "y": 594.9881591796875
+                                            "x": 266.95806884765625,
+                                            "y": 434.16693115234375
                                         }
                                     }
                                 },
@@ -987,50 +843,6 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 7,
-                            "Name": "pink_tree1",
-                            "Prefab_ID": "pink_tree.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": -194.65284729003906,
-                                            "y": 443.44580078125
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -194.65284729003906,
-                                            "y": 539.44580078125
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 1,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 8,
                             "Name": "pink_tree3",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1066,6 +878,77 @@
                             "Tags": [
                                 "objects"
                             ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.30000001192092896
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 3,
+                                    "y": 1
+                                },
+                                "Sheet_Size": {
+                                    "x": 4,
+                                    "y": 2
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 1
+                                },
+                                "Frame_Size": {
+                                    "x": 4,
+                                    "y": 2
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Grass_animation_sprite.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -409.761474609375,
+                                    "y": 80.72113037109375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 84.70587158203125,
+                                    "y": 63.99999237060547
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 8,
+                            "Name": "grass_04",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -1148,14 +1031,14 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 10,
-                            "Name": "yellow_tree1",
-                            "Prefab_ID": "yellow_tree.prefab",
+                            "Name": "green_tree1",
+                            "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
                                 "Components": {
                                     "Physics::Collider": {
                                         "Position": {
-                                            "x": -720.812255859375,
-                                            "y": 33.9788818359375
+                                            "x": 639.0889892578125,
+                                            "y": -292.4460754394531
                                         }
                                     },
                                     "Render::Texture": {
@@ -1168,8 +1051,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": -720.812255859375,
-                                            "y": 129.9788818359375
+                                            "x": 585.9210205078125,
+                                            "y": 115.20367431640625
                                         }
                                     }
                                 },
@@ -1263,14 +1146,14 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 12,
-                            "Name": "green_tree1",
-                            "Prefab_ID": "green_tree.prefab",
+                            "Name": "yellow_tree3",
+                            "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
                                 "Components": {
                                     "Physics::Collider": {
                                         "Position": {
-                                            "x": 639.0889892578125,
-                                            "y": -292.4460754394531
+                                            "x": -403.8442077636719,
+                                            "y": -476.7436828613281
                                         }
                                     },
                                     "Render::Texture": {
@@ -1283,8 +1166,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 639.0889892578125,
-                                            "y": -196.44607543945313
+                                            "x": 690.8411865234375,
+                                            "y": -179.52935791015625
                                         }
                                     }
                                 },
@@ -1431,89 +1314,69 @@
                 },
                 {
                     "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": false,
+                                "Pos_Offset": {
+                                    "x": 5.0,
+                                    "y": -96.0
+                                },
+                                "Position": {
+                                    "x": -403.8442077636719,
+                                    "y": -476.7436828613281
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 50.0,
+                                    "y": 32.0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Tree2.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -360.90576171875,
+                                    "y": -424.191650390625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 255.99996948242188,
+                                    "y": 255.99996948242188
+                                },
+                                "Screen Position": false
+                            }
+                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 15,
-                            "Name": "yellow_tree3",
-                            "Prefab_ID": "yellow_tree.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": -403.8442077636719,
-                                            "y": -476.7436828613281
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -403.8442077636719,
-                                            "y": -380.7436828613281
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 1,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 16,
-                            "Name": "pink_tree4",
-                            "Prefab_ID": "pink_tree.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Physics::Collider": {
-                                        "Position": {
-                                            "x": -307.78338623046875,
-                                            "y": -568.1581420898438
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -307.78338623046875,
-                                            "y": -472.15814208984375
-                                        }
-                                    }
-                                },
-                                "MetaData": {
-                                    "Layer ID": 1,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
+                            "Name": "yellow_tree4",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },
@@ -1580,10 +1443,54 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 17,
+                            "Layer_Order": 16,
                             "Name": "torch_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
+                            "Tags": [
+                                "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 17,
+                            "Name": "pink_tree4",
+                            "Prefab_ID": "pink_tree.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -307.78338623046875,
+                                            "y": -568.1581420898438
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -245.9696044921875,
+                                            "y": -488.2403564453125
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Layer ID": 1,
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
+                            },
                             "Tags": [
                                 "objects"
                             ]
@@ -1646,8 +1553,8 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": -773.4778442382813,
-                                            "y": -610.4813232421875
+                                            "x": -866.65478515625,
+                                            "y": -522.7227783203125
                                         }
                                     }
                                 },
@@ -1867,8 +1774,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -288.69256591796875,
-                                    "y": 199.73574829101563
+                                    "x": -905.4476318359375,
+                                    "y": 589.338134765625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -2005,8 +1912,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 912.4915161132813,
-                                    "y": 451.41729736328125
+                                    "x": 874.712158203125,
+                                    "y": 636.7518310546875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -2139,8 +2046,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 639.195556640625,
-                                    "y": 30.37994384765625
+                                    "x": 585.9212646484375,
+                                    "y": 343.6502685546875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -2200,8 +2107,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 425.47119140625,
-                                    "y": 374.6715087890625
+                                    "x": 581.6107177734375,
+                                    "y": -216.69046020507813
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
