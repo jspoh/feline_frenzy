@@ -29,6 +29,14 @@ namespace NIKE {
             "use_screen_pos", &Transform::Transform::use_screen_pos
         );
 
+        lua_state.new_usertype<Combat::Health>("Health",
+            "lives", &Combat::Health::lives,
+            "max_health", &Combat::Health::max_health,
+            "health", &Combat::Health::health,
+            "invulnerable_flag", &Combat::Health::invulnerable_flag,
+            "taken_damage", &Combat::Health::taken_damage
+        );
+
         //Register create entity
         lua_state.set_function("NewEntity", [&]() -> Entity::Type {
             return NIKE_ECS_MANAGER->createEntity();
@@ -82,9 +90,15 @@ namespace NIKE {
                 );
                 return sol::make_object(lua_state, component);
             }
+            if (componentName == "Combat::Health") {
+                auto component = std::static_pointer_cast<Combat::Health>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
 
             return sol::nil; // Component type not registered for Lua exposure
-            });
+        });
     }
 
 }

@@ -255,7 +255,7 @@ namespace NIKE {
             //Set initial bullet position to player's position
             auto bullet_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bullet_entity);
             if (bullet_transform.has_value()) {
-                bullet_transform.value().get().position = player_transform.position + (bull_direction.normalize() * (player_transform.scale.length() * 0.75f));
+                bullet_transform.value().get().position = player_transform.position + (bull_direction.normalize() * (player_transform.scale.length() * 0.25f));
             }
 
             //Set player bullet SFX

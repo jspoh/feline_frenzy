@@ -1599,6 +1599,12 @@
                                 "MaxHealth": 100.0,
                                 "invulnerable_flag": false
                             },
+                            "GameLogic::ILogic": {
+                                "Named_Args": {},
+                                "Script_ID": "objectsLogic.lua",
+                                "Start_Function": "Test",
+                                "Update_Function": "Test"
+                            },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": false,
                                 "Pos_Offset": {
