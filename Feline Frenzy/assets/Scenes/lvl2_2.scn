@@ -34,12 +34,13 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "player"
         }
     },
     {
         "MetaData": {
             "Entity_Tags": [
+                "boss",
                 "elementui",
                 "enemy",
                 "healthbar",
@@ -115,7 +116,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
-                                "EnemyLimit": 4,
+                                "EnemyLimit": 0,
                                 "LastSpawnTime": 2.7166647911071777
                             },
                             "Render::Texture": {
@@ -172,7 +173,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
-                                "EnemyLimit": 4,
+                                "EnemyLimit": 0,
                                 "LastSpawnTime": 2.7166647911071777
                             },
                             "Render::Texture": {
@@ -220,6 +221,54 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 3,
+                            "Name": "boss",
+                            "Prefab_ID": "boss.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": null,
+                                    "Animation::Sprite": null,
+                                    "Audio::SFX": null,
+                                    "Combat::Faction": null,
+                                    "Combat::Health": null,
+                                    "Element::Entity": null,
+                                    "Enemy::Attack": {
+                                        "Cooldown": 0.800000011920929,
+                                        "Offset": 200.0,
+                                        "Range": 30.0
+                                    },
+                                    "Physics::Collider": null,
+                                    "Physics::Dynamics": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "State::State": null,
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Tags": [
+                                        "boss",
+                                        "enemy"
+                                    ]
+                                }
+                            },
+                            "Tags": [
+                                "boss",
+                                "enemy"
+                            ]
                         }
                     }
                 }
@@ -586,10 +635,10 @@
                             "Render::Cam": {
                                 "Mouse_Offset": 0.0,
                                 "Position": {
-                                    "x": 101.10623168945313,
-                                    "y": 670.7904663085938
+                                    "x": -32.0977783203125,
+                                    "y": -778.258544921875
                                 },
-                                "Zoom": 1.7867059707641602
+                                "Zoom": 1.987634539604187
                             },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,

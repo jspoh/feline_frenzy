@@ -26,7 +26,12 @@ namespace NIKE {
 	{
 		const auto& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
 
-		return entity_tags.find("enemy") != entity_tags.end();
+		// Here should find enemy only and not boss
+		if (entity_tags.find("enemy") != entity_tags.end() && entity_tags.find("boss") == entity_tags.end())
+		{
+			return true;
+		}
+		return false;
 	}
 
 
@@ -43,7 +48,10 @@ namespace NIKE {
 	{
 		const auto& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
 
-		return entity_tags.find("boss") != entity_tags.end();
+		if (entity_tags.find("enemy") != entity_tags.end() && entity_tags.find("boss") != entity_tags.end())
+		{
+			return true;
+		}
 	}
 
 
