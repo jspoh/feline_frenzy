@@ -1,10 +1,10 @@
 /*****************************************************************//**
  * \file   sAudio.cpp
- * \brief  Audio manager function definitions 
+ * \brief  Audio manager function definitions
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (35%)
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
- * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -15,11 +15,19 @@
 #include "Managers/Services/Assets/sAssets.h"
 
 namespace NIKE {
+	// Define the global volume variables.
+	namespace Audio {
+		float gGlobalBGMVolume = 1.0f;  // Default volume for BGM (range 0.0 - 1.0)
+		float gGlobalSFXVolume = 1.0f;  // Default volume for SFX (range 0.0 - 1.0)
+	}
+
 	/*****************************************************************//**
 	* NIKE AUDIO
 	*********************************************************************/
+
 	Audio::NIKEAudio::NIKEAudio(FMOD::Sound* sound, const std::string& path)
-		:sound{ sound }, file_path{path} {}
+		: sound{ sound }, file_path{ path } {
+	}
 
 	FMOD::Sound* Audio::NIKEAudio::getAudio() {
 		return sound;
@@ -43,7 +51,7 @@ namespace NIKE {
 		sound->release();
 	}
 
-	std::string Audio::NIKEAudio::getFilePath() const{
+	std::string Audio::NIKEAudio::getFilePath() const {
 		return file_path;
 	}
 
@@ -57,7 +65,7 @@ namespace NIKE {
 		sound->setMode(mode);
 	}
 
-	NIKE_AUDIO_MODE Audio::NIKEAudio::getMode() const{
+	NIKE_AUDIO_MODE Audio::NIKEAudio::getMode() const {
 		FMOD_MODE mode;
 		sound->getMode(&mode);
 		return mode;
@@ -87,7 +95,8 @@ namespace NIKE {
 	* NIKE CHANNEL
 	*********************************************************************/
 	Audio::NIKEChannel::NIKEChannel(FMOD::Channel* channel, std::shared_ptr<IAudio> sound)
-		: channel{ channel }, sound{ sound } {}
+		: channel{ channel }, sound{ sound } {
+	}
 
 	FMOD::Channel* Audio::NIKEChannel::getChannel() {
 		return channel;
@@ -201,8 +210,9 @@ namespace NIKE {
 	/*****************************************************************//**
 	* NIKE CHANNEL GROUP
 	*********************************************************************/
-	Audio::NIKEChannelGroup::NIKEChannelGroup(FMOD::ChannelGroup* group) 
-		: group{ group } {}
+	Audio::NIKEChannelGroup::NIKEChannelGroup(FMOD::ChannelGroup* group)
+		: group{ group } {
+	}
 
 	FMOD::ChannelGroup* Audio::NIKEChannelGroup::getChannelGroup() {
 		return group;
@@ -325,7 +335,7 @@ namespace NIKE {
 	}
 
 	std::shared_ptr<Audio::IAudio> Audio::NIKEAudioSystem::createSound(std::string const& file_path) {
-		
+
 		//FMOD Loading Variables
 		FMOD::Sound* temp_audio = nullptr;
 		FMOD_RESULT result;
@@ -410,22 +420,22 @@ namespace NIKE {
 		{
 			LOG_CRASH("AUDIO GROUP NOT INITIALIZED");
 		}
-		
+
 		return std::make_shared<Audio::NIKEChannelGroup>(temp);
 	}
 
 	std::shared_ptr<Audio::IChannel> Audio::NIKEAudioSystem::playSound(std::shared_ptr<Audio::IAudio> audio, std::shared_ptr<Audio::IChannelGroup> channel_group, bool start_paused) {
-		
+
 		//Channel & Audio Result checking
 		FMOD::Channel* temp_channel = nullptr;
 		FMOD_RESULT result;
 
 		//Play audio
 		result = fmod_system->playSound(
-				std::static_pointer_cast<NIKEAudio>(audio)->getAudio(),
-				std::static_pointer_cast<NIKEChannelGroup>(channel_group)->getChannelGroup(),
-				start_paused,
-				&temp_channel);
+			std::static_pointer_cast<NIKEAudio>(audio)->getAudio(),
+			std::static_pointer_cast<NIKEChannelGroup>(channel_group)->getChannelGroup(),
+			start_paused,
+			&temp_channel);
 
 		//Check if audio successfully played and added to relevant channels & channel groups
 		if (result == FMOD_OK) {
@@ -455,7 +465,7 @@ namespace NIKE {
 	std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> NIKE::Audio::Service::channel_groups;
 
 	void Audio::Service::onEvent(std::shared_ptr<Audio::PausedEvent> event) {
-		
+
 		if (event->b_game_state) {
 			resumeAllChannels();
 		}
@@ -493,8 +503,7 @@ namespace NIKE {
 	std::shared_ptr<Audio::IAudioSystem> NIKE::Audio::Service::getAudioSystem() const {
 		return audio_system;
 	}
-
-	void Audio::Service::createChannelGroup(std::string const& channel_group_id) {
+	void Audio::Service::createChannelGroup(std::string const& channel_group_id) { // Edited to auto include existing channels with "SFX" in the name to the SFX channel group
 		// Check if the group already exists in the map
 		if (channel_groups.find(channel_group_id) != channel_groups.end())
 		{
@@ -502,10 +511,24 @@ namespace NIKE {
 			return;
 		}
 
-		//Emplace into audio group list
-		channel_groups.emplace(std::piecewise_construct, std::forward_as_tuple(channel_group_id), std::forward_as_tuple(std::move(std::static_pointer_cast<Audio::NIKEChannelGroup>(audio_system->createChannelGroup(channel_group_id)))));
-		//Create a playlist for each group
+		// Create the new channel group from the audio system.
+		auto new_group = std::static_pointer_cast<Audio::NIKEChannelGroup>(audio_system->createChannelGroup(channel_group_id));
+
+		// Emplace into audio group list
+		channel_groups.emplace(std::piecewise_construct,
+			std::forward_as_tuple(channel_group_id),
+			std::forward_as_tuple(new_group));
+
+		// Create a playlist for each group
 		createChannelPlaylist(channel_group_id);
+
+		// If this group is not the static SFX group and its name contains "SFX", add it as a child of the static SFX group.
+		if (channel_group_id != sfx_channel_group_id && channel_group_id.find("SFX") != std::string::npos) {
+			auto staticSfx = getChannelGroup(sfx_channel_group_id);
+			if (staticSfx) {
+				staticSfx->addChildGroup(new_group);
+			}
+		}
 	}
 
 	void Audio::Service::unloadChannelGroup(std::string const& channel_group_id) {
@@ -629,7 +652,7 @@ namespace NIKE {
 	}
 
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
-		
+
 		// Retrieve audio asset
 		std::shared_ptr<Audio::IAudio> audio_asset = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(audio_id);
 
@@ -638,7 +661,6 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("Failed to retrieve audio asset: {}", audio_id);
 			return;
 		}
-
 
 		//Play sound & get channel that sound is playing under
 		std::shared_ptr<Audio::IChannel> new_channel = audio_system->playSound(is_music ? audio_asset : audio_asset, getChannelGroup(channel_group_id), start_paused);
@@ -653,13 +675,45 @@ namespace NIKE {
 			loop ? new_channel->setMode(NIKE_AUDIO_LOOP_NORMAL) : new_channel->setMode(NIKE_AUDIO_LOOP_OFF);
 
 			//Add channel into channel map if channel id path is specified & channel is in looping mode
-			if(channel_id != "" && (new_channel->getMode() & NIKE_AUDIO_LOOP_NORMAL))
-			channels[channel_id] = std::move(new_channel);
+			if (channel_id != "" && (new_channel->getMode() & NIKE_AUDIO_LOOP_NORMAL))
+				channels[channel_id] = std::move(new_channel);
 		}
 		else {
 			NIKEE_CORE_ERROR("Error playing audio in channel!");
 		}
 
+	}
+
+	// Modified setGlobalVolume function.
+	// This function now updates the global volume variables and then applies them to the static BGM and SFX groups.
+	void Audio::Service::setGlobalVolume(float bgmVolume, float sfxVolume) {
+		gGlobalBGMVolume = bgmVolume;
+		gGlobalSFXVolume = sfxVolume;
+		// Set volume for the static BGM group.
+		auto bgmGroup = getChannelGroup(bgm_channel_group_id);
+		if (bgmGroup) {
+			bgmGroup->setVolume(gGlobalBGMVolume);
+		}
+
+		// Set volume for the static SFX group.
+		auto sfxGroup = getChannelGroup(sfx_channel_group_id);
+		if (sfxGroup) {
+			sfxGroup->setVolume(gGlobalSFXVolume);
+		}
+	}
+
+	// New function to update global volumes using the global variables.
+	void Audio::Service::updateGlobalVolumes() {
+		// Update the BGM channel group volume.
+		auto bgmGroup = getChannelGroup(bgm_channel_group_id);
+		if (bgmGroup) {
+			bgmGroup->setVolume(gGlobalBGMVolume);
+		}
+		// Update the SFX channel group volume.
+		auto sfxGroup = getChannelGroup(sfx_channel_group_id);
+		if (sfxGroup) {
+			sfxGroup->setVolume(gGlobalSFXVolume);
+		}
 	}
 
 	void Audio::Service::pauseAllChannels() {
@@ -683,7 +737,7 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("Error: Channel Playlist already exists! Skipping.");
 			return;
 		}
-		channel_playlists[channel_id] = Playlist{ {}, false};
+		channel_playlists[channel_id] = Playlist{ {}, false };
 	}
 
 	const Audio::Service::Playlist& Audio::Service::getChannelPlaylist(const std::string& channel_id) {
@@ -731,7 +785,7 @@ namespace NIKE {
 		it->second.loop = loop;
 	}
 
-	bool Audio::Service::isPlaylistLooping(const std::string& channel_id) const{
+	bool Audio::Service::isPlaylistLooping(const std::string& channel_id) const {
 		auto it = channel_playlists.find(channel_id);
 		if (it == channel_playlists.end()) {
 			NIKEE_CORE_ERROR("Error: Unable to find Channel Playlist!");
@@ -762,7 +816,7 @@ namespace NIKE {
 				++it;
 			}
 		}
-	
+
 	}
 	// Serialize audio channels and data
 	nlohmann::json Audio::Service::serializeAudioChannels() const {

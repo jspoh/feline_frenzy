@@ -4,7 +4,7 @@
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (35%)
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
- * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  *  All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -16,16 +16,30 @@
 
 #include "Components/cAudio.h"
 
+ // Global volume declarations added below.
+ // These global variables control the overall volume for the static BGM and SFX channel groups
+ // and are shared across all files. They can be modified by the settings menu.
+namespace NIKE {
+	namespace Audio {
+		// Global volume variables for the static channel groups.
+		extern float gGlobalBGMVolume; // Default value is defined in sAudio.cpp (initially 1.0f)
+		extern float gGlobalSFXVolume; // Default value is defined in sAudio.cpp (initially 1.0f)
+
+		// Function to update the volumes of the static channel groups using the global variables.
+		void updateGlobalVolumes();
+	}
+}
+
 namespace NIKE {
 	namespace Audio {
 		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
-		/*****************************************************************//**
-		* Abstract Audio Classes
-		*********************************************************************/
+/*****************************************************************//**
+* Abstract Audio Classes
+*********************************************************************/
 
-		//Abstract audio class
+//Abstract audio class
 		class IAudio {
 		private:
 		public:
@@ -137,8 +151,8 @@ namespace NIKE {
 			virtual ~IChannel() = default;
 
 			//Stop audio playing in channel
-			virtual void stop() = 0; 
-			
+			virtual void stop() = 0;
+
 			//Set state of channel
 			virtual void setPaused(bool state) = 0;
 
@@ -161,7 +175,7 @@ namespace NIKE {
 			virtual float getPitch() const = 0;
 
 			//Set channel loop count ( -1 loop indefinitely )
-			virtual void setLoopCount(int count) = 0; 
+			virtual void setLoopCount(int count) = 0;
 
 			//Get channel loop count
 			virtual int getLoopCount() const = 0;
@@ -236,7 +250,7 @@ namespace NIKE {
 		/*****************************************************************//**
 		* DLL Build Implementation
 		*********************************************************************/
-		#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
+#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
 
 		//NIKE Audio
 		class NIKEAudio : public IAudio {
@@ -403,7 +417,7 @@ namespace NIKE {
 			void shutdown() override;
 		};
 
-		#endif //Expose implementation only to NIKE Engine
+#endif //Expose implementation only to NIKE Engine
 
 		/*****************************************************************//**
 		* Audio Service
@@ -440,7 +454,7 @@ namespace NIKE {
 			};
 
 			//Queue for each channel's playlist
-			std::unordered_map<std::string , Playlist> channel_playlists;
+			std::unordered_map<std::string, Playlist> channel_playlists;
 
 		public:
 
@@ -492,15 +506,22 @@ namespace NIKE {
 			//Channel ID will override each other if the same id is specified more than once
 			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
 
+			// Set GLOBAL volume for BGM and SFX channels.
+			// This function updates the global variables and then applies them to the static channel groups.
+			void setGlobalVolume(float bgmVolume, float sfxVolume);
+
+			// New function: update the volumes of the static channel groups using the global variables.
+			void updateGlobalVolumes();
+
 			/**
 			 * pauses all audio.
-			 * 
+			 *
 			 */
 			void pauseAllChannels();
 
 			/**
 			 * resumes all audio.
-			 * 
+			 *
 			 */
 			void resumeAllChannels();
 
@@ -542,7 +563,7 @@ namespace NIKE {
 		};
 
 		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
+#pragma warning(default: 4251)
 	}
 }
 
