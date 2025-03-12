@@ -36,13 +36,17 @@ namespace NIKE {
 
 	void Events::Service::mousepos_cb([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
 		auto world_size = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
-		auto viewport_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
+		auto viewport_size = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+
+		//Account for gaps between game viewport and game window
+		auto gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		gaps /= 2.0f;
 
 		//World Scale Factor
 		Vector2f scale{ (float)world_size.x / ((float)viewport_size.x / NIKE_CAMERA_SERVICE->getActiveCamera().zoom), (float)world_size.y / ((float)viewport_size.y / NIKE_CAMERA_SERVICE->getActiveCamera().zoom) };
 
 		//Calculate world mouse position
-		Vector2f world_mouse_pos = { ((float)xpos) * scale.x , ((float)ypos) * scale.y };
+		Vector2f world_mouse_pos = { ((float)xpos - gaps.x) * scale.x , ((float)ypos - gaps.y) * scale.y };
 		world_mouse_pos.x = world_mouse_pos.x - ((viewport_size.x * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
 		world_mouse_pos.y = -(world_mouse_pos.y - ((viewport_size.y * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y);
  
