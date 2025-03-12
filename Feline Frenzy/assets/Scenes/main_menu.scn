@@ -26,7 +26,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Free Cam"
+            "Active Cam ID": "Title"
         }
     },
     {
@@ -112,7 +112,7 @@
                             "Render::Cam": {
                                 "Mouse_Offset": 0.0,
                                 "Position": {
-                                    "x": 0.0,
+                                    "x": -1511.021484375,
                                     "y": 0.0
                                 },
                                 "Zoom": 0.9950000047683716
@@ -276,9 +276,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.11764705926179886,
-                                    "y": 0.21960784494876862,
-                                    "z": 0.6705882549285889
+                                    "x": 0.4941176474094391,
+                                    "y": 0.7764706015586853,
+                                    "z": 0.501960813999176
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -545,9 +545,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.8549019694328308,
-                                    "y": 0.0,
-                                    "z": 0.7098039388656616
+                                    "x": 0.9137254953384399,
+                                    "y": 0.9843137264251709,
+                                    "z": 0.3176470696926117
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,

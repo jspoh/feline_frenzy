@@ -37,14 +37,14 @@
             "invulnerable_flag": false
         },
         "Element::Entity": {
-            "Element": 0
+            "Element": 2
         },
         "Enemy::Attack": {
-            "Cooldown": 0.5,
+            "Cooldown": 0.800000011920929,
             "Function": "enemyBullet",
             "LastShotTime": 10.0,
             "Layer": 1,
-            "Offset": 100.0,
+            "Offset": 200.0,
             "PrefabPath": "bullet.prefab",
             "Range": 10.0,
             "ScriptID": "",
@@ -123,6 +123,9 @@
     },
     "MetaData": {
         "Layer ID": 0,
-        "Tags": []
+        "Tags": [
+            "boss",
+            "enemy"
+        ]
     }
 }

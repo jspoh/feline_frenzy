@@ -157,12 +157,17 @@ namespace NIKE {
 					NIKE_LUA_SERVICE->executeScript(e_logic.script);
 				}
 
+				// Check if player tag exists
+				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
 				// Check for Elemental Stack comp
 				const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
 				const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+				const auto e_dynamic_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 				if (e_combo_comp.has_value() && e_health_comp.has_value()) {
 					auto& e_combo = e_combo_comp.value().get();
 					auto& e_health = e_health_comp.value().get();
+					auto& e_dynamic = e_dynamic_comp.value().get();
 
 					// Entity has status effect
 					if (e_combo.status_effect != Element::Status::NONE && e_combo.status_timer > 0.0f) {
@@ -175,15 +180,27 @@ namespace NIKE {
 							switch (e_combo.status_effect) {
 							case Element::Status::BURN:
 								NIKEE_CORE_INFO("BURN TICK: -1 HP");
-								e_health.health = max(0.0f, e_health.health - 1.0f); // Apply burn damage
+								e_combo.applyBurn(e_health.health, 5.f); // Apply burn damage
 								break;
-							case Element::Status::FROSTBITE:
-								NIKEE_CORE_INFO("FROSTBITE TICK:  -1 HP");
-								e_health.health = max(0.0f, e_health.health - 1.0f); // Apply poison damage
+							case Element::Status::FREEZE:
+								NIKEE_CORE_INFO("FROZEN TICK");
+								e_combo.applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed/2); // Apply freeze
 								break;
 							case Element::Status::POISON:
 								NIKEE_CORE_INFO("POISON TICK: -1 HP");
-								e_health.health = max(0.0f, e_health.health - 1.0f); // Apply poison damage
+								e_combo.applyBurn(e_health.health, 5.f); // Apply poison damage
+
+								// If player not dead
+								if (!player_entities.empty()) {
+									// Look for player
+									for (auto& player : player_entities) {
+										const auto player_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+										if (player_health_comp.value().get().health != player_health_comp.value().get().max_health) {
+											// Heal player
+											player_health_comp.value().get().health += 5.f;
+										}
+									}
+								}
 								break;
 							}
 
@@ -196,6 +213,14 @@ namespace NIKE {
 
 							// Remove status effect if timer expires
 							if (e_combo.status_timer <= 0.0f) {
+								// Return max speed after freeze ends
+								// Checking if max speed is valid
+								if (e_combo.temp_max_speed >= 0) {  
+									e_dynamic.max_speed = e_combo.temp_max_speed;
+									// Reset after restoring speed
+									e_combo.temp_max_speed = -1;
+								}
+								// Remove status
 								e_combo.status_effect = Element::Status::NONE;
 							}
 
@@ -243,9 +268,6 @@ namespace NIKE {
 							handlePortalInteractions(vents_entities);
 						}
 					}
-
-					// Check if player tag exists
-					std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
 					// Elemental UI 
 					for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
@@ -338,14 +360,36 @@ namespace NIKE {
 		// Create enemy entity
 		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
-		// Load entity from prefab
-		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
-		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
-
 		// When enemy spwan from spawner, set the tag to enemy
-		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
+		if(NIKE_METADATA_SERVICE->isTagValid("enemy") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
+
+		// Spawn normal enemy when only enemy tag exist
+		std::string chosen_enemy{};
+
+		// Get current scene
+		std::string current_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
+
+		// auto const& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(enemy_entity);
+		// Spawn boss when only in level 2_2
+		// (Not sure how can i remove this scene check, can be optmizxed?
+		if (current_scene == "lvl2_2.scn") {
+			chosen_enemy = enemyBossArr[getRandomNumber(0, 2)];
+			// When enemy spwan from spawner, give boss tag
+			if (NIKE_METADATA_SERVICE->isTagValid("boss") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)) {
+				NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "boss");
+			}
+		}
+		else
+		{
+			chosen_enemy = enemyArr[getRandomNumber(0, 3)];
+		}
+
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
+
 
 		// Randomly offset from spawner position		
 		float offset_x = getRandomNumber(-20.f, 20.f);

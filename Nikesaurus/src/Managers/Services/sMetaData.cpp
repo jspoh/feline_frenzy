@@ -360,6 +360,22 @@ namespace NIKE {
 		return entities.at(entity).b_locked;
 	}
 
+	bool MetaData::Service::checkEntityTagExist(Entity::Type entity) const
+	{
+		// Check if the entity exists in the entities map
+		auto it = entities.find(entity);
+		if (it != entities.end()) {
+			// Iterate over the entity's tags and check if any exist in entity_tags
+			for (const auto& tag : it->second.tags) {
+				if (entity_tags.find(tag) != entity_tags.end()) {
+					return true; 
+				}
+			}
+		}
+
+		return false;
+	}
+
 	void MetaData::Service::setEntityLayerID(Entity::Type entity, unsigned int layer_id) {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {

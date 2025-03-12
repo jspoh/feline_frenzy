@@ -684,7 +684,7 @@ namespace NIKE {
 		}
 
 		//Setup show cursor
-		//NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_HIDDEN);
+		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_HIDDEN);
 
 		auto texture_render = [&]() {
 			static Render::Texture crosshair = { "crosshair.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
@@ -694,8 +694,8 @@ namespace NIKE {
 			Transform::Transform cur_transform = { Vector2f(0.f, 0.f), Vector2f(50.0f, 50.0f), 0.0f };
 			cur_transform.scale.x *= NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 			cur_transform.scale.y *= NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
-			cur_transform.position.x = NIKE_INPUT_SERVICE->getMouseWorldPos().x;
-			cur_transform.position.y = NIKE_INPUT_SERVICE->getMouseWorldPos().y;
+			cur_transform.position.x = is_crosshair ? NIKE_INPUT_SERVICE->getMouseWorldPos().x : NIKE_INPUT_SERVICE->getMouseWorldPos().x + cur_transform.scale.x / 2;
+			cur_transform.position.y = is_crosshair ? NIKE_INPUT_SERVICE->getMouseWorldPos().y : NIKE_INPUT_SERVICE->getMouseWorldPos().y - cur_transform.scale.y / 2;;
 			cur_transform.use_screen_pos = true;
 
 			// Render cursor

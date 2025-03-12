@@ -179,6 +179,9 @@ namespace NIKE {
 			//Check if entity is locked
 			bool checkEntityLocked(Entity::Type entity) const;
 
+			//Check if entity tag check
+			bool checkEntityTagExist(Entity::Type entity) const;
+
 			//Set Entity layer ID
 			void setEntityLayerID(Entity::Type entity, unsigned int layer_id);
 

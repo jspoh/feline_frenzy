@@ -41,8 +41,11 @@ namespace NIKE {
 			// Spawn Enemy
 			void spawnEnemy(const Entity::Type& spawner);
 
-			// Prefabs for spawnEnemy
+			// Prefabs for spawnEnemy (enemy)
 			const std::string enemyArr[4] = { "enemy.prefab", "fireEnemy.prefab", "waterEnemy.prefab", "grassEnemy.prefab" };
+
+			// Prefabs for spawnEnemy (boss)
+			const std::string enemyBossArr[3] = { "bossFire.prefab", "bossWater.prefab", "bossGrass.prefab"};
 
 	    public:
 		    //Default constructor
