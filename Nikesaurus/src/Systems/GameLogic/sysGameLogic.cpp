@@ -247,7 +247,6 @@ namespace NIKE {
 					// Check if player tag exists
 					std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
-
 					// Elemental UI 
 					for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
 						// If player not dead
