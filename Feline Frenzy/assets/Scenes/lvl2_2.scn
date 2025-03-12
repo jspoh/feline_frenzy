@@ -231,7 +231,7 @@
                             "Layer_ID": 0,
                             "Layer_Order": 3,
                             "Name": "boss",
-                            "Prefab_ID": "boss.prefab",
+                            "Prefab_ID": "bossWater.prefab",
                             "Prefab_Override": {
                                 "Components": {
                                     "Animation::Base": null,

@@ -4,12 +4,12 @@
             "Animation_Count": 0,
             "B_PingPong": false,
             "B_Reverse": false,
-            "Frame_Duration": 0.054999999701976776
+            "Frame_Duration": 0.20000000298023224
         },
         "Animation::Sprite": {
             "End_Index": {
-                "x": 9,
-                "y": 3
+                "x": 0,
+                "y": 0
             },
             "Sheet_Size": {
                 "x": 0,
@@ -17,18 +17,18 @@
             },
             "Start_Index": {
                 "x": 0,
-                "y": 3
+                "y": 0
             }
         },
         "Audio::SFX": {
-            "Audio_ID": "EnemyWalking1.wav",
+            "Audio_ID": "",
             "B_Play_SFX": false,
-            "Channel_Group_ID": "EnemySFX",
+            "Channel_Group_ID": "",
             "Pitch": 1.0,
             "Volume": 1.0
         },
         "Combat::Faction": {
-            "Faction": 2
+            "Faction": 0
         },
         "Combat::Health": {
             "Health": 100.0,
@@ -37,16 +37,16 @@
             "invulnerable_flag": false
         },
         "Element::Entity": {
-            "Element": 2
+            "Element": 1
         },
         "Enemy::Attack": {
-            "Cooldown": 1.0,
+            "Cooldown": 0.800000011920929,
             "Function": "enemyBullet",
-            "LastShotTime": 0.43333348631858826,
+            "LastShotTime": 10.0,
             "Layer": 1,
-            "Offset": 100.0,
+            "Offset": 200.0,
             "PrefabPath": "bullet.prefab",
-            "Range": 3.0,
+            "Range": 10.0,
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
@@ -58,27 +58,27 @@
                 "y": 0.0
             },
             "Position": {
-                "x": 437.8940124511719,
-                "y": -323.79998779296875
+                "x": 0.0,
+                "y": 0.0
             },
             "Resolution": 1,
             "Rotation": 0.0,
             "Scale": {
-                "x": 91.98487091064453,
-                "y": 118.93585968017578
+                "x": 1.0,
+                "y": 1.0
             }
         },
         "Physics::Dynamics": {
             "Drag": 0.0,
             "Force": {
-                "x": -981.6494750976563,
-                "y": -190.6943359375
+                "x": 100.0,
+                "y": 100.0
             },
             "Mass": 9.999999747378752e-05,
-            "Max_Speed": 100.0,
+            "Max_Speed": 200.0,
             "Velocity": {
-                "x": -98.1649398803711,
-                "y": -19.069429397583008
+                "x": -98.16500091552734,
+                "y": -19.069000244140625
             }
         },
         "Render::Texture": {
@@ -96,27 +96,27 @@
             },
             "Frame_Index": {
                 "x": 0,
-                "y": 4
+                "y": 0
             },
             "Frame_Size": {
-                "x": 10,
-                "y": 16
+                "x": 7,
+                "y": 4
             },
             "Intensity": 0.0,
-            "Texture_ID": "Elite_Enemy_Water_SpriteSheet.png"
+            "Texture_ID": "Boss_Idle_Fire_Spritesheet.png"
         },
         "State::State": {
             "State": "Default"
         },
         "Transform::Transform": {
             "Position": {
-                "x": 437.8940124511719,
-                "y": -323.79998779296875
+                "x": 0.0,
+                "y": 0.0
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 91.98487091064453,
-                "y": 118.93585968017578
+                "x": 260.72015380859375,
+                "y": 238.7991485595703
             },
             "Screen Position": false
         }

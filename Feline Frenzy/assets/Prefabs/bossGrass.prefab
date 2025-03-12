@@ -37,14 +37,14 @@
             "invulnerable_flag": false
         },
         "Element::Entity": {
-            "Element": 0
+            "Element": 3
         },
         "Enemy::Attack": {
-            "Cooldown": 0.5,
+            "Cooldown": 0.800000011920929,
             "Function": "enemyBullet",
             "LastShotTime": 10.0,
             "Layer": 1,
-            "Offset": 100.0,
+            "Offset": 200.0,
             "PrefabPath": "bullet.prefab",
             "Range": 10.0,
             "ScriptID": "",
@@ -103,7 +103,7 @@
                 "y": 4
             },
             "Intensity": 0.0,
-            "Texture_ID": "Boss_Idle_Water_Spritesheet.png"
+            "Texture_ID": "Boss_Idle_Grass_Spritesheet.png"
         },
         "State::State": {
             "State": "Default"
