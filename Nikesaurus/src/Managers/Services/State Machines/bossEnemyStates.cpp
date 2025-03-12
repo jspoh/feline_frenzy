@@ -151,8 +151,8 @@ namespace NIKE {
 		}
 
 		// Play EnemyDeathState animation
-		animationSet(entity, 0, 8, 10, 8);
-		flipX(entity, false);
+		Interaction::animationSet(entity, 0, 8, 10, 8);
+		Interaction::flipX(entity, false);
 		playSFX(entity, true);
 	}
 
