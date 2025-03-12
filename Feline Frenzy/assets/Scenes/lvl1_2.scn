@@ -42,6 +42,7 @@
             "Entity_Tags": [
                 "elementui",
                 "enemy",
+                "healAnimation",
                 "healthbar",
                 "hpcontainer",
                 "objects",
