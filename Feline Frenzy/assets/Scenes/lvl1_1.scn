@@ -1414,7 +1414,7 @@
                                 "Texture_ID": "Player_animation_sprite.png"
                             },
                             "State::State": {
-                                "State": "Idle"
+                                "State": "Default"
                             },
                             "Transform::Transform": {
                                 "Position": {
