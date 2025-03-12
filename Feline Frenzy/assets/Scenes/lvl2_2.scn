@@ -116,7 +116,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
-                                "EnemyLimit": 0,
+                                "EnemyLimit": 1,
                                 "LastSpawnTime": 2.7166647911071777
                             },
                             "Render::Texture": {
@@ -127,7 +127,7 @@
                                 },
                                 "B_Stretch": false,
                                 "Color": {
-                                    "w": 1.0,
+                                    "w": 0.0,
                                     "x": 0.0,
                                     "y": 0.0,
                                     "z": 0.0
@@ -141,12 +141,12 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "Vent.png"
+                                "Texture_ID": ""
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 539.2032470703125,
-                                    "y": 27.50006103515625
+                                    "x": 4.882568359375,
+                                    "y": -184.62841796875
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -164,111 +164,6 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Enemy::Spawner": {
-                                "Cooldown": 3.0,
-                                "EnemiesSpawned": 0,
-                                "EnemyLimit": 0,
-                                "LastSpawnTime": 2.7166647911071777
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Vent.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -535.183349609375,
-                                    "y": 27.1285400390625
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 255.99996948242188,
-                                    "y": 255.99996948242188
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "entity_0002",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 3,
-                            "Name": "boss",
-                            "Prefab_ID": "bossWater.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Animation::Base": null,
-                                    "Animation::Sprite": null,
-                                    "Audio::SFX": null,
-                                    "Combat::Faction": null,
-                                    "Combat::Health": null,
-                                    "Element::Entity": null,
-                                    "Enemy::Attack": {
-                                        "Cooldown": 0.800000011920929,
-                                        "Offset": 200.0,
-                                        "Range": 30.0
-                                    },
-                                    "Physics::Collider": null,
-                                    "Physics::Dynamics": null,
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "State::State": null,
-                                    "Transform::Transform": null
-                                },
-                                "MetaData": {
-                                    "Tags": [
-                                        "boss",
-                                        "enemy"
-                                    ]
-                                }
-                            },
-                            "Tags": [
-                                "boss",
-                                "enemy"
-                            ]
                         }
                     }
                 }
@@ -638,7 +533,7 @@
                                     "x": -3.0185546875,
                                     "y": -1162.0152587890625
                                 },
-                                "Zoom": 1.082614779472351
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -665,7 +560,7 @@
                                 "Texture_ID": "Player_animation_sprite.png"
                             },
                             "State::State": {
-                                "State": "Idle"
+                                "State": "Default"
                             },
                             "Transform::Transform": {
                                 "Position": {

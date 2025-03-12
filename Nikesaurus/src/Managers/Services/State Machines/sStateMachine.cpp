@@ -118,6 +118,7 @@ namespace NIKE {
 			// Register boss enemy states
 			registerState("BossIdle", std::make_shared<State::BossIdleState>());
 			registerState("BossAttack", std::make_shared<State::BossAttackState>());
+			registerState("BossChase", std::make_shared<State::BossChaseState>());
 			registerState("BossDeath", std::make_shared<State::BossDeathState>());
 
 			// Register destructable states

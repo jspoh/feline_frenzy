@@ -339,14 +339,36 @@ namespace NIKE {
 		// Create enemy entity
 		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
-		// Load entity from prefab
-		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
-		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
-
 		// When enemy spwan from spawner, set the tag to enemy
-		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
+		if(NIKE_METADATA_SERVICE->isTagValid("enemy") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
+
+		// Spawn normal enemy when only enemy tag exist
+		std::string chosen_enemy{};
+
+		// Get current scene
+		std::string current_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
+
+		auto const& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(enemy_entity);
+		// Spawn boss when only in level 2_2
+		// (Not sure how can i remove this scene check, can be optmizxed?
+		if (current_scene == "lvl2_2.scn") {
+			chosen_enemy = enemyBossArr[getRandomNumber(0, 2)];
+			// When enemy spwan from spawner, give boss tag
+			if (NIKE_METADATA_SERVICE->isTagValid("boss") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)) {
+				NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "boss");
+			}
+		}
+		else
+		{
+			chosen_enemy = enemyArr[getRandomNumber(0, 3)];
+		}
+
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
+
 
 		// Randomly offset from spawner position		
 		float offset_x = getRandomNumber(-20.f, 20.f);
