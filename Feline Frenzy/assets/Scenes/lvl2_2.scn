@@ -635,10 +635,10 @@
                             "Render::Cam": {
                                 "Mouse_Offset": 0.15000000596046448,
                                 "Position": {
-                                    "x": -32.0977783203125,
-                                    "y": -778.258544921875
+                                    "x": -3.0185546875,
+                                    "y": -1162.0152587890625
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 1.082614779472351
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -669,8 +669,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -32.0977783203125,
-                                    "y": -778.258544921875
+                                    "x": -3.0185546875,
+                                    "y": -1162.0152587890625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -834,7 +834,59 @@
         "Layer": {
             "B_State": true,
             "B_YSort": false,
-            "Entities": [],
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Door_side.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -1.5361328125,
+                                    "y": -1223.426513671875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 512.0,
+                                    "y": 256.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": true,
+                            "Layer_ID": 2,
+                            "Layer_Order": 0,
+                            "Name": "Door_side",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                }
+            ],
             "ID": 2,
             "Mask": 2
         }
@@ -1124,57 +1176,6 @@
                             "Tags": [
                                 "elementui"
                             ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Door_side.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -1.5361328125,
-                                    "y": -1223.426513671875
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 512.0,
-                                    "y": 256.0
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 4,
-                            "Layer_Order": 3,
-                            "Name": "entity_0016",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
                         }
                     }
                 }
