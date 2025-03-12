@@ -26,9 +26,6 @@ namespace NIKE {
 			// Win overlay
 			void gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 
-			// Within range function
-			bool withinRange(Entity::Type source, Entity::Type player);
-
 			// Portal interactions
 			void handlePortalInteractions(const std::set<Entity::Type>& vents_entities);
 

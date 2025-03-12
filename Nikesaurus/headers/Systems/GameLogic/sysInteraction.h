@@ -34,8 +34,8 @@ namespace NIKE {
         // Spawn Heal Animation
         void spawnHealAnimation(Entity::Type player);
 
-        // Check if player is within range
-        bool withinRange(Entity::Type source, Entity::Type player);
+        // For world-space calculation
+        bool isWithinWorldRange(Entity::Type source, Entity::Type player);
 
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
         // Play SFX once

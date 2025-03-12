@@ -127,8 +127,10 @@ namespace NIKE {
 
 		const std::string playerBullet[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
 		const std::string enemyBullet[4] = { "enemyBullet.prefab", "enemyFireBullet.prefab", "enemyWaterBullet.prefab", "enemyGrassBullet.prefab" };
-		const std::string elementUI[4] = { "Water icon grey.png", "Fire icon.png", "Water icon.png", "Grass icon.png" };
 
+		//const std::string elementUI[4] = { "Water icon grey.png", "Fire icon.png", "Water icon.png", "Grass icon.png" };
+
+		// Get Multiplier for Elemental Damage
 		float getElementMultiplier(Element::Elements attacker, Element::Elements defender);
 
 		void registerComponents();

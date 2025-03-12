@@ -4,7 +4,7 @@
  *
  * \author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (100%)
  * \date   January 2025
- *  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ *  * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
@@ -78,7 +78,7 @@ namespace NIKE {
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and within range of enemy
-				if (Enemy::withinRange(entity, player)){
+				if (Enemy::isWithinGridRange(entity, player)){
 					return true;
 				}
 			}
@@ -149,7 +149,7 @@ namespace NIKE {
 
 				// Transition happens when path is not empty
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
-				if (!path.path.empty() && !Enemy::withinRange(entity, player) && !NIKE_METADATA_SERVICE->getEntitiesByTag("player").empty()) {
+				if (!path.path.empty() && !Enemy::isWithinGridRange(entity, player) && !NIKE_METADATA_SERVICE->getEntitiesByTag("player").empty()) {
 					return true;
 				}
 			}
@@ -197,7 +197,7 @@ namespace NIKE {
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (!Enemy::withinRange(entity, player)) {
+				if (!Enemy::isWithinGridRange(entity, player)) {
 					return true;
 				}
 			}
@@ -265,7 +265,7 @@ namespace NIKE {
 
 				// Transition happens when path is not empty
 				auto path = NIKE_MAP_SERVICE->getPath(entity);
-				if (!path.path.empty() && !Enemy::withinRange(entity, player)) {
+				if (!path.path.empty() && !Enemy::isWithinGridRange(entity, player)) {
 					return true;
 				}
 			}
@@ -313,7 +313,7 @@ namespace NIKE {
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (Enemy::withinRange(entity, other_entity)) {
+				if (Enemy::isWithinGridRange(entity, other_entity)) {
 					return true;
 				}
 			}
@@ -437,7 +437,7 @@ namespace NIKE {
 	//		if (e_player_comp.has_value() && health_comp.has_value())
 	//		{
 	//			// If entity has the gamelogic::ilogic component, and not within range of enemy
-	//			if (Enemy::withinRange(entity, other_entity) && !health_comp.value().get().taken_damage) {
+	//			if (Enemy::isWithinGridRange(entity, other_entity) && !health_comp.value().get().taken_damage) {
 	//				return true;
 	//			}
 	//		}
@@ -506,7 +506,7 @@ namespace NIKE {
 
 	//			// Transition happens when path is not empty
 	//			auto path = NIKE_MAP_SERVICE->getPath(entity);
-	//			if (!path.path.empty() && !Enemy::withinRange(entity, player) && !health_comp.value().get().taken_damage) {
+	//			if (!path.path.empty() && !Enemy::isWithinGridRange(entity, player) && !health_comp.value().get().taken_damage) {
 	//				return true;
 	//			}
 	//		}

@@ -6768,7 +6768,7 @@ namespace NIKE {
 
 		//Configure viewport size
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-		float aspect_ratio = NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio();
+		float aspect_ratio = win_size.x / win_size.y;
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
 		if (viewport_height > window_size.y) {

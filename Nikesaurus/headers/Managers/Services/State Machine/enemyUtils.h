@@ -21,8 +21,6 @@
 namespace NIKE {
 	namespace Enemy {
 		// Enemey logic functions
-		// Check if player is within range
-		bool withinRange(const Entity::Type& enemy, const Entity::Type& player);
 
 		// Shoot bullet
 		void shootBullet(const Entity::Type& enemy, const Entity::Type& player);
@@ -32,6 +30,8 @@ namespace NIKE {
 
 		// Standard enemy moving function
 		void moveAlongPath(Entity::Type entity, int x_index, int y_index, float speed, float cell_offset);
+
+		bool isWithinGridRange(const Entity::Type& enemy, const Entity::Type& player);
 
 		// Standard enemy moving function
 		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
