@@ -397,6 +397,13 @@ namespace NIKE {
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+            // Check target type (currently for enemy SFX)
+            const auto& target_entity_tags = NIKE_METADATA_SERVICE->getEntityTags(target);
+            if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
+            {
+                // Temporary hardcoded SFX
+                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
+            }
 
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
