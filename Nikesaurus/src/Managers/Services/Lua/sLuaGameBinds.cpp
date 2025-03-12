@@ -420,7 +420,7 @@ namespace NIKE {
             if (health_comp) {
                 health_comp.value().get().invulnerable_flag = enable;
                 if (health_comp.value().get().invulnerable_flag) {
-                    cout << "Player god mode enabled" << endl;
+                    cout    << "Player god mode enabled" << endl;
                 }
                 else {
                     cout << "Player god mode disabled" << endl;
