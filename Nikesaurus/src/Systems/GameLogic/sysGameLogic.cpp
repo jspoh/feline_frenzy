@@ -349,7 +349,7 @@ namespace NIKE {
 		// Get current scene
 		std::string current_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
 
-		auto const& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(enemy_entity);
+		// auto const& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(enemy_entity);
 		// Spawn boss when only in level 2_2
 		// (Not sure how can i remove this scene check, can be optmizxed?
 		if (current_scene == "lvl2_2.scn") {
