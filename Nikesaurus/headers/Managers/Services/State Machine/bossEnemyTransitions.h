@@ -25,6 +25,14 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
+		class BossIdleToBossChase : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
 		class BossIdleToBossDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
@@ -44,7 +52,34 @@ namespace NIKE {
 			std::shared_ptr<StateMachine::Istate> getNextState() const override;
 		};
 
+		class BossAttackToBossChase : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
 		class BossAttackToBossDeath : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		/****************************
+		* Boss Chase Transitions
+		*****************************/
+		class BossChaseToBossAttack : public StateMachine::Itransition {
+			// Determines if the transition to the next state is valid.
+			bool isValid(Entity::Type& entity) const override;
+
+			// Returns the state that should be transitioned to, if valid.
+			std::shared_ptr<StateMachine::Istate> getNextState() const override;
+		};
+
+		class BossChaseToBossDeath : public StateMachine::Itransition {
 			// Determines if the transition to the next state is valid.
 			bool isValid(Entity::Type& entity) const override;
 

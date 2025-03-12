@@ -81,7 +81,7 @@ namespace NIKE {
                                     //float& source_intensity = source_render_comp.value().get().intensity;
                                     Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    float target_alpha = withinRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
+                                    float target_alpha = isWithinWorldRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
                                     float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
                                     // Smoothly interpolate alpha
@@ -91,7 +91,7 @@ namespace NIKE {
                                     source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
 
                                     // Player Element Swapping
-                                    if (withinRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                    if (isWithinWorldRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
                                         changeElement(other_entity, entity);
                                         if (e_sfx_comp.has_value()) {
                                             e_sfx_comp.value().get().b_play_sfx = true;
@@ -135,7 +135,52 @@ namespace NIKE {
             }
         }
 
-        void flipX(Entity::Type& entity, bool yes_or_no)
+        void animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y)
+        {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+            if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+                auto& e_animate = e_animate_comp.value().get();
+                auto& e_base = e_base_comp.value().get();
+
+                //Boolean to check for changes
+                bool changed = false;
+
+                //Save prev start
+                static Vector2i prev_start = e_animate.start_index;
+
+                //Change animation
+                if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
+                    e_animate.start_index.x = start_x;
+                    e_animate.start_index.y = start_y;
+                    prev_start = e_animate.start_index;
+
+                    changed = true;
+                }
+
+                //Save prev end
+                static Vector2i prev_end = e_animate.end_index;
+
+                //Change animation
+                if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
+                    e_animate.end_index.x = end_x;
+                    e_animate.end_index.y = end_y;
+                    prev_end = e_animate.end_index;
+
+                    changed = true;
+                }
+
+                //If variables changed
+                if (changed) {
+
+                    //Restart animation
+                    e_base.animations_to_complete = 0;
+                    e_base.animation_mode = Animation::Mode::RESTART;
+                }
+            }
+        }
+
+        void flipX(Entity::Type const& entity, bool yes_or_no)
         {
             auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
             if (e_texture_comp.has_value()) {
@@ -146,7 +191,7 @@ namespace NIKE {
             }
         }
 
-        void flipY(Entity::Type& entity, bool yes_or_no)
+        void flipY(Entity::Type const& entity, bool yes_or_no)
         {
             auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
             if (e_texture_comp.has_value()) {
@@ -157,7 +202,7 @@ namespace NIKE {
             }
         }
 
-        void setLastDirection(Entity::Type& entity, int dir)
+        void setLastDirection(Entity::Type const& entity, int dir)
         {
             auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
             if (e_physics_comp.has_value()) {
@@ -165,7 +210,7 @@ namespace NIKE {
             }
         }
 
-        int getLastDirection(Entity::Type& entity)
+        int getLastDirection(Entity::Type const& entity)
         {
             auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
             if (e_physics_comp.has_value()) {
@@ -352,6 +397,13 @@ namespace NIKE {
             target_health.health -= (attacker_damage * multiplier);
             NIKEE_CORE_INFO("Entity {} took {} damage from Entity {}. Remaining health: {}",
                 target, attacker_damage, attacker, target_health.health);
+            // Check target type (currently for enemy SFX)
+            const auto& target_entity_tags = NIKE_METADATA_SERVICE->getEntityTags(target);
+            if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
+            {
+                // Temporary hardcoded SFX
+                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
+            }
 
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
@@ -429,7 +481,7 @@ namespace NIKE {
         }
 
 
-        bool withinRange(Entity::Type source, Entity::Type player) {
+        bool isWithinWorldRange(Entity::Type source, Entity::Type player) {
             // Get player transform
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
             Vector2f player_pos = player_transform_comp.value().get().position;

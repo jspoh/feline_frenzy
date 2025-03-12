@@ -16,8 +16,25 @@
  // Transitions
 #include "Managers/Services/State Machine/bossEnemyTransitions.h"
 #include "Managers/Services/State Machine/destructableTransitions.h"
+#include "Managers/Services/State Machine/enemyStates.h"
 
 namespace NIKE {
+
+	/*******************************
+	* Utility functions
+	*****************************/
+
+	// Lookup table to take the correct spritesheet
+	std::unordered_map<std::string, std::string> state_to_spritesheet = {
+		{"BossIdle", "Boss_Idle"},
+		{"BossAttack", "Boss_Attack"}
+	};
+
+	std::string NIKE::State::getSpriteSheet(const std::string& fsm_state, const std::string& element, const std::string& asset_type)
+	{
+		return state_to_spritesheet[fsm_state] + "_" + element + asset_type;
+	}
+
 	/*******************************
 	* Boss Idle State functions
 	*****************************/
@@ -26,6 +43,7 @@ namespace NIKE {
 	{
 		// Add transitions here
 		addTransition("BossIdleToBossAttack", std::make_shared<Transition::BossIdleToBossAttack>());
+		addTransition("BossIdleToBossChase", std::make_shared<Transition::BossIdleToBossChase>());
 		addTransition("BossIdleToBossDeath", std::make_shared<Transition::BossIdleToBossDeath>());
 	}
 
@@ -41,6 +59,12 @@ namespace NIKE {
 	void State::BossIdleState::onUpdate([[maybe_unused]] Entity::Type& entity)
 	{
 		// cout << "update Idle State" << endl;
+		//auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		//if (e_enemy_dyna.has_value())
+		//{
+		//	// Force Stop boss from moving when idle
+		//	e_enemy_dyna.value().get().velocity = { 0,0 };
+		//}
 	}
 
 	void State::BossIdleState::onExit([[maybe_unused]] Entity::Type& entity)
@@ -61,6 +85,7 @@ namespace NIKE {
 	{
 		// Add transitions here
 		addTransition("BossAttackToBossIdle", std::make_shared<Transition::BossAttackToBossIdle>());
+		addTransition("BossAttackToBossChase", std::make_shared<Transition::BossAttackToBossChase>());
 		addTransition("BossAttackToBossDeath", std::make_shared<Transition::BossAttackToBossDeath>());
 	}
 
@@ -131,6 +156,96 @@ namespace NIKE {
 	{
 	}
 
+	void State::BossAttackState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
+	{
+		// Ensure entities exist and handle the collision
+		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
+			Interaction::handleCollision(event->entity_a, event->entity_b);
+		}
+	}
+
+	/*******************************
+	* Boss Chase State functions
+	*****************************/
+
+	State::BossChaseState::BossChaseState() : cell_offset{ 15.0f }, boss_speed{ 800.0f }
+	{
+		// Add transitions here
+		addTransition("BossChaseToBossAttack", std::make_shared<Transition::BossIdleToBossAttack>());
+		addTransition("BossChaseToBossDeath", std::make_shared<Transition::BossIdleToBossDeath>());
+	}
+
+	void State::BossChaseState::onEnter([[maybe_unused]] Entity::Type& entity)
+	{
+		//cout << "enter idle state" << endl;
+		//if (!checkTransitionExist("IdleToAttack"))
+		//{
+		//	addTransition("IdleToAttack", std::make_shared<Transition::IdleToAttack>());
+		//}
+	}
+
+	void State::BossChaseState::onUpdate([[maybe_unused]] Entity::Type& entity)
+	{
+		if (NIKE_METADATA_SERVICE->getEntitiesByTag("player").empty())
+		{
+			// Stop SFX when walking
+			auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+			if (e_audio_comp.has_value())
+			{
+				playSFX(entity, false);
+			}
+		}
+
+		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player"))
+		{
+			// Getting components from player and enemy entities
+			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
+
+			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+			auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+			auto e_enemy_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+			auto e_animation = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+
+			if (e_enemy_transform.has_value() && e_player_game_logic.has_value() && e_player_transform.has_value() && e_enemy_dyna.has_value()
+				&& e_enemy_health.has_value() && e_animation.has_value())
+			{
+				auto& player_transform = e_player_transform.value().get();
+
+				// Get enemy position as starting cell
+				auto end = NIKE_MAP_SERVICE->getCellIndexFromCords(player_transform.position);
+				if (!end.has_value()) return;
+
+				// Move the entity along the computed path
+				Enemy::moveAlongPath(entity, end.value().x, end.value().y, boss_speed, cell_offset);
+				// Play SFX when walking
+				auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+				if (e_audio_comp.has_value())
+				{
+					playSFX(entity, true);
+				}
+			}
+
+
+			// Update animation based on movement direction
+			//if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
+			//	float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
+			//	updateEnemyChaseAnimation(entity, dir);
+			//}
+
+		}
+	}
+
+	void State::BossChaseState::onExit([[maybe_unused]] Entity::Type& entity)
+	{
+		//cout << "exit idle state" << endl;
+		// removeTransition("IdleToAttack");
+	}
+
+	void State::BossChaseState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
+	{
+	}
+
 	/*******************************
 	* Boss Death State functions
 	*****************************/
@@ -151,8 +266,8 @@ namespace NIKE {
 		}
 
 		// Play EnemyDeathState animation
-		animationSet(entity, 0, 8, 10, 8);
-		flipX(entity, false);
+		Interaction::animationSet(entity, 0, 8, 10, 8);
+		Interaction::flipX(entity, false);
 		playSFX(entity, true);
 	}
 

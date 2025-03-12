@@ -8,6 +8,7 @@
 
 #include "Core/stdafx.h"
 #include "Systems/GameLogic/sysGameLogic.h"
+#include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
 namespace NIKE {
@@ -64,102 +65,6 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::flipX(Entity::Type const& entity, bool flip)
-	{
-		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-		if (e_texture_comp.has_value()) {
-			if (e_texture_comp.value().get().b_flip.x != flip)
-			{
-				e_texture_comp.value().get().b_flip.x = flip;
-			}
-		}
-	}
-
-	void GameLogic::Manager::flipY(Entity::Type const& entity, bool flip)
-	{
-		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-		if (e_texture_comp.has_value()) {
-			if (e_texture_comp.value().get().b_flip.y != flip)
-			{
-				e_texture_comp.value().get().b_flip.y = flip;
-			}
-		}
-	}
-
-	void GameLogic::Manager::animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y)
-	{
-		auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-		auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		if (e_animate_comp.has_value() && e_base_comp.has_value()) {
-			auto& e_animate = e_animate_comp.value().get();
-			auto& e_base = e_base_comp.value().get();
-
-			//Boolean to check for changes
-			bool changed = false;
-
-			//Save prev start
-			static Vector2i prev_start = e_animate.start_index;
-
-			//Change animation
-			if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
-				e_animate.start_index.x = start_x;
-				e_animate.start_index.y = start_y;
-				prev_start = e_animate.start_index;
-
-				changed = true;
-			}
-
-			//Save prev end
-			static Vector2i prev_end = e_animate.end_index;
-
-			//Change animation
-			if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
-				e_animate.end_index.x = end_x;
-				e_animate.end_index.y = end_y;
-				prev_end = e_animate.end_index;
-
-				changed = true;
-			}
-
-			//If variables changed
-			if (changed) {
-
-				//Restart animation
-				e_base.animations_to_complete = 0;
-				e_base.animation_mode = Animation::Mode::RESTART;
-			}
-		}
-	}
-
-	bool GameLogic::Manager::withinRange(Entity::Type source, Entity::Type player) {
-		// Get player transform
-		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		Vector2f player_pos = player_transform_comp.value().get().position;
-		Vector2f player_scale = player_transform_comp.value().get().scale;
-
-		// Get source transform
-		auto source_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(source);
-		Vector2f source_pos = source_transform_comp.value().get().position;
-		Vector2f source_scale = source_transform_comp.value().get().scale;
-
-		// Set source range
-		float source_range = 1;
-
-		// Calculations
-		float avg_scale_x = (source_scale.x + player_scale.x) / 2;
-		float avg_scale_y = (source_scale.y + player_scale.y) / 2;
-
-		float dist_x = (source_pos.x - player_pos.x) / avg_scale_x;
-		float dist_y = (source_pos.y - player_pos.y) / avg_scale_y;
-
-		float distance = (dist_x * dist_x) + (dist_y * dist_y);
-
-		//NIKEE_CORE_INFO("Distance = {}, source Range = {}", distance, source_range);
-
-		// It is recommended to use source_range^2, but it's probably easier this way
-		return distance < source_range;
-	}
-
 	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
 		for (const Entity::Type& vent : vents_entities) {
 			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
@@ -173,12 +78,12 @@ namespace NIKE {
 				entity_texture.value().get().frame_index = { 0, 0 };
 
 				// Set Animation
-				animationSet(vent, 0, 0, 4, 0);
-				flipX(vent, false);
+				Interaction::animationSet(vent, 0, 0, 4, 0);
+				Interaction::flipX(vent, false);
 
 				// Check player interaction
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-					if (withinRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
 						// Handle change scene 
 						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
 						{
@@ -342,7 +247,6 @@ namespace NIKE {
 					// Check if player tag exists
 					std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
-
 					// Elemental UI 
 					for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
 						// If player not dead
@@ -434,14 +338,36 @@ namespace NIKE {
 		// Create enemy entity
 		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
-		// Load entity from prefab
-		std::string chosen_enemy = enemyArr[getRandomNumber(0, 3)];
-		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
-
 		// When enemy spwan from spawner, set the tag to enemy
-		if(NIKE_METADATA_SERVICE->isTagValid("enemy")){
+		if(NIKE_METADATA_SERVICE->isTagValid("enemy") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
+
+		// Spawn normal enemy when only enemy tag exist
+		std::string chosen_enemy{};
+
+		// Get current scene
+		std::string current_scene = NIKE_SCENES_SERVICE->getCurrSceneID();
+
+		// auto const& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(enemy_entity);
+		// Spawn boss when only in level 2_2
+		// (Not sure how can i remove this scene check, can be optmizxed?
+		if (current_scene == "lvl2_2.scn") {
+			chosen_enemy = enemyBossArr[getRandomNumber(0, 2)];
+			// When enemy spwan from spawner, give boss tag
+			if (NIKE_METADATA_SERVICE->isTagValid("boss") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)) {
+				NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "boss");
+			}
+		}
+		else
+		{
+			chosen_enemy = enemyArr[getRandomNumber(0, 3)];
+		}
+
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
+
 
 		// Randomly offset from spawner position		
 		float offset_x = getRandomNumber(-20.f, 20.f);

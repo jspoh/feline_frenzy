@@ -34,8 +34,8 @@ namespace NIKE {
         // Spawn Heal Animation
         void spawnHealAnimation(Entity::Type player);
 
-        // Check if player is within range
-        bool withinRange(Entity::Type source, Entity::Type player);
+        // For world-space calculation
+        bool isWithinWorldRange(Entity::Type source, Entity::Type player);
 
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
         // Play SFX once
@@ -44,10 +44,11 @@ namespace NIKE {
         /***********************
         * Animation handling
         ************************/
-        void flipX(Entity::Type& entity, bool yes_or_no);
-        void flipY(Entity::Type& entity, bool yes_or_no);
-        void setLastDirection(Entity::Type& entity, int dir);
-        int getLastDirection(Entity::Type& entity);
+        void animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y);
+        void flipX(Entity::Type const& entity, bool yes_or_no);
+        void flipY(Entity::Type const& entity, bool yes_or_no);
+        void setLastDirection(Entity::Type const& entity, int dir);
+        int getLastDirection(Entity::Type const& entity);
 
         class Manager : 
             public System::ISystem {

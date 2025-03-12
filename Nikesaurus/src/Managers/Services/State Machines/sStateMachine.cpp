@@ -40,91 +40,6 @@ namespace NIKE {
 			return (transitions.find(transition_id) != transitions.end());
 		}
 
-		void Istate::animationSet(Entity::Type& entity, int start_x, int start_y, int end_x, int end_y)
-		{
-			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-			auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-			if (e_animate_comp.has_value() && e_base_comp.has_value()) {
-				auto& e_animate = e_animate_comp.value().get();
-				auto& e_base = e_base_comp.value().get();
-
-				//Boolean to check for changes
-				bool changed = false;
-
-				//Save prev start
-				static Vector2i prev_start = e_animate.start_index;
-
-				//Change animation
-				if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
-					e_animate.start_index.x = start_x;
-					e_animate.start_index.y = start_y;
-					prev_start = e_animate.start_index;
-
-					changed = true;
-				}
-
-				//Save prev end
-				static Vector2i prev_end = e_animate.end_index;
-
-				//Change animation
-				if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
-					e_animate.end_index.x = end_x;
-					e_animate.end_index.y = end_y;
-					prev_end = e_animate.end_index;
-
-					changed = true;
-				}
-
-				//If variables changed
-				if (changed) {
-
-					//Restart animation
-					e_base.animations_to_complete = 0;
-					e_base.animation_mode = Animation::Mode::RESTART;
-				}
-			}
-		}
-
-		void Istate::flipX(Entity::Type& entity, bool yes_or_no)
-		{
-			auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-			if (e_texture_comp.has_value()) {
-				if (e_texture_comp.value().get().b_flip.x != yes_or_no)
-				{
-					e_texture_comp.value().get().b_flip.x = yes_or_no;
-				}
-			}
-		}
-
-		void Istate::flipY(Entity::Type& entity, bool yes_or_no)
-		{
-			auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-			if (e_texture_comp.has_value()) {
-				if (e_texture_comp.value().get().b_flip.y != yes_or_no)
-				{
-					e_texture_comp.value().get().b_flip.y = yes_or_no;
-				}
-			}
-		}
-
-		void Istate::setLastDirection(Entity::Type& entity, int dir)
-		{
-			auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-			if (e_physics_comp.has_value()) {
-				e_physics_comp.value().get().last_direction = dir;
-			}
-		}
-
-		int Istate::getLastDirection(Entity::Type& entity)
-		{
-			auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-			if (e_physics_comp.has_value()) {
-				return e_physics_comp.value().get().last_direction;
-			}
-			// Return a rand value when cnt retrieve last dir
-			return INT_MAX;
-		}
-
 		void Service::changeState(std::shared_ptr<Istate> new_state, Entity::Type& entity)
 		{
 
@@ -203,6 +118,7 @@ namespace NIKE {
 			// Register boss enemy states
 			registerState("BossIdle", std::make_shared<State::BossIdleState>());
 			registerState("BossAttack", std::make_shared<State::BossAttackState>());
+			registerState("BossChase", std::make_shared<State::BossChaseState>());
 			registerState("BossDeath", std::make_shared<State::BossDeathState>());
 
 			// Register destructable states
