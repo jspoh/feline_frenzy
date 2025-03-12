@@ -121,21 +121,11 @@ namespace NIKE {
 			}
 		}
 
-#ifndef NDEBUG
-		//Setup show cursor
-		if (!NIKE_LVLEDITOR_SERVICE->getGameState()) {
-			NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
-		}
-		else {
-			NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_HIDDEN);
-		}
-#endif
-
+		//Render custom cursor
 		NIKE_RENDER_SERVICE->renderCursor(NIKE_INPUT_SERVICE->getCrosshair(), NIKE_INPUT_SERVICE->getCursorEntererd());
 
 		//Complete rendering process
 		NIKE_RENDER_SERVICE->completeRender();
-
 
 		// Render FPS
 		{
