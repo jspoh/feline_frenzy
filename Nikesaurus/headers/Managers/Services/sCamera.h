@@ -59,7 +59,7 @@ namespace NIKE {
 			*********************************************************************/
 
 			//Get matrix
-			Matrix_33 getWorldToNDCXform() const;
+			Matrix_33 getWorldToNDCXform(bool mouse_effect = true) const;
 
 			//Get fixed world
 			Matrix_33 getFixedWorldToNDCXform() const;

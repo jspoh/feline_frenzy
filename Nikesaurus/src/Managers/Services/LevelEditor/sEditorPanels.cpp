@@ -6784,8 +6784,12 @@ namespace NIKE {
 
 		window_is_selected = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
 
+		//Account for gaps between game viewport and game window
+		auto gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		gaps /= 2.0f;
+
 		//Calculate world mouse position
-		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x, (io.MousePos.y - window_pos.y) * scale.y };
+		world_mouse_pos = { (io.MousePos.x - window_pos.x - gaps.x) * scale.x, (io.MousePos.y - window_pos.y - gaps.y) * scale.y };
 		world_mouse_pos.x = world_mouse_pos.x - ((viewport_width * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
 		world_mouse_pos.y = -(world_mouse_pos.y - ((viewport_height * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y);
 
@@ -6796,10 +6800,9 @@ namespace NIKE {
 		window_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x , (io.MousePos.y - window_pos.y) * scale.y };
 
 		//Calculate UV coordinates for cropping when there are gaps
-		Vector2f gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
-		float u_min = gaps.x / 2.0f / win_size.x;
+		float u_min = 0.0f;
 		float u_max = 1.0f - u_min;
-		float v_min = gaps.y / 2.0f / win_size.y;
+		float v_min = 0.0f;
 		float v_max = 1.0f - v_min;
 
 		//Configure UV Offsets
