@@ -200,27 +200,27 @@ namespace NIKE {
 
 	void State::EnemyAttackState::updateEnemyAttackAnimation([[maybe_unused]] Entity::Type& entity)
 	{
-		int get_last_direction = getLastDirection(entity);
+		int get_last_direction = Interaction::getLastDirection(entity);
 		if (get_last_direction == 0)
 		{
 			// Attack right
-			animationSet(entity, 0, 5, 5, 5);
-			flipX(entity, false);
+			Interaction::animationSet(entity, 0, 5, 5, 5);
+			Interaction::flipX(entity, false);
 		}
 		else if (get_last_direction == 2) {
 			// Attack up
-			animationSet(entity, 0, 7, 5, 7);
-			flipX(entity, false);
+			Interaction::animationSet(entity, 0, 7, 5, 7);
+			Interaction::flipX(entity, false);
 		}
 		else if (get_last_direction == 5) {
 			// Attack down
-			animationSet(entity, 0, 4, 5, 4);
-			flipX(entity, false);
+			Interaction::animationSet(entity, 0, 4, 5, 4);
+			Interaction::flipX(entity, false);
 		}
 		else {
 			// Attack left
-			animationSet(entity, 0, 5, 5, 5);
-			flipX(entity, true);
+			Interaction::animationSet(entity, 0, 5, 5, 5);
+			Interaction::flipX(entity, true);
 		}
 	}
 
@@ -332,51 +332,51 @@ namespace NIKE {
 	{
 		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 			// Moving right
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, false);
-			setLastDirection(entity, 0);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 0);
 		}
 		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
 			// Moving up-right (diagonal)
-			animationSet(entity, 0, 2, 9, 2);
-			flipX(entity, false);
-			setLastDirection(entity, 1);
+			Interaction::animationSet(entity, 0, 2, 9, 2);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 1);
 		}
 		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Moving up
-			animationSet(entity, 0, 3, 9, 3);
-			flipX(entity, false);
-			setLastDirection(entity, 2);
+			Interaction::animationSet(entity, 0, 3, 9, 3);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 2);
 		}
 		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
 			// Moving up-left (diagonal)
-			animationSet(entity, 0, 2, 9, 2);
-			flipX(entity, true);
-			setLastDirection(entity, 3);
+			Interaction::animationSet(entity, 0, 2, 9, 2);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 3);
 		}
 		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
 			// Moving down-right (diagonal)
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, false);
-			setLastDirection(entity, 4);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 4);
 		}
 		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Moving down
-			animationSet(entity, 0, 0, 9, 0);
-			flipX(entity, false);
-			setLastDirection(entity, 5);
+			Interaction::animationSet(entity, 0, 0, 9, 0);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 5);
 		}
 		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
 			// Moving down-left (diagonal)
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, true);
-			setLastDirection(entity, 6);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 6);
 		}
 		else {
 			// Moving left
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, true);
-			setLastDirection(entity, 7);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 7);
 		}
 	}
 
@@ -398,9 +398,9 @@ namespace NIKE {
 		}
 
 		// Play EnemyDeathState animation
-		animationSet(entity, 0, 8, 10, 8);
-		flipX(entity, false);
-		playSFX(entity, true);
+		Interaction::animationSet(entity, 0, 8, 10, 8);
+		Interaction::flipX(entity, false);
+		Interaction::playSFX(entity, true);
 	}
 	void State::EnemyDeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
 
