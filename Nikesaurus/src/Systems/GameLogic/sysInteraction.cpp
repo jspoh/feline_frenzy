@@ -135,7 +135,52 @@ namespace NIKE {
             }
         }
 
-        void flipX(Entity::Type& entity, bool yes_or_no)
+        void animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y)
+        {
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+            auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+            if (e_animate_comp.has_value() && e_base_comp.has_value()) {
+                auto& e_animate = e_animate_comp.value().get();
+                auto& e_base = e_base_comp.value().get();
+
+                //Boolean to check for changes
+                bool changed = false;
+
+                //Save prev start
+                static Vector2i prev_start = e_animate.start_index;
+
+                //Change animation
+                if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
+                    e_animate.start_index.x = start_x;
+                    e_animate.start_index.y = start_y;
+                    prev_start = e_animate.start_index;
+
+                    changed = true;
+                }
+
+                //Save prev end
+                static Vector2i prev_end = e_animate.end_index;
+
+                //Change animation
+                if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
+                    e_animate.end_index.x = end_x;
+                    e_animate.end_index.y = end_y;
+                    prev_end = e_animate.end_index;
+
+                    changed = true;
+                }
+
+                //If variables changed
+                if (changed) {
+
+                    //Restart animation
+                    e_base.animations_to_complete = 0;
+                    e_base.animation_mode = Animation::Mode::RESTART;
+                }
+            }
+        }
+
+        void flipX(Entity::Type const& entity, bool yes_or_no)
         {
             auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
             if (e_texture_comp.has_value()) {
@@ -146,7 +191,7 @@ namespace NIKE {
             }
         }
 
-        void flipY(Entity::Type& entity, bool yes_or_no)
+        void flipY(Entity::Type const& entity, bool yes_or_no)
         {
             auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
             if (e_texture_comp.has_value()) {
@@ -157,7 +202,7 @@ namespace NIKE {
             }
         }
 
-        void setLastDirection(Entity::Type& entity, int dir)
+        void setLastDirection(Entity::Type const& entity, int dir)
         {
             auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
             if (e_physics_comp.has_value()) {
@@ -165,7 +210,7 @@ namespace NIKE {
             }
         }
 
-        int getLastDirection(Entity::Type& entity)
+        int getLastDirection(Entity::Type const& entity)
         {
             auto e_physics_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
             if (e_physics_comp.has_value()) {

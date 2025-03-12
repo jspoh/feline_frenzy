@@ -913,7 +913,7 @@
                                             "y": 0.0,
                                             "z": 0.0
                                         },
-                                        "Texture_ID": "Barrel_highlighted.png"
+                                        "Texture_ID": "Chest_highlighted.png"
                                     },
                                     "State::State": {
                                         "State": "Default"
@@ -921,7 +921,11 @@
                                     "Transform::Transform": {
                                         "Position": {
                                             "x": 607.8994750976563,
-                                            "y": -108.2713623046875
+                                            "y": -161.64007568359375
+                                        },
+                                        "Scale": {
+                                            "x": 209.99998474121094,
+                                            "y": 209.99998474121094
                                         }
                                     }
                                 },
@@ -1637,13 +1641,18 @@
                                             "x": 0.0,
                                             "y": 0.0,
                                             "z": 0.0
-                                        }
+                                        },
+                                        "Texture_ID": "Chest_highlighted.png"
                                     },
                                     "State::State": null,
                                     "Transform::Transform": {
                                         "Position": {
                                             "x": -903.4775390625,
                                             "y": -833.6163330078125
+                                        },
+                                        "Scale": {
+                                            "x": 209.99998474121094,
+                                            "y": 209.99998474121094
                                         }
                                     }
                                 },
@@ -1714,20 +1723,20 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Barrel_highlighted.png"
+                                "Texture_ID": "Chest_highlighted.png"
                             },
                             "State::State": {
                                 "State": "Default"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -639.1051025390625,
-                                    "y": 725.50341796875
+                                    "x": -603.52587890625,
+                                    "y": 716.608642578125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 255.99996948242188,
-                                    "y": 255.99996948242188
+                                    "x": 209.99998474121094,
+                                    "y": 209.99998474121094
                                 },
                                 "Screen Position": false
                             }
@@ -2096,6 +2105,108 @@
                             "Tags": [
                                 "elementui"
                             ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Door_side.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -4.4625244140625,
+                                    "y": -960.931884765625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 512.0,
+                                    "y": 256.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 3,
+                            "Name": "Door_Side",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Door_front.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -4.4625244140625,
+                                    "y": 887.095458984375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 512.0,
+                                    "y": 256.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 4,
+                            "Name": "Door_Front",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 }

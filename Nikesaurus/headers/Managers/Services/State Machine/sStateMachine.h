@@ -49,15 +49,6 @@ namespace NIKE {
             void removeTransition(const std::string& transition_id);
             bool checkTransitionExist(const std::string& transition_id);
 
-            /***********************
-            * Animation handling
-            ************************/
-            void animationSet(Entity::Type& entity, int start_x, int start_y, int end_x, int end_y);
-            void flipX(Entity::Type& entity, bool yes_or_no);
-            void flipY(Entity::Type& entity, bool yes_or_no);
-            void setLastDirection(Entity::Type& entity, int dir);
-            int getLastDirection(Entity::Type& entity);
-
             virtual void playSFX(Entity::Type& entity, bool play_or_false) = 0;
 
         private:

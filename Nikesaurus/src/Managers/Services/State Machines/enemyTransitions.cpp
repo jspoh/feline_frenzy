@@ -48,10 +48,13 @@ namespace NIKE {
 	{
 		const auto& entity_tags = NIKE_METADATA_SERVICE->getEntityTags(entity);
 
+		// Find both boss and enemy tag, boss will have enemy tag to register for the game win overlay
 		if (entity_tags.find("enemy") != entity_tags.end() && entity_tags.find("boss") != entity_tags.end())
 		{
 			return true;
 		}
+
+		return false;
 	}
 
 

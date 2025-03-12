@@ -8,6 +8,7 @@
 
 #include "Core/stdafx.h"
 #include "Systems/GameLogic/sysGameLogic.h"
+#include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
 namespace NIKE {
@@ -64,73 +65,6 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::flipX(Entity::Type const& entity, bool flip)
-	{
-		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-		if (e_texture_comp.has_value()) {
-			if (e_texture_comp.value().get().b_flip.x != flip)
-			{
-				e_texture_comp.value().get().b_flip.x = flip;
-			}
-		}
-	}
-
-	void GameLogic::Manager::flipY(Entity::Type const& entity, bool flip)
-	{
-		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-		if (e_texture_comp.has_value()) {
-			if (e_texture_comp.value().get().b_flip.y != flip)
-			{
-				e_texture_comp.value().get().b_flip.y = flip;
-			}
-		}
-	}
-
-	void GameLogic::Manager::animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y)
-	{
-		auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-		auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		if (e_animate_comp.has_value() && e_base_comp.has_value()) {
-			auto& e_animate = e_animate_comp.value().get();
-			auto& e_base = e_base_comp.value().get();
-
-			//Boolean to check for changes
-			bool changed = false;
-
-			//Save prev start
-			static Vector2i prev_start = e_animate.start_index;
-
-			//Change animation
-			if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
-				e_animate.start_index.x = start_x;
-				e_animate.start_index.y = start_y;
-				prev_start = e_animate.start_index;
-
-				changed = true;
-			}
-
-			//Save prev end
-			static Vector2i prev_end = e_animate.end_index;
-
-			//Change animation
-			if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
-				e_animate.end_index.x = end_x;
-				e_animate.end_index.y = end_y;
-				prev_end = e_animate.end_index;
-
-				changed = true;
-			}
-
-			//If variables changed
-			if (changed) {
-
-				//Restart animation
-				e_base.animations_to_complete = 0;
-				e_base.animation_mode = Animation::Mode::RESTART;
-			}
-		}
-	}
-
 	bool GameLogic::Manager::withinRange(Entity::Type source, Entity::Type player) {
 		// Get player transform
 		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
@@ -173,8 +107,8 @@ namespace NIKE {
 				entity_texture.value().get().frame_index = { 0, 0 };
 
 				// Set Animation
-				animationSet(vent, 0, 0, 4, 0);
-				flipX(vent, false);
+				Interaction::animationSet(vent, 0, 0, 4, 0);
+				Interaction::flipX(vent, false);
 
 				// Check player interaction
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
