@@ -17,8 +17,8 @@
 namespace NIKE {
 	// Define the global volume variables.
 	namespace Audio {
-		float gGlobalBGMVolume = 1.0f;  // Default volume for BGM (range 0.0 - 1.0)
-		float gGlobalSFXVolume = 1.0f;  // Default volume for SFX (range 0.0 - 1.0)
+		float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
+		float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
 	}
 
 	/*****************************************************************//**

@@ -365,6 +365,47 @@ namespace NIKE {
         * Audio
         *********************************************************************/
 
+        // Bind slider arrow functions for adjusting global BGM volume.
+        lua_state.set_function("SliderArrowLeft", [&]() {
+            float currentVolume = NIKE::Audio::gGlobalBGMVolume;
+            float newVolume = currentVolume - 0.05f;
+            if (newVolume < 0.0f)
+                newVolume = 0.0f;
+            NIKE_AUDIO_SERVICE->setGlobalVolume(newVolume, NIKE::Audio::gGlobalSFXVolume);
+            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            });
+
+        lua_state.set_function("SliderArrowRight", [&]() {
+            float currentVolume = NIKE::Audio::gGlobalBGMVolume;
+            float newVolume = currentVolume + 0.05f;
+            if (newVolume > 1.0f)
+                newVolume = 1.0f;
+            NIKE_AUDIO_SERVICE->setGlobalVolume(newVolume, NIKE::Audio::gGlobalSFXVolume);
+            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            });
+
+        // SFX slider arrow buttons
+        lua_state.set_function("SfxSliderArrowLeft", [&]() {
+            float currentVolume = NIKE::Audio::gGlobalSFXVolume;
+            float newVolume = currentVolume - 0.05f;
+            if (newVolume < 0.0f)
+                newVolume = 0.0f;
+            NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newVolume);
+            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            });
+
+        lua_state.set_function("SfxSliderArrowRight", [&]() {
+            float currentVolume = NIKE::Audio::gGlobalSFXVolume;
+            float newVolume = currentVolume + 0.05f;
+            if (newVolume > 1.0f)
+                newVolume = 1.0f;
+            NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newVolume);
+            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            });
+
+
+
+
         //Get SFX
         lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
             auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
