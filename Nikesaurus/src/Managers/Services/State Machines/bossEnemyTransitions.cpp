@@ -29,7 +29,7 @@ namespace NIKE {
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and within range of enemy
-				if (Enemy::withinRange(entity, player)) {
+				if (Enemy::isWithinGridRange(entity, player)) {
 					return true;
 				}
 			}
@@ -78,7 +78,7 @@ namespace NIKE {
 			if (e_player_comp.has_value())
 			{
 				// If entity has the gamelogic::ilogic component, and not within range of enemy
-				if (!Enemy::withinRange(entity, player)) {
+				if (!Enemy::isWithinGridRange(entity, player)) {
 					return true;
 				}
 			}

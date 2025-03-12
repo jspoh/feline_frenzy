@@ -81,7 +81,7 @@ namespace NIKE {
                                     //float& source_intensity = source_render_comp.value().get().intensity;
                                     Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    float target_alpha = withinRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
+                                    float target_alpha = isWithinWorldRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
                                     float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
                                     // Smoothly interpolate alpha
@@ -91,7 +91,7 @@ namespace NIKE {
                                     source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
 
                                     // Player Element Swapping
-                                    if (withinRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                    if (isWithinWorldRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
                                         changeElement(other_entity, entity);
                                         if (e_sfx_comp.has_value()) {
                                             e_sfx_comp.value().get().b_play_sfx = true;
@@ -474,7 +474,7 @@ namespace NIKE {
         }
 
 
-        bool withinRange(Entity::Type source, Entity::Type player) {
+        bool isWithinWorldRange(Entity::Type source, Entity::Type player) {
             // Get player transform
             auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
             Vector2f player_pos = player_transform_comp.value().get().position;

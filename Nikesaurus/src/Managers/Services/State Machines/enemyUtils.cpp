@@ -115,7 +115,7 @@ namespace NIKE {
 		}
 	}
 
-	bool Enemy::withinRange(const Entity::Type& enemy, const Entity::Type& player) {
+	bool Enemy::isWithinGridRange(const Entity::Type& enemy, const Entity::Type& player) {
 		// Get player transform
 		const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 		// Get enemy transform

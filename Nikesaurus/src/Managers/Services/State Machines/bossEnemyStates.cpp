@@ -131,6 +131,14 @@ namespace NIKE {
 	{
 	}
 
+	void State::BossAttackState::onEvent(std::shared_ptr<Physics::CollisionEvent> event)
+	{
+		// Ensure entities exist and handle the collision
+		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
+			Interaction::handleCollision(event->entity_a, event->entity_b);
+		}
+	}
+
 	/*******************************
 	* Boss Death State functions
 	*****************************/

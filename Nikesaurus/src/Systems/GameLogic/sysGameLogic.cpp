@@ -65,35 +65,6 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	bool GameLogic::Manager::withinRange(Entity::Type source, Entity::Type player) {
-		// Get player transform
-		auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-		Vector2f player_pos = player_transform_comp.value().get().position;
-		Vector2f player_scale = player_transform_comp.value().get().scale;
-
-		// Get source transform
-		auto source_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(source);
-		Vector2f source_pos = source_transform_comp.value().get().position;
-		Vector2f source_scale = source_transform_comp.value().get().scale;
-
-		// Set source range
-		float source_range = 1;
-
-		// Calculations
-		float avg_scale_x = (source_scale.x + player_scale.x) / 2;
-		float avg_scale_y = (source_scale.y + player_scale.y) / 2;
-
-		float dist_x = (source_pos.x - player_pos.x) / avg_scale_x;
-		float dist_y = (source_pos.y - player_pos.y) / avg_scale_y;
-
-		float distance = (dist_x * dist_x) + (dist_y * dist_y);
-
-		//NIKEE_CORE_INFO("Distance = {}, source Range = {}", distance, source_range);
-
-		// It is recommended to use source_range^2, but it's probably easier this way
-		return distance < source_range;
-	}
-
 	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
 		for (const Entity::Type& vent : vents_entities) {
 			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
@@ -112,7 +83,7 @@ namespace NIKE {
 
 				// Check player interaction
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-					if (withinRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
 						// Handle change scene 
 						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
 						{

@@ -35,7 +35,7 @@ namespace NIKE {
 
 		};
 
-		class BossAttackState : public StateMachine::Istate
+		class BossAttackState : public StateMachine::Istate, public Events::IEventListener<Physics::CollisionEvent>
 		{
 		public:
 			BossAttackState();
@@ -48,6 +48,9 @@ namespace NIKE {
 			* SFX handling
 			************************/
 			void playSFX(Entity::Type& entity, bool play_or_no) override;
+
+			// Event handling for collisions
+			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
 
