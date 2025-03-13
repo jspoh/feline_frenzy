@@ -276,9 +276,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.1882352977991104,
-                                    "y": 0.48235294222831726,
-                                    "z": 0.8705882430076599
+                                    "x": 0.6627451181411743,
+                                    "y": 0.30588236451148987,
+                                    "z": 0.572549045085907
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -545,9 +545,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.20392157137393951,
-                                    "y": 0.054901961237192154,
-                                    "z": 0.5254902243614197
+                                    "x": 0.9215686321258545,
+                                    "y": 0.45490196347236633,
+                                    "z": 0.250980406999588
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,

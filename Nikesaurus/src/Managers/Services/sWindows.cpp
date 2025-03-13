@@ -576,8 +576,8 @@ namespace NIKE {
 		glBindVertexArray(0);  // Unbind VAO
 		glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind VBO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind EBO
-		glEnable(GL_DEPTH_TEST);  // Re-enable depth testing for 3D scene rendering
-		glEnable(GL_CULL_FACE);  // Re-enable face culling if used
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
 	}
 }
