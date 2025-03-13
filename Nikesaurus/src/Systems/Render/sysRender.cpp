@@ -79,48 +79,92 @@ namespace NIKE {
 					// recalculate offset if child is a gun
 					const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
 					if (child_prefab == "gun_enemy_n.prefab") {
-						// get player world pos
-						auto opt_player_entity = NIKE_METADATA_SERVICE->getEntityByName("player");
 
-						if (!opt_player_entity.has_value()) {
-							NIKEE_CORE_ERROR("Player entity not found");
-							continue;
-						}
+						float angle_rad = M_PI + 1;		// angle from enemy to player
 
-						Entity::Type player_entity = opt_player_entity.value();
+						auto getGunOffset = [&]() {
+							// get player world pos
+							auto opt_player_entity = NIKE_METADATA_SERVICE->getEntityByName("player");
 
-						// get player transform pos
-						auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(player_entity);
-						auto transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-						if (transform_comp == comps.end()) {
-							NIKEE_CORE_ERROR("Player entity missing Transform component");
-							continue;
-						}
-						Transform::Transform& player_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
-						const Vector2f player_pos = player_transform.position;
+							if (!opt_player_entity.has_value()) {
+								NIKEE_CORE_ERROR("Player entity not found");
+								return Vector2f{ 0, 0 };
+							}
 
-						// get current enemy (gun's parent) pos
-						comps = NIKE_ECS_MANAGER->getAllEntityComponents(parent_entity.value());
-						transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-						if (transform_comp == comps.end()) {
-							NIKEE_CORE_ERROR("Parent entity missing Transform component");
-							continue;
-						}
-						Transform::Transform& parent_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
-						const Vector2f parent_pos = parent_transform.position;
+							Entity::Type player_entity = opt_player_entity.value();
 
-						// calculate angle between enemy and player
-						const Vector2f enemy_to_player = parent_pos - player_pos;
-						const float angle_rad = atan2(enemy_to_player.y, enemy_to_player.x);
+							// get player transform pos
+							auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(player_entity);
+							auto transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (transform_comp == comps.end()) {
+								NIKEE_CORE_ERROR("Player entity missing Transform component");
+								return Vector2f{0, 0};
+							}
+							Transform::Transform& player_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
+							const Vector2f player_pos = player_transform.position;
 
-						static constexpr float GUN_DISTANCE = 110.f;
+							// get current enemy (gun's parent) pos
+							if (!parent_entity.has_value()) {
+								return Vector2f{0, 0};
+							}
 
-						// calculate offset for closest point on bounding circle with radius GUM_DISTANCE from enemy to player
-						const Vector2f gun_offset = -Vector2f{ cos(angle_rad), sin(angle_rad) } * GUN_DISTANCE;
+							comps = NIKE_ECS_MANAGER->getAllEntityComponents(parent_entity.value());
+							transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (transform_comp == comps.end()) {
+								NIKEE_CORE_ERROR("Parent entity missing Transform component");
+								return Vector2f{0, 0};
+							}
+							Transform::Transform& parent_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
+							const Vector2f parent_pos = parent_transform.position;
 
-						// modify child transform values
+							// calculate angle between enemy and player
+							const Vector2f enemy_to_player = parent_pos - player_pos;
+							angle_rad = atan2(enemy_to_player.y, enemy_to_player.x);
+
+							static constexpr float GUN_DISTANCE = 110.f;
+
+							// calculate offset for closest point on bounding circle with radius GUM_DISTANCE from enemy to player
+							const Vector2f gun_offset = -Vector2f{ cos(angle_rad), sin(angle_rad) } *GUN_DISTANCE;
+
+							// modify child transform values
+							return gun_offset;
+						};
+
+						const Vector2f gun_offset = getGunOffset();
+
 						if (c_trans.has_value()) {
 							c_trans.value().get().position = gun_offset;
+						}
+
+						// get gun entity components
+						auto gun_comps = NIKE_ECS_MANAGER->getAllEntityComponents(child_entity);
+						auto gun_comp_animation_sprite = gun_comps.find(Utility::convertTypeString(typeid(Animation::Sprite).name()));
+						if (gun_comp_animation_sprite != gun_comps.end()) {
+							// get gun sprite component
+							Animation::Sprite& gun_sprite = *std::static_pointer_cast<Animation::Sprite>(gun_comp_animation_sprite->second);
+
+							// update spritesheet used based on quadrant
+							if (angle_rad > 0 && angle_rad < M_PI_2) {
+								// bottom left quadrant
+								gun_sprite.start_index.y = 1;
+								gun_sprite.end_index.y = 1;
+								// flip texture
+							}
+							else if (angle_rad > M_PI_2 && angle_rad < M_PI) {
+								gun_sprite.start_index.y = 1;
+								gun_sprite.end_index.y = 1;
+							}
+							else if (angle_rad < 0 && angle_rad > -M_PI_2) {
+								// top left quadrant
+								gun_sprite.start_index.y = 2;
+								gun_sprite.end_index.y = 2;
+								// flip
+							}
+							else if (angle_rad < -M_PI_2 && angle_rad > -M_PI) {
+								// top right quadrant
+								gun_sprite.start_index.y = 2;
+								gun_sprite.end_index.y = 2;
+							}
 						}
 					}
 
