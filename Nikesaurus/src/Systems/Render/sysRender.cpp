@@ -79,7 +79,49 @@ namespace NIKE {
 					// recalculate offset if child is a gun
 					const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
 					if (child_prefab == "gun_enemy_n.prefab") {
-						cout << "gun found" << endl;
+						// get player world pos
+						auto opt_player_entity = NIKE_METADATA_SERVICE->getEntityByName("player");
+
+						if (!opt_player_entity.has_value()) {
+							NIKEE_CORE_ERROR("Player entity not found");
+							continue;
+						}
+
+						Entity::Type player_entity = opt_player_entity.value();
+
+						// get player transform pos
+						auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(player_entity);
+						auto transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+						if (transform_comp == comps.end()) {
+							NIKEE_CORE_ERROR("Player entity missing Transform component");
+							continue;
+						}
+						Transform::Transform& player_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
+						const Vector2f player_pos = player_transform.position;
+
+						// get current enemy (gun's parent) pos
+						comps = NIKE_ECS_MANAGER->getAllEntityComponents(parent_entity.value());
+						transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+						if (transform_comp == comps.end()) {
+							NIKEE_CORE_ERROR("Parent entity missing Transform component");
+							continue;
+						}
+						Transform::Transform& parent_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
+						const Vector2f parent_pos = parent_transform.position;
+
+						// calculate angle between enemy and player
+						const Vector2f enemy_to_player = parent_pos - player_pos;
+						const float angle_rad = atan2(enemy_to_player.y, enemy_to_player.x);
+
+						static constexpr float GUN_DISTANCE = 110.f;
+
+						// calculate offset for closest point on bounding circle with radius GUM_DISTANCE from enemy to player
+						const Vector2f gun_offset = -Vector2f{ cos(angle_rad), sin(angle_rad) } * GUN_DISTANCE;
+
+						// modify child transform values
+						if (c_trans.has_value()) {
+							c_trans.value().get().position = gun_offset;
+						}
 					}
 
 					if (c_trans.has_value() && parent_entity.has_value()) {

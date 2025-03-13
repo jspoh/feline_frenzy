@@ -388,17 +388,17 @@ namespace NIKE {
 
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
+		NIKE_METADATA_SERVICE->setEntityPrefab(enemy_entity, chosen_enemy);
 		// set enemy entity as parent
 		NIKE_METADATA_SERVICE->setEntityParentRelation(enemy_entity);
 
 		// create gun entity
 		Entity::Type gun_entity = NIKE_ECS_MANAGER->createEntity();
 		// load gun entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(gun_entity, "gun_enemy_n.prefab");
+		NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
 		// set gun entity as child
 		NIKE_METADATA_SERVICE->setEntityChildRelation(gun_entity);
-		const std::string dbg_gun_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(gun_entity);
+		//const std::string dbg_gun_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(gun_entity);
 
 		// get enemy entity name
 		std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(enemy_entity);

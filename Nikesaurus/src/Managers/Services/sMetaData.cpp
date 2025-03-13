@@ -839,4 +839,23 @@ namespace NIKE {
 			}
 		}
 	}
+
+	void MetaData::Service::setEntityPrefab(Entity::Type entity, std::string const& prefab_id) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if prefab id is valid
+		if (!entities.at(entity).prefab_id.empty() && entities.at(entity).prefab_id.find(".prefab") != std::string::npos) {
+			//Load entity with prefab
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+		}
+
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+
+		//Set prefab master id
+		entities.at(entity).prefab_id = prefab_id;
+	}
 }

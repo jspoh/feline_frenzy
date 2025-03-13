@@ -259,6 +259,8 @@ namespace NIKE {
 
 			//Deserialize data
 			void deserialize(nlohmann::json const& data);
+
+			void setEntityPrefab(Entity::Type entity, std::string const& prefab_id);
 		};
 	}
 }
