@@ -235,13 +235,15 @@
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
+                            "Input_State": 0,
                             "Scripts": {
                                 "OnClick": {
-                                    "Named_Args": {},
+                                    "Named_Args": {
+                                        "scene": "main_menu.scn"
+                                    },
                                     "Script_ID": "ChangeScene.lua",
                                     "Start_Function": "",
-                                    "Update_Function": "Previous"
+                                    "Update_Function": "Change"
                                 },
                                 "OnHover": {
                                     "Named_Args": {
