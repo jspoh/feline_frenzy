@@ -244,10 +244,12 @@
                                     "Update_Function": "Previous"
                                 },
                                 "OnHover": {
-                                    "Named_Args": {},
-                                    "Script_ID": "",
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
                                     "Start_Function": "",
-                                    "Update_Function": ""
+                                    "Update_Function": "HoverButton"
                                 }
                             }
                         },
@@ -886,7 +888,7 @@
                                     "Named_Args": {},
                                     "Script_ID": "UISlider.lua",
                                     "Start_Function": "",
-                                    "Update_Function": "ArrowLeftSfx"
+                                    "Update_Function": "SfxArrowLeft"
                                 }
                             }
                         },
@@ -985,7 +987,7 @@
                                     "Named_Args": {},
                                     "Script_ID": "UISlider.lua",
                                     "Start_Function": "",
-                                    "Update_Function": "ArrowRightSfx"
+                                    "Update_Function": "SfxArrowRight"
                                 }
                             }
                         },

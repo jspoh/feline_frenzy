@@ -175,6 +175,9 @@ namespace NIKE {
 
 			//UI Update function
 			void update();
+
+			// Update volume slider function
+			void updateVolumeSliderPositions();
 		};
 
 		//Re-enable DLL Export warning

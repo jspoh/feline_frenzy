@@ -1,32 +1,33 @@
 -- UISlider.lua
--- This Lua script handles the UI slider functionality for both BGM and SFX volume.
--- It is intended to be attached to the slider arrow buttons.
-
+-- This Lua script handles the UI slider for adjusting BGM and SFX volumes.
 local UISlider = {}
 
--- BGM slider functions
+-- Called when the BGM left arrow is pressed.
 function UISlider:ArrowLeft()
-    SliderArrowLeft()  -- Bound in sLuaGameBinds.cpp for BGM
+    SliderArrowLeft()
 end
 
+-- Called when the BGM right arrow is pressed.
 function UISlider:ArrowRight()
-    SliderArrowRight()  -- Bound in sLuaGameBinds.cpp for BGM
+    SliderArrowRight()
 end
 
--- SFX slider functions
-function UISlider:ArrowLeftSfx()
-    SfxSliderArrowLeft()  -- Bound in sLuaGameBinds.cpp for SFX
+-- Called when the SFX left arrow is pressed.
+function UISlider:SfxArrowLeft()
+    SfxSliderArrowLeft()
 end
 
-function UISlider:ArrowRightSfx()
-    SfxSliderArrowRight()  -- Bound in sLuaGameBinds.cpp for SFX
+-- Called when the SFX right arrow is pressed.
+function UISlider:SfxArrowRight()
+    SfxSliderArrowRight()
 end
 
 -- Optional: Called when the slider itself is dragged.
 -- 'relativePos' should be a value between 0.0 (far left) and 1.0 (far right).
 function UISlider:UpdateVolume(relativePos)
     local vol = math.min(math.max(relativePos, 0.0), 1.0)
-    -- Additional logic for real-time update can be added here if needed.
+    -- Here you might call a bound function to update the volume directly.
+    -- For example: SetGlobalBGMVolume(vol)
 end
 
 return UISlider

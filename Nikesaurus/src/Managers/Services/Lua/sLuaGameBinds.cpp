@@ -1,10 +1,10 @@
 /*****************************************************************//**
- * \file   sLuaGameBinds.h
+ * \file   sLuaGameBinds.cpp
  * \brief  Lua Game bindings
  *
  * \author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (100%)
  * \date   March 2025
- * All content 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -25,10 +25,10 @@ namespace NIKE {
 
 
         /*****************************************************************//**
-        * Physics
-        *********************************************************************/
+         * Physics
+         *********************************************************************/
 
-        //Apply force to entities
+         //Apply force to entities
         lua_state.set_function("ApplyForce", [&](Entity::Type entity, float x, float y) {
             auto e_trans_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
             if (e_trans_comp.has_value()) {
@@ -72,10 +72,10 @@ namespace NIKE {
 
 
         /*****************************************************************//**
-        * Visuals
-        *********************************************************************/
+         * Visuals
+         *********************************************************************/
 
-        //Change animation start & end
+         //Change animation start & end
         lua_state.set_function("AnimationSet", [&](Entity::Type entity, int start_x, int start_y, int end_x, int end_y) {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
             auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
@@ -118,10 +118,10 @@ namespace NIKE {
                     e_base.animation_mode = Animation::Mode::RESTART;
                 }
             }
-         });
+            });
 
         //Change animation variables
-        lua_state.set_function("SetAnimationVariables", [&](Entity::Type entity, int start_x, int start_y, int end_x, int end_y, int curr_x, int  curr_y) {
+        lua_state.set_function("SetAnimationVariables", [&](Entity::Type entity, int start_x, int start_y, int end_x, int end_y, int curr_x, int curr_y) {
             auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
             auto e_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
             if (e_animate_comp.has_value() && e_base_comp.has_value()) {
@@ -133,13 +133,12 @@ namespace NIKE {
                 e_animate.end_index.y = end_y;
                 e_animate.curr_index.x = curr_x;
                 e_animate.curr_index.y = curr_y;
-
             }
-         });
+            });
 
         //Get Last Direction (COMPONENT TO BE MOVED ELSE WHERE)
         lua_state.set_function("AnimationCompleted", [&](Entity::Type entity) -> sol::optional<int> {
-            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent < Animation::Base >(entity);
+            auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
             if (e_animate_comp.has_value()) {
                 return e_animate_comp.value().get().completed_animations;
             }
@@ -183,9 +182,8 @@ namespace NIKE {
             });
 
         /*****************************************************************//**
-        * Game Logic
-        *********************************************************************/
-
+         * Game Logic
+         *********************************************************************/
 
         lua_state.set_function("SetState", [&](Entity::Type entity, std::string state) {
             auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(entity);
@@ -302,7 +300,6 @@ namespace NIKE {
             }
             // Temporary hardcoded SFX
             Interaction::playOneShotSFX(entity, "EnemySpawn1.wav", "EnemySFX", 1.0f, 1.0f);
-
             });
 
         // Player EnemyDeathState annimation function
@@ -362,49 +359,42 @@ namespace NIKE {
             });
 
         /*****************************************************************//**
-        * Audio
-        *********************************************************************/
+         * Audio
+         *********************************************************************/
 
-        // Bind slider arrow functions for adjusting global BGM volume.
+         // Bind slider arrow functions for adjusting global BGM volume.
         lua_state.set_function("SliderArrowLeft", [&]() {
             float currentVolume = NIKE::Audio::gGlobalBGMVolume;
-            float newVolume = currentVolume - 0.05f;
-            if (newVolume < 0.0f)
-                newVolume = 0.0f;
-            NIKE_AUDIO_SERVICE->setGlobalVolume(newVolume, NIKE::Audio::gGlobalSFXVolume);
+            float newVolume = Utility::getMax(0.0f, currentVolume - 0.05f);
+            NIKE::Audio::gGlobalBGMVolume = newVolume;
             NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         lua_state.set_function("SliderArrowRight", [&]() {
             float currentVolume = NIKE::Audio::gGlobalBGMVolume;
-            float newVolume = currentVolume + 0.05f;
-            if (newVolume > 1.0f)
-                newVolume = 1.0f;
-            NIKE_AUDIO_SERVICE->setGlobalVolume(newVolume, NIKE::Audio::gGlobalSFXVolume);
+            float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
+            NIKE::Audio::gGlobalBGMVolume = newVolume;
             NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
-        // SFX slider arrow buttons
+        // Bind slider arrow functions for adjusting global SFX volume.
         lua_state.set_function("SfxSliderArrowLeft", [&]() {
             float currentVolume = NIKE::Audio::gGlobalSFXVolume;
-            float newVolume = currentVolume - 0.05f;
-            if (newVolume < 0.0f)
-                newVolume = 0.0f;
-            NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newVolume);
+            float newVolume = Utility::getMax(0.0f, currentVolume - 0.05f);
+            NIKE::Audio::gGlobalSFXVolume = newVolume;
             NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         lua_state.set_function("SfxSliderArrowRight", [&]() {
             float currentVolume = NIKE::Audio::gGlobalSFXVolume;
-            float newVolume = currentVolume + 0.05f;
-            if (newVolume > 1.0f)
-                newVolume = 1.0f;
-            NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newVolume);
+            float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
+            NIKE::Audio::gGlobalSFXVolume = newVolume;
             NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
-
-
-
 
         //Get SFX
         lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
@@ -456,24 +446,21 @@ namespace NIKE {
 
         // Play SFX once...
         lua_state.set_function("PlayCustomSFXOnce", [&](Entity::Type entity,
-            // bool play,
             std::string custom_audio_id,
             std::string custom_channel_group_id,
             float custom_volume,
             float custom_pitch) {
-                // For debugging, log that we are attempting playback.
                 NIKEE_CORE_INFO("Binding: PlayCustomSFXOnce called with audio '{}' on channel '{}' (vol: {}, pitch: {}).",
-                custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
+                    custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
 
-        // Call our newly created one-shot function.
-        Interaction::playOneShotSFX(entity, custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
+                Interaction::playOneShotSFX(entity, custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
             });
 
         /*****************************************************************//**
-        * Misc
-        *********************************************************************/
+         * Misc
+         *********************************************************************/
 
-        // Set/Teleport entity
+         // Set/Teleport entity
         lua_state.set_function("SetPosition", [&](Entity::Type entity, float x, float y) {
             auto transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
             if (transform.has_value()) {
@@ -487,7 +474,7 @@ namespace NIKE {
             if (health_comp) {
                 health_comp.value().get().invulnerable_flag = enable;
                 if (health_comp.value().get().invulnerable_flag) {
-                    cout    << "Player god mode enabled" << endl;
+                    cout << "Player god mode enabled" << endl;
                 }
                 else {
                     cout << "Player god mode disabled" << endl;
@@ -534,21 +521,12 @@ namespace NIKE {
 
                     //Check if path has been generated or if destination cell has changed
                     if (!NIKE_MAP_SERVICE->checkPath(entity) ||
-
-                        //Condition if changes to grid blocked has been made
                         NIKE_MAP_SERVICE->checkGridChanged() ||
-
-                        //Check if target got shifted
                         (NIKE_MAP_SERVICE->getPath(entity).goal.index != Vector2i(x_index, y_index)) ||
-
-                        //Check if entity got shifted
                         (!NIKE_MAP_SERVICE->getPath(entity).path.empty() &&
                             (std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.x - start_index.x) > 1 ||
                                 std::abs(NIKE_MAP_SERVICE->getPath(entity).path.front().index.y - start_index.y) > 1)) ||
-
-                        //Check if path is finished & entity got shifted
                         (NIKE_MAP_SERVICE->getPath(entity).b_finished && start_index != NIKE_MAP_SERVICE->getPath(entity).end.index)
-
                         ) {
 
                         //Search for path
@@ -581,13 +559,11 @@ namespace NIKE {
                         }
                     }
                     else {
-
                         //Marked path as finished
                         path.b_finished = true;
                     }
                 }
             }
             });
-
     }
 }

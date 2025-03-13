@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   sUserInterface.h
+ * \file   sUserInterface.cpp
  * \brief
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
@@ -563,134 +563,215 @@ namespace NIKE {
 			}
 
 		}
-		// Begin slider processing
-		// ---- Begin of BGMSlider Processing ----
-		static bool isBGMSliderDragging = false;
-		static Vector2f originalBGMSliderScale(0.0f, 0.0f);
+		// ---- Begin of Slider Processing for BGM and SFX ----
 
+		// A static variable to track which slider is currently being dragged.
+		// Allowed values: "BGMSlider", "SFXSlider", or empty if none.
+		static std::string currentlyDraggedSlider = "";
+
+		// Also declare separate static variables for each slider’s original scale.
+		static Vector2f originalBGMSliderScale(0.0f, 0.0f);
+		static Vector2f originalSFXSliderScale(0.0f, 0.0f);
+
+		// If the left mouse button is not pressed at all, then reset the currently dragged slider.
+		if (!NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			currentlyDraggedSlider = "";
+		}
+
+		//////////////////////
+		// Process BGM Slider
+		//////////////////////
+		{
+			auto bgmSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSliderBar");
+			auto bgmSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSlider");
+			if (bgmSliderBarOpt.has_value() && bgmSliderOpt.has_value()) {
+				Entity::Type bgmSliderBar = bgmSliderBarOpt.value();
+				Entity::Type bgmSlider = bgmSliderOpt.value();
+
+				// Retrieve Transform components.
+				auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSliderBar);
+				auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSlider);
+				if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
+					Transform::Transform& barTransform = barTransformOpt.value().get();
+					Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
+
+					// Calculate full horizontal boundaries of the BGMSliderBar.
+					float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
+					float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
+					float barWidth = barRightFull - barLeftFull;
+
+					// Define effective sliding area as the middle 90% (5% margin each side).
+					float margin = barWidth * 0.05f;
+					float barLeft = barLeftFull + margin;
+					float barRight = barRightFull - margin;
+
+					// If this slider is not currently being dragged, update its position based on gGlobalBGMVolume.
+					if (currentlyDraggedSlider == "" || currentlyDraggedSlider == "BGMSlider") {
+						if (currentlyDraggedSlider == "") {
+							// If no slider is active, claim BGMSlider if the mouse is over it.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							bool mouseOver = (mousePos.x >= sliderTransform.position.x - (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.x <= sliderTransform.position.x + (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.y >= sliderTransform.position.y - (sliderTransform.scale.y * 0.5f)) &&
+								(mousePos.y <= sliderTransform.position.y + (sliderTransform.scale.y * 0.5f));
+							if (mouseOver && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT))
+								currentlyDraggedSlider = "BGMSlider";
+						}
+						if (currentlyDraggedSlider == "BGMSlider") {
+							// Store original scale if not already stored.
+							if (originalBGMSliderScale.x == 0.0f && originalBGMSliderScale.y == 0.0f)
+								originalBGMSliderScale = sliderTransform.scale;
+
+							// Get mouse position.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							// Update slider position if left mouse is pressed.
+							if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+								sliderTransform.scale = originalBGMSliderScale * 1.15f;
+								sliderTransform.position.x = std::clamp(mousePos.x, barLeft, barRight);
+							}
+							if (NIKE_INPUT_SERVICE->isMouseReleased(NIKE_MOUSE_BUTTON_LEFT)) {
+								currentlyDraggedSlider = "";
+								sliderTransform.scale = originalBGMSliderScale;
+							}
+							// Compute new BGM volume.
+							float newBGMVol = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
+							newBGMVol = std::clamp(newBGMVol, 0.0f, 1.0f);
+							NIKE_AUDIO_SERVICE->setGlobalVolume(newBGMVol, NIKE::Audio::gGlobalSFXVolume);
+							NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+						}
+					}
+				}
+			}
+		}
+
+		//////////////////////
+		// Process SFX Slider
+		//////////////////////
+		{
+			auto sfxSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSliderBar");
+			auto sfxSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSlider");
+			if (sfxSliderBarOpt.has_value() && sfxSliderOpt.has_value()) {
+				Entity::Type sfxSliderBar = sfxSliderBarOpt.value();
+				Entity::Type sfxSlider = sfxSliderOpt.value();
+
+				// Retrieve Transform components.
+				auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSliderBar);
+				auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSlider);
+				if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
+					Transform::Transform& barTransform = barTransformOpt.value().get();
+					Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
+
+					// Calculate full horizontal boundaries of the SFXSliderBar.
+					float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
+					float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
+					float barWidth = barRightFull - barLeftFull;
+
+					// Define effective sliding area (middle 90% with 5% margin on each side).
+					float margin = barWidth * 0.05f;
+					float barLeft = barLeftFull + margin;
+					float barRight = barRightFull - margin;
+
+					// If this slider is not currently being dragged, update its position based on gGlobalSFXVolume.
+					if (currentlyDraggedSlider == "" || currentlyDraggedSlider == "SFXSlider") {
+						if (currentlyDraggedSlider == "") {
+							// If no slider is active, claim SFXSlider if the mouse is over it.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							bool mouseOver = (mousePos.x >= sliderTransform.position.x - (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.x <= sliderTransform.position.x + (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.y >= sliderTransform.position.y - (sliderTransform.scale.y * 0.5f)) &&
+								(mousePos.y <= sliderTransform.position.y + (sliderTransform.scale.y * 0.5f));
+							if (mouseOver && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT))
+								currentlyDraggedSlider = "SFXSlider";
+						}
+						if (currentlyDraggedSlider == "SFXSlider") {
+							// Store original scale if not already stored.
+							if (originalSFXSliderScale.x == 0.0f && originalSFXSliderScale.y == 0.0f)
+								originalSFXSliderScale = sliderTransform.scale;
+
+							// Get mouse position.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							// Update slider position if left mouse is pressed.
+							if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+								sliderTransform.scale = originalSFXSliderScale * 1.15f;
+								sliderTransform.position.x = std::clamp(mousePos.x, barLeft, barRight);
+							}
+							if (NIKE_INPUT_SERVICE->isMouseReleased(NIKE_MOUSE_BUTTON_LEFT)) {
+								currentlyDraggedSlider = "";
+								sliderTransform.scale = originalSFXSliderScale;
+							}
+							// Compute new SFX volume.
+							float newSFXVol = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
+							newSFXVol = std::clamp(newSFXVol, 0.0f, 1.0f);
+							NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newSFXVol);
+							NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+						}
+					}
+				}
+			}
+		}
+		// ---- End of Slider Processing for BGM and SFX ----
+
+	}
+
+	// --- New function to update slider positions from global volume values ---
+	void UI::Service::updateVolumeSliderPositions() {
+		// --- Update BGM Slider Position ---
 		auto bgmSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSliderBar");
 		auto bgmSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSlider");
-
 		if (bgmSliderBarOpt.has_value() && bgmSliderOpt.has_value()) {
 			Entity::Type bgmSliderBar = bgmSliderBarOpt.value();
 			Entity::Type bgmSlider = bgmSliderOpt.value();
 
+			// Retrieve Transform components.
 			auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSliderBar);
 			auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSlider);
-
 			if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
 				Transform::Transform& barTransform = barTransformOpt.value().get();
 				Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
 
-				// Calculate full horizontal boundaries of the slider bar.
+				// Calculate full horizontal boundaries of the BGMSliderBar.
 				float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
 				float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
 				float barWidth = barRightFull - barLeftFull;
-				// Define effective sliding area (e.g., middle 88% => 6% margin on each side)
-				float margin = barWidth * 0.06f;
+
+				// Define effective sliding area as the middle 90% (5% margin each side).
+				float margin = barWidth * 0.05f;
 				float barLeft = barLeftFull + margin;
 				float barRight = barRightFull - margin;
 
-				if (!isBGMSliderDragging) {
-					// Set slider position based on current global BGM volume.
-					sliderTransform.position.x = barLeft + (NIKE::Audio::gGlobalBGMVolume * (barRight - barLeft));
-					originalBGMSliderScale = sliderTransform.scale;
-				}
-
-				// Get mouse world position.
-				Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
-				bool leftPressed = NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT);
-				bool leftReleased = NIKE_INPUT_SERVICE->isMouseReleased(NIKE_MOUSE_BUTTON_LEFT);
-
-				// Check if mouse is within the BGMSlider's bounding box.
-				bool mouseOnBGMSlider = (mousePos.x >= sliderTransform.position.x - (sliderTransform.scale.x * 0.5f) &&
-					mousePos.x <= sliderTransform.position.x + (sliderTransform.scale.x * 0.5f) &&
-					mousePos.y >= sliderTransform.position.y - (sliderTransform.scale.y * 0.5f) &&
-					mousePos.y <= sliderTransform.position.y + (sliderTransform.scale.y * 0.5f));
-
-				if (leftPressed && (isBGMSliderDragging || mouseOnBGMSlider)) {
-					isBGMSliderDragging = true;
-					// Increase slider size by 15% when dragging.
-					sliderTransform.scale = originalBGMSliderScale * 1.15f;
-					// Clamp slider's x position to the effective sliding area.
-					sliderTransform.position.x = std::clamp(mousePos.x, barLeft, barRight);
-				}
-				if (leftReleased) {
-					isBGMSliderDragging = false;
-					// Revert slider scale to its original size.
-					sliderTransform.scale = originalBGMSliderScale;
-				}
-
-				// Compute new global BGM volume based on slider's x-position.
-				float newBGMVolume = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
-				newBGMVolume = std::clamp(newBGMVolume, 0.0f, 1.0f);
-
-				NIKE_AUDIO_SERVICE->setGlobalVolume(newBGMVolume, NIKE::Audio::gGlobalSFXVolume);
-				NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+				// Update slider position based on the current global BGM volume.
+				sliderTransform.position.x = barLeft + (NIKE::Audio::gGlobalBGMVolume * (barRight - barLeft));
 			}
 		}
-		// ---- End of BGMSlider Processing ----
 
-		// ---- Begin of SFXSlider Processing ----
-		static bool isSFXSliderDragging = false;
-		static Vector2f originalSFXSliderScale(0.0f, 0.0f);
-
+		// --- Update SFX Slider Position ---
 		auto sfxSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSliderBar");
 		auto sfxSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSlider");
-
 		if (sfxSliderBarOpt.has_value() && sfxSliderOpt.has_value()) {
 			Entity::Type sfxSliderBar = sfxSliderBarOpt.value();
 			Entity::Type sfxSlider = sfxSliderOpt.value();
 
+			// Retrieve Transform components.
 			auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSliderBar);
 			auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSlider);
-
 			if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
 				Transform::Transform& barTransform = barTransformOpt.value().get();
 				Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
 
-				// Calculate full horizontal boundaries of the SFX slider bar.
+				// Calculate full horizontal boundaries of the SFXSliderBar.
 				float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
 				float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
 				float barWidth = barRightFull - barLeftFull;
-				// Define effective sliding area (e.g., middle 88% of the bar).
-				float margin = barWidth * 0.06f;
+
+				// Define effective sliding area (middle 90% with 5% margin on each side).
+				float margin = barWidth * 0.05f;
 				float barLeft = barLeftFull + margin;
 				float barRight = barRightFull - margin;
 
-				if (!isSFXSliderDragging) {
-					sliderTransform.position.x = barLeft + (NIKE::Audio::gGlobalSFXVolume * (barRight - barLeft));
-					originalSFXSliderScale = sliderTransform.scale;
-				}
-
-				Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
-				bool leftPressed = NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT);
-				bool leftReleased = NIKE_INPUT_SERVICE->isMouseReleased(NIKE_MOUSE_BUTTON_LEFT);
-
-				bool mouseOnSFXSlider = (mousePos.x >= sliderTransform.position.x - (sliderTransform.scale.x * 0.5f) &&
-					mousePos.x <= sliderTransform.position.x + (sliderTransform.scale.x * 0.5f) &&
-					mousePos.y >= sliderTransform.position.y - (sliderTransform.scale.y * 0.5f) &&
-					mousePos.y <= sliderTransform.position.y + (sliderTransform.scale.y * 0.5f));
-
-				if (leftPressed && (isSFXSliderDragging || mouseOnSFXSlider)) {
-					isSFXSliderDragging = true;
-					sliderTransform.scale = originalSFXSliderScale * 1.15f;
-					sliderTransform.position.x = std::clamp(mousePos.x, barLeft, barRight);
-				}
-				if (leftReleased) {
-					isSFXSliderDragging = false;
-					sliderTransform.scale = originalSFXSliderScale;
-				}
-
-				float newSFXVolume = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
-				newSFXVolume = std::clamp(newSFXVolume, 0.0f, 1.0f);
-
-				NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newSFXVolume);
-				NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+				// Update slider position based on the current global SFX volume.
+				sliderTransform.position.x = barLeft + (NIKE::Audio::gGlobalSFXVolume * (barRight - barLeft));
 			}
 		}
-		// ---- End of SFXSlider Processing ----
-		// End slider processing
-
 	}
-}
+
+} // namespace NIKE
