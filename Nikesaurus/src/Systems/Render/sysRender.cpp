@@ -139,28 +139,42 @@ namespace NIKE {
 						// get gun entity components
 						auto gun_comps = NIKE_ECS_MANAGER->getAllEntityComponents(child_entity);
 						auto gun_comp_animation_sprite = gun_comps.find(Utility::convertTypeString(typeid(Animation::Sprite).name()));
+						auto gun_comp_texture = gun_comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
 						if (gun_comp_animation_sprite != gun_comps.end()) {
-							// get gun sprite component
 							Animation::Sprite& gun_sprite = *std::static_pointer_cast<Animation::Sprite>(gun_comp_animation_sprite->second);
+							Render::Texture& gun_texture = *std::static_pointer_cast<Render::Texture>(gun_comp_texture->second);
 
 							// update spritesheet used based on quadrant
-							if (angle_rad > 0 && angle_rad < M_PI_2) {
-								// bottom left quadrant
+							if (angle_rad > M_PI_4 && angle_rad < M_PI - M_PI_4) {
+								// down
+								gun_sprite.start_index.y = 0;
+								gun_sprite.end_index.y = 0;
+							}
+							else if (angle_rad > 0 && angle_rad < M_PI_4) {
+								// bottom left 
 								gun_sprite.start_index.y = 1;
 								gun_sprite.end_index.y = 1;
 								// flip texture
+								gun_texture.b_flip.x = true;
 							}
-							else if (angle_rad > M_PI_2 && angle_rad < M_PI) {
+							else if (angle_rad > M_PI - M_PI_4 && angle_rad < M_PI) {
+								// bottom right 
 								gun_sprite.start_index.y = 1;
 								gun_sprite.end_index.y = 1;
 							}
-							else if (angle_rad < 0 && angle_rad > -M_PI_2) {
+							else if (angle_rad < -M_PI_4 && angle_rad > -M_PI + M_PI_4) {
+								// up
+								gun_sprite.start_index.y = 3;
+								gun_sprite.end_index.y = 3;
+							}
+							else if (angle_rad < 0 && angle_rad > -M_PI_4) {
 								// top left quadrant
 								gun_sprite.start_index.y = 2;
 								gun_sprite.end_index.y = 2;
-								// flip
+								// flip texture
+								gun_texture.b_flip.x = true;
 							}
-							else if (angle_rad < -M_PI_2 && angle_rad > -M_PI) {
+							else if (angle_rad < -M_PI_4 && angle_rad > -M_PI + M_PI_4) {
 								// top right quadrant
 								gun_sprite.start_index.y = 2;
 								gun_sprite.end_index.y = 2;
