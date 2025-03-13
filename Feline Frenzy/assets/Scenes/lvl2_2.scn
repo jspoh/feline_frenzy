@@ -23,6 +23,10 @@
                 "loop": false,
                 "tracks": []
             },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            },
             "VFX": {
                 "loop": false,
                 "tracks": []
@@ -384,7 +388,7 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Frame_Duration": 0.10000000149011612
+                                "Frame_Duration": 0.20000000298023224
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
@@ -534,7 +538,7 @@
                                     "x": -3.0185546875,
                                     "y": -1162.0152587890625
                                 },
-                                "Zoom": 1.5
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
