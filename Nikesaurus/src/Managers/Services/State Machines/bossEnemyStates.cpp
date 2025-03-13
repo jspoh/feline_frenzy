@@ -336,7 +336,6 @@ namespace NIKE {
 		// Get element string 
 		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
 		// Set texture here
-		cout << e_state_comp.value().get().state_id << endl;
 		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
 		e_texture_comp.value().get().texture_id = spritesheet;
 
