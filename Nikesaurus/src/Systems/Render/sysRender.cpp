@@ -75,6 +75,13 @@ namespace NIKE {
 
 					//child transform
 					auto c_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(child_entity);
+
+					// recalculate offset if child is a gun
+					const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
+					if (child_prefab == "gun_enemy_n.prefab") {
+						cout << "gun found" << endl;
+					}
+
 					if (c_trans.has_value() && parent_entity.has_value()) {
 
 						//Get child transform reference

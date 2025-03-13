@@ -1391,7 +1391,7 @@
                                     "x": -449.859375,
                                     "y": -640.0635986328125
                                 },
-                                "Zoom": 0.43643859028816223
+                                "Zoom": 1.6018060445785522
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1436,7 +1436,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 18,
+                            "Layer_Order": 17,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1482,7 +1482,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 19,
+                            "Layer_Order": 18,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1526,7 +1526,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 20,
+                            "Layer_Order": 19,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1570,7 +1570,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 21,
+                            "Layer_Order": 20,
                             "Name": "bottom_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2201,7 +2201,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": -446.97955322265625,
-                                    "y": -747.8933715820313
+                                    "y": -749.275146484375
                                 },
                                 "Rotation": 90.0,
                                 "Scale": {
@@ -2271,8 +2271,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 0.0,
-                                    "y": -76.5
+                                    "x": 1.35699462890625,
+                                    "y": -127.0484619140625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
