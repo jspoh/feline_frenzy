@@ -150,10 +150,10 @@ namespace NIKE {
 
 							// update spritesheet used based on section
 							// circle will be divided into 8 sections, with a focus on nsew
-							cout << angle_rad << endl;
+							//cout << angle_rad << endl;
 							if (angle_rad > M_PI_3 && angle_rad < M_PI - M_PI_3) {
 								// up
-								cout << "top" << endl;
+								//cout << "top" << endl;
 								gun_sprite.start_index.y = 3;
 								gun_sprite.end_index.y = 3;
 								gun_texture.b_flip.x = false;
@@ -161,14 +161,14 @@ namespace NIKE {
 							}
 							else if (angle_rad > -2 * M_PI_3&& angle_rad < -M_PI_3) {
 								// down
-								cout << "bottom" << endl;
+								//cout << "bottom" << endl;
 								gun_sprite.start_index.y = 0;
 								gun_sprite.end_index.y = 0;
 								gun_texture.b_flip.x = false;
 								c_trans.value().get().rotation = 0.f;
 							}
 							else if (angle_rad > -M_PI_6 && angle_rad < M_PI_6) {
-								cout << "left" << endl;
+								//cout << "left" << endl;
 								gun_texture.b_flip.x = true;
 
 								gun_sprite.start_index.y = 3;
@@ -178,7 +178,7 @@ namespace NIKE {
 							}
 							else if (angle_rad > 5 * M_PI_6 || angle_rad < -5 * M_PI_6) {
 								// right
-								cout << "right" << endl;
+								//cout << "right" << endl;
 								gun_texture.b_flip.x = false;
 
 								gun_sprite.start_index.y = 3;
@@ -187,16 +187,44 @@ namespace NIKE {
 								c_trans.value().get().rotation = 270.f;
 							}
 							else if (angle_rad > M_PI_6 && angle_rad < M_PI_3) {
-								cout << "top left" << endl;
+								//cout << "top left" << endl;
+
+								gun_texture.b_flip.x = true;
+
+								gun_sprite.start_index.y = 2;
+								gun_sprite.end_index.y = 2;
+
+								c_trans.value().get().rotation = 0.f;
 							}
 							else if (angle_rad > 2 * M_PI_3 && angle_rad < 5 * M_PI_6) {
-								cout << "top right" << endl;;
+								//cout << "top right" << endl;
+
+								gun_texture.b_flip.x = false;
+
+								gun_sprite.start_index.y = 2;
+								gun_sprite.end_index.y = 2;
+
+								c_trans.value().get().rotation = 0.f;
 							}
 							else if (angle_rad > -M_PI_3 && angle_rad < - M_PI_6) {
-								cout << "bottom left" << endl;
+								//cout << "bottom left" << endl;
+
+								gun_texture.b_flip.x = true;
+
+								gun_sprite.start_index.y = 1;
+								gun_sprite.end_index.y = 1;
+
+								c_trans.value().get().rotation = 0.f;
 							}
 							else if (angle_rad > -5 * M_PI_6 && angle_rad < -2 * M_PI_3) {
-								cout << "bottom right" << endl;
+								//cout << "bottom right" << endl;
+
+								gun_texture.b_flip.x = false;
+
+								gun_sprite.start_index.y = 1;
+								gun_sprite.end_index.y = 1;
+
+								c_trans.value().get().rotation = 0.f;
 							}
 							
 
