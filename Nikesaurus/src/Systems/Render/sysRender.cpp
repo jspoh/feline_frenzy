@@ -17,8 +17,8 @@
 #include "Math/Mtx33.h"
 
 
-#define M_PI_3 (M_PI / 3.f)
-#define M_PI_6 (M_PI / 6.f)
+#define M_PI_3 1.0471975512
+#define M_PI_6 0.52359877559
 
 
 
@@ -151,7 +151,7 @@ namespace NIKE {
 							// update spritesheet used based on section
 							// circle will be divided into 8 sections, with a focus on nsew
 							//cout << angle_rad << endl;
-							if (angle_rad > M_PI_3 && angle_rad < M_PI - M_PI_3) {
+							if (angle_rad >= M_PI_3 && angle_rad <= M_PI - M_PI_3) {
 								// up
 								//cout << "top" << endl;
 								gun_sprite.start_index.y = 3;
@@ -159,7 +159,7 @@ namespace NIKE {
 								gun_texture.b_flip.x = false;
 								c_trans.value().get().rotation = 0.f;
 							}
-							else if (angle_rad > -2 * M_PI_3&& angle_rad < -M_PI_3) {
+							else if (angle_rad >= -2 * M_PI_3&& angle_rad <= -M_PI_3) {
 								// down
 								//cout << "bottom" << endl;
 								gun_sprite.start_index.y = 0;
@@ -167,7 +167,7 @@ namespace NIKE {
 								gun_texture.b_flip.x = false;
 								c_trans.value().get().rotation = 0.f;
 							}
-							else if (angle_rad > -M_PI_6 && angle_rad < M_PI_6) {
+							else if (angle_rad >= -M_PI_6 && angle_rad <= M_PI_6) {
 								//cout << "left" << endl;
 								gun_texture.b_flip.x = true;
 
@@ -176,7 +176,7 @@ namespace NIKE {
 
 								c_trans.value().get().rotation = 90.f;
 							}
-							else if (angle_rad > 5 * M_PI_6 || angle_rad < -5 * M_PI_6) {
+							else if (angle_rad >= 5 * M_PI_6 || angle_rad <= -5 * M_PI_6) {
 								// right
 								//cout << "right" << endl;
 								gun_texture.b_flip.x = false;
@@ -186,7 +186,7 @@ namespace NIKE {
 								
 								c_trans.value().get().rotation = 270.f;
 							}
-							else if (angle_rad > M_PI_6 && angle_rad < M_PI_3) {
+							else if (angle_rad >= M_PI_6 && angle_rad <= M_PI_3) {
 								//cout << "top left" << endl;
 
 								gun_texture.b_flip.x = true;
@@ -196,7 +196,7 @@ namespace NIKE {
 
 								c_trans.value().get().rotation = 0.f;
 							}
-							else if (angle_rad > 2 * M_PI_3 && angle_rad < 5 * M_PI_6) {
+							else if (angle_rad >= 2 * M_PI_3 && angle_rad <= 5 * M_PI_6) {
 								//cout << "top right" << endl;
 
 								gun_texture.b_flip.x = false;
@@ -206,7 +206,7 @@ namespace NIKE {
 
 								c_trans.value().get().rotation = 0.f;
 							}
-							else if (angle_rad > -M_PI_3 && angle_rad < - M_PI_6) {
+							else if (angle_rad >= -M_PI_3 && angle_rad <= - M_PI_6) {
 								//cout << "bottom left" << endl;
 
 								gun_texture.b_flip.x = true;
@@ -216,7 +216,7 @@ namespace NIKE {
 
 								c_trans.value().get().rotation = 0.f;
 							}
-							else if (angle_rad > -5 * M_PI_6 && angle_rad < -2 * M_PI_3) {
+							else if (angle_rad >= -5 * M_PI_6 && angle_rad <= -2 * M_PI_3) {
 								//cout << "bottom right" << endl;
 
 								gun_texture.b_flip.x = false;
