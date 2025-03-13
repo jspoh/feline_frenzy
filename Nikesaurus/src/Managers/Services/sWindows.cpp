@@ -115,7 +115,7 @@ namespace NIKE {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
-			NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}\nType: {2}\nSeverity: {3}", message, source, type, severity);
+			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}\nType: {2}\nSeverity: {3}", message, source, type, severity);
 			}, nullptr);
 #endif
 
@@ -309,7 +309,7 @@ namespace NIKE {
 		glfwSwapBuffers(ptr_window);
 
 		while ((err = glGetError()) != GL_NO_ERROR) {
-			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+			//NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
