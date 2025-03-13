@@ -69,36 +69,35 @@ namespace NIKE {
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {
 
-                            // Look for entity with player component
-                            for (auto& other_entity : entities) {
-                                auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+                            std::set<NIKE::Entity::Type> e_player_comp = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+                            auto player_entity = *e_player_comp.begin();
 
-                                if (e_player_comp.has_value()) { // Player entity exists
+                            if (!e_player_comp.empty()) { // Player entity exists
 
-                                    // Get Render Component
-                                    const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-                                    auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-                                    //float& source_intensity = source_render_comp.value().get().intensity;
-                                    Vector4f& source_alpha = source_render_comp.value().get().color;
+                                // Get Render Component
+                                const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+                                auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+                                //float& source_intensity = source_render_comp.value().get().intensity;
+                                Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    float target_alpha = isWithinWorldRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
-                                    float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+                                float target_alpha = isWithinWorldRange(entity, player_entity) ? 1.0f : 0.0f; // Set target alpha
+                                float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
-                                    // Smoothly interpolate alpha
-                                    source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+                                // Smoothly interpolate alpha
+                                source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
 
-                                    // Clamp alpha between 0 and 1.0
-                                    source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+                                // Clamp alpha between 0 and 1.0
+                                source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
 
-                                    // Player Element Swapping
-                                    if (isWithinWorldRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
-                                        changeElement(other_entity, entity);
-                                        if (e_sfx_comp.has_value()) {
-                                            e_sfx_comp.value().get().b_play_sfx = true;
-                                        }
+                                // Player Element Swapping
+                                if (isWithinWorldRange(entity, player_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                    changeElement(player_entity, entity);
+                                    if (e_sfx_comp.has_value()) {
+                                        e_sfx_comp.value().get().b_play_sfx = true;
                                     }
                                 }
                             }
+                            
                         }
                     }
                 }
