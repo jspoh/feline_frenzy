@@ -110,6 +110,7 @@ namespace NIKE {
 						// Win whole game overlay
 						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
 							NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
+							// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lv.scn"));
 							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
 							return;
 						}
@@ -191,6 +192,32 @@ namespace NIKE {
 
 							// Offset the health bar so it shrinks from right to left
 							healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
+						}
+					}
+					
+					// Time based change texture
+					if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn")
+					{
+						std::string cutscene_string = "Cutscene_2_";
+						static float elapsed_time = 0.0f;
+						elapsed_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						static int counter = 1;
+						std::string cutscene_asset_id = cutscene_string + std::to_string(counter) + ".png";
+						// Change texture by timer
+						if (elapsed_time >= 3.f && counter <= 8)
+						{
+							auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+							{
+								texture_comp.value().get().texture_id = cutscene_asset_id;
+							}
+							// This is for counter to cut scene
+							++counter;
+							elapsed_time = 0.0f;
+						}
+						if (counter >= 8)
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
 						}
 					}
 
@@ -397,6 +424,10 @@ namespace NIKE {
 						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn")
 						{
 							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
+						}
+						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_before_boss.scn"));
 						}
 					}
 				}
