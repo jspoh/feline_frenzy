@@ -32,15 +32,6 @@ namespace NIKE {
 			// Portal interactions
 			void handlePortalInteractions(const std::set<Entity::Type>& vents_entities);
 
-			//Internal script management
-			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
-
-			// Player Shooting
-			//void shootCursor(const Entity::Type& player_entity);
-
-			// Spawn Health Bar
-			//void spawnHealthBar(const Entity::Type& entity);
-
 			// Spawn Enemy
 			void spawnEnemy(const Entity::Type& spawner);
 
@@ -83,9 +74,6 @@ namespace NIKE {
 
 			//Init Inputs
 			void init() override;
-
-			////Register systems for lua
-			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 		    //Update Inputs
 		    void update() override;

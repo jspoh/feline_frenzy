@@ -386,6 +386,9 @@ namespace NIKE {
 				// Check player interaction
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+						// Save player data
+						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
+
 						// Handle change scene 
 						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
 						{

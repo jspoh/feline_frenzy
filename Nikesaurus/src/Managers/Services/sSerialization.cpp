@@ -386,6 +386,42 @@ namespace NIKE {
 		file.close();
 	}
 
+	nlohmann::json Serialization::Service::serializePlayerData(Entity::Type player) {
+		// Create a new JSON object
+		nlohmann::json playerData;
+
+		// Get player health
+		if (auto healthComp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player)) {
+			playerData["Health"] = healthComp.value().get().health;
+		}
+
+		// Get equipped element
+		if (auto elementComp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player)) {
+			playerData["Element"] = static_cast<int>(elementComp.value().get().element);
+		}
+
+		return playerData;
+	}
+
+
+	bool Serialization::Service::deserializePlayerData(Entity::Type player, nlohmann::json const& data) {
+		// Check if the JSON contains player data
+		if (data.contains("Health")) {
+			if (auto healthComp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player)) {
+				healthComp.value().get().health = data["Health"];
+			}
+		}
+
+		if (data.contains("Element")) {
+			if (auto elementComp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player)) {
+				elementComp.value().get().element = static_cast<Element::Elements>(data["Element"]);
+			}
+		}
+
+		return true; // Return success
+	}
+
+
 	/*****************************************************************//**
 	* Scenes
 	*********************************************************************/

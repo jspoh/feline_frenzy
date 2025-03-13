@@ -189,6 +189,14 @@ namespace NIKE {
 			//Get prev scene id
 			std::string getPrevSceneID() const;
 
+			// Player data for switching levels
+			static nlohmann::json saved_player_data;
+			static void savePlayerData(nlohmann::json data);
+			static nlohmann::json loadPlayerData();
+
+			//Restore player data
+			void restorePlayerData();
+
 			//Reset scene
 			void resetScene();
 
