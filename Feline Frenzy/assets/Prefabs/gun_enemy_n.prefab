@@ -1,7 +1,7 @@
 {
     "Components": {
         "Animation::Base": {
-            "Animation_Count": 0,
+            "Animation_Count": 1,
             "B_PingPong": false,
             "B_Reverse": false,
             "Frame_Duration": 0.009999999776482582
