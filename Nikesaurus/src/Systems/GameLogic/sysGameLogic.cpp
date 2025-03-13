@@ -75,7 +75,15 @@ namespace NIKE {
 				// Change the sprite to be the animation sprite
 				entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
 				entity_texture.value().get().frame_size = { 5, 1 };
-				entity_texture.value().get().frame_index = { 0, 0 };
+				//entity_texture.value().get().frame_index = { 1, 0 };
+
+				// Set params for animation
+				entity_animation_sprite.value().get().start_index = { 0,0 };
+				entity_animation_sprite.value().get().end_index = { 4,1 };
+				entity_animation_sprite.value().get().curr_index = entity_animation_sprite.value().get().start_index;
+				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
+
+				entity_animation_base.value().get().animation_mode = Animation::Mode::RESTART;
 
 				// Set Animation
 				Interaction::animationSet(vent, 0, 0, 4, 0);

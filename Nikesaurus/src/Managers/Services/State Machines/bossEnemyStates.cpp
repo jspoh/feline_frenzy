@@ -27,11 +27,17 @@ namespace NIKE {
 	// Lookup table to take the correct spritesheet
 	std::unordered_map<std::string, std::string> state_to_spritesheet = {
 		{"BossIdle", "Boss_Idle"},
-		{"BossAttack", "Boss_Attack"}
+		{"BossAttack", "Boss_Attack"},
+		{"BossHurt", "Boss_Hurt"},
+		{"BossDeath", "Boss_Death" }
 	};
 
 	std::string NIKE::State::getSpriteSheet(const std::string& fsm_state, const std::string& element)
 	{
+		if (fsm_state == "BossDeath")
+		{
+			return state_to_spritesheet[fsm_state] + "_Spritesheet" + ".png";
+		}
 		return state_to_spritesheet[fsm_state] + "_" + element + "_Spritesheet" + ".png";
 	}
 
@@ -92,6 +98,7 @@ namespace NIKE {
 
 			// Set animation based on direction
 			Interaction::animationSet(entity, start_x, anim_direction, end_x, anim_direction);
+			
 			Interaction::flipX(entity, flip_x);
 			// Keeping flipY as false unless needed
 			Interaction::flipY(entity, false); 
@@ -325,14 +332,15 @@ namespace NIKE {
 		//cout << "enter idle state" << endl;
 		// Stop enemy from moving
 		auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		auto texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		auto elem = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
 		if (dynamics.has_value()) {
 
 			dynamics.value().get().max_speed = { 0.0f };
 		}
 
 		// Play EnemyDeathState animation
-		Interaction::animationSet(entity, 0, 8, 10, 8);
-		Interaction::flipX(entity, false);
+		setBossAnimation(entity, "BossDeath", "", 0, 0, 6);
 		playSFX(entity, true);
 	}
 
