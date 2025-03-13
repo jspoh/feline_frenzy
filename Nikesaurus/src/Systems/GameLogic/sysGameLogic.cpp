@@ -232,7 +232,7 @@ namespace NIKE {
 					const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 					if (e_spawner_comp.has_value()) {
 						auto& e_spawner = e_spawner_comp.value().get();
-						e_spawner.enemy_limit = 1;
+						//e_spawner.enemy_limit = 1;
 
 						// If spawn on cooldown
 						if (e_spawner.last_spawn_time <= e_spawner.cooldown) {

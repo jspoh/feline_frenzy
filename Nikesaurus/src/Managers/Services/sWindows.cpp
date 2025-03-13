@@ -309,7 +309,7 @@ namespace NIKE {
 		glfwSwapBuffers(ptr_window);
 
 		while ((err = glGetError()) != GL_NO_ERROR) {
-			//NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
 
