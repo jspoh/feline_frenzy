@@ -71,38 +71,90 @@ namespace NIKE {
                         if (e_source_comp.has_value()) {
 
                             std::set<NIKE::Entity::Type> e_player_comp = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+                            if (e_player_comp.empty()) { // Player entity exists
+                                continue;
+                            }
+
                             auto player_entity = *e_player_comp.begin();
 
-                            if (!e_player_comp.empty()) { // Player entity exists
 
-                                // Get Render Component
-                                const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-                                auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-                                //float& source_intensity = source_render_comp.value().get().intensity;
-                                Vector4f& source_alpha = source_render_comp.value().get().color;
+                            // Get Render Component
+                            const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+                            auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+                            //float& source_intensity = source_render_comp.value().get().intensity;
+                            Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                float target_alpha = isWithinWorldRange(entity, player_entity) ? 1.0f : 0.0f; // Set target alpha
-                                float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+                            float target_alpha = isWithinWorldRange(entity, player_entity) ? 1.0f : 0.0f; // Set target alpha
+                            float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
-                                // Smoothly interpolate alpha
-                                source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+                            // Smoothly interpolate alpha
+                            source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
 
-                                // Clamp alpha between 0 and 1.0
-                                source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+                            // Clamp alpha between 0 and 1.0
+                            source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
 
-                                // Player Element Swapping
-                                if (isWithinWorldRange(entity, player_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
-                                    changeElement(player_entity, entity);
-                                    if (e_sfx_comp.has_value()) {
-                                        e_sfx_comp.value().get().b_play_sfx = true;
-                                    }
+                            // Player Element Swapping
+                            if (isWithinWorldRange(entity, player_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                changeElement(player_entity, entity);
+                                if (e_sfx_comp.has_value()) {
+                                    e_sfx_comp.value().get().b_play_sfx = true;
                                 }
                             }
+
                             
                         }
                     }
                 }
             }
+        }
+
+        void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
+        {
+            // Destroy the player's health UI container if applicable
+            // NIKE_ECS_MANAGER->destroyEntity(entity);
+
+            // Create the overlay entity
+            auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
+            NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+            NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
+                overlay_entity, Render::Texture(background_texture, Vector4f()));
+
+            // Get viewport size and adjust transform
+            auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+            NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
+                overlay_entity, Transform::Transform(
+                    Vector2f(0.0f, 0.0f),
+                    viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
+                    0.0f,
+                    true));
+
+            // Create Play Again button
+            NIKE_UI_SERVICE->createButton(play_again,
+                Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+                Render::Text(),
+                Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+            // Create Quit button
+            NIKE_UI_SERVICE->createButton(quit_game_text,
+                Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+                Render::Text(),
+                Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+            // Set button input states
+            NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
+            NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
+
+            // Assign Lua scripts to buttons
+            auto play_again_script = Lua::Script();
+            play_again_script.script_id = "ChangeScene.lua";
+            play_again_script.update_function = "Restart";
+            NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
+
+            auto quit_script = Lua::Script();
+            quit_script.script_id = "ChangeScene.lua";
+            quit_script.update_function = "Quit";
+            NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
         }
 
         /* TODO, remove or edit call */
@@ -227,6 +279,8 @@ namespace NIKE {
             // Return a rand value when cnt retrieve last dir
             return INT_MAX;
         }
+
+        // what even is this function for????
         // Testing playing 1 custom SFX
         void playOneShotSFX(Entity::Type& entity,
             const std::string& custom_audio_id,

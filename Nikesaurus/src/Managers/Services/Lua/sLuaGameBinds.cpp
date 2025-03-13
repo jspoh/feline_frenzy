@@ -328,7 +328,7 @@ namespace NIKE {
                 {
                     // Temporary hardcoded SFX
                     Interaction::playOneShotSFX(entity, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
-
+                    Interaction::gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
                     // Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
                     float secondsToDelay = 0.5f;
                     float currentDelay = 0.0f;

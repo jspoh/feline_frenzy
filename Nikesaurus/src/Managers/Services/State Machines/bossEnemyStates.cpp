@@ -464,7 +464,10 @@ namespace NIKE {
 
 		// Play EnemyDeathState animation
 		Interaction::animationSet(entity, 0, 0, 7, 0);
+
 		playSFX(entity, true);
+
+		Interaction::gameOverlay("You_Win_bg.png", "Play Again", "Quit");
 	}
 
 	void State::BossDeathState::onUpdate([[maybe_unused]] Entity::Type& entity)
