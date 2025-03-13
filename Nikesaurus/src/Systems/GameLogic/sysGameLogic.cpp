@@ -420,31 +420,13 @@ namespace NIKE {
 			const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
 
 			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
-				// Change the sprite to be the animation sprite
-				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
-				{
-					entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
-				}
-				entity_texture.value().get().frame_size = { 5, 1 };
-				//entity_texture.value().get().frame_index = { 1, 0 };
-
-				// Set params for animation
-				entity_animation_sprite.value().get().start_index = { 0,0 };
-				entity_animation_sprite.value().get().end_index = { 4,1 };
-				entity_animation_sprite.value().get().curr_index = entity_animation_sprite.value().get().start_index;
-				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
-
-				entity_animation_base.value().get().animation_mode = Animation::Mode::RESTART;
-
-				// Set Animation
-				Interaction::animationSet(vent, 0, 0, 4, 0);
-				Interaction::flipX(vent, false);
 
 				// Check player interaction
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
 						// Save player data
 						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
+						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", "SFX", 1.f, 0.5f, false, false);
 
 						// Handle change scene 
 						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
@@ -461,6 +443,34 @@ namespace NIKE {
 						}
 					}
 				}
+
+				// Handle spawning portal once 
+				if (entity_texture.value().get().texture_id == "Front gate_animation_sprite.png") {
+					continue;
+				}
+
+				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", "SFX", 1.f, 1.f, false, false);
+
+				// Change the sprite to be the animation sprite
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
+				{
+					entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				}
+
+
+				entity_texture.value().get().frame_size = { 5, 1 };
+				//entity_texture.value().get().frame_index = { 1, 0 };
+
+				// Set params for animation
+				entity_animation_sprite.value().get().start_index = { 0,0 };
+				entity_animation_sprite.value().get().end_index = { 4,0 };
+
+				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
+
+				// Set Animation
+				Interaction::flipX(vent, false);
+
+				
 			}
 		}
 	}

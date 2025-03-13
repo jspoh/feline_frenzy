@@ -279,6 +279,8 @@ namespace NIKE {
             // Return a rand value when cnt retrieve last dir
             return INT_MAX;
         }
+
+        // what even is this function for????
         // Testing playing 1 custom SFX
         void playOneShotSFX(Entity::Type& entity,
             const std::string& custom_audio_id,
