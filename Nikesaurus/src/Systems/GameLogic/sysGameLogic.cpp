@@ -110,9 +110,10 @@ namespace NIKE {
 						// Win whole game overlay
 						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
 							NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
-							// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lv.scn"));
+							// WIP cut scenes for after boss
+							// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
 							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
-							return;
+							// return;
 						}
 
 						// Portal animations and interactions
@@ -195,29 +196,59 @@ namespace NIKE {
 						}
 					}
 					
-					// Time based change texture
+					static float elapsed_time_before = 0.0f;
+					static int counter_before = 1;
+					static float elapsed_time_after = 0.0f;
+					static int counter_after = 1;
+
+					// Time based change texture for before boss room cut scene
 					if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn")
 					{
 						std::string cutscene_string = "Cutscene_2_";
-						static float elapsed_time = 0.0f;
-						elapsed_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-						static int counter = 1;
-						std::string cutscene_asset_id = cutscene_string + std::to_string(counter) + ".png";
+						elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
 						// Change texture by timer
-						if (elapsed_time >= 3.f && counter <= 8)
+						if (elapsed_time_before >= 3.f && counter_before <= 8)
 						{
 							auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 							if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
 							{
 								texture_comp.value().get().texture_id = cutscene_asset_id;
+								// This is for counter to cut scene
+								++counter_before;
+								elapsed_time_before = 0.0f;
 							}
-							// This is for counter to cut scene
-							++counter;
-							elapsed_time = 0.0f;
+							cout << counter_before << endl;
 						}
-						if (counter >= 8)
+						if (counter_before > 8)
 						{
 							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+						}
+					}		
+
+					// Time based change texture for after boss room cut scene
+					if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn")
+					{
+						std::string cutscene_string = "Ending_Cutscene_";
+						elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+						// Change texture by timer
+						if (elapsed_time_after >= 3.f && counter_after <= 6)
+						{
+							auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+							{
+								texture_comp.value().get().texture_id = cutscene_asset_id;
+								// This is for counter to cut scene
+								++counter_after;
+								elapsed_time_after = 0.0f;
+							}
+
+						}
+						if (counter_after > 6)
+						{
+							// After boss cutscene play finish, show win game overlay
+							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
 						}
 					}
 
@@ -336,52 +367,52 @@ namespace NIKE {
 
 
 		void GameLogic::Manager::gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
-	{
-		// Destroy the player's health UI container if applicable
-		NIKE_ECS_MANAGER->destroyEntity(entity);
+		{
+			// Destroy the player's health UI container if applicable
+			// NIKE_ECS_MANAGER->destroyEntity(entity);
 
-		// Create the overlay entity
-		auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
-		NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
-		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
-			overlay_entity, Render::Texture(background_texture, Vector4f()));
+			// Create the overlay entity
+			auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
+			NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
+				overlay_entity, Render::Texture(background_texture, Vector4f()));
 
-		// Get viewport size and adjust transform
-		auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
-		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
-			overlay_entity, Transform::Transform(
-				Vector2f(0.0f, 0.0f),
-				viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
-				0.0f,
-				true));
+			// Get viewport size and adjust transform
+			auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+			NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
+				overlay_entity, Transform::Transform(
+					Vector2f(0.0f, 0.0f),
+					viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
+					0.0f,
+					true));
 
-		// Create Play Again button
-		NIKE_UI_SERVICE->createButton(play_again,
-			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
-			Render::Text(),
-			Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+			// Create Play Again button
+			NIKE_UI_SERVICE->createButton(play_again,
+				Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+				Render::Text(),
+				Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
 
-		// Create Quit button
-		NIKE_UI_SERVICE->createButton(quit_game_text,
-			Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
-			Render::Text(),
-			Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+			// Create Quit button
+			NIKE_UI_SERVICE->createButton(quit_game_text,
+				Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+				Render::Text(),
+				Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
 
-		// Set button input states
-		NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
-		NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
+			// Set button input states
+			NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
+			NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
 
-		// Assign Lua scripts to buttons
-		auto play_again_script = Lua::Script();
-		play_again_script.script_id = "ChangeScene.lua";
-		play_again_script.update_function = "Restart";
-		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
+			// Assign Lua scripts to buttons
+			auto play_again_script = Lua::Script();
+			play_again_script.script_id = "ChangeScene.lua";
+			play_again_script.update_function = "Restart";
+			NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
 
-		auto quit_script = Lua::Script();
-		quit_script.script_id = "ChangeScene.lua";
-		quit_script.update_function = "Quit";
-		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
-	}
+			auto quit_script = Lua::Script();
+			quit_script.script_id = "ChangeScene.lua";
+			quit_script.update_function = "Quit";
+			NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
+		}
 
 	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
 		for (const Entity::Type& vent : vents_entities) {
