@@ -1224,13 +1224,13 @@
                                 "Faction": 1
                             },
                             "Combat::Health": {
-                                "Health": 100.0,
+                                "Health": 60.0,
                                 "Lives": 1,
                                 "MaxHealth": 100.0,
                                 "invulnerable_flag": false
                             },
                             "Element::Entity": {
-                                "Element": 2
+                                "Element": 1
                             },
                             "GameLogic::ILogic": {
                                 "Named_Args": {
@@ -1276,7 +1276,7 @@
                                     "x": -966.9425659179688,
                                     "y": -89.24889373779297
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 1.0342178344726563
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -2394,7 +2394,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2406,8 +2406,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -691.5874633789063,
-                                    "y": 336.75799560546875
+                                    "x": -680.0,
+                                    "y": 340.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

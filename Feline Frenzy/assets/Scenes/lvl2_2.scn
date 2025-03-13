@@ -486,13 +486,13 @@
                                 "Faction": 1
                             },
                             "Combat::Health": {
-                                "Health": 100.0,
+                                "Health": 60.0,
                                 "Lives": 1,
                                 "MaxHealth": 100.0,
                                 "invulnerable_flag": false
                             },
                             "Element::Entity": {
-                                "Element": 2
+                                "Element": 1
                             },
                             "GameLogic::ILogic": {
                                 "Named_Args": {
@@ -1055,8 +1055,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -711.6787719726563,
-                                    "y": 356.9342956542969
+                                    "x": -680.0,
+                                    "y": 340.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

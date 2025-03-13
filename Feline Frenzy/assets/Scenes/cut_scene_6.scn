@@ -7,6 +7,10 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            },
             "VFX": {
                 "loop": false,
                 "tracks": []
