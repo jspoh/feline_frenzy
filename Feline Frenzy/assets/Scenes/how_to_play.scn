@@ -145,58 +145,7 @@
                             "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Tutorial.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 0.0,
-                                    "y": 9.0361328125
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 2163.261962890625,
-                                    "y": 1216.8348388671875
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": true,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "How to play",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -253,9 +202,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.6666666865348816,
-                                    "y": 0.572549045085907,
-                                    "z": 0.03921568766236305
+                                    "x": 0.686274528503418,
+                                    "y": 0.07450980693101883,
+                                    "z": 0.9921568632125854
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
