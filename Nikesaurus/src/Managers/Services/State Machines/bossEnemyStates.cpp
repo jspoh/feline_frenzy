@@ -26,8 +26,8 @@ namespace NIKE {
 
 	// Lookup table to take the correct spritesheet
 	std::unordered_map<std::string, std::string> state_to_spritesheet = {
-		{"BossIdle", "Boss_Idle"},
-		{"BossAttack", "Boss_Attack"},
+		{"BossChase", "Boss_Idle"},
+		{"BossAttack", "Boss_Shoot"},
 		{"BossHurt", "Boss_Hurt"},
 		{"BossDeath", "Boss_Death" }
 	};
@@ -39,71 +39,6 @@ namespace NIKE {
 			return state_to_spritesheet[fsm_state] + "_Spritesheet" + ".png";
 		}
 		return state_to_spritesheet[fsm_state] + "_" + element + "_Spritesheet" + ".png";
-	}
-
-	void State::setBossAnimation(Entity::Type const& entity, const std::string& fsm_state, const std::string& element,
-		float dir, int start_x, int end_x)
-	{
-		// Get corresponding state spritesheet
-		std::string boss_spritesheet = getSpriteSheet(fsm_state, element);
-
-		// Get relevant components
-		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-		auto e_ani_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		auto e_ani_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
-
-		if (e_texture_comp.has_value() && e_ani_sprite_comp.has_value() && e_ani_base_comp.has_value())
-		{
-			// Determine animation direction
-			int anim_direction = 0;
-			bool flip_x = false;
-
-			if (dir >= -M_PI / 8 && dir < M_PI / 8) {
-				// Front
-				anim_direction = 1;
-				flip_x = true;
-			}
-			else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
-				// Front-Right
-				anim_direction = 1;
-			}
-			else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
-				// Back-Right
-				anim_direction = 3;
-			}
-			else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
-				// Back
-				anim_direction = 2;
-			}
-			else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
-				// Front-Left (flip it to look right)
-				anim_direction = 1;
-				flip_x = true;
-			}
-			else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
-				// Back-Left (flip it to look right)
-				anim_direction = 3;
-				flip_x = true;
-			}
-			else {
-				// Back
-				anim_direction = 1;
-			}
-
-			// Flip X when facing left
-			//flip_x = (anim_direction == 1 || anim_direction == 3);
-
-			// Change the spritesheet accordingly
-			e_texture_comp.value().get().texture_id = boss_spritesheet;
-
-			// Set animation based on direction
-			Interaction::animationSet(entity, start_x, anim_direction, end_x, anim_direction);
-			
-			Interaction::flipX(entity, flip_x);
-			// Keeping flipY as false unless needed
-			Interaction::flipY(entity, false); 
-			Interaction::setLastDirection(entity, anim_direction);
-		}
 	}
 
 
@@ -178,7 +113,8 @@ namespace NIKE {
 		auto e_enemy_dyna = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 		auto e_enemy_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 		auto e_enemy_ani = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
-		if (e_enemy_comp.has_value() && e_enemy_dyna.has_value() && e_enemy_health.has_value() && e_enemy_ani.has_value()) {
+		auto e_enemy_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+		if (e_enemy_comp.has_value() && e_enemy_dyna.has_value() && e_enemy_health.has_value() && e_enemy_ani.has_value() && e_enemy_element.has_value()) {
 
 			auto& enemy_comp = e_enemy_comp.value().get();
 			auto& dyna_comp = e_enemy_dyna.value().get();
@@ -202,8 +138,7 @@ namespace NIKE {
 						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::bossShoot(entity, player);
-						// TODO: ADD ANIMATIONS
-						// updateEnemyAttackAnimation(entity);
+						updateBossAttackAnimation(entity);
 						auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 						if (e_audio_comp.has_value())
 						{
@@ -233,6 +168,61 @@ namespace NIKE {
 		// Ensure entities exist and handle the collision
 		if (NIKE_ECS_MANAGER->checkEntity(event->entity_a) && NIKE_ECS_MANAGER->checkEntity(event->entity_b)) {
 			Interaction::handleCollision(event->entity_a, event->entity_b);
+		}
+	}
+
+	void State::BossAttackState::updateBossAttackAnimation(Entity::Type& entity)
+	{
+		// Get entity current state
+		auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(entity);
+		auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+
+		if (!e_state_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no state comp");
+			return;
+		}
+
+		if (!e_elem_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no element comp");
+			return;
+		}
+
+		if (!e_texture_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no texture comp");
+			return;
+		}
+
+		// Get element string 
+		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
+		// Set texture here
+		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
+		e_texture_comp.value().get().texture_id = spritesheet;
+
+		int get_last_direction = Interaction::getLastDirection(entity);
+		if (get_last_direction == 0)
+		{
+			// Attack right
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, true);
+		}
+		else if (get_last_direction == 2) {
+			// Attack up
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, false);
+		}
+		else if (get_last_direction == 5) {
+			// Attack down
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, false);
+		}
+		else {
+			// Attack left
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, false);
 		}
 	}
 
@@ -300,10 +290,10 @@ namespace NIKE {
 
 
 			// Update animation based on movement direction
-			//if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
-			//	float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
-			//	updateEnemyChaseAnimation(entity, dir);
-			//}
+			if (e_enemy_dyna.has_value() && e_enemy_dyna.value().get().force.length() > 0.01f) {
+				float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
+				updateBossChaseAnimation(entity, dir);
+			}
 
 		}
 	}
@@ -316,6 +306,87 @@ namespace NIKE {
 
 	void State::BossChaseState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
 	{
+	}
+
+	void State::BossChaseState::updateBossChaseAnimation(Entity::Type& entity, float dir)
+	{
+		// Get entity current state
+		auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(entity);
+		auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+
+		if (!e_state_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no state comp");
+			return;
+		}
+
+		if (!e_elem_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no element comp");
+			return;
+		}
+
+		if (!e_texture_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no texture comp");
+			return;
+		}
+
+		// Get element string 
+		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
+		// Set texture here
+		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
+		e_texture_comp.value().get().texture_id = spritesheet;
+
+		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
+			// Moving right
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 0);
+		}
+		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
+			// Moving up-right (diagonal)
+			Interaction::animationSet(entity, 0, 2, 7, 2);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 1);
+		}
+		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
+			// Moving up
+			Interaction::animationSet(entity, 0, 3, 7, 3);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 2);
+		}
+		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+			// Moving up-left (diagonal)
+			Interaction::animationSet(entity, 0, 2, 7, 2);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 3);
+		}
+		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+			// Moving down-right (diagonal)
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 4);
+		}
+		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
+			// Moving down
+			Interaction::animationSet(entity, 0, 0, 7, 0);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 5);
+		}
+		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+			// Moving down-left (diagonal)
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 6);
+		}
+		else {
+			// Moving left
+			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 7);
+		}
 	}
 
 	/*******************************
@@ -334,13 +405,40 @@ namespace NIKE {
 		auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
 		auto texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 		auto elem = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+		auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
+		// Get entity current state
+		auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(entity);
 		if (dynamics.has_value()) {
 
-			dynamics.value().get().max_speed = { 0.0f };
+			dynamics.value().get().velocity = { 0.f, 0.f };
 		}
 
+		if (!e_state_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no state comp");
+			return;
+		}
+
+		if (!e_elem_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no element comp");
+			return;
+		}
+
+		if (!texture.has_value())
+		{
+			NIKEE_CORE_WARN("error! no texture comp");
+			return;
+		}
+
+		// Get element string 
+		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
+		// Set texture here
+		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
+		texture.value().get().texture_id = spritesheet;
+
 		// Play EnemyDeathState animation
-		setBossAnimation(entity, "BossDeath", "", 0, 0, 6);
+		Interaction::animationSet(entity, 0, 0, 7, 0);
 		playSFX(entity, true);
 	}
 
