@@ -143,7 +143,8 @@ namespace NIKE {
 						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
-						updateEnemyAttackAnimation(entity);
+						float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
+						updateEnemyAttackAnimation(entity, dir);
 						auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 						if (e_audio_comp.has_value())
 						{
@@ -198,22 +199,43 @@ namespace NIKE {
 		}
 	}
 
-	void State::EnemyAttackState::updateEnemyAttackAnimation([[maybe_unused]] Entity::Type& entity)
+	void State::EnemyAttackState::updateEnemyAttackAnimation([[maybe_unused]] Entity::Type& entity, float& dir)
 	{
-		int get_last_direction = Interaction::getLastDirection(entity);
-		if (get_last_direction == 0)
+
+		if (dir >= -M_PI / 8 && dir < M_PI / 8)
 		{
 			// Attack right
 			Interaction::animationSet(entity, 0, 5, 5, 5);
 			Interaction::flipX(entity, false);
 		}
-		else if (get_last_direction == 2) {
+		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8)
+		{
+			// Attack up-right
+			Interaction::animationSet(entity, 0, 7, 5, 7);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Attack up
 			Interaction::animationSet(entity, 0, 7, 5, 7);
 			Interaction::flipX(entity, false);
 		}
-		else if (get_last_direction == 5) {
+		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+			// Attack up-left
+			Interaction::animationSet(entity, 0, 7, 5, 7);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+			// Attack down-right
+			Interaction::animationSet(entity, 0, 4, 5, 4);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Attack down
+			Interaction::animationSet(entity, 0, 4, 5, 4);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+			// Attack up
 			Interaction::animationSet(entity, 0, 4, 5, 4);
 			Interaction::flipX(entity, false);
 		}

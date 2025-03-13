@@ -688,7 +688,7 @@ namespace NIKE {
 
 		auto texture_render = [&]() {
 			static Render::Texture crosshair = { "crosshair.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
-			static Render::Texture cursor = { "cursor.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
+			static Render::Texture cursor = { "cursor_highlighted.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
 
 			Matrix_33 cur_matrix;
 			Transform::Transform cur_transform = { Vector2f(0.f, 0.f), Vector2f(50.0f, 50.0f), 0.0f };
