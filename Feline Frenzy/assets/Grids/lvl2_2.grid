@@ -8,434 +8,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -1216.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1088.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 64.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 192.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 320.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1088.0,
-                    "y": 1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1216.0,
-                    "y": 1344.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1216.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1088.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 64.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 192.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 320.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1088.0,
-                    "y": 1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1216.0,
-                    "y": 1216.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1216.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1088.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 64.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 192.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 320.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1088.0,
-                    "y": 1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1216.0,
-                    "y": 1088.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1216.0,
-                    "y": 960.0
+                    "x": -1152.0,
+                    "y": 1408.0
                 }
             },
             {
@@ -723,14 +297,14 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -768.0,
                     "y": 1152.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -640.0,
                     "y": 1152.0
@@ -744,14 +318,14 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -384.0,
                     "y": 1152.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -256.0,
                     "y": 1152.0
@@ -851,14 +425,14 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -896.0,
                     "y": 1024.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -768.0,
                     "y": 1024.0
@@ -942,21 +516,21 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 768.0,
                     "y": 1024.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 896.0,
                     "y": 1024.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 1024.0,
                     "y": 1024.0
@@ -1028,7 +602,7 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -128.0,
                     "y": 896.0
@@ -1070,7 +644,7 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 640.0,
                     "y": 896.0
@@ -1084,14 +658,14 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 896.0,
                     "y": 896.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": 1024.0,
                     "y": 896.0
@@ -1116,22 +690,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -1088.0,
-                    "y": 320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": 320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": 320.0
+                    "x": -1024.0,
+                    "y": 768.0
                 }
             },
             {
@@ -1300,15 +860,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -448.0,
-                    "y": 192.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": 192.0
+                    "x": -384.0,
+                    "y": 640.0
                 }
             },
             {
@@ -1335,43 +888,15 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 192.0,
-                    "y": 192.0
+                    "x": 128.0,
+                    "y": 640.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 320.0,
-                    "y": 192.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": 192.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": 192.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": 192.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": 192.0
+                    "x": 256.0,
+                    "y": 640.0
                 }
             },
             {
@@ -1449,50 +974,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -832.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": 64.0
+                    "x": -768.0,
+                    "y": 512.0
                 }
             },
             {
@@ -1533,22 +1016,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 704.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": 64.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": 64.0
+                    "x": 0.0,
+                    "y": 512.0
                 }
             },
             {
@@ -1894,14 +1363,14 @@
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -1024.0,
                     "y": 128.0
                 }
             },
             {
-                "Blocked": false,
+                "Blocked": true,
                 "Position": {
                     "x": -896.0,
                     "y": 128.0
@@ -2045,29 +1514,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -832.0,
-                    "y": -320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": -320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": -320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": -320.0
+                    "x": -768.0,
+                    "y": 0.0
                 }
             },
             {
@@ -2115,22 +1563,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 448.0,
-                    "y": -320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": -320.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": -320.0
+                    "x": 128.0,
+                    "y": 0.0
                 }
             },
             {
@@ -2215,22 +1649,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -832.0,
-                    "y": -448.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": -448.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": -448.0
+                    "x": -768.0,
+                    "y": -128.0
                 }
             },
             {
@@ -2278,22 +1698,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": 320.0,
-                    "y": -448.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": -448.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": -448.0
+                    "x": 128.0,
+                    "y": -128.0
                 }
             },
             {
@@ -2364,15 +1770,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -1088.0,
-                    "y": -576.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": -576.0
+                    "x": -1024.0,
+                    "y": -256.0
                 }
             },
             {
@@ -2392,36 +1791,15 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -576.0,
-                    "y": -576.0
+                    "x": -640.0,
+                    "y": -256.0
                 }
             },
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -448.0,
-                    "y": -576.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": -576.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": -576.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": -576.0
+                    "x": -512.0,
+                    "y": -256.0
                 }
             },
             {
@@ -2534,22 +1912,8 @@
             {
                 "Blocked": false,
                 "Position": {
-                    "x": -960.0,
-                    "y": -704.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": -704.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": -704.0
+                    "x": -896.0,
+                    "y": -384.0
                 }
             },
             {
@@ -3742,438 +3106,12 @@
                 "Position": {
                     "x": 1152.0,
                     "y": -1408.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1216.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1088.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 64.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 192.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 320.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1088.0,
-                    "y": -1088.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1216.0,
-                    "y": -1088.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1216.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1088.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 64.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 192.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 320.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1088.0,
-                    "y": -1216.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1216.0,
-                    "y": -1216.0
-                }
-            }
-        ],
-        [
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1216.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -1088.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -960.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -832.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -704.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -576.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -448.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -320.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -192.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": -64.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 64.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 192.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 320.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 448.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 576.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 704.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 832.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 960.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1088.0,
-                    "y": -1344.0
-                }
-            },
-            {
-                "Blocked": false,
-                "Position": {
-                    "x": 1216.0,
-                    "y": -1344.0
                 }
             }
         ]
     ],
     "Grid_Size": {
-        "x": 20,
-        "y": 22
+        "x": 19,
+        "y": 23
     }
 }
