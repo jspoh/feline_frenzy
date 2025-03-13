@@ -12,6 +12,9 @@
 #define GAME_LOGIC_HPP
 
 #include "Managers/ECS/mSystem.h"
+#include "Components/cElement.h"
+#include "Components/cCombat.h"
+#include "Components/cPhysics.h"
 #include <random>
 
 namespace NIKE {
@@ -46,6 +49,24 @@ namespace NIKE {
 
 			// Prefabs for spawnEnemy (boss)
 			const std::string enemyBossArr[3] = { "bossFire.prefab", "bossWater.prefab", "bossGrass.prefab"};
+
+			// Status Effect Update
+			void updateStatusEffects(Entity::Type entity);
+
+			// Apply status effects
+			void applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic);
+
+			// Remove status effect
+			void removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic);
+
+			// Lifesteal Status
+			void applyLifesteal(float& health, float lifesteal_amount);
+
+			// Burn Status
+			void applyBurn(float& health, float burn_damage);
+
+			// Freeze Status
+			void applyFreeze(float& max_speed, float freeze_speed, float& temp_max_speed);
 
 	    public:
 		    //Default constructor

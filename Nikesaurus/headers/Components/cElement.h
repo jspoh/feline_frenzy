@@ -131,20 +131,6 @@ namespace NIKE {
 					status_timer = status_duration;  
 				}
 			}
-
-			void applyBurn(float& health, float burn_damage) {
-				// Decrement by burn ammount
-				health = max(0.0f, health - burn_damage);
-			}
-
-			void applyFreeze(float& max_speed, float freeze_speed) {
-				// Only store max speed once
-				if (temp_max_speed < 0) { 
-					temp_max_speed = max_speed;
-				}
-				// Setting max speed to lowered speed
-				max_speed = freeze_speed;
-			}
 		};
 
 		const std::string playerBullet[4] = { "bullet.prefab", "fireBullet.prefab", "waterBullet.prefab", "grassBullet.prefab" };
