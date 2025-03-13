@@ -276,9 +276,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.18039216101169586,
-                                    "y": 0.43921568989753723,
-                                    "z": 0.18431372940540314
+                                    "x": 0.1882352977991104,
+                                    "y": 0.48235294222831726,
+                                    "z": 0.8705882430076599
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -545,9 +545,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.09019608050584793,
-                                    "y": 0.95686274766922,
-                                    "z": 0.729411780834198
+                                    "x": 0.20392157137393951,
+                                    "y": 0.054901961237192154,
+                                    "z": 0.5254902243614197
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
@@ -829,7 +829,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "UI_Options_Spritesheet.png"
+                                "Texture_ID": "UI_Options_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
