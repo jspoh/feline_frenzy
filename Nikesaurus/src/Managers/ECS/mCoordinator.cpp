@@ -12,6 +12,24 @@
 #include "Core/Engine.h"
 
 namespace NIKE {
+	int Coordinator::Manager::nextEntityId = 0;
+
+	int Coordinator::Manager::getNextEntityId() {
+		if (nextEntityId >= Entity::MAX) {
+			nextEntityId = 0;
+		}
+
+		auto entities = entity_manager->getAllEntities();
+		auto it = entities.find(nextEntityId);
+		
+		while (it != entities.end()) {
+			nextEntityId++;
+			it = entities.find(nextEntityId);
+		}
+
+		return nextEntityId++;
+	}
+
 	//Default constructor
 	Coordinator::Manager::Manager()
 		: entity_manager{ std::make_unique<Entity::Manager>() },

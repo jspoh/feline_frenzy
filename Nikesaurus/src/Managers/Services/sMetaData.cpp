@@ -558,7 +558,13 @@ namespace NIKE {
 		}
 
 		//Return relation
-		return entities.at(entity).relation;
+		try {
+			return entities.at(entity).relation;
+		}
+		catch (...) {
+			NIKEE_CORE_ERROR("Relation is invalid");
+			return Parent();
+		}
 	}
 
 	std::vector<const char*> MetaData::Service::getAllParents() const {

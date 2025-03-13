@@ -38,7 +38,8 @@ namespace NIKE {
 	void Entity::Manager::destroyEntity(Entity::Type entity) {
 		//Check if entity has alr been created
 		if (entities.find(entity) == entities.end()) {
-			throw std::runtime_error("Entity not found.");
+			//throw std::runtime_error("Entity not found.");
+			return;
 		}
 
 		//Erase entity and push into avail entities

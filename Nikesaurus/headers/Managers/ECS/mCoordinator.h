@@ -32,11 +32,16 @@ namespace NIKE {
 			std::unique_ptr<Entity::Manager> entity_manager;
 			std::unique_ptr<Component::Manager> component_manager;
 			std::unique_ptr<System::Manager> system_manager;
+			static int nextEntityId;
 
 		public:
 
 			//Default constructor
 			Manager();
+
+			// this is preferable to .size() or getcount to prevent conflicts during quickly adding and removing entities
+			int getNextEntityId();
+
 
 			/*****************************************************************//**
 			* Entity Methods

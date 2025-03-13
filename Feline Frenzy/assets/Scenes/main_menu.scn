@@ -276,9 +276,9 @@
                                 "particle_acceleration": -150.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.13333334028720856,
-                                    "y": 0.8470588326454163,
-                                    "z": 0.7490196228027344
+                                    "x": 0.7058823704719543,
+                                    "y": 0.18431372940540314,
+                                    "z": 0.14901961386203766
                                 },
                                 "particle_color_changes_over_time": true,
                                 "particle_color_is_random": true,
@@ -545,9 +545,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.45490196347236633,
-                                    "y": 0.06666667014360428,
-                                    "z": 0.7686274647712708
+                                    "x": 0.003921568859368563,
+                                    "y": 0.658823549747467,
+                                    "z": 0.05882352963089943
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,
@@ -634,7 +634,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 2,
-                            "Name": "entity_0005",
+                            "Name": "entity_0011",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

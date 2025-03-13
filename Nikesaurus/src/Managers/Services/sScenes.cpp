@@ -1,7 +1,7 @@
 /*****************************************************************//**
  * \file   sScenes.cpp
- * \brief  
- * 
+ * \brief
+ *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -31,7 +31,7 @@ namespace NIKE {
 		b_ysort = y_sort_state;
 	}
 
-	bool Scenes::Layer::getLayerYSort() const{
+	bool Scenes::Layer::getLayerYSort() const {
 		return b_ysort;
 	}
 
@@ -58,9 +58,31 @@ namespace NIKE {
 
 	void Scenes::Layer::removeEntity(Entity::Type entity) {
 		auto it = std::find(entities.begin(), entities.end(), entity);
-		if (it != entities.end()) {
-			entities.erase(it);
+		if (it == entities.end()) {
+			return;
 		}
+
+		// remove entity children
+		// auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		// auto* parent = std::get_if<MetaData::Parent>(&relation);
+
+		// if (parent) {
+		// 	for (const auto child : parent->childrens) {
+		// 		auto e = NIKE_METADATA_SERVICE->getEntityByName(child);
+
+		// 		if (!e.has_value()) {
+		// 			continue;
+		// 		}
+
+		// 		Entity::Type entity = e.value();
+		// 		removeEntity(entity);
+		// 	}
+		// }
+
+		// // Re-find the iterator in case it was invalidated by recursive removals
+		// it = std::find(entities.begin(), entities.end(), entity);
+		if (it != entities.end())
+			entities.erase(it);
 	}
 
 	bool Scenes::Layer::checkEntity(Entity::Type entity) {
@@ -165,7 +187,7 @@ namespace NIKE {
 				{"Mask", mask.to_ulong()},
 				{"B_State", b_state},
 				{"B_YSort", b_ysort}
-				};
+		};
 	}
 
 	void Scenes::Layer::deserialize(nlohmann::json const& data) {
@@ -199,7 +221,7 @@ namespace NIKE {
 		if (scene_id == curr_scene) {
 			return;
 		}
-		
+
 		//Set curr & prev scene id references
 		prev_scene = curr_scene;
 		curr_scene = scene_id;
@@ -290,7 +312,7 @@ namespace NIKE {
 
 		// Reset grid here
 		NIKE_MAP_SERVICE->resetGrid();
-		
+
 		//Reset Camera
 		NIKE_CAMERA_SERVICE->clearCameraEntities();
 
@@ -325,7 +347,7 @@ namespace NIKE {
 
 		// Reset grid here
 		NIKE_MAP_SERVICE->resetGrid();
-		
+
 		//Reset Camera
 		NIKE_CAMERA_SERVICE->clearCameraEntities();
 

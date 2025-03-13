@@ -393,19 +393,39 @@ namespace NIKE {
 		// set enemy entity as parent
 		NIKE_METADATA_SERVICE->setEntityParentRelation(enemy_entity);
 
+		// weaken enemy for testing
+		// !TODO: jspoh remove
+		{
+			auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(enemy_entity);
+			if (e_health_comp.has_value()) {
+				e_health_comp.value().get().health = 1;
+			}
+		}
+
 		// create gun entity
-		Entity::Type gun_entity = NIKE_ECS_MANAGER->createEntity();
-		// load gun entity from prefab
-		NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
-		// set gun entity as child
-		NIKE_METADATA_SERVICE->setEntityChildRelation(gun_entity);
-		//const std::string dbg_gun_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(gun_entity);
+		{
+			Entity::Type gun_entity = NIKE_ECS_MANAGER->createEntity();
+			// load gun entity from prefab
+			NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
+			// set gun entity as child
+			NIKE_METADATA_SERVICE->setEntityChildRelation(gun_entity);
+			//const std::string dbg_gun_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(gun_entity);
 
-		// get enemy entity name
-		std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(enemy_entity);
+			// get enemy entity name
+			std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(enemy_entity);
 
-		// set gun entity as child of enemy entity
-		NIKE_METADATA_SERVICE->setEntityChildRelationParent(gun_entity, enemy_entity_name);
+			// set gun entity as child of enemy entity
+			NIKE_METADATA_SERVICE->setEntityChildRelationParent(gun_entity, enemy_entity_name);
+
+			// check that gun has a parent
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(gun_entity);
+			//auto* parent = std::get_if<MetaData::Parent>(&relation);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			if (!child || !NIKE_METADATA_SERVICE->getEntityByName(child->parent).has_value()) {
+				NIKEE_CORE_ERROR("Gun entity has no parent");
+			}
+		}
 
 
 		// Randomly offset from spawner position		
