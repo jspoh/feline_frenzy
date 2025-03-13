@@ -266,10 +266,16 @@ namespace NIKE {
 			return;
 		}
 
+		const auto e_ani_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(enemy);
+		if (!e_ani_comp.has_value()) {
+			NIKEE_CORE_WARN("ENEMY missing Ani component!");
+			return;
+		}
+
 		// For boss to move slightly left and right while shooting
 		static bool move_left = true;
 		float move_force = 50.0f;
-		float move_dir = (move_left) ? -static_cast<float>(M_PI) : 0;
+		// float move_dir = (move_left) ? -static_cast<float>(M_PI) : 0;
 		if (move_left) {
 			// Move left
 			e_physics_comp.value().get().force.x -= move_force;  
@@ -288,11 +294,12 @@ namespace NIKE {
 
 		// Play moving animation (left or right)
 		// Get element
-		std::string elem_string = Element::getElementString(e_elem_comp.value().get().element);
-		State::setBossAnimation(enemy, "BossIdle", elem_string, move_dir, 0, 6);
+		//std::string elem_string = Element::getElementString(e_elem_comp.value().get().element);
+		//State::setBossAnimation(enemy, "BossAttack", elem_string, move_dir, 0, 6);
 
 		// Flip direction 
 		move_left = !move_left;
+
 
 		const Vector2f& enemy_pos = e_transform_comp.value().get().position;
 

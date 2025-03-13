@@ -17,96 +17,6 @@ namespace NIKE {
 
 	}
 
-	void GameLogic::Manager::gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
-	{
-		// Destroy the player's health UI container if applicable
-		NIKE_ECS_MANAGER->destroyEntity(entity);
-
-		// Create the overlay entity
-		auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
-		NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
-		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
-			overlay_entity, Render::Texture(background_texture, Vector4f()));
-
-		// Get viewport size and adjust transform
-		auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
-		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
-			overlay_entity, Transform::Transform(
-				Vector2f(0.0f, 0.0f),
-				viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
-				0.0f,
-				true));
-
-		// Create Play Again button
-		NIKE_UI_SERVICE->createButton(play_again,
-			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
-			Render::Text(),
-			Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-
-		// Create Quit button
-		NIKE_UI_SERVICE->createButton(quit_game_text,
-			Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
-			Render::Text(),
-			Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-
-		// Set button input states
-		NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
-		NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
-
-		// Assign Lua scripts to buttons
-		auto play_again_script = Lua::Script();
-		play_again_script.script_id = "ChangeScene.lua";
-		play_again_script.update_function = "Restart";
-		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
-
-		auto quit_script = Lua::Script();
-		quit_script.script_id = "ChangeScene.lua";
-		quit_script.update_function = "Quit";
-		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
-	}
-
-	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
-		for (const Entity::Type& vent : vents_entities) {
-			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
-			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
-			const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
-
-			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
-				// Change the sprite to be the animation sprite
-				entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
-				entity_texture.value().get().frame_size = { 5, 1 };
-				//entity_texture.value().get().frame_index = { 1, 0 };
-
-				// Set params for animation
-				entity_animation_sprite.value().get().start_index = { 0,0 };
-				entity_animation_sprite.value().get().end_index = { 4,1 };
-				entity_animation_sprite.value().get().curr_index = entity_animation_sprite.value().get().start_index;
-				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
-
-				entity_animation_base.value().get().animation_mode = Animation::Mode::RESTART;
-
-				// Set Animation
-				Interaction::animationSet(vent, 0, 0, 4, 0);
-				Interaction::flipX(vent, false);
-
-				// Check player interaction
-				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
-						// Handle change scene 
-						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
-						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
-						}
-						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn")
-						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
-						}
-					}
-				}
-			}
-		}
-	}
-
 	void GameLogic::Manager::update() {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
@@ -168,73 +78,7 @@ namespace NIKE {
 				// Check if player tag exists
 				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
-				// Check for Elemental Stack comp
-				const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
-				const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-				const auto e_dynamic_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-				if (e_combo_comp.has_value() && e_health_comp.has_value()) {
-					auto& e_combo = e_combo_comp.value().get();
-					auto& e_health = e_health_comp.value().get();
-					auto& e_dynamic = e_dynamic_comp.value().get();
-
-					// Entity has status effect
-					if (e_combo.status_effect != Element::Status::NONE && e_combo.status_timer > 0.0f) {
-
-						// Decrease tick timer
-						e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
-						
-						// Applying status effect
-						if (e_combo.tick_timer <= 0.0f) {
-							switch (e_combo.status_effect) {
-							case Element::Status::BURN:
-								NIKEE_CORE_INFO("BURN TICK: -1 HP");
-								e_combo.applyBurn(e_health.health, 5.f); // Apply burn damage
-								break;
-							case Element::Status::FREEZE:
-								NIKEE_CORE_INFO("FROZEN TICK");
-								e_combo.applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed/2); // Apply freeze
-								break;
-							case Element::Status::POISON:
-								NIKEE_CORE_INFO("POISON TICK: -1 HP");
-								e_combo.applyBurn(e_health.health, 5.f); // Apply poison damage
-
-								// If player not dead
-								if (!player_entities.empty()) {
-									// Look for player
-									for (auto& player : player_entities) {
-										const auto player_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
-										if (player_health_comp.value().get().health != player_health_comp.value().get().max_health) {
-											// Heal player
-											player_health_comp.value().get().health += 5.f;
-										}
-									}
-								}
-								break;
-							}
-
-							// Reset tick timer
-							e_combo.tick_timer = Element::Combo::tick_interval;
-						}
-
-							// Decrease status time
-							e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
-
-							// Remove status effect if timer expires
-							if (e_combo.status_timer <= 0.0f) {
-								// Return max speed after freeze ends
-								// Checking if max speed is valid
-								if (e_combo.temp_max_speed >= 0) {  
-									e_dynamic.max_speed = e_combo.temp_max_speed;
-									// Reset after restoring speed
-									e_combo.temp_max_speed = -1;
-								}
-								// Remove status
-								e_combo.status_effect = Element::Status::NONE;
-							}
-
-							NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
-						}
-					}
+				updateStatusEffects(entity);
 
 					// Check for Spawner comp
 					const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
@@ -266,8 +110,10 @@ namespace NIKE {
 						// Win whole game overlay
 						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
 							NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
+							// WIP cut scenes for after boss
+							// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
 							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
-							return;
+							// return;
 						}
 
 						// Portal animations and interactions
@@ -349,12 +195,276 @@ namespace NIKE {
 							healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
 						}
 					}
+					
+					static float elapsed_time_before = 0.0f;
+					static int counter_before = 1;
+					static float elapsed_time_after = 0.0f;
+					static int counter_after = 1;
+
+					// Time based change texture for before boss room cut scene
+					if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn")
+					{
+						std::string cutscene_string = "Cutscene_2_";
+						elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
+						// Change texture by timer
+						if (elapsed_time_before >= 3.f && counter_before <= 8)
+						{
+							auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+							{
+								texture_comp.value().get().texture_id = cutscene_asset_id;
+								// This is for counter to cut scene
+								++counter_before;
+								elapsed_time_before = 0.0f;
+							}
+							cout << counter_before << endl;
+						}
+						if (counter_before > 8)
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+						}
+					}		
+
+					// Time based change texture for after boss room cut scene
+					if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn")
+					{
+						std::string cutscene_string = "Ending_Cutscene_";
+						elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+						// Change texture by timer
+						if (elapsed_time_after >= 3.f && counter_after <= 6)
+						{
+							auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+							if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+							{
+								texture_comp.value().get().texture_id = cutscene_asset_id;
+								// This is for counter to cut scene
+								++counter_after;
+								elapsed_time_after = 0.0f;
+							}
+
+						}
+						if (counter_after > 6)
+						{
+							// After boss cutscene play finish, show win game overlay
+							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
+						}
+					}
 
 					// Update of FSM will be called here
 					NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 				}
 			}
 		}
+
+		void GameLogic::Manager::updateStatusEffects(Entity::Type entity) {
+			// Check for Elemental Stack comp
+			const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
+			const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+			const auto e_dynamic_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+
+			if (!e_combo_comp.has_value() || !e_health_comp.has_value()) return;
+
+			auto& e_combo = e_combo_comp.value().get();
+			auto& e_health = e_health_comp.value().get();
+			auto& e_dynamic = e_dynamic_comp.value().get();
+
+			// Exit if no status effect
+			if (e_combo.status_effect == Element::Status::NONE || e_combo.status_timer <= 0.0f) { 
+				return; 
+			}
+
+			// Decrease tick timer
+			e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+			// Apply status effect if tick timer reached
+			if (e_combo.tick_timer <= 0.0f) {
+				applyStatusEffect(e_combo, e_health, e_dynamic);
+				e_combo.tick_timer = Element::Combo::tick_interval; // Reset tick timer
+			}
+
+			// Decrease status effect duration
+			e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+			// Remove status effect if expired
+			if (e_combo.status_timer <= 0.0f) {
+				removeStatusEffect(e_combo, e_dynamic);
+			}
+
+			NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
+		}
+
+		void GameLogic::Manager::applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic) {
+			switch (e_combo.status_effect) {
+			case Element::Status::BURN:
+				NIKEE_CORE_INFO("BURN TICK: -1 HP");
+				applyBurn(e_health.health, 5.f);
+				break;
+
+			case Element::Status::FREEZE:
+				NIKEE_CORE_INFO("FROZEN TICK");
+				applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed / 2, e_combo.temp_max_speed);
+				break;
+
+			case Element::Status::POISON:
+				NIKEE_CORE_INFO("POISON TICK: -1 HP");
+				applyLifesteal(e_health.health, 5.f);
+				break;
+			}
+		}
+
+		void GameLogic::Manager::removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic) {
+			// Restore speed if frozen
+			if (e_combo.status_effect == Element::Status::FREEZE && e_combo.temp_max_speed >= 0) {
+				e_dynamic.max_speed = e_combo.temp_max_speed;
+				e_combo.temp_max_speed = -1; // Reset
+			}
+
+			// Remove status effect
+			e_combo.status_effect = Element::Status::NONE;
+		}
+
+
+		void GameLogic::Manager::applyLifesteal(float& health, float lifesteal_amount) {
+			// Damage enemy
+			applyBurn(health, lifesteal_amount);
+
+			// Get all player entities
+			std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+			// Check if player alive
+			if (player_entities.empty()) {
+				return;
+			}
+
+			for (auto& player : player_entities) {
+				const auto player_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+				if (player_health_comp) {
+					auto& player_health = player_health_comp.value().get();
+
+					// Heal player
+					if (player_health.health < player_health.max_health) {
+						player_health.health = min(player_health.max_health, player_health.health + lifesteal_amount);
+					}
+				}
+			}
+		}
+
+		void GameLogic::Manager::applyBurn(float& health, float burn_damage) {
+			// Decrement by burn amount
+			health = max(0.0f, health - burn_damage);
+		}
+
+		void GameLogic::Manager::applyFreeze(float& max_speed, float freeze_speed, float& temp_max_speed) {
+			// Only store max speed once
+			if (temp_max_speed < 0) {
+				temp_max_speed = max_speed;
+			}
+			// Setting max speed to lowered speed
+			max_speed = freeze_speed;
+		}
+
+
+		void GameLogic::Manager::gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
+		{
+			// Destroy the player's health UI container if applicable
+			// NIKE_ECS_MANAGER->destroyEntity(entity);
+
+			// Create the overlay entity
+			auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
+			NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
+				overlay_entity, Render::Texture(background_texture, Vector4f()));
+
+			// Get viewport size and adjust transform
+			auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+			NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
+				overlay_entity, Transform::Transform(
+					Vector2f(0.0f, 0.0f),
+					viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
+					0.0f,
+					true));
+
+			// Create Play Again button
+			NIKE_UI_SERVICE->createButton(play_again,
+				Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+				Render::Text(),
+				Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+			// Create Quit button
+			NIKE_UI_SERVICE->createButton(quit_game_text,
+				Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+				Render::Text(),
+				Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+			// Set button input states
+			NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
+			NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
+
+			// Assign Lua scripts to buttons
+			auto play_again_script = Lua::Script();
+			play_again_script.script_id = "ChangeScene.lua";
+			play_again_script.update_function = "Restart";
+			NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
+
+			auto quit_script = Lua::Script();
+			quit_script.script_id = "ChangeScene.lua";
+			quit_script.update_function = "Quit";
+			NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
+		}
+
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
+		for (const Entity::Type& vent : vents_entities) {
+			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
+			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
+			const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
+
+			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
+				// Change the sprite to be the animation sprite
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
+				{
+					entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				}
+				entity_texture.value().get().frame_size = { 5, 1 };
+				//entity_texture.value().get().frame_index = { 1, 0 };
+
+				// Set params for animation
+				entity_animation_sprite.value().get().start_index = { 0,0 };
+				entity_animation_sprite.value().get().end_index = { 4,1 };
+				entity_animation_sprite.value().get().curr_index = entity_animation_sprite.value().get().start_index;
+				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
+
+				entity_animation_base.value().get().animation_mode = Animation::Mode::RESTART;
+
+				// Set Animation
+				Interaction::animationSet(vent, 0, 0, 4, 0);
+				Interaction::flipX(vent, false);
+
+				// Check player interaction
+				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
+					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+						// Save player data
+						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
+
+						// Handle change scene 
+						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
+						}
+						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
+						}
+						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_before_boss.scn"));
+						}
+					}
+				}
+			}
+		}
+	}
 
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
 		// Get spawner position

@@ -10,6 +10,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Managers/Services/State Machine/bossEnemyStates.h"
 
 namespace NIKE {
     namespace Interaction {
@@ -69,36 +70,35 @@ namespace NIKE {
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {
 
-                            // Look for entity with player component
-                            for (auto& other_entity : entities) {
-                                auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+                            std::set<NIKE::Entity::Type> e_player_comp = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+                            auto player_entity = *e_player_comp.begin();
 
-                                if (e_player_comp.has_value()) { // Player entity exists
+                            if (!e_player_comp.empty()) { // Player entity exists
 
-                                    // Get Render Component
-                                    const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-                                    auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-                                    //float& source_intensity = source_render_comp.value().get().intensity;
-                                    Vector4f& source_alpha = source_render_comp.value().get().color;
+                                // Get Render Component
+                                const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+                                auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+                                //float& source_intensity = source_render_comp.value().get().intensity;
+                                Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    float target_alpha = isWithinWorldRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
-                                    float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+                                float target_alpha = isWithinWorldRange(entity, player_entity) ? 1.0f : 0.0f; // Set target alpha
+                                float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
-                                    // Smoothly interpolate alpha
-                                    source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+                                // Smoothly interpolate alpha
+                                source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
 
-                                    // Clamp alpha between 0 and 1.0
-                                    source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+                                // Clamp alpha between 0 and 1.0
+                                source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
 
-                                    // Player Element Swapping
-                                    if (isWithinWorldRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
-                                        changeElement(other_entity, entity);
-                                        if (e_sfx_comp.has_value()) {
-                                            e_sfx_comp.value().get().b_play_sfx = true;
-                                        }
+                                // Player Element Swapping
+                                if (isWithinWorldRange(entity, player_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                    changeElement(player_entity, entity);
+                                    if (e_sfx_comp.has_value()) {
+                                        e_sfx_comp.value().get().b_play_sfx = true;
                                     }
                                 }
                             }
+                            
                         }
                     }
                 }
@@ -416,18 +416,71 @@ namespace NIKE {
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
             auto sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(target);
+            auto tags = NIKE_METADATA_SERVICE->getEntityTags(target);
             if (base_comp.has_value() && sprite_comp.has_value()) {
-                auto& base = base_comp.value().get();
-                auto& sprite = sprite_comp.value().get();
 
-                //Set base
-                base.animations_to_complete = 3;
-                base.animation_mode = Animation::Mode::RESTART;
+                // If entities are not boss
+                if (tags.find("boss") == tags.end())
+                {
+                    auto& base = base_comp.value().get();
+                    auto& sprite = sprite_comp.value().get();
 
-                //Set sprite
-                sprite.start_index = { 0, 12 };
-                sprite.end_index = { 1, 12 };
-                sprite.curr_index = sprite.start_index;
+                    //Set base
+                    base.animations_to_complete = 3;
+                    base.animation_mode = Animation::Mode::RESTART;
+
+                    //Set sprite
+                    sprite.start_index = { 0, 12 };
+                    sprite.end_index = { 1, 12 };
+                    sprite.curr_index = sprite.start_index;
+                }
+                // If entity is boss
+                else if (tags.find("enemy") != tags.end() && tags.find("boss") != tags.end())
+                {
+                    // Get entity current state
+                    auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(target);
+                    auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
+                    auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+
+                    if (!e_state_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no state comp");
+                        return;
+                    }
+
+                    if (!e_elem_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no element comp");
+                        return;
+                    }
+
+                    if (!e_texture_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no texture comp");
+                        return;
+                    }
+
+                    // Get element string 
+                    std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
+                    // Set texture here
+                    std::string spritesheet = State::getSpriteSheet("BossHurt", element_string);
+                    if (NIKE_ASSETS_SERVICE->isAssetRegistered(spritesheet))
+                    {
+                        e_texture_comp.value().get().texture_id = spritesheet;
+                    }
+                    auto& base = base_comp.value().get();
+                    auto& sprite = sprite_comp.value().get();
+
+                    //Set base
+                    base.animations_to_complete = 3;
+                    base.animation_mode = Animation::Mode::RESTART;
+
+                    //Set sprite
+                    sprite.start_index = { 0, 0 };
+                    sprite.end_index = { 7, 0 };
+                    sprite.curr_index = sprite.start_index;
+                }
+
             }
 
             // Check if target health drops to zero or below
