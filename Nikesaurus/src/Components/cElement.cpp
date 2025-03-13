@@ -16,6 +16,13 @@ namespace NIKE {
 		return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
 	}
 
+	std::string Element::getElementString(Element::Elements& element)
+	{
+		auto it = elements_to_string.find(element);
+		// Return empty str if no element found
+		return (it != elements_to_string.end()) ? it->second : "";
+	}
+
 	void Element::registerComponents() {
 		// Register components
 		NIKE_ECS_MANAGER->registerComponent<Combo>();

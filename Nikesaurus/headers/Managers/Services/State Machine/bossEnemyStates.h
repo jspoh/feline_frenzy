@@ -18,7 +18,8 @@
 namespace NIKE {
 	namespace State {
 
-		std::string getSpriteSheet(const std::string& fsm_state, const std::string& element, const std::string& asset_type);
+		// Utility functions
+		std::string getSpriteSheet(const std::string& fsm_state, const std::string& element);
 
 		class BossIdleState : public StateMachine::Istate
 		{
@@ -56,7 +57,7 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<Physics::CollisionEvent> event) override;
 
 		private:
-
+			void updateBossAttackAnimation([[maybe_unused]] Entity::Type& entity);
 		};
 
 		class BossChaseState : public StateMachine::Istate
@@ -76,6 +77,8 @@ namespace NIKE {
 		private:
 			float cell_offset;
 			float boss_speed;
+			void updateBossChaseAnimation([[maybe_unused]] Entity::Type& entity, float dir);
+
 		};
 
 		class BossDeathState : public StateMachine::Istate

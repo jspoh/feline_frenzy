@@ -162,6 +162,12 @@ namespace NIKE {
 
 			//Load json file path
 			nlohmann::json loadJsonFile(std::string const& file_path);
+
+			//Serialize player data
+			nlohmann::json serializePlayerData(Entity::Type player);
+
+			//Deserialize player data
+			bool deserializePlayerData(Entity::Type player, nlohmann::json const& data);
 		};
 
 		//Re-enable DLL Export warning

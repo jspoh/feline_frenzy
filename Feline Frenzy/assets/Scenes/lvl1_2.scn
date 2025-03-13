@@ -535,147 +535,6 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Frame_Duration": 0.054999999701976776
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Sheet_Size": {
-                                    "x": 10,
-                                    "y": 16
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 1
-                                }
-                            },
-                            "Audio::SFX": {
-                                "Audio_ID": "WalkingNature.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "PlayerSFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Combat::Faction": {
-                                "Faction": 1
-                            },
-                            "Combat::Health": {
-                                "Health": 100.0,
-                                "Lives": 1,
-                                "MaxHealth": 100.0,
-                                "invulnerable_flag": false
-                            },
-                            "Element::Entity": {
-                                "Element": 2
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 1647
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "",
-                                "Update_Function": "update"
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": false,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": -20.0
-                                },
-                                "Position": {
-                                    "x": -325.49688720703125,
-                                    "y": 594.0060424804688
-                                },
-                                "Resolution": 1,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 50.0,
-                                    "y": 80.0
-                                }
-                            },
-                            "Physics::Dynamics": {
-                                "Drag": 10.0,
-                                "Force": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Mass": 0.5,
-                                "Max_Speed": 3000.0,
-                                "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                }
-                            },
-                            "Render::Cam": {
-                                "Mouse_Offset": 0.15000000596046448,
-                                "Position": {
-                                    "x": -325.49688720703125,
-                                    "y": 594.0060424804688
-                                },
-                                "Zoom": 1.0
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 2,
-                                    "y": 1
-                                },
-                                "Frame_Size": {
-                                    "x": 10,
-                                    "y": 16
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Player_animation_sprite.png"
-                            },
-                            "State::State": {
-                                "State": "Idle"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -325.49688720703125,
-                                    "y": 594.0060424804688
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 88.9101791381836,
-                                    "y": 127.99999237060547
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 4,
-                            "Name": "player",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": [
-                                "player"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
                                 "Frame_Duration": 0.20000000298023224
                             },
                             "Combat::Health": {
@@ -744,7 +603,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 5,
+                            "Layer_Order": 4,
                             "Name": "barrel_3",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -817,7 +676,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 6,
+                            "Layer_Order": 5,
                             "Name": "grass_05",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -900,7 +759,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 7,
+                            "Layer_Order": 6,
                             "Name": "barrel_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -915,7 +774,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 8,
+                            "Layer_Order": 7,
                             "Name": "yellow_tree2",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1003,7 +862,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 9,
+                            "Layer_Order": 8,
                             "Name": "uppermid_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1047,7 +906,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 10,
+                            "Layer_Order": 9,
                             "Name": "rightmid_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1060,7 +919,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 11,
+                            "Layer_Order": 10,
                             "Name": "pink_tree3",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1162,7 +1021,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 12,
+                            "Layer_Order": 11,
                             "Name": "grass_04",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1233,7 +1092,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 13,
+                            "Layer_Order": 12,
                             "Name": "lamp_1",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1279,7 +1138,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 14,
+                            "Layer_Order": 13,
                             "Name": "leftmid_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1292,7 +1151,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 15,
+                            "Layer_Order": 14,
                             "Name": "green_tree1",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1327,6 +1186,147 @@
                             },
                             "Tags": [
                                 "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.054999999701976776
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 5,
+                                    "y": 1
+                                },
+                                "Sheet_Size": {
+                                    "x": 10,
+                                    "y": 16
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 1
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "WalkingNature.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "PlayerSFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Combat::Faction": {
+                                "Faction": 1
+                            },
+                            "Combat::Health": {
+                                "Health": 100.0,
+                                "Lives": 1,
+                                "MaxHealth": 100.0,
+                                "invulnerable_flag": false
+                            },
+                            "Element::Entity": {
+                                "Element": 2
+                            },
+                            "GameLogic::ILogic": {
+                                "Named_Args": {
+                                    "entity": 1647
+                                },
+                                "Script_ID": "player.lua",
+                                "Start_Function": "",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": false,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": -20.0
+                                },
+                                "Position": {
+                                    "x": -325.49688720703125,
+                                    "y": 594.0060424804688
+                                },
+                                "Resolution": 1,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 50.0,
+                                    "y": 80.0
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 10.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 0.5,
+                                "Max_Speed": 3000.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Render::Cam": {
+                                "Mouse_Offset": 0.15000000596046448,
+                                "Position": {
+                                    "x": -966.9425659179688,
+                                    "y": -89.24889373779297
+                                },
+                                "Zoom": 1.0
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 2,
+                                    "y": 1
+                                },
+                                "Frame_Size": {
+                                    "x": 10,
+                                    "y": 16
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_animation_sprite.png"
+                            },
+                            "State::State": {
+                                "State": "Idle"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -966.9425659179688,
+                                    "y": -89.24889373779297
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 88.9101791381836,
+                                    "y": 127.99999237060547
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 15,
+                            "Name": "player",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "player"
                             ]
                         }
                     }

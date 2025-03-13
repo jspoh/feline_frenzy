@@ -10,6 +10,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Managers/Services/State Machine/bossEnemyStates.h"
 
 namespace NIKE {
     namespace Interaction {
@@ -147,6 +148,11 @@ namespace NIKE {
 
                 //Save prev start
                 static Vector2i prev_start = e_animate.start_index;
+                //Save prev end
+                static Vector2i prev_end = e_animate.end_index;
+
+                // Force start the animation
+                e_base.animation_mode = Animation::Mode::RESTART;
 
                 //Change animation
                 if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
@@ -157,8 +163,7 @@ namespace NIKE {
                     changed = true;
                 }
 
-                //Save prev end
-                static Vector2i prev_end = e_animate.end_index;
+
 
                 //Change animation
                 if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
@@ -176,6 +181,10 @@ namespace NIKE {
                     e_base.animations_to_complete = 0;
                     e_base.animation_mode = Animation::Mode::RESTART;
                 }
+
+                // Reset the start and end index of comp
+                e_animate.start_index = prev_start;
+                e_animate.end_index = prev_end;
             }
         }
 
@@ -407,18 +416,71 @@ namespace NIKE {
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
             auto sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(target);
+            auto tags = NIKE_METADATA_SERVICE->getEntityTags(target);
             if (base_comp.has_value() && sprite_comp.has_value()) {
-                auto& base = base_comp.value().get();
-                auto& sprite = sprite_comp.value().get();
 
-                //Set base
-                base.animations_to_complete = 3;
-                base.animation_mode = Animation::Mode::RESTART;
+                // If entities are not boss
+                if (tags.find("boss") == tags.end())
+                {
+                    auto& base = base_comp.value().get();
+                    auto& sprite = sprite_comp.value().get();
 
-                //Set sprite
-                sprite.start_index = { 0, 12 };
-                sprite.end_index = { 1, 12 };
-                sprite.curr_index = sprite.start_index;
+                    //Set base
+                    base.animations_to_complete = 3;
+                    base.animation_mode = Animation::Mode::RESTART;
+
+                    //Set sprite
+                    sprite.start_index = { 0, 12 };
+                    sprite.end_index = { 1, 12 };
+                    sprite.curr_index = sprite.start_index;
+                }
+                // If entity is boss
+                else if (tags.find("enemy") != tags.end() && tags.find("boss") != tags.end())
+                {
+                    // Get entity current state
+                    auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(target);
+                    auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
+                    auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+
+                    if (!e_state_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no state comp");
+                        return;
+                    }
+
+                    if (!e_elem_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no element comp");
+                        return;
+                    }
+
+                    if (!e_texture_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no texture comp");
+                        return;
+                    }
+
+                    // Get element string 
+                    std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
+                    // Set texture here
+                    std::string spritesheet = State::getSpriteSheet("BossHurt", element_string);
+                    if (NIKE_ASSETS_SERVICE->isAssetRegistered(spritesheet))
+                    {
+                        e_texture_comp.value().get().texture_id = spritesheet;
+                    }
+                    auto& base = base_comp.value().get();
+                    auto& sprite = sprite_comp.value().get();
+
+                    //Set base
+                    base.animations_to_complete = 3;
+                    base.animation_mode = Animation::Mode::RESTART;
+
+                    //Set sprite
+                    sprite.start_index = { 0, 0 };
+                    sprite.end_index = { 7, 0 };
+                    sprite.curr_index = sprite.start_index;
+                }
+
             }
 
             // Check if target health drops to zero or below

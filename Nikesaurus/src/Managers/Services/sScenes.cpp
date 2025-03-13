@@ -12,6 +12,8 @@
 #include "Core/Engine.h"
 
 namespace NIKE {
+	nlohmann::json Scenes::Service::saved_player_data = nlohmann::json();
+
 	/*****************************************************************//**
 	* Layer
 	*********************************************************************/
@@ -230,6 +232,14 @@ namespace NIKE {
 
 		//Run scene
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+
+		// Skip loading player data if not changing to game level
+		if (curr_scene.substr(0, 3) != "lvl" || scene_id == "lvl1_1.scn") {
+			return;
+		}
+
+		//Load player data
+		restorePlayerData();
 	}
 
 	void Scenes::Service::restartScene() {
@@ -423,6 +433,32 @@ namespace NIKE {
 
 	std::string Scenes::Service::getPrevSceneID() const {
 		return prev_scene;
+	}
+
+	void Scenes::Service::restorePlayerData() {
+		// Check if we have saved data
+		if (saved_player_data.empty()) {
+			return;  // No data to restore
+		}
+
+		// Find the player entity in the new scene
+		std::set<Entity::Type> players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+		if (players.empty()) {
+			return; // No player entity found
+		}
+
+		Entity::Type playerEntity = *players.begin(); // Get the first player entity
+
+		// Restore player data from savedPlayerData
+		NIKE_SERIALIZE_SERVICE->deserializePlayerData(playerEntity, saved_player_data);
+	}
+
+	void Scenes::Service::savePlayerData(nlohmann::json data) {
+		saved_player_data = std::move(data);
+	}
+
+	nlohmann::json Scenes::Service::loadPlayerData() {
+		return saved_player_data;
 	}
 
 	void Scenes::Service::init() {

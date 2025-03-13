@@ -46,7 +46,7 @@
             "Layer": 1,
             "Offset": 200.0,
             "PrefabPath": "bullet.prefab",
-            "Range": 10.0,
+            "Range": 6.0,
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
@@ -115,14 +115,14 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 260.72015380859375,
-                "y": 238.7991485595703
+                "x": 559.0,
+                "y": 512.0
             },
             "Screen Position": false
         }
     },
     "MetaData": {
-        "Layer ID": 0,
+        "Layer ID": 1,
         "Tags": [
             "boss",
             "enemy"
