@@ -364,7 +364,10 @@ namespace NIKE {
 
 			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
 				// Change the sprite to be the animation sprite
-				entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
+				{
+					entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				}
 				entity_texture.value().get().frame_size = { 5, 1 };
 				//entity_texture.value().get().frame_index = { 1, 0 };
 

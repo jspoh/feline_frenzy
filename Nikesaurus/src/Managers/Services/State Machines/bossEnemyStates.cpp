@@ -157,6 +157,12 @@ namespace NIKE {
 	{
 		//cout << "exit idle state" << endl;
 		// removeTransition("IdleToAttack");
+		auto e_ani_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (e_ani_base_comp.has_value())
+		{
+			// Reset back to normal frame duration
+			e_ani_base_comp.value().get().frame_duration = 0.2f;
+		}
 	}
 
 	void State::BossAttackState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
@@ -177,10 +183,17 @@ namespace NIKE {
 		auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(entity);
 		auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
 		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		auto e_ani_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 
 		if (!e_state_comp.has_value())
 		{
 			NIKEE_CORE_WARN("error! no state comp");
+			return;
+		}
+
+		if (!e_ani_base_comp.has_value())
+		{
+			NIKEE_CORE_WARN("error! no ani base comp");
 			return;
 		}
 
@@ -200,29 +213,35 @@ namespace NIKE {
 		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
 		// Set texture here
 		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
-		e_texture_comp.value().get().texture_id = spritesheet;
-
+		if (NIKE_ASSETS_SERVICE->isAssetRegistered(spritesheet))
+		{
+			e_texture_comp.value().get().texture_id = spritesheet;
+		}
 		int get_last_direction = Interaction::getLastDirection(entity);
 		if (get_last_direction == 0)
 		{
 			// Attack right
 			Interaction::animationSet(entity, 0, 1, 7, 1);
 			Interaction::flipX(entity, true);
+			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 		else if (get_last_direction == 2) {
 			// Attack up
 			Interaction::animationSet(entity, 0, 1, 7, 1);
 			Interaction::flipX(entity, false);
+			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 		else if (get_last_direction == 5) {
 			// Attack down
 			Interaction::animationSet(entity, 0, 1, 7, 1);
 			Interaction::flipX(entity, false);
+			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 		else {
 			// Attack left
 			Interaction::animationSet(entity, 0, 1, 7, 1);
 			Interaction::flipX(entity, false);
+			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 	}
 
@@ -337,7 +356,10 @@ namespace NIKE {
 		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
 		// Set texture here
 		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
-		e_texture_comp.value().get().texture_id = spritesheet;
+		if (NIKE_ASSETS_SERVICE->isAssetRegistered(spritesheet))
+		{
+			e_texture_comp.value().get().texture_id = spritesheet;
+		}
 
 		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 			// Moving right
@@ -435,7 +457,10 @@ namespace NIKE {
 		std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
 		// Set texture here
 		std::string spritesheet = getSpriteSheet(e_state_comp.value().get().state_id, element_string);
-		texture.value().get().texture_id = spritesheet;
+		if (NIKE_ASSETS_SERVICE->isAssetRegistered(spritesheet))
+		{
+			texture.value().get().texture_id = spritesheet;
+		}
 
 		// Play EnemyDeathState animation
 		Interaction::animationSet(entity, 0, 0, 7, 0);
