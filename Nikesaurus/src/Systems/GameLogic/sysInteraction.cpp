@@ -148,6 +148,11 @@ namespace NIKE {
 
                 //Save prev start
                 static Vector2i prev_start = e_animate.start_index;
+                //Save prev end
+                static Vector2i prev_end = e_animate.end_index;
+
+                // Force start the animation
+                e_base.animation_mode = Animation::Mode::RESTART;
 
                 //Change animation
                 if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
@@ -158,8 +163,7 @@ namespace NIKE {
                     changed = true;
                 }
 
-                //Save prev end
-                static Vector2i prev_end = e_animate.end_index;
+
 
                 //Change animation
                 if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
@@ -177,6 +181,10 @@ namespace NIKE {
                     e_base.animations_to_complete = 0;
                     e_base.animation_mode = Animation::Mode::RESTART;
                 }
+
+                // Reset the start and end index of comp
+                e_animate.start_index = prev_start;
+                e_animate.end_index = prev_end;
             }
         }
 

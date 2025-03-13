@@ -87,8 +87,6 @@ namespace NIKE {
 			// Flip X when facing left
 			//flip_x = (anim_direction == 1 || anim_direction == 3);
 
-			cout << anim_direction << endl;
-
 			// Change the spritesheet accordingly
 			e_texture_comp.value().get().texture_id = boss_spritesheet;
 
