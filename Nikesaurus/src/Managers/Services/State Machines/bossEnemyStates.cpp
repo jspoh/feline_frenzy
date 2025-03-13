@@ -221,25 +221,25 @@ namespace NIKE {
 		if (get_last_direction == 0)
 		{
 			// Attack right
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, true);
 			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 		else if (get_last_direction == 2) {
 			// Attack up
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, false);
 			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 		else if (get_last_direction == 5) {
 			// Attack down
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, false);
 			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
 		else {
 			// Attack left
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, false);
 			e_ani_base_comp.value().get().frame_duration = 0.055f;
 		}
@@ -363,50 +363,50 @@ namespace NIKE {
 
 		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 			// Moving right
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, true);
 			Interaction::setLastDirection(entity, 0);
 		}
 		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
 			// Moving up-right (diagonal)
-			Interaction::animationSet(entity, 0, 2, 7, 2);
+			Interaction::animationSet(entity, 0, 2, 6, 2);
 			Interaction::flipX(entity, true);
 			Interaction::setLastDirection(entity, 1);
 		}
 		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Moving up
-			Interaction::animationSet(entity, 0, 3, 7, 3);
+			Interaction::animationSet(entity, 0, 3, 6, 3);
 			Interaction::flipX(entity, false);
 			Interaction::setLastDirection(entity, 2);
 		}
 		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
 			// Moving up-left (diagonal)
-			Interaction::animationSet(entity, 0, 2, 7, 2);
+			Interaction::animationSet(entity, 0, 2, 6, 2);
 			Interaction::flipX(entity, false);
 			Interaction::setLastDirection(entity, 3);
 		}
 		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
 			// Moving down-right (diagonal)
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, true);
 			Interaction::setLastDirection(entity, 4);
 		}
 		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Moving down
-			Interaction::animationSet(entity, 0, 0, 7, 0);
+			Interaction::animationSet(entity, 0, 0, 6, 0);
 			Interaction::flipX(entity, false);
 			Interaction::setLastDirection(entity, 5);
 		}
 		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
 			// Moving down-left (diagonal)
-			Interaction::animationSet(entity, 0, 1, 7, 1);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
 			Interaction::flipX(entity, false);
 			Interaction::setLastDirection(entity, 6);
 		}
 		else {
 			// Moving left
-			Interaction::animationSet(entity, 0, 1, 7, 1);
-			Interaction::flipX(entity, true);
+			Interaction::animationSet(entity, 0, 1, 6, 1);
+			Interaction::flipX(entity, false);
 			Interaction::setLastDirection(entity, 7);
 		}
 	}
