@@ -30,10 +30,77 @@ namespace NIKE {
 		{"BossAttack", "Boss_Attack"}
 	};
 
-	std::string NIKE::State::getSpriteSheet(const std::string& fsm_state, const std::string& element, const std::string& asset_type)
+	std::string NIKE::State::getSpriteSheet(const std::string& fsm_state, const std::string& element)
 	{
-		return state_to_spritesheet[fsm_state] + "_" + element + asset_type;
+		return state_to_spritesheet[fsm_state] + "_" + element + "_Spritesheet" + ".png";
 	}
+
+	void State::setBossAnimation(Entity::Type const& entity, const std::string& fsm_state, const std::string& element,
+		float dir, int start_x, int end_x)
+	{
+		// Get corresponding state spritesheet
+		std::string boss_spritesheet = getSpriteSheet(fsm_state, element);
+
+		// Get relevant components
+		auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		auto e_ani_sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		auto e_ani_base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity);
+
+		if (e_texture_comp.has_value() && e_ani_sprite_comp.has_value() && e_ani_base_comp.has_value())
+		{
+			// Determine animation direction
+			int anim_direction = 0;
+			bool flip_x = false;
+
+			if (dir >= -M_PI / 8 && dir < M_PI / 8) {
+				// Front
+				anim_direction = 1;
+				flip_x = true;
+			}
+			else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
+				// Front-Right
+				anim_direction = 1;
+			}
+			else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
+				// Back-Right
+				anim_direction = 3;
+			}
+			else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+				// Back
+				anim_direction = 2;
+			}
+			else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+				// Front-Left (flip it to look right)
+				anim_direction = 1;
+				flip_x = true;
+			}
+			else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
+				// Back-Left (flip it to look right)
+				anim_direction = 3;
+				flip_x = true;
+			}
+			else {
+				// Back
+				anim_direction = 1;
+			}
+
+			// Flip X when facing left
+			//flip_x = (anim_direction == 1 || anim_direction == 3);
+
+			cout << anim_direction << endl;
+
+			// Change the spritesheet accordingly
+			e_texture_comp.value().get().texture_id = boss_spritesheet;
+
+			// Set animation based on direction
+			Interaction::animationSet(entity, start_x, anim_direction, end_x, anim_direction);
+			Interaction::flipX(entity, flip_x);
+			// Keeping flipY as false unless needed
+			Interaction::flipY(entity, false); 
+			Interaction::setLastDirection(entity, anim_direction);
+		}
+	}
+
 
 	/*******************************
 	* Boss Idle State functions

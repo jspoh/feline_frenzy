@@ -12,6 +12,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
+#include "Managers/Services/State Machine/bossEnemyStates.h"
 #include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
@@ -268,6 +269,7 @@ namespace NIKE {
 		// For boss to move slightly left and right while shooting
 		static bool move_left = true;
 		float move_force = 50.0f;
+		float move_dir = (move_left) ? -static_cast<float>(M_PI) : 0;
 		if (move_left) {
 			// Move left
 			e_physics_comp.value().get().force.x -= move_force;  
@@ -276,6 +278,18 @@ namespace NIKE {
 			// Move right
 			e_physics_comp.value().get().force.x += move_force;  
 		}
+
+		// Get enemy physics component
+		const auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
+		if (!e_elem_comp.has_value()) {
+			NIKEE_CORE_WARN("ENEMY missing Physics component!");
+			return;
+		}
+
+		// Play moving animation (left or right)
+		// Get element
+		std::string elem_string = Element::getElementString(e_elem_comp.value().get().element);
+		State::setBossAnimation(enemy, "BossIdle", elem_string, move_dir, 0, 6);
 
 		// Flip direction 
 		move_left = !move_left;

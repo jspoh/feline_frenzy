@@ -18,7 +18,10 @@
 namespace NIKE {
 	namespace State {
 
-		std::string getSpriteSheet(const std::string& fsm_state, const std::string& element, const std::string& asset_type);
+		// Utility functions
+		std::string getSpriteSheet(const std::string& fsm_state, const std::string& element);
+		void setBossAnimation(Entity::Type const& entity, const std::string& fsm_state, const std::string& element,
+			float dir, int start_x, int end_x);
 
 		class BossIdleState : public StateMachine::Istate
 		{

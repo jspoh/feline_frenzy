@@ -22,6 +22,13 @@ namespace NIKE {
 			GRASS,
 		};
 
+		const std::unordered_map<Elements, std::string> elements_to_string = {
+			{ Elements::NONE, "None" },
+			{ Elements::FIRE, "Fire" },
+			{ Elements::WATER, "Water" },
+			{ Elements::GRASS, "Grass" }
+		};
+
 		const enum class Status : int {
 			NONE = 0,
 			BURN,
@@ -147,6 +154,8 @@ namespace NIKE {
 
 		// Get Multiplier for Elemental Damage
 		float getElementMultiplier(Element::Elements attacker, Element::Elements defender);
+
+		std::string getElementString(Element::Elements& element);
 
 		void registerComponents();
 
