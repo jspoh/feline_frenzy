@@ -34,7 +34,7 @@ namespace NIKE {
 			{
 				spawnHealthDrop(entity);
 				spawnBrokenBarrel(entity);
-				// Play Barrel Destroy sound here
+				Interaction::playOneShotSFX(entity, "BreakSFX1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 			}
 			else {
