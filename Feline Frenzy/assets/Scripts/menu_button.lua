@@ -19,8 +19,8 @@ function Audios:HoverButton(args)
 	local component = GetComponent(entity, "Transform::Transform")
 	if component ~= nil then
     	-- Access the component's properties, e.g., position, scale, rotation
-    	cout(component.position.x)
-    	cout(component.position.y)
+    	--cout(component.position.x)
+    	--cout(component.position.y)
 	else
 	    cout("Component 'Transform' not found for entity.")
 	end

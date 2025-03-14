@@ -46,8 +46,8 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->bindEditorFrameBuffer();
 #endif
 
-		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		for (auto& layer : NIKE_SCENES_SERVICE->getLayers()) {
 

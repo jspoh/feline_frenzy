@@ -31,7 +31,7 @@
             "Faction": 0
         },
         "Combat::Health": {
-            "Health": 100.0,
+            "Health": 250.0,
             "Lives": 1,
             "MaxHealth": 100.0,
             "invulnerable_flag": false
@@ -46,13 +46,13 @@
             "Layer": 1,
             "Offset": 200.0,
             "PrefabPath": "bullet.prefab",
-            "Range": 10.0,
+            "Range": 6.0,
             "ScriptID": "",
             "ScriptLoaded": false,
             "ScriptPath": "assets/Scripts/enemyBullet.lua"
         },
         "Physics::Collider": {
-            "B_Bind_To_Entity": true,
+            "B_Bind_To_Entity": false,
             "Pos_Offset": {
                 "x": 0.0,
                 "y": 0.0
@@ -64,8 +64,8 @@
             "Resolution": 1,
             "Rotation": 0.0,
             "Scale": {
-                "x": 1.0,
-                "y": 1.0
+                "x": 250.0,
+                "y": 250.0
             }
         },
         "Physics::Dynamics": {
@@ -115,14 +115,14 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 260.72015380859375,
-                "y": 238.7991485595703
+                "x": 559.0,
+                "y": 512.0
             },
             "Screen Position": false
         }
     },
     "MetaData": {
-        "Layer ID": 0,
+        "Layer ID": 1,
         "Tags": [
             "boss",
             "enemy"

@@ -12,6 +12,9 @@
 #define GAME_LOGIC_HPP
 
 #include "Managers/ECS/mSystem.h"
+#include "Components/cElement.h"
+#include "Components/cCombat.h"
+#include "Components/cPhysics.h"
 #include <random>
 
 namespace NIKE {
@@ -24,19 +27,10 @@ namespace NIKE {
 		    void operator=(Manager const& copy) = delete;
 
 			// Win overlay
-			void gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
+			void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 
 			// Portal interactions
 			void handlePortalInteractions(const std::set<Entity::Type>& vents_entities);
-
-			//Internal script management
-			//sol::protected_function executeScript(std::string const& file_path, std::string& script_id, bool& b_loaded, std::string const& function);
-
-			// Player Shooting
-			//void shootCursor(const Entity::Type& player_entity);
-
-			// Spawn Health Bar
-			//void spawnHealthBar(const Entity::Type& entity);
 
 			// Spawn Enemy
 			void spawnEnemy(const Entity::Type& spawner);
@@ -46,6 +40,24 @@ namespace NIKE {
 
 			// Prefabs for spawnEnemy (boss)
 			const std::string enemyBossArr[3] = { "bossFire.prefab", "bossWater.prefab", "bossGrass.prefab"};
+
+			// Status Effect Update
+			void updateStatusEffects(Entity::Type entity);
+
+			// Apply status effects
+			void applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic);
+
+			// Remove status effect
+			void removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic);
+
+			// Lifesteal Status
+			void applyLifesteal(float& health, float lifesteal_amount);
+
+			// Burn Status
+			void applyBurn(float& health, float burn_damage);
+
+			// Freeze Status
+			void applyFreeze(float& max_speed, float freeze_speed, float& temp_max_speed);
 
 	    public:
 		    //Default constructor
@@ -62,9 +74,6 @@ namespace NIKE {
 
 			//Init Inputs
 			void init() override;
-
-			////Register systems for lua
-			//void registerLuaSystem(std::shared_ptr<Lua::ILuaBind> system);
 
 		    //Update Inputs
 		    void update() override;

@@ -10,6 +10,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Managers/Services/State Machine/bossEnemyStates.h"
 
 namespace NIKE {
     namespace Interaction {
@@ -69,40 +70,91 @@ namespace NIKE {
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
                         if (e_source_comp.has_value()) {
 
-                            // Look for entity with player component
-                            for (auto& other_entity : entities) {
-                                auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+                            std::set<NIKE::Entity::Type> e_player_comp = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
-                                if (e_player_comp.has_value()) { // Player entity exists
+                            if (e_player_comp.empty()) { // Player entity exists
+                                continue;
+                            }
 
-                                    // Get Render Component
-                                    const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-                                    auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-                                    //float& source_intensity = source_render_comp.value().get().intensity;
-                                    Vector4f& source_alpha = source_render_comp.value().get().color;
+                            auto player_entity = *e_player_comp.begin();
 
-                                    float target_alpha = isWithinWorldRange(entity, other_entity) ? 1.0f : 0.0f; // Set target alpha
-                                    float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
-                                    // Smoothly interpolate alpha
-                                    source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+                            // Get Render Component
+                            const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+                            auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
+                            //float& source_intensity = source_render_comp.value().get().intensity;
+                            Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                                    // Clamp alpha between 0 and 1.0
-                                    source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+                            float target_alpha = isWithinWorldRange(entity, player_entity) ? 1.0f : 0.0f; // Set target alpha
+                            float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
-                                    // Player Element Swapping
-                                    if (isWithinWorldRange(entity, other_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
-                                        changeElement(other_entity, entity);
-                                        if (e_sfx_comp.has_value()) {
-                                            e_sfx_comp.value().get().b_play_sfx = true;
-                                        }
-                                    }
+                            // Smoothly interpolate alpha
+                            source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+
+                            // Clamp alpha between 0 and 1.0
+                            source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+
+                            // Player Element Swapping
+                            if (isWithinWorldRange(entity, player_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                                changeElement(player_entity, entity);
+                                if (e_sfx_comp.has_value()) {
+                                    e_sfx_comp.value().get().b_play_sfx = true;
                                 }
                             }
+
+                            
                         }
                     }
                 }
             }
+        }
+
+        void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
+        {
+            // Destroy the player's health UI container if applicable
+            // NIKE_ECS_MANAGER->destroyEntity(entity);
+
+            // Create the overlay entity
+            auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
+            NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+            NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
+                overlay_entity, Render::Texture(background_texture, Vector4f()));
+
+            // Get viewport size and adjust transform
+            auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+            NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
+                overlay_entity, Transform::Transform(
+                    Vector2f(0.0f, 0.0f),
+                    viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
+                    0.0f,
+                    true));
+
+            // Create Play Again button
+            NIKE_UI_SERVICE->createButton(play_again,
+                Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+                Render::Text(),
+                Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+            // Create Quit button
+            NIKE_UI_SERVICE->createButton(quit_game_text,
+                Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
+                Render::Text(),
+                Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+
+            // Set button input states
+            NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
+            NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
+
+            // Assign Lua scripts to buttons
+            auto play_again_script = Lua::Script();
+            play_again_script.script_id = "ChangeScene.lua";
+            play_again_script.update_function = "Restart";
+            NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
+
+            auto quit_script = Lua::Script();
+            quit_script.script_id = "ChangeScene.lua";
+            quit_script.update_function = "Quit";
+            NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
         }
 
         /* TODO, remove or edit call */
@@ -148,6 +200,11 @@ namespace NIKE {
 
                 //Save prev start
                 static Vector2i prev_start = e_animate.start_index;
+                //Save prev end
+                static Vector2i prev_end = e_animate.end_index;
+
+                // Force start the animation
+                e_base.animation_mode = Animation::Mode::RESTART;
 
                 //Change animation
                 if (prev_start != Vector2i(start_x, start_y) || e_base.animation_mode == Animation::Mode::END) {
@@ -158,8 +215,7 @@ namespace NIKE {
                     changed = true;
                 }
 
-                //Save prev end
-                static Vector2i prev_end = e_animate.end_index;
+
 
                 //Change animation
                 if (prev_end != Vector2i(end_x, end_y) || e_base.animation_mode == Animation::Mode::END) {
@@ -177,6 +233,10 @@ namespace NIKE {
                     e_base.animations_to_complete = 0;
                     e_base.animation_mode = Animation::Mode::RESTART;
                 }
+
+                // Reset the start and end index of comp
+                e_animate.start_index = prev_start;
+                e_animate.end_index = prev_end;
             }
         }
 
@@ -219,6 +279,8 @@ namespace NIKE {
             // Return a rand value when cnt retrieve last dir
             return INT_MAX;
         }
+
+        // what even is this function for????
         // Testing playing 1 custom SFX
         void playOneShotSFX(Entity::Type& entity,
             const std::string& custom_audio_id,
@@ -330,7 +392,7 @@ namespace NIKE {
 
                 target_health += healer_heal;
                 // Temporary hardcoded SFX
-                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", 1.0f, 1.0f);
+                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
             }
         }
 
@@ -402,24 +464,77 @@ namespace NIKE {
             if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
             {
                 // Temporary hardcoded SFX
-                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
+                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
             }
 
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
             auto sprite_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(target);
+            auto tags = NIKE_METADATA_SERVICE->getEntityTags(target);
             if (base_comp.has_value() && sprite_comp.has_value()) {
-                auto& base = base_comp.value().get();
-                auto& sprite = sprite_comp.value().get();
 
-                //Set base
-                base.animations_to_complete = 3;
-                base.animation_mode = Animation::Mode::RESTART;
+                // If entities are not boss
+                if (tags.find("boss") == tags.end())
+                {
+                    auto& base = base_comp.value().get();
+                    auto& sprite = sprite_comp.value().get();
 
-                //Set sprite
-                sprite.start_index = { 0, 12 };
-                sprite.end_index = { 1, 12 };
-                sprite.curr_index = sprite.start_index;
+                    //Set base
+                    base.animations_to_complete = 3;
+                    base.animation_mode = Animation::Mode::RESTART;
+
+                    //Set sprite
+                    sprite.start_index = { 0, 12 };
+                    sprite.end_index = { 1, 12 };
+                    sprite.curr_index = sprite.start_index;
+                }
+                // If entity is boss
+                else if (tags.find("enemy") != tags.end() && tags.find("boss") != tags.end())
+                {
+                    // Get entity current state
+                    auto e_state_comp = NIKE_ECS_MANAGER->getEntityComponent<NIKE::State::State>(target);
+                    auto e_elem_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(target);
+                    auto e_texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+
+                    if (!e_state_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no state comp");
+                        return;
+                    }
+
+                    if (!e_elem_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no element comp");
+                        return;
+                    }
+
+                    if (!e_texture_comp.has_value())
+                    {
+                        NIKEE_CORE_WARN("error! no texture comp");
+                        return;
+                    }
+
+                    // Get element string 
+                    std::string element_string = Element::getElementString(e_elem_comp.value().get().element);
+                    // Set texture here
+                    std::string spritesheet = State::getSpriteSheet("BossHurt", element_string);
+                    if (NIKE_ASSETS_SERVICE->isAssetRegistered(spritesheet))
+                    {
+                        e_texture_comp.value().get().texture_id = spritesheet;
+                    }
+                    auto& base = base_comp.value().get();
+                    auto& sprite = sprite_comp.value().get();
+
+                    //Set base
+                    base.animations_to_complete = 3;
+                    base.animation_mode = Animation::Mode::RESTART;
+
+                    //Set sprite
+                    sprite.start_index = { 0, 0 };
+                    sprite.end_index = { 7, 0 };
+                    sprite.curr_index = sprite.start_index;
+                }
+
             }
 
             // Check if target health drops to zero or below

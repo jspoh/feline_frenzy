@@ -18,6 +18,8 @@
 
 namespace NIKE {
     namespace Interaction {
+        // HARD CODED
+        void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 
         // Handles interaction logic between two entities
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b);

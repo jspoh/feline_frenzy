@@ -151,6 +151,21 @@ namespace NIKE {
 			for (auto entity : entities_to_destroy) {
 				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 
+					//Check if entity has childs and delete them
+					auto* parent = std::get_if<Parent>(&entities.at(entity).relation);
+					if (parent && !parent->childrens.empty()) {
+
+						//Destroy childrens
+						for (auto const& child : parent->childrens) {
+							
+							//Destroy children
+							auto c_entity = getEntityByName(child);
+							if (c_entity.has_value()) {
+								if (NIKE_ECS_MANAGER->checkEntity(c_entity.value())) NIKE_ECS_MANAGER->destroyEntity(c_entity.value());
+							}
+						}
+					}
+
 					NIKE_ECS_MANAGER->destroyEntity(entity);
 				}
 			}
@@ -481,9 +496,6 @@ namespace NIKE {
 			if (parent_it != parents.end()) {
 				parent_it->second->childrens.insert(child.first);
 			}
-			else {
-				child.second->parent = "";
-			}
 		}
 	}
 
@@ -539,9 +551,6 @@ namespace NIKE {
 
 		//Skip if relation is not child
 		if (!child) return;
-
-		//Check if parent is valid
-		if (!checkParent(parent_name)) return;
 
 		//Set child's parent
 		child->parent = parent_name;

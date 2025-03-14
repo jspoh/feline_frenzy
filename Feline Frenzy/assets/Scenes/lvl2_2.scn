@@ -23,6 +23,10 @@
                 "loop": false,
                 "tracks": []
             },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            },
             "VFX": {
                 "loop": false,
                 "tracks": []
@@ -147,7 +151,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 4.882568359375,
-                                    "y": -184.62841796875
+                                    "y": -186.65542602539063
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -384,7 +388,7 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Frame_Duration": 0.10000000149011612
+                                "Frame_Duration": 0.20000000298023224
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
@@ -482,13 +486,13 @@
                                 "Faction": 1
                             },
                             "Combat::Health": {
-                                "Health": 100.0,
+                                "Health": 60.0,
                                 "Lives": 1,
                                 "MaxHealth": 100.0,
                                 "invulnerable_flag": false
                             },
                             "Element::Entity": {
-                                "Element": 2
+                                "Element": 1
                             },
                             "GameLogic::ILogic": {
                                 "Named_Args": {
@@ -534,7 +538,7 @@
                                     "x": -3.0185546875,
                                     "y": -1162.0152587890625
                                 },
-                                "Zoom": 1.5
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1051,8 +1055,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -711.6787719726563,
-                                    "y": 356.9342956542969
+                                    "x": -680.0,
+                                    "y": 340.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

@@ -4,7 +4,7 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Explore_v1.wav"
+                    "BGM_Menu_v1.wav"
                 ]
             },
             "SFX": {

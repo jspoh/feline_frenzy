@@ -17,10 +17,362 @@ namespace NIKE {
 
 	}
 
-	void GameLogic::Manager::gameOverlay(Entity::Type const& entity, const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
+	void GameLogic::Manager::update() 
+	{
+		//Get layers
+		auto& layers = NIKE_SCENES_SERVICE->getLayers();
+
+		//Reverse Iterate through layers
+		for (auto layer = layers.rbegin(); layer != layers.rend(); ++layer) {
+
+			//Skip inactive layer
+			if (!(*layer)->getLayerState())
+				continue;
+
+			//Iterate through all entities
+			for (auto& entity : (*layer)->getEntitites()) {
+
+				//Skip entity not registered to this system
+				if (entities.find(entity) == entities.end()) continue;
+
+				// Main Menu Background Scrolling
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "main_menu.scn") {
+					std::set<Entity::Type> background_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("Background");
+
+					for (auto& background : NIKE_METADATA_SERVICE->getEntitiesByTag("Background")) {
+						const auto background_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(background);
+
+						if (background_transform_comp) {
+							// Scroll background
+							const float scroll_speed = .2f;
+
+							auto& background_transform_x = background_transform_comp.value().get().position.x;
+							background_transform_x += scroll_speed;
+
+							// Loop back
+							const float start_pos = -1599.f;
+							const float reset_pos = 1599.f;
+
+							if (background_transform_x >= reset_pos) {
+								background_transform_x = start_pos;
+							}
+						}
+					}
+				}
+
+				//Check for logic comp
+				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
+				if (e_logic_comp.has_value()) {
+					auto& e_logic = e_logic_comp.value().get();
+
+					//Check if script is active
+					if (e_logic.script.script_id == "")
+						continue;
+
+					//Default named argument passed to the script
+					e_logic.script.named_args["entity"] = entity;
+
+					//Execute script
+					NIKE_LUA_SERVICE->executeScript(e_logic.script);
+				}
+
+				// Check if player tag exists
+				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+				updateStatusEffects(entity);
+
+				//// If no player exists, overlay defeat screen
+				//if (player_entities.empty()) {
+
+				//	gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
+				//	return;
+				//}
+
+				// Check for Spawner comp
+				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
+				if (e_spawner_comp.has_value()) {
+					auto& e_spawner = e_spawner_comp.value().get();
+
+					// If spawn on cooldown
+					if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
+						// Accumulate time since last shot
+						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					}
+
+					// If enemies spawned less than spawn limit
+					if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
+						// If spawn on not cooldown
+						if (e_spawner.last_spawn_time >= e_spawner.cooldown) {
+							// Spawn enemy
+							spawnEnemy(entity);
+
+							// Reset last time spawned
+							e_spawner.last_spawn_time = 0.f;
+						}
+					}
+
+					// Check if enemies are all dead
+					std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
+					// Check if entities with vent tag exists
+					std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
+					// Win whole game overlay (MOVED TO BOSS ENEMY STATES)
+					//if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
+					//	NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
+					//	// WIP cut scenes for after boss
+					//	// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
+					//	gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+					//	// return;
+					//}
+					
+					static bool is_spawn_portal = false;
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_H)) { is_spawn_portal = true; }
+
+					// Portal animations and interactions
+					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
+						is_spawn_portal)
+					{
+						handlePortalInteractions(vents_entities);
+					}
+				}
+
+				// Elemental UI 
+				for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
+					// If player not dead
+					if (player_entities.empty()) {
+						continue;
+					}
+
+					// Look for player
+					for (auto& player : player_entities) {
+						const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+						const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
+
+						// Set element ui to player's element
+						if (elementui_texture.has_value())
+						{
+							//elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+							elementui_texture.value().get().frame_index.x = static_cast<int>(player_element.value().get().element);
+						}
+					}
+				}			
+
+				// Health bar logic
+				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
+					// If no player exists, destroy the health bar
+					if (player_entities.empty()) {
+						//NIKE_ECS_MANAGER->destroyEntity(healthbar);
+						return;
+					}
+
+					// Look for player
+					for (auto& player : player_entities) {
+						const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+						const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
+						const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+
+						// Check for missing component
+						if (e_player_health.has_value() == false || e_player_transform.has_value() == false || e_healthbar_transform.has_value() == false) {
+							NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
+							continue;
+						}
+
+						//const auto& player_pos = e_player_transform.value().get().position;
+						//const auto& player_scale = e_player_transform.value().get().scale;
+						auto& healthbar_pos = e_healthbar_transform.value().get().position;
+						auto& healthbar_scale = e_healthbar_transform.value().get().scale;
+						//const float offset_y = player_scale.y * 0.9f;
+
+						// Set healthbar to player health
+
+						// Constants
+						static float original_healthbar_width = healthbar_scale.x;
+						static float original_healthbar_x = healthbar_pos.x;  // Store original X position once
+
+						// Get health percentage
+						float health_percentage = e_player_health.value().get().health / e_player_health.value().get().max_health;
+
+						// Update health bar scale
+						healthbar_scale.x = health_percentage * original_healthbar_width;
+
+						// Offset the health bar so it shrinks from right to left
+						healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
+					}
+				}
+					
+				static float elapsed_time_before = 0.0f;
+				static int counter_before = 1;
+				static float elapsed_time_after = 0.0f;
+				static int counter_after = 1;
+
+				// Time based change texture for before boss room cut scene
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn")
+				{
+					std::string cutscene_string = "Cutscene_2_";
+					elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
+					// Change texture by timer
+					if (elapsed_time_before >= 3.f && counter_before <= 8)
+					{
+						auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+						if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+						{
+							texture_comp.value().get().texture_id = cutscene_asset_id;
+							// This is for counter to cut scene
+							++counter_before;
+							elapsed_time_before = 0.0f;
+						}
+						cout << counter_before << endl;
+					}
+					if (counter_before > 8)
+					{
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+					}
+				}		
+
+				// Time based change texture for after boss room cut scene
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn")
+				{
+					std::string cutscene_string = "Ending_Cutscene_";
+					elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+					// Change texture by timer
+					if (elapsed_time_after >= 3.f && counter_after <= 6)
+					{
+						auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+						if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+						{
+							texture_comp.value().get().texture_id = cutscene_asset_id;
+							// This is for counter to cut scene
+							++counter_after;
+							elapsed_time_after = 0.0f;
+						}
+
+					}
+					if (counter_after > 6)
+					{
+						// After boss cutscene play finish, show win game overlay
+						gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+					}
+				}
+
+				// Update of FSM will be called here
+				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
+			}
+		}
+	}
+
+	void GameLogic::Manager::updateStatusEffects(Entity::Type entity) {
+		// Check for Elemental Stack comp
+		const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
+		const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
+		const auto e_dynamic_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+
+		if (!e_combo_comp.has_value() || !e_health_comp.has_value()) return;
+
+		auto& e_combo = e_combo_comp.value().get();
+		auto& e_health = e_health_comp.value().get();
+		auto& e_dynamic = e_dynamic_comp.value().get();
+
+		// Exit if no status effect
+		if (e_combo.status_effect == Element::Status::NONE || e_combo.status_timer <= 0.0f) { 
+			return; 
+		}
+
+		// Decrease tick timer
+		e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+		// Apply status effect if tick timer reached
+		if (e_combo.tick_timer <= 0.0f) {
+			applyStatusEffect(e_combo, e_health, e_dynamic);
+			e_combo.tick_timer = Element::Combo::tick_interval; // Reset tick timer
+		}
+
+		// Decrease status effect duration
+		e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+
+		// Remove status effect if expired
+		if (e_combo.status_timer <= 0.0f) {
+			removeStatusEffect(e_combo, e_dynamic);
+		}
+
+		NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
+	}
+
+	void GameLogic::Manager::applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic) {
+		switch (e_combo.status_effect) {
+		case Element::Status::BURN:
+			NIKEE_CORE_INFO("BURN TICK: -1 HP");
+			applyBurn(e_health.health, 5.f);
+			break;
+
+		case Element::Status::FREEZE:
+			NIKEE_CORE_INFO("FROZEN TICK");
+			applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed / 2, e_combo.temp_max_speed);
+			break;
+
+		case Element::Status::POISON:
+			NIKEE_CORE_INFO("POISON TICK: -1 HP");
+			applyLifesteal(e_health.health, 5.f);
+			break;
+		}
+	}
+
+	void GameLogic::Manager::removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic) {
+		// Restore speed if frozen
+		if (e_combo.status_effect == Element::Status::FREEZE && e_combo.temp_max_speed >= 0) {
+			e_dynamic.max_speed = e_combo.temp_max_speed;
+			e_combo.temp_max_speed = -1; // Reset
+		}
+
+		// Remove status effect
+		e_combo.status_effect = Element::Status::NONE;
+	}
+
+
+	void GameLogic::Manager::applyLifesteal(float& health, float lifesteal_amount) {
+		// Damage enemy
+		applyBurn(health, lifesteal_amount);
+
+		// Get all player entities
+		std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+		// Check if player alive
+		if (player_entities.empty()) {
+			return;
+		}
+
+		for (auto& player : player_entities) {
+			const auto player_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+			if (player_health_comp) {
+				auto& player_health = player_health_comp.value().get();
+
+				// Heal player
+				if (player_health.health < player_health.max_health) {
+					player_health.health = min(player_health.max_health, player_health.health + lifesteal_amount);
+				}
+			}
+		}
+	}
+
+	void GameLogic::Manager::applyBurn(float& health, float burn_damage) {
+		// Decrement by burn amount
+		health = max(0.0f, health - burn_damage);
+	}
+
+	void GameLogic::Manager::applyFreeze(float& max_speed, float freeze_speed, float& temp_max_speed) {
+		// Only store max speed once
+		if (temp_max_speed < 0) {
+			temp_max_speed = max_speed;
+		}
+		// Setting max speed to lowered speed
+		max_speed = freeze_speed;
+	}
+
+
+	void GameLogic::Manager::gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
 	{
 		// Destroy the player's health UI container if applicable
-		NIKE_ECS_MANAGER->destroyEntity(entity);
+		// NIKE_ECS_MANAGER->destroyEntity(entity);
 
 		// Create the overlay entity
 		auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
@@ -72,18 +424,14 @@ namespace NIKE {
 			const auto entity_animation_sprite = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(vent);
 
 			if (entity_texture.has_value() && entity_animation_base.has_value() && entity_animation_sprite.has_value()) {
-				// Change the sprite to be the animation sprite
-				entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
-				entity_texture.value().get().frame_size = { 5, 1 };
-				entity_texture.value().get().frame_index = { 0, 0 };
-
-				// Set Animation
-				Interaction::animationSet(vent, 0, 0, 4, 0);
-				Interaction::flipX(vent, false);
 
 				// Check player interaction
 				for (const auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+						// Save player data
+						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
+						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", "SFX", 1.f, 0.5f, false, false);
+
 						// Handle change scene 
 						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
 						{
@@ -93,261 +441,43 @@ namespace NIKE {
 						{
 							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
 						}
+						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
+						{
+							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_before_boss.scn"));
+						}
 					}
 				}
+
+				// Handle spawning portal once 
+				if (entity_texture.value().get().texture_id == "Front gate_animation_sprite.png") {
+					continue;
+				}
+
+				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", "SFX", 1.f, 1.f, false, false);
+
+				// Change the sprite to be the animation sprite
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
+				{
+					entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
+				}
+
+
+				entity_texture.value().get().frame_size = { 5, 1 };
+				//entity_texture.value().get().frame_index = { 1, 0 };
+
+				// Set params for animation
+				entity_animation_sprite.value().get().start_index = { 0,0 };
+				entity_animation_sprite.value().get().end_index = { 4,0 };
+
+				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
+
+				// Set Animation
+				Interaction::flipX(vent, false);
+
+				
 			}
 		}
 	}
-
-	void GameLogic::Manager::update() {
-		//Get layers
-		auto& layers = NIKE_SCENES_SERVICE->getLayers();
-
-		//Reverse Iterate through layers
-		for (auto layer = layers.rbegin(); layer != layers.rend(); ++layer) {
-
-			//Skip inactive layer
-			if (!(*layer)->getLayerState())
-				continue;
-
-			//Iterate through all entities
-			for (auto& entity : (*layer)->getEntitites()) {
-
-				//Skip entity not registered to this system
-				if (entities.find(entity) == entities.end()) continue;
-
-				// Main Menu Background Scrolling
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "main_menu.scn") {
-					std::set<Entity::Type> background_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("Background");
-
-					for (auto& background : NIKE_METADATA_SERVICE->getEntitiesByTag("Background")) {
-						const auto background_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(background);
-
-						if (background_transform_comp) {
-							// Scroll background
-							const float scroll_speed = .2f;
-
-							auto& background_transform_x = background_transform_comp.value().get().position.x;
-							background_transform_x += scroll_speed;
-
-							// Loop back
-							const float start_pos = -1599.f;
-							const float reset_pos = 1599.f;
-
-							if (background_transform_x >= reset_pos) {
-								background_transform_x = start_pos;
-							}
-						}
-					}
-				}
-
-				//Check for player logic comp
-				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
-				if (e_logic_comp.has_value()) {
-					auto& e_logic = e_logic_comp.value().get();
-
-					//Check if script is active
-					if (e_logic.script.script_id == "")
-						continue;
-
-					//Default named argument passed to the script
-					e_logic.script.named_args["entity"] = entity;
-
-					//Execute script
-					NIKE_LUA_SERVICE->executeScript(e_logic.script);
-				}
-
-				// Check if player tag exists
-				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
-
-				// Check for Elemental Stack comp
-				const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
-				const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-				const auto e_dynamic_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
-				if (e_combo_comp.has_value() && e_health_comp.has_value()) {
-					auto& e_combo = e_combo_comp.value().get();
-					auto& e_health = e_health_comp.value().get();
-					auto& e_dynamic = e_dynamic_comp.value().get();
-
-					// Entity has status effect
-					if (e_combo.status_effect != Element::Status::NONE && e_combo.status_timer > 0.0f) {
-
-						// Decrease tick timer
-						e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
-						
-						// Applying status effect
-						if (e_combo.tick_timer <= 0.0f) {
-							switch (e_combo.status_effect) {
-							case Element::Status::BURN:
-								NIKEE_CORE_INFO("BURN TICK: -1 HP");
-								e_combo.applyBurn(e_health.health, 5.f); // Apply burn damage
-								break;
-							case Element::Status::FREEZE:
-								NIKEE_CORE_INFO("FROZEN TICK");
-								e_combo.applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed/2); // Apply freeze
-								break;
-							case Element::Status::POISON:
-								NIKEE_CORE_INFO("POISON TICK: -1 HP");
-								e_combo.applyBurn(e_health.health, 5.f); // Apply poison damage
-
-								// If player not dead
-								if (!player_entities.empty()) {
-									// Look for player
-									for (auto& player : player_entities) {
-										const auto player_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
-										if (player_health_comp.value().get().health != player_health_comp.value().get().max_health) {
-											// Heal player
-											player_health_comp.value().get().health += 5.f;
-										}
-									}
-								}
-								break;
-							}
-
-							// Reset tick timer
-							e_combo.tick_timer = Element::Combo::tick_interval;
-						}
-
-							// Decrease status time
-							e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
-
-							// Remove status effect if timer expires
-							if (e_combo.status_timer <= 0.0f) {
-								// Return max speed after freeze ends
-								// Checking if max speed is valid
-								if (e_combo.temp_max_speed >= 0) {  
-									e_dynamic.max_speed = e_combo.temp_max_speed;
-									// Reset after restoring speed
-									e_combo.temp_max_speed = -1;
-								}
-								// Remove status
-								e_combo.status_effect = Element::Status::NONE;
-							}
-
-							NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
-						}
-					}
-
-					// Check for Spawner comp
-					const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
-					if (e_spawner_comp.has_value()) {
-						auto& e_spawner = e_spawner_comp.value().get();
-						//e_spawner.enemy_limit = 1;
-
-						// If spawn on cooldown
-						if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
-							// Accumulate time since last shot
-							e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-						}
-
-						// If enemies spawned less than spawn limit
-						if (e_spawner.enemies_spawned < e_spawner.enemy_limit) {
-							// If spawn on not cooldown
-							if (e_spawner.last_spawn_time >= e_spawner.cooldown) {
-								// Spawn enemy
-								spawnEnemy(entity);
-
-								// Reset last time spawned
-								e_spawner.last_spawn_time = 0.f;
-							}
-						}
-
-						// Check if enemies are all dead
-						std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
-						// Check if entities with vent tag exists
-						std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
-						// Win whole game overlay
-						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
-							NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
-							gameOverlay(entity, "You_Win_bg.png", "Play Again", "Quit");
-							return;
-						}
-
-						// Portal animations and interactions
-						if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
-						{
-							handlePortalInteractions(vents_entities);
-						}
-					}
-
-					// Elemental UI 
-					for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
-						// If player not dead
-						if (player_entities.empty()) {
-							continue;
-						}
-
-						// Look for player
-						for (auto& player : player_entities) {
-							const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
-							const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
-
-							// Set element ui to player's element
-							if (elementui_texture.has_value())
-							{
-								//elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
-								elementui_texture.value().get().frame_index.x = static_cast<int>(player_element.value().get().element);
-							}
-						}
-					}
-
-					for (Entity::Type const& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
-						// If no player exists, destroy the health bar
-						if (player_entities.empty()) {
-
-							gameOverlay(hp_container, "Defeat_screen_bg.png", "Play Again", "Quit");
-							return;
-						}
-					}
-
-					// Health bar logic
-					for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
-						// If no player exists, destroy the health bar
-						if (player_entities.empty()) {
-							//NIKE_ECS_MANAGER->destroyEntity(healthbar);
-							return;
-						}
-
-						// Look for player
-						for (auto& player : player_entities) {
-							const auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-							const auto e_healthbar_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(healthbar);
-							const auto e_player_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
-
-							// Check for missing component
-							if (e_player_health.has_value() == false || e_player_transform.has_value() == false || e_healthbar_transform.has_value() == false) {
-								NIKEE_CORE_WARN("sysGameLogic: healthbar/player missing component(s)");
-								continue;
-							}
-
-							//const auto& player_pos = e_player_transform.value().get().position;
-							//const auto& player_scale = e_player_transform.value().get().scale;
-							auto& healthbar_pos = e_healthbar_transform.value().get().position;
-							auto& healthbar_scale = e_healthbar_transform.value().get().scale;
-							//const float offset_y = player_scale.y * 0.9f;
-
-							// Set healthbar to player health
-
-							// Constants
-							static float original_healthbar_width = healthbar_scale.x;
-							static float original_healthbar_x = healthbar_pos.x;  // Store original X position once
-
-							// Get health percentage
-							float health_percentage = e_player_health.value().get().health / e_player_health.value().get().max_health;
-
-							// Update health bar scale
-							healthbar_scale.x = health_percentage * original_healthbar_width;
-
-							// Offset the health bar so it shrinks from right to left
-							healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
-						}
-					}
-
-					// Update of FSM will be called here
-					NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
-				}
-			}
-		}
 
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
 		// Get spawner position
