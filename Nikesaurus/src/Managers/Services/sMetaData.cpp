@@ -21,8 +21,10 @@ namespace NIKE {
 		if (!child) {
 			return {
 				{"Name", name},
-				{"Prefab_ID", prefab_id},
-				{"Prefab_Override", prefab_override},
+				{"Prefab_ID", prefab.id},
+				{"Prefab_Creation_ID", prefab.creation_id},
+				{"Prefab_Entity_Name", prefab.entity_name},
+				{"Prefab_Override", prefab.override},
 				{"B_Locked", b_locked},
 				{"Layer_ID", layer_id},
 				{"Layer_Order", layer_order},
@@ -32,8 +34,10 @@ namespace NIKE {
 		else {
 			return {
 				{"Name", name},
-				{"Prefab_ID", prefab_id},
-				{"Prefab_Override", prefab_override},
+				{"Prefab_ID", prefab.id},
+				{"Prefab_Creation_ID", prefab.creation_id},
+				{"Prefab_Entity_Name", prefab.entity_name},
+				{"Prefab_Override", prefab.override},
 				{"B_Locked", b_locked},
 				{"Layer_ID", layer_id},
 				{"Layer_Order", layer_order},
@@ -51,8 +55,10 @@ namespace NIKE {
 		}
 
 		//Get default values
-		prefab_id = data.value("Prefab_ID", "");
-		prefab_override = data.value("Prefab_Override", nlohmann::json());
+		prefab.id = data.value("Prefab_ID", "");
+		prefab.creation_id = data.value("Prefab_Creation_ID", 0);
+		prefab.entity_name = data.value("Prefab_Entity_Name", "");
+		prefab.override = data.value("Prefab_Override", nlohmann::json());
 		b_locked = data.value("B_Locked", false);
 		layer_id = data.value("Layer_ID", static_cast<unsigned int>(0));
 		layer_order = data.value("Layer_Order", static_cast<unsigned int>(0));
@@ -257,10 +263,10 @@ namespace NIKE {
 		}
 
 		//Set prefab master id
-		entities.at(entity).prefab_id = prefab_id;
+		entities.at(entity).prefab.id = prefab_id;
 
 		//Check if prefab id is valid
-		if (!entities.at(entity).prefab_id.empty() && entities.at(entity).prefab_id.find(".prefab") != std::string::npos) {
+		if (!entities.at(entity).prefab.id.empty() && entities.at(entity).prefab.id.find(".prefab") != std::string::npos) {
 			//Load entity with prefab
 			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
 		}
@@ -273,7 +279,59 @@ namespace NIKE {
 			return "";
 		}
 
-		return entities.at(entity).prefab_id;
+		return entities.at(entity).prefab.id;
+	}
+
+	void MetaData::Service::setEntityPrefabCreationID(Entity::Type entity, int creation_id) {
+
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if prefab id is a valid one
+		if (NIKE_ASSETS_SERVICE->getAssetType(entities.at(entity).prefab.id) != Assets::Types::Prefab) return;
+
+		//Set prefab master id
+		entities.at(entity).prefab.creation_id = creation_id;
+	}
+
+	int MetaData::Service::getEntityPrefabCreationID(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return -1;
+		}
+
+		return entities.at(entity).prefab.creation_id;
+	}
+
+	void MetaData::Service::setEntityPrefabEntityName(Entity::Type entity, std::string const& entity_name) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if entity name is valid
+		if (NIKE_ASSETS_SERVICE->getAssetType(entities.at(entity).prefab.id) != Assets::Types::Prefab) return;
+		Serialization::Prefab temp_prefab;
+		NIKE_SERIALIZE_SERVICE->loadPrefab(temp_prefab, NIKE_ASSETS_SERVICE->getAssetPath(entities.at(entity).prefab.id).string());
+		if (temp_prefab.entities.find(entity_name) == temp_prefab.entities.end()) return;
+
+		//Set prefab master id
+		entities.at(entity).prefab.entity_name = entity_name;
+	}
+
+	std::string MetaData::Service::getEntityPrefabEntityName(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return "";
+		}
+
+		return entities.at(entity).prefab.entity_name;
 	}
 
 	void MetaData::Service::setEntityPrefabOverride(Entity::Type entity, nlohmann::json const& data) {
@@ -284,7 +342,7 @@ namespace NIKE {
 		}
 
 		//Set prefab master id
-		entities.at(entity).prefab_override = data;
+		entities.at(entity).prefab.override = data;
 	}
 
 	nlohmann::json MetaData::Service::getEntityPrefabOverride(Entity::Type entity) const {
@@ -294,7 +352,7 @@ namespace NIKE {
 			return "";
 		}
 
-		return entities.at(entity).prefab_override;
+		return entities.at(entity).prefab.override;
 	}
 
 	void MetaData::Service::addEntityTag(Entity::Type entity, std::string const& tag) {
@@ -660,9 +718,23 @@ namespace NIKE {
 		//Update with cloned meta data
 		entities.at(entity).tags = it_clone->second.tags;
 		entities.at(entity).b_locked = it_clone->second.b_locked;
-		entities.at(entity).prefab_id = it_clone->second.prefab_id;
-		entities.at(entity).prefab_override = it_clone->second.prefab_override;
+		entities.at(entity).prefab.id = it_clone->second.prefab.id;
+		entities.at(entity).prefab.creation_id = it_clone->second.prefab.creation_id;
+		entities.at(entity).prefab.entity_name = it_clone->second.prefab.entity_name;
+		entities.at(entity).prefab.override = it_clone->second.prefab.override;
 		entities.at(entity).layer_id = it_clone->second.layer_id;
+	}
+
+	void MetaData::Service::cloneEntityData(Entity::Type entity, MetaData::EntityData const& clone) {
+
+		//Update with cloned meta data
+		entities.at(entity).tags = clone.tags;
+		entities.at(entity).b_locked = clone.b_locked;
+		entities.at(entity).prefab.id = clone.prefab.id;
+		entities.at(entity).prefab.creation_id = clone.prefab.creation_id;
+		entities.at(entity).prefab.entity_name = clone.prefab.entity_name;
+		entities.at(entity).prefab.override = clone.prefab.override;
+		entities.at(entity).layer_id = clone.layer_id;
 	}
 
 	nlohmann::json MetaData::Service::serializeEntityData(Entity::Type entity) const {

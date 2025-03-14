@@ -17,7 +17,8 @@
 #include "Managers/ECS/mCoordinator.h"
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/sMetaData.h"
-#include "Managers/Services/sUserInterface.h"
+#include "Managers/Services/sUserinterface.h"
+#include "Managers/Services/sSerialization.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -416,11 +417,11 @@ namespace NIKE {
 		class PrefabsPanel : public IPanel {
 		private:
 
-			//Prefab ID
-			std::string prefab_id;
+			//Prefab data structure
+			Serialization::Prefab prefab;
 
-			//Prefab copy count
-			size_t copy_count;
+			//Active editing entity within prefab
+			std::string editing_entity;
 
 			//For comp management
 			std::string comp_ref;
@@ -440,12 +441,6 @@ namespace NIKE {
 			//Reference to main panel
 			std::weak_ptr<GameWindowPanel> game_panel;
 
-			//Prefab layer ID
-			MetaData::EntityData meta_data;
-
-			//Map to array of component type
-			std::unordered_map<std::string, std::shared_ptr<void>> prefab_comps;
-
 			//Add component popup
 			std::function<void()> addComponentPopUp(std::string const& popup_id);
 
@@ -461,6 +456,15 @@ namespace NIKE {
 			//Create entity popup
 			std::function<void()> createEntityPopup(std::string const& popup_id);
 
+			//Remove entity popup
+			std::function<void()> removeEntityPopup(std::string const& popup_id);
+
+			//Clone entity popup
+			std::function<void()> cloneEntityPopup(std::string const& popup_id);
+
+			//Create prefab entity popup
+			std::function<void()> createPrefabEntityPopup(std::string const& popup_id);
+
 			//Frame buffer name
 			unsigned int preview_buffer_id;
 
@@ -468,7 +472,7 @@ namespace NIKE {
 			void renderPrefabPreview();
 
 		public:
-			PrefabsPanel() : copy_count{ 0 }, preview_buffer_id{ 0 } {}
+			PrefabsPanel() : preview_buffer_id{ 0 } {}
 			~PrefabsPanel() = default;
 
 			//Panel Name
@@ -491,7 +495,7 @@ namespace NIKE {
 			void prefabAcceptPayload();
 
 			// For component stuff
-			void renderPrefabComponents();
+			void renderPrefabComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps);
 
 			//Save prefab
 			void savePrefab();

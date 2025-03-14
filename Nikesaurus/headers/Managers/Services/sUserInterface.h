@@ -13,15 +13,7 @@
 #include "Components/cAnimation.h"
 #include "sInput.h"
 #include "sEvents.h"
-#include "sSerialization.h"
 #include "Lua/sLua.h"
-
- //Forward declaration of friend class
-namespace NIKE {
-	namespace Serialization {
-		class Service;
-	}
-}
 
 namespace NIKE {
 	namespace UI {
@@ -73,9 +65,6 @@ namespace NIKE {
 			public Events::IEventListener<Input::MouseMovedEvent>,
 			public Events::IEventListener<Input::MouseBtnEvent>,
 			public Events::IEventListener<ChangeBtnTxtRatio> {
-
-			//Friend class
-			friend class NIKE::Serialization::Service;
 
 		private:
 			//On key btn event

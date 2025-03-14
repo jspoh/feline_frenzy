@@ -12,8 +12,6 @@
 #ifndef M_SCENE_HPP
 #define M_SCENE_HPP
 
-#include "sSerialization.h"
-
 namespace NIKE {
 	namespace Scenes {
 

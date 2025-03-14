@@ -8,7 +8,6 @@
  *********************************************************************/
 #pragma once
 
-#include "Core/Engine.h"
 #include "Managers/ECS/mCoordinator.h"
 #include "Managers/Services/sMetaData.h"
 
@@ -20,6 +19,17 @@ namespace NIKE {
 
 		//Temporary Disable DLL Export Warning
 		#pragma warning(disable: 4251)
+
+		//Prefab data structure
+		struct Prefab {
+			struct Entity {
+				MetaData::EntityData data;
+				std::unordered_map<std::string, std::shared_ptr<void>> comps;
+			};
+
+			std::string prefab_id;
+			std::unordered_map<std::string, Entity> entities;
+		};
 
 		//Component Serializer
 		class CompSerializer {
@@ -89,6 +99,15 @@ namespace NIKE {
 			//current scene path string when (de-serialising)
 			std::string curr_scene_file = "";
 
+			//Mapping from prefab entity name to actual entity name
+			using PEntityToEntity = std::unordered_map<std::string, std::string>;
+
+			//Storage of prefab template and prefab creation map
+			using PrefabTemplate = std::pair<Prefab, std::vector<PEntityToEntity>>;
+
+			//Prefab mapping
+			std::unordered_map<std::string, PrefabTemplate> prefab_mapping;
+
 		public:
 			Service() : comp_registry{ std::make_unique<CompSerializer>() } {}
 			~Service() = default;
@@ -130,11 +149,26 @@ namespace NIKE {
 			//Load grid from .map file
 			void loadGridFromFile(const std::string& file_path);
 
+			//Get Prefab Copy Count
+			int getPrefabCopyCount(std::string const& prefab_id) const;
+
 			//Serialize Prefab
-			void savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, MetaData::EntityData const& meta_data);
+			void savePrefab(Prefab const& prefab, std::string const& file_path);
 
 			//Deserialize Prefab
-			void loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, MetaData::EntityData& meta_data, std::string const& file_path);
+			void loadPrefab(Prefab& prefab, std::string const& file_path);
+
+			//Create entities from prefab
+			void createEntitiesFromPrefab(std::string const& main_name, std::string const& prefab_id);
+
+			//Serialize prefab entities
+			nlohmann::json serializePrefabEntities();
+
+			//Deserialize prefab entities
+			void deserializePrefabEntities(nlohmann::json const& data);
+
+			//Load entity from prefab
+			void loadEntityFromPrefab(Entity::Type entity, std::string const& prefab_id, int prefab_creation_id,std::string const& prefab_entity_name, std::string const& main_name = "");
 
 			//Serialize prefab overrides
 			nlohmann::json serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id);

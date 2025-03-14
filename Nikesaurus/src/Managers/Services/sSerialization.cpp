@@ -8,6 +8,7 @@
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
+#include "Core/Engine.h"
 #include "Managers/Services/sSerialization.h"
 
 namespace NIKE {
@@ -144,18 +145,38 @@ namespace NIKE {
 		return success;
 	}
 
-	void Serialization::Service::savePrefab(std::unordered_map<std::string, std::shared_ptr<void>> const& comps, std::string const& file_path, MetaData::EntityData const& meta_data) {
+	int Serialization::Service::getPrefabCopyCount(std::string const& prefab_id) const {
+		//Check if prefab is valid
+		if (NIKE_ASSETS_SERVICE->getAssetType(prefab_id) != Assets::Types::Prefab) return 0;
+
+		//Check prefab mapping, if not created yet, create a prefab template
+		if (prefab_mapping.find(prefab_id) == prefab_mapping.end()) {
+			return 0;
+		} 
+		else {
+			return static_cast<int>(prefab_mapping.at(prefab_id).second.size());
+		}
+	}
+
+	void Serialization::Service::savePrefab(Prefab const& prefab, std::string const& file_path) {
 
 		//Create new data
 		nlohmann::json data;
 
-		//Iterate through all comp
-		for (auto const& comp : comps) {
-			data["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
-		}
+		//Create json array
+		auto& entities = data["Entities"];
 
-		//Serialize prefab metadata
-		data["MetaData"] = NIKE_METADATA_SERVICE->serializePrefabData(meta_data);
+		//Iterate through entity within prefab
+		for (auto const& entity : prefab.entities) {
+
+			//Iterate through all comp
+			for (auto const& comp : entity.second.comps) {
+				entities[entity.first]["Components"][comp.first] = comp_registry->serializeComponent(comp.first, comp.second.get());
+			}
+
+			//Serialize prefab metadata
+			entities[entity.first]["MetaData"] = NIKE_METADATA_SERVICE->serializePrefabData(entity.second.data);
+		}
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::out);
@@ -167,7 +188,7 @@ namespace NIKE {
 		file.close();
 	}
 
-	void Serialization::Service::loadPrefab(std::unordered_map<std::string, std::shared_ptr<void>>& comps, MetaData::EntityData& meta_data, std::string const& file_path) {
+	void Serialization::Service::loadPrefab(Prefab& prefab, std::string const& file_path) {
 
 		//Boolean for flagging errors in deserializing
 		bool success = true;
@@ -189,43 +210,220 @@ namespace NIKE {
 		if (data.empty())
 			return;
 
-		//If there are no components
-		if (data.contains("Components")) {
-			//Iterate through all components stored within data
-			for (auto const& [comp_name, comp_data] : data["Components"].items()) {
-				//Check for comp functions validity
-				if (comp_funcs.find(comp_name) != comp_funcs.end()) {
-					comps[comp_name] = comp_funcs[comp_name]();
+		//If there are no entities
+		if (data.contains("Entities")) {
 
-					//Deserialize data into component
-					comp_registry->deserializeComponent(comp_name, comps[comp_name].get(), comp_data);
+			//Reference entities data
+			auto const& entities_data = data["Entities"];
+
+			//Iterate through all entities
+			for (auto const& [e_name, e_data] : entities_data.items()) {
+
+				//Check if entities data contains components
+				if (e_data.contains("Components")) {
+
+					//Get entity components
+					auto& components = prefab.entities[e_name].comps;
+
+					//Iterate through all components stored within data
+					for (auto const& [comp_name, comp_data] : e_data["Components"].items()) {
+
+						//Check for comp functions validity
+						if (comp_funcs.find(comp_name) != comp_funcs.end()) {
+
+							//Create a default component
+							components[comp_name] = comp_funcs[comp_name]();
+
+							//Deserialize data into component
+							comp_registry->deserializeComponent(comp_name, components[comp_name].get(), comp_data);
+						}
+						else {
+							success = false;
+						}
+					}
+				}
+
+				//Check if entities data contains metadata
+				if (e_data.contains("MetaData")) {
+					success = NIKE_METADATA_SERVICE->deserializePrefabData(prefab.entities[e_name].data, e_data["MetaData"]);
 				}
 				else {
 					success = false;
 				}
 			}
 		}
-		else {
-			success = false;
-		}
 
-		//Load prefab metadata
-		if (data.contains("MetaData")) {
-			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data.at("MetaData"));
-		}
-		else {
-			success = false;
-		}
-
-		//Error encountered in deserializing
-		if (!success) {
-
-			//Save prefab again
-			savePrefab(comps, file_path, meta_data);
-		}
+		//If Success is false
+		//Reserialise here
 
 		//Close file
 		file.close();
+	}
+
+	void Serialization::Service::createEntitiesFromPrefab(std::string const& main_name, std::string const& prefab_id) {
+
+		//Check if prefab is valid
+		if (NIKE_ASSETS_SERVICE->getAssetType(prefab_id) != Assets::Types::Prefab) return;
+
+		//Check prefab mapping, if not created yet, create a prefab template
+		if (prefab_mapping.find(prefab_id) == prefab_mapping.end()) {
+			loadPrefab(prefab_mapping[prefab_id].first, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		}
+
+		//Increment the vector
+		prefab_mapping[prefab_id].second.push_back(PEntityToEntity());
+
+		//Iterate through prefab template
+		for (auto const& e_template : prefab_mapping[prefab_id].first.entities) {
+
+			//Create entity
+			auto entity = NIKE_ECS_MANAGER->createEntity();
+
+			//Get entities components
+			auto components = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+
+			//Iterate through prefab entity template components
+			for (auto const& [comp_name, comp_data] : e_template.second.comps) {
+
+				//Get component type
+				Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+				//Check if component is already present, if not add component
+				if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+				}
+
+				//Deserialize data into component
+				deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), serializeComponent(comp_name, comp_data.get()));
+			}
+
+			//Entity name
+			auto e_name = main_name + "_" + e_template.first;
+
+			//Prefab creation ID
+			auto creation_id = static_cast<int>(prefab_mapping[prefab_id].second.size() - 1);
+
+			//Create name for entity
+			NIKE_METADATA_SERVICE->setEntityName(entity, e_name);
+
+			//Set entity prefab id
+			NIKE_METADATA_SERVICE->setEntityPrefabID(entity, prefab_id);
+
+			//Set entity creation id
+			NIKE_METADATA_SERVICE->setEntityPrefabCreationID(entity, creation_id);
+
+			//Set entity prefab entity name
+			NIKE_METADATA_SERVICE->setEntityPrefabEntityName(entity, e_template.first);
+
+			//Map into creation vector
+			prefab_mapping[prefab_id].second[creation_id][e_template.first] = e_name;
+		}
+	}
+
+	nlohmann::json Serialization::Service::serializePrefabEntities() {
+
+		//Prefab serialization data
+		nlohmann::json data;
+
+		//Iterate through prefab creation map
+		for (auto& [prefab_name, prefab_template] : prefab_mapping) {
+
+			//Creat a json array for prefab
+			data[prefab_name] = nlohmann::json::array();
+
+			//Iterate through all creation of that prefab
+			for (PEntityToEntity& prefab_creation : prefab_template.second) {
+
+				//Prefab entity data
+				nlohmann::json p_entity_data;
+
+				//Iterate through all prefab entity names
+				for (auto const& [prefab_entity_name, prefab_data] : prefab_template.first.entities) {
+
+					//Check mapping & get entity
+					std::string entity_name = prefab_creation[prefab_entity_name];
+					auto entity = NIKE_METADATA_SERVICE->getEntityByName(entity_name);
+
+					//If entity exists
+					if (entity.has_value()) {
+
+						//Serialize override data
+						NIKE_METADATA_SERVICE->setEntityPrefabOverride(entity.value(), NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity.value(), prefab_name));
+
+						//Serialize metadata
+						p_entity_data[prefab_entity_name] = nlohmann::json::object();
+						p_entity_data[prefab_entity_name]["MetaData"] = NIKE_METADATA_SERVICE->serializeEntityData(entity.value());
+					}
+				}
+
+				//Pushback to data
+				data[prefab_name].push_back(p_entity_data);
+			}
+		}
+
+		return data;
+	}
+
+	void Serialization::Service::deserializePrefabEntities(nlohmann::json const& data) {
+
+	}
+
+	void Serialization::Service::loadEntityFromPrefab(Entity::Type entity, std::string const& prefab_id, int prefab_creation_id, std::string const& prefab_entity_name, std::string const& main_name) {
+		
+		//Check if prefab is valid
+		if (NIKE_ASSETS_SERVICE->getAssetType(prefab_id) != Assets::Types::Prefab) return;
+
+		//Check prefab mapping, if not created yet, create a prefab template
+		if (prefab_mapping.find(prefab_id) == prefab_mapping.end()) {
+			loadPrefab(prefab_mapping[prefab_id].first, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		}
+
+		//Check for entity validity
+		if (!NIKE_ECS_MANAGER->checkEntity(entity)) return;
+
+		//Check creation id
+		if(prefab_creation_id >= prefab_mapping[prefab_id].second.size()) {
+			prefab_mapping[prefab_id].second.resize(prefab_creation_id + 1);
+		}
+
+		//Set of used prefab entity name
+		auto& used_name_set = prefab_mapping[prefab_id].second[prefab_creation_id];
+
+		//Check prefab_entity_name
+		if (prefab_mapping[prefab_id].first.entities.find(prefab_entity_name) != prefab_mapping[prefab_id].first.entities.end() && used_name_set.find(prefab_entity_name) == used_name_set.end()) {
+
+			//Get entities components
+			auto components = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
+
+			//Entity Template
+			auto const& e_template = prefab_mapping[prefab_id].first.entities.at(prefab_entity_name);
+
+			//Iterate through prefab entity template components
+			for (auto const& [comp_name, comp_data] : e_template.comps) {
+
+				//Get component type
+				Component::Type comp_type = NIKE_ECS_MANAGER->getComponentType(comp_name);
+
+				//Check if component is already present, if not add component
+				if (!NIKE_ECS_MANAGER->checkEntityComponent(entity, comp_type)) {
+					NIKE_ECS_MANAGER->addDefEntityComponent(entity, comp_type);
+				}
+
+				//Deserialize data into component
+				deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), serializeComponent(comp_name, comp_data.get()));
+			}
+
+			if (!main_name.empty()) {
+				//Create name for entity
+				NIKE_METADATA_SERVICE->setEntityName(entity, main_name + "_" + prefab_entity_name);
+			}
+
+			//Clone entity data from prefab entity template
+			NIKE_METADATA_SERVICE->cloneEntityData(entity, e_template.data);
+
+			//Set entity creation id
+			NIKE_METADATA_SERVICE->setEntityPrefabCreationID(entity, prefab_creation_id);
+		}
 	}
 
 	nlohmann::json Serialization::Service::serializePrefabOverrides(Entity::Type entity, std::string const& prefab_id) {
@@ -239,8 +437,8 @@ namespace NIKE {
 		//Layer ID
 		MetaData::EntityData metadata;
 
-		//Load prefab into prefab comps
-		loadPrefab(prefab_comps, metadata, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
+		////Load prefab into prefab comps
+		//loadPrefab(prefab_comps, metadata, NIKE_ASSETS_SERVICE->getAssetPath(prefab_id).string());
 
 		//Iterate through all comp
 		for (auto const& comp : NIKE_ECS_MANAGER->getAllEntityComponents(entity)) {
@@ -374,7 +572,7 @@ namespace NIKE {
 		if (!deserializeEntity(entity, data) || !data.contains("MetaData")) {
 
 			//Error encountered in deserialization
-			savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(entity).value() : MetaData::EntityData());
+			//savePrefab(NIKE_ECS_MANAGER->getAllEntityComponents(entity), file_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(entity).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(entity).value() : MetaData::EntityData());
 		}
 
 		//Deserialize prefab data
@@ -403,7 +601,6 @@ namespace NIKE {
 		return playerData;
 	}
 
-
 	bool Serialization::Service::deserializePlayerData(Entity::Type player, nlohmann::json const& data) {
 		// Check if the JSON contains player data
 		if (data.contains("Health")) {
@@ -420,7 +617,6 @@ namespace NIKE {
 
 		return true; // Return success
 	}
-
 
 	/*****************************************************************//**
 	* Scenes
@@ -491,30 +687,19 @@ namespace NIKE {
 			//Iterate through all entities in layer
 			for (auto& entity : layer->getEntitites()) {
 
-				// skip 'built in' fps display entity
-				const auto entity_components = NIKE_ECS_MANAGER->getAllEntityComponents(entity);
-				const auto it = entity_components.find("Render::BuiltIn");
-				if (it != entity_components.end()) {
-					// is built in component, do not savee to scene
-					continue;
-				}
-
 				//Entity data
 				nlohmann::json e_data;
 
 				//Check if prefab is valid
 				auto prefab_id = NIKE_METADATA_SERVICE->getEntityPrefabID(entity);
-				if (!prefab_id.empty()) {
-					//Serialize override data
-					NIKE_METADATA_SERVICE->setEntityPrefabOverride(entity, NIKE_SERIALIZE_SERVICE->serializePrefabOverrides(entity, prefab_id));
-				}
-				else {
+				if (prefab_id.empty()) {
+
 					//Serialize entity data
 					e_data["Entity"] = serializeEntity(entity);
-				}
 
-				//Serialize metadata
-				e_data["Entity"]["MetaData"] = NIKE_METADATA_SERVICE->serializeEntityData(entity);
+					//Serialize metadata
+					e_data["Entity"]["MetaData"] = NIKE_METADATA_SERVICE->serializeEntityData(entity);
+				}
 
 				//If entity is a UI Entity
 				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
@@ -529,6 +714,11 @@ namespace NIKE {
 			//Push layer data into main data
 			data.push_back(l_data);
 		}
+
+		//Serialize prefab entities
+		nlohmann::json prefab_data;
+		prefab_data["Prefabs"] = serializePrefabEntities();
+		data.push_back(prefab_data);
 
 		//Open file stream
 		std::fstream file(file_path, std::ios::out | std::ios::trunc);
@@ -561,7 +751,6 @@ namespace NIKE {
 		//Return if there is no data
 		if (data.empty())
 			return;
-
 
 		//Iterate through all data
 		for (const auto& l_data : data) {

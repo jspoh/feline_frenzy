@@ -660,14 +660,14 @@ namespace NIKE {
 					}
 
 					//Create tempe entity
-					auto temp = NIKE_ECS_MANAGER->createEntity();
+					//auto temp = NIKE_ECS_MANAGER->createEntity();
 
-					//Deserialize
-					NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(temp, asset_data.first);
+					////Deserialize
+					//NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(temp, asset_data.first);
 
-					//Serialize
-					const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(temp);
-					NIKE_SERIALIZE_SERVICE->savePrefab(comps, asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(temp).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(temp).value() : NIKE::MetaData::EntityData());
+					////Serialize
+					//const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(temp);
+					//NIKE_SERIALIZE_SERVICE->savePrefab(comps, asset_data.second.primary_path.string(), NIKE_METADATA_SERVICE->getEntityDataCopy(temp).has_value() ? NIKE_METADATA_SERVICE->getEntityDataCopy(temp).value() : NIKE::MetaData::EntityData());
 
 					break;
 				}

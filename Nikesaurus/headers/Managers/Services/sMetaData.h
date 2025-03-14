@@ -33,14 +33,21 @@ namespace NIKE {
 		//Data Type
 		struct EntityData {
 
+			//Prefab data structure
+			struct Prefab {
+				std::string id;
+				int creation_id;
+				std::string entity_name;
+				nlohmann::json override;
+
+				Prefab() : id{ "" }, creation_id{ -1 }, entity_name{ "" }, override() {}
+			};
+
 			//Name
 			std::string name;
 
-			//Prefab tag
-			std::string prefab_id;
-
-			//Override data for variant prefab
-			nlohmann::json prefab_override;
+			//Prefab data
+			Prefab prefab;
 
 			//Boolean for locking entities in editor
 			bool b_locked;
@@ -58,9 +65,9 @@ namespace NIKE {
 			std::variant<Parent, Child> relation;
 
 			//Constructors
-			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
+			EntityData() : name{ "entity_" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
 			EntityData(std::string const& name)
-				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
+				: name{ name }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
 
 			//Serialize data
 			nlohmann::json serialize() const;
@@ -149,6 +156,18 @@ namespace NIKE {
 			//Get Entity Master prefab
 			std::string getEntityPrefabID(Entity::Type entity) const;
 
+			//Set Entity Master prefab Creation ID
+			void setEntityPrefabCreationID(Entity::Type entity, int creation_id);
+
+			//Get Entity Master prefab Creation ID
+			int getEntityPrefabCreationID(Entity::Type entity) const;
+
+			//Set Entity Master prefab
+			void setEntityPrefabEntityName(Entity::Type entity, std::string const& entity_name);
+
+			//Get Entity Master prefab Entity Name
+			std::string getEntityPrefabEntityName(Entity::Type entity) const;
+
 			//Set Entity prefab override
 			void setEntityPrefabOverride(Entity::Type entity, nlohmann::json const& data);
 
@@ -220,6 +239,9 @@ namespace NIKE {
 
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);
+
+			//Clone MetaData except for name
+			void cloneEntityData(Entity::Type entity, EntityData const& clone);
 
 			//Serialize entity
 			nlohmann::json serializeEntityData(Entity::Type entity) const;

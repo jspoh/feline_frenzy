@@ -94,6 +94,8 @@
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "Background",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
@@ -155,6 +157,8 @@
                             "Layer_ID": 0,
                             "Layer_Order": 1,
                             "Name": "Background 2",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
@@ -216,12 +220,16 @@
                             "Layer_ID": 0,
                             "Layer_Order": 2,
                             "Name": "Title",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         }
                     }
-                }
+                },
+                null,
+                null
             ],
             "ID": 0,
             "Mask": 1
@@ -320,6 +328,8 @@
                             "Layer_ID": 1,
                             "Layer_Order": 0,
                             "Name": "how_to_play_btn",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -442,6 +452,8 @@
                             "Layer_ID": 1,
                             "Layer_Order": 1,
                             "Name": "play_game_btn",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -558,6 +570,8 @@
                             "Layer_ID": 1,
                             "Layer_Order": 2,
                             "Name": "quit_game_btn",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -678,6 +692,8 @@
                             "Layer_ID": 1,
                             "Layer_Order": 3,
                             "Name": "options_btn",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -746,6 +762,8 @@
                             "Layer_ID": 2,
                             "Layer_Order": 0,
                             "Name": "fade_overlay",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
@@ -757,6 +775,105 @@
             ],
             "ID": 2,
             "Mask": 4
+        }
+    },
+    {
+        "Prefabs": {
+            "test.prefab": [
+                {
+                    "test_0": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 3,
+                            "Name": "test_0_test_0",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "test_0",
+                            "Prefab_ID": "test.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "B_Blend": false,
+                                        "B_Flip": {
+                                            "x": false,
+                                            "y": false
+                                        },
+                                        "B_Stretch": false,
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 0,
+                                            "y": 0
+                                        },
+                                        "Frame_Size": {
+                                            "x": 1,
+                                            "y": 1
+                                        },
+                                        "Intensity": 0.0,
+                                        "Texture_ID": "Intro_Cutscene_5.png"
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -141.89999389648438,
+                                            "y": 0.0
+                                        },
+                                        "Rotation": 0.0,
+                                        "Scale": {
+                                            "x": 189.76473999023438,
+                                            "y": 106.74266052246094
+                                        },
+                                        "Screen Position": false
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": []
+                        }
+                    },
+                    "test_1": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 4,
+                            "Name": "test_0_test_1",
+                            "Prefab_Creation_ID": 0,
+                            "Prefab_Entity_Name": "test_1",
+                            "Prefab_ID": "test.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Shape": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 1.0,
+                                            "y": 1.0,
+                                            "z": 1.0
+                                        },
+                                        "Model_ID": "square.model"
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 0.0,
+                                            "y": 149.39999389648438
+                                        },
+                                        "Rotation": 0.0,
+                                        "Scale": {
+                                            "x": 176.6999969482422,
+                                            "y": 59.900001525878906
+                                        },
+                                        "Screen Position": false
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": []
+                        }
+                    }
+                }
+            ]
         }
     }
 ]
