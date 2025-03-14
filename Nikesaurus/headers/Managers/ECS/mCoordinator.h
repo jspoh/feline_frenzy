@@ -39,10 +39,6 @@ namespace NIKE {
 			//Default constructor
 			Manager();
 
-			// this is preferable to .size() or getcount to prevent conflicts during quickly adding and removing entities
-			int getNextEntityId();
-
-
 			/*****************************************************************//**
 			* Entity Methods
 			*********************************************************************/
