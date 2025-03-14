@@ -222,7 +222,6 @@ namespace NIKE {
 							++counter_before;
 							elapsed_time_before = 0.0f;
 						}
-						cout << counter_before << endl;
 					}
 					if (counter_before > 8)
 					{
@@ -252,7 +251,8 @@ namespace NIKE {
 					if (counter_after > 6)
 					{
 						// After boss cutscene play finish, show win game overlay
-						gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+						// gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 					}
 				}
 
@@ -411,7 +411,7 @@ namespace NIKE {
 		play_again_script.script_id = "ChangeScene.lua";
 		play_again_script.update_function = "Restart";
 		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
-
+		
 		auto quit_script = Lua::Script();
 		quit_script.script_id = "ChangeScene.lua";
 		quit_script.update_function = "Quit";
