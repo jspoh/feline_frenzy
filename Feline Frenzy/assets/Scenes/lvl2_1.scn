@@ -7,6 +7,12 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "BGM2": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []

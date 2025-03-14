@@ -282,9 +282,18 @@ namespace NIKE {
                 bullet_transform.value().get().position = player_transform.position + (bull_direction.normalize() * (player_transform.scale.length() * 0.25f));
             }
 
-            //Set player bullet SFX
+            //Set player bullet SFX with randomized variant
             auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
             if (bullet_sfx.has_value()) {
+                // Randomize between 1 and 2
+                int randomVariant = rand() % 2 + 1; // rand() should be seeded during initialization
+                // Assuming the current SFX string is stored in a member named audio_id
+                std::string sfxID = bullet_sfx.value().get().audio_id;
+                if (!sfxID.empty() && sfxID.size() >= 5) {
+                    // Replace the 5th character from the end with the random variant ('1' or '2')
+                    sfxID[sfxID.size() - 5] = static_cast<char>('0' + randomVariant);
+                }
+                bullet_sfx.value().get().audio_id = sfxID;
                 bullet_sfx.value().get().b_play_sfx = true;
             }
             });

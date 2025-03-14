@@ -466,6 +466,9 @@ namespace NIKE {
                 // Temporary hardcoded SFX
                 Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
             }
+            else if (target_entity_tags.find("objects") != target_entity_tags.end()) {
+                Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+            }
 
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
