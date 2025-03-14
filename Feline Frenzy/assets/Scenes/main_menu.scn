@@ -2,10 +2,6 @@
     {
         "Channels": {
             "BGM": {
-                "loop": false,
-                "tracks": []
-            },
-            "Menu_BGM": {
                 "loop": true,
                 "tracks": [
                     "BGM_Menu_v1.wav"

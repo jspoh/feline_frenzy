@@ -4,12 +4,6 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Explore_v1.wav"
-                ]
-            },
-            "Menu_BGM": {
-                "loop": true,
-                "tracks": [
                     "BGM_Menu_v1.wav"
                 ]
             },
@@ -202,9 +196,9 @@
                                 "particle_acceleration": 0.0,
                                 "particle_color": {
                                     "w": 1.0,
-                                    "x": 0.686274528503418,
-                                    "y": 0.07450980693101883,
-                                    "z": 0.9921568632125854
+                                    "x": 0.5607843399047852,
+                                    "y": 0.6392157077789307,
+                                    "z": 0.07450980693101883
                                 },
                                 "particle_color_changes_over_time": false,
                                 "particle_color_is_random": true,

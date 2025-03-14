@@ -853,4 +853,14 @@ namespace NIKE {
 		}
 	}
 
+	// NEW: Implementation for getBGMTrackForScene()
+	std::string Audio::Service::getBGMTrackForScene() {
+		std::string currentBGMTrack = "";
+		auto currentPlaylist = this->getChannelPlaylist(this->getBGMChannelGroupID());
+		if (!currentPlaylist.tracks.empty()) {
+			currentBGMTrack = currentPlaylist.tracks.front();
+		}
+		return currentBGMTrack;
+	}
+
 }

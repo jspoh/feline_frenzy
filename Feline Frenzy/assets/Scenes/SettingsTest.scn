@@ -59,7 +59,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "AudioMenu_UI.png"
+                                "Texture_ID": "Main_Menu_NoTitleSky.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -78,6 +78,57 @@
                             "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
+                            "Name": "Background2",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "AudioMenu_UI.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 33.645477294921875,
+                                    "y": 13.1536865234375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1920.0,
+                                    "y": 1080.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": true,
+                            "Layer_ID": 0,
+                            "Layer_Order": 1,
                             "Name": "Background",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -124,8 +175,8 @@
                         "MetaData": {
                             "B_Locked": true,
                             "Layer_ID": 0,
-                            "Layer_Order": 1,
-                            "Name": "entity_0001",
+                            "Layer_Order": 2,
+                            "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -214,8 +265,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 7.554999828338623,
-                                    "y": -272.3450012207031
+                                    "x": 10.6217041015625,
+                                    "y": -196.81082153320313
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -235,13 +286,15 @@
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
+                            "Input_State": 0,
                             "Scripts": {
                                 "OnClick": {
-                                    "Named_Args": {},
+                                    "Named_Args": {
+                                        "scene": "main_menu.scn"
+                                    },
                                     "Script_ID": "ChangeScene.lua",
                                     "Start_Function": "",
-                                    "Update_Function": "Previous"
+                                    "Update_Function": "Change"
                                 },
                                 "OnHover": {
                                     "Named_Args": {
@@ -492,8 +545,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -103.36399841308594,
-                                    "y": 163.21099853515625
+                                    "x": -86.6756591796875,
+                                    "y": 145.75674438476563
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -591,8 +644,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 279.29998779296875,
-                                    "y": 163.21099853515625
+                                    "x": 227.64100646972656,
+                                    "y": 145.7570037841797
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -861,8 +914,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -103.36399841308594,
-                                    "y": -25.45800018310547
+                                    "x": -86.6756591796875,
+                                    "y": -4.243255615234375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -960,8 +1013,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 279.29998779296875,
-                                    "y": -25.45800018310547
+                                    "x": 227.10000610351563,
+                                    "y": -4.243000030517578
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
