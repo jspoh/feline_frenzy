@@ -531,6 +531,7 @@ namespace NIKE {
                     //Set base
                     base.animations_to_complete = 3;
                     base.animation_mode = Animation::Mode::RESTART;
+                    base.frame_duration = 0.08f;
 
                     //Set sprite
                     sprite.start_index = { 0, 0 };
