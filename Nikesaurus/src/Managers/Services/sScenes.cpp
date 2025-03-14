@@ -15,7 +15,7 @@ namespace NIKE {
     nlohmann::json Scenes::Service::saved_player_data = nlohmann::json();
 
     /*****************************************************************//**
-     * Layer functions (unchanged)
+     * Layer functions
      *********************************************************************/
     unsigned int Scenes::Layer::getLayerID() const { return id; }
     void Scenes::Layer::setLayerState(bool state) { b_state = state; }
@@ -25,32 +25,42 @@ namespace NIKE {
     void Scenes::Layer::setLayerMask(unsigned int mask_id, bool state) { mask.set(mask_id, state); }
     std::bitset<Scenes::MAXLAYERS> Scenes::Layer::getLayerMask() const { return mask; }
     void Scenes::Layer::insertEntity(Entity::Type entity) {
-        for (auto const& e : entities)
-            if (e == entity) return;
+        for (auto const& e : entities) {
+            if (e == entity) {
+                return;
+            }
+        }
         entities.push_back(entity);
     }
     void Scenes::Layer::removeEntity(Entity::Type entity) {
         auto it = std::find(entities.begin(), entities.end(), entity);
-        if (it != entities.end()) { entities.erase(it); }
+        if (it != entities.end()) {
+            entities.erase(it);
+        }
     }
     bool Scenes::Layer::checkEntity(Entity::Type entity) {
         return std::find(entities.begin(), entities.end(), entity) != entities.end();
     }
     void Scenes::Layer::sortEntitiesBasedOnMetaData() {
-        if (entities.empty()) return;
+        if (entities.empty()) {
+            return;
+        }
         std::sort(entities.begin(), entities.end(), [](Entity::Type a, Entity::Type b) {
             return NIKE_METADATA_SERVICE->getEntityLayerOrder(a) < NIKE_METADATA_SERVICE->getEntityLayerOrder(b);
             });
     }
     void Scenes::Layer::sortEntitiesBasedOnYPosition() {
-        if (entities.empty()) return;
+        if (entities.empty()) {
+            return;
+        }
         std::vector<Entity::Type> sortedEntities = entities;
         std::sort(sortedEntities.begin(), sortedEntities.end(), [](Entity::Type a, Entity::Type b) {
             size_t orderA = NIKE_METADATA_SERVICE->getEntityLayerOrder(a);
             size_t orderB = NIKE_METADATA_SERVICE->getEntityLayerOrder(b);
-            auto transformA = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(a);
-            auto transformB = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(b);
-            if (!transformA || !transformB) return orderA < orderB;
+            const auto& transformA = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(a);
+            const auto& transformB = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(b);
+            if (!transformA || !transformB)
+                return orderA < orderB;
             const auto& tA = transformA.value().get();
             const auto& tB = transformB.value().get();
             float bottomA = tA.position.y - (tA.scale.y * 0.5f);
@@ -62,7 +72,9 @@ namespace NIKE {
         }
     }
     void Scenes::Layer::setEntityOrder(Entity::Type entity, size_t order_in_layer) {
-        if (entities.empty() || order_in_layer >= entities.size()) return;
+        if (entities.empty() || order_in_layer >= entities.size()) {
+            return;
+        }
         size_t current_index = getEntityOrder(entity);
         if (current_index == (std::numeric_limits<size_t>::max)() || current_index == order_in_layer)
             return;
@@ -81,10 +93,10 @@ namespace NIKE {
     size_t Scenes::Layer::getEntitiesSize() const { return entities.size(); }
     nlohmann::json Scenes::Layer::serialize() const {
         return {
-          {"ID", id},
-          {"Mask", mask.to_ulong()},
-          {"B_State", b_state},
-          {"B_YSort", b_ysort}
+            {"ID", id},
+            {"Mask", mask.to_ulong()},
+            {"B_State", b_state},
+            {"B_YSort", b_ysort}
         };
     }
     void Scenes::Layer::deserialize(nlohmann::json const& data) {
@@ -100,46 +112,40 @@ namespace NIKE {
     void Scenes::Service::initScene(std::string const& scene_id) {
         curr_scene = scene_id;
         prev_scene = curr_scene;
-        if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene))
+        if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
             throw std::runtime_error("Error scene file does not exist");
+        }
         NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
     }
 
-    // In changeScene (and similarly in restartScene and previousScene) we add a check
-    // to compare the current BGM track with the one loaded by the new scene. We capture
-    // the old track before scene change and, after getExecutable(), if the new track differs,
-    // we force a restart of the BGM.
+    // Modified changeScene: we capture the current BGM track using the new Audio Service function.
     void Scenes::Service::changeScene(std::string const& scene_id) {
-        if (scene_id == curr_scene) return;
+        if (scene_id == curr_scene) {
+            return;
+        }
 
-        // Capture current BGM track from the BGM channel group's playlist
-        std::string oldBGM = "";
-        auto currentPlaylist = NIKE_AUDIO_SERVICE->getChannelPlaylist(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
-        if (!currentPlaylist.tracks.empty())
-            oldBGM = currentPlaylist.tracks.front();
+        // Capture current BGM track from the BGM channel's playlist.
+        std::string oldBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
 
         prev_scene = curr_scene;
         curr_scene = scene_id;
 
         NIKE_ECS_MANAGER->destroyAllEntities();
         NIKE_UI_SERVICE->destroyAllButtons();
-        // Do not clear the entire audio channel groups here so that we can reuse the BGM channel
+        NIKE_AUDIO_SERVICE->clearAllChannelGroups();
         NIKE_CAMERA_SERVICE->clearCameraEntities();
         NIKE_METADATA_SERVICE->reset();
         NIKE_MAP_SERVICE->resetGrid();
         layers.clear();
         createLayer();
         NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
-        if (curr_scene.substr(0, 3) == "lvl" && scene_id != "lvl1_1.scn")
+        if (curr_scene.substr(0, 3) == "lvl" && scene_id != "lvl1_1.scn") {
             restorePlayerData();
+        }
 
-        // After scene loading, check new BGM track
-        std::string newBGM = "";
-        auto newPlaylist = NIKE_AUDIO_SERVICE->getChannelPlaylist(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
-        if (!newPlaylist.tracks.empty())
-            newBGM = newPlaylist.tracks.front();
-
-        // If the new track differs from the old, stop the BGM channel and clear its playlist
+        // After scene loading, capture the new BGM track.
+        std::string newBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
+        // If the new track differs from the old, stop the BGM channel and clear its playlist.
         if (newBGM != oldBGM) {
             auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
             if (bgmGroup)
@@ -149,27 +155,23 @@ namespace NIKE {
     }
 
     void Scenes::Service::restartScene() {
-        if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene))
+        if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
             return;
-
-        std::string oldBGM = "";
-        auto currentPlaylist = NIKE_AUDIO_SERVICE->getChannelPlaylist(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
-        if (!currentPlaylist.tracks.empty())
-            oldBGM = currentPlaylist.tracks.front();
+        }
+        // Capture current BGM track.
+        std::string oldBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
 
         NIKE_ECS_MANAGER->destroyAllEntities();
         NIKE_UI_SERVICE->destroyAllButtons();
-        NIKE_CAMERA_SERVICE->clearCameraEntities();
+        NIKE_AUDIO_SERVICE->clearAllChannelGroups();
         NIKE_METADATA_SERVICE->reset();
         NIKE_MAP_SERVICE->resetGrid();
+        NIKE_CAMERA_SERVICE->clearCameraEntities();
         layers.clear();
         createLayer();
         NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 
-        std::string newBGM = "";
-        auto newPlaylist = NIKE_AUDIO_SERVICE->getChannelPlaylist(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
-        if (!newPlaylist.tracks.empty())
-            newBGM = newPlaylist.tracks.front();
+        std::string newBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
         if (newBGM != oldBGM) {
             auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
             if (bgmGroup)
@@ -183,17 +185,18 @@ namespace NIKE {
             restartScene();
             return;
         }
-
         std::swap(prev_scene, curr_scene);
         NIKE_ECS_MANAGER->destroyAllEntities();
         NIKE_UI_SERVICE->destroyAllButtons();
+        NIKE_AUDIO_SERVICE->clearAllChannelGroups();
         NIKE_CAMERA_SERVICE->clearCameraEntities();
         NIKE_METADATA_SERVICE->reset();
         NIKE_MAP_SERVICE->resetGrid();
         layers.clear();
         createLayer();
-        if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene))
+        if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene)) {
             throw std::runtime_error("Error scene file does not exist");
+        }
         NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
     }
 
@@ -210,8 +213,9 @@ namespace NIKE {
 
     std::shared_ptr<Scenes::Layer> Scenes::Service::createLayer(int index) {
         std::shared_ptr<Layer> layer = std::make_shared<Layer>();
-        if (index >= 0)
+        if (index >= 0) {
             layers.emplace(layers.begin() + index, layer);
+        }
         else {
             layers.push_back(layer);
             index = static_cast<int>(layers.size()) - 1;
@@ -222,18 +226,21 @@ namespace NIKE {
     }
 
     std::shared_ptr<Scenes::Layer> Scenes::Service::getLayer(unsigned int layer_id) {
-        if (layer_id >= static_cast<unsigned int>(layers.size()))
+        if (layer_id >= static_cast<unsigned int>(layers.size())) {
             throw std::runtime_error("Layer has not been registered.");
+        }
         return layers.at(layer_id);
     }
 
     void Scenes::Service::clearLayers() { layers.clear(); }
 
     void Scenes::Service::removeLayer(unsigned int layer_id) {
-        if (layer_id >= static_cast<unsigned int>(layers.size()))
+        if (layer_id >= static_cast<unsigned int>(layers.size())) {
             throw std::runtime_error("Layer has not been registered.");
-        for (auto& layer : layers)
+        }
+        for (auto& layer : layers) {
             layer->mask.set(layer_id, false);
+        }
         layers.erase(layers.begin() + layer_id);
         unsigned int index = 0;
         for (auto& layer : layers) {
@@ -272,18 +279,16 @@ namespace NIKE {
         if (saved_player_data.empty())
             return;
         std::set<Entity::Type> players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
-        if (players.empty()) return;
+        if (players.empty())
+            return;
         Entity::Type playerEntity = *players.begin();
         NIKE_SERIALIZE_SERVICE->deserializePlayerData(playerEntity, saved_player_data);
     }
 
     void Scenes::Service::savePlayerData(nlohmann::json data) { saved_player_data = std::move(data); }
     nlohmann::json Scenes::Service::loadPlayerData() { return saved_player_data; }
-
     void Scenes::Service::init() { createLayer(); }
-
     void Scenes::Service::update() {
-        // (Keep the check for curr_scene active as in your working version.)
         if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene))
             curr_scene.clear();
         while (!event_queue.empty()) {
