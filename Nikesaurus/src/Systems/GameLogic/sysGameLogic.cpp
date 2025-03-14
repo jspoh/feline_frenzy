@@ -123,9 +123,13 @@ namespace NIKE {
 					//	gameOverlay("You_Win_bg.png", "Play Again", "Quit");
 					//	// return;
 					//}
+					
+					static bool is_spawn_portal = false;
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_H)) { is_spawn_portal = true; }
 
 					// Portal animations and interactions
-					if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit)
+					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
+						is_spawn_portal)
 					{
 						handlePortalInteractions(vents_entities);
 					}
