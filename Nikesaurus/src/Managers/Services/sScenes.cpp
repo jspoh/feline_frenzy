@@ -295,7 +295,7 @@ namespace NIKE {
 			event_queue.pop();
 
 			// fade in current scene
-			NIKE_RENDER_SERVICE->fadeIn(2.f);
+			// NIKE_RENDER_SERVICE->fadeIn(2.f);
 		}
 	}
 } // namespace NIKE
