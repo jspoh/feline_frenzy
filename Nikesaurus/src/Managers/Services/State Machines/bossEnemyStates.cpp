@@ -493,7 +493,7 @@ namespace NIKE {
 	{
 		if (play_or_no) {
 			// Temporary hardcoded SFX
-			Interaction::playOneShotSFX(entity, "EnemyDeath1.wav", "EnemySFX", 1.0f, 1.0f);
+			Interaction::playOneShotSFX(entity, "EnemyDeath1.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
 
 			// Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
 			float secondsToDelay = 0.5f;

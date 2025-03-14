@@ -299,7 +299,7 @@ namespace NIKE {
                 e_trans_comp.value().get().position.y = y;
             }
             // Temporary hardcoded SFX
-            Interaction::playOneShotSFX(entity, "EnemySpawn1.wav", "EnemySFX", 1.0f, 1.0f);
+            Interaction::playOneShotSFX(entity, "EnemySpawn1.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
             });
 
         // Player EnemyDeathState annimation function
@@ -315,7 +315,7 @@ namespace NIKE {
 
                 // If health has decreased, play the damage-taken SFX and update prevHealth.
                 if (health.health < prevHealth) {
-                    Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
+                    Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
                     prevHealth = health.health;
                 }
                 else {
@@ -327,7 +327,7 @@ namespace NIKE {
                 if (health_comp.value().get().lives <= 0)
                 {
                     // Temporary hardcoded SFX
-                    Interaction::playOneShotSFX(entity, "PlayerDeathMeow2.wav", "PlayerSFX", 1.0f, 1.0f);
+                    Interaction::playOneShotSFX(entity, "PlayerDeathMeow2.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
                     Interaction::gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
                     // Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
                     float secondsToDelay = 0.5f;

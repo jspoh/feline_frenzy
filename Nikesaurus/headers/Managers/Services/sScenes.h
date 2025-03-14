@@ -1,7 +1,7 @@
 /*****************************************************************//**
  * \file   sScene.h
- * \brief  
- * 
+ * \brief
+ *
  * \author Poh Jing Seng, 2301363, jingseng.poh@digipen.edu (100%)
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -18,7 +18,7 @@ namespace NIKE {
 	namespace Scenes {
 
 		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
 		const int MAXLAYERS = 64;
 
@@ -30,7 +30,7 @@ namespace NIKE {
 		public:
 			using LayerMask = std::bitset<MAXLAYERS>;
 		private:
-			
+
 			//Friend of layer class
 			friend class Service;
 
@@ -123,7 +123,8 @@ namespace NIKE {
 
 			//Constructor
 			SceneEvent(Actions scene_action, std::string next_scene_id)
-				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {}
+				: scene_action{ scene_action }, next_scene_id{ next_scene_id } {
+			}
 		};
 
 		class NIKE_API Service {
@@ -208,7 +209,7 @@ namespace NIKE {
 		};
 
 		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
+#pragma warning(default: 4251)
 	}
 }
 

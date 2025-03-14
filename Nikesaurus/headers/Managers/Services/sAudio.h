@@ -560,6 +560,8 @@ namespace NIKE {
 			// Deserialize
 			void deserializeAudioChannels(nlohmann::json const& data);
 
+			// NEW: Get the current BGM track for the scene.
+			std::string getBGMTrackForScene();
 		};
 
 		//Re-enable DLL Export warning

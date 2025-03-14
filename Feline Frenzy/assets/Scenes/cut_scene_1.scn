@@ -4,8 +4,12 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Explore_v1.wav"
+                    "BGM_Menu_v1.wav"
                 ]
+            },
+            "SFX": {
+                "loop": false,
+                "tracks": []
             },
             "VFX": {
                 "loop": false,
@@ -69,7 +73,7 @@
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 1631.5250244140625,
-                                    "y": 917.7328491210938
+                                    "y": 917.7327880859375
                                 },
                                 "Screen Position": true
                             }
