@@ -1,5 +1,25 @@
 {
     "Components": {
+        "Animation::Base": {
+            "Animation_Count": 0,
+            "B_PingPong": false,
+            "B_Reverse": false,
+            "Frame_Duration": 0.20800000429153442
+        },
+        "Animation::Sprite": {
+            "End_Index": {
+                "x": 6,
+                "y": 0
+            },
+            "Sheet_Size": {
+                "x": 0,
+                "y": 0
+            },
+            "Start_Index": {
+                "x": 0,
+                "y": 0
+            }
+        },
         "Combat::HealthDrop": {
             "HealAmount": 10.0
         },
@@ -38,11 +58,11 @@
                 "y": 0
             },
             "Frame_Size": {
-                "x": 1,
+                "x": 7,
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "Heart.png"
+            "Texture_ID": "Heart_Ani_Spritesheet.png"
         },
         "Transform::Transform": {
             "Position": {
@@ -51,14 +71,14 @@
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 64.0,
-                "y": 64.0
+                "x": 58.67230987548828,
+                "y": 68.91667175292969
             },
             "Screen Position": false
         }
     },
     "MetaData": {
-        "Layer ID": 1,
+        "Layer ID": 0,
         "Tags": []
     }
 }
