@@ -34,16 +34,12 @@ namespace NIKE {
 
             //Layer mask
             LayerMask mask;
-
             //Layer mask id
             unsigned int id;
-
             //Layer state
             bool b_state;
-
             //Y Sorting on layer
             bool b_ysort;
-
             //Vector of entity in order
             std::vector<Entity::Type> entities;
         public:
@@ -107,7 +103,6 @@ namespace NIKE {
             }
         };
 
-        // New fade transition members added for audio transition:
         class NIKE_API Service {
         private:
             //Curr scene
@@ -119,21 +114,14 @@ namespace NIKE {
             //Layers within scene
             std::vector<std::shared_ptr<Layer>> layers;
 
-            // Internal functions for immediate scene change
+            //Init starting scene
             void initScene(std::string const& scene_id);
+            //Change scene
             void changeScene(std::string const& scene_id);
+            //Restart scene
             void restartScene();
+            //Go To Previous scene
             void previousScene();
-
-            // --- New members for fade transition ---
-            bool inTransition = false;
-            float transitionTimer = 0.0f;
-            const float fadeDuration = 1.5f; // seconds for fade-out (and fade-in)
-            enum class FadePhase { None, FadingOut, FadingIn } fadePhase = FadePhase::None;
-            std::string pendingScene;       // scene id to change to
-            float targetBGMVolume = 1.0f;     // store the current global BGM volume at transition start
-            bool restartBGM = true;           // if true, then new scene's BGM track will be restarted
-
         public:
             Service() = default;
             ~Service() = default;
@@ -152,7 +140,7 @@ namespace NIKE {
             unsigned int getLayerCount() const;
             //Get all layers
             std::vector<std::shared_ptr<Layer>>& getLayers();
-            //Queue scene event (modified to trigger fade transition when applicable)
+            //Queue scene event
             void queueSceneEvent(SceneEvent&& event);
             //Set curr scene id
             void setCurrSceneID(std::string const& new_scene_id);
@@ -170,7 +158,7 @@ namespace NIKE {
             void resetScene();
             //Init scene service
             void init();
-            //Update scene events (including processing fade transition)
+            //Update scene event
             void update();
         };
 

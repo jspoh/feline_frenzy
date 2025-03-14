@@ -392,7 +392,7 @@ namespace NIKE {
 
                 target_health += healer_heal;
                 // Temporary hardcoded SFX
-                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", 1.0f, 1.0f);
+                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
             }
         }
 
@@ -464,7 +464,7 @@ namespace NIKE {
             if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
             {
                 // Temporary hardcoded SFX
-                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", 1.0f, 1.0f);
+                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
             }
 
             //Apply hurt animation
