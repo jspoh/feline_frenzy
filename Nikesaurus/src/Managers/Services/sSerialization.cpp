@@ -210,8 +210,8 @@ namespace NIKE {
 		}
 
 		//Load prefab metadata
-		if (!data.contains("MetaData")) {
-			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data);
+		if (data.contains("MetaData")) {
+			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data.at("MetaData"));
 		}
 		else {
 			success = false;
