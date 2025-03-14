@@ -57,8 +57,28 @@ namespace NIKE {
 			TextBuffer() : vao{ 0 }, vbo{ 0 } {};
 		};
 
+		enum class FADE_STATE {
+			NONE = 0,
+			FADE_IN,
+			FADE_OUT
+		};
+
 		class Service : public Events::IEventListener<Windows::WindowResized> {
 			private:
+				/* this fbo effects affect entire screen */
+				unsigned int fbo{};
+				unsigned int fbo_texture{};
+				float fbo_opacity{1.f};
+
+				FADE_STATE fade_state{ FADE_STATE::NONE };
+
+				float fade_duration{};
+				float fade_elapsed_time{};
+
+				void fadeInHelper();
+				void fadeOutHelper();
+
+				/* end fbo effects */
 
 				//Delete Copy Constructor & Copy Assignment
 				Service(Service const& copy) = delete;
@@ -217,6 +237,18 @@ namespace NIKE {
 				* RENDER COMPLETION CALL
 				*********************************************************************/
 				void completeRender();
+
+				/*****************************************************************//**
+				* SPECIAL EFFECTS
+				*********************************************************************/
+
+				void fadeIn(float duration);
+
+				void fadeOut(float duration);
+
+				float getFboOpacity() const;
+
+				FADE_STATE getFadeState() const;
 		};
 	}
 }
