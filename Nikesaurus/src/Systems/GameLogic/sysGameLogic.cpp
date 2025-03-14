@@ -82,13 +82,6 @@ namespace NIKE {
 
 				updateStatusEffects(entity);
 
-				//// If no player exists, overlay defeat screen
-				//if (player_entities.empty()) {
-
-				//	gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
-				//	return;
-				//}
-
 				// Check for Spawner comp
 				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 				if (e_spawner_comp.has_value()) {
@@ -199,23 +192,23 @@ namespace NIKE {
 						healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
 					}
 				}
-					
-				static float elapsed_time_before = 0.0f;
-				static int counter_before = 1;
-				static float elapsed_time_after = 0.0f;
-				static int counter_after = 1;
+
+				//Get texture comp
+				auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
 				// Time based change texture for before boss room cut scene
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn")
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && texture_comp.has_value())
 				{
+					static float elapsed_time_before = 0.0f;
+					static int counter_before = 1;
+
 					std::string cutscene_string = "Cutscene_2_";
 					elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
 					// Change texture by timer
 					if (elapsed_time_before >= 3.f && counter_before <= 8)
 					{
-						auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-						if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
 						{
 							texture_comp.value().get().texture_id = cutscene_asset_id;
 							// This is for counter to cut scene
@@ -230,28 +223,31 @@ namespace NIKE {
 				}		
 
 				// Time based change texture for after boss room cut scene
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn")
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && texture_comp.has_value())
 				{
+					static float elapsed_time_after = 3.0f;
+					static int counter_after = 1;
+
 					std::string cutscene_string = "Ending_Cutscene_";
 					elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+
 					// Change texture by timer
-					if (elapsed_time_after >= 3.f && counter_after <= 6)
+					if (elapsed_time_after >= 3.f)
 					{
-						auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-						if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
 						{
 							texture_comp.value().get().texture_id = cutscene_asset_id;
-							// This is for counter to cut scene
-							++counter_after;
-							elapsed_time_after = 0.0f;
 						}
 
+						// This is for counter to cut scene
+						++counter_after;
+						elapsed_time_after = 0.0f;
 					}
-					if (counter_after > 6)
+
+					if (counter_after > 7)
 					{
 						// After boss cutscene play finish, show win game overlay
-						// gameOverlay("You_Win_bg.png", "Play Again", "Quit");
 						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 					}
 				}
