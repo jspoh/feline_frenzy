@@ -266,7 +266,8 @@ namespace NIKE {
 	}
 
 	void Render::Service::unbindFrameBuffer() {
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	/*****************************************************************//**
@@ -1464,68 +1465,67 @@ namespace NIKE {
 			screen_particle_render_queue.pop();
 		}
 
-
 		// render from fbo
 
-		{
-			const Vector2f framesize{ 1.0f , 1.0f };
-			Vector2f uv_offset{ 0, 0 };
+		//{
+		//	const Vector2f framesize{ 1.0f , 1.0f };
+		//	Vector2f uv_offset{ 0, 0 };
 
-			shader_manager->useShader("texture");
+		//	shader_manager->useShader("texture");
 
-			//Texture unit
-			static constexpr int texture_unit = 6;
+		//	//Texture unit
+		//	static constexpr int texture_unit = 6;
 
-			// set texture
-			glBindTextureUnit(
-				texture_unit, // texture unit (binding index)
-				fbo_texture
-			);
+		//	// set texture
+		//	glBindTextureUnit(
+		//		texture_unit, // texture unit (binding index)
+		//		fbo_texture
+		//	);
 
-			glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		//	glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		//	glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			//Set uniforms for texture rendering
-			shader_manager->setUniform("texture", "u_tex2d", texture_unit);
-			shader_manager->setUniform("texture", "u_opacity", fbo_opacity);
-			shader_manager->setUniform("texture", "u_transform", 2 * Matrix_33::Identity());
-			shader_manager->setUniform("texture", "uvOffset", uv_offset);
-			shader_manager->setUniform("texture", "frameSize", framesize);
+		//	//Set uniforms for texture rendering
+		//	shader_manager->setUniform("texture", "u_tex2d", texture_unit);
+		//	shader_manager->setUniform("texture", "u_opacity", fbo_opacity);
+		//	shader_manager->setUniform("texture", "u_transform", 2 * Matrix_33::Identity());
+		//	shader_manager->setUniform("texture", "uvOffset", uv_offset);
+		//	shader_manager->setUniform("texture", "frameSize", framesize);
 
-			//Blending options for texture
-			shader_manager->setUniform("texture", "u_color", Vector3f(1.f, 1.f, 1.f));
-			shader_manager->setUniform("texture", "u_blend", true);
-			shader_manager->setUniform("texture", "u_intensity", 0.f);
+		//	//Blending options for texture
+		//	shader_manager->setUniform("texture", "u_color", Vector3f(1.f, 1.f, 1.f));
+		//	shader_manager->setUniform("texture", "u_blend", true);
+		//	shader_manager->setUniform("texture", "u_intensity", 0.f);
 
-			//Flip texture options
-			//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-			//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+		//	//Flip texture options
+		//	//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+		//	//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
-			//Get model
-			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
+		//	//Get model
+		//	auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
 
-			//Draw
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glClear(GL_COLOR_BUFFER_BIT);
-			glBindVertexArray(model.vaoid);
-			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+		//	//Draw
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//	glClear(GL_COLOR_BUFFER_BIT);
+		//	glBindVertexArray(model.vaoid);
+		//	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
 
-			//Unuse texture
-			glBindVertexArray(0);
-			shader_manager->unuseShader();
-		}
+		//	//Unuse texture
+		//	glBindVertexArray(0);
+		//	shader_manager->unuseShader();
+		//}
 
 		// fbo update
-		{
-			switch (fade_state) {
-			case FADE_STATE::FADE_IN:
-				fadeInHelper();
-				break;
-			case FADE_STATE::FADE_OUT:
-				fadeOutHelper();
-				break;
-			}
-		}
+		//{
+		//	switch (fade_state) {
+		//	case FADE_STATE::FADE_IN:
+		//		fadeInHelper();
+		//		break;
+		//	case FADE_STATE::FADE_OUT:
+		//		fadeOutHelper();
+		//		break;
+		//	}
+		//}
 	}
 
 	void Render::Service::fadeIn(float duration) {
