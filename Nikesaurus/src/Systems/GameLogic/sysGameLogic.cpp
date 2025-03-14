@@ -520,23 +520,16 @@ namespace NIKE {
 
 		// Load entity from prefab
 		NIKE_METADATA_SERVICE->setEntityPrefab(enemy_entity, chosen_enemy);
+
 		// set enemy entity as parent
 		NIKE_METADATA_SERVICE->setEntityParentRelation(enemy_entity);
-
-		// weaken enemy for testing
-		// !TODO: jspoh remove
-		{
-			auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(enemy_entity);
-			if (e_health_comp.has_value()) {
-				e_health_comp.value().get().health = 1;
-			}
-		}
 
 		// create gun entity
 		{
 			Entity::Type gun_entity = NIKE_ECS_MANAGER->createEntity();
 			// load gun entity from prefab
 			NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
+
 			// set gun entity as child
 			NIKE_METADATA_SERVICE->setEntityChildRelation(gun_entity);
 			//const std::string dbg_gun_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(gun_entity);

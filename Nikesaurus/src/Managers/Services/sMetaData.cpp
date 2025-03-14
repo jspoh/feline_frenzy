@@ -105,7 +105,6 @@ namespace NIKE {
 		entity_names.clear();
 
 		//Add new entities from the ECS that are not yet in the editor
-		int index = 0;
 		for (auto& entity : ecs_entities) {
 
 			//Update entities ref
@@ -113,7 +112,7 @@ namespace NIKE {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), entity);
 				entities[entity].name = entity_name;
 
 				//Set a proper layer ID
@@ -123,15 +122,12 @@ namespace NIKE {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), entity);
 				entities[entity].name = entity_name;
 			}
 
 			//Populate entity name
 			entity_names[entities[entity].name] = entity;
-
-			//Increment index
-			++index;
 		}
 	}
 
@@ -166,6 +162,7 @@ namespace NIKE {
 						}
 					}
 
+					//Destroy entity
 					NIKE_ECS_MANAGER->destroyEntity(entity);
 				}
 			}
