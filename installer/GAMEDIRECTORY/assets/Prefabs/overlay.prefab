@@ -1,0 +1,29 @@
+{
+    "Components": {
+        "Render::Shape": {
+            "Color": {
+                "w": 0.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Model_ID": "square.model"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 1600.0,
+                "y": 900.0
+            },
+            "Screen Position": false
+        }
+    },
+    "MetaData": {
+        "Layer ID": 0,
+        "Tags": []
+    }
+}

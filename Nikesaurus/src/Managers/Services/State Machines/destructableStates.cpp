@@ -33,7 +33,12 @@ namespace NIKE {
 			if (tag == "objects")
 			{
 				spawnHealthDrop(entity);
-				spawnBrokenBarrel(entity);
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn" || NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn") {
+					spawnBrokenBarrel(entity);
+				}
+				else {
+					spawnBrokenChest(entity);
+				}
 				Interaction::playOneShotSFX(entity, "BreakSFX1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 			}
@@ -90,6 +95,27 @@ namespace NIKE {
 
 		// Load entity from prefab
 		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(barrel_entity, "brokenBarrel.prefab");
+
+		// Set health drop location
+		auto drop_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(barrel_entity);
+		if (drop_transform_comp.has_value()) {
+			drop_transform_comp.value().get().position = e_transform_comp.value().get().position;
+		}
+	}
+
+	void State::DestructableDeathState::spawnBrokenChest(Entity::Type entity) {
+		// Get entity position
+		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+		if (!e_transform_comp.has_value()) {
+			NIKEE_CORE_WARN("spawnBrokenBarrel: Entity missing Transform Component, barrel not spawned");
+			return;
+		}
+
+		// Create broken barrel entity
+		Entity::Type barrel_entity = NIKE_ECS_MANAGER->createEntity();
+
+		// Load entity from prefab
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(barrel_entity, "brokenChest.prefab");
 
 		// Set health drop location
 		auto drop_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(barrel_entity);

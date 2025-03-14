@@ -7,12 +7,6 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
-            "BGM2": {
-                "loop": true,
-                "tracks": [
-                    "BGM_Level_Combat_v1.wav"
-                ]
-            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
@@ -350,7 +344,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -446.97955322265625,
+                                    "x": -446.9794921875,
                                     "y": -747.8933715820313
                                 },
                                 "Rotation": 90.0,
@@ -1298,77 +1292,6 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Frame_Duration": 0.30000001192092896
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 3,
-                                    "y": 1
-                                },
-                                "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
-                                },
-                                "Frame_Size": {
-                                    "x": 4,
-                                    "y": 2
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Grass_animation_sprite.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -280.05963134765625,
-                                    "y": -576.0347290039063
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 84.70587158203125,
-                                    "y": 63.99999237060547
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 16,
-                            "Name": "entity_0021",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
                                 "Frame_Duration": 0.054999999701976776
                             },
                             "Animation::Sprite": {
@@ -1445,10 +1368,10 @@
                             "Render::Cam": {
                                 "Mouse_Offset": 0.15000000596046448,
                                 "Position": {
-                                    "x": -449.859375,
-                                    "y": -554.8934326171875
+                                    "x": -428.064697265625,
+                                    "y": -536.460693359375
                                 },
-                                "Zoom": 0.9994921684265137
+                                "Zoom": 1.0024311542510986
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1479,8 +1402,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -449.859375,
-                                    "y": -554.8934326171875
+                                    "x": -428.064697265625,
+                                    "y": -536.460693359375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1493,13 +1416,84 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 17,
+                            "Layer_Order": 16,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": [
                                 "player"
                             ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.30000001192092896
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 3,
+                                    "y": 1
+                                },
+                                "Sheet_Size": {
+                                    "x": 4,
+                                    "y": 2
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 1
+                                },
+                                "Frame_Size": {
+                                    "x": 4,
+                                    "y": 2
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "Grass_animation_sprite.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -280.05963134765625,
+                                    "y": -576.0347290039063
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 84.70587158203125,
+                                    "y": 63.99999237060547
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 17,
+                            "Name": "entity_0022",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
                         }
                     }
                 },

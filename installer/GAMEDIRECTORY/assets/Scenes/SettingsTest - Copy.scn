@@ -1,0 +1,479 @@
+[
+    {
+        "Channels": {
+            "BGM": {
+                "loop": false,
+                "tracks": []
+            },
+            "Menu_BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Menu_v1.wav"
+                ]
+            },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            }
+        }
+    },
+    {
+        "Grid ID": "SettingsTest.grid"
+    },
+    {
+        "Camera": {
+            "Active Cam ID": "entity_0001"
+        }
+    },
+    {
+        "MetaData": {
+            "Entity_Tags": []
+        }
+    },
+    {
+        "Layer Count": 2
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "B_YSort": false,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "AudioMenu_UI.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 33.645477294921875,
+                                    "y": 13.1536865234375
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1920.0,
+                                    "y": 1080.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": true,
+                            "Childrens": [],
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
+                            "Name": "Background",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Cam": {
+                                "Mouse_Offset": 0.0,
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 12.650634765625
+                                },
+                                "Zoom": 0.8044978976249695
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.43877553939819336,
+                                    "y": 0.2731153964996338,
+                                    "z": 0.2731153964996338
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "AudioMenu_UI.png"
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": true,
+                            "Childrens": [],
+                            "Layer_ID": 0,
+                            "Layer_Order": 1,
+                            "Name": "entity_0001",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "B_YSort": false,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuNoClose.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.5803921818733215,
+                                    "y": 0.5490196347236633,
+                                    "z": 0.8509804010391235
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 10.0,
+                                "Size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "UI_Back_spritesheet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 16.255462646484375,
+                                    "y": -272.3450012207031
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 217.6465606689453,
+                                    "y": 87.05862426757813
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Childrens": [],
+                            "Layer_ID": 1,
+                            "Layer_Order": 0,
+                            "Name": "back_btn",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Script": {
+                                "Named_Args": {},
+                                "Script_ID": "ChangeScene.lua",
+                                "Start_Function": "",
+                                "Update_Function": "Previous"
+                            }
+                        },
+                        "UI ID": "back_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "SliderBar_bar.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 70.8219985961914,
+                                    "y": 139.548828125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 300.0,
+                                    "y": 24.23076820373535
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Childrens": [],
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "BGMSliderBar",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "SliderBar_slider.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 76.1500015258789,
+                                    "y": 139.548828125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 19.9999942779541,
+                                    "y": 46.24998474121094
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Childrens": [],
+                            "Layer_ID": 1,
+                            "Layer_Order": 2,
+                            "Name": "BGMSlider",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "SliderBar_arrow.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 226.0679931640625,
+                                    "y": 143.90728759765625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 63.99999237060547,
+                                    "y": 63.99999237060547
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Childrens": [],
+                            "Layer_ID": 1,
+                            "Layer_Order": 3,
+                            "Name": "BGMArrow",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.5803921818733215,
+                                    "y": 0.5490196347236633,
+                                    "z": 0.8509804010391235
+                                },
+                                "Font_ID": "Skranji-Bold.ttf",
+                                "Origin": 0,
+                                "Scale": 1.0,
+                                "Size": {
+                                    "x": 116.0,
+                                    "y": 38.0
+                                },
+                                "Text": "BGM"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -154.8699951171875,
+                                    "y": 141.00164794921875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1.0,
+                                    "y": 1.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Childrens": [],
+                            "Layer_ID": 1,
+                            "Layer_Order": 4,
+                            "Name": "BGMLabel",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                }
+            ],
+            "ID": 1,
+            "Mask": 2
+        }
+    }
+]
