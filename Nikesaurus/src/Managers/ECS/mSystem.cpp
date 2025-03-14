@@ -61,6 +61,26 @@ namespace NIKE {
 	}
 
 	void System::ISystem::removeEntity(Entity::Type entity) {
+		if (entities.find(entity) == entities.end()) {
+			return;
+		}
+
+		// remove entity children
+		// auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		// auto* parent = std::get_if<MetaData::Parent>(&relation);
+
+		// if (parent) {
+		// 	for (const auto child : parent->childrens) {
+		// 		auto e = NIKE_METADATA_SERVICE->getEntityByName(child);
+
+		// 		if (!e.has_value()) {
+		// 			continue;
+		// 		}
+
+		// 		Entity::Type entity = e.value();
+		// 		removeEntity(entity);
+		// 	}
+		// }
 
 		//No exception needed, set returns 0 if entity is not found
 		entities.erase(entity);

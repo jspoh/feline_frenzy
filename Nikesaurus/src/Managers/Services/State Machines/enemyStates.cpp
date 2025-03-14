@@ -13,7 +13,7 @@
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
-// Transitions
+ // Transitions
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/destructableTransitions.h"
 
@@ -429,14 +429,35 @@ namespace NIKE {
 		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 		if (animation_comp.has_value())
 		{
-			if (animation_comp.value().get().completed_animations >= 1) { 
+			if (animation_comp.value().get().completed_animations >= 1) {
 				playSFX(entity, false);
+
+				// destroy children
+				{
+					auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+					auto* parent = std::get_if<MetaData::Parent>(&relation);
+					//auto* child = std::get_if<MetaData::Child>(&relation);
+
+					if (parent) {
+						for (const auto child : parent->childrens) {
+							auto e = NIKE_METADATA_SERVICE->getEntityByName(child);
+
+							if (!e.has_value()) {
+								continue;
+							}
+
+							Entity::Type de = e.value();
+							NIKE_METADATA_SERVICE->destroyEntity(de);
+						}
+					}
+				}
+
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 			}
 		}
 	}
-	void State::EnemyDeathState::onExit([[maybe_unused]] Entity::Type& entity){
-		
+	void State::EnemyDeathState::onExit([[maybe_unused]] Entity::Type& entity) {
+
 	}
 
 	void State::EnemyDeathState::playSFX(Entity::Type& entity, bool play_or_no)
@@ -451,7 +472,7 @@ namespace NIKE {
 			while (currentDelay < secondsToDelay) {
 				currentDelay += NIKE_WINDOWS_SERVICE->getDeltaTime();
 			}
-		}	
+		}
 	}
 
 	/*******************************

@@ -105,7 +105,6 @@ namespace NIKE {
 		entity_names.clear();
 
 		//Add new entities from the ECS that are not yet in the editor
-		int index = 0;
 		for (auto& entity : ecs_entities) {
 
 			//Update entities ref
@@ -113,7 +112,7 @@ namespace NIKE {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), entity);
 				entities[entity].name = entity_name;
 
 				//Set a proper layer ID
@@ -123,15 +122,12 @@ namespace NIKE {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), entity);
 				entities[entity].name = entity_name;
 			}
 
 			//Populate entity name
 			entity_names[entities[entity].name] = entity;
-
-			//Increment index
-			++index;
 		}
 	}
 
@@ -166,6 +162,7 @@ namespace NIKE {
 						}
 					}
 
+					//Destroy entity
 					NIKE_ECS_MANAGER->destroyEntity(entity);
 				}
 			}
@@ -567,7 +564,13 @@ namespace NIKE {
 		}
 
 		//Return relation
-		return entities.at(entity).relation;
+		try {
+			return entities.at(entity).relation;
+		}
+		catch (...) {
+			NIKEE_CORE_ERROR("Relation is invalid");
+			return Parent();
+		}
 	}
 
 	std::vector<const char*> MetaData::Service::getAllParents() const {
@@ -847,5 +850,24 @@ namespace NIKE {
 				entity_tags.insert(tag.value());
 			}
 		}
+	}
+
+	void MetaData::Service::setEntityPrefab(Entity::Type entity, std::string const& prefab_id) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if prefab id is valid
+		if (!entities.at(entity).prefab_id.empty() && entities.at(entity).prefab_id.find(".prefab") != std::string::npos) {
+			//Load entity with prefab
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+		}
+
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+
+		//Set prefab master id
+		entities.at(entity).prefab_id = prefab_id;
 	}
 }
