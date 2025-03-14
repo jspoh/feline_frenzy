@@ -258,7 +258,7 @@ namespace NIKE {
 
 				// get child entity prefab
 				const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
-				if (child_prefab == "gun_enemy_n.prefab") {
+				if (child_prefab == "gun_enemy_n.prefab" || child_prefab == "gun_enemy_n_2.prefab") {
 					return child_entity;
 				}
 			}

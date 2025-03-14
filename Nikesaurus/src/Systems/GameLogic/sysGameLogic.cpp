@@ -527,8 +527,15 @@ namespace NIKE {
 		// create gun entity
 		{
 			Entity::Type gun_entity = NIKE_ECS_MANAGER->createEntity();
-			// load gun entity from prefab
-			NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
+
+			if (Utility::randFloat() < 0.5f) {
+				// load gun entity from prefab
+				NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
+			}
+			else {
+				// load gun entity from prefab
+				NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n_2.prefab");
+			}
 
 			// set gun entity as child
 			NIKE_METADATA_SERVICE->setEntityChildRelation(gun_entity);

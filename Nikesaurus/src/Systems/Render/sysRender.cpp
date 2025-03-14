@@ -82,7 +82,7 @@ namespace NIKE {
 
 					// recalculate offset if child is a gun
 					const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
-					if (child_prefab == "gun_enemy_n.prefab") {
+					if (child_prefab == "gun_enemy_n.prefab" || child_prefab == "gun_enemy_n_2.prefab") {
 
 						float angle_rad = (float)M_PI + 1;		// angle from enemy to player
 
