@@ -92,7 +92,7 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "background",
@@ -782,8 +782,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 1170.87841796875,
-                                    "y": 23.98974609375
+                                    "x": 1200.428955078125,
+                                    "y": -4.2230000495910645
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -839,13 +839,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -8.594970703125,
-                                    "y": 925.9332275390625
+                                    "x": -0.27593994140625,
+                                    "y": 906.2073364257813
                                 },
                                 "Rotation": 90.0,
                                 "Scale": {
-                                    "x": 271.1050109863281,
-                                    "y": 2600.0
+                                    "x": 256.0,
+                                    "y": 2048.0
                                 },
                                 "Screen Position": false
                             }
@@ -889,7 +889,7 @@
                                 "Rotation": 90.0,
                                 "Scale": {
                                     "x": 256.0,
-                                    "y": 2600.0
+                                    "y": 2048.0
                                 },
                                 "Screen Position": false
                             }
@@ -989,16 +989,7 @@
                                     "x": 101.10623168945313,
                                     "y": 670.7904663085938
                                 },
-                                "Zoom": 1.4857617616653442
-                            },
-                            "Render::ParticleEmitter": {
-                                "duration": -1.0,
-                                "offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "preset": 0,
-                                "render_type": 1
+                                "Zoom": 1.1298325061798096
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

@@ -1,6 +1,21 @@
 [
     {
-        "Channels": null
+        "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Menu_v1.wav"
+                ]
+            },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
+                "loop": false,
+                "tracks": []
+            }
+        }
     },
     {
         "Grid ID": "cut_scene_1.grid"
@@ -21,6 +36,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -57,7 +73,7 @@
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 1631.5250244140625,
-                                    "y": 917.7328491210938
+                                    "y": 917.7327880859375
                                 },
                                 "Screen Position": true
                             }
@@ -81,6 +97,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -93,7 +110,7 @@
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 5,
+                                    "x": 6,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
@@ -117,9 +134,9 @@
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.8676470518112183,
-                                    "y": 0.8049019575119019,
-                                    "z": 1.149999976158142
+                                    "x": 1.6176469326019287,
+                                    "y": 1.5549018383026123,
+                                    "z": 1.8999998569488525
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -161,8 +178,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1260.0,
-                                    "y": 734.9999389648438
+                                    "x": 1679.9998779296875,
+                                    "y": 938.066650390625
                                 },
                                 "Screen Position": false
                             }
@@ -177,99 +194,25 @@
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Change",
-                                "Named_Args": {
-                                    "scene": "cut_scene_2.scn"
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "cut_scene_2.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "Change"
                                 },
-                                "Script_ID": "ChangeScene.lua"
+                                "OnHover": {
+                                    "Named_Args": {},
+                                    "Script_ID": "",
+                                    "Start_Function": "",
+                                    "Update_Function": ""
+                                }
                             }
                         },
                         "UI ID": "next_button"
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.0
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 0.7176470756530762,
-                                    "y": 0.6549019813537598,
-                                    "z": 1.0
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Text": ""
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -733.7400512695313,
-                                    "y": 411.7725524902344
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 165.89999389648438,
-                                    "y": 71.30000305175781
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 1,
-                            "Name": "back_button",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Change",
-                                "Named_Args": {
-                                    "scene": "main_menu.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua"
-                            }
-                        },
-                        "UI ID": "back_button"
                     }
                 },
                 {
@@ -313,10 +256,87 @@
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
-                                "Scale": 0.9660493731498718,
+                                "Scale": 10.0,
                                 "Size": {
-                                    "x": 78.25,
-                                    "y": 37.675926208496094
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Text": ""
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -733.7400512695313,
+                                    "y": 411.7725524902344
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 183.5,
+                                    "y": 73.5
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "back_button",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 1,
+                            "Scripts": null
+                        },
+                        "UI ID": "back_button"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.0
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 6,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Start_Index": {
+                                    "x": 1,
+                                    "y": 0
+                                }
+                            },
+                            "Render::Shape": {
+                                "Color": {
+                                    "w": 0.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Model_ID": "square-texture.model"
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.8676470518112183,
+                                    "y": 0.8049019575119019,
+                                    "z": 1.149999976158142
+                                },
+                                "Font_ID": "Skranji-Regular.ttf",
+                                "Origin": 0,
+                                "Scale": 1.0143518447875977,
+                                "Size": {
+                                    "x": 82.1624984741211,
+                                    "y": 39.559722900390625
                                 },
                                 "Text": "Skip"
                             },
@@ -327,8 +347,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 156.5,
-                                    "y": 100.0
+                                    "x": 164.3249969482422,
+                                    "y": 104.99999237060547
                                 },
                                 "Screen Position": false
                             }
@@ -344,13 +364,7 @@
                         },
                         "UI Btn": {
                             "Input_State": 1,
-                            "Script": {
-                                "Function": "Change",
-                                "Named_Args": {
-                                    "scene": "lvl1Copy.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua"
-                            }
+                            "Scripts": null
                         },
                         "UI ID": "skip_button"
                     }
