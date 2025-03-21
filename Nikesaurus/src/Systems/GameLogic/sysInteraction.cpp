@@ -20,6 +20,27 @@ namespace NIKE {
         }
 
         void Manager::update() {
+
+            // When hitting objects
+            for (auto& [entity, isHit] : hitEntities) {
+                if (!isHit) continue; // Skip objects that haven't been hit
+
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+                if (!texture_comp) continue;
+
+                auto& intensity = texture_comp.value().get().intensity;
+                cout << intensity << endl;
+                float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+
+                intensity += (0.0f - intensity) * alpha_speed; // Fade towards 0
+                intensity = std::clamp(intensity, 0.0f, 1.0f);
+
+                // Stop updating once intensity is very close to 0
+                if (intensity <= 0.01f) {
+                    isHit = false;
+                }
+            }
+
             // Get layers
             auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
@@ -465,10 +486,29 @@ namespace NIKE {
             {
                 // Temporary hardcoded SFX
                 Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+                hitEntities[target] = true;
+
+                // Set intensity to max (1.0f) when hit
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+                if (!texture_comp) return;
+
+                texture_comp.value().get().intensity = 1.0f;
+
             }
             else if (target_entity_tags.find("objects") != target_entity_tags.end()) {
                 Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+
+                hitEntities[target] = true;
+
+                // Set intensity to max (1.0f) when hit
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+                if (!texture_comp) return;
+
+                texture_comp.value().get().intensity = 1.0f;
+
             }
+
+          
 
             //Apply hurt animation
             auto base_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(target);
@@ -485,6 +525,7 @@ namespace NIKE {
                     //Set base
                     base.animations_to_complete = 3;
                     base.animation_mode = Animation::Mode::RESTART;
+                    base.frame_duration = 0.08f;
 
                     //Set sprite
                     sprite.start_index = { 0, 12 };

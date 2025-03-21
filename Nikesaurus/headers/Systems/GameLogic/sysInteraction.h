@@ -52,6 +52,8 @@ namespace NIKE {
         void setLastDirection(Entity::Type const& entity, int dir);
         int getLastDirection(Entity::Type const& entity);
 
+        static std::unordered_map<Entity::Type, bool> hitEntities;
+
         class Manager : 
             public System::ISystem {
         public:

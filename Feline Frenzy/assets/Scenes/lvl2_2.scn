@@ -165,7 +165,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
+                            "Name": "entity_0081",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -535,10 +535,10 @@
                             "Render::Cam": {
                                 "Mouse_Offset": 0.15000000596046448,
                                 "Position": {
-                                    "x": -3.0185546875,
-                                    "y": -1162.0152587890625
+                                    "x": -1.8079999685287476,
+                                    "y": -1162.5150146484375
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 1.5
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -569,8 +569,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -3.0185546875,
-                                    "y": -1162.0152587890625
+                                    "x": -1.8079999685287476,
+                                    "y": -1162.5150146484375
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

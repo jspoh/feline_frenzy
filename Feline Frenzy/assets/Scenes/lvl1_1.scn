@@ -164,7 +164,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
+                            "Name": "entity_0120",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -235,7 +235,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "entity_0121",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -359,7 +359,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0004",
+                            "Name": "entity_0123",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1133,7 +1133,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 12,
-                            "Name": "entity_0017",
+                            "Name": "entity_0136",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1490,7 +1490,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 17,
-                            "Name": "entity_0022",
+                            "Name": "entity_0141",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1649,9 +1649,9 @@
                                 "Frame_Duration": 0.20000000298023224
                             },
                             "Combat::Health": {
-                                "Health": 100.0,
+                                "Health": 50.0,
                                 "Lives": 1,
-                                "MaxHealth": 100.0,
+                                "MaxHealth": 50.0,
                                 "invulnerable_flag": false
                             },
                             "GameLogic::ILogic": {
@@ -1678,7 +1678,7 @@
                                 }
                             },
                             "Render::Texture": {
-                                "B_Blend": false,
+                                "B_Blend": true,
                                 "B_Flip": {
                                     "x": false,
                                     "y": false
@@ -1686,9 +1686,9 @@
                                 "B_Stretch": false,
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
                                 },
                                 "Frame_Index": {
                                     "x": 0,
@@ -1698,7 +1698,7 @@
                                     "x": 1,
                                     "y": 1
                                 },
-                                "Intensity": 0.5,
+                                "Intensity": 0.0,
                                 "Texture_ID": "Barrel_highlighted.png"
                             },
                             "State::State": {
@@ -1743,9 +1743,9 @@
                                     "Animation::Base": null,
                                     "Animation::Sprite": null,
                                     "Combat::Health": {
-                                        "Health": 100.0,
+                                        "Health": 50.0,
                                         "Lives": 1,
-                                        "MaxHealth": 100.0,
+                                        "MaxHealth": 50.0,
                                         "invulnerable_flag": false
                                     },
                                     "Physics::Collider": {
@@ -1755,17 +1755,19 @@
                                         }
                                     },
                                     "Render::Texture": {
+                                        "B_Blend": true,
                                         "Color": {
                                             "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
+                                            "x": 1.0,
+                                            "y": 1.0,
+                                            "z": 1.0
+                                        },
+                                        "Intensity": 0.0
                                     },
                                     "State::State": null,
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 571.2615966796875,
+                                            "x": 575.315673828125,
                                             "y": -518.0911865234375
                                         }
                                     }
@@ -1793,9 +1795,9 @@
                                 "Frame_Duration": 0.20000000298023224
                             },
                             "Combat::Health": {
-                                "Health": 100.0,
+                                "Health": 50.0,
                                 "Lives": 1,
-                                "MaxHealth": 100.0,
+                                "MaxHealth": 50.0,
                                 "invulnerable_flag": false
                             },
                             "Physics::Collider": {
@@ -1816,7 +1818,7 @@
                                 }
                             },
                             "Render::Texture": {
-                                "B_Blend": false,
+                                "B_Blend": true,
                                 "B_Flip": {
                                     "x": false,
                                     "y": false

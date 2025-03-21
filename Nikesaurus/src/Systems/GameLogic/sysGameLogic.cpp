@@ -522,7 +522,7 @@ namespace NIKE {
 		}
 		else
 		{
-			chosen_enemy = enemyArr[getRandomNumber(0, 3)];
+			chosen_enemy = enemyArr[getRandomNumber(1, 3)];
 		}
 
 
