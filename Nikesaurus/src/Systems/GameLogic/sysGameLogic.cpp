@@ -23,9 +23,6 @@ namespace NIKE {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
-		//Delta time
-		auto dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); ++layer) {
 
@@ -48,10 +45,10 @@ namespace NIKE {
 
 						if (background_transform_comp) {
 							// Scroll background
-							const float scroll_speed = 2.f;
+							const float scroll_speed = 10.f;
 
 							auto& background_transform_x = background_transform_comp.value().get().position.x;
-							background_transform_x += scroll_speed * dt;
+							background_transform_x += scroll_speed * NIKE_WINDOWS_SERVICE->getDeltaTime();
 
 							// Loop back
 							const float start_pos = -1599.f;
