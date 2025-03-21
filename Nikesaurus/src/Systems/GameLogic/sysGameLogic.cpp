@@ -90,7 +90,7 @@ namespace NIKE {
 					// If spawn on cooldown
 					if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
 						// Accumulate time since last shot
-						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 					}
 
 					// If enemies spawned less than spawn limit
