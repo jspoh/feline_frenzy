@@ -12,6 +12,7 @@
 #include "Core/Engine.h"
 
 namespace NIKE {
+
 	//Default constructor
 	Coordinator::Manager::Manager()
 		: entity_manager{ std::make_unique<Entity::Manager>() },

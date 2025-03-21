@@ -45,8 +45,13 @@ void main() {
     // Convert size from pixels to NDC scale
     vec2 ndcSize = a_particle_size / iResolution;
 
+    // apply rotation
+    float cosTheta = cos(a_rotation);
+    float sinTheta = sin(a_rotation);
+    mat2 rotationMatrix = mat2(cosTheta, -sinTheta, sinTheta, cosTheta);
+
     // Scale vertex by size and translate to position
-    vec2 vertexPos = vertices[gl_VertexID % 6] * ndcSize + ndcPos;
+    vec2 vertexPos = rotationMatrix *  vertices[gl_VertexID % 6] * ndcSize + ndcPos;
 
     gl_Position = vec4(vertexPos, 0.0, 1.0);
   // gl_Position = vec4(a_position, 0.0, 1.0);

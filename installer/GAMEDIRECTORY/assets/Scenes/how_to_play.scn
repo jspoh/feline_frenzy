@@ -1,7 +1,7 @@
 [
     {
         "Channels": {
-            "Menu_BGM": {
+            "BGM": {
                 "loop": true,
                 "tracks": [
                     "BGM_Menu_v1.wav"
@@ -18,12 +18,14 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "entity_0001"
+            "Active Cam ID": "Free Cam"
         }
     },
     {
         "MetaData": {
-            "Entity_Tags": []
+            "Entity_Tags": [
+                "overlay"
+            ]
         }
     },
     {
@@ -32,6 +34,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -88,6 +91,7 @@
                     "Entity": {
                         "Components": {
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 0.0,
                                     "y": 12.650634765625
@@ -135,58 +139,7 @@
                             "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Tutorial.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 0.0,
-                                    "y": 9.0361328125
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 2163.261962890625,
-                                    "y": 1216.8348388671875
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": true,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "How to play",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -201,6 +154,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -232,12 +186,70 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "num_new_particles_per_second": 10,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_acceleration": 0.0,
+                                "particle_color": {
+                                    "w": 1.0,
+                                    "x": 0.5607843399047852,
+                                    "y": 0.6392157077789307,
+                                    "z": 0.07450980693101883
+                                },
+                                "particle_color_changes_over_time": false,
+                                "particle_color_is_random": true,
+                                "particle_final_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_final_size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_lifespan": 1.0,
+                                "particle_rand_width_range": {
+                                    "x": 5.0,
+                                    "y": 10.0
+                                },
+                                "particle_rand_x_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_y_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rotation": 0.0,
+                                "particle_rotation_speed": 0.0,
+                                "particle_size_changes_over_time": false,
+                                "particle_vector_x_range": {
+                                    "x": -1.0,
+                                    "y": 1.0
+                                },
+                                "particle_vector_y_range": {
+                                    "x": -1.0,
+                                    "y": 1.0
+                                },
+                                "particle_velocity_range": {
+                                    "x": 5.0,
+                                    "y": 100.0
+                                },
+                                "preset": 0,
+                                "render_type": 0,
+                                "texture_ref": ""
+                            },
                             "Render::Text": {
                                 "Color": {
                                     "w": 1.0,
-                                    "x": 0.5803921818733215,
-                                    "y": 0.5490196347236633,
-                                    "z": 0.8509804010391235
+                                    "x": 0.8803921937942505,
+                                    "y": 0.8490196466445923,
+                                    "z": 1.1509803533554077
                                 },
                                 "Font_ID": "Skranji-Regular.ttf",
                                 "Origin": 0,
@@ -279,8 +291,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 217.6465606689453,
-                                    "y": 87.05862426757813
+                                    "x": 239.95643615722656,
+                                    "y": 95.98257446289063
                                 },
                                 "Screen Position": true
                             }
@@ -295,14 +307,60 @@
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Previous",
-                                "Named_Args": {},
-                                "Script_ID": "ChangeScene.lua"
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "main_menu.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "Change"
+                                },
+                                "OnHover": {
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "HoverButton"
+                                }
                             }
                         },
                         "UI ID": "back_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 1,
+                            "Name": "overlay",
+                            "Prefab_ID": "overlay.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Shape": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Layer ID": 1,
+                                    "Tags": [
+                                        "overlay"
+                                    ]
+                                }
+                            },
+                            "Tags": [
+                                "overlay"
+                            ]
+                        }
                     }
                 }
             ],

@@ -41,6 +41,9 @@ namespace {
 		return final_xform * world_pos;
 	}
 
+	float lerp(float a, float b, float t) {
+		return a + t * (b - a);
+	}
 }
 
 
@@ -190,6 +193,22 @@ namespace NIKE {
 
 		//Start counter
 		counter = 0;
+
+		// framebuffer init
+		{
+			glCreateFramebuffers(1, &fbo);
+			glCreateTextures(GL_TEXTURE_2D, 1, &fbo_texture);
+			glTextureStorage2D(fbo_texture, 1, GL_RGBA8, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, fbo_texture, 0);
+		}
+
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
+
 	}
 
 	void Render::Service::bindShader(std::string const& shader_ref) {
@@ -247,6 +266,7 @@ namespace NIKE {
 	}
 
 	void Render::Service::unbindFrameBuffer() {
+		//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -351,7 +371,6 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
-		// !TODO: batched rendering for texture incomplete
 
 		//Caculate UV Offset
 		const Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
@@ -1445,5 +1464,116 @@ namespace NIKE {
 			screen_particle_render_queue.front()();
 			screen_particle_render_queue.pop();
 		}
+
+		// render from fbo
+
+		//{
+		//	const Vector2f framesize{ 1.0f , 1.0f };
+		//	Vector2f uv_offset{ 0, 0 };
+
+		//	shader_manager->useShader("texture");
+
+		//	//Texture unit
+		//	static constexpr int texture_unit = 6;
+
+		//	// set texture
+		//	glBindTextureUnit(
+		//		texture_unit, // texture unit (binding index)
+		//		fbo_texture
+		//	);
+
+		//	glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		//	glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		//	//Set uniforms for texture rendering
+		//	shader_manager->setUniform("texture", "u_tex2d", texture_unit);
+		//	shader_manager->setUniform("texture", "u_opacity", fbo_opacity);
+		//	shader_manager->setUniform("texture", "u_transform", 2 * Matrix_33::Identity());
+		//	shader_manager->setUniform("texture", "uvOffset", uv_offset);
+		//	shader_manager->setUniform("texture", "frameSize", framesize);
+
+		//	//Blending options for texture
+		//	shader_manager->setUniform("texture", "u_color", Vector3f(1.f, 1.f, 1.f));
+		//	shader_manager->setUniform("texture", "u_blend", true);
+		//	shader_manager->setUniform("texture", "u_intensity", 0.f);
+
+		//	//Flip texture options
+		//	//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+		//	//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+
+		//	//Get model
+		//	auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
+
+		//	//Draw
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//	glClear(GL_COLOR_BUFFER_BIT);
+		//	glBindVertexArray(model.vaoid);
+		//	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+
+		//	//Unuse texture
+		//	glBindVertexArray(0);
+		//	shader_manager->unuseShader();
+		//}
+
+		// fbo update
+		//{
+		//	switch (fade_state) {
+		//	case FADE_STATE::FADE_IN:
+		//		fadeInHelper();
+		//		break;
+		//	case FADE_STATE::FADE_OUT:
+		//		fadeOutHelper();
+		//		break;
+		//	}
+		//}
+	}
+
+	void Render::Service::fadeIn(float duration) {
+		fade_duration = duration;
+		fade_elapsed_time = 0.f;
+		fbo_opacity = 0.f;
+		fade_state = FADE_STATE::FADE_IN;
+	}
+
+	void Render::Service::fadeOut(float duration) {
+		fade_duration = duration;
+		fade_elapsed_time = 0.f;
+		fbo_opacity = 1.f;
+		fade_state = FADE_STATE::FADE_OUT;
+	}
+
+	void Render::Service::fadeInHelper() {
+		if (fade_elapsed_time >= fade_duration) {
+			fbo_opacity = 1.f;
+			fade_state = FADE_STATE::NONE;
+			return;
+		}
+
+		fade_elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+		static constexpr float start_opacity = 0.f;
+		static constexpr float end_opacity = 1.f;
+
+		fbo_opacity = lerp(start_opacity, end_opacity, fade_elapsed_time / fade_duration);
+	}
+
+	void Render::Service::fadeOutHelper() {
+		if (fade_elapsed_time >= fade_duration) {
+			fbo_opacity = 0.f;
+			fade_state = FADE_STATE::NONE;
+			return;
+		}
+		fade_elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+		static constexpr float start_opacity = 1.f;
+		static constexpr float end_opacity = 0.f;
+		fbo_opacity = lerp(start_opacity, end_opacity, fade_elapsed_time / fade_duration);
+	}
+
+	float Render::Service::getFboOpacity() const {
+		return fbo_opacity;
+	}
+
+	Render::FADE_STATE Render::Service::getFadeState() const {
+		return fade_state;
 	}
 }

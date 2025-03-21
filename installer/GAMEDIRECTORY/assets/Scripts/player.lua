@@ -128,35 +128,61 @@ function Player:Animate(entity, args)
     end
 end
 
--- Player movement
 function Player:Move(entity)
-    -- Initialize force variables
-    local fx, fy = 0.0, 0.0
+    -- Initialize direction variables
+    local dx, dy = 0.0, 0.0
 
-    -- Accumulate forces based on key presses
+    -- Determine movement direction
     if IsKeyPressed(Key.W) then
-        fy = fy + PlayerConfig.forces.up
+        dy = dy + 1
     end
 
     if IsKeyPressed(Key.A) then
-        fx = fx + PlayerConfig.forces.left
+        dx = dx - 1
     end
 
     if IsKeyPressed(Key.S) then
-        fy = fy + PlayerConfig.forces.down
+        dy = dy - 1
     end
 
     if IsKeyPressed(Key.D) then
-        fx = fx + PlayerConfig.forces.right
+        dx = dx + 1
     end
 
-    -- Apply the combined force to the entity
+    -- Normalize direction vector if moving diagonally
+    local length = math.sqrt(dx * dx + dy * dy)
+    if length > 0 then
+        dx = dx / length
+        dy = dy / length
+    end
+
+    -- Apply force in normalized direction
+    local fx = dx * PlayerConfig.forces.right  -- 3000
+    local fy = dy * PlayerConfig.forces.up     -- 3000
+
     ApplyForce(entity, fx, fy)
 end
 
+
 -- Player shoot function
 function Player:Shoot(entity)
+    local lastShotTime = GetLastShotTime()
+    local shotCooldown = GetShotCooldown()
+    local deltaTime = GetDeltaTime()
+
+    -- Accumulate elapsed time
+    lastShotTime = lastShotTime + deltaTime
+    SetLastShotTime(lastShotTime)
+
+    -- If not enough time has passed, prevent shooting
+    if lastShotTime < shotCooldown then
+        return
+    end
+
     if IsMouseTriggered(Key.MOUSE_LEFT) then
+        -- Reset cooldown timer
+        SetLastShotTime(0.0)
+
         -- Get direction based on last direction
         local direction = LastDirection(entity)
 
@@ -232,6 +258,20 @@ function Player:update(args)
             KillEntity(entity)
         end
     end
+end
+
+function Player:Test(args)
+	local entity = args.entity
+	local component = GetComponent(entity, "Transform::Transform")
+
+	-- Check if the component is valid (not nil)
+	if component ~= nil then
+    	-- Access the component's properties, e.g., position, scale, rotation
+    	cout(component.position.x)
+    	cout(component.position.y)
+	else
+	    cout("Component 'Transform' not found for entity.")
+	end
 end
 
 -- Return player object

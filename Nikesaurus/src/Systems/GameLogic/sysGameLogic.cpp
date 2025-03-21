@@ -1,8 +1,9 @@
 /*****************************************************************//**
  * \file   sysGameLogic.cpp
  * \brief  game logic system
- * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
- * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (50%)
+ * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (40%)
+ * \co-author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (40%)
+ * \co-author Bryan Lim Li Cheng, 2301214, bryanlicheng.l@digipen.edu (20%)
  * \date   September 2024
  *********************************************************************/
 
@@ -81,13 +82,6 @@ namespace NIKE {
 
 				updateStatusEffects(entity);
 
-				//// If no player exists, overlay defeat screen
-				//if (player_entities.empty()) {
-
-				//	gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
-				//	return;
-				//}
-
 				// Check for Spawner comp
 				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 				if (e_spawner_comp.has_value()) {
@@ -131,7 +125,7 @@ namespace NIKE {
 					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
 						is_spawn_portal)
 					{
-						handlePortalInteractions(vents_entities);
+						handlePortalInteractions(vents_entities, is_spawn_portal);
 					}
 				}
 
@@ -198,60 +192,69 @@ namespace NIKE {
 						healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
 					}
 				}
-					
-				static float elapsed_time_before = 0.0f;
-				static int counter_before = 1;
-				static float elapsed_time_after = 0.0f;
-				static int counter_after = 1;
+
+				//Get texture comp
+				auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 
 				// Time based change texture for before boss room cut scene
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn")
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && texture_comp.has_value())
 				{
+					static float elapsed_time_before = 0.0f;
+					static int counter_before = 1;
+
 					std::string cutscene_string = "Cutscene_2_";
 					elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
 					// Change texture by timer
 					if (elapsed_time_before >= 3.f && counter_before <= 8)
 					{
-						auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-						if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
 						{
 							texture_comp.value().get().texture_id = cutscene_asset_id;
 							// This is for counter to cut scene
 							++counter_before;
 							elapsed_time_before = 0.0f;
 						}
-						cout << counter_before << endl;
 					}
 					if (counter_before > 8)
 					{
 						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+						// Reset counters
+						counter_before = 1;
+						elapsed_time_before = 0.0f;
 					}
 				}		
 
 				// Time based change texture for after boss room cut scene
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn")
+				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && texture_comp.has_value())
 				{
+					static float elapsed_time_after = 3.0f;
+					static int counter_after = 1;
+
 					std::string cutscene_string = "Ending_Cutscene_";
 					elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
 					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+
 					// Change texture by timer
-					if (elapsed_time_after >= 3.f && counter_after <= 6)
+					if (elapsed_time_after >= 3.f)
 					{
-						auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-						if (texture_comp.has_value() && NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
 						{
 							texture_comp.value().get().texture_id = cutscene_asset_id;
-							// This is for counter to cut scene
-							++counter_after;
-							elapsed_time_after = 0.0f;
 						}
 
+						// This is for counter to cut scene
+						++counter_after;
+						elapsed_time_after = 0.0f;
 					}
-					if (counter_after > 6)
+
+					if (counter_after > 7)
 					{
 						// After boss cutscene play finish, show win game overlay
-						gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+						// Reset static counters
+						elapsed_time_after = 3.0f;
+						counter_after = 1;
 					}
 				}
 
@@ -410,14 +413,14 @@ namespace NIKE {
 		play_again_script.script_id = "ChangeScene.lua";
 		play_again_script.update_function = "Restart";
 		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
-
+		
 		auto quit_script = Lua::Script();
 		quit_script.script_id = "ChangeScene.lua";
 		quit_script.update_function = "Quit";
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {
 		for (const Entity::Type& vent : vents_entities) {
 			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
 			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
@@ -432,19 +435,45 @@ namespace NIKE {
 						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
 						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", "SFX", 1.f, 0.5f, false, false);
 
+						// Lvl counters to reduce hardcoded
+						static int level_counter = 1;
+						static int stage_counter = 1;
+
+						std::string scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+
 						// Handle change scene 
-						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(scene_string))
 						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
+							if (scene_string == "lvl1_1.scn")
+							{
+								// Increment stage counter
+								++stage_counter;
+								scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+								NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene_string));
+								is_spawn_portal = false;
+							}
+							else if (scene_string == "lvl1_2.scn")
+							{
+								++level_counter;
+								stage_counter = 1;
+								scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+								NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene_string));
+								is_spawn_portal = false;
+							}
+							else if (scene_string == "lvl2_1.scn")
+							{
+								if (NIKE_ASSETS_SERVICE->isAssetRegistered("cut_scene_before_boss.scn"))
+								{
+									scene_string = "cut_scene_before_boss.scn";
+									NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene_string));
+									// Reset static vars
+									level_counter = 1;
+									stage_counter = 1;
+									is_spawn_portal = false;
+								}
+							}
 						}
-						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn")
-						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
-						}
-						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
-						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_before_boss.scn"));
-						}
+
 					}
 				}
 
@@ -452,11 +481,20 @@ namespace NIKE {
 				if (entity_texture.value().get().texture_id == "Front gate_animation_sprite.png") {
 					continue;
 				}
+				if (entity_texture.value().get().texture_id == "Frontdoor_animation_sprite.png") {
+					continue;
+				}
 
 				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", "SFX", 1.f, 1.f, false, false);
-
+				
+				// If is level 2_2, change the sprite to portal door
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png") && 
+					NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
+				{
+					entity_texture.value().get().texture_id = "Frontdoor_animation_sprite.png";
+				}
 				// Change the sprite to be the animation sprite
-				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
+				else if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
 				{
 					entity_texture.value().get().texture_id = "Front gate_animation_sprite.png";
 				}
@@ -470,6 +508,8 @@ namespace NIKE {
 				entity_animation_sprite.value().get().end_index = { 4,0 };
 
 				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
+
+				entity_animation_base.value().get().frame_duration = 0.1f;
 
 				// Set Animation
 				Interaction::flipX(vent, false);
@@ -519,7 +559,43 @@ namespace NIKE {
 
 
 		// Load entity from prefab
-		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(enemy_entity, chosen_enemy);
+		NIKE_METADATA_SERVICE->setEntityPrefab(enemy_entity, chosen_enemy);
+
+		// set enemy entity as parent
+		NIKE_METADATA_SERVICE->setEntityParentRelation(enemy_entity);
+
+		// create gun entity
+		{
+			Entity::Type gun_entity = NIKE_ECS_MANAGER->createEntity();
+
+			if (Utility::randFloat() < 0.5f) {
+				// load gun entity from prefab
+				NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n.prefab");
+			}
+			else {
+				// load gun entity from prefab
+				NIKE_METADATA_SERVICE->setEntityPrefab(gun_entity, "gun_enemy_n_2.prefab");
+			}
+
+			// set gun entity as child
+			NIKE_METADATA_SERVICE->setEntityChildRelation(gun_entity);
+			//const std::string dbg_gun_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(gun_entity);
+
+			// get enemy entity name
+			std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(enemy_entity);
+
+			// set gun entity as child of enemy entity
+			NIKE_METADATA_SERVICE->setEntityChildRelationParent(gun_entity, enemy_entity_name);
+
+			// check that gun has a parent
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(gun_entity);
+			//auto* parent = std::get_if<MetaData::Parent>(&relation);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			if (!child || !NIKE_METADATA_SERVICE->getEntityByName(child->parent).has_value()) {
+				NIKEE_CORE_ERROR("Gun entity has no parent");
+			}
+		}
 
 
 		// Randomly offset from spawner position		

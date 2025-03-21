@@ -240,6 +240,43 @@ namespace NIKE {
 			float rand_pitch = GameLogic::getRandomNumber(0.5f,2.f);
 			bullet_sfx.value().get().pitch = rand_pitch;
 		}
+
+		// get gun child entity
+		auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(enemy);
+		//auto* child = std::get_if<MetaData::Child>(&relation);
+		auto* parent = std::get_if<MetaData::Parent>(&relation);
+
+		auto getGunEntity = [&parent]() {
+			for (const auto& child : parent->childrens) {
+				// get entity
+				auto opt_child_entity = NIKE_METADATA_SERVICE->getEntityByName(child);
+				if (!opt_child_entity.has_value()) {
+					NIKEE_CORE_WARN("shootBullet: CHILD entity not found");
+					continue;
+				}
+				Entity::Type child_entity = opt_child_entity.value();
+
+				// get child entity prefab
+				const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
+				if (child_prefab == "gun_enemy_n.prefab" || child_prefab == "gun_enemy_n_2.prefab") {
+					return child_entity;
+				}
+			}
+			return (unsigned short)-1;
+		};
+
+		// get gun entity
+		Entity::Type gun_entity = getGunEntity();
+		if (gun_entity == (unsigned short)-1) {
+			NIKEE_CORE_WARN("shootBullet: GUN entity not found");
+			return;
+		}
+
+		// set gun animation
+		auto gun_animation = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(gun_entity);
+		if (gun_animation.has_value()) {
+			gun_animation.value().get().animation_mode = Animation::Mode::PLAYING;
+		}
 	}
 
 	void Enemy::bossShoot(const Entity::Type& enemy, const Entity::Type& player)

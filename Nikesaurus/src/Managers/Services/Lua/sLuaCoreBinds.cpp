@@ -249,12 +249,14 @@ namespace NIKE {
     void Lua::luaSceneBinds(sol::state& lua_state) {
 
         lua_state.set_function("ChangeScene", [&](std::string const& scene) {
+            const float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
             constexpr float fade_duration = 2.f;
             constexpr float max_alpha = 255.0f;
             float elapsed_time = 0.0f;
             while (elapsed_time < fade_duration) {
                 // Fade by steps
-                float alpha_change = (max_alpha / fade_duration) * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+                float alpha_change = (max_alpha / fade_duration) * dt;
                 auto const& overlay_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("overlay");
                 for (const auto& entity : overlay_entities)
                 {
@@ -270,7 +272,7 @@ namespace NIKE {
                     }
                 }
                 // Use delta time for fading
-                elapsed_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+                elapsed_time += dt;
             }
 
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene));

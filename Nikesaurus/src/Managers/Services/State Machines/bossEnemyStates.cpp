@@ -467,7 +467,8 @@ namespace NIKE {
 
 		playSFX(entity, true);
 
-		Interaction::gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+		// Interaction::gameOverlay("You_Win_bg.png", "Play Again", "Quit");
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
 	}
 
 	void State::BossDeathState::onUpdate([[maybe_unused]] Entity::Type& entity)

@@ -1,6 +1,12 @@
 [
     {
         "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
@@ -16,7 +22,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "Player"
+            "Active Cam ID": "player"
         }
     },
     {
@@ -32,6 +38,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -462,11 +469,12 @@
                                 "Element": 0
                             },
                             "GameLogic::ILogic": {
-                                "Function": "update",
                                 "Named_Args": {
                                     "entity": 351
                                 },
-                                "Script_ID": "player.lua"
+                                "Script_ID": "player.lua",
+                                "Start_Function": "",
+                                "Update_Function": ""
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -499,6 +507,7 @@
                                 }
                             },
                             "Render::Cam": {
+                                "Mouse_Offset": 0.0,
                                 "Position": {
                                     "x": 31.615283966064453,
                                     "y": -224.44717407226563
@@ -1137,6 +1146,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [],
             "ID": 1,
             "Mask": 2
