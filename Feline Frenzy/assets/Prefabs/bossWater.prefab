@@ -28,7 +28,7 @@
             "Volume": 1.0
         },
         "Combat::Faction": {
-            "Faction": 0
+            "Faction": 2
         },
         "Combat::Health": {
             "Health": 250.0,
