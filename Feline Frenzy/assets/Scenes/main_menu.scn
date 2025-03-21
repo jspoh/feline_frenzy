@@ -78,7 +78,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 87.99980163574219,
+                                    "x": 1490.287841796875,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -139,7 +139,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -1511.021484375,
+                                    "x": -108.64978790283203,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -261,6 +261,64 @@
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
+                            },
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "num_new_particles_per_second": 0,
+                                "offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_acceleration": 0.0,
+                                "particle_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_color_changes_over_time": false,
+                                "particle_color_is_random": false,
+                                "particle_final_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_final_size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_lifespan": 0.0,
+                                "particle_rand_width_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_x_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_y_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rotation": 0.0,
+                                "particle_rotation_speed": 0.0,
+                                "particle_size_changes_over_time": false,
+                                "particle_vector_x_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_vector_y_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_velocity_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "preset": 0,
+                                "render_type": 1,
+                                "texture_ref": ""
                             },
                             "Render::Text": {
                                 "Color": {
@@ -473,48 +531,63 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.20000000298023224
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 7,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Audio::SFX": {
-                                "Audio_ID": "MenuNoClose.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "SFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.630392074584961,
-                                    "y": 1.5990195274353027,
-                                    "z": 1.9009802341461182
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
+                            "Render::ParticleEmitter": {
+                                "duration": -1.0,
+                                "num_new_particles_per_second": 0,
+                                "offset": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Text": ""
+                                "particle_acceleration": 0.0,
+                                "particle_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_color_changes_over_time": false,
+                                "particle_color_is_random": false,
+                                "particle_final_color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "particle_final_size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_lifespan": 0.0,
+                                "particle_rand_width_range": {
+                                    "x": 5.0,
+                                    "y": 10.0
+                                },
+                                "particle_rand_x_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rand_y_offset_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_rotation": 0.0,
+                                "particle_rotation_speed": 0.0,
+                                "particle_size_changes_over_time": false,
+                                "particle_vector_x_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_vector_y_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "particle_velocity_range": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "preset": 0,
+                                "render_type": 2,
+                                "texture_ref": ""
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -605,8 +678,8 @@
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 7,
+                                    "y": 1
                                 },
                                 "Start_Index": {
                                     "x": 0,
@@ -719,6 +792,86 @@
                 {
                     "Entity": {
                         "Components": {
+                            "GameLogic::ILogic": {
+                                "Named_Args": {
+                                    "entity": 7,
+                                    "scene": "lvl1.scn",
+                                    "trigger_func": "Change",
+                                    "trigger_script": "ChangeScene.lua",
+                                    "trigger_type": "Trigger"
+                                },
+                                "Script_ID": "Button.lua",
+                                "Start_Function": "Init",
+                                "Update_Function": "Update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -496.426025390625,
+                                    "y": -208.9820556640625
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 201.5935516357422,
+                                    "y": 201.5935516357422
+                                }
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "Chest.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -496.426025390625,
+                                    "y": -208.9820556640625
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 201.5935516357422,
+                                    "y": 201.5935516357422
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 2,
+                            "Layer_Order": 0,
+                            "Name": "button_testing",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
                             "Render::Shape": {
                                 "Color": {
                                     "w": 0.0,
@@ -744,7 +897,7 @@
                         "MetaData": {
                             "B_Locked": true,
                             "Layer_ID": 2,
-                            "Layer_Order": 0,
+                            "Layer_Order": 1,
                             "Name": "fade_overlay",
                             "Prefab_ID": "",
                             "Prefab_Override": null,

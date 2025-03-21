@@ -173,6 +173,7 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <None Include="assets\Scenes\SettingsTest.scn" />
     <None Include="assets\Engine\Shaders\textured_particle.frag" />
     <None Include="assets\Engine\Shaders\textured_particle.vert" />
+    <None Include="assets\Scripts\Button.lua" />
     <None Include="assets\Scripts\createBullet.lua" />
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\enemyBullet.lua" />

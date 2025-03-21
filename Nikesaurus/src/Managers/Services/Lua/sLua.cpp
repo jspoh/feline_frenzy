@@ -103,7 +103,7 @@ namespace NIKE {
         lua_state = std::make_unique<sol::state>();
 
         //Lua state init
-        lua_state->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table, sol::lib::io);
+        lua_state->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table, sol::lib::io, sol::lib::package);
 
         //Register all bindings here
         luaBasicBinds(*lua_state);
@@ -112,6 +112,17 @@ namespace NIKE {
         luaSceneBinds(*lua_state);
         luaECSBinds(*lua_state);
         luaGameBinds(*lua_state);
+
+        // Ensure "package.path" exists and is a string before modifying it
+        sol::object path_obj = (*lua_state)["package"]["path"];
+
+        if (path_obj.is<std::string>()) {
+            std::string current_path = path_obj.as<std::string>();
+            (*lua_state)["package"]["path"] = current_path + ";assets/Scripts/?.lua";
+        }
+        else {
+            (*lua_state)["package"]["path"] = "assets/Scripts/?.lua";
+        }
 
         //Get all lua global functions
         sol::table globals = lua_state->globals();

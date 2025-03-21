@@ -24,7 +24,7 @@ function Player:InitSFX(entity)
 end
 
 -- Player animation
-function Player:Animate(entity, args)
+function Player:Animate(entity)
     -- Get Last Direction
     local lastDirection = LastDirection(entity)
     
@@ -243,7 +243,7 @@ function Player:update(args)
 
     -- If not attacking, allow movement and animations
     Player:Move(entity)
-    Player:Animate(entity, args)
+    Player:Animate(entity)
     Player:Shoot(entity)
 
     -- Handle death stuff

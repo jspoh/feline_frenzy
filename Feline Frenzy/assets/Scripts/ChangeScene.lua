@@ -9,6 +9,13 @@
 
 Scenes = {}
 
+function Scenes:new()
+    local obj = { }
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+end
+
 -- A simple blocking wait function, note this is a busy-wait loop and will block execution.
 local function wait(seconds)
     local start = os.clock()
@@ -40,6 +47,7 @@ end
 
 --Quit Window
 function Scenes:Quit()
+cout("here")
 QuitScene()
 end
 

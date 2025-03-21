@@ -49,9 +49,12 @@ namespace NIKE {
 		Vector2f world_mouse_pos = { ((float)xpos - gaps.x) * scale.x , ((float)ypos - gaps.y) * scale.y };
 		world_mouse_pos.x = world_mouse_pos.x - ((viewport_size.x * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
 		world_mouse_pos.y = -(world_mouse_pos.y - ((viewport_size.y * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y);
+
+		//Get mouse position
+		auto mouse_pos = Vector2f(static_cast<float>(xpos), static_cast<float>(ypos));
  
 		//Dispatch mouse event
-		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseMovedEvent>(Vector2f(static_cast<float>(xpos), static_cast<float>(ypos)), world_mouse_pos));
+		NIKE_EVENTS_SERVICE->dispatchEvent(std::make_shared<Input::MouseMovedEvent>(mouse_pos, world_mouse_pos));
 	}
 
 	void Events::Service::mousescroll_cb([[maybe_unused]] GLFWwindow* window, double xoffset, double yoffset) {

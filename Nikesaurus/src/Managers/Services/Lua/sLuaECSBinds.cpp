@@ -29,6 +29,17 @@ namespace NIKE {
             "use_screen_pos", &Transform::Transform::use_screen_pos
         );
 
+        lua_state.new_usertype<Physics::Collider>("Collider",
+            "Transform", sol::property(
+                [](Physics::Collider& t) { return t.transform; },
+                [](Physics::Collider& t, Physics::Collider val) { t.transform = val.transform; }
+                ),
+            "Vertices", sol::property(
+                [](Physics::Collider& t) { return t.vertices; },
+                [](Physics::Collider& t, std::vector<Vector2f> val) { t.vertices = val; }
+                )
+        );
+
         lua_state.new_usertype<Combat::Health>("Health",
             "lives", &Combat::Health::lives,
             "max_health", &Combat::Health::max_health,
@@ -83,6 +94,13 @@ namespace NIKE {
                     return sol::nil;
             }
 
+            // Use a template function to handle different component types
+            if (componentName == "Physics::Collider") {
+                auto component = std::static_pointer_cast<Physics::Collider>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
             // Use a template function to handle different component types
             if (componentName == "Transform::Transform") {
                     auto component = std::static_pointer_cast<Transform::Transform>(

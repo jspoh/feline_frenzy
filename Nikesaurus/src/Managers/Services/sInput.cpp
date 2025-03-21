@@ -116,7 +116,11 @@ namespace NIKE {
 	}
 
 	Vector2f Input::Service::getMouseWindowPos() const {
-		return mouse.window_pos;
+		//Account for gaps between game viewport and game window
+		auto gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		gaps /= 2.0f;
+
+		return Vector2f(mouse.window_pos.x - gaps.x, mouse.window_pos.y - gaps.y);
 	}
 
 	Vector2f Input::Service::getMouseWorldPos() const {

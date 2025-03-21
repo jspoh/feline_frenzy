@@ -359,7 +359,8 @@ namespace NIKE {
 
 	std::filesystem::path Assets::Service::getAssetPath(std::string const& asset_id) const {
 		if (asset_registry.find(asset_id) == asset_registry.end()) {
-			throw std::runtime_error("Asset not yet registered.");
+			NIKEE_CORE_WARN("Asset not registered!");
+			return std::filesystem::path();
 		}
 
 		return asset_registry.at(asset_id).primary_path;

@@ -123,6 +123,64 @@ namespace NIKE {
                 e_collider.transform.position = e_transform.position + e_collider.pos_offset;
             }
 
+            //Update vertices function
+            auto updateVertices = [&e_collider, e_transform](std::vector<Assets::Vertex> const& vertices) {
+
+                //Clear all vertices
+                e_collider.vertices.clear();
+
+                //Get World size
+                auto world_size = NIKE_WINDOWS_SERVICE->getWindow()->getWorldSize();
+
+                //Get window size
+                auto window_size = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+
+                //Calculate scale factor
+                Vector2f scale_factor = { static_cast<float>(window_size.x) / static_cast<float>(world_size.x), static_cast<float>(window_size.y) / static_cast<float>(world_size.y) };
+
+                //Update vertices
+                for (const Assets::Vertex& v : vertices) {
+                    e_collider.vertices.push_back(v.pos);
+                }
+
+                for (auto& point : e_collider.vertices) {
+                    point.x *= (e_transform.scale.x * scale_factor.x);
+                    point.y *= (e_transform.scale.y * scale_factor.y);
+                    point.x += (e_transform.position.x * scale_factor.x);
+                    point.y -= (e_transform.position.y * scale_factor.y);
+
+                    //Translate model to world coordinates
+                    point.x += (window_size.x / 2.0f);
+                    point.y += (window_size.y / 2.0f);
+                }
+                };
+
+            // Update collider vertices
+            auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
+            if (e_shape_comp.has_value()) {
+                auto const& e_shape = e_shape_comp.value().get();
+
+                //Check if model is registered
+                if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
+
+                    //Get vertices
+                    std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>(e_shape.model_id)->vertices;
+
+                    //Update vertices
+                    updateVertices(vertices);
+                }
+            }
+            else {
+                if (NIKE_ASSETS_SERVICE->isAssetRegistered("square-texture.model")) {
+
+                    //Get vertices
+                    std::vector<Assets::Vertex>& vertices = NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model")->vertices;
+
+                    //Update vertices
+                    updateVertices(vertices);
+                }
+            }
+
             // Reset collision flag
             e_collider.b_collided = false;
 
