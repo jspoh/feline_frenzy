@@ -45,10 +45,10 @@ namespace NIKE {
 
 						if (background_transform_comp) {
 							// Scroll background
-							const float scroll_speed = .2f;
+							const float scroll_speed = 10.f;
 
 							auto& background_transform_x = background_transform_comp.value().get().position.x;
-							background_transform_x += scroll_speed;
+							background_transform_x += scroll_speed * NIKE_WINDOWS_SERVICE->getDeltaTime();
 
 							// Loop back
 							const float start_pos = -1599.f;
@@ -90,7 +90,7 @@ namespace NIKE {
 					// If spawn on cooldown
 					if (e_spawner.last_spawn_time <= e_spawner.cooldown) {
 						// Accumulate time since last shot
-						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+						e_spawner.last_spawn_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 					}
 
 					// If enemies spawned less than spawn limit
@@ -125,7 +125,7 @@ namespace NIKE {
 					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
 						is_spawn_portal)
 					{
-						handlePortalInteractions(vents_entities);
+						handlePortalInteractions(vents_entities, is_spawn_portal);
 					}
 				}
 
@@ -219,6 +219,9 @@ namespace NIKE {
 					if (counter_before > 8)
 					{
 						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+						// Reset counters
+						counter_before = 1;
+						elapsed_time_before = 0.0f;
 					}
 				}		
 
@@ -249,6 +252,9 @@ namespace NIKE {
 					{
 						// After boss cutscene play finish, show win game overlay
 						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+						// Reset static counters
+						elapsed_time_after = 3.0f;
+						counter_after = 1;
 					}
 				}
 
@@ -414,7 +420,7 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities) {
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {
 		for (const Entity::Type& vent : vents_entities) {
 			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
 			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
@@ -429,19 +435,45 @@ namespace NIKE {
 						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
 						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", "SFX", 1.f, 0.5f, false, false);
 
+						// Lvl counters to reduce hardcoded
+						static int level_counter = 1;
+						static int stage_counter = 1;
+
+						std::string scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+
 						// Handle change scene 
-						if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_1.scn")
+						if (NIKE_ASSETS_SERVICE->isAssetRegistered(scene_string))
 						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_2.scn"));
+							if (scene_string == "lvl1_1.scn")
+							{
+								// Increment stage counter
+								++stage_counter;
+								scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+								NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene_string));
+								is_spawn_portal = false;
+							}
+							else if (scene_string == "lvl1_2.scn")
+							{
+								++level_counter;
+								stage_counter = 1;
+								scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+								NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene_string));
+								is_spawn_portal = false;
+							}
+							else if (scene_string == "lvl2_1.scn")
+							{
+								if (NIKE_ASSETS_SERVICE->isAssetRegistered("cut_scene_before_boss.scn"))
+								{
+									scene_string = "cut_scene_before_boss.scn";
+									NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene_string));
+									// Reset static vars
+									level_counter = 1;
+									stage_counter = 1;
+									is_spawn_portal = false;
+								}
+							}
 						}
-						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl1_2.scn")
-						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_1.scn"));
-						}
-						else if (NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
-						{
-							NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_before_boss.scn"));
-						}
+
 					}
 				}
 

@@ -352,7 +352,12 @@ namespace NIKE {
 
 			//Render FPS Display
 			Matrix_33 matrix;
-			static bool show_fps = true;
+			#ifndef NDEBUG
+						static bool show_fps = true;
+			#else
+						static bool show_fps = false;
+			#endif
+
 			static Transform::Transform fps_transform = { Vector2f((worldsize.x / 2.0f) - 200.0f, (worldsize.y / 2.0f) - 30.0f), Vector2f(1.0f, 1.0f), 0.0f };
 			fps_transform.use_screen_pos = true;
 
