@@ -29,7 +29,6 @@ namespace NIKE {
                 if (!texture_comp) continue;
 
                 auto& intensity = texture_comp.value().get().intensity;
-                cout << intensity << endl;
                 float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
                 intensity += (0.0f - intensity) * alpha_speed; // Fade towards 0
@@ -486,6 +485,8 @@ namespace NIKE {
             {
                 // Temporary hardcoded SFX
                 Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+
+                // Set entity hit boolean to true
                 hitEntities[target] = true;
 
                 // Set intensity to max (1.0f) when hit
@@ -495,9 +496,25 @@ namespace NIKE {
                 texture_comp.value().get().intensity = 1.0f;
 
             }
-            else if (target_entity_tags.find("objects") != target_entity_tags.end()) {
+            else if ((target_entity_tags.find("boss") != target_entity_tags.end())) { // Entity is a boss
+
                 Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
 
+                // Set entity hit boolean to true
+                hitEntities[target] = true;
+
+                // Set intensity to max (1.0f) when hit
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+                if (!texture_comp) return;
+
+                texture_comp.value().get().intensity = 1.0f;
+
+            }
+            else if (target_entity_tags.find("objects") != target_entity_tags.end()) { // Entity is an object
+
+                Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+
+                // Set entity hit boolean to true
                 hitEntities[target] = true;
 
                 // Set intensity to max (1.0f) when hit
@@ -516,7 +533,7 @@ namespace NIKE {
             auto tags = NIKE_METADATA_SERVICE->getEntityTags(target);
             if (base_comp.has_value() && sprite_comp.has_value()) {
 
-                // If entities are not boss
+                // If entities are a not boss
                 if (tags.find("boss") == tags.end())
                 {
                     auto& base = base_comp.value().get();

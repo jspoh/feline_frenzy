@@ -163,7 +163,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 0,
                             "Name": "skip_button",
                             "Prefab_ID": "",
                             "Prefab_Override": null,

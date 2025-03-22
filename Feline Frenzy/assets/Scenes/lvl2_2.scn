@@ -165,7 +165,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0081",
+                            "Name": "entity_0009",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -182,63 +182,6 @@
             "B_State": true,
             "B_YSort": true,
             "Entities": [
-                {
-                    "Entity": {
-                        "Components": {
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": -8.594970703125,
-                                    "y": 1245.835205078125
-                                },
-                                "Resolution": 0,
-                                "Rotation": 90.0,
-                                "Scale": {
-                                    "x": 271.1050109863281,
-                                    "y": 2600.0
-                                }
-                            },
-                            "Physics::Dynamics": {
-                                "Drag": 0.0,
-                                "Force": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Mass": 1.0,
-                                "Max_Speed": 0.0,
-                                "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                }
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -8.594970703125,
-                                    "y": 1245.835205078125
-                                },
-                                "Rotation": 90.0,
-                                "Scale": {
-                                    "x": 271.1050109863281,
-                                    "y": 2600.0
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 0,
-                            "Name": "top_wall",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
                 {
                     "Entity": {
                         "Components": {
@@ -302,7 +245,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
+                            "Layer_Order": 0,
                             "Name": "Water_Element",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -373,7 +316,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 1,
                             "Name": "Grass_Element",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -444,8 +387,65 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 3,
+                            "Layer_Order": 2,
                             "Name": "Fire_Element",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": -8.594970703125,
+                                    "y": 1245.835205078125
+                                },
+                                "Resolution": 0,
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 271.1050109863281,
+                                    "y": 2600.0
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 1.0,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -8.594970703125,
+                                    "y": 201.36492919921875
+                                },
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 271.1050109863281,
+                                    "y": 2600.0
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 3,
+                            "Name": "top_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -538,7 +538,7 @@
                                     "x": -1.8079999685287476,
                                     "y": -1162.5150146484375
                                 },
-                                "Zoom": 1.5
+                                "Zoom": 1.25
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
