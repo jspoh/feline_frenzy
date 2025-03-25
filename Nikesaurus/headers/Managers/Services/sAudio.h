@@ -16,20 +16,6 @@
 
 #include "Components/cAudio.h"
 
- // Global volume declarations added below.
- // These global variables control the overall volume for the static BGM and SFX channel groups
- // and are shared across all files. They can be modified by the settings menu.
-namespace NIKE {
-	namespace Audio {
-		// Global volume variables for the static channel groups.
-		extern float gGlobalBGMVolume; // Default value is defined in sAudio.cpp (initially 1.0f)
-		extern float gGlobalSFXVolume; // Default value is defined in sAudio.cpp (initially 1.0f)
-
-		// Function to update the volumes of the static channel groups using the global variables.
-		void updateGlobalVolumes();
-	}
-}
-
 namespace NIKE {
 	namespace Audio {
 		//Temporary Disable DLL Export Warning
@@ -447,6 +433,10 @@ namespace NIKE {
 			std::string bgm_channel_group_id;
 			std::string sfx_channel_group_id;
 
+			// Define the global volume variables.
+			float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
+			float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
+
 			// Playlist Management
 			struct Playlist {
 				std::deque<std::string> tracks;
@@ -505,13 +495,12 @@ namespace NIKE {
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
 			//Channel ID will override each other if the same id is specified more than once
 			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
+			
+			float getGlobalBGMVolume() const;
+			void setGlobalBGMVolume(float vol);
 
-			// Set GLOBAL volume for BGM and SFX channels.
-			// This function updates the global variables and then applies them to the static channel groups.
-			void setGlobalVolume(float bgmVolume, float sfxVolume);
-
-			// New function: update the volumes of the static channel groups using the global variables.
-			void updateGlobalVolumes();
+			float getGlobalSFXVolume() const;
+			void setGlobalSFXVolume(float vol);
 
 			/**
 			 * pauses all audio.

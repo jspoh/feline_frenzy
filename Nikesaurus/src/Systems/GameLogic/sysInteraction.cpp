@@ -300,59 +300,6 @@ namespace NIKE {
             return INT_MAX;
         }
 
-        // what even is this function for????
-        // Testing playing 1 custom SFX
-        void playOneShotSFX(Entity::Type& entity,
-            const std::string& custom_audio_id,
-            const std::string& custom_channel_group_id,
-            float custom_volume,
-            float custom_pitch)
-        {
-            // Retrieve the SFX component.
-            auto compOpt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-            if (!compOpt.has_value()) {
-                //NIKEE_CORE_WARN("playOneShotSFX: Entity {} does not have an Audio::SFX component.", entity);
-                return;
-            }
-            auto& comp = compOpt.value().get();
-
-            // Optionally, make a copy of the current settings if you need to revert later.
-            Audio::SFX original = comp;
-
-            // Overwrite the component with custom parameters.
-            comp.b_play_sfx = true;
-            comp.audio_id = custom_audio_id;
-            comp.channel_group_id = custom_channel_group_id;
-            comp.volume = custom_volume;
-            comp.pitch = custom_pitch;
-
-            // Retrieve the channel group.
-            auto group = NIKE_AUDIO_SERVICE->getChannelGroup(custom_channel_group_id);
-            if (!group) {
-                //NIKEE_CORE_WARN("playOneShotSFX: Channel group '{}' not found for entity {}.", custom_channel_group_id, entity);
-                comp = original; // Revert changes
-                return;
-            }
-
-            // Force unpause the group (if necessary).
-            group->setPaused(false);
-
-            // Play the sound using the audio service.
-            // (Here we assume playAudio() will trigger the sound immediately.)
-            NIKE_AUDIO_SERVICE->playAudio(custom_audio_id, "", custom_channel_group_id, custom_volume, custom_pitch, false, false);
-
-            // Log the result.
-            if (group->isPlaying()) {
-                //NIKEE_CORE_INFO("playOneShotSFX: Custom SFX '{}' is playing on channel '{}'.", custom_audio_id, custom_channel_group_id);
-            }
-            else {
-                //NIKEE_CORE_WARN("playOneShotSFX: Custom SFX '{}' did not start playing for entity {}.", custom_audio_id, entity);
-            }
-
-            // Revert the component back to its original settings.
-            comp = original;
-        }
-
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
@@ -412,7 +359,7 @@ namespace NIKE {
 
                 target_health += healer_heal;
                 // Temporary hardcoded SFX
-                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+                NIKE_AUDIO_SERVICE->playAudio("HealSFX.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
             }
         }
 
@@ -484,8 +431,7 @@ namespace NIKE {
             if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
             {
                 // Temporary hardcoded SFX
-                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
-
+                NIKE_AUDIO_SERVICE->playAudio("EnemyGetHit2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                 // Set entity hit boolean to true
                 hitEntities[target] = true;
 
@@ -497,8 +443,7 @@ namespace NIKE {
 
             }
             else if ((target_entity_tags.find("boss") != target_entity_tags.end())) { // Entity is a boss
-
-                Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+                NIKE_AUDIO_SERVICE->playAudio("MetalHit1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
                 // Set entity hit boolean to true
                 hitEntities[target] = true;
@@ -511,8 +456,8 @@ namespace NIKE {
 
             }
             else if (target_entity_tags.find("objects") != target_entity_tags.end()) { // Entity is an object
+                NIKE_AUDIO_SERVICE->playAudio("MetalHit1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
-                Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
 
                 // Set entity hit boolean to true
                 hitEntities[target] = true;

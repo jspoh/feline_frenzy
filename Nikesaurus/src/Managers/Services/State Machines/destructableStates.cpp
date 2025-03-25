@@ -39,7 +39,8 @@ namespace NIKE {
 				else {
 					spawnBrokenChest(entity);
 				}
-				Interaction::playOneShotSFX(entity, "BreakSFX1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+
+				NIKE_AUDIO_SERVICE->playAudio("BreakSFX1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 			}
 			else {

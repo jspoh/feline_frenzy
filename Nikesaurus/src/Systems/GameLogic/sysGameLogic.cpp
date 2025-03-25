@@ -433,7 +433,7 @@ namespace NIKE {
 					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
 						// Save player data
 						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
-						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", "SFX", 1.f, 0.5f, false, false);
+						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false);
 
 						// Lvl counters to reduce hardcoded
 						static int level_counter = 1;
@@ -485,7 +485,7 @@ namespace NIKE {
 					continue;
 				}
 
-				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", "SFX", 1.f, 1.f, false, false);
+				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume() , 1.f, false, false);
 				
 				// If is level 2_2, change the sprite to portal door
 				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png") && 

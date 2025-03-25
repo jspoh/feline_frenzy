@@ -133,7 +133,7 @@ namespace NIKE {
 			if (bgmGroup)
 				bgmGroup->stop();
 			// Immediately play the new BGM track (this temporary override does not modify the scene file)
-			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE::Audio::gGlobalBGMVolume, 1.f, true, true);
+			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 		}
 	}
 
@@ -158,7 +158,7 @@ namespace NIKE {
 			auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
 			if (bgmGroup)
 				bgmGroup->stop();
-			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE::Audio::gGlobalBGMVolume, 1.f, true, true);
+			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 		}
 	}
 

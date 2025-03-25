@@ -18,7 +18,7 @@
     },
     {
         "Camera": {
-            "Active Cam ID": "entity_0001"
+            "Active Cam ID": "entity_0242"
         }
     },
     {
@@ -145,7 +145,7 @@
                                     "x": 0.0,
                                     "y": 12.650634765625
                                 },
-                                "Zoom": 0.8044978976249695
+                                "Zoom": 8.800000190734863
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -173,10 +173,10 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": true,
+                            "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "entity_0382",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -273,7 +273,7 @@
                                     "x": 217.6465606689453,
                                     "y": 87.05862426757813
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
@@ -312,15 +312,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -372,15 +363,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -553,7 +535,7 @@
                                     "x": 70.0,
                                     "y": 70.0
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
@@ -573,6 +555,12 @@
                                     "Script_ID": "UISlider.lua",
                                     "Start_Function": "",
                                     "Update_Function": "ArrowLeft"
+                                },
+                                "OnHover": {
+                                    "Named_Args": {},
+                                    "Script_ID": "",
+                                    "Start_Function": "",
+                                    "Update_Function": ""
                                 }
                             }
                         },
@@ -652,7 +640,7 @@
                                     "x": 70.0,
                                     "y": 70.0
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
@@ -681,15 +669,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -741,15 +720,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -922,7 +892,7 @@
                                     "x": 70.0,
                                     "y": 70.0
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
@@ -1021,7 +991,7 @@
                                     "x": 70.0,
                                     "y": 70.0
                                 },
-                                "Screen Position": true
+                                "Screen Position": false
                             }
                         },
                         "MetaData": {
