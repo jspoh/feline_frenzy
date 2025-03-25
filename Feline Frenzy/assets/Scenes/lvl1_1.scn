@@ -100,6 +100,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
+                                "EnemyElement": 0,
                                 "EnemyLimit": 3,
                                 "LastSpawnTime": 1.0168436765670776
                             },
@@ -144,7 +145,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0272",
+                            "Name": "entity_0009",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -205,8 +206,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 225.78811645507813,
-                                    "y": 89.99945831298828
+                                    "x": 225.67938232421875,
+                                    "y": 90.2717514038086
                                 },
                                 "Screen Position": false
                             }
@@ -215,7 +216,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0273",
+                            "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -339,7 +340,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0275",
+                            "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1204,7 +1205,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 14,
-                            "Name": "entity_0290",
+                            "Name": "entity_0027",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1617,7 +1618,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0296",
+                            "Name": "entity_0033",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

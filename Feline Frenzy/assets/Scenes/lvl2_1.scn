@@ -120,6 +120,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
+                                "EnemyElement": 0,
                                 "EnemyLimit": 3,
                                 "LastSpawnTime": 2.4166650772094727
                             },
@@ -177,6 +178,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
+                                "EnemyElement": 0,
                                 "EnemyLimit": 3,
                                 "LastSpawnTime": 2.4166650772094727
                             },

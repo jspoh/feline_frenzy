@@ -522,6 +522,8 @@ namespace NIKE {
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
 		// Get spawner position
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(spawner);
+		const auto enemy_element = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(spawner).value().get().enemy_element;
+
 		if (!e_transform_comp.has_value()) {
 			NIKEE_CORE_WARN("spawnEnemy: SPAWNER missing Transform Component, enemy not spawned");
 			return;
@@ -531,7 +533,7 @@ namespace NIKE {
 		// Create enemy entity
 		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
-		// When enemy spwan from spawner, set the tag to enemy
+		// When enemy spawn from spawner, set the tag to enemy
 		if(NIKE_METADATA_SERVICE->isTagValid("enemy") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
@@ -554,7 +556,14 @@ namespace NIKE {
 		}
 		else
 		{
-			chosen_enemy = enemyArr[getRandomNumber(1, 3)];
+			// Random enemy spawn
+			if (enemy_element == Element::Elements::NONE) {
+				chosen_enemy = enemyArr[getRandomNumber(1, 3)];
+			}
+			else {
+				// Spawn enemy of chosen element
+				chosen_enemy = enemyArr[static_cast<int>(enemy_element)];
+			}
 		}
 
 
