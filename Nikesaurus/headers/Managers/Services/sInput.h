@@ -92,13 +92,15 @@ namespace NIKE {
 
 			//Data structure of state
 			struct EventStates {
+				bool polling;
 				bool pressed;
 				bool triggered;
 				bool released;
 			};
 
-			//Input events map
-			std::unordered_map<int, EventStates> input_events;
+			//Set of keys
+			std::set<int> curr_keys;
+			std::set<int> prev_keys;
 
 			//Mouse data structure
 			struct Mouse {
@@ -121,6 +123,9 @@ namespace NIKE {
 
 			//Default Constructor
 			Service() = default;
+
+			//Update func
+			void update();
 
 			//Key Pressed
 			bool isKeyPressed(int key);

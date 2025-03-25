@@ -314,8 +314,11 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->updateAndRender();
 #endif
 
-		//update UI First
+		//update UI
 		NIKE_UI_SERVICE->update();
+
+		//update Input
+		NIKE_INPUT_SERVICE->update();
 
 		//Swap Buffers
 		NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
