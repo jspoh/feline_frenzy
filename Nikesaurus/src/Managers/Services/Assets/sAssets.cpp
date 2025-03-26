@@ -150,7 +150,18 @@ namespace NIKE {
 
 		//Register Scripts loader
 		registerLoader(Assets::Types::Script, [this](std::filesystem::path const& primary_path) {
-			return std::make_shared<sol::load_result>(NIKE_LUA_SERVICE->loadScript(primary_path));
+
+			//Update all entities with current script loaded
+			auto entities = NIKE_ECS_MANAGER->getAllComponentEntities(NIKE_ECS_MANAGER->getComponentType<GameLogic::Script>());
+			for (auto entity : entities) {
+				auto e_script_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(entity);
+				if (e_script_comp.has_value()) {
+					auto& e_script = e_script_comp.value().get();
+					if (NIKE_ASSETS_SERVICE->getAssetPath(e_script.script_id) == primary_path) e_script.b_init = false;
+				}
+			}
+
+			return std::make_shared<Lua::ScriptObj>(NIKE_LUA_SERVICE->loadScript(primary_path));
 			});
 	}
 

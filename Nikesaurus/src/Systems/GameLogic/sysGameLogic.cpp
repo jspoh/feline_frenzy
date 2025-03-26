@@ -61,20 +61,36 @@ namespace NIKE {
 					}
 				}
 
-				//Check for logic comp
-				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
-				if (e_logic_comp.has_value()) {
-					auto& e_logic = e_logic_comp.value().get();
+				////Check for logic comp
+				//const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
+				//if (e_logic_comp.has_value()) {
+				//	auto& e_logic = e_logic_comp.value().get();
+
+				//	//Check if script is active
+				//	if (e_logic.script.script_id == "")
+				//		continue;
+
+				//	//Default named argument passed to the script
+				//	e_logic.script.named_args["entity"] = entity;
+
+				//	//Execute script
+				//	NIKE_LUA_SERVICE->executeScript(e_logic.script);
+				//}
+
+				//Check for script comp
+				const auto e_script_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(entity);
+				if (e_script_comp.has_value()) {
+					auto& e_script = e_script_comp.value().get();
 
 					//Check if script is active
-					if (e_logic.script.script_id == "")
+					if (e_script.script_id == "")
 						continue;
 
-					//Default named argument passed to the script
-					e_logic.script.named_args["entity"] = entity;
-
-					//Execute script
-					NIKE_LUA_SERVICE->executeScript(e_logic.script);
+					//Call script update function
+					sol::function script_function = e_script.script_instance[e_script.update_func];
+					if (script_function.valid()) {
+						script_function(entity);
+					}
 				}
 
 				// Check if player tag exists

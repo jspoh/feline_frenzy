@@ -14,6 +14,25 @@
 namespace NIKE {
 	namespace GameLogic {
 
+		//Define a Lua-compatible value type
+		using LuaValue = std::variant<int, float, std::string, bool>;
+
+		struct Script {
+
+			//Lua values
+			std::string script_id;
+			std::string update_func;
+
+			//Script configs
+			std::unordered_map<std::string, LuaValue> configs;
+
+			//Script instance
+			sol::table script_instance;
+
+			//Init flag
+			bool b_init = false;
+		};
+
 		struct State {
 			std::function<void()> onEnter;     // Lua function for enter action
 			std::function<void()> onExit;      // Lua function for exit action

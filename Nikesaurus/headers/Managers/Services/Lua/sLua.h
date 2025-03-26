@@ -46,6 +46,12 @@ namespace NIKE {
 			void overrideDeserialize(nlohmann::json const& data);
 		};
 
+		//Cached lua script object
+		struct ScriptObj {
+			std::filesystem::path path;
+			std::unordered_map<std::string, LuaValue> configs;
+		};
+
 		//Lua Service
 		class NIKE_API Service {
 		private:
@@ -90,11 +96,26 @@ namespace NIKE {
 				lua_state->new_usertype<Type>(args);
 			}
 
+			//Convert schema to config
+			void convertSchemaToConfig(sol::table const& schema, std::unordered_map<std::string, LuaValue>& configs);
+
+			//Convert config to schema
+			void convertConfigToSchema(std::unordered_map<std::string, LuaValue> const& configs, sol::table& schema);
+
+			//Get table keys
+			std::vector<std::string> getTableKeys(sol::table const& table);
+
+			//Load script
+			ScriptObj loadScript(std::filesystem::path const& path);
+
+			//Init script
+			void initScript(std::string const& script_id, std::unordered_map<std::string, LuaValue> const& configs, sol::table& script_instance, bool& init);
+
 			//Load lua script
 			sol::load_result loadScript(std::string const& virtual_path);
 
-			//Load lua script
-			sol::load_result loadScript(std::filesystem::path const& path);
+			////Load lua script
+			//sol::load_result loadScript(std::filesystem::path const& path);
 
 			//Get functions from lua script
 			std::vector<std::string> getScriptFunctions(std::string const& virtual_path);
@@ -208,8 +229,6 @@ namespace NIKE {
 					if (result.get_type() != sol::type::table) {
 						throw std::runtime_error("Error! Cant call a function from a function script!");
 					}
-
-
 
 					//Function to be called
 					sol::function script_function = script_table[script.update_function];
