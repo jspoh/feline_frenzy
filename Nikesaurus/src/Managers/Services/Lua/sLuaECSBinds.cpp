@@ -32,11 +32,94 @@ namespace NIKE {
         lua_state.new_usertype<Physics::Collider>("Collider",
             "Transform", sol::property(
                 [](Physics::Collider& t) { return t.transform; },
-                [](Physics::Collider& t, Physics::Collider val) { t.transform = val.transform; }
+                [](Physics::Collider& t, Transform::Transform val) { t.transform = val; }
                 ),
             "Vertices", sol::property(
                 [](Physics::Collider& t) { return t.vertices; },
                 [](Physics::Collider& t, std::vector<Vector2f> val) { t.vertices = val; }
+                )
+        );
+
+        lua_state.new_usertype<Animation::Base>("Base",
+            "AnimationMode", sol::property(
+                [](Animation::Base& b) { return b.animation_mode; },
+                [](Animation::Base& b, int val) { b.animation_mode = static_cast<Animation::Mode>(val); }
+                ),
+            "AnimationsToComplete", sol::property(
+                [](Animation::Base& b) { return b.animations_to_complete; },
+                [](Animation::Base& b, int val) { b.animations_to_complete = val; }
+                ),
+            "CompletedAnimations", sol::property(
+                [](Animation::Base& b) { return b.completed_animations; },
+                [](Animation::Base& b, int val) { b.completed_animations = val; }
+                ),
+            "PingPong", sol::property(
+                [](Animation::Base& b) { return b.b_pingpong; },
+                [](Animation::Base& b, bool val) { b.b_pingpong = val; }
+                ),
+            "Reverse", sol::property(
+                [](Animation::Base& b) { return b.b_reverse; },
+                [](Animation::Base& b, bool val) { b.b_reverse = val; }
+                ),
+            "FrameDuration", sol::property(
+                [](Animation::Base& b) { return b.frame_duration; },
+                [](Animation::Base& b, float val) { b.frame_duration = val; }
+                ),
+            "Timer", sol::property(
+                [](Animation::Base& b) { return b.timer; }
+                )
+        );
+
+        lua_state.new_usertype<Animation::Sprite>("Sprite",
+            "SheetSize", sol::property(
+                [](Animation::Sprite& s) { return s.sheet_size; }
+                ),
+            "StartIndex", sol::property(
+                [](Animation::Sprite& s) { return s.start_index; },
+                [](Animation::Sprite& s, Vector2i val) { s.start_index = val; }
+                ),
+            "EndIndex", sol::property(
+                [](Animation::Sprite& s) { return s.end_index; },
+                [](Animation::Sprite& s, Vector2i val) { s.end_index = val; }
+                ),
+            "CurrentIndex", sol::property(
+                [](Animation::Sprite& s) { return s.curr_index; },
+                [](Animation::Sprite& s, Vector2i val) { s.curr_index = val; }
+                )
+        );
+
+        lua_state.new_usertype<Render::Texture>("Texture",
+            "TextureID", sol::property(
+                [](Render::Texture& t) { return t.texture_id; },
+                [](Render::Texture& t, const std::string& val) { t.texture_id = val; }
+                ),
+            "Color", sol::property(
+                [](Render::Texture& t) { return t.color; },
+                [](Render::Texture& t, Vector4f val) { t.color = val; }
+                ),
+            "FrameSize", sol::property(
+                [](Render::Texture& t) { return t.frame_size; },
+                [](Render::Texture& t, Vector2i val) { t.frame_size = val; }
+                ),
+            "FrameIndex", sol::property(
+                [](Render::Texture& t) { return t.frame_index; },
+                [](Render::Texture& t, Vector2i val) { t.frame_index = val; }
+                ),
+            "Blend", sol::property(
+                [](Render::Texture& t) { return t.b_blend; },
+                [](Render::Texture& t, bool val) { t.b_blend = val; }
+                ),
+            "Intensity", sol::property(
+                [](Render::Texture& t) { return t.intensity; },
+                [](Render::Texture& t, float val) { t.intensity = val; }
+                ),
+            "Stretch", sol::property(
+                [](Render::Texture& t) { return t.b_stretch; },
+                [](Render::Texture& t, bool val) { t.b_stretch = val; }
+                ),
+            "Flip", sol::property(
+                [](Render::Texture& t) { return t.b_flip; },
+                [](Render::Texture& t, Vector2b val) { t.b_flip = val; }
                 )
         );
 
@@ -104,6 +187,27 @@ namespace NIKE {
             // Use a template function to handle different component types
             if (componentName == "Transform::Transform") {
                     auto component = std::static_pointer_cast<Transform::Transform>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
+            // Use a template function to handle different component types
+            if (componentName == "Render::Texture") {
+                auto component = std::static_pointer_cast<Render::Texture>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
+            // Use a template function to handle different component types
+            if (componentName == "Animation::Base") {
+                auto component = std::static_pointer_cast<Animation::Base>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
+            // Use a template function to handle different component types
+            if (componentName == "Animation::Sprite") {
+                auto component = std::static_pointer_cast<Animation::Sprite>(
                     NIKE_ECS_MANAGER->getEntityComponent(entity, type)
                 );
                 return sol::make_object(lua_state, component);

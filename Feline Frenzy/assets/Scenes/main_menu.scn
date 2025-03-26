@@ -78,7 +78,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 1490.287841796875,
+                                    "x": -323.2467346191406,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -139,7 +139,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -108.64978790283203,
+                                    "x": 1275.819580078125,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -792,17 +792,40 @@
                 {
                     "Entity": {
                         "Components": {
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 7,
-                                    "scene": "lvl1.scn",
-                                    "trigger_func": "Change",
-                                    "trigger_script": "ChangeScene.lua",
-                                    "trigger_type": "Trigger"
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "animation_speed": 0.30000001192092896,
+                                    "hover_scale": 1.2000000476837158,
+                                    "sprite_end_x": 6,
+                                    "sprite_end_y": 0,
+                                    "sprite_size_x": 7,
+                                    "sprite_size_y": 1,
+                                    "sprite_start_x": 1,
+                                    "sprite_start_y": 0,
+                                    "trigger_type": "trigger"
                                 },
                                 "Script_ID": "Button.lua",
-                                "Start_Function": "Init",
-                                "Update_Function": "Update"
+                                "Update_Function": "update"
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -811,14 +834,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -496.426025390625,
-                                    "y": -208.9820556640625
+                                    "x": -438.7222595214844,
+                                    "y": -73.71658325195313
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 201.5935516357422,
-                                    "y": 201.5935516357422
+                                    "x": 386.2175598144531,
+                                    "y": 73.38133239746094
                                 }
                             },
                             "Render::Texture": {
@@ -839,23 +862,23 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 7,
                                     "y": 1
                                 },
                                 "Intensity": 0.0,
-                                "Texture_ID": "Chest.png"
+                                "Texture_ID": "UI_PlayGame_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -496.426025390625,
-                                    "y": -208.9820556640625
+                                    "x": -438.7222595214844,
+                                    "y": -73.71658325195313
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 201.5935516357422,
-                                    "y": 201.5935516357422
+                                    "x": 386.2175598144531,
+                                    "y": 73.38133239746094
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "MetaData": {

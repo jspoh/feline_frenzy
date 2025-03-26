@@ -52,8 +52,14 @@
     <ClCompile Include="src\Components\cDespawn.cpp" />
     <ClCompile Include="src\Components\cElement.cpp" />
     <ClCompile Include="src\Components\cEnemy.cpp" />
-    <ClCompile Include="src\Managers\Services\Lua\sLuaECSBinds.cpp" />
-    <ClCompile Include="src\Managers\Services\Lua\sLuaGameBinds.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaECSBinds.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="src\Managers\Services\Lua\sLuaGameBinds.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="src\Managers\Services\Render\sParticle.cpp" />
     <ClCompile Include="src\Components\cState.cpp" />
     <ClCompile Include="src\Components\cGameLogic.cpp" />
@@ -74,7 +80,10 @@
     <ClCompile Include="src\Managers\Services\LevelEditor\sEditorActions.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Managers\Services\Lua\sLuaCoreBinds.cpp" />
+    <ClCompile Include="src\Managers\Services\Lua\sLuaCoreBinds.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="src\Managers\Services\Render\sShader.cpp" />
     <ClCompile Include="src\Managers\Services\Render\sVideoPlayer.cpp" />
     <ClCompile Include="src\Managers\Services\sAudio.cpp" />

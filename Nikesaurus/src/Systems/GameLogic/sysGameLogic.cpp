@@ -83,7 +83,7 @@ namespace NIKE {
 					auto& e_script = e_script_comp.value().get();
 
 					//Check if script is active
-					if (e_script.script_id == "")
+					if (e_script.script_id == "" || !e_script.script_instance.valid())
 						continue;
 
 					//Call script update function

@@ -1714,10 +1714,6 @@ namespace NIKE {
 			//Get transform
 			Transform::Transform e_transform = e_transform_comp.value().get();
 
-			if (e_transform.use_screen_pos) {
-				return false;
-			}
-
 			//Check if child
 			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
 			auto* child = std::get_if<MetaData::Child>(&relation);

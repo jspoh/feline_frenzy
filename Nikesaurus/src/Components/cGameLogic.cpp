@@ -71,6 +71,8 @@ namespace NIKE {
 				comp.script_id = data.value("Script_ID", "");
 				comp.update_func = data.value("Update_Function", "");
 
+				if (comp.script_id.empty()) return;
+
 				//Get main script configs
 				auto script_obj = NIKE_ASSETS_SERVICE->getAsset<Lua::ScriptObj>(comp.script_id);
 				auto const& configs = script_obj->configs;
@@ -111,6 +113,8 @@ namespace NIKE {
 			[](GameLogic::Script& comp, nlohmann::json const& delta) {
 				comp.script_id = delta.value("Script_ID", "");
 				comp.update_func = delta.value("Update_Function", "");
+
+				if (comp.script_id.empty()) return;
 
 				//Get main script configs
 				auto script_obj = NIKE_ASSETS_SERVICE->getAsset<Lua::ScriptObj>(comp.script_id);

@@ -165,6 +165,8 @@ namespace NIKE {
     }
 
     std::vector<std::string> Lua::Service::getTableKeys(sol::table const& table) {
+        if (!table.valid()) return std::vector<std::string>();
+
         std::vector<std::string> keys;
         for (auto& [key_obj, val_obj] : table) {
             std::string key = key_obj.as<std::string>();
@@ -185,7 +187,7 @@ namespace NIKE {
         sol::load_result chunk = lua_state->load_file(obj.path.string());
         if (!chunk.valid()) {
             sol::error err = chunk;
-           throw std::runtime_error(err);
+            throw std::runtime_error(err);
         }
 
         // Script executed here (top-level code runs)
@@ -218,15 +220,15 @@ namespace NIKE {
         //Load script file
         sol::load_result chunk = lua_state->load_file(cached_script->path.string());
         if (!chunk.valid()) {
-            sol::error err = chunk;
-            throw std::runtime_error(err);
+            NIKEE_CORE_WARN("Error loading script! Probably due to syntax error");
+            return;
         }
 
         // Script executed here (top-level code runs)
         sol::protected_function_result chunck_result = chunk();
         if (!chunck_result.valid()) {
-            sol::error err = chunck_result;
-            throw std::runtime_error(err);
+            NIKEE_CORE_WARN("Error loading script! Probably due to syntax error");
+            return;
         }
 
         //Create config table
@@ -248,6 +250,9 @@ namespace NIKE {
                 //Set flagged to successful
                 init = true;
             }
+        }
+        else {
+            NIKEE_CORE_WARN("No lua table stored under script instances, there might be errors with the constructor");
         }
     }
 

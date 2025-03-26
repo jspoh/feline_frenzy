@@ -14,8 +14,8 @@ namespace NIKE {
 		template<typename T>
 		class Vector2 {
 		private:
-			using type = T;
 		public:
+			using type = T;
 			type x, y;
 
 			Vector2() : x(0), y(0) {}
