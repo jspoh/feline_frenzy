@@ -395,9 +395,19 @@ namespace NIKE {
 			playerData["Health"] = healthComp.value().get().health;
 		}
 
-		// Get equipped element
+		// Get equipped element and unlocked elements
 		if (auto elementComp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player)) {
-			playerData["Element"] = static_cast<int>(elementComp.value().get().element);
+			auto& elementCompRef = elementComp.value().get();
+
+			// Save current equipped element
+			playerData["Element"] = static_cast<int>(elementCompRef.element);
+
+			// Save all unlocked elements
+			std::vector<int> elementsCollectedVec;
+			for (const auto& element : elementCompRef.elements_collected) {
+				elementsCollectedVec.push_back(static_cast<int>(element));
+			}
+			playerData["ElementsCollected"] = elementsCollectedVec;
 		}
 
 		return playerData;
@@ -414,9 +424,21 @@ namespace NIKE {
 
 		if (data.contains("Element")) {
 			if (auto elementComp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player)) {
-				elementComp.value().get().element = static_cast<Element::Elements>(data["Element"]);
+				auto& elementCompRef = elementComp.value().get();
+
+				// Load current equipped element
+				elementCompRef.element = static_cast<Element::Elements>(data["Element"].get<int>());
+
+				// Load unlocked elements
+				if (data.contains("ElementsCollected")) {
+					elementCompRef.elements_collected.clear();
+					for (const auto& elementInt : data["ElementsCollected"]) {
+						elementCompRef.elements_collected.insert(static_cast<Element::Elements>(elementInt));
+					}
+				}
 			}
 		}
+
 
 		return true; // Return success
 	}

@@ -47,11 +47,39 @@ namespace NIKE {
 
 		struct Entity {
 			Elements element;			// Currently equipped element
-			// !TODO: Maybe make it random at the start?
+			std::unordered_set<Elements> elements_collected;
 
 			Entity() : element(Elements::NONE) {};
 			Entity(int element)
 				: element{ element } {}
+
+			void unlockElement(Entity& player, Elements new_element) {
+				player.elements_collected.insert(new_element);
+			}
+
+			void removeElement(Entity& player, Elements remove_element) {
+				player.elements_collected.erase(remove_element);
+			}
+
+			void cycleElement(Entity& player) {
+				if (player.elements_collected.empty()) return;
+
+				auto it = player.elements_collected.find(player.element);
+
+				if (it != player.elements_collected.end()) {
+					++it;
+					if (it == player.elements_collected.end()) it = player.elements_collected.begin();
+					player.element = *it;
+				}
+				else {
+					player.element = *player.elements_collected.begin();
+				}
+			}
+
+			bool isElementUnlocked(const Entity& player, Elements element_unlock) {
+				return player.elements_collected.find(element_unlock) != player.elements_collected.end();
+			}
+
 
 			static const std::string enemyBullet[4];	// Array of enemy elemental bullet
 			static const std::string playerBullet[4];	// Array of elemental bullets (For shooting)

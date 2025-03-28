@@ -27,14 +27,20 @@ namespace NIKE {
                 const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
                 auto& player_element = player_element_comp.value().get();
 
-                if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_R)) {
-                    if (player_element.element == Element::Elements::GRASS) {
-                        player_element.element = Element::Elements::FIRE;
-                    }
-                    else {
-                        player_element.element = static_cast<Element::Elements>(static_cast<int>(player_element.element) + 1);
-                    }
+                //if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_R)) {
+                //    if (player_element.element == Element::Elements::GRASS) {
+                //        player_element.element = Element::Elements::FIRE;
+                //    }
+                //    else {
+                //        player_element.element = static_cast<Element::Elements>(static_cast<int>(player_element.element) + 1);
+                //    }
+                //}
+
+                if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_Q)) {
+                    // Switch to the next unlocked element
+                    player_element.cycleElement(player_element);  
                 }
+
             }
 
             // When hitting objects
@@ -393,18 +399,6 @@ namespace NIKE {
             auto& target_health = target_health_comp.value().get();
             auto& attacker_damage = attacker_damage_comp.value().get().damage;
 
-            // Check if target is in HurtState
-            //auto state_comp = NIKE_ECS_MANAGER->getEntityComponent<State::State>(target);
-            //if (state_comp.has_value()) {
-            //    auto& state = state_comp.value().get();
-            //    auto current_state = state.current_state.lock();
-
-            //    // If entity is already in HurtState, skip damage application
-            //    if (current_state == NIKE_FSM_SERVICE->getStateByID("EnemyHurt")) {
-            //        return;  // Skip applying damage if in HurtState
-            //    }
-            //}
-
             // Check invulnerability flag
             if (target_health.invulnerable_flag) {
                 return; // Skip damage
@@ -610,9 +604,24 @@ namespace NIKE {
             if (player_element_comp.has_value() && source_element_comp.has_value()) {
                 auto& player_element = player_element_comp.value().get().element;
                 auto& source_element = source_element_comp.value().get().element;
-
+                auto& collected_elements = player_element_comp.value().get().elements_collected;
+                
                 // Set player element to source element
-                player_element = source_element;
+                // player_element = source_element;
+
+                 // Check if the element is already unlocked
+                if (collected_elements.find(source_element) == collected_elements.end()) {
+                    // Element is NOT unlocked, so we unlock it
+                    collected_elements.insert(source_element);
+
+                    //NIKEE_CORE_INFO("Element Unlocked: {}", player_element_comp.value().get().elements_to_string.at(source_element));
+                }
+                else {
+                    // Element is already unlocked, switch to it
+                    player_element = source_element;
+
+                    //NIKEE_CORE_INFO("Element Switched To: {}", elements_to_string.at(source_element));
+                }
 
                 // !TODO: Play element change animation here
             }
