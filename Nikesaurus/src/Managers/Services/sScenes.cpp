@@ -128,12 +128,16 @@ namespace NIKE {
 			restorePlayerData();
 
 		std::string newBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
+		std::string currBGMC = NIKE_AUDIO_SERVICE->getBGMCTrackForScene();
+
 		if (!newBGM.empty() && newBGM != oldBGM) {
 			auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
 			if (bgmGroup)
 				bgmGroup->stop();
 			// Immediately play the new BGM track (this temporary override does not modify the scene file)
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			// BGMC will also restart (and muted at first) if BGM track is different
+			NIKE_AUDIO_SERVICE->playAudio(currBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.f, 1.f, true, true);
 		}
 	}
 
@@ -154,11 +158,14 @@ namespace NIKE {
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 
 		std::string newBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
+		std::string currBGMC = NIKE_AUDIO_SERVICE->getBGMCTrackForScene();
+
 		if (!newBGM.empty() && newBGM != oldBGM) {
 			auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
 			if (bgmGroup)
 				bgmGroup->stop();
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			NIKE_AUDIO_SERVICE->playAudio(currBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.f, 1.f, true, true);
 		}
 	}
 

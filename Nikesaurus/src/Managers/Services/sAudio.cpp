@@ -556,7 +556,7 @@ namespace NIKE {
 		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
 
 			//Skip static channels groups
-			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id) {
+			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id || it->first == bgmc_channel_group_id) {
 				++it;
 				continue;
 			}
@@ -849,7 +849,7 @@ namespace NIKE {
 		}
 	}
 
-	// NEW: Implementation for getBGMTrackForScene()
+	// Implementation for getBGMTrackForScene()
 	std::string Audio::Service::getBGMTrackForScene() {
 		std::string currentBGMTrack = "";
 		auto currentPlaylist = this->getChannelPlaylist(this->getBGMChannelGroupID());
@@ -857,6 +857,16 @@ namespace NIKE {
 			currentBGMTrack = currentPlaylist.tracks.front();
 		}
 		return currentBGMTrack;
+	}
+
+	// BGMC track getter
+	std::string Audio::Service::getBGMCTrackForScene() {
+		std::string currentBGMCTrack = "";
+		auto currentPlaylist = this->getChannelPlaylist(this->getBGMCChannelGroupID());
+		if (!currentPlaylist.tracks.empty()) {
+			currentBGMCTrack = currentPlaylist.tracks.front();
+		}
+		return currentBGMCTrack;
 	}
 
 }

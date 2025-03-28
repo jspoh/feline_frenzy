@@ -432,12 +432,12 @@ namespace NIKE {
 			//Static channel group ID
 			std::string bgm_channel_group_id;
 			std::string sfx_channel_group_id;
+			// Turns out "channel group" is just a singular channel so need to add another "channel" group to have 2 tracks playing together
+			std::string bgmc_channel_group_id;
 
 			// Define the global volume variables.
 			float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
 			float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
-			// Turns out "channel group" is just a singular channel so need to add another "channel" group to have 2 tracks playing together
-			std::string bgmc_channel_group_id;
 
 			// Playlist Management
 			struct Playlist {
@@ -554,8 +554,12 @@ namespace NIKE {
 			// Deserialize
 			void deserializeAudioChannels(nlohmann::json const& data);
 
-			// NEW: Get the current BGM track for the scene.
+			// Get the current BGM track for the scene.
 			std::string getBGMTrackForScene();
+
+			// Get current BGMC track for scene
+			std::string getBGMCTrackForScene();
+
 		};
 
 		//Re-enable DLL Export warning
