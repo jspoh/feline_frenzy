@@ -392,13 +392,14 @@ namespace NIKE {
 		// Define the fade duration (in seconds) and compute the fade rate.
 		const float fadeTime = 1.5f;
 		float fadeRate = targetVolume / fadeTime;
-		float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
-		float fadeAmount = fadeRate * delta;
+		//float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
+		//float fadeAmount = fadeRate * delta;
+		float fadeAmount = fadeRate * 0.017; // Test if getDeltaTime() is the problem...
 
 		if (!enemy_tags.empty()) {
 			// Enemies are present: fade in.
 			float newVolume = currentVolume + fadeAmount;
-			if (newVolume > targetVolume) {
+			if (newVolume >= targetVolume) {
 				newVolume = targetVolume;
 			}
 			bgmcGroup->setVolume(newVolume);
@@ -407,7 +408,7 @@ namespace NIKE {
 		else {
 			// No enemies: fade out.
 			float newVolume = currentVolume - fadeAmount;
-			if (newVolume < 0.01f) {
+			if (newVolume <= 0.01f) {
 				newVolume = 0.01f;  // Minimal audible level
 			}
 			bgmcGroup->setVolume(newVolume);
