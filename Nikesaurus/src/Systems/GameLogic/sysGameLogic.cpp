@@ -120,6 +120,8 @@ namespace NIKE {
 					//}
 					
 					static bool is_spawn_portal = false;
+
+					// Cheat codes
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_H)) { is_spawn_portal = true; }
 					
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_G)) { resetHealth(); }
@@ -500,7 +502,7 @@ namespace NIKE {
 						static int level_counter = 1;
 						static int stage_counter = 1;
 
-						std::string scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+						std::string scene_string = NIKE_SCENES_SERVICE->getCurrSceneID();
 
 						// Handle change scene 
 						if (NIKE_ASSETS_SERVICE->isAssetRegistered(scene_string))

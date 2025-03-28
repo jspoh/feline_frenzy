@@ -162,6 +162,7 @@ namespace NIKE {
 			// Change boss elem every 2 seconds
 			if (elapsed_time >= 2.0f)
 			{
+				// Change boss element between 1,3 (enum idexes)
 				int random_number = GameLogic::getRandomNumber(1, 3);
 				element_com.value().get().element = static_cast<Element::Elements>(random_number);
 				elapsed_time = 0;
