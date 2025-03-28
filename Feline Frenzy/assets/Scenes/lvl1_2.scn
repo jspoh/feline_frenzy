@@ -7,6 +7,12 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1_voladj.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
@@ -165,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_1023",
+                            "Name": "entity_0265",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -226,8 +232,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 225.78811645507813,
-                                    "y": 89.99945831298828
+                                    "x": 225.67938232421875,
+                                    "y": 90.2717514038086
                                 },
                                 "Screen Position": false
                             }
@@ -236,7 +242,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_1024",
+                            "Name": "entity_0266",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
