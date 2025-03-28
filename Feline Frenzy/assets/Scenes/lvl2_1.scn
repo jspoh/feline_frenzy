@@ -7,6 +7,12 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1_voladj.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
@@ -120,6 +126,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
+                                "EnemyElement": 0,
                                 "EnemyLimit": 3,
                                 "LastSpawnTime": 2.4166650772094727
                             },
@@ -164,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0382",
+                            "Name": "entity_0385",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -177,6 +184,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
+                                "EnemyElement": 0,
                                 "EnemyLimit": 3,
                                 "LastSpawnTime": 2.4166650772094727
                             },

@@ -7,6 +7,12 @@
                     "BGM_Menu_v1.wav"
                 ]
             },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1_voladj.wav"
+                ]
+            },
             "SFX": {
                 "loop": false,
                 "tracks": []
@@ -176,7 +182,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0382",
+                            "Name": "entity_0052",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

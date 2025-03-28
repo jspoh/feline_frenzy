@@ -32,6 +32,20 @@ namespace NIKE {
                     showPauseMenu = true;
                 }
 
+            // Player Tab Element Swapping
+            std::set<Entity::Type> player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+            for (auto& player : player_tag) {
+                const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+                auto& player_element = player_element_comp.value().get();
+
+                if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_R)) {
+                    if (player_element.element == Element::Elements::GRASS) {
+                        player_element.element = Element::Elements::FIRE;
+                    }
+                    else {
+                        player_element.element = static_cast<Element::Elements>(static_cast<int>(player_element.element) + 1);
+                    }
+                }
             }
 
             // When hitting objects
@@ -135,7 +149,7 @@ namespace NIKE {
                                 }
                             }
 
-                            
+
                         }
                     }
                 }

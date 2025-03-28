@@ -4,6 +4,12 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
+                    "BGM_Level_Explore_v1.wav"
+                ]
+            },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
                     "BGM_Level_Combat_v1_voladj.wav"
                 ]
             },
@@ -121,6 +127,7 @@
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
+                                "EnemyElement": 0,
                                 "EnemyLimit": 1,
                                 "LastSpawnTime": 2.7166647911071777
                             },
@@ -165,7 +172,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0704",
+                            "Name": "entity_0549",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
