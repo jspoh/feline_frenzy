@@ -10,7 +10,7 @@
             "BGMC": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Combat_v1_voladj.wav"
+                    "BGM_Level_Combat_v1.wav"
                 ]
             },
             "BulletSFX": {
@@ -172,9 +172,38 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_1173",
+                            "Name": "entity_0420",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 2,
+                            "Name": "player_shadow",
+                            "Parent": "player",
+                            "Prefab_ID": "player_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "player"
+                                }
+                            },
                             "Tags": []
                         }
                     }

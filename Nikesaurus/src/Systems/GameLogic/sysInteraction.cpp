@@ -699,7 +699,7 @@ namespace NIKE {
                 texture_comp.value().get().intensity = 1.0f;
 
             }
-            else if ((target_entity_tags.find("boss") != target_entity_tags.end())) { // Entity is a boss
+            else if ((target_entity_tags.find("enemy") != target_entity_tags.end())) { // Entity is a boss
                 NIKE_AUDIO_SERVICE->playAudio("MetalHit1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
                 // Set entity hit boolean to true

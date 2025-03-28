@@ -33,6 +33,9 @@ namespace NIKE {
 
 		bool isWithinGridRange(const Entity::Type& enemy, const Entity::Type& player);
 
+		// Change boss elem
+		void changeBossElem(const Entity::Type& enemy);
+
 		// Standard enemy moving function
 		//void chasing(Pathfinding::Path& path, Transform::Transform& enemy, Transform::Transform& player);
 

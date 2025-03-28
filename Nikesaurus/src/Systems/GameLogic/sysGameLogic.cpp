@@ -35,6 +35,7 @@ namespace NIKE {
 
 				//Skip entity not registered to this system
 				if (entities.find(entity) == entities.end()) continue;
+			
 
 				// Main Menu Background Scrolling
 				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "main_menu.scn") {
@@ -119,7 +120,12 @@ namespace NIKE {
 					//}
 					
 					static bool is_spawn_portal = false;
+
+					// Cheat codes
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_H)) { is_spawn_portal = true; }
+					
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_G)) { resetHealth(); }
+					
 
 					// Portal animations and interactions
 					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
@@ -398,6 +404,19 @@ namespace NIKE {
 		max_speed = freeze_speed;
 	}
 
+	void GameLogic::Manager::resetHealth()
+	{
+		std::set<Entity::Type> players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+		for (auto player : players)
+		{
+			auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+			if (health_comp.has_value())
+			{
+				health_comp.value().get().health = 100.0f;
+			}
+		}
+	}
+
 	void GameLogic::Manager::updateBGMCVolume() {
 		// Get the current enemy entities.
 		std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
@@ -416,13 +435,14 @@ namespace NIKE {
 		// Define the fade duration (in seconds) and compute the fade rate.
 		const float fadeTime = 1.5f;
 		float fadeRate = targetVolume / fadeTime;
-		float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
-		float fadeAmount = fadeRate * delta;
+		//float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
+		//float fadeAmount = fadeRate * delta;
+		float fadeAmount = fadeRate * static_cast<float>(0.017); // Test if getDeltaTime() is the problem...
 
 		if (!enemy_tags.empty()) {
 			// Enemies are present: fade in.
 			float newVolume = currentVolume + fadeAmount;
-			if (newVolume > targetVolume) {
+			if (newVolume >= targetVolume) {
 				newVolume = targetVolume;
 			}
 			bgmcGroup->setVolume(newVolume);
@@ -431,7 +451,7 @@ namespace NIKE {
 		else {
 			// No enemies: fade out.
 			float newVolume = currentVolume - fadeAmount;
-			if (newVolume < 0.01f) {
+			if (newVolume <= 0.01f) {
 				newVolume = 0.01f;  // Minimal audible level
 			}
 			bgmcGroup->setVolume(newVolume);
@@ -507,7 +527,7 @@ namespace NIKE {
 						static int level_counter = 1;
 						static int stage_counter = 1;
 
-						std::string scene_string = "lvl" + std::to_string(level_counter) + "_" + std::to_string(stage_counter) + ".scn";
+						std::string scene_string = NIKE_SCENES_SERVICE->getCurrSceneID();
 
 						// Handle change scene 
 						if (NIKE_ASSETS_SERVICE->isAssetRegistered(scene_string))
@@ -556,10 +576,13 @@ namespace NIKE {
 				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume() , 1.f, false, false);
 				
 				// If is level 2_2, change the sprite to portal door
-				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png") && 
-					NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Frontdoor_animation_sprite.png") && 
+					NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn" && entity_animation_base.has_value())
 				{
 					entity_texture.value().get().texture_id = "Frontdoor_animation_sprite.png";
+					// Set faster animation
+					entity_animation_base.value().get().frame_duration = 0.09f;
+
 				}
 				// Change the sprite to be the animation sprite
 				else if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
@@ -577,7 +600,17 @@ namespace NIKE {
 
 				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
 
-				entity_animation_base.value().get().frame_duration = 0.1f;
+				if (entity_texture.has_value())
+				{
+					if (entity_texture.value().get().texture_id == "Frontdoor_animation_sprite.png")
+					{
+						entity_animation_base.value().get().frame_duration = 0.09f;
+					}
+					else {
+						entity_animation_base.value().get().frame_duration = 0.1f;
+					}
+				}
+
 
 				// Set Animation
 				Interaction::flipX(vent, false);
@@ -671,6 +704,30 @@ namespace NIKE {
 
 			if (!child || !NIKE_METADATA_SERVICE->getEntityByName(child->parent).has_value()) {
 				NIKEE_CORE_ERROR("Gun entity has no parent");
+			}
+		}
+
+		// Create Shadow Entity
+		{
+			Entity::Type shadow_entity = NIKE_ECS_MANAGER->createEntity();
+
+			NIKE_METADATA_SERVICE->setEntityPrefab(shadow_entity, "shadow.prefab");
+
+			// set gun entity as child
+			NIKE_METADATA_SERVICE->setEntityChildRelation(shadow_entity);
+		
+			// get enemy entity name
+			std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(enemy_entity);
+
+			// set gun entity as child of enemy entity
+			NIKE_METADATA_SERVICE->setEntityChildRelationParent(shadow_entity, enemy_entity_name);
+
+			// check that gun has a parent
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(shadow_entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			if (!child || !NIKE_METADATA_SERVICE->getEntityByName(child->parent).has_value()) {
+				NIKEE_CORE_ERROR("Shadow entity has no parent");
 			}
 		}
 

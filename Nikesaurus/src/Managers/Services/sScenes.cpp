@@ -133,12 +133,18 @@ namespace NIKE {
 
 		if (!newBGM.empty() && newBGM != oldBGM) {
 			auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
+			auto bgmcGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMCChannelGroupID());
+
 			if (bgmGroup)
 				bgmGroup->stop();
+			if (bgmcGroup)
+				bgmcGroup->stop();
+
 			// Immediately play the new BGM track (this temporary override does not modify the scene file)
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 			// BGMC will also restart (and muted at first) if BGM track is different
-			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true); // No volume if not "init" to global... debug volume later
+			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			bgmcGroup->setVolume(0.01f); // setVolume() is based on the volume set in playAudio()!!!
 		}
 	}
 
@@ -164,10 +170,16 @@ namespace NIKE {
 
 		if (!newBGM.empty() && newBGM != oldBGM) {
 			auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
+			auto bgmcGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMCChannelGroupID());
+
 			if (bgmGroup)
 				bgmGroup->stop();
+			if (bgmcGroup)
+				bgmcGroup->stop();
+
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true); // No volume if not "init" to global... debug volume later
+			bgmcGroup->setVolume(0.01f); // setVolume() is based on the volume set in playAudio()!!!
 		}
 	}
 

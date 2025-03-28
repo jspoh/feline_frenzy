@@ -150,6 +150,9 @@ namespace NIKE {
 					}
 				}
 			}
+
+			// Change boss elem every 2 seconds
+			Enemy::changeBossElem(entity);
 		}
 	}
 
@@ -315,6 +318,9 @@ namespace NIKE {
 			}
 
 		}
+
+		// Change boss elem every 2 seconds
+		Enemy::changeBossElem(entity);
 	}
 
 	void State::BossChaseState::onExit([[maybe_unused]] Entity::Type& entity)
