@@ -821,13 +821,15 @@
                             "GameLogic::Script": {
                                 "Configs": {
                                     "animation_speed": 0.20000000298023224,
+                                    "change_scene": "cut_scene_1.scn",
                                     "hover_scale": 1.0499999523162842,
                                     "sprite_end_x": 6,
                                     "sprite_end_y": 0,
                                     "sprite_size_x": 7,
                                     "sprite_size_y": 1,
-                                    "sprite_start_x": 1,
+                                    "sprite_start_x": -36,
                                     "sprite_start_y": 0,
+                                    "trigger_action": 3,
                                     "trigger_type": "trigger"
                                 },
                                 "Script_ID": "Button.lua",

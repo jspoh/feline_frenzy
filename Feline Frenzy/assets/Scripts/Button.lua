@@ -3,6 +3,8 @@
 schema = {
     hover_scale = 1.05,
     trigger_type = "trigger",
+    trigger_action = 0,
+    change_scene = "",
     sprite_size_x = 7,
     sprite_size_y = 1,
     sprite_start_x = 1,
@@ -27,18 +29,20 @@ end
 -- Button Trigger Script
 function Button:OnTrigger()
 
-    cout("Triggered")
-
-    -- Convert file path to module name
-    --local formatted_name = args.trigger_script:gsub("%.lua$", "")
-
-    --Trigger script
-    --local status, script = pcall(require, formatted_name)
-   -- if status and type(script) == "table" then
-        --script[args.trigger_func](args);
-    --else
-     --   cout("Error: Failed to load script '" .. args.trigger_script .. "'.")
-   -- end
+    -- Button Triggered Action
+    if self.config.trigger_action == 0 then
+        ChangeScene(self.config.change_scene)
+    elseif self.config.trigger_action == 1 then
+        RestartScene()
+    elseif self.config.trigger_action == 2 then
+        PreviousScene()
+    elseif self.config.trigger_action == 3 then
+        CloseScene()
+    elseif self.config.trigger_action == 4 then
+        QuitScene()
+    else
+        ChangeScene(self.config.change_scene)
+    end
 end
 
 -- Mouse In Button

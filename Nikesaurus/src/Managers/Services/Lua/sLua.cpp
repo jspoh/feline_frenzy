@@ -204,11 +204,11 @@ namespace NIKE {
         sol::table schema;
         if (schema_obj.valid() && schema_obj.get_type() == sol::type::table) {
             schema = schema_obj.as<sol::table>();
-        }
 
-        //Convert schema to conifgs
-        convertSchemaToConfig(schema, obj.configs);
-        (*lua_state)["schema"] = sol::nil;
+            //Convert schema to conifgs
+            convertSchemaToConfig(schema, obj.configs);
+            (*lua_state)["schema"] = sol::nil;
+        }
 
         //Return lua script object
         return obj;
@@ -238,23 +238,30 @@ namespace NIKE {
         convertConfigToSchema(configs, config_table);
 
         //Obtain sol table from script
-        sol::protected_function func = chunck_result;
-        sol::protected_function_result result = func(config_table);
-        if (result.valid()) {
+        if (chunck_result.get_type() == sol::type::function) {
 
-            //Obtain object and double check
-            sol::object obj = result;
-            if (obj.get_type() == sol::type::table) {
+            //Get protecte function from result
+            sol::protected_function func = chunck_result;
+            sol::protected_function_result result = func(config_table);
+            if (result.valid()) {
 
-                //Extract sol table
-                script_instance = result.get<sol::table>();
-                
-                //Set flagged to successful
-                init = true;
+                //Obtain object and double check
+                sol::object obj = result;
+                if (obj.get_type() == sol::type::table) {
+
+                    //Extract sol table
+                    script_instance = result.get<sol::table>();
+
+                    //Set flagged to successful
+                    init = true;
+                }
+            }
+            else {
+                NIKEE_CORE_WARN("No lua table stored under script instances, there might be errors with the constructor");
             }
         }
         else {
-            NIKEE_CORE_WARN("No lua table stored under script instances, there might be errors with the constructor");
+            NIKEE_CORE_WARN("Result does not return a function for creating lua object! Invalid script!");
         }
     }
 

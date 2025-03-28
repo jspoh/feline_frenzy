@@ -47,7 +47,6 @@ end
 
 --Quit Window
 function Scenes:Quit()
-cout("here")
 QuitScene()
 end
 
