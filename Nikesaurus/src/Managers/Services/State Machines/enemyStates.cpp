@@ -466,7 +466,7 @@ namespace NIKE {
 
 	}
 
-	void State::EnemyDeathState::playSFX(Entity::Type& entity, bool play_or_no)
+	void State::EnemyDeathState::playSFX([[maybe_unused]] Entity::Type& entity, bool play_or_no)
 	{
 		if (play_or_no) {
 			// Temporary hardcoded SFX

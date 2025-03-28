@@ -121,6 +121,9 @@ namespace NIKE {
 					
 					static bool is_spawn_portal = false;
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_H)) { is_spawn_portal = true; }
+					
+					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_G)) { resetHealth(); }
+					
 
 					// Portal animations and interactions
 					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
@@ -372,6 +375,19 @@ namespace NIKE {
 		}
 		// Setting max speed to lowered speed
 		max_speed = freeze_speed;
+	}
+
+	void GameLogic::Manager::resetHealth()
+	{
+		std::set<Entity::Type> players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+		for (auto player : players)
+		{
+			auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player);
+			if (health_comp.has_value())
+			{
+				health_comp.value().get().health = 100.0f;
+			}
+		}
 	}
 
 	void GameLogic::Manager::updateBGMCVolume() {
