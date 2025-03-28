@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0081",
+                            "Name": "entity_0963",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -222,7 +222,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0082",
+                            "Name": "entity_0964",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -346,7 +346,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0084",
+                            "Name": "entity_0966",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1211,7 +1211,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 14,
-                            "Name": "entity_0099",
+                            "Name": "entity_0981",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1505,7 +1505,7 @@
                                     "x": -428.064697265625,
                                     "y": -536.6420288085938
                                 },
-                                "Zoom": 1.0024311542510986
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1624,7 +1624,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0105",
+                            "Name": "entity_0987",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2090,7 +2090,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {

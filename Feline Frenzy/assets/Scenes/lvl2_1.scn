@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0385",
+                            "Name": "entity_1068",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1851,7 +1851,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 382.62896728515625,
+                                    "x": -680.0,
                                     "y": -993.6240844726563
                                 },
                                 "Rotation": 0.0,
@@ -2257,7 +2257,7 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 2,
+                                    "x": 0,
                                     "y": 0
                                 },
                                 "Frame_Size": {
@@ -2269,8 +2269,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -678.8020629882813,
-                                    "y": 356.9342956542969
+                                    "x": -680.0,
+                                    "y": 340.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {

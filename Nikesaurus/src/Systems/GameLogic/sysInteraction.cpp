@@ -11,6 +11,7 @@
 #include "Core/Engine.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Managers/Services/State Machine/bossEnemyStates.h"
+#include "Systems/Render/sysRender.h"
 
 namespace NIKE {
     namespace Interaction {
@@ -24,13 +25,64 @@ namespace NIKE {
 
             // Pause Menu
             if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-                pauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
+
+                // Get player tag
+                std::set<Entity::Type> player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+                // Prevent pausing when there is no player
+                if (player_tag.empty()) {
+                    return;
+                }
+
+                showPauseMenu = !showPauseMenu;
+
+                //Get all ecs systems
+                auto& systems = NIKE_ECS_MANAGER->getAllSystems();
+
+                static float saved_mouse_offset = 0.f;
+
                 if (showPauseMenu) {
-                    showPauseMenu = false;
+
+                    // Change cursor
+                    for (auto& player : player_tag) {
+                        const auto player_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(player);
+                        auto& cam = player_cam_comp.value().get();
+
+
+                        saved_mouse_offset = cam.mouse_offset;
+                        cam.mouse_offset = 0.f;
+                    }
+
+                    std::for_each(systems.begin(), systems.end(),
+                        [](std::shared_ptr<System::ISystem>& system) {
+                            if (system->getSysName() == "Physics System" || system->getSysName() == "Game Logic System") {
+                                system->setActiveState(false);
+                            }
+                        });
                 }
                 else {
-                    showPauseMenu = true;
+                    // Change cursor
+
+                    for (auto& player : player_tag) {
+                        const auto player_cam_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Cam>(player);
+                        auto& cam = player_cam_comp.value().get();
+
+                        cam.mouse_offset = saved_mouse_offset;
+                    }
+
+                    std::for_each(systems.begin(), systems.end(),
+                        [](std::shared_ptr<System::ISystem>& system) {
+                            system->setActiveState(true);
+
+                        });
+
                 }
+                pauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
+            }
+
+            if (showPauseMenu) {
+                return;
+            }
 
             // Player Tab Element Swapping
             std::set<Entity::Type> player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
@@ -187,7 +239,7 @@ namespace NIKE {
                 NIKE_UI_SERVICE->createButton(resume,
                     Transform::Transform(Vector2f(-10.0f, 120.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
                     Render::Text(),
-                    Render::Texture("UI_ResumeGame_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(6, 1)));
+                    Render::Texture("UI_ResumeGame_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
                 NIKE_UI_SERVICE->setButtonInputState(resume, UI::InputStates::TRIGGERED);
                 auto resume_hover_script = Lua::Script();
                 resume_hover_script.script_id = "menu_button.lua";
@@ -252,32 +304,13 @@ namespace NIKE {
 
             }
 
-            auto container_entity = NIKE_METADATA_SERVICE->getEntityByName(background_texture);
-            auto resume_entity = NIKE_METADATA_SERVICE->getEntityByName(resume);
-            auto options_entity = NIKE_METADATA_SERVICE->getEntityByName(options);
-            auto howtoplay_entity = NIKE_METADATA_SERVICE->getEntityByName(how_to_play);
-            auto quit_entity = NIKE_METADATA_SERVICE->getEntityByName(quit);
+            // Handle button visibility
+            auto& container_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(background_texture).value()).value().get();
+            auto& resume_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(resume).value()).value().get();
+            auto& options_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(options).value()).value().get();
+            auto& howtoplay_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(how_to_play).value()).value().get();
+            auto& quit_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(quit).value()).value().get();
 
-            auto container_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(container_entity.value());
-            auto resume_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(resume_entity.value());
-            auto options_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(options_entity.value());
-            auto howtoplay_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(howtoplay_entity.value());
-            auto quit_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(quit_entity.value());
-
-            if (!container_texture.has_value() || !resume_texture.has_value() || !options_texture.has_value() || !howtoplay_texture.has_value() || !quit_texture.has_value()) {
-                return;
-            }
-            auto& container_comp = container_texture.value().get();
-            auto& resume_comp = resume_texture.value().get();
-            auto& options_comp = options_texture.value().get();
-            auto& howtoplay_comp = howtoplay_texture.value().get();
-            auto& quit_comp = quit_texture.value().get();
-
-            container_comp.b_blend = true;
-            resume_comp.b_blend = true;
-            options_comp.b_blend = true;
-            howtoplay_comp.b_blend = true;
-            quit_comp.b_blend = true;
 
             NIKE_UI_SERVICE->setButtonDisabled(resume, !showPauseMenu);
             NIKE_UI_SERVICE->setButtonDisabled(options, !showPauseMenu);
@@ -798,42 +831,7 @@ namespace NIKE {
                 // Set player element to source element
                 player_element = source_element;
 
-                // Elemental UI 
-                for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
-
-                    const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
-
-                    // Set element ui to player's element
-                    if (elementui_texture.has_value())
-                    {
-                        //elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
-                        elementui_texture.value().get().frame_index.x = static_cast<int>(player_element);
-
-                        // Hardcoded af
-                        for (auto& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
-                            const auto e_container_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(hp_container);
-                            if (!e_container_texture.has_value()) {
-                                continue;
-                            }
-
-
-                            if (static_cast<int>(player_element) == 1) {
-                                e_container_texture.value().get().texture_id = "FireHealth_Bar.png";
-                            }
-                            else if (static_cast<int>(player_element) == 2) {
-                                e_container_texture.value().get().texture_id = "WaterHealth_Bar.png";
-                            }
-                            else if (static_cast<int>(player_element) == 3) {
-                                e_container_texture.value().get().texture_id = "GrassHealth_Bar.png";
-                            }
-                            else {
-                                e_container_texture.value().get().texture_id = "Healthbar_base.png";
-                            }
-
-
-                        }
-                    }
-                }
+                // Elemental UI removed and added back to update
 
                 // !TODO: Play element change animation here
             }
