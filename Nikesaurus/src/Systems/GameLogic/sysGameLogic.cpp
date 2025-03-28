@@ -35,6 +35,7 @@ namespace NIKE {
 
 				//Skip entity not registered to this system
 				if (entities.find(entity) == entities.end()) continue;
+			
 
 				// Main Menu Background Scrolling
 				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "main_menu.scn") {
