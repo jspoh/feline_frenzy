@@ -124,7 +124,7 @@ namespace NIKE {
             }
 
             //Update vertices function
-            auto updateVertices = [&e_collider, e_transform](std::vector<Assets::Vertex> const& vertices) {
+            auto updateVertices = [&e_collider](std::vector<Assets::Vertex> const& vertices) {
 
                 //Clear all vertices
                 e_collider.vertices.clear();
@@ -144,10 +144,10 @@ namespace NIKE {
                 }
 
                 for (auto& point : e_collider.vertices) {
-                    point.x *= (e_transform.scale.x * scale_factor.x);
-                    point.y *= (e_transform.scale.y * scale_factor.y);
-                    point.x += (e_transform.position.x * scale_factor.x);
-                    point.y -= (e_transform.position.y * scale_factor.y);
+                    point.x *= (e_collider.transform.scale.x * scale_factor.x);
+                    point.y *= (e_collider.transform.scale.y * scale_factor.y);
+                    point.x += (e_collider.transform.position.x * scale_factor.x);
+                    point.y -= (e_collider.transform.position.y * scale_factor.y);
 
                     //Translate model to world coordinates
                     point.x += (window_size.x / 2.0f);
