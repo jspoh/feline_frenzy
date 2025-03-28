@@ -311,12 +311,12 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 22.862274169921875,
-                                    "y": -214.9755859375
+                                    "y": -204.731689453125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 345.5222473144531,
-                                    "y": 58.280860900878906
+                                    "x": 327.9312438964844,
+                                    "y": 55.31370544433594
                                 },
                                 "Screen Position": true
                             }
@@ -432,13 +432,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 22.170486450195313,
-                                    "y": -143.3545379638672
+                                    "x": 22.0,
+                                    "y": -136.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 315.24249267578125,
-                                    "y": 59.89607238769531
+                                    "x": 285.33050537109375,
+                                    "y": 54.21279525756836
                                 },
                                 "Screen Position": true
                             }
@@ -549,12 +549,12 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 22.862274169921875,
-                                    "y": -364.9756164550781
+                                    "y": -388.3902893066406
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 272.1745910644531,
-                                    "y": 56.173622131347656
+                                    "x": 276.49090576171875,
+                                    "y": 57.064456939697266
                                 },
                                 "Screen Position": true
                             }
@@ -669,12 +669,12 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 24.889373779296875,
-                                    "y": -289.9756164550781
+                                    "y": -269.4878234863281
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 215.9463348388672,
-                                    "y": 58.710411071777344
+                                    "x": 208.49688720703125,
+                                    "y": 56.68509292602539
                                 },
                                 "Screen Position": true
                             }
@@ -710,6 +710,122 @@
                             }
                         },
                         "UI ID": "options_btn"
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuYesOpen.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Font_ID": "",
+                                "Origin": 0,
+                                "Scale": 1.0,
+                                "Size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "CreditsButton_UI.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 18.808319091796875,
+                                    "y": -330.8522644042969
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 188.228759765625,
+                                    "y": 60.0730094909668
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 4,
+                            "Name": "credits_btn",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "credits.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "Change",
+                                    "Update_Function": ""
+                                },
+                                "OnHover": {
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "HoverButton"
+                                }
+                            }
+                        },
+                        "UI ID": "credits_btn"
                     }
                 }
             ],

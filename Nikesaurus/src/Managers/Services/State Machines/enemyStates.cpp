@@ -414,9 +414,15 @@ namespace NIKE {
 	void State::EnemyDeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
 		// Stop enemy from moving
 		auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		auto animation = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 		if (dynamics.has_value()) {
 
 			dynamics.value().get().max_speed = { 0.0f };
+		}
+		if (animation.has_value())
+		{
+			// Set death animation frame duration
+			animation.value().get().frame_duration = 0.03f;
 		}
 
 		// Play EnemyDeathState animation
