@@ -278,6 +278,8 @@ namespace NIKE {
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}
 		}
+		// Update BGMC volume
+		updateBGMCVolume();
 	}
 
 	void GameLogic::Manager::updateStatusEffects(Entity::Type entity) {
@@ -387,6 +389,47 @@ namespace NIKE {
 		max_speed = freeze_speed;
 	}
 
+	void GameLogic::Manager::updateBGMCVolume() {
+		// Get the current enemy entities.
+		std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
+
+		// Get the BGMC channel group.
+		auto bgmcGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMCChannelGroupID());
+		if (!bgmcGroup) {
+			NIKEE_CORE_ERROR("updateBGMCVolume: BGMC channel group not found!");
+			return;
+		}
+
+		// Retrieve current BGMC volume and the target volume (using the global BGM volume).
+		float currentVolume = bgmcGroup->getVolume();
+		float targetVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
+
+		// Define the fade duration (in seconds) and compute the fade rate.
+		const float fadeTime = 1.5f;
+		float fadeRate = targetVolume / fadeTime;
+		float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
+		float fadeAmount = fadeRate * delta;
+
+		if (!enemy_tags.empty()) {
+			// Enemies are present: fade in.
+			float newVolume = currentVolume + fadeAmount;
+			if (newVolume > targetVolume) {
+				newVolume = targetVolume;
+			}
+			bgmcGroup->setVolume(newVolume);
+			NIKEE_CORE_INFO("Fading in BGMC, volume = {}", newVolume);
+		}
+		else {
+			// No enemies: fade out.
+			float newVolume = currentVolume - fadeAmount;
+			if (newVolume < 0.01f) {
+				newVolume = 0.01f;  // Minimal audible level
+			}
+			bgmcGroup->setVolume(newVolume);
+			NIKEE_CORE_INFO("Fading out BGMC, volume = {}", newVolume);
+		}
+	}
+
 
 	void GameLogic::Manager::gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
 	{
@@ -449,7 +492,7 @@ namespace NIKE {
 					if (Interaction::isWithinWorldRange(vent, player) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
 						// Save player data
 						NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
-						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", "SFX", 1.f, 0.5f, false, false);
+						NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false);
 
 						// Lvl counters to reduce hardcoded
 						static int level_counter = 1;
@@ -501,7 +544,7 @@ namespace NIKE {
 					continue;
 				}
 
-				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", "SFX", 1.f, 1.f, false, false);
+				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume() , 1.f, false, false);
 				
 				// If is level 2_2, change the sprite to portal door
 				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png") && 
@@ -538,6 +581,8 @@ namespace NIKE {
 	void GameLogic::Manager::spawnEnemy(const Entity::Type& spawner) {
 		// Get spawner position
 		const auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(spawner);
+		const auto enemy_element = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(spawner).value().get().enemy_element;
+
 		if (!e_transform_comp.has_value()) {
 			NIKEE_CORE_WARN("spawnEnemy: SPAWNER missing Transform Component, enemy not spawned");
 			return;
@@ -547,7 +592,7 @@ namespace NIKE {
 		// Create enemy entity
 		Entity::Type enemy_entity = NIKE_ECS_MANAGER->createEntity();
 
-		// When enemy spwan from spawner, set the tag to enemy
+		// When enemy spawn from spawner, set the tag to enemy
 		if(NIKE_METADATA_SERVICE->isTagValid("enemy") && !NIKE_METADATA_SERVICE->checkEntityTagExist(enemy_entity)){
 			NIKE_METADATA_SERVICE->addEntityTag(enemy_entity, "enemy");
 		}
@@ -570,7 +615,14 @@ namespace NIKE {
 		}
 		else
 		{
-			chosen_enemy = enemyArr[getRandomNumber(1, 3)];
+			// Random enemy spawn
+			if (enemy_element == Element::Elements::NONE) {
+				chosen_enemy = enemyArr[getRandomNumber(1, 3)];
+			}
+			else {
+				// Spawn enemy of chosen element
+				chosen_enemy = enemyArr[static_cast<int>(enemy_element)];
+			}
 		}
 
 

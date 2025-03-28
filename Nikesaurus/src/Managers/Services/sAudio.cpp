@@ -15,11 +15,6 @@
 #include "Managers/Services/Assets/sAssets.h"
 
 namespace NIKE {
-	// Define the global volume variables.
-	namespace Audio {
-		float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
-		float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
-	}
 
 	/*****************************************************************//**
 	* NIKE AUDIO
@@ -490,9 +485,12 @@ namespace NIKE {
 
 			bgm_channel_group_id = data.value("BGM Channel Group", "BGM");
 			sfx_channel_group_id = data.value("SFX Channel Group", "SFX");
+			bgmc_channel_group_id = data.value("BGMC Channel Group", "BGMC");
 
 			createChannelGroup(bgm_channel_group_id);
 			createChannelGroup(sfx_channel_group_id);
+			createChannelGroup(bgmc_channel_group_id);
+
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -558,7 +556,7 @@ namespace NIKE {
 		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
 
 			//Skip static channels groups
-			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id) {
+			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id || it->first == bgmc_channel_group_id) {
 				++it;
 				continue;
 			}
@@ -651,6 +649,10 @@ namespace NIKE {
 		return sfx_channel_group_id;
 	}
 
+	std::string Audio::Service::getBGMCChannelGroupID() const {
+		return bgmc_channel_group_id;
+	}
+
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
 
 		// Retrieve audio asset
@@ -684,32 +686,26 @@ namespace NIKE {
 
 	}
 
-	// Modified setGlobalVolume function.
-	// This function now updates the global volume variables and then applies them to the static BGM and SFX groups.
-	void Audio::Service::setGlobalVolume(float bgmVolume, float sfxVolume) {
-		gGlobalBGMVolume = bgmVolume;
-		gGlobalSFXVolume = sfxVolume;
-		// Set volume for the static BGM group.
+	float Audio::Service::getGlobalBGMVolume() const{
+		return gGlobalBGMVolume;
+	}
+
+	void Audio::Service::setGlobalBGMVolume(float vol) {
+		gGlobalBGMVolume = vol;
+
 		auto bgmGroup = getChannelGroup(bgm_channel_group_id);
 		if (bgmGroup) {
 			bgmGroup->setVolume(gGlobalBGMVolume);
-		}
-
-		// Set volume for the static SFX group.
-		auto sfxGroup = getChannelGroup(sfx_channel_group_id);
-		if (sfxGroup) {
-			sfxGroup->setVolume(gGlobalSFXVolume);
 		}
 	}
 
-	// New function to update global volumes using the global variables.
-	void Audio::Service::updateGlobalVolumes() {
-		// Update the BGM channel group volume.
-		auto bgmGroup = getChannelGroup(bgm_channel_group_id);
-		if (bgmGroup) {
-			bgmGroup->setVolume(gGlobalBGMVolume);
-		}
-		// Update the SFX channel group volume.
+	float Audio::Service::getGlobalSFXVolume() const{
+		return gGlobalSFXVolume;
+	}
+
+	void Audio::Service::setGlobalSFXVolume(float vol) {
+		gGlobalSFXVolume = vol;
+
 		auto sfxGroup = getChannelGroup(sfx_channel_group_id);
 		if (sfxGroup) {
 			sfxGroup->setVolume(gGlobalSFXVolume);
@@ -853,7 +849,7 @@ namespace NIKE {
 		}
 	}
 
-	// NEW: Implementation for getBGMTrackForScene()
+	// Implementation for getBGMTrackForScene()
 	std::string Audio::Service::getBGMTrackForScene() {
 		std::string currentBGMTrack = "";
 		auto currentPlaylist = this->getChannelPlaylist(this->getBGMChannelGroupID());
@@ -861,6 +857,16 @@ namespace NIKE {
 			currentBGMTrack = currentPlaylist.tracks.front();
 		}
 		return currentBGMTrack;
+	}
+
+	// BGMC track getter
+	std::string Audio::Service::getBGMCTrackForScene() {
+		std::string currentBGMCTrack = "";
+		auto currentPlaylist = this->getChannelPlaylist(this->getBGMCChannelGroupID());
+		if (!currentPlaylist.tracks.empty()) {
+			currentBGMCTrack = currentPlaylist.tracks.front();
+		}
+		return currentBGMCTrack;
 	}
 
 }

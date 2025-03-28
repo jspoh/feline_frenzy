@@ -21,6 +21,22 @@ namespace NIKE {
 
         void Manager::update() {
 
+            // Player Tab Element Swapping
+            std::set<Entity::Type> player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+            for (auto& player : player_tag) {
+                const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+                auto& player_element = player_element_comp.value().get();
+
+                if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_R)) {
+                    if (player_element.element == Element::Elements::GRASS) {
+                        player_element.element = Element::Elements::FIRE;
+                    }
+                    else {
+                        player_element.element = static_cast<Element::Elements>(static_cast<int>(player_element.element) + 1);
+                    }
+                }
+            }
+
             // When hitting objects
             for (auto& [entity, isHit] : hitEntities) {
                 if (!isHit) continue; // Skip objects that haven't been hit
@@ -29,7 +45,6 @@ namespace NIKE {
                 if (!texture_comp) continue;
 
                 auto& intensity = texture_comp.value().get().intensity;
-                cout << intensity << endl;
                 float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
                 intensity += (0.0f - intensity) * alpha_speed; // Fade towards 0
@@ -123,7 +138,7 @@ namespace NIKE {
                                 }
                             }
 
-                            
+
                         }
                     }
                 }
@@ -301,59 +316,6 @@ namespace NIKE {
             return INT_MAX;
         }
 
-        // what even is this function for????
-        // Testing playing 1 custom SFX
-        void playOneShotSFX(Entity::Type& entity,
-            const std::string& custom_audio_id,
-            const std::string& custom_channel_group_id,
-            float custom_volume,
-            float custom_pitch)
-        {
-            // Retrieve the SFX component.
-            auto compOpt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-            if (!compOpt.has_value()) {
-                //NIKEE_CORE_WARN("playOneShotSFX: Entity {} does not have an Audio::SFX component.", entity);
-                return;
-            }
-            auto& comp = compOpt.value().get();
-
-            // Optionally, make a copy of the current settings if you need to revert later.
-            Audio::SFX original = comp;
-
-            // Overwrite the component with custom parameters.
-            comp.b_play_sfx = true;
-            comp.audio_id = custom_audio_id;
-            comp.channel_group_id = custom_channel_group_id;
-            comp.volume = custom_volume;
-            comp.pitch = custom_pitch;
-
-            // Retrieve the channel group.
-            auto group = NIKE_AUDIO_SERVICE->getChannelGroup(custom_channel_group_id);
-            if (!group) {
-                //NIKEE_CORE_WARN("playOneShotSFX: Channel group '{}' not found for entity {}.", custom_channel_group_id, entity);
-                comp = original; // Revert changes
-                return;
-            }
-
-            // Force unpause the group (if necessary).
-            group->setPaused(false);
-
-            // Play the sound using the audio service.
-            // (Here we assume playAudio() will trigger the sound immediately.)
-            NIKE_AUDIO_SERVICE->playAudio(custom_audio_id, "", custom_channel_group_id, custom_volume, custom_pitch, false, false);
-
-            // Log the result.
-            if (group->isPlaying()) {
-                //NIKEE_CORE_INFO("playOneShotSFX: Custom SFX '{}' is playing on channel '{}'.", custom_audio_id, custom_channel_group_id);
-            }
-            else {
-                //NIKEE_CORE_WARN("playOneShotSFX: Custom SFX '{}' did not start playing for entity {}.", custom_audio_id, entity);
-            }
-
-            // Revert the component back to its original settings.
-            comp = original;
-        }
-
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
@@ -413,7 +375,7 @@ namespace NIKE {
 
                 target_health += healer_heal;
                 // Temporary hardcoded SFX
-                playOneShotSFX(target, "HealSFX.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+                NIKE_AUDIO_SERVICE->playAudio("HealSFX.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
             }
         }
 
@@ -485,7 +447,8 @@ namespace NIKE {
             if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
             {
                 // Temporary hardcoded SFX
-                Interaction::playOneShotSFX(target, "EnemyGetHit2.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+                NIKE_AUDIO_SERVICE->playAudio("EnemyGetHit2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+                // Set entity hit boolean to true
                 hitEntities[target] = true;
 
                 // Set intensity to max (1.0f) when hit
@@ -495,9 +458,24 @@ namespace NIKE {
                 texture_comp.value().get().intensity = 1.0f;
 
             }
-            else if (target_entity_tags.find("objects") != target_entity_tags.end()) {
-                Interaction::playOneShotSFX(target, "MetalHit1.wav", "EnvironmentSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+            else if ((target_entity_tags.find("boss") != target_entity_tags.end())) { // Entity is a boss
+                NIKE_AUDIO_SERVICE->playAudio("MetalHit1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
+                // Set entity hit boolean to true
+                hitEntities[target] = true;
+
+                // Set intensity to max (1.0f) when hit
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(target);
+                if (!texture_comp) return;
+
+                texture_comp.value().get().intensity = 1.0f;
+
+            }
+            else if (target_entity_tags.find("objects") != target_entity_tags.end()) { // Entity is an object
+                NIKE_AUDIO_SERVICE->playAudio("MetalHit1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+
+
+                // Set entity hit boolean to true
                 hitEntities[target] = true;
 
                 // Set intensity to max (1.0f) when hit
@@ -516,7 +494,7 @@ namespace NIKE {
             auto tags = NIKE_METADATA_SERVICE->getEntityTags(target);
             if (base_comp.has_value() && sprite_comp.has_value()) {
 
-                // If entities are not boss
+                // If entities are a not boss
                 if (tags.find("boss") == tags.end())
                 {
                     auto& base = base_comp.value().get();

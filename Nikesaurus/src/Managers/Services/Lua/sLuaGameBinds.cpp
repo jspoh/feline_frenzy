@@ -308,7 +308,7 @@ namespace NIKE {
                 e_trans_comp.value().get().position.y = y;
             }
             // Temporary hardcoded SFX
-            Interaction::playOneShotSFX(entity, "EnemySpawn1.wav", "EnemySFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+            NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
             });
 
         // Player EnemyDeathState annimation function
@@ -324,7 +324,8 @@ namespace NIKE {
 
                 // If health has decreased, play the damage-taken SFX and update prevHealth.
                 if (health.health < prevHealth) {
-                    Interaction::playOneShotSFX(entity, "TakeDamageMeow2.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+
+                    NIKE_AUDIO_SERVICE->playAudio("TakeDamageMeow2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                     prevHealth = health.health;
                 }
                 else {
@@ -336,7 +337,7 @@ namespace NIKE {
                 if (health_comp.value().get().lives <= 0)
                 {
                     // Temporary hardcoded SFX
-                    Interaction::playOneShotSFX(entity, "PlayerDeathMeow2.wav", "PlayerSFX", NIKE::Audio::gGlobalSFXVolume, 1.0f);
+                    NIKE_AUDIO_SERVICE->playAudio("PlayerDeathMeow2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                     Interaction::gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
                     // Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
                     float secondsToDelay = 0.5f;
@@ -373,35 +374,31 @@ namespace NIKE {
 
          // Bind slider arrow functions for adjusting global BGM volume.
         lua_state.set_function("SliderArrowLeft", [&]() {
-            float currentVolume = NIKE::Audio::gGlobalBGMVolume;
+            float currentVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
             float newVolume = Utility::getMax(0.0f, currentVolume - 0.05f);
-            NIKE::Audio::gGlobalBGMVolume = newVolume;
-            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_AUDIO_SERVICE->setGlobalBGMVolume(newVolume);
             NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         lua_state.set_function("SliderArrowRight", [&]() {
-            float currentVolume = NIKE::Audio::gGlobalBGMVolume;
+            float currentVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
             float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
-            NIKE::Audio::gGlobalBGMVolume = newVolume;
-            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_AUDIO_SERVICE->setGlobalBGMVolume(newVolume);
             NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         // Bind slider arrow functions for adjusting global SFX volume.
         lua_state.set_function("SfxSliderArrowLeft", [&]() {
-            float currentVolume = NIKE::Audio::gGlobalSFXVolume;
+            float currentVolume = NIKE_AUDIO_SERVICE->getGlobalSFXVolume();
             float newVolume = Utility::getMax(0.0f, currentVolume - 0.05f);
-            NIKE::Audio::gGlobalSFXVolume = newVolume;
-            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newVolume);
             NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         lua_state.set_function("SfxSliderArrowRight", [&]() {
-            float currentVolume = NIKE::Audio::gGlobalSFXVolume;
+            float currentVolume = NIKE_AUDIO_SERVICE->getGlobalSFXVolume();
             float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
-            NIKE::Audio::gGlobalSFXVolume = newVolume;
-            NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+            NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newVolume);
             NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
@@ -433,7 +430,7 @@ namespace NIKE {
 
         //Play audio
         lua_state.set_function("PlayAudio", [&](std::string const& audio_id) {
-            NIKE_AUDIO_SERVICE->playAudio(audio_id, "", "SFX", 1.f, 1.f, false, false);
+            NIKE_AUDIO_SERVICE->playAudio(audio_id, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
             });
 
         // Set SFX list from script
@@ -451,18 +448,6 @@ namespace NIKE {
                     }
                 }
             }
-            });
-
-        // Play SFX once...
-        lua_state.set_function("PlayCustomSFXOnce", [&](Entity::Type entity,
-            std::string custom_audio_id,
-            std::string custom_channel_group_id,
-            float custom_volume,
-            float custom_pitch) {
-                NIKEE_CORE_INFO("Binding: PlayCustomSFXOnce called with audio '{}' on channel '{}' (vol: {}, pitch: {}).",
-                    custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
-
-                Interaction::playOneShotSFX(entity, custom_audio_id, custom_channel_group_id, custom_volume, custom_pitch);
             });
 
         /*****************************************************************//**

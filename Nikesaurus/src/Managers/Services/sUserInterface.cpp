@@ -636,8 +636,7 @@ namespace NIKE {
 							// Compute new BGM volume.
 							float newBGMVol = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
 							newBGMVol = std::clamp(newBGMVol, 0.0f, 1.0f);
-							NIKE_AUDIO_SERVICE->setGlobalVolume(newBGMVol, NIKE::Audio::gGlobalSFXVolume);
-							NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+							NIKE_AUDIO_SERVICE->setGlobalBGMVolume(newBGMVol);
 						}
 					}
 				}
@@ -702,8 +701,7 @@ namespace NIKE {
 							// Compute new SFX volume.
 							float newSFXVol = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
 							newSFXVol = std::clamp(newSFXVol, 0.0f, 1.0f);
-							NIKE_AUDIO_SERVICE->setGlobalVolume(NIKE::Audio::gGlobalBGMVolume, newSFXVol);
-							NIKE_AUDIO_SERVICE->updateGlobalVolumes();
+							NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newSFXVol);
 						}
 					}
 				}
@@ -740,7 +738,7 @@ namespace NIKE {
 				float barRight = barRightFull - margin;
 
 				// Update slider position based on the current global BGM volume.
-				sliderTransform.position.x = barLeft + (NIKE::Audio::gGlobalBGMVolume * (barRight - barLeft));
+				sliderTransform.position.x = barLeft + (NIKE_AUDIO_SERVICE->getGlobalBGMVolume() * (barRight - barLeft));
 			}
 		}
 
@@ -769,7 +767,7 @@ namespace NIKE {
 				float barRight = barRightFull - margin;
 
 				// Update slider position based on the current global SFX volume.
-				sliderTransform.position.x = barLeft + (NIKE::Audio::gGlobalSFXVolume * (barRight - barLeft));
+				sliderTransform.position.x = barLeft + (NIKE_AUDIO_SERVICE->getGlobalSFXVolume() * (barRight - barLeft));
 			}
 		}
 	}
