@@ -262,6 +262,8 @@ namespace NIKE {
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}
 		}
+		// Update BGMC volume
+		updateBGMCVolume();
 	}
 
 	void GameLogic::Manager::updateStatusEffects(Entity::Type entity) {
@@ -369,6 +371,47 @@ namespace NIKE {
 		}
 		// Setting max speed to lowered speed
 		max_speed = freeze_speed;
+	}
+
+	void GameLogic::Manager::updateBGMCVolume() {
+		// Get the current enemy entities.
+		std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
+
+		// Get the BGMC channel group.
+		auto bgmcGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMCChannelGroupID());
+		if (!bgmcGroup) {
+			NIKEE_CORE_ERROR("updateBGMCVolume: BGMC channel group not found!");
+			return;
+		}
+
+		// Retrieve current BGMC volume and the target volume (using the global BGM volume).
+		float currentVolume = bgmcGroup->getVolume();
+		float targetVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
+
+		// Define the fade duration (in seconds) and compute the fade rate.
+		const float fadeTime = 1.5f;
+		float fadeRate = targetVolume / fadeTime;
+		float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
+		float fadeAmount = fadeRate * delta;
+
+		if (!enemy_tags.empty()) {
+			// Enemies are present: fade in.
+			float newVolume = currentVolume + fadeAmount;
+			if (newVolume > targetVolume) {
+				newVolume = targetVolume;
+			}
+			bgmcGroup->setVolume(newVolume);
+			NIKEE_CORE_INFO("Fading in BGMC, volume = {}", newVolume);
+		}
+		else {
+			// No enemies: fade out.
+			float newVolume = currentVolume - fadeAmount;
+			if (newVolume < 0.01f) {
+				newVolume = 0.01f;  // Minimal audible level
+			}
+			bgmcGroup->setVolume(newVolume);
+			NIKEE_CORE_INFO("Fading out BGMC, volume = {}", newVolume);
+		}
 	}
 
 
