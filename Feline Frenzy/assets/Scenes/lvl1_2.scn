@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0426",
+                            "Name": "entity_0085",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -257,7 +257,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0428",
+                            "Name": "entity_0087",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -279,6 +279,35 @@
                                     }
                                 },
                                 "MetaData": null
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 4,
+                            "Name": "player_shadow",
+                            "Parent": "player",
+                            "Prefab_ID": "player_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "player"
+                                }
                             },
                             "Tags": []
                         }
