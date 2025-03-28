@@ -160,21 +160,9 @@ namespace NIKE {
 								if (!e_container_texture.has_value()) {
 									continue;
 								}
+								e_container_texture.value().get().frame_index.x = element_state;
 
-
-								if (element_state == 1) {
-									e_container_texture.value().get().texture_id = "FireHealth_Bar.png";
-								}
-								else if (element_state == 2) {
-									e_container_texture.value().get().texture_id = "WaterHealth_Bar.png";
-								}
-								else if (element_state == 3) {
-									e_container_texture.value().get().texture_id = "GrassHealth_Bar.png";
-								}
-								else {
-									e_container_texture.value().get().texture_id = "Healthbar_base.png";
-								}
-
+							
 
 							}
 						}

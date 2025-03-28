@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0052",
+                            "Name": "entity_0804",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1835,11 +1835,11 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 4,
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "Healthbar_base.png"
+                                "Texture_ID": "HealthBar_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1848,8 +1848,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 150.0,
-                                    "y": 128.0
+                                    "x": 158.0,
+                                    "y": 64.77017974853516
                                 },
                                 "Screen Position": false
                             }
@@ -1955,8 +1955,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 512.0,
-                                    "y": 256.0
+                                    "x": 269.0724792480469,
+                                    "y": 134.53623962402344
                                 },
                                 "Screen Position": false
                             }

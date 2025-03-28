@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0010",
+                            "Name": "entity_0613",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -275,7 +275,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0012",
+                            "Name": "entity_0615",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -288,7 +288,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0013",
+                            "Name": "entity_0616",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -719,8 +719,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 104.50702667236328,
-                                    "y": 139.99998474121094
+                                    "x": 80.48863220214844,
+                                    "y": 155.05899047851563
                                 },
                                 "Screen Position": false
                             }
@@ -865,7 +865,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 11,
-                            "Name": "entity_0025",
+                            "Name": "entity_0629",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1301,7 +1301,7 @@
                                     "x": -428.064697265625,
                                     "y": -536.6420288085938
                                 },
-                                "Zoom": 1.0
+                                "Zoom": 1.0012085437774658
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1362,7 +1362,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0034",
+                            "Name": "entity_0638",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1793,21 +1793,21 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 4,
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "Healthbar_base.png"
+                                "Texture_ID": "HealthBar_spritesheet.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -7.800000190734863,
-                                    "y": 86.0
+                                    "x": -9.61444091796875,
+                                    "y": 80.5264892578125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 150.0,
-                                    "y": 128.0
+                                    "x": 158.0,
+                                    "y": 64.77017974853516
                                 },
                                 "Screen Position": false
                             }
