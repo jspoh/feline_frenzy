@@ -129,32 +129,12 @@ namespace NIKE {
 					}
 				}
 
-				// Elemental UI 
-				for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
-					// If player not dead
-					if (player_entities.empty()) {
-						continue;
-					}
-
-					// Look for player
-					for (auto& player : player_entities) {
-						const auto player_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
-						const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
-
-						// Set element ui to player's element
-						if (elementui_texture.has_value())
-						{
-							//elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
-							elementui_texture.value().get().frame_index.x = static_cast<int>(player_element.value().get().element);
-						}
-					}
-				}			
 
 				// Health bar logic
 				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
-					// If no player exists, destroy the health bar
+
 					if (player_entities.empty()) {
-						//NIKE_ECS_MANAGER->destroyEntity(healthbar);
+
 						return;
 					}
 

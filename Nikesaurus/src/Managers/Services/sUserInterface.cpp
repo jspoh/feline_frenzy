@@ -23,12 +23,14 @@ namespace NIKE {
 		}
 
 		return {
+			{"Disabled", b_disabled},
 			{"Input_State", static_cast<int>(input_state)},
 			{"Scripts", script_data} // Store all scripts
 		};
 	}
 
 	void UI::UIBtn::deserialize(nlohmann::json const& data) {
+		b_disabled = data.value("Disabled", false);
 		input_state = data.value("Input_State", UI::InputStates::TRIGGERED);
 
 		if (data.contains("Scripts")) {
@@ -242,11 +244,19 @@ namespace NIKE {
 			NIKE_SCENES_SERVICE->createLayer();
 		}
 
+		if (!NIKE_METADATA_SERVICE->isNameValid(btn_id)) {
+			NIKEE_CORE_ERROR("Button has already been created");
+			return uint16_t(-1);
+		}
+
+
 		//Place always place UI entity at the top layer
 		UIBtn btn;
 		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityName(btn.entity_id, btn_id);
 		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
+		btn.b_disabled = false;
 		ui_entities[btn_id] = btn;
 
 		//Add components for UI
@@ -276,11 +286,18 @@ namespace NIKE {
 			NIKE_SCENES_SERVICE->createLayer();
 		}
 
+		if (!NIKE_METADATA_SERVICE->isNameValid(btn_id)) {
+			NIKEE_CORE_ERROR("Button has already been created");
+			return uint16_t(-1);
+		}
+
 		//Place always place UI entity at the top layer
 		UIBtn btn;
 		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityName(btn.entity_id, btn_id);
 		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
+		btn.b_disabled = false;
 		ui_entities[btn_id] = btn;
 
 		//Add components for UI
@@ -321,6 +338,15 @@ namespace NIKE {
 
 		//Erase button
 		it = ui_entities.erase(it);
+	}
+	void UI::Service::setButtonDisabled(std::string const& btn_id, bool disable) {
+		//Check if button exists
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button doesnt exist.");
+		}
+
+		it->second.b_disabled = disable;
 	}
 
 	bool UI::Service::isButtonHovered(std::string const& btn_id) const {
@@ -381,6 +407,14 @@ namespace NIKE {
 
 	std::unordered_map<std::string, UI::UIBtn>& UI::Service::getAllButtons() {
 		return ui_entities;
+	}
+
+	UI::UIBtn* UI::Service::getButton(const std::string& buttonName) {
+		auto it = ui_entities.find(buttonName);
+		if (it != ui_entities.end()) {
+			return &(it->second); // Return a pointer to the button if found
+		}
+		return nullptr; // Return nullptr if button not found
 	}
 
 	void UI::Service::destroyAllButtons() {
@@ -470,6 +504,10 @@ namespace NIKE {
 				return;
 			}
 #endif
+			if (entity.b_disabled) {
+				continue;
+			}
+
 			// Reset all input checks once per frame
 			for (auto& input : input_checks) {
 				input.second.first = false;

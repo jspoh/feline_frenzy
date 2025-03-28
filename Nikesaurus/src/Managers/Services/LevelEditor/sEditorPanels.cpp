@@ -5514,6 +5514,13 @@ namespace NIKE {
 			//Collapsing button
 			if (ImGui::CollapsingHeader(std::string("Button: " + button_name).c_str(), ImGuiTreeNodeFlags_None)) {
 
+				// Enable / Disable button
+				bool disable_button = button.b_disabled;
+				if (ImGui::Checkbox(std::string("Disable Button##" + button_name).c_str(), &disable_button)) {
+					button.b_disabled = disable_button; // Flip the state correctly
+				}
+
+
 				//Set trigger state
 				{
 					//Select Input State

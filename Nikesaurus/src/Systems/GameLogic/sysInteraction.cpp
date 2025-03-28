@@ -16,10 +16,23 @@ namespace NIKE {
     namespace Interaction {
 
         void Manager::init() {
+            showPauseMenu = false;
 
         }
 
         void Manager::update() {
+
+            // Pause Menu
+            if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+                pauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
+                if (showPauseMenu) {
+                    showPauseMenu = false;
+                }
+                else {
+                    showPauseMenu = true;
+                }
+
+            }
 
             // When hitting objects
             for (auto& [entity, isHit] : hitEntities) {
@@ -129,6 +142,153 @@ namespace NIKE {
             }
         }
 
+        /*****************************************************************//**
+         * UI Interactions
+         *********************************************************************/
+
+
+        void pauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& options, const std::string& how_to_play, const std::string& quit)
+        {
+
+            if (!NIKE_METADATA_SERVICE->getEntityByName(background_texture)) {
+                // Create the overlay entity
+                auto overlay_entity = NIKE_ECS_MANAGER->createEntity();
+                NIKE_METADATA_SERVICE->setEntityLayerID(overlay_entity, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+                NIKE_METADATA_SERVICE->setEntityName(overlay_entity, background_texture);
+                NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(
+                    overlay_entity, Render::Texture(background_texture, Vector4f(), true));
+
+                // Get viewport size and adjust transform
+                auto viewport = NIKE_WINDOWS_SERVICE->getWindow()->getViewportSize();
+                NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(
+                    overlay_entity, Transform::Transform(
+                        Vector2f(0.0f, 0.0f),
+                        viewport * (NIKE_CAMERA_SERVICE->getCameraHeight() / viewport.y),
+                        0.0f,
+                        true));
+            }
+
+            if (!NIKE_METADATA_SERVICE->getEntityByName(resume)) {
+                // Create Resume button
+                NIKE_UI_SERVICE->createButton(resume,
+                    Transform::Transform(Vector2f(-10.0f, 120.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
+                    Render::Text(),
+                    Render::Texture("UI_ResumeGame_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(6, 1)));
+                NIKE_UI_SERVICE->setButtonInputState(resume, UI::InputStates::TRIGGERED);
+                auto resume_hover_script = Lua::Script();
+                resume_hover_script.script_id = "menu_button.lua";
+                resume_hover_script.update_function = "HoverButton";
+                resume_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
+                NIKE_UI_SERVICE->setButtonScript(resume, resume_hover_script, "OnHover");
+            }
+
+
+            if (!NIKE_METADATA_SERVICE->getEntityByName(options)) {
+                // Create Option button
+
+                NIKE_UI_SERVICE->createButton(options,
+                    Transform::Transform(Vector2f(-10.0f, 45.0f), Vector2f(210.0f, 55.0f), 0.0f, true),
+                    Render::Text(),
+                    Render::Texture("UI_Options_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
+                NIKE_UI_SERVICE->setButtonInputState(options, UI::InputStates::TRIGGERED);
+
+                auto options_hover_script = Lua::Script();
+                options_hover_script.script_id = "menu_button.lua";
+                options_hover_script.update_function = "HoverButton";
+                options_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
+                NIKE_UI_SERVICE->setButtonScript(options, options_hover_script, "OnHover");
+            }
+
+            if (!NIKE_METADATA_SERVICE->getEntityByName(how_to_play)) {
+                // Create How to play button
+                NIKE_UI_SERVICE->createButton(how_to_play,
+                    Transform::Transform(Vector2f(-10.0f, -25.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
+                    Render::Text(),
+                    Render::Texture("UI_HowToPlayButton_Spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
+
+                NIKE_UI_SERVICE->setButtonInputState(how_to_play, UI::InputStates::TRIGGERED);
+
+                auto how_to_play_hover_script = Lua::Script();
+                how_to_play_hover_script.script_id = "menu_button.lua";
+                how_to_play_hover_script.update_function = "HoverButton";
+                how_to_play_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
+                NIKE_UI_SERVICE->setButtonScript(how_to_play, how_to_play_hover_script, "OnHover");
+
+            }
+            if (!NIKE_METADATA_SERVICE->getEntityByName(quit)) {
+                // Create Quit button
+                NIKE_UI_SERVICE->createButton(quit,
+                    Transform::Transform(Vector2f(-10.0f, -95.0f), Vector2f(245.0f, 55.0f), 0.0f, true),
+                    Render::Text(),
+                    Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
+
+                NIKE_UI_SERVICE->setButtonInputState(quit, UI::InputStates::TRIGGERED);
+
+                auto quit_hover_script = Lua::Script();
+                quit_hover_script.script_id = "menu_button.lua";
+                quit_hover_script.update_function = "HoverButton";
+                quit_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
+                auto quit_script = Lua::Script();
+                quit_script.script_id = "ChangeScene.lua";
+                quit_script.update_function = "Quit";
+
+                NIKE_UI_SERVICE->setButtonScript(quit, quit_hover_script, "OnHover");
+                NIKE_UI_SERVICE->setButtonScript(quit, quit_script, "OnClick");
+
+
+            }
+
+            auto container_entity = NIKE_METADATA_SERVICE->getEntityByName(background_texture);
+            auto resume_entity = NIKE_METADATA_SERVICE->getEntityByName(resume);
+            auto options_entity = NIKE_METADATA_SERVICE->getEntityByName(options);
+            auto howtoplay_entity = NIKE_METADATA_SERVICE->getEntityByName(how_to_play);
+            auto quit_entity = NIKE_METADATA_SERVICE->getEntityByName(quit);
+
+            auto container_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(container_entity.value());
+            auto resume_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(resume_entity.value());
+            auto options_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(options_entity.value());
+            auto howtoplay_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(howtoplay_entity.value());
+            auto quit_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(quit_entity.value());
+
+            if (!container_texture.has_value() || !resume_texture.has_value() || !options_texture.has_value() || !howtoplay_texture.has_value() || !quit_texture.has_value()) {
+                return;
+            }
+            auto& container_comp = container_texture.value().get();
+            auto& resume_comp = resume_texture.value().get();
+            auto& options_comp = options_texture.value().get();
+            auto& howtoplay_comp = howtoplay_texture.value().get();
+            auto& quit_comp = quit_texture.value().get();
+
+            container_comp.b_blend = true;
+            resume_comp.b_blend = true;
+            options_comp.b_blend = true;
+            howtoplay_comp.b_blend = true;
+            quit_comp.b_blend = true;
+
+            NIKE_UI_SERVICE->setButtonDisabled(resume, !showPauseMenu);
+            NIKE_UI_SERVICE->setButtonDisabled(options, !showPauseMenu);
+            NIKE_UI_SERVICE->setButtonDisabled(how_to_play, !showPauseMenu);
+            NIKE_UI_SERVICE->setButtonDisabled(quit, !showPauseMenu);
+
+            if (showPauseMenu) {
+                container_comp.color.a = 1.f;
+                resume_comp.color.a = 1.f;
+                options_comp.color.a = 1.f;
+                howtoplay_comp.color.a = 1.f;
+                quit_comp.color.a = 1.f;
+
+            }
+            else {
+                container_comp.color.a = 0.f;
+                resume_comp.color.a = 0.f;
+                options_comp.color.a = 0.f;
+                howtoplay_comp.color.a = 0.f;
+                quit_comp.color.a = 0.f;
+            }
+          
+
+        }
+
         void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
         {
             // Destroy the player's health UI container if applicable
@@ -166,16 +326,31 @@ namespace NIKE {
             NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
 
             // Assign Lua scripts to buttons
+            auto play_again_hover_script = Lua::Script();
+            play_again_hover_script.script_id = "menu_button.lua";
+            play_again_hover_script.update_function = "HoverButton";
+            play_again_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
             auto play_again_script = Lua::Script();
             play_again_script.script_id = "ChangeScene.lua";
             play_again_script.update_function = "Restart";
+            NIKE_UI_SERVICE->setButtonScript(play_again, play_again_hover_script, "OnHover");
             NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
 
+
+            auto quit_hover_script = Lua::Script();
+            quit_hover_script.script_id = "menu_button.lua";
+            quit_hover_script.update_function = "HoverButton";
+            quit_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
             auto quit_script = Lua::Script();
             quit_script.script_id = "ChangeScene.lua";
             quit_script.update_function = "Quit";
+            NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_hover_script, "OnHover");
             NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
         }
+
+        /*****************************************************************//**
+         * VFX and SFX Interactions
+         *********************************************************************/
 
         /* TODO, remove or edit call */
         void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
@@ -300,6 +475,67 @@ namespace NIKE {
             return INT_MAX;
         }
 
+
+        void spawnHealAnimation(const Entity::Type player) {
+            // Get player position
+            const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
+            if (!player_transform_comp.has_value()) {
+                NIKEE_CORE_WARN("spawnEnemy: PLAYER missing Transform Component, heal animation not playing");
+                return;
+            }
+
+            const Vector2f& player_pos = player_transform_comp.value().get().position;
+
+            // Create heal animation entity
+            Entity::Type anim_entity = NIKE_ECS_MANAGER->createEntity();
+
+            // Load from prefab
+            NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(anim_entity, "healAnimation.prefab");
+
+            // Add tag to animation
+            if (NIKE_METADATA_SERVICE->isTagValid("healAnimation")) {
+                NIKE_METADATA_SERVICE->addEntityTag(anim_entity, "healAnimation");
+            }
+
+            // Set animation position to player position
+            auto anim_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(anim_entity);
+            if (anim_transform_comp.has_value()) {
+                anim_transform_comp.value().get().position = { player_pos };
+            }
+        }
+
+
+        /*****************************************************************//**
+         * Player Interactions
+         *********************************************************************/
+
+        void restoreHealth(Entity::Type healer, Entity::Type target) {
+            const auto healer_heal_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(healer);
+            const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
+            const auto& healer_heal = healer_heal_comp.value().get().heal_amount;
+
+            // Return if target has no health
+            if (target_health_comp.has_value() == false) {
+                return;
+            }
+
+            auto& target_health = target_health_comp.value().get().health;
+            const auto& target_max_health = target_health_comp.value().get().max_health;
+
+            // Heal Target
+            // (The check might be redundant now as there is another check in sysCollision)
+            if (target_health < target_max_health) {
+                // Spawn health animation
+                // Check no health animation tag exists
+                // If no health animation tag
+                spawnHealAnimation(target);
+
+                target_health += healer_heal;
+                // Temporary hardcoded SFX
+                NIKE_AUDIO_SERVICE->playAudio("HealSFX.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+            }
+        }
+
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b) {
             // Collision between damage and health
             const auto a_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(entity_a);
@@ -336,32 +572,6 @@ namespace NIKE {
             }
         }
 
-        void restoreHealth(Entity::Type healer, Entity::Type target) {
-            const auto healer_heal_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::HealthDrop>(healer);
-            const auto target_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(target);
-            const auto& healer_heal = healer_heal_comp.value().get().heal_amount;
-
-            // Return if target has no health
-            if (target_health_comp.has_value() == false) {
-                return;
-            }
-
-            auto& target_health = target_health_comp.value().get().health;
-            const auto& target_max_health = target_health_comp.value().get().max_health;
-
-            // Heal Target
-            // (The check might be redundant now as there is another check in sysCollision)
-            if (target_health < target_max_health) {
-                // Spawn health animation
-                // Check no health animation tag exists
-                // If no health animation tag
-                spawnHealAnimation(target);
-
-                target_health += healer_heal;
-                // Temporary hardcoded SFX
-                NIKE_AUDIO_SERVICE->playAudio("HealSFX.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
-            }
-        }
 
         void applyDamage(Entity::Type attacker, Entity::Type target) {
             const auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
@@ -553,33 +763,9 @@ namespace NIKE {
             }
         }
 
-        void spawnHealAnimation(const Entity::Type player) {
-            // Get player position
-            const auto player_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
-            if (!player_transform_comp.has_value()) {
-                NIKEE_CORE_WARN("spawnEnemy: PLAYER missing Transform Component, heal animation not playing");
-                return;
-            }
-
-            const Vector2f& player_pos = player_transform_comp.value().get().position;
-
-            // Create heal animation entity
-            Entity::Type anim_entity = NIKE_ECS_MANAGER->createEntity();
-
-            // Load from prefab
-            NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(anim_entity, "healAnimation.prefab");
-
-            // Add tag to animation
-            if (NIKE_METADATA_SERVICE->isTagValid("healAnimation")) {
-                NIKE_METADATA_SERVICE->addEntityTag(anim_entity, "healAnimation");
-            }
-
-            // Set animation position to player position
-            auto anim_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(anim_entity);
-            if (anim_transform_comp.has_value()) {
-                anim_transform_comp.value().get().position = { player_pos };
-            }
-        }
+        /*****************************************************************//**
+         * Environment Interactions
+         *********************************************************************/
 
         void changeElement(Entity::Type player, Entity::Type source) {
             const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
@@ -598,8 +784,47 @@ namespace NIKE {
                 // Set player element to source element
                 player_element = source_element;
 
+                // Elemental UI 
+                for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
+
+                    const auto elementui_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(elementui);
+
+                    // Set element ui to player's element
+                    if (elementui_texture.has_value())
+                    {
+                        //elementui_texture.value().get().texture_id = Element::elementUI[static_cast<int>(player_element.value().get().element)];
+                        elementui_texture.value().get().frame_index.x = static_cast<int>(player_element);
+
+                        // Hardcoded af
+                        for (auto& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
+                            const auto e_container_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(hp_container);
+                            if (!e_container_texture.has_value()) {
+                                continue;
+                            }
+
+
+                            if (static_cast<int>(player_element) == 1) {
+                                e_container_texture.value().get().texture_id = "FireHealth_Bar.png";
+                            }
+                            else if (static_cast<int>(player_element) == 2) {
+                                e_container_texture.value().get().texture_id = "WaterHealth_Bar.png";
+                            }
+                            else if (static_cast<int>(player_element) == 3) {
+                                e_container_texture.value().get().texture_id = "GrassHealth_Bar.png";
+                            }
+                            else {
+                                e_container_texture.value().get().texture_id = "Healthbar_base.png";
+                            }
+
+
+                        }
+                    }
+                }
+
                 // !TODO: Play element change animation here
             }
+
+       
         }
 
 

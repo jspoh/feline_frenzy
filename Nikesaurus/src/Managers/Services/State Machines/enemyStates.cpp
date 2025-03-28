@@ -460,8 +460,11 @@ namespace NIKE {
 
 	}
 
+	// ???
 	void State::EnemyDeathState::playSFX(Entity::Type& entity, bool play_or_no)
 	{
+		UNREFERENCED_PARAMETER(entity);
+
 		if (play_or_no) {
 			// Temporary hardcoded SFX
 			NIKE_AUDIO_SERVICE->playAudio("EnemyDeath1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
