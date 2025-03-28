@@ -532,10 +532,13 @@ namespace NIKE {
 				NIKE_AUDIO_SERVICE->playAudio("EnemySpawn1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume() , 1.f, false, false);
 				
 				// If is level 2_2, change the sprite to portal door
-				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png") && 
-					NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn")
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered("Frontdoor_animation_sprite.png") && 
+					NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_1.scn" && entity_animation_base.has_value())
 				{
 					entity_texture.value().get().texture_id = "Frontdoor_animation_sprite.png";
+					// Set faster animation
+					entity_animation_base.value().get().frame_duration = 0.09f;
+
 				}
 				// Change the sprite to be the animation sprite
 				else if (NIKE_ASSETS_SERVICE->isAssetRegistered("Front gate_animation_sprite.png"))
@@ -553,7 +556,17 @@ namespace NIKE {
 
 				entity_animation_sprite.value().get().sheet_size = { 5, 1 };
 
-				entity_animation_base.value().get().frame_duration = 0.1f;
+				if (entity_texture.has_value())
+				{
+					if (entity_texture.value().get().texture_id == "Frontdoor_animation_sprite.png")
+					{
+						entity_animation_base.value().get().frame_duration = 0.09f;
+					}
+					else {
+						entity_animation_base.value().get().frame_duration = 0.1f;
+					}
+				}
+
 
 				// Set Animation
 				Interaction::flipX(vent, false);

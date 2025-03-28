@@ -125,10 +125,10 @@
                         "Components": {
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
-                                "EnemiesSpawned": 0,
+                                "EnemiesSpawned": 1,
                                 "EnemyElement": 0,
                                 "EnemyLimit": 3,
-                                "LastSpawnTime": 2.4166650772094727
+                                "LastSpawnTime": 2.8655741214752197
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0385",
+                            "Name": "entity_0009",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -183,10 +183,10 @@
                         "Components": {
                             "Enemy::Spawner": {
                                 "Cooldown": 3.0,
-                                "EnemiesSpawned": 0,
+                                "EnemiesSpawned": 1,
                                 "EnemyElement": 0,
                                 "EnemyLimit": 3,
-                                "LastSpawnTime": 2.4166650772094727
+                                "LastSpawnTime": 2.8655741214752197
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -306,6 +306,282 @@
                             "Tags": []
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 4,
+                            "Name": "entity_0042",
+                            "Prefab_ID": "grassEnemy.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.01666666753590107
+                                    },
+                                    "Animation::Sprite": {
+                                        "End_Index": {
+                                            "x": 5,
+                                            "y": 5
+                                        },
+                                        "Sheet_Size": {
+                                            "x": 10,
+                                            "y": 16
+                                        },
+                                        "Start_Index": {
+                                            "x": 0,
+                                            "y": 5
+                                        }
+                                    },
+                                    "Audio::SFX": null,
+                                    "Combat::Faction": null,
+                                    "Combat::Health": null,
+                                    "Element::Entity": null,
+                                    "Enemy::Attack": {
+                                        "LastShotTime": 0.4436764121055603
+                                    },
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": 507.664794921875,
+                                            "y": 371.8164978027344
+                                        }
+                                    },
+                                    "Physics::Dynamics": {
+                                        "Force": {
+                                            "x": 0.0,
+                                            "y": 0.0
+                                        },
+                                        "Velocity": {
+                                            "x": 0.0,
+                                            "y": 0.0
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 1,
+                                            "y": 5
+                                        }
+                                    },
+                                    "State::State": {
+                                        "State": "EnemyAttack"
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 507.664794921875,
+                                            "y": 371.8164978027344
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "enemy"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 5,
+                            "Name": "entity_0043",
+                            "Parent": "entity_0042",
+                            "Prefab_ID": "gun_enemy_n.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Animation_Count": 3,
+                                        "Timer": 0.3833334445953369
+                                    },
+                                    "Animation::Sprite": {
+                                        "End_Index": {
+                                            "x": 5,
+                                            "y": 3
+                                        },
+                                        "Sheet_Size": {
+                                            "x": 6,
+                                            "y": 4
+                                        },
+                                        "Start_Index": {
+                                            "x": 0,
+                                            "y": 3
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "B_Flip": {
+                                            "x": true,
+                                            "y": false
+                                        },
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 0,
+                                            "y": 3
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -104.57618713378906,
+                                            "y": 34.11481857299805
+                                        },
+                                        "Rotation": 90.0
+                                    }
+                                },
+                                "MetaData": {
+                                    "Parent": "entity_0042"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 6,
+                            "Name": "entity_0044",
+                            "Prefab_ID": "grassEnemy.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.03333333507180214
+                                    },
+                                    "Animation::Sprite": {
+                                        "End_Index": {
+                                            "x": 9,
+                                            "y": 1
+                                        },
+                                        "Sheet_Size": {
+                                            "x": 10,
+                                            "y": 16
+                                        },
+                                        "Start_Index": {
+                                            "x": 0,
+                                            "y": 1
+                                        }
+                                    },
+                                    "Audio::SFX": null,
+                                    "Combat::Faction": null,
+                                    "Combat::Health": null,
+                                    "Element::Entity": null,
+                                    "Enemy::Attack": {
+                                        "LastShotTime": 0.8344517946243286
+                                    },
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -560.50537109375,
+                                            "y": -56.066192626953125
+                                        }
+                                    },
+                                    "Physics::Dynamics": {
+                                        "Force": {
+                                            "x": 926.0479125976563,
+                                            "y": -377.4058837890625
+                                        },
+                                        "Velocity": {
+                                            "x": 92.60479736328125,
+                                            "y": -37.74059295654297
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 0,
+                                            "y": 1
+                                        }
+                                    },
+                                    "State::State": {
+                                        "State": "EnemyChase"
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -560.50537109375,
+                                            "y": -56.066192626953125
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "enemy"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 7,
+                            "Name": "entity_0045",
+                            "Parent": "entity_0044",
+                            "Prefab_ID": "gun_enemy_n_2.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 2.4833316802978516
+                                    },
+                                    "Animation::Sprite": {
+                                        "End_Index": {
+                                            "x": 5,
+                                            "y": 2
+                                        },
+                                        "Sheet_Size": {
+                                            "x": 6,
+                                            "y": 4
+                                        },
+                                        "Start_Index": {
+                                            "x": 0,
+                                            "y": 2
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 0,
+                                            "y": 2
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 83.89745330810547,
+                                            "y": 71.14222717285156
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Parent": "entity_0044"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
                 }
             ],
             "ID": 0,
@@ -329,11 +605,11 @@
                             "Animation::Sprite": {
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 1
+                                    "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
+                                    "x": 6,
+                                    "y": 1
                                 },
                                 "Start_Index": {
                                     "x": 0,
@@ -354,8 +630,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
+                                    "x": 2,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 6,
@@ -395,16 +671,16 @@
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Frame_Duration": 0.20000000298023224
+                                "Frame_Duration": 0.09000000357627869
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 0,
+                                    "x": 4,
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
+                                    "x": 5,
+                                    "y": 1
                                 },
                                 "Start_Index": {
                                     "x": 0,
@@ -429,16 +705,16 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 1,
+                                    "x": 5,
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "Door_front.png"
+                                "Texture_ID": "Frontdoor_animation_sprite.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -4.4625244140625,
-                                    "y": 887.095458984375
+                                    "x": 8.304229736328125,
+                                    "y": 900.0538330078125
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -463,86 +739,17 @@
                 },
                 {
                     "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.10000000149011612
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
-                                },
-                                "Frame_Size": {
-                                    "x": 6,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "ElectricSpark_animation_sprite_level_2.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -762.0564575195313,
-                                    "y": 694.1179809570313
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 127.47547912597656,
-                                    "y": 127.47547912597656
-                                },
-                                "Screen Position": false
-                            }
-                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 2,
-                            "Name": "Spark6",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 3,
                             "Name": "barrel_1",
                             "Prefab_ID": "barrel2.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Animation::Base": null,
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
                                     "Animation::Sprite": {
                                         "End_Index": {
                                             "x": 0,
@@ -558,7 +765,12 @@
                                         }
                                     },
                                     "Combat::Health": null,
-                                    "Physics::Collider": null,
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -603.52587890625,
+                                            "y": 706.608642578125
+                                        }
+                                    },
                                     "Render::Texture": {
                                         "Color": {
                                             "w": 1.0,
@@ -580,6 +792,41 @@
                 },
                 {
                     "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 3,
+                            "Name": "Spark6",
+                            "Prefab_ID": "lv2_spark.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
+                                    "Animation::Sprite": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -771.171142578125,
+                                            "y": 659.017822265625
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
                         "Components": {
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -588,14 +835,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 1419.773681640625,
-                                    "y": 14.87762451171875
+                                    "x": 382.62896728515625,
+                                    "y": 785.5401611328125
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 156.1999969482422,
+                                    "y": 479.6000061035156
                                 }
                             },
                             "Transform::Transform": {
@@ -634,11 +881,11 @@
                             "Animation::Sprite": {
                                 "End_Index": {
                                     "x": 5,
-                                    "y": 1
+                                    "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
+                                    "x": 6,
+                                    "y": 1
                                 },
                                 "Start_Index": {
                                     "x": 0,
@@ -659,8 +906,8 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
+                                    "x": 2,
+                                    "y": 0
                                 },
                                 "Frame_Size": {
                                     "x": 6,
@@ -697,24 +944,89 @@
                     "Entity": {
                         "Components": {
                             "Animation::Base": {
-                                "Animation_Count": 0,
+                                "Animation_Count": 3,
                                 "B_PingPong": false,
                                 "B_Reverse": false,
-                                "Frame_Duration": 0.10000000149011612
+                                "Frame_Duration": 0.07999999821186066
                             },
                             "Animation::Sprite": {
                                 "End_Index": {
-                                    "x": 5,
-                                    "y": 1
+                                    "x": 1,
+                                    "y": 12
                                 },
                                 "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
+                                    "x": 10,
+                                    "y": 16
                                 },
                                 "Start_Index": {
                                     "x": 0,
-                                    "y": 0
+                                    "y": 12
                                 }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "WalkingNature.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "PlayerSFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Combat::Faction": {
+                                "Faction": 1
+                            },
+                            "Combat::Health": {
+                                "Health": 60.0,
+                                "Lives": 1,
+                                "MaxHealth": 100.0,
+                                "invulnerable_flag": false
+                            },
+                            "Element::Entity": {
+                                "Element": 2
+                            },
+                            "GameLogic::ILogic": {
+                                "Named_Args": {
+                                    "entity": 29
+                                },
+                                "Script_ID": "player.lua",
+                                "Start_Function": "Test",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": false,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": -20.0
+                                },
+                                "Position": {
+                                    "x": 100.6682357788086,
+                                    "y": 484.5868225097656
+                                },
+                                "Resolution": 1,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 50.0,
+                                    "y": 80.0
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 10.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 0.5,
+                                "Max_Speed": 3000.0,
+                                "Velocity": {
+                                    "x": -6.25034260792745e-07,
+                                    "y": 250.51638793945313
+                                }
+                            },
+                            "Render::Cam": {
+                                "Mouse_Offset": 0.15000000596046448,
+                                "Position": {
+                                    "x": 100.6682357788086,
+                                    "y": 504.5868225097656
+                                },
+                                "Zoom": 1.5062084197998047
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -730,25 +1042,28 @@
                                     "z": 0.0
                                 },
                                 "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
+                                    "x": 1,
+                                    "y": 12
                                 },
                                 "Frame_Size": {
-                                    "x": 6,
-                                    "y": 1
+                                    "x": 10,
+                                    "y": 16
                                 },
-                                "Intensity": 0.5,
-                                "Texture_ID": "ElectricSpark_animation_sprite_level_2.png"
+                                "Intensity": 0.0,
+                                "Texture_ID": "Player_animation_sprite.png"
+                            },
+                            "State::State": {
+                                "State": "Idle"
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -576.743408203125,
-                                    "y": 437.77484130859375
+                                    "x": 100.6682357788086,
+                                    "y": 504.5868225097656
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 127.47547912597656,
-                                    "y": 127.47547912597656
+                                    "x": 88.9101791381836,
+                                    "y": 127.99999237060547
                                 },
                                 "Screen Position": false
                             }
@@ -756,10 +1071,47 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 6,
-                            "Name": "Spark2",
+                            "Layer_Order": 7,
+                            "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
+                            "Tags": [
+                                "player"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 8,
+                            "Name": "Spark5",
+                            "Prefab_ID": "lv2_spark.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
+                                    "Animation::Sprite": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -567.2637939453125,
+                                            "y": 440.72344970703125
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
                             "Tags": []
                         }
                     }
@@ -774,14 +1126,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 1419.773681640625,
-                                    "y": 14.87762451171875
+                                    "x": -384.0301208496094,
+                                    "y": 646.3246459960938
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 156.1999969482422,
+                                    "y": 700.0
                                 }
                             },
                             "Transform::Transform": {
@@ -800,7 +1152,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 7,
+                            "Layer_Order": 9,
                             "Name": "middle_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -830,8 +1182,8 @@
                                     "y": -10.0
                                 },
                                 "Position": {
-                                    "x": -779.4362182617188,
-                                    "y": 155.28192138671875
+                                    "x": 624.5977172851563,
+                                    "y": 95.2606201171875
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
@@ -883,7 +1235,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 8,
+                            "Layer_Order": 10,
                             "Name": "barrel_3",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -895,71 +1247,30 @@
                 },
                 {
                     "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.20000000298023224
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 4,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 1,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Fire_animation_sprite_level_2.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -567.6417846679688,
-                                    "y": -10.512481689453125
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 129.99998474121094,
-                                    "y": 129.99998474121094
-                                },
-                                "Screen Position": false
-                            }
-                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 9,
+                            "Layer_Order": 11,
                             "Name": "Fire_Element",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
+                            "Prefab_ID": "lv2_fire.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
+                                    "Animation::Sprite": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
                             "Tags": [
                                 "objects"
                             ]
@@ -968,71 +1279,30 @@
                 },
                 {
                     "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.10000000149011612
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
-                                },
-                                "Frame_Size": {
-                                    "x": 6,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "ElectricSpark_animation_sprite_level_2.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -920.281005859375,
-                                    "y": -28.2415771484375
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 127.47547912597656,
-                                    "y": 127.47547912597656
-                                },
-                                "Screen Position": false
-                            }
-                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 10,
-                            "Name": "Spark5",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
+                            "Layer_Order": 12,
+                            "Name": "Spark2",
+                            "Prefab_ID": "lv2_spark.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
+                                    "Animation::Sprite": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
                             "Tags": []
                         }
                     }
@@ -1047,14 +1317,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 1419.773681640625,
-                                    "y": 14.87762451171875
+                                    "x": 382.62896728515625,
+                                    "y": 18.369873046875
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 156.1999969482422,
+                                    "y": 479.6000061035156
                                 }
                             },
                             "Transform::Transform": {
@@ -1073,7 +1343,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 11,
+                            "Layer_Order": 13,
                             "Name": "middle_wall_6",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1130,7 +1400,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 12,
+                            "Layer_Order": 14,
                             "Name": "top_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1148,14 +1418,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -1405.6329345703125,
-                                    "y": 0.77911376953125
+                                    "x": 1158.955810546875,
+                                    "y": 27.81219482421875
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 234.43576049804688,
+                                    "y": 1013.1701049804688
                                 }
                             },
                             "Physics::Dynamics": {
@@ -1187,7 +1457,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 13,
+                            "Layer_Order": 15,
                             "Name": "Right_Collision",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1205,14 +1475,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -1405.6329345703125,
+                                    "x": -1165.0299072265625,
                                     "y": 0.77911376953125
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 256.0,
-                                    "y": 2193.0
+                                    "y": 1000.0
                                 }
                             },
                             "Physics::Dynamics": {
@@ -1244,7 +1514,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 14,
+                            "Layer_Order": 16,
                             "Name": "Left_Collision",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1254,117 +1524,22 @@
                 },
                 {
                     "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.20000000298023224
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 5,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 6,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": false,
-                                "Pos_Offset": {
-                                    "x": 5.0,
-                                    "y": -50.0
-                                },
-                                "Position": {
-                                    "x": 1038.397705078125,
-                                    "y": -973.20263671875
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 50.0,
-                                    "y": 32.0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 3,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 6,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Plant_animation_sprite_level_2.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 705.2508544921875,
-                                    "y": -543.3329467773438
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 199.99996948242188,
-                                    "y": 199.99996948242188
-                                },
-                                "Screen Position": false
-                            }
-                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 15,
+                            "Layer_Order": 17,
                             "Name": "Grass_Element",
-                            "Prefab_ID": "",
+                            "Prefab_ID": "lv2_plant.prefab",
                             "Prefab_Override": {
                                 "Components": {
                                     "Animation::Base": {
-                                        "Animation_Count": 0,
-                                        "B_PingPong": false,
-                                        "B_Reverse": false,
-                                        "Frame_Duration": 0.20000000298023224
+                                        "Timer": 0.03333333507180214
                                     },
-                                    "Animation::Sprite": {
-                                        "End_Index": {
-                                            "x": 5,
-                                            "y": 0
-                                        },
-                                        "Sheet_Size": {
-                                            "x": 6,
-                                            "y": 1
-                                        },
-                                        "Start_Index": {
-                                            "x": 0,
-                                            "y": 0
-                                        }
-                                    },
+                                    "Animation::Sprite": null,
                                     "Physics::Collider": {
-                                        "Pos_Offset": {
-                                            "x": 5.0,
-                                            "y": -50.0
-                                        },
                                         "Position": {
-                                            "x": 1038.397705078125,
-                                            "y": -973.20263671875
+                                            "x": 710.2508544921875,
+                                            "y": -593.3329467773438
                                         }
                                     },
                                     "Render::Texture": {
@@ -1375,32 +1550,13 @@
                                             "z": 0.0
                                         },
                                         "Frame_Index": {
-                                            "x": 3,
+                                            "x": 5,
                                             "y": 0
-                                        },
-                                        "Frame_Size": {
-                                            "x": 6,
-                                            "y": 1
-                                        },
-                                        "Texture_ID": "Plant_animation_sprite_level_2.png"
-                                    },
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": 705.2508544921875,
-                                            "y": -543.3329467773438
-                                        },
-                                        "Scale": {
-                                            "x": 199.99996948242188,
-                                            "y": 199.99996948242188
                                         }
-                                    }
+                                    },
+                                    "Transform::Transform": null
                                 },
-                                "MetaData": {
-                                    "Layer ID": 1,
-                                    "Tags": [
-                                        "objects"
-                                    ]
-                                }
+                                "MetaData": null
                             },
                             "Tags": [
                                 "objects"
@@ -1410,71 +1566,35 @@
                 },
                 {
                     "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.10000000149011612
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Sheet_Size": {
-                                    "x": 4,
-                                    "y": 2
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 1
-                                },
-                                "Frame_Size": {
-                                    "x": 6,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "ElectricSpark_animation_sprite_level_2.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 1033.3779296875,
-                                    "y": -599.829345703125
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 127.47547912597656,
-                                    "y": 127.47547912597656
-                                },
-                                "Screen Position": false
-                            }
-                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 16,
+                            "Layer_Order": 18,
                             "Name": "Spark4",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
+                            "Prefab_ID": "lv2_spark.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
+                                    "Animation::Sprite": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 867.4710693359375,
+                                            "y": -680.4752197265625
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
                             "Tags": []
                         }
                     }
@@ -1489,14 +1609,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 1419.773681640625,
-                                    "y": 14.87762451171875
+                                    "x": -384.0301208496094,
+                                    "y": -619.8175659179688
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 156.1999969482422,
+                                    "y": 450.0
                                 }
                             },
                             "Transform::Transform": {
@@ -1515,7 +1635,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 17,
+                            "Layer_Order": 19,
                             "Name": "middle_wall_4",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1528,12 +1648,14 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 18,
+                            "Layer_Order": 20,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel2.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Animation::Base": null,
+                                    "Animation::Base": {
+                                        "Timer": 0.06666667014360428
+                                    },
                                     "Animation::Sprite": {
                                         "End_Index": {
                                             "x": 0,
@@ -1549,7 +1671,12 @@
                                         }
                                     },
                                     "Combat::Health": null,
-                                    "Physics::Collider": null,
+                                    "Physics::Collider": {
+                                        "Position": {
+                                            "x": -890.8135986328125,
+                                            "y": -826.496826171875
+                                        }
+                                    },
                                     "Render::Texture": {
                                         "Color": {
                                             "w": 1.0,
@@ -1577,147 +1704,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.054999999701976776
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Sheet_Size": {
-                                    "x": 10,
-                                    "y": 16
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 1
-                                }
-                            },
-                            "Audio::SFX": {
-                                "Audio_ID": "WalkingNature.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "PlayerSFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Combat::Faction": {
-                                "Faction": 1
-                            },
-                            "Combat::Health": {
-                                "Health": 100.0,
-                                "Lives": 1,
-                                "MaxHealth": 100.0,
-                                "invulnerable_flag": false
-                            },
-                            "Element::Entity": {
-                                "Element": 2
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 44
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "Test",
-                                "Update_Function": "update"
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": false,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": -20.0
-                                },
-                                "Position": {
-                                    "x": 101.10623168945313,
-                                    "y": -552.2369995117188
-                                },
-                                "Resolution": 1,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 50.0,
-                                    "y": 80.0
-                                }
-                            },
-                            "Physics::Dynamics": {
-                                "Drag": 10.0,
-                                "Force": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Mass": 0.5,
-                                "Max_Speed": 3000.0,
-                                "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                }
-                            },
-                            "Render::Cam": {
-                                "Mouse_Offset": 0.15000000596046448,
-                                "Position": {
-                                    "x": 11.0235595703125,
-                                    "y": -870.8397216796875
-                                },
-                                "Zoom": 1.0
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 3,
-                                    "y": 1
-                                },
-                                "Frame_Size": {
-                                    "x": 10,
-                                    "y": 16
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Player_animation_sprite.png"
-                            },
-                            "State::State": {
-                                "State": "Idle"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 11.0235595703125,
-                                    "y": -870.8397216796875
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 88.9101791381836,
-                                    "y": 127.99999237060547
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 19,
-                            "Name": "player",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": [
-                                "player"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
                                 "Pos_Offset": {
@@ -1725,14 +1711,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -1405.6329345703125,
+                                    "x": 1416.2781982421875,
                                     "y": 0.77911376953125
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 266.543212890625,
+                                    "y": 2016.2196044921875
                                 }
                             },
                             "Physics::Dynamics": {
@@ -1764,7 +1750,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 20,
+                            "Layer_Order": 21,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1821,7 +1807,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 21,
+                            "Layer_Order": 22,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1839,14 +1825,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 1419.773681640625,
-                                    "y": 14.87762451171875
+                                    "x": 382.62896728515625,
+                                    "y": -993.6240844726563
                                 },
                                 "Resolution": 0,
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2193.0
+                                    "x": 156.1999969482422,
+                                    "y": 450.0
                                 }
                             },
                             "Transform::Transform": {
@@ -1865,7 +1851,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 22,
+                            "Layer_Order": 23,
                             "Name": "middle_wall_3",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1883,14 +1869,14 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": 0.7127685546875,
+                                    "x": -10.44818115234375,
                                     "y": -1170.7091064453125
                                 },
                                 "Resolution": 0,
                                 "Rotation": 90.0,
                                 "Scale": {
-                                    "x": 256.0,
-                                    "y": 2600.0
+                                    "x": 296.732177734375,
+                                    "y": 2498.170166015625
                                 }
                             },
                             "Physics::Dynamics": {
@@ -1922,7 +1908,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 23,
+                            "Layer_Order": 24,
                             "Name": "bottom_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1949,67 +1935,6 @@
             "B_State": true,
             "B_YSort": false,
             "Entities": [
-                {
-                    "Entity": {
-                        "Components": {
-                            "Audio::SFX": {
-                                "Audio_ID": "ChangeElement.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "EnvironmentSFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Element::Source": {
-                                "Element": 1
-                            },
-                            "Render::Texture": {
-                                "B_Blend": true,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 0.9489796161651611,
-                                    "y": 0.2614535689353943,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.09000001847743988,
-                                "Texture_ID": "Fire icon.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -567.0709838867188,
-                                    "y": 156.09698486328125
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 215.8861541748047,
-                                    "y": 215.8861541748047
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 3,
-                            "Layer_Order": 0,
-                            "Name": "fire_elem",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
                 {
                     "Entity": {
                         "Components": {
@@ -2063,7 +1988,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 3,
-                            "Layer_Order": 1,
+                            "Layer_Order": 0,
                             "Name": "grass_elem",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2124,7 +2049,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 3,
-                            "Layer_Order": 2,
+                            "Layer_Order": 1,
                             "Name": "water_elem",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2163,11 +2088,11 @@
                                     },
                                     "Transform::Transform": {
                                         "Position": {
-                                            "x": 6.806690216064453,
+                                            "x": -12.689432144165039,
                                             "y": 95.62039184570313
                                         },
                                         "Scale": {
-                                            "x": 97.4806137084961,
+                                            "x": 58.48836898803711,
                                             "y": 17.37278175354004
                                         }
                                     }
