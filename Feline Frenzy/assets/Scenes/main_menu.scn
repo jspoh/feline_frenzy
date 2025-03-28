@@ -711,6 +711,122 @@
                         },
                         "UI ID": "options_btn"
                     }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuYesOpen.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Render::Text": {
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Font_ID": "",
+                                "Origin": 0,
+                                "Scale": 1.0,
+                                "Size": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Text": ""
+                            },
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 1.0,
+                                    "y": 1.0,
+                                    "z": 1.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Intensity": 0.5,
+                                "Texture_ID": "UI_Back_spritesheet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": -54.729705810546875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 293.17230224609375,
+                                    "y": 117.26892852783203
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 4,
+                            "Name": "credits_btn",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        },
+                        "UI Btn": {
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "credits.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": ""
+                                },
+                                "OnHover": {
+                                    "Named_Args": {
+                                        "audio": "MenuHoverOverSFX.wav"
+                                    },
+                                    "Script_ID": "menu_button.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "HoverButton"
+                                }
+                            }
+                        },
+                        "UI ID": "credits_btn"
+                    }
                 }
             ],
             "ID": 1,
