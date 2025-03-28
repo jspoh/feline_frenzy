@@ -266,8 +266,8 @@
                                         "scene": "main_menu.scn"
                                     },
                                     "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "Change"
+                                    "Start_Function": "Change",
+                                    "Update_Function": ""
                                 },
                                 "OnHover": {
                                     "Named_Args": {

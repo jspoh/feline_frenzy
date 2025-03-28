@@ -780,7 +780,7 @@
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "UI_Back_spritesheet.png"
+                                "Texture_ID": "CreditsButton_UI.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -789,8 +789,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 293.17230224609375,
-                                    "y": 117.26892852783203
+                                    "x": 300.8080749511719,
+                                    "y": 96.00257110595703
                                 },
                                 "Screen Position": true
                             }
@@ -812,7 +812,7 @@
                                         "scene": "credits.scn"
                                     },
                                     "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "",
+                                    "Start_Function": "Change",
                                     "Update_Function": ""
                                 },
                                 "OnHover": {
