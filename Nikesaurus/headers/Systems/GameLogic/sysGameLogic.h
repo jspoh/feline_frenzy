@@ -26,6 +26,9 @@ namespace NIKE {
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
 
+			// Combat BGM (BGMC) control
+			void updateBGMCVolume();
+
 			// Win overlay
 			void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 

@@ -7,11 +7,21 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1_voladj.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
             },
             "PlayerSFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "SFX": {
                 "loop": false,
                 "tracks": []
             }
@@ -46,7 +56,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
-                            "Name": "entity_0000",
+                            "Name": "entity_0088",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -97,7 +107,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
+                            "Name": "entity_0089",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -168,7 +178,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "entity_0090",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -239,7 +249,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0003",
+                            "Name": "entity_0091",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -283,7 +293,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0004",
+                            "Name": "entity_0092",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -327,7 +337,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 5,
-                            "Name": "entity_0005",
+                            "Name": "entity_0093",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -384,7 +394,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 6,
-                            "Name": "entity_0006",
+                            "Name": "entity_0094",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -428,7 +438,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 7,
-                            "Name": "entity_0007",
+                            "Name": "entity_0095",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -685,7 +695,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 9,
-                            "Name": "entity_0009",
+                            "Name": "entity_0097",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -756,7 +766,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 10,
-                            "Name": "entity_0010",
+                            "Name": "entity_0098",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -881,7 +891,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 11,
-                            "Name": "entity_0011",
+                            "Name": "entity_0099",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1006,7 +1016,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 12,
-                            "Name": "entity_0012",
+                            "Name": "entity_0100",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

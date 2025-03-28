@@ -485,9 +485,12 @@ namespace NIKE {
 
 			bgm_channel_group_id = data.value("BGM Channel Group", "BGM");
 			sfx_channel_group_id = data.value("SFX Channel Group", "SFX");
+			bgmc_channel_group_id = data.value("BGMC Channel Group", "BGMC");
 
 			createChannelGroup(bgm_channel_group_id);
 			createChannelGroup(sfx_channel_group_id);
+			createChannelGroup(bgmc_channel_group_id);
+
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -553,7 +556,7 @@ namespace NIKE {
 		for (auto it = channel_groups.begin(); it != channel_groups.end(); ) {
 
 			//Skip static channels groups
-			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id) {
+			if (it->first == bgm_channel_group_id || it->first == sfx_channel_group_id || it->first == bgmc_channel_group_id) {
 				++it;
 				continue;
 			}
@@ -644,6 +647,10 @@ namespace NIKE {
 
 	std::string Audio::Service::getSFXChannelGroupID() const {
 		return sfx_channel_group_id;
+	}
+
+	std::string Audio::Service::getBGMCChannelGroupID() const {
+		return bgmc_channel_group_id;
 	}
 
 	void Audio::Service::playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused) {
@@ -842,7 +849,7 @@ namespace NIKE {
 		}
 	}
 
-	// NEW: Implementation for getBGMTrackForScene()
+	// Implementation for getBGMTrackForScene()
 	std::string Audio::Service::getBGMTrackForScene() {
 		std::string currentBGMTrack = "";
 		auto currentPlaylist = this->getChannelPlaylist(this->getBGMChannelGroupID());
@@ -850,6 +857,16 @@ namespace NIKE {
 			currentBGMTrack = currentPlaylist.tracks.front();
 		}
 		return currentBGMTrack;
+	}
+
+	// BGMC track getter
+	std::string Audio::Service::getBGMCTrackForScene() {
+		std::string currentBGMCTrack = "";
+		auto currentPlaylist = this->getChannelPlaylist(this->getBGMCChannelGroupID());
+		if (!currentPlaylist.tracks.empty()) {
+			currentBGMCTrack = currentPlaylist.tracks.front();
+		}
+		return currentBGMCTrack;
 	}
 
 }
