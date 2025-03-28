@@ -7,6 +7,12 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1_voladj.wav"
+                ]
+            },
             "SFX": {
                 "loop": false,
                 "tracks": []
@@ -145,78 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0063",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.30000001192092896
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 4,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 2,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 5,
-                                    "y": 1
-                                },
-                                "Intensity": 0.5,
-                                "Texture_ID": "Puddle_animation_sprite.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 223.55191040039063,
-                                    "y": -359.72845458984375
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 225.67938232421875,
-                                    "y": 90.2717514038086
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "entity_0064",
+                            "Name": "entity_0283",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -340,9 +275,37 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0066",
+                            "Name": "entity_0286",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 4,
+                            "Name": "entity_0284",
+                            "Prefab_ID": "water_puddle.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": null,
+                                    "Animation::Sprite": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
                             "Tags": []
                         }
                     }
@@ -873,7 +836,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 11,
-                            "Name": "entity_0081",
+                            "Name": "entity_0298",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1370,7 +1333,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0087",
+                            "Name": "entity_0307",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
                                 "Components": {
