@@ -168,16 +168,26 @@ namespace NIKE {
 
         //New usertype vector2f
         lua_state.new_usertype<Vector2f>("Vector2f",
-            sol::constructors<Vector2f(), Vector2f(float, float)>(),
-            "x", &Vector2f::x,
-            "y", &Vector2f::y
+            "x", sol::property(
+                [](Vector2f& t) { return t.x; },
+                [](Vector2f& t, float val) { t.x = val; }
+                ),
+            "y", sol::property(
+                [](Vector2f& t) { return t.y; },
+                [](Vector2f& t, float val) { t.y = val; }
+                )
         );
 
         //New usertype vector2i
         lua_state.new_usertype<Vector2i>("Vector2i",
-            sol::constructors<Vector2i(), Vector2i(int, int)>(),
-            "x", &Vector2i::x,
-            "y", &Vector2i::y
+            "x", sol::property(
+                [](Vector2i& t) { return t.x; },
+                [](Vector2i& t, int val) { t.x = val; }
+                ),
+            "y", sol::property(
+                [](Vector2i& t) { return t.y; },
+                [](Vector2i& t, int val) { t.y = val; }
+                )
         );
 
         //New usertype vector2f

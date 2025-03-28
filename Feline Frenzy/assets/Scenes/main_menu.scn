@@ -84,7 +84,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -323.2467346191406,
+                                    "x": 1289.978271484375,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -145,7 +145,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 1275.819580078125,
+                                    "x": -308.8944396972656,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -820,8 +820,8 @@
                             },
                             "GameLogic::Script": {
                                 "Configs": {
-                                    "animation_speed": 0.30000001192092896,
-                                    "hover_scale": 1.2000000476837158,
+                                    "animation_speed": 0.20000000298023224,
+                                    "hover_scale": 1.0499999523162842,
                                     "sprite_end_x": 6,
                                     "sprite_end_y": 0,
                                     "sprite_size_x": 7,

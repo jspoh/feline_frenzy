@@ -187,14 +187,16 @@ namespace NIKE {
         sol::load_result chunk = lua_state->load_file(obj.path.string());
         if (!chunk.valid()) {
             sol::error err = chunk;
-            throw std::runtime_error(err);
+            NIKEE_CORE_WARN(err.what());
+            return Lua::ScriptObj();
         }
 
         // Script executed here (top-level code runs)
         sol::protected_function_result result = chunk();
         if (!result.valid()) {
             sol::error err = result;
-            throw std::runtime_error(err);
+            NIKEE_CORE_WARN(err.what());
+            return Lua::ScriptObj();
         }
 
         //Read schema

@@ -417,7 +417,7 @@ namespace NIKE {
 				newVolume = targetVolume;
 			}
 			bgmcGroup->setVolume(newVolume);
-			NIKEE_CORE_INFO("Fading in BGMC, volume = {}", newVolume);
+			//NIKEE_CORE_INFO("Fading in BGMC, volume = {}", newVolume);
 		}
 		else {
 			// No enemies: fade out.
@@ -426,7 +426,7 @@ namespace NIKE {
 				newVolume = 0.01f;  // Minimal audible level
 			}
 			bgmcGroup->setVolume(newVolume);
-			NIKEE_CORE_INFO("Fading out BGMC, volume = {}", newVolume);
+			//NIKEE_CORE_INFO("Fading out BGMC, volume = {}", newVolume);
 		}
 	}
 

@@ -1,13 +1,13 @@
 
 -- Schema configs
 schema = {
-    hover_scale = 1.2,
+    hover_scale = 1.05,
     trigger_type = "trigger",
-    sprite_size_x = 1,
+    sprite_size_x = 7,
     sprite_size_y = 1,
-    sprite_start_x = 0,
+    sprite_start_x = 1,
     sprite_start_y = 0,
-    sprite_end_x = 0,
+    sprite_end_x = 6,
     sprite_end_y = 0,
     animation_speed = 0.2
 }
@@ -20,6 +20,7 @@ Button.__index = Button
 function Button:new(configs)
     local self = setmetatable({}, Button)
     self.config = configs or {}
+    self.hovered = false
     return self
 end
 
@@ -106,44 +107,58 @@ function Button:Update(entity)
 	if transform ~= nil then
         -- Ensure button is using screen pos
         transform.use_screen_pos = true
-    end
 
-    -- Get Texture component of entity
-    local texture = GetComponent(entity, "Render::Texture")
+        -- Get Texture component of entity
+        local texture = GetComponent(entity, "Render::Texture")
 
-    -- Check if the component is valid
-	if texture ~= nil then
-        -- Set sprite size based on config
-        texture.FrameSize.x = self.config.sprite_size_x
-        texture.FrameSize.y = self.config.sprite_size_y
-    end
-
-    -- Get Texture component of entity
-    local animation_sprite = GetComponent(entity, "Animation::Sprite")
-    local animation_base = GetComponent(entity, "Animation::Base")
-
-    -- Check if mouse is within button
-    if self:MouseInButton(entity) then
-        -- Hover Button
-        if animation_sprite ~= nil and animation_base ~= nil then
-            animation_sprite.StartIndex.x = self.config.sprite_start_x
-            animation_sprite.StartIndex.y = self.config.sprite_start_y
-            animation_sprite.EndIndex.x = self.config.sprite_end_x
-            animation_sprite.EndIndex.y = self.config.sprite_end_y
-            animation_base.FrameDuration = self.config.animation_speed
-            animation_base.AnimationMode = 0;
+        -- Check if the component is valid
+	    if texture ~= nil then
+            -- Set sprite size based on config
+            texture:SetFrameSize(self.config.sprite_size_x, self.config.sprite_size_y)
         end
+
+        -- Get Texture component of entity
+        local animation_sprite = GetComponent(entity, "Animation::Sprite")
+        local animation_base = GetComponent(entity, "Animation::Base")
+
+        -- Check if mouse is within button
+        if self:MouseInButton(entity) then
+
+            -- Save prev scale before hover
+            if self.hovered ~= true then
+                self.before_hover_scale_x = transform.scale.x
+                self.before_hover_scale_y = transform.scale.y
+                transform:SetScale(self.before_hover_scale_x * self.config.hover_scale, self.before_hover_scale_y * self.config.hover_scale)
+                self.hovered = true
+            end
+
+            -- Hover Button
+            if animation_sprite ~= nil and animation_base ~= nil then
+                animation_sprite:SetStartIndex(self.config.sprite_start_x, self.config.sprite_start_y)
+                animation_sprite:SetEndIndex(self.config.sprite_end_x, self.config.sprite_end_y)
+                animation_base.FrameDuration = self.config.animation_speed
+                animation_base.AnimationMode = 0;
+            end
         
-        -- Trigger button
-        if(self:Trigger()) then
-            self:OnTrigger()
-        end
-    else
-        -- Reset hover animation
-        if animation_sprite ~= nil and animation_base ~= nil then
-            animation_sprite.CurrentIndex.x = self.config.sprite_start_x
-            animation_sprite.CurrentIndex.y = self.config.sprite_start_y
-            animation_base.AnimationMode = 3;
+            -- Trigger button
+            if(self:Trigger()) then
+                self:OnTrigger()
+            end
+        else
+
+            -- Reset hover scale
+            if self.hovered ~= false then
+                transform:SetScale(self.before_hover_scale_x, self.before_hover_scale_y)
+                self.hovered = false
+            end
+
+            -- Reset hover animation
+            if animation_sprite ~= nil and animation_base ~= nil then
+                animation_sprite:SetStartIndex(0, 0)
+                animation_sprite:SetEndIndex(0, 0)
+                animation_sprite:SetCurrentIndex(0, 0)
+                animation_base.AnimationMode = 3;
+            end
         end
     end
 end

@@ -25,6 +25,10 @@ namespace NIKE {
                 [](Transform::Transform& t) { return t.scale; },
                 [](Transform::Transform& t, Vector2f val) { t.scale = val; }
                 ),
+            "SetScale", [](Transform::Transform& s, float x, float y) {
+                s.scale.x = x;
+                s.scale.y = y;
+            },
             "rotation", &Transform::Transform::rotation,
             "use_screen_pos", &Transform::Transform::use_screen_pos
         );
@@ -85,7 +89,19 @@ namespace NIKE {
             "CurrentIndex", sol::property(
                 [](Animation::Sprite& s) { return s.curr_index; },
                 [](Animation::Sprite& s, Vector2i val) { s.curr_index = val; }
-                )
+                ),
+            "SetStartIndex", [](Animation::Sprite& s, int x, int y) {
+                s.start_index.x = x;
+                s.start_index.y = y;
+            },
+            "SetEndIndex", [](Animation::Sprite& s, int x, int y) {
+                s.end_index.x = x;
+                s.end_index.y = y;
+            },
+            "SetCurrentIndex", [](Animation::Sprite& s, int x, int y) {
+                s.curr_index.x = x;
+                s.curr_index.y = y;
+            }
         );
 
         lua_state.new_usertype<Render::Texture>("Texture",
@@ -120,7 +136,11 @@ namespace NIKE {
             "Flip", sol::property(
                 [](Render::Texture& t) { return t.b_flip; },
                 [](Render::Texture& t, Vector2b val) { t.b_flip = val; }
-                )
+                ),
+            "SetFrameSize", [](Render::Texture& t, int x, int y) {
+                t.frame_size.x = x;
+                t.frame_size.y = y;
+            }
         );
 
         lua_state.new_usertype<Combat::Health>("Health",
