@@ -394,7 +394,7 @@ namespace NIKE {
 		float fadeRate = targetVolume / fadeTime;
 		//float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
 		//float fadeAmount = fadeRate * delta;
-		float fadeAmount = fadeRate * 0.017; // Test if getDeltaTime() is the problem...
+		float fadeAmount = fadeRate * static_cast<float>(0.017); // Test if getDeltaTime() is the problem...
 
 		if (!enemy_tags.empty()) {
 			// Enemies are present: fade in.
