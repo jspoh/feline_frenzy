@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0081",
+                            "Name": "entity_0094",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -222,7 +222,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0082",
+                            "Name": "entity_0095",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -346,9 +346,38 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0084",
+                            "Name": "entity_0097",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 5,
+                            "Name": "player_shadow",
+                            "Parent": "player",
+                            "Prefab_ID": "player_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "player"
+                                }
+                            },
                             "Tags": []
                         }
                     }
@@ -1211,7 +1240,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 14,
-                            "Name": "entity_0099",
+                            "Name": "entity_0113",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1624,7 +1653,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0105",
+                            "Name": "entity_0119",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

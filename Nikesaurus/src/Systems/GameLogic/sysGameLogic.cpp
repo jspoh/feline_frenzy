@@ -649,6 +649,30 @@ namespace NIKE {
 			}
 		}
 
+		// Create Shadow Entity
+		{
+			Entity::Type shadow_entity = NIKE_ECS_MANAGER->createEntity();
+
+			NIKE_METADATA_SERVICE->setEntityPrefab(shadow_entity, "shadow.prefab");
+
+			// set gun entity as child
+			NIKE_METADATA_SERVICE->setEntityChildRelation(shadow_entity);
+		
+			// get enemy entity name
+			std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(enemy_entity);
+
+			// set gun entity as child of enemy entity
+			NIKE_METADATA_SERVICE->setEntityChildRelationParent(shadow_entity, enemy_entity_name);
+
+			// check that gun has a parent
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(shadow_entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			if (!child || !NIKE_METADATA_SERVICE->getEntityByName(child->parent).has_value()) {
+				NIKEE_CORE_ERROR("Shadow entity has no parent");
+			}
+		}
+
 
 		// Randomly offset from spawner position		
 		float offset_x = getRandomNumber(-20.f, 20.f);
