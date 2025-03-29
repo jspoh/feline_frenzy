@@ -123,6 +123,8 @@
     },
     "MetaData": {
         "Layer ID": 1,
-        "Tags": []
+        "Tags": [
+            "enemy"
+        ]
     }
 }

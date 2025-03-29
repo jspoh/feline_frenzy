@@ -151,6 +151,26 @@ namespace NIKE {
 		return false;
 	}
 
+	void Enemy::changeBossElem(const Entity::Type& enemy)
+	{
+		auto element_com = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(enemy);
+		if (element_com.has_value())
+		{
+			// Get delta time
+			static float elapsed_time = 0.f;
+			elapsed_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			// Change boss elem every 2 seconds
+			if (elapsed_time >= 2.0f)
+			{
+				// Change boss element between 1,3 (enum idexes)
+				int random_number = GameLogic::getRandomNumber(1, 3);
+				element_com.value().get().element = static_cast<Element::Elements>(random_number);
+				elapsed_time = 0;
+			}
+			
+		}
+	}
+
 
 
 	void Enemy::shootBullet(const Entity::Type& enemy, const Entity::Type& player) {
