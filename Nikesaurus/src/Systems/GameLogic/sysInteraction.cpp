@@ -614,6 +614,9 @@ namespace NIKE {
                     // Element is NOT unlocked, so we unlock it
                     collected_elements.insert(source_element);
 
+                    // Switch to the new element
+                    player_element = source_element;
+
                     //NIKEE_CORE_INFO("Element Unlocked: {}", player_element_comp.value().get().elements_to_string.at(source_element));
                 }
                 else {

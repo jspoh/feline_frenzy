@@ -865,7 +865,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 11,
-                            "Name": "entity_0025",
+                            "Name": "entity_0026",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1255,7 +1255,7 @@
                                 "invulnerable_flag": false
                             },
                             "Element::Entity": {
-                                "Element": 2
+                                "Element": 0
                             },
                             "GameLogic::ILogic": {
                                 "Named_Args": {
@@ -1362,7 +1362,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0034",
+                            "Name": "entity_0035",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
                                 "Components": {
