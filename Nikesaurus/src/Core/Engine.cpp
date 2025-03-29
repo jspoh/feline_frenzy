@@ -100,7 +100,6 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerSystem<GameLogic::Manager>(false);
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Enemy::Attack>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<Despawn::Lifetime>());
-		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Script>());
 		NIKE_ECS_MANAGER->addSystemComponentType<GameLogic::Manager>(NIKE_ECS_MANAGER->getComponentType<State::State>());
 		// Yes i know it shldnt be here, but we make do first
@@ -139,7 +138,7 @@ namespace NIKE {
 
 		//auto enemy_sys = NIKE_ECS_MANAGER->registerSystem<Enemy::Manager>(false);
 		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
-		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::ILogic>());
+		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<GameLogic::Script>());
 		//NIKE_ECS_MANAGER->addSystemComponentType<Enemy::Manager>(NIKE_ECS_MANAGER->getComponentType<Pathfinding::Path>());
 	}
 
@@ -158,7 +157,6 @@ namespace NIKE {
 		provideService(std::make_shared<Debug::Service>());
 		provideService(std::make_shared<Map::Service>());
 		provideService(std::make_shared<Camera::Service>());
-		provideService(std::make_shared<UI::Service>());
 #ifndef NDEBUG
 		provideService(std::make_shared<LevelEditor::Service>());
 #endif
@@ -212,18 +210,15 @@ namespace NIKE {
 
 		//Add event listeners for key event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_INPUT_SERVICE);
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::KeyEvent>(NIKE_UI_SERVICE);
 
 
 		//Add event listeners for mouse event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::CursorEnterEvent>(NIKE_INPUT_SERVICE);
 
 
 		//Add event listeners for mouse move event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_INPUT_SERVICE);
-		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_UI_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseMovedEvent>(NIKE_MAP_SERVICE);
 
 		//Add event listeners for mouse scroll event
@@ -246,9 +241,6 @@ namespace NIKE {
 
 		//Init scene
 		NIKE_SCENES_SERVICE->init();
-
-		//Init UI
-		NIKE_UI_SERVICE->init();
 
 		//Init Lua
 		NIKE_LUA_SERVICE->init();
@@ -283,7 +275,7 @@ namespace NIKE {
 #endif
 
 #ifndef NDEBUG
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_1.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
 #endif 
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
@@ -314,9 +306,6 @@ namespace NIKE {
 		//Update & Render Level Editor
 		NIKE_LVLEDITOR_SERVICE->updateAndRender();
 #endif
-
-		////update UI
-		//NIKE_UI_SERVICE->update();
 
 		//update Input
 		NIKE_INPUT_SERVICE->update();

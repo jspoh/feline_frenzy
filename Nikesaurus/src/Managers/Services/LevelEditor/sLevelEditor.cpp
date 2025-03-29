@@ -369,11 +369,6 @@ namespace NIKE {
 		panels.push_back(camera_panel);
 		panels_map.emplace(camera_panel->getName(), camera_panel);
 
-		//Add UI management panel
-		auto ui_panel = std::make_shared<UIPanel>();
-		panels.push_back(ui_panel);
-		panels_map.emplace(ui_panel->getName(), ui_panel);
-
 		//Add Tile Map management panel
 		auto tile_map_panel = std::make_shared<TileMapPanel>();
 		panels.push_back(tile_map_panel);

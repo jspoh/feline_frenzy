@@ -17,7 +17,7 @@
 #include "Managers/ECS/mCoordinator.h"
 #include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/sMetaData.h"
-#include "Managers/Services/sUserInterface.h"
+
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -727,46 +727,6 @@ namespace NIKE {
 			void cameraChangeAction(Render::Cam& active_cam, Render::Cam& cam_before_change);
 
 			void dispatchCameraChange(Entity::Type cam, const std::string& name);
-
-			//Init
-			void init() override;
-
-			//Render
-			void render() override;
-		};
-
-		//User interface Management Panel
-		class UIPanel : public IPanel {
-		private:
-			//Create button popup
-			std::function<void()> createButtonPopup(std::string const& popup_id);
-
-			//Weak reference to entity panel
-			std::weak_ptr<EntitiesPanel> entities_panel;
-
-			// Temporary map to store UI state per button
-			static std::unordered_map<std::string, int> val_type_map;
-			static std::unordered_map<std::string, std::string> named_key_map;
-			static std::unordered_map<std::string, std::string> str_val_map;
-			static std::unordered_map<std::string, int> int_val_map;
-			static std::unordered_map<std::string, float> float_val_map;
-			static std::unordered_map<std::string, bool> bool_val_map;
-
-		public:
-			UIPanel() = default;
-			~UIPanel() = default;
-
-			//Panel Name
-			std::string getName() const override {
-				return "User Interface Management";
-			}
-
-			//Static panel name
-			static std::string getStaticName() {
-				return "User Interface Management";
-			}
-
-			void renderButtonEvent(const std::string& event_name, const std::string& button_name, NIKE::UI::UIBtn & button);
 
 			//Init
 			void init() override;

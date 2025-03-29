@@ -387,35 +387,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 0,
-                            "Scripts": {
-                                "OnClick": {
-                                    "Named_Args": {
-                                        "scene": "how_to_play.scn"
-                                    },
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "Change",
-                                    "Update_Function": ""
-                                },
-                                "OnHover": {
-                                    "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
-                                    },
-                                    "Script_ID": "menu_button.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "HoverButton"
-                                },
-                                "how_to_play_btn": {
-                                    "Named_Args": {},
-                                    "Script_ID": "",
-                                    "Start_Function": "",
-                                    "Update_Function": ""
-                                }
-                            }
-                        },
-                        "UI ID": "how_to_play_btn"
+                        }
                     }
                 },
                 {
@@ -509,29 +481,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 0,
-                            "Scripts": {
-                                "OnClick": {
-                                    "Named_Args": {
-                                        "scene": "cut_scene_1.scn"
-                                    },
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "Change"
-                                },
-                                "OnHover": {
-                                    "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
-                                    },
-                                    "Script_ID": "menu_button.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "HoverButton"
-                                }
-                            }
-                        },
-                        "UI ID": "start_game_btn"
+                        }
                     }
                 },
                 {
@@ -565,8 +515,8 @@
                                 },
                                 "particle_lifespan": 0.0,
                                 "particle_rand_width_range": {
-                                    "x": 5.0,
-                                    "y": 10.0
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "particle_rand_x_offset_range": {
                                     "x": 0.0,
@@ -640,33 +590,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 0,
-                            "Scripts": {
-                                "OnClick": {
-                                    "Named_Args": {},
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "Quit",
-                                    "Update_Function": ""
-                                },
-                                "OnHover": {
-                                    "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
-                                    },
-                                    "Script_ID": "menu_button.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "HoverButton"
-                                },
-                                "quit_btn": {
-                                    "Named_Args": {},
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "Quit"
-                                }
-                            }
-                        },
-                        "UI ID": "quit_btn"
+                        }
                     }
                 },
                 {
@@ -760,29 +684,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 0,
-                            "Scripts": {
-                                "OnClick": {
-                                    "Named_Args": {
-                                        "scene": "SettingsTest.scn"
-                                    },
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "Change",
-                                    "Update_Function": ""
-                                },
-                                "OnHover": {
-                                    "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
-                                    },
-                                    "Script_ID": "menu_button.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "HoverButton"
-                                }
-                            }
-                        },
-                        "UI ID": "options_btn"
+                        }
                     }
                 }
             ],

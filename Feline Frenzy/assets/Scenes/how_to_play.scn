@@ -253,29 +253,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 0,
-                            "Scripts": {
-                                "OnClick": {
-                                    "Named_Args": {
-                                        "scene": "main_menu.scn"
-                                    },
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "Change"
-                                },
-                                "OnHover": {
-                                    "Named_Args": {
-                                        "audio": "MenuHoverOverSFX.wav"
-                                    },
-                                    "Script_ID": "menu_button.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "HoverButton"
-                                }
-                            }
-                        },
-                        "UI ID": "back_btn"
+                        }
                     }
                 },
                 {

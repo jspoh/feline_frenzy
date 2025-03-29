@@ -461,13 +461,6 @@ namespace NIKE {
 		mt_data["MetaData"] = NIKE_METADATA_SERVICE->serialize();
 		data.push_back(mt_data);
 
-		//UI Entities
-		auto const& ui_entities = NIKE_UI_SERVICE->getAllButtons();
-		std::unordered_map<Entity::Type, std::string> ui_entity_to_ref;
-		for (auto it = ui_entities.begin(); it != ui_entities.end(); ++it) {
-			ui_entity_to_ref.emplace(it->second.entity_id, it->first);
-		}
-
 		//Layers in scene
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
@@ -515,12 +508,6 @@ namespace NIKE {
 
 				//Serialize metadata
 				e_data["Entity"]["MetaData"] = NIKE_METADATA_SERVICE->serializeEntityData(entity);
-
-				//If entity is a UI Entity
-				if (ui_entity_to_ref.find(entity) != ui_entity_to_ref.end()) {
-					e_data["Entity"]["UI ID"] = ui_entity_to_ref.at(entity);
-					e_data["Entity"]["UI Btn"] = ui_entities.at(ui_entity_to_ref.at(entity)).serialize();
-				}
 
 				//Push entity into layer data
 				l_data["Layer"]["Entities"].push_back(e_data);
@@ -647,16 +634,6 @@ namespace NIKE {
 									success = false;
 								}
 							}
-						}
-
-						//Check if entity is a UI entity
-						if (e_data.at("Entity").contains("UI ID")) {
-
-							UI::UIBtn btn;
-							btn.deserialize(e_data.at("Entity").at("UI Btn"));
-							btn.entity_id = entity;
-							btn.b_hovered = false;
-							NIKE_UI_SERVICE->getAllButtons()[e_data.at("Entity").at("UI ID").get<std::string>()] = btn;
 						}
 					}
 				}

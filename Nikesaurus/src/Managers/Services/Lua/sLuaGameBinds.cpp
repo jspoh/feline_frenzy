@@ -377,14 +377,14 @@ namespace NIKE {
             float currentVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
             float newVolume = Utility::getMax(0.0f, currentVolume - 0.05f);
             NIKE_AUDIO_SERVICE->setGlobalBGMVolume(newVolume);
-            NIKE_UI_SERVICE->updateVolumeSliderPositions();
+            //NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         lua_state.set_function("SliderArrowRight", [&]() {
             float currentVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
             float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
             NIKE_AUDIO_SERVICE->setGlobalBGMVolume(newVolume);
-            NIKE_UI_SERVICE->updateVolumeSliderPositions();
+            //NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         // Bind slider arrow functions for adjusting global SFX volume.
@@ -392,14 +392,14 @@ namespace NIKE {
             float currentVolume = NIKE_AUDIO_SERVICE->getGlobalSFXVolume();
             float newVolume = Utility::getMax(0.0f, currentVolume - 0.05f);
             NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newVolume);
-            NIKE_UI_SERVICE->updateVolumeSliderPositions();
+            //NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         lua_state.set_function("SfxSliderArrowRight", [&]() {
             float currentVolume = NIKE_AUDIO_SERVICE->getGlobalSFXVolume();
             float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
             NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newVolume);
-            NIKE_UI_SERVICE->updateVolumeSliderPositions();
+            //NIKE_UI_SERVICE->updateVolumeSliderPositions();
             });
 
         //Get SFX

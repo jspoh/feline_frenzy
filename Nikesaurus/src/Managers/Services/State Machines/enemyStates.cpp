@@ -133,7 +133,7 @@ namespace NIKE {
 			// Look for entity w player component
 			for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(other_entity);
 				// If player entity exists
 				if (e_player_comp.has_value()) {
 					// Check if player is within range & shot not on cooldown
@@ -279,7 +279,7 @@ namespace NIKE {
 		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player"))
 		{
 			// Getting components from player and enemy entities
-			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(other_entity);
 			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
 
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
@@ -460,7 +460,7 @@ namespace NIKE {
 
 	}
 
-	void State::EnemyDeathState::playSFX(Entity::Type& entity, bool play_or_no)
+	void State::EnemyDeathState::playSFX([[maybe_unused]] Entity::Type& entity, bool play_or_no)
 	{
 		if (play_or_no) {
 			// Temporary hardcoded SFX

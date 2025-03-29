@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0385",
+                            "Name": "entity_0233",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -570,7 +570,11 @@
                                     "State::State": null,
                                     "Transform::Transform": null
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "objects"
@@ -1566,7 +1570,11 @@
                                         }
                                     }
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "objects"
@@ -1615,14 +1623,6 @@
                             },
                             "Element::Entity": {
                                 "Element": 2
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 44
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "Test",
-                                "Update_Function": "update"
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": false,

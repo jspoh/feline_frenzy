@@ -172,7 +172,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0549",
+                            "Name": "entity_0268",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -500,14 +500,6 @@
                             },
                             "Element::Entity": {
                                 "Element": 1
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 11
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "Test",
-                                "Update_Function": "update"
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": false,

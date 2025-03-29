@@ -127,10 +127,7 @@ namespace NIKE {
 
 			// Look for entity w player component
 			for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-				// Look for entity w player component, do like this first, when meta data is out, no need iterate through
-				auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
-				// If player entity exists
-				if (e_player_comp.has_value()) {
+
 					// Check if player is within range & shot not on cooldown
 					if (enemy_comp.last_shot_time >= enemy_comp.cooldown) {
 						// Stop enemy when they shooting
@@ -148,7 +145,6 @@ namespace NIKE {
 						// Reset the last shot time after shooting
 						enemy_comp.last_shot_time = 0.f;
 					}
-				}
 			}
 		}
 	}
@@ -280,7 +276,7 @@ namespace NIKE {
 		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player"))
 		{
 			// Getting components from player and enemy entities
-			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_game_logic = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(other_entity);
 			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(other_entity);
 
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);

@@ -61,7 +61,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
-                            "Name": "entity_0024",
+                            "Name": "entity_0217",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -112,7 +112,7 @@
                             "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0025",
+                            "Name": "entity_0218",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -183,7 +183,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0026",
+                            "Name": "entity_0219",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -254,7 +254,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0027",
+                            "Name": "entity_0220",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -298,7 +298,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0028",
+                            "Name": "entity_0221",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -342,7 +342,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 5,
-                            "Name": "entity_0029",
+                            "Name": "entity_0222",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -399,7 +399,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 6,
-                            "Name": "entity_0030",
+                            "Name": "entity_0223",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -443,7 +443,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 7,
-                            "Name": "entity_0031",
+                            "Name": "entity_0224",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -488,14 +488,6 @@
                             },
                             "Element::Entity": {
                                 "Element": 0
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 118
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "",
-                                "Update_Function": ""
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": true,
@@ -713,7 +705,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 9,
-                            "Name": "entity_0033",
+                            "Name": "entity_0226",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -784,7 +776,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 10,
-                            "Name": "entity_0034",
+                            "Name": "entity_0227",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -909,7 +901,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 11,
-                            "Name": "entity_0035",
+                            "Name": "entity_0228",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1034,7 +1026,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 12,
-                            "Name": "entity_0036",
+                            "Name": "entity_0229",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1159,7 +1151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 13,
-                            "Name": "entity_0037",
+                            "Name": "entity_0230",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

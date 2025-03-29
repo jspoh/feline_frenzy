@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0265",
+                            "Name": "entity_0043",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -242,7 +242,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0266",
+                            "Name": "entity_0044",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1142,14 +1142,6 @@
                             },
                             "Element::Entity": {
                                 "Element": 2
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 1647
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "",
-                                "Update_Function": "update"
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": false,

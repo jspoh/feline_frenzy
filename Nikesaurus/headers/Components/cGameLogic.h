@@ -31,6 +31,10 @@ namespace NIKE {
 
 			//Init flag
 			bool b_init = false;
+
+			//Constructors
+			Script() = default;
+			Script(std::string const& script_id, std::string const& update_func) : script_id{ script_id }, update_func{ update_func } {}
 		};
 
 		struct State {
@@ -43,14 +47,6 @@ namespace NIKE {
 			std::string currentState;
 			std::unordered_map<std::string, State> states;
 			std::unordered_map<std::string, std::function<bool()>> transitions; // Use Lua functions as conditions
-		};
-
-		//Movement logic component
-		struct ILogic {
-			Lua::Script script;
-
-			ILogic() : script() {}
-			// Movement(std::string const& script) : script(script) {}
 		};
 
 		void registerComponents();

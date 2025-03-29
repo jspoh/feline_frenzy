@@ -174,27 +174,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Scripts": {
-                                "OnClick": {
-                                    "Named_Args": {
-                                        "scene": "cut_scene_3.scn"
-                                    },
-                                    "Script_ID": "ChangeScene.lua",
-                                    "Start_Function": "",
-                                    "Update_Function": "Change"
-                                },
-                                "OnHover": {
-                                    "Named_Args": {},
-                                    "Script_ID": "",
-                                    "Start_Function": "",
-                                    "Update_Function": ""
-                                }
-                            }
-                        },
-                        "UI ID": "next_button"
+                        }
                     }
                 },
                 {
@@ -266,12 +246,7 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Scripts": null
-                        },
-                        "UI ID": "back_button"
+                        }
                     }
                 }
             ],

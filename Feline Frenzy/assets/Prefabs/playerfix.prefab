@@ -39,14 +39,6 @@
         "Element::Entity": {
             "Element": 0
         },
-        "GameLogic::ILogic": {
-            "Named_Args": {
-                "entity": 11
-            },
-            "Script_ID": "player.lua",
-            "Start_Function": "",
-            "Update_Function": ""
-        },
         "Physics::Collider": {
             "B_Bind_To_Entity": true,
             "Pos_Offset": {

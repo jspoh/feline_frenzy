@@ -102,7 +102,6 @@
     <ClCompile Include="src\Managers\Services\State Machines\destructableTransitions.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\sStateMachine.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\enemyStates.cpp" />
-    <ClCompile Include="src\Managers\Services\sUserInterface.cpp" />
     <ClCompile Include="src\Managers\Services\State Machines\enemyTransitions.cpp" />
     <ClCompile Include="src\Systems\Animation\subAnimations.cpp" />
     <ClCompile Include="src\Systems\Animation\sysAnimation.cpp" />
@@ -196,7 +195,6 @@
     <ClInclude Include="headers\Managers\Services\State Machine\destructableTransitions.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\sStateMachine.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\enemyStates.h" />
-    <ClInclude Include="headers\Managers\Services\sUserInterface.h" />
     <ClInclude Include="headers\Managers\Services\State Machine\enemyTransitions.h" />
     <ClInclude Include="headers\Systems\Animation\subAnimations.h" />
     <ClInclude Include="headers\Systems\Animation\sysAnimation.h" />

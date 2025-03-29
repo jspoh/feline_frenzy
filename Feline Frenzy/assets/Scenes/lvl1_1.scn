@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
+                            "Name": "entity_0183",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -222,7 +222,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "entity_0184",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -346,7 +346,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0004",
+                            "Name": "entity_0186",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -564,7 +564,11 @@
                                     "State::State": null,
                                     "Transform::Transform": null
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "objects"
@@ -1043,14 +1047,6 @@
                                 "Components": {
                                     "Animation::Base": null,
                                     "Combat::Health": null,
-                                    "GameLogic::ILogic": {
-                                        "Named_Args": {
-                                            "entity": 173
-                                        },
-                                        "Script_ID": "objectsLogic.lua",
-                                        "Start_Function": "Test",
-                                        "Update_Function": "Test"
-                                    },
                                     "Physics::Collider": null,
                                     "Render::Texture": {
                                         "Color": {
@@ -1068,7 +1064,11 @@
                                         }
                                     }
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "objects"
@@ -1211,7 +1211,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 14,
-                            "Name": "entity_0019",
+                            "Name": "entity_0201",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1411,7 +1411,11 @@
                                         }
                                     }
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "objects"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "objects"
@@ -1626,7 +1630,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0025",
+                            "Name": "entity_0207",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

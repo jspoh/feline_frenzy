@@ -62,7 +62,7 @@ namespace NIKE {
 				}
 
 				////Check for logic comp
-				//const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
+				//const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(entity);
 				//if (e_logic_comp.has_value()) {
 				//	auto& e_logic = e_logic_comp.value().get();
 
@@ -436,7 +436,7 @@ namespace NIKE {
 	}
 
 
-	void GameLogic::Manager::gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)
+	void GameLogic::Manager::gameOverlay(const std::string& background_texture, [[maybe_unused]]const std::string& play_again, [[maybe_unused]]const std::string& quit_game_text)
 	{
 		// Destroy the player's health UI container if applicable
 		// NIKE_ECS_MANAGER->destroyEntity(entity);
@@ -457,31 +457,21 @@ namespace NIKE {
 				true));
 
 		// Create Play Again button
-		NIKE_UI_SERVICE->createButton(play_again,
-			Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
-			Render::Text(),
-			Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+		auto e_play_again = NIKE_ECS_MANAGER->createEntity();
+		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(e_play_again, Transform::Transform(Vector2f(0.0f, -200.0f), Vector2f(375.0f, 75.0f), 0.0f, true));
+		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(e_play_again, Render::Texture("Play_Again_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+		GameLogic::Script play_again_script = GameLogic::Script("Button.lua", "update");
+		play_again_script.configs["trigger_action"] = static_cast<int>(Scenes::Actions::CHANGE);
+		play_again_script.configs["change_scene"] = "lvl1_1.scn";
+		NIKE_ECS_MANAGER->addEntityComponent<GameLogic::Script>(e_play_again, std::move(play_again_script));
 
 		// Create Quit button
-		NIKE_UI_SERVICE->createButton(quit_game_text,
-			Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true),
-			Render::Text(),
-			Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
-
-		// Set button input states
-		NIKE_UI_SERVICE->setButtonInputState(play_again, UI::InputStates::TRIGGERED);
-		NIKE_UI_SERVICE->setButtonInputState(quit_game_text, UI::InputStates::TRIGGERED);
-
-		// Assign Lua scripts to buttons
-		auto play_again_script = Lua::Script();
-		play_again_script.script_id = "ChangeScene.lua";
-		play_again_script.update_function = "Restart";
-		NIKE_UI_SERVICE->setButtonScript(play_again, play_again_script, "OnClick");
-		
-		auto quit_script = Lua::Script();
-		quit_script.script_id = "ChangeScene.lua";
-		quit_script.update_function = "Quit";
-		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
+		auto e_quit = NIKE_ECS_MANAGER->createEntity();
+		NIKE_ECS_MANAGER->addEntityComponent<Transform::Transform>(e_quit, Transform::Transform(Vector2f(0.0f, -300.0f), Vector2f(375.0f, 75.0f), 0.0f, true));
+		NIKE_ECS_MANAGER->addEntityComponent<Render::Texture>(e_quit, Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), false, 0.5f, false, Vector2i(7, 1)));
+		GameLogic::Script quit_script = GameLogic::Script("Button.lua", "update");
+		quit_script.configs["trigger_action"] = static_cast<int>(Scenes::Actions::CLOSE);
+		NIKE_ECS_MANAGER->addEntityComponent<GameLogic::Script>(e_quit, std::move(quit_script));
 	}
 
 	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {

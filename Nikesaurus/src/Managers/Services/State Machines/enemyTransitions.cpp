@@ -73,11 +73,11 @@ namespace NIKE {
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(player);
 			// Somehow e_player_comp is getting nullptr
 			if (e_player_comp.has_value())
 			{
-				// If entity has the gamelogic::ilogic component, and within range of enemy
+				// If entity has the GameLogic::Script component, and within range of enemy
 				if (Enemy::isWithinGridRange(entity, player)){
 					return true;
 				}
@@ -103,7 +103,7 @@ namespace NIKE {
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(player);
 			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 			auto e_enemy_combat = NIKE_ECS_MANAGER->getEntityComponent<Combat::Faction>(entity);
@@ -193,10 +193,10 @@ namespace NIKE {
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(player);
 			if (e_player_comp.has_value())
 			{
-				// If entity has the gamelogic::ilogic component, and not within range of enemy
+				// If entity has the GameLogic::Script component, and not within range of enemy
 				if (!Enemy::isWithinGridRange(entity, player)) {
 					return true;
 				}
@@ -221,7 +221,7 @@ namespace NIKE {
 		// This function will check if there is a path from player to enemy entity(param)
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(player);
 			auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 			auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
@@ -309,10 +309,10 @@ namespace NIKE {
 	{
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(other_entity);
 			if (e_player_comp.has_value())
 			{
-				// If entity has the gamelogic::ilogic component, and not within range of enemy
+				// If entity has the GameLogic::Script component, and not within range of enemy
 				if (Enemy::isWithinGridRange(entity, other_entity)) {
 					return true;
 				}
@@ -338,7 +338,7 @@ namespace NIKE {
 		// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 		for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 			// Getting comps
-			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+			auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(player);
 
 			if (e_player_comp.has_value())
 			{
@@ -433,10 +433,10 @@ namespace NIKE {
 	//	// Look for entity w player component, do like this first, when meta data is out, no need iterate through
 	//	for (auto& other_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 	//		auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
-	//		auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(other_entity);
+	//		auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(other_entity);
 	//		if (e_player_comp.has_value() && health_comp.has_value())
 	//		{
-	//			// If entity has the gamelogic::ilogic component, and not within range of enemy
+	//			// If entity has the GameLogic::Script component, and not within range of enemy
 	//			if (Enemy::isWithinGridRange(entity, other_entity) && !health_comp.value().get().taken_damage) {
 	//				return true;
 	//			}
@@ -460,7 +460,7 @@ namespace NIKE {
 	//	// This function will check if there is a path from player to enemy entity(param)
 	//	for (auto& player : NIKE_METADATA_SERVICE->getEntitiesByTag("player")) {
 	//		// Getting comps
-	//		auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(player);
+	//		auto e_player_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::Script>(player);
 	//		auto e_player_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player);
 	//		auto e_enemy_transform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 	//		auto health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);

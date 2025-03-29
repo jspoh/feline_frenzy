@@ -117,7 +117,6 @@ namespace NIKE {
 		curr_scene = scene_id;
 
 		NIKE_ECS_MANAGER->destroyAllEntities();
-		NIKE_UI_SERVICE->destroyAllButtons();
 		// Do not clear audio channel groups so as not to modify the .scn file data.
 		NIKE_CAMERA_SERVICE->clearCameraEntities();
 		NIKE_METADATA_SERVICE->reset();
@@ -150,7 +149,6 @@ namespace NIKE {
 		std::string oldBGMC = NIKE_AUDIO_SERVICE->getBGMCTrackForScene();
 
 		NIKE_ECS_MANAGER->destroyAllEntities();
-		NIKE_UI_SERVICE->destroyAllButtons();
 		// Do not clear audio channel groups.
 		NIKE_METADATA_SERVICE->reset();
 		NIKE_MAP_SERVICE->resetGrid();
@@ -178,7 +176,6 @@ namespace NIKE {
 		}
 		std::swap(prev_scene, curr_scene);
 		NIKE_ECS_MANAGER->destroyAllEntities();
-		NIKE_UI_SERVICE->destroyAllButtons();
 		// Do not clear audio channel groups.
 		NIKE_CAMERA_SERVICE->clearCameraEntities();
 		NIKE_METADATA_SERVICE->reset();
@@ -192,7 +189,6 @@ namespace NIKE {
 
 	void Scenes::Service::resetScene() {
 		NIKE_ECS_MANAGER->destroyAllEntities();
-		NIKE_UI_SERVICE->destroyAllButtons();
 		// For resetScene, we may still clear audio channel groups if desired;
 		// if not, remove the call below.
 		// NIKE_AUDIO_SERVICE->clearAllChannelGroups();
