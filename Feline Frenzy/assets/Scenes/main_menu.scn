@@ -84,7 +84,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 1289.978271484375,
+                                    "x": 303.5274963378906,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -145,7 +145,7 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -308.8944396972656,
+                                    "x": -1295.4583740234375,
                                     "y": 0.0
                                 },
                                 "Rotation": 0.0,
@@ -268,6 +268,40 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "animation_speed": 0.20000000298023224,
+                                    "change_scene": "how_to_play.scn",
+                                    "hover_scale": 1.0499999523162842,
+                                    "sprite_end_x": 6,
+                                    "sprite_end_y": 0,
+                                    "sprite_size_x": 7,
+                                    "sprite_size_y": 1,
+                                    "sprite_start_x": 1,
+                                    "sprite_start_y": 0,
+                                    "trigger_action": 0,
+                                    "trigger_type": "trigger"
+                                },
+                                "Script_ID": "Button.lua",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 22.862274169921875,
+                                    "y": -214.9755859375
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 345.5222473144531,
+                                    "y": 58.280860900878906
+                                }
+                            },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
                                 "num_new_particles_per_second": 0,
@@ -325,22 +359,6 @@
                                 "preset": 0,
                                 "render_type": 1,
                                 "texture_ref": ""
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.8999999761581421,
-                                    "y": 0.8999999761581421,
-                                    "z": 0.8999999761581421
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Text": ""
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -420,21 +438,39 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 3.580393075942993,
-                                    "y": 3.549020528793335,
-                                    "z": 3.8509814739227295
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "animation_speed": 0.20000000298023224,
+                                    "change_scene": "cut_scene_1.scn",
+                                    "hover_scale": 1.0499999523162842,
+                                    "sprite_end_x": 6,
+                                    "sprite_end_y": 0,
+                                    "sprite_size_x": 7,
+                                    "sprite_size_y": 1,
+                                    "sprite_start_x": 1,
+                                    "sprite_start_y": 0,
+                                    "trigger_action": 0,
+                                    "trigger_type": "trigger"
                                 },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
+                                "Script_ID": "Button.lua",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Text": ""
+                                "Position": {
+                                    "x": 22.170486450195313,
+                                    "y": -143.3545379638672
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 315.24249267578125,
+                                    "y": 59.89607238769531
+                                }
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -487,6 +523,67 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Animation::Base": {
+                                "Animation_Count": 0,
+                                "B_PingPong": false,
+                                "B_Reverse": false,
+                                "Frame_Duration": 0.20000000298023224
+                            },
+                            "Animation::Sprite": {
+                                "End_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Sheet_Size": {
+                                    "x": 7,
+                                    "y": 1
+                                },
+                                "Start_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            },
+                            "Audio::SFX": {
+                                "Audio_ID": "MenuYesOpen.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "SFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "animation_speed": 0.20000000298023224,
+                                    "change_scene": "",
+                                    "hover_scale": 1.0499999523162842,
+                                    "sprite_end_x": 6,
+                                    "sprite_end_y": 0,
+                                    "sprite_size_x": 7,
+                                    "sprite_size_y": 1,
+                                    "sprite_start_x": 1,
+                                    "sprite_start_y": 0,
+                                    "trigger_action": 4,
+                                    "trigger_type": "trigger"
+                                },
+                                "Script_ID": "Button.lua",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 22.862274169921875,
+                                    "y": -364.9756164550781
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 272.1745910644531,
+                                    "y": 56.173622131347656
+                                }
+                            },
                             "Render::ParticleEmitter": {
                                 "duration": -1.0,
                                 "num_new_particles_per_second": 0,
@@ -623,21 +720,39 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.9019607901573181,
-                                    "y": 0.9019607901573181,
-                                    "z": 0.9019607901573181
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "animation_speed": 0.20000000298023224,
+                                    "change_scene": "SettingsTest.scn",
+                                    "hover_scale": 1.0499999523162842,
+                                    "sprite_end_x": 6,
+                                    "sprite_end_y": 0,
+                                    "sprite_size_x": 7,
+                                    "sprite_size_y": 1,
+                                    "sprite_start_x": 1,
+                                    "sprite_start_y": 0,
+                                    "trigger_action": 0,
+                                    "trigger_type": "trigger"
                                 },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
+                                "Script_ID": "Button.lua",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
                                     "x": 0.0,
                                     "y": 0.0
                                 },
-                                "Text": ""
+                                "Position": {
+                                    "x": 24.889373779296875,
+                                    "y": -289.9756164550781
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 215.9463348388672,
+                                    "y": 58.710411071777344
+                                }
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -700,111 +815,6 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.20000000298023224
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 7,
-                                    "y": 1
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "GameLogic::Script": {
-                                "Configs": {
-                                    "animation_speed": 0.20000000298023224,
-                                    "change_scene": "cut_scene_1.scn",
-                                    "hover_scale": 1.0499999523162842,
-                                    "sprite_end_x": 6,
-                                    "sprite_end_y": 0,
-                                    "sprite_size_x": 7,
-                                    "sprite_size_y": 1,
-                                    "sprite_start_x": 1,
-                                    "sprite_start_y": 0,
-                                    "trigger_action": 0,
-                                    "trigger_type": "trigger"
-                                },
-                                "Script_ID": "Button.lua",
-                                "Update_Function": "update"
-                            },
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
-                                    "x": -438.7222595214844,
-                                    "y": -73.71658325195313
-                                },
-                                "Resolution": 0,
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 386.2175598144531,
-                                    "y": 73.38133239746094
-                                }
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 7,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "UI_PlayGame_spritesheet.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -438.7222595214844,
-                                    "y": -73.71658325195313
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 386.2175598144531,
-                                    "y": 73.38133239746094
-                                },
-                                "Screen Position": true
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 2,
-                            "Layer_Order": 0,
-                            "Name": "button_testing",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
                             "Render::Shape": {
                                 "Color": {
                                     "w": 0.0,
@@ -830,7 +840,7 @@
                         "MetaData": {
                             "B_Locked": true,
                             "Layer_ID": 2,
-                            "Layer_Order": 1,
+                            "Layer_Order": 0,
                             "Name": "fade_overlay",
                             "Prefab_ID": "",
                             "Prefab_Override": null,

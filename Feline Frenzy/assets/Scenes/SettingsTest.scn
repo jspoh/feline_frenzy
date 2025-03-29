@@ -182,7 +182,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0030",
+                            "Name": "entity_0024",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -228,6 +228,40 @@
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
+                            },
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "animation_speed": 0.20000000298023224,
+                                    "change_scene": "main_menu.scn",
+                                    "hover_scale": 1.0499999523162842,
+                                    "sprite_end_x": 6,
+                                    "sprite_end_y": 0,
+                                    "sprite_size_x": 7,
+                                    "sprite_size_y": 1,
+                                    "sprite_start_x": 1,
+                                    "sprite_start_y": 0,
+                                    "trigger_action": 0,
+                                    "trigger_type": "trigger"
+                                },
+                                "Script_ID": "Button.lua",
+                                "Update_Function": "update"
+                            },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1.0,
+                                    "y": 1.0
+                                }
                             },
                             "Render::Text": {
                                 "Color": {

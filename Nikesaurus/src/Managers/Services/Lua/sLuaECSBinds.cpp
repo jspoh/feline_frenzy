@@ -44,6 +44,29 @@ namespace NIKE {
                 )
         );
 
+        lua_state.new_usertype<Audio::SFX>("SFX",
+            "Play", sol::property(
+                [](Audio::SFX& s) { return s.b_play_sfx; },
+                [](Audio::SFX& s, bool val) { s.b_play_sfx = val; }
+                ),
+            "AudioID", sol::property(
+                [](Audio::SFX& s) { return s.audio_id; },
+                [](Audio::SFX& s, const std::string& val) { s.audio_id = val; }
+                ),
+            "ChannelGroupID", sol::property(
+                [](Audio::SFX& s) { return s.channel_group_id; },
+                [](Audio::SFX& s, const std::string& val) { s.channel_group_id = val; }
+                ),
+            "Volume", sol::property(
+                [](Audio::SFX& s) { return s.volume; },
+                [](Audio::SFX& s, float val) { s.volume = val; }
+                ),
+            "Pitch", sol::property(
+                [](Audio::SFX& s) { return s.pitch; },
+                [](Audio::SFX& s, float val) { s.pitch = val; }
+                )
+        );
+
         lua_state.new_usertype<Animation::Base>("Base",
             "AnimationMode", sol::property(
                 [](Animation::Base& b) { return b.animation_mode; },
@@ -200,6 +223,13 @@ namespace NIKE {
             // Use a template function to handle different component types
             if (componentName == "Physics::Collider") {
                 auto component = std::static_pointer_cast<Physics::Collider>(
+                    NIKE_ECS_MANAGER->getEntityComponent(entity, type)
+                );
+                return sol::make_object(lua_state, component);
+            }
+            // Use a template function to handle different component types
+            if (componentName == "Audio::SFX") {
+                auto component = std::static_pointer_cast<Audio::SFX>(
                     NIKE_ECS_MANAGER->getEntityComponent(entity, type)
                 );
                 return sol::make_object(lua_state, component);

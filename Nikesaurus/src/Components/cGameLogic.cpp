@@ -200,6 +200,7 @@ namespace NIKE {
 								else if constexpr (std::is_same_v<T, std::string>) {
 									//Static variables for string input management
 									std::string text_input = v;
+									text_input.resize(64);
 									ImGui::Text(key.c_str());
 									if (ImGui::InputText(("##Config " + key).c_str(), text_input.data(), text_input.capacity() + 1)) {
 										text_input.resize(strlen(text_input.c_str()));

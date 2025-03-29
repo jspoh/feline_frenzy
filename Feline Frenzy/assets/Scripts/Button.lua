@@ -134,6 +134,16 @@ function Button:Update(entity)
                 self.before_hover_scale_y = transform.scale.y
                 transform:SetScale(self.before_hover_scale_x * self.config.hover_scale, self.before_hover_scale_y * self.config.hover_scale)
                 self.hovered = true
+
+                -- Play hovered audio
+                local sfx = GetComponent(entity, "Audio::SFX")
+
+                -- Check if the component is valid
+	            if sfx ~= nil then
+
+                    -- Set SFX Play To Be True
+                    sfx.Play = true
+                end
             end
 
             -- Hover Button
