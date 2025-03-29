@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0081",
+                            "Name": "entity_0001",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -222,7 +222,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0082",
+                            "Name": "entity_0002",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -346,7 +346,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0084",
+                            "Name": "entity_0004",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1211,7 +1211,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 14,
-                            "Name": "entity_0099",
+                            "Name": "entity_0019",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1461,12 +1461,14 @@
                             "Element::Entity": {
                                 "Element": 2
                             },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 179
+                            "GameLogic::Script": {
+                                "Configs": {
+                                    "forces_down": -3000,
+                                    "forces_left": -3000,
+                                    "forces_right": 3000,
+                                    "forces_up": 3000
                                 },
                                 "Script_ID": "player.lua",
-                                "Start_Function": "Test",
                                 "Update_Function": "update"
                             },
                             "Physics::Collider": {
@@ -1624,7 +1626,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 20,
-                            "Name": "entity_0105",
+                            "Name": "entity_0025",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

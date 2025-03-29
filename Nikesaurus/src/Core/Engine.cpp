@@ -283,7 +283,7 @@ namespace NIKE {
 #endif
 
 #ifndef NDEBUG
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_1.scn"));
 #endif 
 #ifdef NDEBUG
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
@@ -315,8 +315,8 @@ namespace NIKE {
 		NIKE_LVLEDITOR_SERVICE->updateAndRender();
 #endif
 
-		//update UI
-		NIKE_UI_SERVICE->update();
+		////update UI
+		//NIKE_UI_SERVICE->update();
 
 		//update Input
 		NIKE_INPUT_SERVICE->update();

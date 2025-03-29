@@ -827,9 +827,9 @@
                                     "sprite_end_y": 0,
                                     "sprite_size_x": 7,
                                     "sprite_size_y": 1,
-                                    "sprite_start_x": -36,
+                                    "sprite_start_x": 1,
                                     "sprite_start_y": 0,
-                                    "trigger_action": 3,
+                                    "trigger_action": 0,
                                     "trigger_type": "trigger"
                                 },
                                 "Script_ID": "Button.lua",

@@ -83,8 +83,13 @@ namespace NIKE {
 					auto& e_script = e_script_comp.value().get();
 
 					//Check if script is active
-					if (e_script.script_id == "" || !e_script.script_instance.valid())
+					if (e_script.script_id == "")
 						continue;
+
+					//Check if script needs to be hot reloaded
+					if (!e_script.b_init || !e_script.script_instance.valid()) {
+						NIKE_LUA_SERVICE->initScript(e_script.script_id, e_script.configs, e_script.script_instance, e_script.b_init);
+					}
 
 					//Call script update function
 					sol::function script_function = e_script.script_instance[e_script.update_func];
