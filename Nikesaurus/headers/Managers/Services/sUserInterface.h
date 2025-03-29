@@ -27,9 +27,9 @@ namespace NIKE {
 	namespace UI {
 
 		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
-		//UI Input States
+//UI Input States
 		enum class InputStates {
 			PRESSED = 0,
 			TRIGGERED,
@@ -51,9 +51,8 @@ namespace NIKE {
 			bool b_hovered;
 			InputStates input_state;
 			std::unordered_map<std::string, Lua::Script> scripts;
-			bool b_disabled;
 
-			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, b_disabled{ false } {};
+			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED } {};
 
 			nlohmann::json serialize() const;
 
@@ -139,9 +138,6 @@ namespace NIKE {
 			//Destroy button
 			void destroyButton(std::string const& btn_id);
 
-			//Set button disabled
-			void setButtonDisabled(std::string const& btn_id, bool disable);
-
 			//Check button hovered
 			bool isButtonHovered(std::string const& btn_id) const;
 
@@ -150,9 +146,6 @@ namespace NIKE {
 
 			//Get all buttons
 			std::unordered_map<std::string, UI::UIBtn>& getAllButtons();
-
-			//Find a button
-			UI::UIBtn* getButton(const std::string& buttonName);
 
 			//Destroy all buttons
 			void destroyAllButtons();

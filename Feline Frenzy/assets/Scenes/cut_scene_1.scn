@@ -10,7 +10,7 @@
             "BGMC": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Combat_v1.wav"
+                    "BGM_Level_Combat_v1_voladj.wav"
                 ]
             },
             "SFX": {

@@ -334,14 +334,14 @@ namespace NIKE {
 			}
 
 			//Escape Key
-			//if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-			//	if (NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen()) {
-			//		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-			//	}
-			//	else {
-			//		NIKE_WINDOWS_SERVICE->getWindow()->terminate();
-			//	}
-			//}
+			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+				if (NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen()) {
+					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
+				}
+				else {
+					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				}
+			}
 
 			//Toggle full screen
 			if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {

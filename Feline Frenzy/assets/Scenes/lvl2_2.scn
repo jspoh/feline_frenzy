@@ -10,7 +10,7 @@
             "BGMC": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Combat_v1.wav"
+                    "BGM_Level_Combat_v1_voladj.wav"
                 ]
             },
             "BulletSFX": {
@@ -172,38 +172,9 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0163",
+                            "Name": "entity_0268",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 0,
-                            "Layer_Order": 2,
-                            "Name": "player_shadow",
-                            "Parent": "player",
-                            "Prefab_ID": "player_shadow.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": null
-                                },
-                                "MetaData": {
-                                    "Parent": "player"
-                                }
-                            },
                             "Tags": []
                         }
                     }
@@ -529,14 +500,6 @@
                             },
                             "Element::Entity": {
                                 "Element": 1
-                            },
-                            "GameLogic::ILogic": {
-                                "Named_Args": {
-                                    "entity": 11
-                                },
-                                "Script_ID": "player.lua",
-                                "Start_Function": "Test",
-                                "Update_Function": "update"
                             },
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": false,
@@ -1029,11 +992,11 @@
                                     "y": 0
                                 },
                                 "Frame_Size": {
-                                    "x": 4,
+                                    "x": 1,
                                     "y": 1
                                 },
                                 "Intensity": 0.5,
-                                "Texture_ID": "HealthBar_spritesheet.png"
+                                "Texture_ID": "Healthbar_base.png"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -1042,8 +1005,8 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 158.0,
-                                    "y": 64.77017974853516
+                                    "x": 150.0,
+                                    "y": 128.0
                                 },
                                 "Screen Position": false
                             }

@@ -62,9 +62,6 @@ namespace NIKE {
 			// Freeze Status
 			void applyFreeze(float& max_speed, float freeze_speed, float& temp_max_speed);
 
-			// Cheat code to set health to 100 everytime
-			void resetHealth();
-
 	    public:
 		    //Default constructor
 		    Manager() = default;
