@@ -15,7 +15,6 @@ function Audios:HoverButton(args)
 	SetAnimationVariables(entity, 1, 0, 6, 0, 5, 0)
 	PlayAudio(args.audio)
 
-
 	local component = GetComponent(entity, "Transform::Transform")
 	if component ~= nil then
     	-- Access the component's properties, e.g., position, scale, rotation

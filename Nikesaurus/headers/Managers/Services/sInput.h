@@ -1,7 +1,7 @@
 /*****************************************************************//**
  * \file   sInput.h
  * \brief  input manager for engine
- * 
+ *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
  * All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
@@ -17,9 +17,9 @@ namespace NIKE {
 	namespace Input {
 
 		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
-		//Key States
+//Key States
 		enum class NIKE_API States {
 			PRESS = NIKE_PRESS,
 			RELEASE = NIKE_RELEASE,
@@ -70,12 +70,12 @@ namespace NIKE {
 		};
 
 		//Input manager for input polling
-		class NIKE_API Service 
-			:	public Events::IEventListener<KeyEvent>,
-				public Events::IEventListener<MouseBtnEvent>,
-				public Events::IEventListener<MouseMovedEvent>,
-				public Events::IEventListener<MouseScrollEvent>,
-				public Events::IEventListener<CursorEnterEvent>
+		class NIKE_API Service
+			: public Events::IEventListener<KeyEvent>,
+			public Events::IEventListener<MouseBtnEvent>,
+			public Events::IEventListener<MouseMovedEvent>,
+			public Events::IEventListener<MouseScrollEvent>,
+			public Events::IEventListener<CursorEnterEvent>
 		{
 		private:
 
@@ -92,13 +92,15 @@ namespace NIKE {
 
 			//Data structure of state
 			struct EventStates {
+				bool polling;
 				bool pressed;
 				bool triggered;
 				bool released;
 			};
 
-			//Input events map
-			std::unordered_map<int, EventStates> input_events;
+			//Set of keys
+			std::set<int> curr_keys;
+			std::set<int> prev_keys;
 
 			//Mouse data structure
 			struct Mouse {
@@ -121,6 +123,9 @@ namespace NIKE {
 
 			//Default Constructor
 			Service() = default;
+
+			//Update func
+			void update();
 
 			//Key Pressed
 			bool isKeyPressed(int key);
@@ -160,7 +165,7 @@ namespace NIKE {
 		};
 
 		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
+#pragma warning(default: 4251)
 	}
 }
 

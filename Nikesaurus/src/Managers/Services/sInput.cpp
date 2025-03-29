@@ -15,27 +15,16 @@ namespace NIKE {
 
 	void Input::Service::onEvent(std::shared_ptr<KeyEvent> event) {
 
-		//Reset all release events upon new event
-		for (auto& input : input_events) {
-			input.second.released = false;
-		}
-
 		//Handle event states
 		switch (event->state) {
 		case States::PRESS:
-			input_events[event->code].pressed = true;
-			input_events[event->code].triggered = true;
-			input_events[event->code].released = false;
+			curr_keys.insert(event->code);
 			break;
 		case States::REPEAT:
-			input_events[event->code].pressed = true;
-			input_events[event->code].triggered = false;
-			input_events[event->code].released = false;
+			curr_keys.insert(event->code);
 			break;
 		case States::RELEASE:
-			input_events[event->code].pressed = false;
-			input_events[event->code].triggered = false;
-			input_events[event->code].released = true;
+			curr_keys.erase(event->code);
 			break;
 		default:
 			break;
@@ -43,27 +32,17 @@ namespace NIKE {
 	}
 
 	void Input::Service::onEvent(std::shared_ptr<MouseBtnEvent> event) {
-		//Reset all release events upon new event
-		for (auto& input : input_events) {
-			input.second.released = false;
-		}
 
 		//Handle event states
 		switch (event->state) {
 		case States::PRESS:
-			input_events[event->code].pressed = true;
-			input_events[event->code].triggered = true;
-			input_events[event->code].released = false;
+			curr_keys.insert(event->code);
 			break;
 		case States::REPEAT:
-			input_events[event->code].pressed = true;
-			input_events[event->code].triggered = false;
-			input_events[event->code].released = false;
+			curr_keys.insert(event->code);
 			break;
 		case States::RELEASE:
-			input_events[event->code].pressed = false;
-			input_events[event->code].triggered = false;
-			input_events[event->code].released = true;
+			curr_keys.erase(event->code);
 			break;
 		default:
 			break;
@@ -83,40 +62,42 @@ namespace NIKE {
 		cursor.cursor_entered = event->entered;
 	}
 
+	void Input::Service::update() {
+
+		//Update prev keys with curr keys
+		prev_keys = curr_keys;
+	}
+
 	bool Input::Service::isKeyPressed(int key) {
-		return input_events[key].pressed;
+		return curr_keys.find(key) != curr_keys.end();
 	}
 
 	bool Input::Service::isKeyTriggered(int key) {
-		bool return_state = input_events[key].triggered;
-		input_events[key].triggered = false;
-		return return_state;
+		return (curr_keys.find(key) != curr_keys.end()) && (prev_keys.find(key) == prev_keys.end());
 	}
 
 	bool Input::Service::isKeyReleased(int key) {
-		bool return_state = input_events[key].released;
-		input_events[key].released = false;
-		return return_state;
+		return (curr_keys.find(key) == curr_keys.end()) && (prev_keys.find(key) != prev_keys.end());
 	}
 
 	bool Input::Service::isMousePressed(int btn) {
-		return input_events[btn].pressed;
+		return curr_keys.find(btn) != curr_keys.end();
 	}
 
 	bool Input::Service::isMouseTriggered(int btn) {
-		bool return_state = input_events[btn].triggered;
-		input_events[btn].triggered = false;
-		return return_state;
+		return (curr_keys.find(btn) != curr_keys.end()) && (prev_keys.find(btn) == prev_keys.end());
 	}
 
 	bool Input::Service::isMouseReleased(int btn) {
-		bool return_state = input_events[btn].released;
-		input_events[btn].released = false;
-		return return_state;
+		return (curr_keys.find(btn) == curr_keys.end()) && (prev_keys.find(btn) != prev_keys.end());
 	}
 
 	Vector2f Input::Service::getMouseWindowPos() const {
-		return mouse.window_pos;
+		//Account for gaps between game viewport and game window
+		auto gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		gaps /= 2.0f;
+
+		return Vector2f(mouse.window_pos.x - gaps.x, mouse.window_pos.y - gaps.y);
 	}
 
 	Vector2f Input::Service::getMouseWorldPos() const {
@@ -153,5 +134,4 @@ namespace NIKE {
 	void Input::Service::setCrosshair(bool is_crosshair) {
 		cursor.is_crosshair = is_crosshair;
 	}
-
 }

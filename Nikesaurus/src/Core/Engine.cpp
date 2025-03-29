@@ -317,6 +317,9 @@ namespace NIKE {
 		//update UI First
 		NIKE_UI_SERVICE->update();
 
+		//Update input service
+		NIKE_INPUT_SERVICE->update();
+
 		//Swap Buffers
 		NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 

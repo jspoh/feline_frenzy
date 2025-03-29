@@ -580,10 +580,8 @@ namespace NIKE {
 				e_text.color.g = std::clamp(hover_container[entity_name].btn_text.color.g + 0.15f, 0.0f, 1.0f);
 				e_text.color.b = std::clamp(hover_container[entity_name].btn_text.color.b + 0.15f, 0.0f, 1.0f);
 
-
-				// Execute click script
-				if (isButtonClicked(entity_name, NIKE_MOUSE_BUTTON_LEFT)) {
-					input_checks[NIKE_MOUSE_BUTTON_LEFT].first = false;
+				//Check if button is clicked
+				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_LEFT)) {
 					executeScriptIfExists(entity, "OnClick");
 				}
 			}
