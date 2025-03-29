@@ -127,7 +127,7 @@
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
                                 "EnemyElement": 0,
-                                "EnemyLimit": 3,
+                                "EnemyLimit": 4,
                                 "LastSpawnTime": 2.4166650772094727
                             },
                             "Render::Texture": {
@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0052",
+                            "Name": "entity_0087",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -185,7 +185,7 @@
                                 "Cooldown": 3.0,
                                 "EnemiesSpawned": 0,
                                 "EnemyElement": 0,
-                                "EnemyLimit": 3,
+                                "EnemyLimit": 4,
                                 "LastSpawnTime": 2.4166650772094727
                             },
                             "Render::Texture": {
@@ -1648,9 +1648,6 @@
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
-                            "Element::Source": {
-                                "Element": 3
-                            },
                             "Render::Texture": {
                                 "B_Blend": true,
                                 "B_Flip": {
@@ -1708,9 +1705,6 @@
                                 "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
-                            },
-                            "Element::Source": {
-                                "Element": 2
                             },
                             "Render::Texture": {
                                 "B_Blend": true,
