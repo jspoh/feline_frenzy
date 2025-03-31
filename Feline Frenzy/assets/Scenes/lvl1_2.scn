@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0051",
+                            "Name": "entity_1768",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -257,7 +257,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0053",
+                            "Name": "Puddle",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -290,6 +290,596 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
+                            "Name": "tree_shadow1",
+                            "Parent": "pink_tree1",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "pink_tree1"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 5,
+                            "Name": "tree_shadow2",
+                            "Parent": "pink_tree2",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "pink_tree2"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 6,
+                            "Name": "tree_shadow3",
+                            "Parent": "yellow_tree1",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "yellow_tree1"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 7,
+                            "Name": "tree_shadow4",
+                            "Parent": "yellow_tree2",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "yellow_tree2"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 8,
+                            "Name": "tree_shadow5",
+                            "Parent": "pink_tree3",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "pink_tree3"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 9,
+                            "Name": "tree_shadow6",
+                            "Parent": "green_tree1",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "green_tree1"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 10,
+                            "Name": "tree_shadow7",
+                            "Parent": "yellow_tree3",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "yellow_tree3"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 11,
+                            "Name": "tree_shadow8",
+                            "Parent": "pink_tree4",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "pink_tree4"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 12,
+                            "Name": "tree_shadow9",
+                            "Parent": "yellow_tree4",
+                            "Prefab_ID": "tree_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "yellow_tree4"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 13,
+                            "Name": "barrel_shadow1",
+                            "Parent": "barrel_1",
+                            "Prefab_ID": "barrel_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "barrel_1"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 14,
+                            "Name": "barrel_shadow2",
+                            "Parent": "barrel_2",
+                            "Prefab_ID": "barrel_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "barrel_2"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 15,
+                            "Name": "barrel_shadow3",
+                            "Parent": "barrel_3",
+                            "Prefab_ID": "barrel_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "barrel_3"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 16,
+                            "Name": "barrel_shadow4",
+                            "Parent": "barrel_4",
+                            "Prefab_ID": "barrel_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "barrel_4"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 17,
+                            "Name": "grass_shadow1",
+                            "Parent": "grass_01",
+                            "Prefab_ID": "grass_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "grass_01"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 18,
+                            "Name": "grass_shadow2",
+                            "Parent": "grass_02",
+                            "Prefab_ID": "grass_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "grass_02"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 19,
+                            "Name": "grass_shadow3",
+                            "Parent": "grass_03",
+                            "Prefab_ID": "grass_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "grass_03"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 20,
+                            "Name": "grass_shadow4",
+                            "Parent": "grass_04",
+                            "Prefab_ID": "grass_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "grass_04"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 21,
+                            "Name": "grass_shadow5",
+                            "Parent": "grass_05",
+                            "Prefab_ID": "grass_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "grass_05"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 22,
+                            "Name": "lamp2_shadow",
+                            "Parent": "torch_1",
+                            "Prefab_ID": "lamp2_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Scale": {
+                                            "x": 255.99960327148438,
+                                            "y": 255.99960327148438
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Parent": "torch_1"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 23,
+                            "Name": "lamp1_shadow",
+                            "Parent": "lamp_1",
+                            "Prefab_ID": "lamp1_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Scale": {
+                                            "x": 133.76004028320313,
+                                            "y": 179.18797302246094
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Parent": "lamp_1"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 24,
                             "Name": "player_shadow",
                             "Parent": "player",
                             "Prefab_ID": "player_shadow.prefab",

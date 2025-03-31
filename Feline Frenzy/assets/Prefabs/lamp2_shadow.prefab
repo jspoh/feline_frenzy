@@ -15,24 +15,24 @@
             },
             "Frame_Index": {
                 "x": 0,
-                "y": 0
+                "y": 1
             },
             "Frame_Size": {
                 "x": 1,
                 "y": 1
             },
             "Intensity": 0.0,
-            "Texture_ID": "barrel_shadow.png"
+            "Texture_ID": "Lamp2_shadow.png"
         },
         "Transform::Transform": {
             "Position": {
                 "x": 0.0,
-                "y": 19.399999618530273
+                "y": 0.0
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 255.9998779296875,
-                "y": 255.9998779296875
+                "x": 255.99996948242188,
+                "y": 255.99996948242188
             },
             "Screen Position": false
         }
