@@ -172,7 +172,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0163",
+                            "Name": "entity_0052",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -202,6 +202,69 @@
                                 },
                                 "MetaData": {
                                     "Parent": "player"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 3,
+                            "Name": "plant_shadow",
+                            "Parent": "Grass_Element",
+                            "Prefab_ID": "plant_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": {
+                                    "Parent": "Grass_Element"
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 4,
+                            "Name": "water_shadow",
+                            "Parent": "Water_Element",
+                            "Prefab_ID": "water_shadow.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -3.252685546875,
+                                            "y": -27.2413330078125
+                                        }
+                                    }
+                                },
+                                "MetaData": {
+                                    "Parent": "Water_Element"
                                 }
                             },
                             "Tags": []
@@ -574,7 +637,7 @@
                                     "x": -1.8079999685287476,
                                     "y": -1162.5150146484375
                                 },
-                                "Zoom": 1.25
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,

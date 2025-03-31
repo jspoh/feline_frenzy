@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0837",
+                            "Name": "entity_0051",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -257,7 +257,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0839",
+                            "Name": "entity_0053",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
