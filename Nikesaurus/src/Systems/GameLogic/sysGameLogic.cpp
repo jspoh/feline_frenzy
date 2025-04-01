@@ -409,41 +409,82 @@ namespace NIKE {
 		// Get the current enemy entities.
 		std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
 
-		// Get the BGMC channel group.
+		// Get the BGM and BGMC channel groups.
+		auto bgmGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMChannelGroupID());
 		auto bgmcGroup = NIKE_AUDIO_SERVICE->getChannelGroup(NIKE_AUDIO_SERVICE->getBGMCChannelGroupID());
+
+		// Check if groups are valid
+		if (!bgmGroup) {
+			// Log error only once or less frequently if needed
+			static bool bgmErrorLogged = false;
+			if (!bgmErrorLogged) {
+				NIKEE_CORE_ERROR("updateBGMCVolume: BGM channel group not found!");
+				bgmErrorLogged = true;
+			}
+			// If BGM group fails, we might still want to handle BGMC, or return early.
+			// For now, let's try to continue if BGMC is valid.
+		}
 		if (!bgmcGroup) {
-			NIKEE_CORE_ERROR("updateBGMCVolume: BGMC channel group not found!");
-			return;
+			static bool bgmcErrorLogged = false;
+			if (!bgmcErrorLogged) {
+				NIKEE_CORE_ERROR("updateBGMCVolume: BGMC channel group not found!");
+				bgmcErrorLogged = true;
+			}
+			return; // Can't proceed without BGMC group
 		}
 
-		// Retrieve current BGMC volume and the target volume (using the global BGM volume).
-		float currentVolume = bgmcGroup->getVolume();
-		float targetVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
+		// Retrieve the target volume (using the global BGM volume as the max).
+		float targetMaxVolume = NIKE_AUDIO_SERVICE->getGlobalBGMVolume();
+		const float targetMinVolume = 0.0f; // Fade completely out
 
 		// Define the fade duration (in seconds) and compute the fade rate.
-		const float fadeTime = 1.5f;
-		float fadeRate = targetVolume / fadeTime;
-		//float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
-		//float fadeAmount = fadeRate * delta;
-		float fadeAmount = fadeRate * static_cast<float>(0.017); // Test if getDeltaTime() is the problem...
+		const float fadeTime = 1.5f; // Duration for the fade
+		float fadeRate = (fadeTime > 0.0f) ? (targetMaxVolume / fadeTime) : targetMaxVolume; // Avoid division by zero
+
+		// Use a fixed delta time for consistent fading regardless of frame rate fluctuations
+		// float delta = NIKE_WINDOWS_SERVICE->getDeltaTime(); // Using actual delta time might be smoother if consistent
+		float fixedDelta = static_cast<float>(0.017); // Using the fixed step from original code
+		float fadeAmount = fadeRate * fixedDelta;
+
+		// Get current volumes safely (checking if groups are valid)
+		float currentBGMVolume = bgmGroup ? bgmGroup->getVolume() : 0.0f;
+		float currentBGMCVolume = bgmcGroup ? bgmcGroup->getVolume() : 0.0f; // Already checked bgmcGroup isn't null
 
 		if (!enemy_tags.empty()) {
-			// Enemies are present: fade in.
-			float newVolume = currentVolume + fadeAmount;
-			if (newVolume >= targetVolume) {
-				newVolume = targetVolume;
+			// Enemies are present: Fade in BGMC, Fade out BGM.
+
+			// Fade in BGMC
+			float newBGMCVolume = currentBGMCVolume + fadeAmount;
+			newBGMCVolume = Utility::getMin(newBGMCVolume, targetMaxVolume); // Clamp at max volume
+			bgmcGroup->setVolume(newBGMCVolume); // bgmcGroup is guaranteed non-null here
+
+			// Fade out BGM (only if bgmGroup is valid)
+			if (bgmGroup) {
+				float newBGMVolume = currentBGMVolume - fadeAmount;
+				newBGMVolume = Utility::getMax(newBGMVolume, targetMinVolume); // Clamp at min volume (0.0f)
+				bgmGroup->setVolume(newBGMVolume);
 			}
-			bgmcGroup->setVolume(newVolume);
-			//NIKEE_CORE_INFO("Fading in BGMC, volume = {}", newVolume);
+			// NIKEE_CORE_INFO("Fading in BGMC ({}), Fading out BGM ({})", newBGMCVolume, newBGMVolume);
 		}
 		else {
-			// No enemies: fade out.
-			float newVolume = currentVolume - fadeAmount;
-			if (newVolume <= 0.01f) {
-				newVolume = 0.01f;  // Minimal audible level
+			// No enemies: Fade out BGMC, Fade in BGM.
+
+			// Fade out BGMC
+			float newBGMCVolume = currentBGMCVolume - fadeAmount;
+			newBGMCVolume = Utility::getMax(newBGMCVolume, targetMinVolume); // Clamp at min volume (0.0f)
+			// Consider setting pause/stop when volume reaches 0? Depends on FMOD setup.
+			// Example: if (newBGMCVolume == targetMinVolume) { bgmcGroup->setPaused(true); }
+			bgmcGroup->setVolume(newBGMCVolume); // bgmcGroup is guaranteed non-null here
+
+
+			// Fade in BGM (only if bgmGroup is valid)
+			if (bgmGroup) {
+				float newBGMVolume = currentBGMVolume + fadeAmount;
+				newBGMVolume = Utility::getMin(newBGMVolume, targetMaxVolume); // Clamp at max volume
+				bgmGroup->setVolume(newBGMVolume);
+				// Example: if (bgmGroup->getPaused() && newBGMVolume > targetMinVolume) { bgmGroup->setPaused(false); }
 			}
-			bgmcGroup->setVolume(newVolume);
-			//NIKEE_CORE_INFO("Fading out BGMC, volume = {}", newVolume);
+			// NIKEE_CORE_INFO("Fading out BGMC ({}), Fading in BGM ({})", newBGMCVolume, newBGMVolume);
 		}
 	}
 
