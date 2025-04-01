@@ -436,8 +436,8 @@ namespace NIKE {
 			std::string bgmc_channel_group_id;
 
 			// Define the global volume variables.
-			float gGlobalBGMVolume = 1.0f;  // Default volume for BGM (range 0.0 - 1.0)
-			float gGlobalSFXVolume = 0.4f;  // Default volume for SFX (range 0.0 - 1.0)
+			float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
+			float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
 
 			// Playlist Management
 			struct Playlist {
