@@ -17,6 +17,8 @@
 #include "Managers/Services/State Machine/bossEnemyTransitions.h"
 #include "Managers/Services/State Machine/destructableTransitions.h"
 #include "Managers/Services/State Machine/enemyStates.h"
+// Random number
+#include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
 
@@ -500,7 +502,9 @@ namespace NIKE {
 	{
 		if (play_or_no) {
 			// Temporary hardcoded SFX
-			NIKE_AUDIO_SERVICE->playAudio("EnemyDeath1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+			int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6); // TO CHANGE, BOSS SHOULD BE DIFFERENT SOUND (MAYBE ONLY 1)
+			std::string sfxToPlay = "Enemy_Death_0" + std::to_string(randomVariant) + ".wav"; 
+			NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
 			// Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
 			float secondsToDelay = 0.5f;

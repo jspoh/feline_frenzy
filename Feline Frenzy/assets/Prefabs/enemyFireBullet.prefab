@@ -1,12 +1,12 @@
 {
     "Components": {
-        "Audio::SFX": {
-            "Audio_ID": "Laser1.wav",
-            "B_Play_SFX": false,
-            "Channel_Group_ID": "BulletSFX",
-            "Pitch": 1.0,
-            "Volume": 0.5
-        },
+      "Audio::SFX": {
+        "Audio_ID": "Shoot_Fire_01.wav",
+        "B_Play_SFX": false,
+        "Channel_Group_ID": "BulletSFX",
+        "Pitch": 1.0,
+        "Volume": 0.5
+      },
         "Combat::Damage": {
             "Damage": 10.0
         },

@@ -65,6 +65,11 @@ namespace NIKE {
 				: std::make_pair(b, a);
 		}
 
+		int getRandomInt(int min, int max) {
+			if (min > max) std::swap(min, max);
+			if (min == max) return min;
+			return min + (rand() % (max - min + 1));
+		}
 
 		std::vector<Vector2f> convertTransformToVert(Transform::Transform const& e_transform);
 

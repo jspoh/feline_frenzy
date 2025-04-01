@@ -16,6 +16,8 @@
  // Transitions
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/destructableTransitions.h"
+// Random number
+#include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
 
@@ -472,6 +474,9 @@ namespace NIKE {
 
 		if (play_or_no) {
 			// Temporary hardcoded SFX
+			// Temporary hardcoded SFX
+			int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6);
+			std::string sfxToPlay = "Enemy_Death_0" + std::to_string(randomVariant) + ".wav";
 			NIKE_AUDIO_SERVICE->playAudio("EnemyDeath1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
 			// Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)

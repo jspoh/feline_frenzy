@@ -12,6 +12,7 @@
 #include "Managers/Services/Lua/sLuaGameBinds.h"
 
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
     const float Lua::player_shot_cooldown = 0.1f;
@@ -202,7 +203,7 @@ namespace NIKE {
             }
             });
 
-        //Get SFX
+        // Play SFX (To edit)
         lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
             auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
             if (e_sfx_comp.has_value()) {
@@ -283,18 +284,52 @@ namespace NIKE {
             }
 
             //Set player bullet SFX with randomized variant
-            auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
-            if (bullet_sfx.has_value()) {
-                // Randomize between 1 and 2
-                int randomVariant = rand() % 2 + 1; // rand() should be seeded during initialization
-                // Assuming the current SFX string is stored in a member named audio_id
-                std::string sfxID = bullet_sfx.value().get().audio_id;
-                if (!sfxID.empty() && sfxID.size() >= 5) {
-                    // Replace the 5th character from the end with the random variant ('1' or '2')
-                    sfxID[sfxID.size() - 5] = static_cast<char>('0' + randomVariant);
+            auto bullet_sfx_opt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
+            if (bullet_sfx_opt.has_value()) {
+                auto& sfx_comp = bullet_sfx_opt.value().get();
+                std::string original_sfxID = sfx_comp.audio_id; // Get ID set by prefab
+
+                std::string baseFilename = "";
+                int maxVariant = 1; // Default to 1 if type unknown
+
+                // Determine type and randomization range based on original ID
+                if (original_sfxID.find("Shoot_Fire") != std::string::npos) { // Check if "Shoot_Fire" is present
+                    baseFilename = "Shoot_Fire_0";
+                    maxVariant = 3;
                 }
-                bullet_sfx.value().get().audio_id = sfxID;
-                bullet_sfx.value().get().b_play_sfx = true;
+                else if (original_sfxID.find("Shoot_Water") != std::string::npos) {
+                    baseFilename = "Shoot_Water_0";
+                    maxVariant = 9;
+                }
+                else if (original_sfxID.find("Shoot_Wind") != std::string::npos) { // Assuming "Wind" based on your list
+                    baseFilename = "Shoot_Wind_0";
+                    maxVariant = 15;
+                }
+                else if (original_sfxID.find("Laser") != std::string::npos) {
+                    baseFilename = "Laser";
+                    maxVariant = 3;
+                }
+                else if (original_sfxID.find("Pop") != std::string::npos) {
+                    baseFilename = "Pop";
+                    maxVariant = 5;
+                }
+                // Add more else if checks for other bullet base names if needed
+
+                std::string randomized_sfxID = original_sfxID; // Default to original if type unknown
+
+                if (!baseFilename.empty()) { // If a known type was found
+                    int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, maxVariant);
+                    randomized_sfxID = baseFilename + std::to_string(randomVariant) + ".wav";
+                }
+                else {
+                    NIKEE_CORE_WARN("FireBullet: Unknown bullet SFX base type for '{}', using original ID for playback.", original_sfxID);
+                }
+
+                // Update the component's audio_id with the randomized one
+                sfx_comp.audio_id = randomized_sfxID;
+
+                // Set the flag for sysAudio to play this sound
+                sfx_comp.b_play_sfx = true;
             }
             });
 
@@ -325,7 +360,10 @@ namespace NIKE {
                 // If health has decreased, play the damage-taken SFX and update prevHealth.
                 if (health.health < prevHealth) {
 
-                    NIKE_AUDIO_SERVICE->playAudio("TakeDamageMeow2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+                    // Temporary hardcoded SFX
+                    int randomVariantDamage = NIKE::GameLogic::getRandomNumber<int>(1, 2); // Assuming variations 1-2
+                    std::string sfxToPlay = "TakeDamageMeow" + std::to_string(randomVariantDamage) + ".wav";
+                    NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                     prevHealth = health.health;
                 }
                 else {
@@ -337,7 +375,10 @@ namespace NIKE {
                 if (health_comp.value().get().lives <= 0)
                 {
                     // Temporary hardcoded SFX
-                    NIKE_AUDIO_SERVICE->playAudio("PlayerDeathMeow2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+                    int randomVariantDeath = NIKE::GameLogic::getRandomNumber<int>(1, 2); // Assuming variations 1-2
+                    std::string sfxToPlay = "PlayerDeathMeow" + std::to_string(randomVariantDeath) + ".wav";
+                    NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+
                     Interaction::gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
                     // Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
                     float secondsToDelay = 0.5f;
@@ -400,32 +441,6 @@ namespace NIKE {
             float newVolume = Utility::getMin(1.0f, currentVolume + 0.05f);
             NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newVolume);
             NIKE_UI_SERVICE->updateVolumeSliderPositions();
-            });
-
-        //Get SFX
-        lua_state.set_function("PlaySFX", [&](Entity::Type entity, bool play_or_stop) {
-            auto e_sfx_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
-            if (e_sfx_comp.has_value()) {
-                auto& e_sfx = e_sfx_comp.value().get();
-
-                //Check if group exists
-                auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
-                if (!group) {
-                    e_sfx.b_play_sfx = play_or_stop;
-                    return;
-                }
-                else {
-                    //Play sound
-                    if (play_or_stop && !group->isPlaying()) {
-                        e_sfx.b_play_sfx = play_or_stop;
-                    }
-                }
-
-                //stop sfx
-                if (!play_or_stop) {
-                    group->stop();
-                }
-            }
             });
 
         //Play audio

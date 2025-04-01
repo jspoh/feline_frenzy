@@ -10,6 +10,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Systems/GameLogic/sysInteraction.h"
+#include "Systems/GameLogic/sysGameLogic.h"
 #include "Managers/Services/State Machine/bossEnemyStates.h"
 #include "Systems/Render/sysRender.h"
 
@@ -409,7 +410,7 @@ namespace NIKE {
                 //Check if group exists
                 auto group = NIKE_AUDIO_SERVICE->getChannelGroup(e_sfx.channel_group_id);
                 if (!group) {
-                    e_sfx.audio_id = "EnemyGetHit2.wav";
+                    e_sfx.audio_id = "EnemyGetHit2.wav"; // Placeholder
                     e_sfx.b_play_sfx = play_or_no;
                     return;
                 }
@@ -688,7 +689,9 @@ namespace NIKE {
             if ( (target_entity_tags.find("enemy") != target_entity_tags.end()) && (target_entity_tags.find("boss") == target_entity_tags.end()) ) // Only identify enemy, not boss
             {
                 // Temporary hardcoded SFX
-                NIKE_AUDIO_SERVICE->playAudio("EnemyGetHit2.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+                int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 5); // Assuming variations 1-5
+                std::string sfxToPlay = "Enemy_Pawn_Hit_0" + std::to_string(randomVariant) + ".wav";
+                NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                 // Set entity hit boolean to true
                 hitEntities[target] = true;
 
@@ -700,7 +703,9 @@ namespace NIKE {
 
             }
             else if ((target_entity_tags.find("enemy") != target_entity_tags.end())) { // Entity is a boss
-                NIKE_AUDIO_SERVICE->playAudio("MetalHit1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+                int randomVariantInteract = NIKE::GameLogic::getRandomNumber<int>(1, 5); // Assuming variations 1-5
+                std::string sfxToPlay = "Enemy_Guard_Hit_0" + std::to_string(randomVariantInteract) + ".wav";
+                NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
                 // Set entity hit boolean to true
                 hitEntities[target] = true;
