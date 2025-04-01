@@ -7,11 +7,21 @@
                     "BGM_Level_Explore_v1.wav"
                 ]
             },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1.wav"
+                ]
+            },
             "BulletSFX": {
                 "loop": false,
                 "tracks": []
             },
             "PlayerSFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "SFX": {
                 "loop": false,
                 "tracks": []
             },
@@ -46,10 +56,9 @@
                     "Entity": {
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 0,
-                            "Name": "entity_0000",
+                            "Name": "entity_0039",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -98,10 +107,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0001",
+                            "Name": "entity_0040",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -170,10 +178,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0002",
+                            "Name": "entity_0041",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -242,10 +249,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0003",
+                            "Name": "entity_0042",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -314,10 +320,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0004",
+                            "Name": "entity_0043",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -386,10 +391,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 5,
-                            "Name": "entity_0005",
+                            "Name": "entity_0044",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -438,10 +442,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 6,
-                            "Name": "entity_0006",
+                            "Name": "entity_0045",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -490,10 +493,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 7,
-                            "Name": "entity_0007",
+                            "Name": "entity_0046",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -542,10 +544,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 8,
-                            "Name": "entity_0008",
+                            "Name": "entity_0047",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -594,10 +595,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 9,
-                            "Name": "entity_0009",
+                            "Name": "entity_0048",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -646,10 +646,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 10,
-                            "Name": "entity_0010",
+                            "Name": "entity_0049",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -698,10 +697,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 11,
-                            "Name": "entity_0011",
+                            "Name": "entity_0050",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -750,10 +748,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 12,
-                            "Name": "entity_0012",
+                            "Name": "entity_0051",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -802,10 +799,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 13,
-                            "Name": "entity_0013",
+                            "Name": "entity_0052",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -854,10 +850,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 14,
-                            "Name": "entity_0014",
+                            "Name": "entity_0053",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -906,10 +901,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 15,
-                            "Name": "entity_0015",
+                            "Name": "entity_0054",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -958,10 +952,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 16,
-                            "Name": "entity_0016",
+                            "Name": "entity_0055",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1010,10 +1003,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 17,
-                            "Name": "entity_0017",
+                            "Name": "entity_0056",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1062,10 +1054,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 18,
-                            "Name": "entity_0018",
+                            "Name": "entity_0057",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1114,10 +1105,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 19,
-                            "Name": "entity_0019",
+                            "Name": "entity_0058",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1166,10 +1156,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 20,
-                            "Name": "entity_0020",
+                            "Name": "entity_0059",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1218,10 +1207,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 21,
-                            "Name": "entity_0021",
+                            "Name": "entity_0060",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1263,10 +1251,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 22,
-                            "Name": "entity_0022",
+                            "Name": "entity_0061",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1308,10 +1295,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 23,
-                            "Name": "entity_0023",
+                            "Name": "entity_0062",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1366,10 +1352,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 24,
-                            "Name": "entity_0024",
+                            "Name": "entity_0063",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1411,10 +1396,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 25,
-                            "Name": "entity_0025",
+                            "Name": "entity_0064",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1539,10 +1523,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 26,
-                            "Name": "entity_0026",
+                            "Name": "entity_0065",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1665,10 +1648,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 27,
-                            "Name": "entity_0027",
+                            "Name": "entity_0066",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1771,10 +1753,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 28,
-                            "Name": "entity_0028",
+                            "Name": "entity_0067",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1877,10 +1858,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 29,
-                            "Name": "entity_0029",
+                            "Name": "entity_0068",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1983,10 +1963,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 30,
-                            "Name": "entity_0030",
+                            "Name": "entity_0069",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2055,10 +2034,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 31,
-                            "Name": "entity_0031",
+                            "Name": "entity_0070",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2127,10 +2105,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 32,
-                            "Name": "entity_0032",
+                            "Name": "entity_0071",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2199,10 +2176,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 33,
-                            "Name": "entity_0033",
+                            "Name": "entity_0072",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2243,18 +2219,17 @@
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 255.99996948242188,
-                                    "y": 255.99996948242188
+                                    "x": 309.7928771972656,
+                                    "y": 187.3509063720703
                                 },
                                 "Screen Position": false
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 34,
-                            "Name": "entity_0034",
+                            "Name": "entity_0073",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2320,10 +2295,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 35,
-                            "Name": "entity_0035",
+                            "Name": "entity_0074",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2389,10 +2363,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 36,
-                            "Name": "entity_0036",
+                            "Name": "entity_0075",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2458,10 +2431,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 37,
-                            "Name": "entity_0037",
+                            "Name": "entity_0076",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2527,10 +2499,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 38,
-                            "Name": "entity_0038",
+                            "Name": "entity_0077",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2596,10 +2567,9 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 39,
-                            "Name": "entity_0039",
+                            "Name": "entity_0078",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2648,7 +2618,6 @@
                         },
                         "MetaData": {
                             "B_Locked": false,
-                            "Childrens": [],
                             "Layer_ID": 0,
                             "Layer_Order": 40,
                             "Name": "entity_0040",

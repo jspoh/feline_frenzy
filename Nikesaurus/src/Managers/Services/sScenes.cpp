@@ -261,10 +261,10 @@ namespace NIKE {
 		event_queue.push(std::move(new_event));
 
 		// fade out current scene
-		static constexpr float fade_dur = 2.f;
-		if (NIKE_RENDER_SERVICE->getFadeState() == NIKE::Render::FADE_STATE::NONE) {
-			NIKE_RENDER_SERVICE->fadeOut(fade_dur);
-		}
+		//static constexpr float fade_dur = 2.f;
+		//if (NIKE_RENDER_SERVICE->getFadeState() == NIKE::Render::FADE_STATE::NONE) {
+		//	NIKE_RENDER_SERVICE->fadeOut(fade_dur);
+		//}
 	}
 	void Scenes::Service::setCurrSceneID(std::string const& new_scene_id) { curr_scene = new_scene_id; }
 	std::string Scenes::Service::getCurrSceneID() const { return curr_scene; }
@@ -285,13 +285,13 @@ namespace NIKE {
 		while (!event_queue.empty()) {
 
 			//     // fade in current scene
-			//     static constexpr float fade_dur = 2.f;
-			//     if (NIKE_RENDER_SERVICE->getFadeState() == NIKE::Render::FADE_STATE::NONE) {
+			   //  static constexpr float fade_dur = 2.f;
+			   //  if (NIKE_RENDER_SERVICE->getFadeState() == NIKE::Render::FADE_STATE::NONE) {
 					 //NIKE_RENDER_SERVICE->fadeIn(fade_dur);
-			//     }
-			//     if (NIKE_RENDER_SERVICE->getFadeState() != NIKE::Render::FADE_STATE::NONE) {
-			//         break;
-			//     }
+			   //  }
+			   //  if (NIKE_RENDER_SERVICE->getFadeState() != NIKE::Render::FADE_STATE::NONE) {
+			   //      break;
+			   //  }
 
 			auto& action = event_queue.front();
 			switch (action.scene_action) {
@@ -316,7 +316,7 @@ namespace NIKE {
 			event_queue.pop();
 
 			// fade in current scene
-			// NIKE_RENDER_SERVICE->fadeIn(2.f);
+			 NIKE_RENDER_SERVICE->fadeIn(0.5f);
 		}
 	}
 } // namespace NIKE

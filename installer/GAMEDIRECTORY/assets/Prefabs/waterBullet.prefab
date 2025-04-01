@@ -2,7 +2,7 @@
     "Components": {
         "Audio::SFX": {
             "Audio_ID": "Waterball1.wav",
-            "B_Play_SFX": false,
+            "B_Play_SFX": true,
             "Channel_Group_ID": "BulletSFX",
             "Pitch": 1.0,
             "Volume": 0.5

@@ -125,6 +125,8 @@ namespace NIKE {
 
 			public:
 
+				unsigned int getFbo() const { return fbo; }
+
 				//Rendering constants
 				const bool BATCHED_RENDERING = true;
 				static constexpr unsigned int MAX_INSTANCES = 500;

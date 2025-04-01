@@ -278,9 +278,9 @@ namespace NIKE {
 		// Ensure framebuffer is bound and valid
 		GLint framebuffer_id;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer_id);
-		if (framebuffer_id != 0) {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		}
+		//if (framebuffer_id != 0) {
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//}
 
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -580,6 +580,6 @@ namespace NIKE {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind EBO
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
 	}
 }
