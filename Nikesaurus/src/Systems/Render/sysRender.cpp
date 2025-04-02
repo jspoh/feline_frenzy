@@ -45,7 +45,7 @@ namespace NIKE {
 		//Bind frame buffer for rendering to editor ( Binding occurs when editor is active )
 		NIKE_LVLEDITOR_SERVICE->bindEditorFrameBuffer();
 #else
-		NIKE_RENDER_SERVICE->bindFrameBuffer(NIKE_RENDER_SERVICE->getFbo());
+		glBindFramebuffer(GL_FRAMEBUFFER, NIKE_RENDER_SERVICE->getFbo());
 #endif
 
 		glClearColor(0, 0, 0, 1);
