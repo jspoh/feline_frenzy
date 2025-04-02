@@ -120,7 +120,7 @@ namespace NIKE {
 #endif
 
 		// set window icon
-		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
+		static constexpr const char* ICON_PATH = "./assets/icons/Icon_256x256.png";
 
 
 		int width, height, size;

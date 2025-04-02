@@ -87,10 +87,10 @@ Source: .\REDIST\VC_redist.x64.exe; DestDir: {tmp}; Flags: ignoreversion
 ;   {group} is the start menu location that the game will install shortcuts to.
 ;   {commondesktop} is your Windows desktop directory.
 [Icons]
-Name: {group}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; WorkingDir: {app}; IconFilename: "{app}\assets\Icons\Icon_32x32.ico"
+Name: {group}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; WorkingDir: {app}; IconFilename: "{app}\assets\Icons\Icon_256x256.ico"
 Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe}
-Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe};  IconFilename: "{app}\assets\Icons\Icon_32x32.ico"
-Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\assets\Icons\Icon_32x32.ico"
+Name: {group}\{cm:UninstallProgram,Feline-Frenzy}; Filename: {uninstallexe};  IconFilename: "{app}\assets\Icons\Icon_256x256.ico"
+Name: {commondesktop}\Feline-Frenzy; Filename: {app}\Feline Frenzy.exe; Tasks: desktopicon; WorkingDir: {app}; IconFilename: "{app}\assets\Icons\Icon_256x256.ico"
 
 ; List of items to execute in the installer.
 ; Note that this will run all executables in their silent versions as required by the TCRs.
