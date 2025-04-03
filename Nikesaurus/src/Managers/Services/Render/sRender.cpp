@@ -50,6 +50,20 @@ namespace {
 namespace NIKE {
 
 	void Render::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
+		
+		// update main fbo
+		{
+			glDeleteFramebuffers(1, &fbo);
+			glDeleteTextures(1, &fbo_texture);
+
+			// create new framebuffer
+			glCreateFramebuffers(1, &fbo);
+			glCreateTextures(GL_TEXTURE_2D, 1, &fbo_texture);
+			glTextureStorage2D(fbo_texture, 1, GL_RGBA8, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, fbo_texture, 0);
+		}
 
 		//Iterate through all frame buffers
 		for (auto& frame_buffer : frame_buffers) {
@@ -91,7 +105,7 @@ namespace NIKE {
 				NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
 
 			glBindTexture(GL_TEXTURE_2D, 0);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 			err = glGetError();
 			if (err != GL_NO_ERROR) {
@@ -266,8 +280,8 @@ namespace NIKE {
 	}
 
 	void Render::Service::unbindFrameBuffer() {
-		//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	/*****************************************************************//**
@@ -1467,65 +1481,66 @@ namespace NIKE {
 
 		// render from fbo
 
-		//{
-		//	const Vector2f framesize{ 1.0f , 1.0f };
-		//	Vector2f uv_offset{ 0, 0 };
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		//	shader_manager->useShader("texture");
+			const Vector2f framesize{ 1.0f , 1.0f };
+			Vector2f uv_offset{ 0, 0 };
 
-		//	//Texture unit
-		//	static constexpr int texture_unit = 6;
+			shader_manager->useShader("texture");
 
-		//	// set texture
-		//	glBindTextureUnit(
-		//		texture_unit, // texture unit (binding index)
-		//		fbo_texture
-		//	);
+			//Texture unit
+			static constexpr int texture_unit = 6;
 
-		//	glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//	glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				fbo_texture
+			);
 
-		//	//Set uniforms for texture rendering
-		//	shader_manager->setUniform("texture", "u_tex2d", texture_unit);
-		//	shader_manager->setUniform("texture", "u_opacity", fbo_opacity);
-		//	shader_manager->setUniform("texture", "u_transform", 2 * Matrix_33::Identity());
-		//	shader_manager->setUniform("texture", "uvOffset", uv_offset);
-		//	shader_manager->setUniform("texture", "frameSize", framesize);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		//	//Blending options for texture
-		//	shader_manager->setUniform("texture", "u_color", Vector3f(1.f, 1.f, 1.f));
-		//	shader_manager->setUniform("texture", "u_blend", true);
-		//	shader_manager->setUniform("texture", "u_intensity", 0.f);
+			//Set uniforms for texture rendering
+			shader_manager->setUniform("texture", "u_tex2d", texture_unit);
+			shader_manager->setUniform("texture", "u_opacity", fbo_opacity);
+			shader_manager->setUniform("texture", "u_transform", 2 * Matrix_33::Identity());
+			shader_manager->setUniform("texture", "uvOffset", uv_offset);
+			shader_manager->setUniform("texture", "frameSize", framesize);
 
-		//	//Flip texture options
-		//	//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
-		//	//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+			//Blending options for texture
+			shader_manager->setUniform("texture", "u_color", Vector3f(1.f, 1.f, 1.f));
+			shader_manager->setUniform("texture", "u_blend", true);
+			shader_manager->setUniform("texture", "u_intensity", 0.f);
 
-		//	//Get model
-		//	auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
+			//Flip texture options
+			//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
 
-		//	//Draw
-		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//	glClear(GL_COLOR_BUFFER_BIT);
-		//	glBindVertexArray(model.vaoid);
-		//	glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+			//Get model
+			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
 
-		//	//Unuse texture
-		//	glBindVertexArray(0);
-		//	shader_manager->unuseShader();
-		//}
+			//Draw
+			glClear(GL_COLOR_BUFFER_BIT);
+			glBindVertexArray(model.vaoid);
+			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
 
-		// fbo update
-		//{
-		//	switch (fade_state) {
-		//	case FADE_STATE::FADE_IN:
-		//		fadeInHelper();
-		//		break;
-		//	case FADE_STATE::FADE_OUT:
-		//		fadeOutHelper();
-		//		break;
-		//	}
-		//}
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_manager->unuseShader();
+		}
+
+		 // fbo update
+		{
+			switch (fade_state) {
+			case FADE_STATE::FADE_IN:
+				fadeInHelper();
+				break;
+			case FADE_STATE::FADE_OUT:
+				fadeOutHelper();
+				break;
+			}
+		}
 	}
 
 	void Render::Service::fadeIn(float duration) {
