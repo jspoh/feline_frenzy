@@ -113,7 +113,9 @@ namespace NIKE {
 			RESTART,
 			PREVIOUS,
 			RESET,
-			CLOSE
+			CLOSE,
+			RESUME,
+			PAUSE
 		};
 
 		//Change Scene Event
@@ -153,6 +155,13 @@ namespace NIKE {
 
 			//Go To Previous scene
 			void previousScene();
+
+			// Pause scene
+			void pauseScene();
+
+			// Resume scene
+			void resumeScene();
+
 		public:
 			Service() = default;
 			~Service() = default;

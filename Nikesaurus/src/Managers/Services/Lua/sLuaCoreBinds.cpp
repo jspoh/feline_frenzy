@@ -317,6 +317,14 @@ namespace NIKE {
             NIKE_WINDOWS_SERVICE->getWindow()->terminate();
             });
 
+        lua_state.set_function("ResumeScene", [&]() {
+            NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESUME, ""));
+            });
+
+        lua_state.set_function("PauseScene", [&]() {
+            NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PAUSE, ""));
+            });
+
     }
 
 }

@@ -216,6 +216,35 @@ namespace NIKE {
 				auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 				auto video_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Video>(entity);
 
+				// Time based change texture for start_game cut scene
+				//if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_1.scn" && texture_comp.has_value())
+				//{
+				//	static float elapsed_time_before = 0.0f;
+				//	static int counter_start_cut_scene = 1;
+
+				//	std::string cutscene_string = "Intro_Cutscene_";
+				//	elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+				//	std::string cutscene_asset_id = cutscene_string + std::to_string(counter_start_cut_scene) + ".png";
+				//	// Change texture by timer
+				//	if (elapsed_time_before >= 3.f && counter_start_cut_scene <= 8)
+				//	{
+				//		if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+				//		{
+				//			texture_comp.value().get().texture_id = cutscene_asset_id;
+				//			// This is for counter to cut scene
+				//			++counter_start_cut_scene;
+				//			elapsed_time_before = 0.0f;
+				//		}
+				//	} 
+				//	if (counter_start_cut_scene > 8)
+				//	{
+				//		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_1.scn"));
+				//		// Reset counters
+				//		counter_start_cut_scene = 1;
+				//		elapsed_time_before = 0.0f;
+				//	}
+				//}
+
 				// Time based change texture for before boss room cut scene
 				//if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && texture_comp.has_value())
 				//{
@@ -253,38 +282,38 @@ namespace NIKE {
 					}
 				}
 
-				// Time based change texture for after boss room cut scene
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && texture_comp.has_value())
-				{
-					static float elapsed_time_after = 3.0f;
-					static int counter_after = 1;
+			//	// Time based change texture for after boss room cut scene
+			//	if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && texture_comp.has_value())
+			//	{
+			//		static float elapsed_time_after = 3.0f;
+			//		static int counter_after = 1;
 
-					std::string cutscene_string = "Ending_Cutscene_";
-					elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-					std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+			//		std::string cutscene_string = "Ending_Cutscene_";
+			//		elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			//		std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
 
-					// Change texture by timer
-					if (elapsed_time_after >= 3.f)
-					{
-						if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
-						{
-							texture_comp.value().get().texture_id = cutscene_asset_id;
-						}
+			//		// Change texture by timer
+			//		if (elapsed_time_after >= 3.f)
+			//		{
+			//			if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+			//			{
+			//				texture_comp.value().get().texture_id = cutscene_asset_id;
+			//			}
 
-						// This is for counter to cut scene
-						++counter_after;
-						elapsed_time_after = 0.0f;
-					}
+			//			// This is for counter to cut scene
+			//			++counter_after;
+			//			elapsed_time_after = 0.0f;
+			//		}
 
-					if (counter_after > 7)
-					{
-						// After boss cutscene play finish, show win game overlay
-						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
-						// Reset static counters
-						elapsed_time_after = 3.0f;
-						counter_after = 1;
-					}
-				}
+			//		if (counter_after > 7)
+			//		{
+			//			// After boss cutscene play finish, show win game overlay
+			//			NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+			//			// Reset static counters
+			//			elapsed_time_after = 3.0f;
+			//			counter_after = 1;
+			//		}
+			//	}
 
 				// Update of FSM will be called here
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));

@@ -8,6 +8,7 @@
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/sScenes.h"
+#include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
 namespace NIKE {
@@ -202,6 +203,36 @@ namespace NIKE {
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 	}
 
+	void Scenes::Service::pauseScene()
+	{
+		//Get all ecs systems
+		auto& systems = NIKE_ECS_MANAGER->getAllSystems();
+
+		std::for_each(systems.begin(), systems.end(),
+			[](std::shared_ptr<System::ISystem>& system) {
+				if (system->getSysName() == "Physics System" || system->getSysName() == "Game Logic System") {
+					system->setActiveState(false);
+				}
+			});
+
+		// Hide pause overlay
+		Interaction::togglePauseOverlay(true);
+	}
+
+	void Scenes::Service::resumeScene()
+	{
+		//Get all ecs systems
+		auto& systems = NIKE_ECS_MANAGER->getAllSystems();
+
+		std::for_each(systems.begin(), systems.end(),
+			[](std::shared_ptr<System::ISystem>& system) {
+				system->setActiveState(true);
+			});
+
+		// Hide pause overlay
+		Interaction::togglePauseOverlay(false);
+	}
+
 	void Scenes::Service::resetScene() {
 		NIKE_ECS_MANAGER->destroyAllEntities();
 		NIKE_UI_SERVICE->destroyAllButtons();
@@ -300,23 +331,32 @@ namespace NIKE {
 				break;
 			case Actions::PREVIOUS:
 				previousScene();
+				// fade in current scene
+				NIKE_RENDER_SERVICE->fadeIn(0.5f);
 				break;
 			case Actions::RESTART:
 				restartScene();
+				// fade in current scene
+				NIKE_RENDER_SERVICE->fadeIn(0.5f);
 				break;
 			case Actions::RESET:
 				resetScene();
+				// fade in current scene
+				NIKE_RENDER_SERVICE->fadeIn(0.5f);
 				break;
 			case Actions::CLOSE:
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+				break;
+			case Actions::RESUME:
+				resumeScene();
+				break;
+			case Actions::PAUSE:
+				pauseScene();
 				break;
 			default:
 				break;
 			}
 			event_queue.pop();
-
-			// fade in current scene
-			 NIKE_RENDER_SERVICE->fadeIn(0.5f);
 		}
 	}
 } // namespace NIKE

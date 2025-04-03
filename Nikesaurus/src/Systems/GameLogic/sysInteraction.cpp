@@ -54,12 +54,17 @@ namespace NIKE {
                         cam.mouse_offset = 0.f;
                     }
 
-                    std::for_each(systems.begin(), systems.end(),
-                        [](std::shared_ptr<System::ISystem>& system) {
-                            if (system->getSysName() == "Physics System" || system->getSysName() == "Game Logic System") {
-                                system->setActiveState(false);
-                            }
-                        });
+                    //std::for_each(systems.begin(), systems.end(),
+                    //    [](std::shared_ptr<System::ISystem>& system) {
+                    //        if (system->getSysName() == "Physics System" || system->getSysName() == "Game Logic System") {
+                    //            system->setActiveState(false);
+                    //        }
+                    //    });
+
+                    initPauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
+                    //togglePauseOverlay(true);
+
+                    NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PAUSE, ""));
                 }
                 else {
                     // Change cursor
@@ -71,14 +76,15 @@ namespace NIKE {
                         cam.mouse_offset = saved_mouse_offset;
                     }
 
-                    std::for_each(systems.begin(), systems.end(),
-                        [](std::shared_ptr<System::ISystem>& system) {
-                            system->setActiveState(true);
+                    NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESUME, ""));
 
-                        });
-
+                    //std::for_each(systems.begin(), systems.end(),
+                    //    [](std::shared_ptr<System::ISystem>& system) {
+                    //        system->setActiveState(true);
+                    //    });
+                    //togglePauseOverlay(false);
                 }
-                pauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
+
             }
 
             if (show_pause_menu) {
@@ -214,8 +220,15 @@ namespace NIKE {
          *********************************************************************/
 
 
-        void pauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& options, const std::string& how_to_play, const std::string& quit)
+        void initPauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& options, const std::string& how_to_play, const std::string& quit)
         {
+
+            static bool is_initialized = false;
+            // Prevent duplicate creation
+            if (is_initialized) return;
+
+            is_initialized = true;
+
 
             if (!NIKE_METADATA_SERVICE->getEntityByName(background_texture)) {
                 // Create the overlay entity
@@ -241,12 +254,17 @@ namespace NIKE {
                     Transform::Transform(Vector2f(-10.0f, 120.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
                     Render::Text(),
                     Render::Texture("UI_ResumeGame_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
-                NIKE_UI_SERVICE->setButtonInputState(resume, UI::InputStates::TRIGGERED);
+                NIKE_UI_SERVICE->setButtonInputState(resume, UI::InputStates::PRESSED);
                 auto resume_hover_script = Lua::Script();
                 resume_hover_script.script_id = "menu_button.lua";
                 resume_hover_script.update_function = "HoverButton";
                 resume_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
                 NIKE_UI_SERVICE->setButtonScript(resume, resume_hover_script, "OnHover");
+
+                auto resume_click_script = Lua::Script();
+                resume_click_script.script_id = "ChangeScene.lua";
+                resume_click_script.update_function = "Resume";
+                NIKE_UI_SERVICE->setButtonScript(resume, resume_click_script, "OnClick");
             }
 
 
@@ -305,36 +323,34 @@ namespace NIKE {
 
             }
 
-            // Handle button visibility
-            auto& container_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(background_texture).value()).value().get();
-            auto& resume_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(resume).value()).value().get();
-            auto& options_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(options).value()).value().get();
-            auto& howtoplay_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(how_to_play).value()).value().get();
-            auto& quit_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(quit).value()).value().get();
+        }
 
+        void togglePauseOverlay(bool show)
+        {
 
-            NIKE_UI_SERVICE->setButtonDisabled(resume, !show_pause_menu);
-            NIKE_UI_SERVICE->setButtonDisabled(options, !show_pause_menu);
-            NIKE_UI_SERVICE->setButtonDisabled(how_to_play, !show_pause_menu);
-            NIKE_UI_SERVICE->setButtonDisabled(quit, !show_pause_menu);
+            // Boolean of show menu will be toggled here
+            show_pause_menu = show;
 
-            if (show_pause_menu) {
-                container_comp.color.a = 1.f;
-                resume_comp.color.a = 1.f;
-                options_comp.color.a = 1.f;
-                howtoplay_comp.color.a = 1.f;
-                quit_comp.color.a = 1.f;
+            const std::vector<std::string> elements = {
+                "Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit"
+            };
 
+            for (const auto& element : elements) {
+                auto entity = NIKE_METADATA_SERVICE->getEntityByName(element);
+                if (!entity.has_value()) continue;
+
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity.value());
+                // Change opacity for all buttons here
+                if (texture_comp.has_value())
+                {
+                    texture_comp.value().get().color.a = show ? 1.0f : 0.0f;
+                }
+                
+                if (element != "Paused_UI.png")
+                {
+                    NIKE_UI_SERVICE->setButtonDisabled(element, !show);
+                }
             }
-            else {
-                container_comp.color.a = 0.f;
-                resume_comp.color.a = 0.f;
-                options_comp.color.a = 0.f;
-                howtoplay_comp.color.a = 0.f;
-                quit_comp.color.a = 0.f;
-            }
-          
-
         }
 
         void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)

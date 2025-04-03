@@ -3,9 +3,9 @@
         "Channels": {
             "BGM": {
                 "loop": true,
-              "tracks": [
-                "Cutscene_3_v1.wav"
-              ]
+                "tracks": [
+                    "Cutscene_3_v1.wav"
+                ]
             },
             "BGMC": {
                 "loop": true,
@@ -47,29 +47,9 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Ending_Cutscene_1.png"
+                            "Render::Video": {
+                                "B_Loop": false,
+                                "Video_ID": "EndingCutscene.mpg"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -85,7 +65,7 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": true,
+                            "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "cut_scene_png",

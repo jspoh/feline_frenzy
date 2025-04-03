@@ -27,7 +27,9 @@ namespace NIKE {
         /*****************************************************************//**
          * UI Interactions
          *********************************************************************/
-        void pauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& settings, const std::string& how_to_play, const std::string& quit);
+        void initPauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& settings, const std::string& how_to_play, const std::string& quit);
+
+        void togglePauseOverlay(bool show);
 
         // HARD CODED
         void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);

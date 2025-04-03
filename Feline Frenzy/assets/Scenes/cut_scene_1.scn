@@ -3,9 +3,9 @@
         "Channels": {
             "BGM": {
                 "loop": true,
-              "tracks": [
-                "Cutscene_1_v1.wav"
-              ]
+                "tracks": [
+                    "Cutscene_1_v1.wav"
+                ]
             },
             "BGMC": {
                 "loop": true,
@@ -53,7 +53,7 @@
                         "Components": {
                             "Render::Video": {
                                 "B_Loop": false,
-                                "Video_ID": ""
+                                "Video_ID": "OpeningCutscene.mpg"
                             },
                             "Transform::Transform": {
                                 "Position": {
