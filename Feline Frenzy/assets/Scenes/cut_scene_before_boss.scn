@@ -3,9 +3,9 @@
         "Channels": {
             "BGM": {
                 "loop": true,
-                "tracks": [
-                    "BGM_Level_Explore_v1.wav"
-                ]
+              "tracks": [
+                "Cutscene_2_v1.wav"
+              ]
             },
             "BGMC": {
                 "loop": true,
