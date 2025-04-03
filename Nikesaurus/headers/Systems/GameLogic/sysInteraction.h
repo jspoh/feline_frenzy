@@ -21,7 +21,7 @@ namespace NIKE {
 
         static std::unordered_map<Entity::Type, bool> hitEntities;
 
-        static bool showPauseMenu;
+        static bool show_pause_menu;
 
 
         /*****************************************************************//**

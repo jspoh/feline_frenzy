@@ -17,7 +17,7 @@ namespace NIKE {
     namespace Interaction {
 
         void Manager::init() {
-            showPauseMenu = false;
+            show_pause_menu = false;
 
         }
 
@@ -34,14 +34,14 @@ namespace NIKE {
                     return;
                 }
 
-                showPauseMenu = !showPauseMenu;
+                show_pause_menu = !show_pause_menu;
 
                 //Get all ecs systems
                 auto& systems = NIKE_ECS_MANAGER->getAllSystems();
 
                 static float saved_mouse_offset = 0.f;
 
-                if (showPauseMenu) {
+                if (show_pause_menu) {
 
                     // Change cursor
                     for (auto& player : player_tag) {
@@ -80,7 +80,7 @@ namespace NIKE {
                 pauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
             }
 
-            if (showPauseMenu) {
+            if (show_pause_menu) {
                 return;
             }
 
@@ -312,12 +312,12 @@ namespace NIKE {
             auto& quit_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(NIKE_METADATA_SERVICE->getEntityByName(quit).value()).value().get();
 
 
-            NIKE_UI_SERVICE->setButtonDisabled(resume, !showPauseMenu);
-            NIKE_UI_SERVICE->setButtonDisabled(options, !showPauseMenu);
-            NIKE_UI_SERVICE->setButtonDisabled(how_to_play, !showPauseMenu);
-            NIKE_UI_SERVICE->setButtonDisabled(quit, !showPauseMenu);
+            NIKE_UI_SERVICE->setButtonDisabled(resume, !show_pause_menu);
+            NIKE_UI_SERVICE->setButtonDisabled(options, !show_pause_menu);
+            NIKE_UI_SERVICE->setButtonDisabled(how_to_play, !show_pause_menu);
+            NIKE_UI_SERVICE->setButtonDisabled(quit, !show_pause_menu);
 
-            if (showPauseMenu) {
+            if (show_pause_menu) {
                 container_comp.color.a = 1.f;
                 resume_comp.color.a = 1.f;
                 options_comp.color.a = 1.f;

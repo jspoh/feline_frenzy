@@ -47,29 +47,9 @@
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Cutscene_2_1.png"
+                            "Render::Video": {
+                                "B_Loop": false,
+                                "Video_ID": "BeforeBossCutscene.mpg"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -85,7 +65,7 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": true,
+                            "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "cut_scene_png",
@@ -148,22 +128,22 @@
                                 "Origin": 0,
                                 "Scale": 1.0143518447875977,
                                 "Size": {
-                                    "x": 82.1624984741211,
-                                    "y": 39.559722900390625
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
-                                "Text": "Skip"
+                                "Text": ""
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 725.4962158203125,
-                                    "y": -398.91058349609375
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 164.3249969482422,
-                                    "y": 104.99999237060547
+                                    "x": 1631.0,
+                                    "y": 917.0
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "MetaData": {
@@ -176,13 +156,16 @@
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
+                            "Disabled": false,
+                            "Input_State": 0,
                             "Scripts": {
                                 "OnClick": {
-                                    "Named_Args": {},
-                                    "Script_ID": "",
+                                    "Named_Args": {
+                                        "scene": "lvl2_2.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
                                     "Start_Function": "",
-                                    "Update_Function": ""
+                                    "Update_Function": "Change"
                                 },
                                 "OnHover": {
                                     "Named_Args": {},
