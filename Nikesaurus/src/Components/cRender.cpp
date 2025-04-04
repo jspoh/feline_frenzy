@@ -1314,7 +1314,7 @@ namespace NIKE {
 					{
 						//Set Text input
 						ImGui::Text("Enter Text:");
-						if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
+						if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 10)) {
 							text_input.resize(strlen(text_input.c_str()));
 						}
 

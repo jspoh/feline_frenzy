@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0231",
+                            "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -275,7 +275,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0233",
+                            "Name": "entity_0012",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -288,7 +288,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0234",
+                            "Name": "entity_0013",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -1150,6 +1150,51 @@
                 },
                 {
                     "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 6,
+                            "Name": "barrel_1",
+                            "Prefab_ID": "barrel1.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Animation::Base": null,
+                                    "Combat::Health": null,
+                                    "GameLogic::ILogic": {
+                                        "Named_Args": {
+                                            "entity": 173
+                                        },
+                                        "Script_ID": "objectsLogic.lua",
+                                        "Start_Function": "Test",
+                                        "Update_Function": "Test"
+                                    },
+                                    "Physics::Collider": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 1.0,
+                                            "y": 1.0,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "State::State": null,
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": -673.9058227539063,
+                                            "y": 400.0
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "objects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
                         "Components": {
                             "Physics::Collider": {
                                 "B_Bind_To_Entity": false,
@@ -1208,7 +1253,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 6,
+                            "Layer_Order": 7,
                             "Name": "yellow_tree",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1221,7 +1266,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 7,
+                            "Layer_Order": 8,
                             "Name": "pink_tree3",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -1265,7 +1310,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 8,
+                            "Layer_Order": 9,
                             "Name": "grass_03",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
@@ -1356,7 +1401,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 9,
+                            "Layer_Order": 10,
                             "Name": "lamp_2",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1371,7 +1416,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 10,
+                            "Layer_Order": 11,
                             "Name": "yellow_tree1",
                             "Prefab_ID": "yellow_tree.prefab",
                             "Prefab_Override": {
@@ -1415,7 +1460,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 11,
+                            "Layer_Order": 12,
                             "Name": "grass_05",
                             "Prefab_ID": "grass.prefab",
                             "Prefab_Override": {
@@ -1448,7 +1493,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 12,
+                            "Layer_Order": 13,
                             "Name": "green_tree1",
                             "Prefab_ID": "green_tree.prefab",
                             "Prefab_Override": {
@@ -1480,51 +1525,6 @@
                                         "objects"
                                     ]
                                 }
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 13,
-                            "Name": "barrel_1",
-                            "Prefab_ID": "barrel1.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Animation::Base": null,
-                                    "Combat::Health": null,
-                                    "GameLogic::ILogic": {
-                                        "Named_Args": {
-                                            "entity": 173
-                                        },
-                                        "Script_ID": "objectsLogic.lua",
-                                        "Start_Function": "Test",
-                                        "Update_Function": "Test"
-                                    },
-                                    "Physics::Collider": null,
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 1.0,
-                                            "y": 1.0,
-                                            "z": 1.0
-                                        }
-                                    },
-                                    "State::State": null,
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -673.9058227539063,
-                                            "y": -72.54766082763672
-                                        }
-                                    }
-                                },
-                                "MetaData": null
                             },
                             "Tags": [
                                 "objects"
@@ -2427,6 +2427,58 @@
                             "Tags": [
                                 "elementui"
                             ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 4,
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 4,
+                            "Name": "Portal_UI",
+                            "Prefab_ID": "ui_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": []
                         }
                     }
                 }

@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_1768",
+                            "Name": "entity_0067",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2750,6 +2750,49 @@
                             "Tags": [
                                 "elementui"
                             ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 3,
+                            "Name": "portal_text",
+                            "Prefab_ID": "portal_text.prefab",
+                            "Prefab_Override": {
+                                "MetaData": {
+                                    "Layer ID": 4
+                                }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 4,
+                            "Name": "portal_ui",
+                            "Prefab_ID": "ui_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": []
                         }
                     }
                 }

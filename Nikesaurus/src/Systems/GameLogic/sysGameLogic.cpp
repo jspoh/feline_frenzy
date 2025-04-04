@@ -605,7 +605,8 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {			
+
 		for (const Entity::Type& vent : vents_entities) {
 			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
 			const auto entity_animation_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
@@ -711,8 +712,6 @@ namespace NIKE {
 
 				// Set Animation
 				Interaction::flipX(vent, false);
-
-				
 			}
 		}
 	}
