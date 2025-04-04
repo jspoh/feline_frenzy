@@ -361,8 +361,8 @@ namespace NIKE {
                 if (health.health < prevHealth) {
 
                     // Temporary hardcoded SFX
-                    int randomVariantDamage = NIKE::GameLogic::getRandomNumber<int>(1, 2); // Assuming variations 1-2
-                    std::string sfxToPlay = "TakeDamageMeow" + std::to_string(randomVariantDamage) + ".wav";
+                    int randomVariantDamage = NIKE::GameLogic::getRandomNumber<int>(1, 12); // Assuming variations 1-12
+                    std::string sfxToPlay = "Cat3High_Hurt_0" + std::to_string(randomVariantDamage) + ".wav";
                     NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                     prevHealth = health.health;
                 }
@@ -375,8 +375,8 @@ namespace NIKE {
                 if (health_comp.value().get().lives <= 0)
                 {
                     // Temporary hardcoded SFX
-                    int randomVariantDeath = NIKE::GameLogic::getRandomNumber<int>(1, 2); // Assuming variations 1-2
-                    std::string sfxToPlay = "PlayerDeathMeow" + std::to_string(randomVariantDeath) + ".wav";
+                    int randomVariantDeath = NIKE::GameLogic::getRandomNumber<int>(1, 7); // Assuming variations 1-7
+                    std::string sfxToPlay = "Cat3High_Death_0" + std::to_string(randomVariantDeath) + ".wav";
                     NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
                     Interaction::gameOverlay("Defeat_screen_bg.png", "Play Again", "Quit");
