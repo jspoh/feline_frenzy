@@ -124,7 +124,7 @@ namespace NIKE {
 			// If shot on cooldown
 			if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
 				// Accumulate time since last shot
-				enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+				enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 			}
 
 			// Look for entity w player component
