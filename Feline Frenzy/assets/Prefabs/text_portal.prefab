@@ -31,6 +31,8 @@
     },
     "MetaData": {
         "Layer ID": 4,
-        "Tags": []
+        "Tags": [
+            "portal_ui"
+        ]
     }
 }

@@ -57,6 +57,7 @@
                 "hpcontainer",
                 "objects",
                 "player",
+                "portal_ui",
                 "vent"
             ]
         }
@@ -171,7 +172,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0067",
+                            "Name": "entity_0134",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -898,6 +899,21 @@
                                 "MetaData": {
                                     "Parent": "player"
                                 }
+                            },
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 25,
+                            "Name": "portal_text",
+                            "Prefab_ID": "portal_text.prefab",
+                            "Prefab_Override": {
+                                "MetaData": null
                             },
                             "Tags": []
                         }
@@ -2759,23 +2775,6 @@
                             "B_Locked": false,
                             "Layer_ID": 4,
                             "Layer_Order": 3,
-                            "Name": "portal_text",
-                            "Prefab_ID": "portal_text.prefab",
-                            "Prefab_Override": {
-                                "MetaData": {
-                                    "Layer ID": 4
-                                }
-                            },
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 4,
-                            "Layer_Order": 4,
                             "Name": "portal_ui",
                             "Prefab_ID": "ui_portal.prefab",
                             "Prefab_Override": {
@@ -2790,7 +2789,9 @@
                                     },
                                     "Transform::Transform": null
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": []
+                                }
                             },
                             "Tags": []
                         }

@@ -37,6 +37,7 @@
                 "hpcontainer",
                 "objects",
                 "player",
+                "portal_ui",
                 "vent"
             ]
         }
@@ -2435,24 +2436,19 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 4,
-                            "Layer_Order": 4,
+                            "Layer_Order": 3,
                             "Name": "portal_text",
                             "Prefab_ID": "text_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Render::Text": {
-                                        "Color": {
-                                            "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
+                                    "Render::Text": null,
                                     "Transform::Transform": null
                                 },
                                 "MetaData": null
                             },
-                            "Tags": []
+                            "Tags": [
+                                "portal_ui"
+                            ]
                         }
                     }
                 },
@@ -2466,19 +2462,14 @@
                             "Prefab_ID": "ui_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
+                                    "Render::Texture": null,
                                     "Transform::Transform": null
                                 },
                                 "MetaData": null
                             },
-                            "Tags": []
+                            "Tags": [
+                                "portal_ui"
+                            ]
                         }
                     }
                 }

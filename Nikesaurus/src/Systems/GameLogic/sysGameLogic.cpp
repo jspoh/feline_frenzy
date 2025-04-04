@@ -605,7 +605,36 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {			
+	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal) {	
+
+		auto portal_ui_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("portal_ui");
+		auto players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+
+
+		for (const Entity::Type& portal_ui : portal_ui_entities)
+		{
+			for (const Entity::Type& player : players)
+			{
+				// Get Render Component
+				const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(portal_ui);
+				if (source_render_comp.has_value())
+				{
+					//float& source_intensity = source_render_comp.value().get().intensity;
+					Vector4f& source_alpha = source_render_comp.value().get().color;
+
+					// Set target alpha
+					float target_alpha = Interaction::isWithinWorldRange(portal_ui, player) ? 1.0f : 0.0f; 
+					// Adjust based on deltaTime
+					float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); 
+
+					// Smoothly interpolate alpha
+					source_alpha.a += (target_alpha - source_alpha.a) * alpha_speed;
+
+					// Clamp alpha between 0 and 1.0
+					source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
+				}
+			}
+		}
 
 		for (const Entity::Type& vent : vents_entities) {
 			const auto entity_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
