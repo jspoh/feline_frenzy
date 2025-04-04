@@ -212,108 +212,8 @@ namespace NIKE {
 					}
 				}
 
-				//Get texture comp
-				auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
-				auto video_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Video>(entity);
-
-				// Time based change texture for start_game cut scene
-				//if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_1.scn" && texture_comp.has_value())
-				//{
-				//	static float elapsed_time_before = 0.0f;
-				//	static int counter_start_cut_scene = 1;
-
-				//	std::string cutscene_string = "Intro_Cutscene_";
-				//	elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-				//	std::string cutscene_asset_id = cutscene_string + std::to_string(counter_start_cut_scene) + ".png";
-				//	// Change texture by timer
-				//	if (elapsed_time_before >= 3.f && counter_start_cut_scene <= 8)
-				//	{
-				//		if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
-				//		{
-				//			texture_comp.value().get().texture_id = cutscene_asset_id;
-				//			// This is for counter to cut scene
-				//			++counter_start_cut_scene;
-				//			elapsed_time_before = 0.0f;
-				//		}
-				//	} 
-				//	if (counter_start_cut_scene > 8)
-				//	{
-				//		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_1.scn"));
-				//		// Reset counters
-				//		counter_start_cut_scene = 1;
-				//		elapsed_time_before = 0.0f;
-				//	}
-				//}
-
-				// Time based change texture for before boss room cut scene
-				//if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && texture_comp.has_value())
-				//{
-				//	static float elapsed_time_before = 0.0f;
-				//	static int counter_before = 1;
-
-				//	std::string cutscene_string = "Cutscene_2_";
-				//	elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-				//	std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
-				//	// Change texture by timer
-				//	if (elapsed_time_before >= 3.f && counter_before <= 8)
-				//	{
-				//		if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
-				//		{
-				//			texture_comp.value().get().texture_id = cutscene_asset_id;
-				//			// This is for counter to cut scene
-				//			++counter_before;
-				//			elapsed_time_before = 0.0f;
-				//		}
-				//	}
-				//	if (counter_before > 8)
-				//	{
-				//		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
-				//		// Reset counters
-				//		counter_before = 1;
-				//		elapsed_time_before = 0.0f;
-				//	}
-				//}
-
-				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && video_comp.has_value())
-				{
-					// Check if video has ended
-					if (!video_comp.value().get().b_is_playing) {
-						NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
-					}
-				}
-
-			//	// Time based change texture for after boss room cut scene
-			//	if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && texture_comp.has_value())
-			//	{
-			//		static float elapsed_time_after = 3.0f;
-			//		static int counter_after = 1;
-
-			//		std::string cutscene_string = "Ending_Cutscene_";
-			//		elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-			//		std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
-
-			//		// Change texture by timer
-			//		if (elapsed_time_after >= 3.f)
-			//		{
-			//			if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
-			//			{
-			//				texture_comp.value().get().texture_id = cutscene_asset_id;
-			//			}
-
-			//			// This is for counter to cut scene
-			//			++counter_after;
-			//			elapsed_time_after = 0.0f;
-			//		}
-
-			//		if (counter_after > 7)
-			//		{
-			//			// After boss cutscene play finish, show win game overlay
-			//			NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
-			//			// Reset static counters
-			//			elapsed_time_after = 3.0f;
-			//			counter_after = 1;
-			//		}
-			//	}
+				// Cutscene transitions will be called here
+				// cutsceneTransitions(entity);
 
 				// Update of FSM will be called here
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
@@ -439,6 +339,141 @@ namespace NIKE {
 			if (health_comp.has_value())
 			{
 				health_comp.value().get().health = 100.0f;
+			}
+		}
+	}
+
+	void GameLogic::Manager::cutsceneTransitions(Entity::Type& entity)
+	{
+		//Get texture comp
+		auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+		auto video_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Video>(entity);
+
+		// !!! NOTE TO TAKE HERE: COMMENT OUT EITHER ONE!!
+
+		/************************
+		* Time based type transitions
+		************************/
+
+		// Time based change texture for start_game cut scene
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_1.scn" && texture_comp.has_value())
+		{
+			static float elapsed_time_before = 0.0f;
+			static int counter_start_cut_scene = 1;
+
+			std::string cutscene_string = "Intro_Cutscene_";
+			elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			std::string cutscene_asset_id = cutscene_string + std::to_string(counter_start_cut_scene) + ".png";
+			// Change texture by timer
+			if (elapsed_time_before >= 3.f && counter_start_cut_scene <= 8)
+			{
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+				{
+					texture_comp.value().get().texture_id = cutscene_asset_id;
+					// This is for counter to cut scene
+					++counter_start_cut_scene;
+					elapsed_time_before = 0.0f;
+				}
+			} 
+			if (counter_start_cut_scene > 8)
+			{
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_1.scn"));
+				// Reset counters
+				counter_start_cut_scene = 1;
+				elapsed_time_before = 0.0f;
+			}
+		}
+
+		// Time based change texture for before boss room cut scene
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && texture_comp.has_value())
+		{
+			static float elapsed_time_before = 0.0f;
+			static int counter_before = 1;
+
+			std::string cutscene_string = "Cutscene_2_";
+			elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			std::string cutscene_asset_id = cutscene_string + std::to_string(counter_before) + ".png";
+			// Change texture by timer
+			if (elapsed_time_before >= 3.f && counter_before <= 8)
+			{
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+				{
+					texture_comp.value().get().texture_id = cutscene_asset_id;
+					// This is for counter to cut scene
+					++counter_before;
+					elapsed_time_before = 0.0f;
+				}
+			}
+			if (counter_before > 8)
+			{
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+				// Reset counters
+				counter_before = 1;
+				elapsed_time_before = 0.0f;
+			}
+		}
+
+		// Time based change texture for after boss room cut scene
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && texture_comp.has_value())
+		{
+			static float elapsed_time_after = 3.0f;
+			static int counter_after = 1;
+
+			std::string cutscene_string = "Ending_Cutscene_";
+			elapsed_time_after += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+			std::string cutscene_asset_id = cutscene_string + std::to_string(counter_after) + ".png";
+
+			// Change texture by timer
+			if (elapsed_time_after >= 3.f)
+			{
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(cutscene_asset_id))
+				{
+					texture_comp.value().get().texture_id = cutscene_asset_id;
+				}
+
+				// This is for counter to cut scene
+				++counter_after;
+				elapsed_time_after = 0.0f;
+			}
+
+			if (counter_after > 7)
+			{
+				// After boss cutscene play finish, show win game overlay
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+				// Reset static counters
+				elapsed_time_after = 3.0f;
+				counter_after = 1;
+			}
+		}
+
+		/************************
+		* Video type transitions
+		************************/
+
+		// Cutscene transitions
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_before_boss.scn" && video_comp.has_value())
+		{
+			// Check if video has ended
+			if (!video_comp.value().get().b_is_playing && video_comp.value().get().curr_time == video_comp.value().get().duration) {
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl2_2.scn"));
+			}
+		}
+
+		// Cutscene transitions
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_after_before_boss.scn" && video_comp.has_value())
+		{
+			// Check if video has ended
+			if (!video_comp.value().get().b_is_playing && video_comp.value().get().curr_time == video_comp.value().get().duration) {
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "main_menu.scn"));
+			}
+		}
+
+		// Cutscene transitions
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_1.scn" && video_comp.has_value())
+		{
+			// Check if video has ended
+			if (!video_comp.value().get().b_is_playing && video_comp.value().get().curr_time == video_comp.value().get().duration) {
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "lvl1_1.scn"));
 			}
 		}
 	}

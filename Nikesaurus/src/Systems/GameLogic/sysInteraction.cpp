@@ -37,9 +37,6 @@ namespace NIKE {
 
                 show_pause_menu = !show_pause_menu;
 
-                //Get all ecs systems
-                auto& systems = NIKE_ECS_MANAGER->getAllSystems();
-
                 static float saved_mouse_offset = 0.f;
 
                 if (show_pause_menu) {
@@ -54,15 +51,8 @@ namespace NIKE {
                         cam.mouse_offset = 0.f;
                     }
 
-                    //std::for_each(systems.begin(), systems.end(),
-                    //    [](std::shared_ptr<System::ISystem>& system) {
-                    //        if (system->getSysName() == "Physics System" || system->getSysName() == "Game Logic System") {
-                    //            system->setActiveState(false);
-                    //        }
-                    //    });
 
                     initPauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
-                    //togglePauseOverlay(true);
 
                     NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PAUSE, ""));
                 }
@@ -77,12 +67,6 @@ namespace NIKE {
                     }
 
                     NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::RESUME, ""));
-
-                    //std::for_each(systems.begin(), systems.end(),
-                    //    [](std::shared_ptr<System::ISystem>& system) {
-                    //        system->setActiveState(true);
-                    //    });
-                    //togglePauseOverlay(false);
                 }
 
             }

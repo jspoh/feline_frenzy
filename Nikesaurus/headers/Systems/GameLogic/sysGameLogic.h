@@ -65,6 +65,8 @@ namespace NIKE {
 			// Cheat code to set health to 100 everytime
 			void resetHealth();
 
+			void cutsceneTransitions(Entity::Type& entity);
+
 	    public:
 		    //Default constructor
 		    Manager() = default;
