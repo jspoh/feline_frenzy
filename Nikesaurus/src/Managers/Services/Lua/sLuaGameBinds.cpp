@@ -294,15 +294,15 @@ namespace NIKE {
 
                 // Determine type and randomization range based on original ID
                 if (original_sfxID.find("Shoot_Fire") != std::string::npos) { // Check if "Shoot_Fire" is present
-                    baseFilename = "Shoot_Fire_0";
+                    baseFilename = "Shoot_Fire_";
                     maxVariant = 3;
                 }
                 else if (original_sfxID.find("Shoot_Water") != std::string::npos) {
-                    baseFilename = "Shoot_Water_0";
+                    baseFilename = "Shoot_Water_";
                     maxVariant = 9;
                 }
                 else if (original_sfxID.find("Shoot_Wind") != std::string::npos) { // Assuming "Wind" based on your list
-                    baseFilename = "Shoot_Wind_0";
+                    baseFilename = "Shoot_Wind_";
                     maxVariant = 15;
                 }
                 else if (original_sfxID.find("Laser") != std::string::npos) {
@@ -319,6 +319,9 @@ namespace NIKE {
 
                 if (!baseFilename.empty()) { // If a known type was found
                     int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, maxVariant);
+                    if (randomVariant < 10) {
+						baseFilename = baseFilename + "0"; // Add leading zero for 2-digit numbers
+                    }
                     randomized_sfxID = baseFilename + std::to_string(randomVariant) + ".wav";
                 }
                 else {
@@ -326,10 +329,12 @@ namespace NIKE {
                 }
 
                 // Update the component's audio_id with the randomized one
-                sfx_comp.audio_id = randomized_sfxID;
-
+                //sfx_comp.audio_id = randomized_sfxID;
                 // Set the flag for sysAudio to play this sound
-                sfx_comp.b_play_sfx = true;
+                //sfx_comp.b_play_sfx = true;
+
+                // Play the determined sound directly, consistent with other SFX calls
+                NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), sfx_comp.volume * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), sfx_comp.pitch, false, false);
             }
             });
 
@@ -362,7 +367,14 @@ namespace NIKE {
 
                     // Temporary hardcoded SFX
                     int randomVariantDamage = NIKE::GameLogic::getRandomNumber<int>(1, 12); // Assuming variations 1-12
-                    std::string sfxToPlay = "Cat3High_Hurt_0" + std::to_string(randomVariantDamage) + ".wav";
+                    std::string sfxToPlay = "";
+					if (randomVariantDamage < 10) {
+						// Add leading zero for 2-digit numbers
+						sfxToPlay = "Cat3High_Hurt_0" + std::to_string(randomVariantDamage) + ".wav";
+					}
+					else {
+						sfxToPlay = "Cat3High_Hurt_" + std::to_string(randomVariantDamage) + ".wav";
+					}
                     NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
                     prevHealth = health.health;
                 }
