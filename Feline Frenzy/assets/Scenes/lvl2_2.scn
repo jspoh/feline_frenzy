@@ -10,7 +10,7 @@
             "BGMC": {
                 "loop": true,
               "tracks": [
-                "Boss_Music_v1.wav"
+                "Boss_Music.wav"
               ]
             },
             "BulletSFX": {

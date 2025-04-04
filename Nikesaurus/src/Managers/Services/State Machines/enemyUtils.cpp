@@ -165,6 +165,21 @@ namespace NIKE {
 				// Change boss element between 1,3 (enum idexes)
 				int random_number = GameLogic::getRandomNumber(1, 3);
 				element_com.value().get().element = static_cast<Element::Elements>(random_number);
+				// Fire = 1, Water = 2, Wind/Grass = 3
+				switch (random_number) {
+				case 1:
+					NIKE_AUDIO_SERVICE->playAudio("Fireball1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.0f, false, false);
+					break;
+				case 2:
+					NIKE_AUDIO_SERVICE->playAudio("Waterball1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.0f, false, false);
+					break;
+				case 3:
+					NIKE_AUDIO_SERVICE->playAudio("Windball1.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.0f, false, false);
+					break;
+				default:
+					// Optionally handle unexpected values
+					break;
+				}
 				elapsed_time = 0;
 			}
 			
@@ -246,19 +261,53 @@ namespace NIKE {
 			bullet_physics_comp.value().get().force = { direction.x, direction.y };
 		}
 
-		//Set bullet SFX
-		auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
-		if (bullet_sfx.has_value()) {
-			bullet_sfx.value().get().b_play_sfx = true;
-			// float rand_pitch = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);		
-			std::random_device rd;
-			// Mersenne Twister random engine
-			std::mt19937 gen(rd());  
-			// Rand pitch between 0.5 and 2
-			std::uniform_real_distribution<float> dist(0.5f, 2.0f);
+		// Set bullet SFX
+		auto bullet_sfx_opt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
+		if (bullet_sfx_opt.has_value()) {
+			auto& sfx_comp = bullet_sfx_opt.value().get();
+			std::string original_sfxID = sfx_comp.audio_id; // Get ID set by prefab
 
-			float rand_pitch = GameLogic::getRandomNumber(0.5f,2.f);
-			bullet_sfx.value().get().pitch = rand_pitch;
+			std::string baseFilename = "";
+			int maxVariant = 1;
+
+			// Determine type and range based on original ID (Adjust base names/ranges as needed)
+			if (original_sfxID.find("Shoot_Fire") != std::string::npos) { // Check if "Shoot_Fire" is present
+				baseFilename = "Shoot_Fire_";
+				maxVariant = 3;
+			}
+			else if (original_sfxID.find("Shoot_Water") != std::string::npos) {
+				baseFilename = "Shoot_Water_";
+				maxVariant = 9;
+			}
+			else if (original_sfxID.find("Shoot_Wind") != std::string::npos) {
+				baseFilename = "Shoot_Wind_";
+				maxVariant = 15;
+			}
+			else if (original_sfxID.find("Laser") != std::string::npos) {
+				baseFilename = "Laser";
+				maxVariant = 3;
+			}
+			else if (original_sfxID.find("Pop") != std::string::npos) {
+				baseFilename = "Pop";
+				maxVariant = 5;
+			}
+			// Add more checks if needed (e.g., for a default "EnemyBullet")
+
+			std::string randomized_sfxID = original_sfxID;
+
+			if (!baseFilename.empty()) {
+				int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, maxVariant);
+				if (randomVariant < 10) {
+					baseFilename = baseFilename + "0"; // Adds '0' to base if variant > 9
+				}
+				randomized_sfxID = baseFilename + std::to_string(randomVariant) + ".wav";
+			}
+			else {
+				NIKEE_CORE_WARN("shootBullet: Unknown enemy bullet SFX base type for '%s', using original.", original_sfxID.c_str());
+			}
+
+			// Play directly
+			NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false); // Different pitch from player
 		}
 
 		// get gun child entity
@@ -406,10 +455,53 @@ namespace NIKE {
 			}
 
 			// Bullet SFX
-			auto bullet_sfx = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
-			if (bullet_sfx.has_value()) {
-				bullet_sfx.value().get().b_play_sfx = true;
-				bullet_sfx.value().get().pitch = GameLogic::getRandomNumber(0.5f, 2.0f);
+			// Set bullet SFX
+			auto bullet_sfx_opt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
+			if (bullet_sfx_opt.has_value()) {
+				auto& sfx_comp = bullet_sfx_opt.value().get();
+				std::string original_sfxID = sfx_comp.audio_id; // Get ID set by prefab
+
+				std::string baseFilename = "";
+				int maxVariant = 1;
+
+				// Determine type and range based on original ID (Adjust base names/ranges as needed)
+				if (original_sfxID.find("Shoot_Fire") != std::string::npos) { // Check if "Shoot_Fire" is present
+					baseFilename = "Shoot_Fire_";
+					maxVariant = 3;
+				}
+				else if (original_sfxID.find("Shoot_Water") != std::string::npos) {
+					baseFilename = "Shoot_Water_";
+					maxVariant = 9;
+				}
+				else if (original_sfxID.find("Shoot_Wind") != std::string::npos) {
+					baseFilename = "Shoot_Wind_";
+					maxVariant = 15;
+				}
+				else if (original_sfxID.find("Laser") != std::string::npos) {
+					baseFilename = "Laser";
+					maxVariant = 3;
+				}
+				else if (original_sfxID.find("Pop") != std::string::npos) {
+					baseFilename = "Pop";
+					maxVariant = 5;
+				}
+				// Add more checks if needed (e.g., for a default "EnemyBullet")
+
+				std::string randomized_sfxID = original_sfxID;
+
+				if (!baseFilename.empty()) {
+					int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, maxVariant);
+					if (randomVariant < 10) {
+						baseFilename = baseFilename + "0"; // Adds '0' to base if variant > 9
+					}
+					randomized_sfxID = baseFilename + std::to_string(randomVariant) + ".wav";
+				}
+				else {
+					NIKEE_CORE_WARN("shootBullet: Unknown enemy bullet SFX base type for '%s', using original.", original_sfxID.c_str());
+				}
+
+				// Play directly
+				NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.6f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false); // Different pitch from player
 			}
 		}
 	}

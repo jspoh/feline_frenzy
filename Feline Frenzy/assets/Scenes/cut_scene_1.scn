@@ -4,7 +4,7 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
-                    "Cutscene_1_v1.wav"
+                    "Cutscene_1.wav"
                 ]
             },
             "BGMC": {

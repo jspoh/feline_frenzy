@@ -301,7 +301,7 @@ namespace NIKE {
                     baseFilename = "Shoot_Water_";
                     maxVariant = 9;
                 }
-                else if (original_sfxID.find("Shoot_Wind") != std::string::npos) { // Assuming "Wind" based on your list
+                else if (original_sfxID.find("Shoot_Wind") != std::string::npos) {
                     baseFilename = "Shoot_Wind_";
                     maxVariant = 15;
                 }
