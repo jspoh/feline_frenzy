@@ -151,7 +151,7 @@ namespace NIKE {
 							Render::Texture& gun_texture = *std::static_pointer_cast<Render::Texture>(gun_comp_texture->second);
 
 							auto radToDeg = [](float rad) -> float {
-								return rad * (180.0 / M_PI); // M_PI is a constant in cmath for the value of pi
+								return static_cast<float>(rad * (180.0 / M_PI)); // M_PI is a constant in cmath for the value of pi
 								};
 
 							// update spritesheet used based on section
