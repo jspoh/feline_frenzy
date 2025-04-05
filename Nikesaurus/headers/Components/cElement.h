@@ -80,7 +80,7 @@ namespace NIKE {
 
 			Combo() : last_hits{}, status_effect(Status::NONE), status_timer(0.f), tick_timer(0.f), temp_max_speed(-1.f)  {};
 
-			void registerHit(Elements element) {
+			int registerHit(Elements element) {
 				// If queue is full (queue full of random elements)
 				if (last_hits.size() == max_size) {
 					NIKEE_CORE_INFO("queue full, {} popped", static_cast<int>(last_hits.front()));
@@ -93,17 +93,22 @@ namespace NIKE {
 				last_hits.push_back(element); 
 
 				// Apply Status Effect
-				applyStatusEffect();
+				int status_applied = applyStatusEffect();
+
+				return status_applied;
 			}
 
-			void applyStatusEffect() {
+			int applyStatusEffect() {
+				int status_applied{ 0 };
+
 				// Ensure 3 hits exist
 				if (last_hits.size() < max_size) {
-					return;
+					return status_applied;
 				}
 
 				// If all elements in the queue are the same
 				if (last_hits[0] == last_hits[1] && last_hits[1] == last_hits[2]) {
+
 					switch (last_hits[0]) {
 					case Elements::FIRE:
 						status_effect = Status::BURN;
@@ -119,6 +124,8 @@ namespace NIKE {
 						break;
 					}
 
+					status_applied = static_cast<int>(last_hits[0]);
+
 					NIKEE_CORE_INFO("{} status applied", static_cast<int>(status_effect));
 
 					// Clear queue after inflicting status
@@ -130,6 +137,7 @@ namespace NIKE {
 					// Reset status effect duration
 					status_timer = status_duration;  
 				}
+				return status_applied;
 			}
 		};
 

@@ -38,6 +38,7 @@
                 "objects",
                 "player",
                 "portal_ui",
+                "statusAnimation",
                 "vent"
             ]
         }
@@ -2441,7 +2442,14 @@
                             "Prefab_ID": "text_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Render::Text": null,
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
                                     "Transform::Transform": null
                                 },
                                 "MetaData": null
@@ -2462,7 +2470,14 @@
                             "Prefab_ID": "ui_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Render::Texture": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
                                     "Transform::Transform": null
                                 },
                                 "MetaData": null

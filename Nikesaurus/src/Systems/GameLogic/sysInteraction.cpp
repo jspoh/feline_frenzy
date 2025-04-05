@@ -620,6 +620,33 @@ namespace NIKE {
             }
         }
 
+        // Spawn Status Animation
+        void spawnStatusAnimation(const Entity::Type entity, const int status) {
+            //NIKEE_CORE_INFO("SPAWNING STATUS ANIMATION");
+
+            const std::string status_prefabs[3] = { "fire_status.prefab", "water_status.prefab", "grass_status.prefab" };
+
+            Entity::Type status_entity = NIKE_ECS_MANAGER->createEntity();
+            NIKE_METADATA_SERVICE->setEntityPrefab(status_entity, status_prefabs[status - 1]);
+
+            // set status entity as child
+            NIKE_METADATA_SERVICE->setEntityChildRelation(status_entity);
+
+            // get enemy entity name
+            std::string enemy_entity_name = NIKE_METADATA_SERVICE->getEntityName(entity);
+
+            // set status entity as child of enemy entity
+            NIKE_METADATA_SERVICE->setEntityChildRelationParent(status_entity, enemy_entity_name);
+
+            // check that status has a parent
+            auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(status_entity);
+            auto* child = std::get_if<MetaData::Child>(&relation);
+
+            if (!child || !NIKE_METADATA_SERVICE->getEntityByName(child->parent).has_value()) {
+                NIKEE_CORE_ERROR("Status entity has no parent");
+            }
+        }
+
 
         void applyDamage(Entity::Type attacker, Entity::Type target) {
             const auto attacker_damage_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Damage>(attacker);
@@ -676,7 +703,12 @@ namespace NIKE {
                 const auto target_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(target);
                 if (target_combo_comp) {
                     // Update combo component
-                    target_combo_comp.value().get().registerHit(attacker_element);
+                    int status_applied = target_combo_comp.value().get().registerHit(attacker_element);
+
+                    // Adding status animation
+                    if (status_applied != 0) {
+                        spawnStatusAnimation(target, status_applied);
+                    }
                 }
             }
 

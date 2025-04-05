@@ -73,6 +73,9 @@ namespace NIKE {
         // For world-space calculation
         bool isWithinWorldRange(Entity::Type source, Entity::Type player);
 
+        // Status Animation
+        void spawnStatusAnimation(const Entity::Type entity, const int status);
+
         class Manager : 
             public System::ISystem {
         public:

@@ -41,7 +41,7 @@ namespace NIKE {
 				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "main_menu.scn") {
 					std::set<Entity::Type> background_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("Background");
 
-					for (auto& background : NIKE_METADATA_SERVICE->getEntitiesByTag("Background")) {
+					for (auto& background : background_tags) {
 						const auto background_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(background);
 
 						if (background_transform_comp) {
@@ -245,7 +245,7 @@ namespace NIKE {
 
 		// Apply status effect if tick timer reached
 		if (e_combo.tick_timer <= 0.0f) {
-			applyStatusEffect(e_combo, e_health, e_dynamic);
+			applyStatusEffect(e_combo, e_health, e_dynamic, entity);
 			e_combo.tick_timer = Element::Combo::tick_interval; // Reset tick timer
 		}
 
@@ -254,13 +254,15 @@ namespace NIKE {
 
 		// Remove status effect if expired
 		if (e_combo.status_timer <= 0.0f) {
-			removeStatusEffect(e_combo, e_dynamic);
+			removeStatusEffect(e_combo, e_dynamic, entity);
 		}
 
 		NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
 	}
 
-	void GameLogic::Manager::applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic) {
+	void GameLogic::Manager::applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic, const Entity::Type entity) {
+
+
 		switch (e_combo.status_effect) {
 		case Element::Status::BURN:
 			NIKEE_CORE_INFO("BURN TICK: -1 HP");
@@ -279,7 +281,7 @@ namespace NIKE {
 		}
 	}
 
-	void GameLogic::Manager::removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic) {
+	void GameLogic::Manager::removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic, Entity::Type entity) {
 		// Restore speed if frozen
 		if (e_combo.status_effect == Element::Status::FREEZE && e_combo.temp_max_speed >= 0) {
 			e_dynamic.max_speed = e_combo.temp_max_speed;
@@ -288,6 +290,32 @@ namespace NIKE {
 
 		// Remove status effect
 		e_combo.status_effect = Element::Status::NONE;
+
+		// Remove Status Animation
+		//std::set<Entity::Type> players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+		
+
+
+		auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		auto* parent = std::get_if<MetaData::Parent>(&relation);
+
+		if (parent) {
+			for (const auto child : parent->childrens) {
+				auto e = NIKE_METADATA_SERVICE->getEntityByName(child);
+
+				if (!e.has_value()) {
+					continue;
+				}
+
+				Entity::Type de = e.value();
+				std::set<std::string> entity_tags = NIKE_METADATA_SERVICE->getEntityTags(de);
+				for (auto& tag : entity_tags) {
+					if (tag == "statusAnimation") {
+						NIKE_METADATA_SERVICE->destroyEntity(de);
+					}
+				}
+			}
+		}
 	}
 
 

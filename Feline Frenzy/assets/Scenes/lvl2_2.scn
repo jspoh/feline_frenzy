@@ -58,6 +58,7 @@
                 "hpcontainer",
                 "objects",
                 "player",
+                "statusAnimation",
                 "vent"
             ]
         }

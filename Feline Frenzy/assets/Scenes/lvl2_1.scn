@@ -56,6 +56,7 @@
                 "objects",
                 "player",
                 "portal_ui",
+                "statusAnimation",
                 "vent"
             ]
         }
