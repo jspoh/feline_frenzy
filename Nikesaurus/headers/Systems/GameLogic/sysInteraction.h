@@ -34,6 +34,8 @@ namespace NIKE {
         // HARD CODED
         void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 
+        // Screen text overlay
+        void handleScreenOverlay();
 
         /*****************************************************************//**
          * VFX and SFX Interactions

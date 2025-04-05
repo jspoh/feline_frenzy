@@ -75,6 +75,12 @@ namespace NIKE {
                 return;
             }
 
+            // Get tags
+            auto player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+            auto heal_animation_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("healAnimation");
+
+            handleScreenOverlay();
+
             // Player Tab Element Swapping
             //std::set<Entity::Type> player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
             //for (auto& player : player_tag) {
@@ -121,16 +127,15 @@ namespace NIKE {
                     continue;
 
                 // Update heal animation
-                for (auto& heal_entity : NIKE_METADATA_SERVICE->getEntitiesByTag("healAnimation")) {
+                for (auto& heal_entity : heal_animation_tag) {
                    
                     // Updating to player location
-                    std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
-                    if (!player_entities.empty()) {
+                    if (!player_tag.empty()) {
                         // Get heal animation position
                         auto &heal_animation_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(heal_entity).value().get().position;
 
                         // Get player position
-                        for (auto& player : player_entities) {
+                        for (auto& player : player_tag) {
                             const auto player_pos = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(player).value().get().position;
 
                             // Set heal animation to player position
@@ -149,25 +154,30 @@ namespace NIKE {
                     }
                 }
 
+
                 // Iterate through all entities
                 for (auto& entity : (*layer)->getEntitites()) {
 
                     //Skip entity not registered to this system
                     if (entities.find(entity) == entities.end()) continue;
-
+                    
                     if (NIKE_ECS_MANAGER->checkEntity(entity)) {
                         // Check for Elemental Source component
                         const auto e_source_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Source>(entity);
+
                         if (e_source_comp.has_value()) {
 
-                            std::set<NIKE::Entity::Type> e_player_comp = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
-                            if (e_player_comp.empty()) { // Player entity exists
+                            if (player_tag.empty()) { // Player entity exists
                                 continue;
                             }
 
-                            auto player_entity = *e_player_comp.begin();
+                            auto player_entity = *player_tag.begin();
 
+                            // E to interact overlay
+
+                            bool in_range = isWithinWorldRange(entity, player_entity);
+                            NIKE_UI_SERVICE->inRangeEntities[entity] = in_range;
 
                             // Get Render Component
                             const auto source_render_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
@@ -175,7 +185,7 @@ namespace NIKE {
                             //float& source_intensity = source_render_comp.value().get().intensity;
                             Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                            float target_alpha = isWithinWorldRange(entity, player_entity) ? 1.0f : 0.0f; // Set target alpha
+                            float target_alpha = in_range ? 1.0f : 0.0f; // Set target alpha
                             float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
                             // Smoothly interpolate alpha
@@ -185,7 +195,7 @@ namespace NIKE {
                             source_alpha.a = std::clamp(source_alpha.a, 0.0f, 1.0f);
 
                             // Player Element Swapping
-                            if (isWithinWorldRange(entity, player_entity) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
+                            if (in_range && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E)) {
                                 changeElement(player_entity, entity);
                                 if (e_sfx_comp.has_value()) {
                                     e_sfx_comp.value().get().b_play_sfx = true;
@@ -207,11 +217,10 @@ namespace NIKE {
         void initPauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& options, const std::string& how_to_play, const std::string& quit)
         {
 
-            static bool is_initialized = false;
             // Prevent duplicate creation
-            if (is_initialized) return;
+            if (NIKE_UI_SERVICE->is_pause_initialized) return;
 
-            is_initialized = true;
+            NIKE_UI_SERVICE->is_pause_initialized = true;
 
 
             if (!NIKE_METADATA_SERVICE->getEntityByName(background_texture)) {
@@ -394,6 +403,45 @@ namespace NIKE {
             quit_script.update_function = "Quit";
             NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_hover_script, "OnHover");
             NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
+        }
+
+        void handleScreenOverlay() {
+
+            auto screen_overlay = NIKE_METADATA_SERVICE->getEntitiesByTag("portal_ui");
+            
+            bool in_range = false;
+            for (auto& [entity, inRange] : NIKE_UI_SERVICE->inRangeEntities) {
+                in_range = in_range || inRange;  // Correctly updating in_range
+            }
+
+            // UI Overlay Opacity
+            for (const auto& screen_entity : screen_overlay)
+            {
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(screen_entity);
+                auto text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(screen_entity);
+
+                float target_alpha = in_range ? 1.0f : 0.0f;
+
+                float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+                // Update texture alpha
+                if (texture_comp.has_value())
+                {
+                    Vector4f& color = texture_comp.value().get().color;
+                    color.a += (target_alpha - color.a) * alpha_speed;
+                    color.a = std::clamp(color.a, 0.0f, 1.0f);
+                }
+
+                // Update text alpha
+                if (text_comp.has_value())
+                {
+                    Vector4f& color = text_comp.value().get().color;
+                    color.a += (target_alpha - color.a) * alpha_speed;
+                    color.a = std::clamp(color.a, 0.0f, 1.0f);
+                }
+            }
+
+            NIKE_UI_SERVICE->inRangeEntities.clear();
         }
 
         /*****************************************************************//**

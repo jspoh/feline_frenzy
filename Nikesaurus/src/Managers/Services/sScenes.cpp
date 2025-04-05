@@ -117,6 +117,7 @@ namespace NIKE {
 		prev_scene = curr_scene;
 		curr_scene = scene_id;
 
+		NIKE_UI_SERVICE->is_pause_initialized = false;
 		NIKE_ECS_MANAGER->destroyAllEntities();
 		NIKE_UI_SERVICE->destroyAllButtons();
 		// Do not clear audio channel groups so as not to modify the .scn file data.
@@ -156,6 +157,7 @@ namespace NIKE {
 		std::string oldBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
 		std::string oldBGMC = NIKE_AUDIO_SERVICE->getBGMCTrackForScene();
 
+		NIKE_UI_SERVICE->is_pause_initialized = false;
 		NIKE_ECS_MANAGER->destroyAllEntities();
 		NIKE_UI_SERVICE->destroyAllButtons();
 		// Do not clear audio channel groups.
@@ -190,6 +192,8 @@ namespace NIKE {
 			return;
 		}
 		std::swap(prev_scene, curr_scene);
+
+		NIKE_UI_SERVICE->is_pause_initialized = false;
 		NIKE_ECS_MANAGER->destroyAllEntities();
 		NIKE_UI_SERVICE->destroyAllButtons();
 		// Do not clear audio channel groups.
@@ -239,6 +243,7 @@ namespace NIKE {
 		// For resetScene, we may still clear audio channel groups if desired;
 		// if not, remove the call below.
 		// NIKE_AUDIO_SERVICE->clearAllChannelGroups();
+		NIKE_UI_SERVICE->is_pause_initialized = false;
 		NIKE_METADATA_SERVICE->reset();
 		NIKE_MAP_SERVICE->resetGrid();
 		NIKE_CAMERA_SERVICE->clearCameraEntities();
@@ -327,27 +332,57 @@ namespace NIKE {
 			auto& action = event_queue.front();
 			switch (action.scene_action) {
 			case Actions::CHANGE:
+#ifndef NDEBUG
+				if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
+					NIKE_RENDER_SERVICE->fadeOut(1.0f);
+				}
+#endif 
+#ifdef NDEBUG
 				NIKE_RENDER_SERVICE->fadeOut(1.0f);
+#endif
+
 				changeScene(action.next_scene_id);
+
+#ifndef NDEBUG
+				if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
+					NIKE_RENDER_SERVICE->fadeIn(1.0f);
+				}
+#endif 
+#ifdef NDEBUG
 				NIKE_RENDER_SERVICE->fadeIn(1.0f);
+#endif
+
 				break;
 			case Actions::PREVIOUS:
+#ifndef NDEBUG
+				if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
+					NIKE_RENDER_SERVICE->fadeOut(1.0f);
+				}
+#endif 
+#ifdef NDEBUG
 				NIKE_RENDER_SERVICE->fadeOut(1.0f);
+#endif
+
+
 				previousScene();
-				// fade in current scene
+
+#ifndef NDEBUG
+				if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
+					NIKE_RENDER_SERVICE->fadeIn(1.0f);
+				}
+#endif 
+#ifdef NDEBUG
 				NIKE_RENDER_SERVICE->fadeIn(1.0f);
+#endif
+
 				break;
 			case Actions::RESTART:
-				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				restartScene();
-				// fade in current scene
-				NIKE_RENDER_SERVICE->fadeIn(1.0f);
+
 				break;
 			case Actions::RESET:
-				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				resetScene();
-				// fade in current scene
-				NIKE_RENDER_SERVICE->fadeIn(1.0f);
+
 				break;
 			case Actions::CLOSE:
 				NIKE_RENDER_SERVICE->fadeOut(1.0f);

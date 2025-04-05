@@ -23,6 +23,9 @@ namespace NIKE {
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
+		//Get Tags
+		auto background_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("Background");
+
 		//Reverse Iterate through layers
 		for (auto layer = layers.rbegin(); layer != layers.rend(); ++layer) {
 
@@ -39,7 +42,6 @@ namespace NIKE {
 
 				// Main Menu Background Scrolling
 				if (NIKE_SCENES_SERVICE->getCurrSceneID() == "main_menu.scn") {
-					std::set<Entity::Type> background_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("Background");
 
 					for (auto& background : background_tags) {
 						const auto background_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(background);
@@ -108,30 +110,54 @@ namespace NIKE {
 
 					// Check if enemies are all dead
 					std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
-					// Check if entities with vent tag exists
-					std::set<Entity::Type> vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
-					// Win whole game overlay (MOVED TO BOSS ENEMY STATES)
-					//if (enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit &&
-					//	NIKE_SCENES_SERVICE->getCurrSceneID() == "lvl2_2.scn") {
-					//	// WIP cut scenes for after boss
-					//	// NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
-					//	gameOverlay("You_Win_bg.png", "Play Again", "Quit");
-					//	// return;
-					//}
-					
+
 					static bool is_spawn_portal = false;
 
 					// Cheat codes
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_H)) { is_spawn_portal = true; }
 					
 					if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_G)) { resetHealth(); }
-					
+
+					static float elapsed_time_before = 0.0f;
 
 					// Portal animations and interactions
 					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
 						is_spawn_portal)
 					{
-						handlePortalInteractions(vents_entities, is_spawn_portal);
+						auto portal_ui_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("screen_text");
+
+						// UI Overlay Opacity
+						for (const auto& portal_ui : portal_ui_entities)
+						{
+							auto text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(portal_ui);
+
+
+							elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+							// Update text alpha
+							if (text_comp.has_value())
+							{
+								Vector4f& color = text_comp.value().get().color;
+
+								float fade_duration = 0.5f;
+								if (elapsed_time_before < fade_duration) // Fade-in
+								{
+									color.a = std::clamp(elapsed_time_before / fade_duration, 0.0f, 1.0f);
+								}
+								else if (elapsed_time_before < 2.0f) // Full visible
+								{
+									color.a = 1.0f;
+								}
+								else if (elapsed_time_before < 3.0f) // Fade-out
+								{
+									color.a = std::clamp(1.0f - ((elapsed_time_before - 2.0f) / fade_duration), 0.0f, 1.0f);
+								}
+								else // Reset
+								{
+									color.a = 0.0f;
+								}
+							}
+						}
+						handlePortalInteractions(is_spawn_portal, elapsed_time_before);
 					}
 				}
 
@@ -668,12 +694,12 @@ namespace NIKE {
 		NIKE_UI_SERVICE->setButtonScript(quit_game_text, quit_script, "OnClick");
 	}
 
-	void GameLogic::Manager::handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal)
+	void GameLogic::Manager::handlePortalInteractions(bool& is_spawn_portal, float& elapsed_time_before)
 	{
-		auto portal_ui_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("portal_ui");
 		auto players = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+		auto vents_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("vent");
 
-		for (const Entity::Type& vent : vents_entities)
+		for (auto vent : vents_entities)
 		{
 			auto texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(vent);
 			auto anim_base = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(vent);
@@ -686,35 +712,13 @@ namespace NIKE {
 			{
 				bool in_range = Interaction::isWithinWorldRange(vent, player);
 
-				// UI Overlay Opacity
-				for (const auto& portal_ui : portal_ui_entities)
-				{
-					auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(portal_ui);
-					auto text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(portal_ui);
-
-					float target_alpha = in_range ? 1.0f : 0.0f;
-					float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime();
-
-					// Update texture alpha
-					if (texture_comp.has_value())
-					{
-						Vector4f& color = texture_comp.value().get().color;
-						color.a += (target_alpha - color.a) * alpha_speed;
-						color.a = std::clamp(color.a, 0.0f, 1.0f);
-					}
-
-					// Update text alpha
-					if (text_comp.has_value())
-					{
-						Vector4f& color = text_comp.value().get().color;
-						color.a += (target_alpha - color.a) * alpha_speed;
-						color.a = std::clamp(color.a, 0.0f, 1.0f);
-					}
-				}
+				NIKE_UI_SERVICE->inRangeEntities[vent] = in_range;
 
 				// Scene Change
 				if (in_range && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_E))
 				{
+					// Reset timer for portal text
+					elapsed_time_before = 0.f;
 					NIKE_SCENES_SERVICE->savePlayerData(NIKE_SERIALIZE_SERVICE->serializePlayerData(player));
 					NIKE_AUDIO_SERVICE->playAudio("Laser3.wav", "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false);
 
