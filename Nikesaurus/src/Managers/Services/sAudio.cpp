@@ -712,6 +712,39 @@ namespace NIKE {
 		}
 	}
 
+	void Audio::Service::BGMFadeIn(float fadeTime) {
+		auto bgmGroup = getChannelGroup(getBGMChannelGroupID());
+		if (!bgmGroup) {
+			NIKEE_CORE_ERROR("BGMFadeIn: BGM channel group not found!");
+			return;
+		}
+		// Set up fade parameters.
+		bgmFadeDuration = fadeTime;
+		bgmFadeTimeRemaining = fadeTime;
+		bgmFadingIn = true;
+		bgmFadeStartVolume = bgmGroup->getVolume(); // current volume
+		bgmFadeTargetVolume = gGlobalBGMVolume;       // target is global BGM volume
+		bgmFadeInProgress = true;
+		NIKEE_CORE_INFO("BGMFadeIn: starting fade in over {} seconds", fadeTime);
+	}
+
+	void Audio::Service::BGMFadeOut(float fadeTime) {
+		auto bgmGroup = getChannelGroup(getBGMChannelGroupID());
+		if (!bgmGroup) {
+			NIKEE_CORE_ERROR("BGMFadeOut: BGM channel group not found!");
+			return;
+		}
+		// Set up fade parameters.
+		bgmFadeDuration = fadeTime;
+		bgmFadeTimeRemaining = fadeTime;
+		bgmFadingIn = false;
+		bgmFadeStartVolume = bgmGroup->getVolume(); // current volume
+		bgmFadeTargetVolume = 0.0f; // fade out completely (or set a minimal value if desired)
+		bgmFadeInProgress = true;
+		NIKEE_CORE_INFO("BGMFadeOut: starting fade out over {} seconds", fadeTime);
+	}
+
+
 	void Audio::Service::pauseAllChannels() {
 		for (auto& pair : getAllChannelGroups()) {
 			pair.second->setPaused(true);
@@ -810,6 +843,25 @@ namespace NIKE {
 			}
 			else {
 				++it;
+			}
+		}
+
+		// --- Process BGM fade if active ---
+		if (bgmFadeInProgress) {
+			float delta = NIKE_WINDOWS_SERVICE->getDeltaTime();
+			bgmFadeTimeRemaining -= delta;
+			// Calculate interpolation factor (clamped between 0 and 1)
+			float t = 1.0f - (bgmFadeTimeRemaining / bgmFadeDuration);
+			if (t < 0.0f) t = 0.0f;
+			if (t > 1.0f) t = 1.0f;
+			float newVolume = bgmFadeStartVolume + t * (bgmFadeTargetVolume - bgmFadeStartVolume);
+			auto bgmGroup = getChannelGroup(getBGMChannelGroupID());
+			if (bgmGroup) {
+				bgmGroup->setVolume(newVolume);
+				NIKEE_CORE_INFO("BGM fading: new volume = {}", newVolume);
+			}
+			if (bgmFadeTimeRemaining <= 0.0f) {
+				bgmFadeInProgress = false; // Fade complete.
 			}
 		}
 

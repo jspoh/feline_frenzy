@@ -3,15 +3,15 @@
         "Channels": {
             "BGM": {
                 "loop": true,
-                "tracks": [
-                    "BGM_Level_Explore_v1.wav"
-                ]
+              "tracks": [
+                "Level_2_Music.wav"
+              ]
             },
             "BGMC": {
                 "loop": true,
-                "tracks": [
-                    "BGM_Level_Combat_v1.wav"
-                ]
+              "tracks": [
+                "Boss_Music.wav"
+              ]
             },
             "BulletSFX": {
                 "loop": false,

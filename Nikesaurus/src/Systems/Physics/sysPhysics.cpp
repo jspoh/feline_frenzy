@@ -182,8 +182,8 @@ namespace NIKE {
             float width = transform.scale.x;
             float height = transform.scale.y;
 
-            // If bigger than 1500 in either dimension, treat as a "wall"
-            return (width >= 1500.0f || height >= 1500.0f);
+            // If bigger than 1000 in either dimension, treat as a "wall"
+            return (width >= 1000.0f || height >= 1000.0f);  // (Temporarily forced more)
             };
 
         // Collect "large" entities and all other colliders

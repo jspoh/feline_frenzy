@@ -144,7 +144,7 @@ namespace NIKE {
 			// Immediately play the new BGM track (this temporary override does not modify the scene file)
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 			// BGMC will also restart (and muted at first) if BGM track is different
-			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.8f * NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 			bgmcGroup->setVolume(0.01f); // setVolume() is based on the volume set in playAudio()!!!
 		}
 	}
@@ -327,24 +327,30 @@ namespace NIKE {
 			auto& action = event_queue.front();
 			switch (action.scene_action) {
 			case Actions::CHANGE:
+				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				changeScene(action.next_scene_id);
+				NIKE_RENDER_SERVICE->fadeIn(1.0f);
 				break;
 			case Actions::PREVIOUS:
+				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				previousScene();
 				// fade in current scene
-				NIKE_RENDER_SERVICE->fadeIn(0.5f);
+				NIKE_RENDER_SERVICE->fadeIn(1.0f);
 				break;
 			case Actions::RESTART:
+				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				restartScene();
 				// fade in current scene
-				NIKE_RENDER_SERVICE->fadeIn(0.5f);
+				NIKE_RENDER_SERVICE->fadeIn(1.0f);
 				break;
 			case Actions::RESET:
+				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				resetScene();
 				// fade in current scene
-				NIKE_RENDER_SERVICE->fadeIn(0.5f);
+				NIKE_RENDER_SERVICE->fadeIn(1.0f);
 				break;
 			case Actions::CLOSE:
+				NIKE_RENDER_SERVICE->fadeOut(1.0f);
 				NIKE_WINDOWS_SERVICE->getWindow()->terminate();
 				break;
 			case Actions::RESUME:

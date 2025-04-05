@@ -43,4 +43,14 @@ function Scenes:Quit()
 QuitScene()
 end
 
+--Resume Scene
+function Scenes:Resume()
+ResumeScene()
+end
+
+--Pause Scene
+function Scenes:Pause()
+PauseScene()
+end
+
 return Scenes

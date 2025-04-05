@@ -473,7 +473,7 @@ namespace NIKE {
 		// Play EnemyDeathState animation
 		Interaction::animationSet(entity, 0, 0, 7, 0);
 
-		playSFX(entity, true);
+		playSFX(entity, true); // BOSS DEATH SFX (?)
 
 		// Interaction::gameOverlay("You_Win_bg.png", "Play Again", "Quit");
 		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));

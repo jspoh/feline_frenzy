@@ -304,7 +304,7 @@ namespace NIKE {
 				auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 				if (e_audio_comp.has_value())
 				{
-					playSFX(entity, true);
+					//playSFX(entity, true); // FOOTSTEPS SFX
 				}
 			}
 
@@ -430,7 +430,11 @@ namespace NIKE {
 		// Play EnemyDeathState animation
 		Interaction::animationSet(entity, 0, 8, 10, 8);
 		Interaction::flipX(entity, false);
-		Interaction::playSFX(entity, true);
+		//Interaction::playSFX(entity, true); // ENEMY DEATH SFX, BUGGED
+		// Temporary hardcoded SFX
+		int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6);
+		std::string sfxToPlay = "Enemy_Death_0" + std::to_string(randomVariant) + ".wav";
+		NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 	}
 	void State::EnemyDeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
 
@@ -472,7 +476,7 @@ namespace NIKE {
 	{
 		UNREFERENCED_PARAMETER(entity);
 
-		if (play_or_no) {
+		/*if (play_or_no) {
 			// Temporary hardcoded SFX
 			int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6);
 			std::string sfxToPlay = "Enemy_Death_0" + std::to_string(randomVariant) + ".wav";
@@ -484,7 +488,7 @@ namespace NIKE {
 			while (currentDelay < secondsToDelay) {
 				currentDelay += NIKE_WINDOWS_SERVICE->getDeltaTime();
 			}
-		}
+		}*/
 	}
 
 	/*******************************

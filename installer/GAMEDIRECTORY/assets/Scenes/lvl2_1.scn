@@ -4,14 +4,12 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Explore_v1.wav"
+                    "Level_2_Music.wav"
                 ]
             },
             "BGMC": {
                 "loop": true,
-                "tracks": [
-                    "BGM_Level_Combat_v1.wav"
-                ]
+                "tracks": []
             },
             "BulletSFX": {
                 "loop": false,
@@ -171,7 +169,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0010",
+                            "Name": "entity_0190",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

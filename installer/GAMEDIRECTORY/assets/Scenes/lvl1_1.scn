@@ -10,7 +10,7 @@
             "BGMC": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Level_Combat_v1.wav"
+                    "BGM_Level_1_Combat.wav"
                 ]
             },
             "SFX": {
@@ -151,7 +151,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_1564",
+                            "Name": "entity_0231",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -275,7 +275,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_1566",
+                            "Name": "entity_0233",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -288,7 +288,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_1567",
+                            "Name": "entity_0234",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {

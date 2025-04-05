@@ -438,6 +438,14 @@ namespace NIKE {
 			// Define the global volume variables.
 			float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
 			float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
+			// BGM fading variables
+			// In Audio::Service private section:
+			float bgmFadeDuration = 0.0f;       // Total fade duration in seconds.
+			float bgmFadeTimeRemaining = 0.0f;    // Time remaining in the fade.
+			bool  bgmFadeInProgress = false;      // True if a fade is active.
+			bool  bgmFadingIn = false;            // True for fade in, false for fade out.
+			float bgmFadeStartVolume = 0.0f;      // Volume when fade started.
+			float bgmFadeTargetVolume = 0.0f;     // Volume we want to reach at the end.
 
 			// Playlist Management
 			struct Playlist {
@@ -506,6 +514,10 @@ namespace NIKE {
 
 			float getGlobalSFXVolume() const;
 			void setGlobalSFXVolume(float vol);
+
+			// Fading BGM between scenes functions
+			void BGMFadeIn(float fadeTime);
+			void BGMFadeOut(float fadeTime);
 
 			/**
 			 * pauses all audio.
