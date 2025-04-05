@@ -69,13 +69,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 33.645477294921875,
-                                    "y": 13.1536865234375
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 1920.0,
-                                    "y": 1080.0
+                                    "x": 1600.0,
+                                    "y": 900.0
                                 },
                                 "Screen Position": false
                             }
@@ -179,10 +179,10 @@
                             }
                         },
                         "MetaData": {
-                            "B_Locked": false,
+                            "B_Locked": true,
                             "Layer_ID": 0,
                             "Layer_Order": 2,
-                            "Name": "entity_0052",
+                            "Name": "entity_0055",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -292,6 +292,7 @@
                             "Tags": []
                         },
                         "UI Btn": {
+                            "Disabled": false,
                             "Input_State": 0,
                             "Scripts": {
                                 "OnClick": {
@@ -554,6 +555,7 @@
                             "Tags": []
                         },
                         "UI Btn": {
+                            "Disabled": false,
                             "Input_State": 1,
                             "Scripts": {
                                 "OnClick": {
@@ -659,6 +661,7 @@
                             "Tags": []
                         },
                         "UI Btn": {
+                            "Disabled": false,
                             "Input_State": 1,
                             "Scripts": {
                                 "OnClick": {
@@ -911,6 +914,7 @@
                             "Tags": []
                         },
                         "UI Btn": {
+                            "Disabled": false,
                             "Input_State": 1,
                             "Scripts": {
                                 "OnClick": {
@@ -1010,6 +1014,7 @@
                             "Tags": []
                         },
                         "UI Btn": {
+                            "Disabled": false,
                             "Input_State": 1,
                             "Scripts": {
                                 "OnClick": {
