@@ -266,7 +266,7 @@ namespace NIKE {
 		switch (e_combo.status_effect) {
 		case Element::Status::BURN:
 			NIKEE_CORE_INFO("BURN TICK: -1 HP");
-			applyBurn(e_health.health, 5.f);
+			applyBurn(e_health.health, 10.f);
 			break;
 
 		case Element::Status::FREEZE:
