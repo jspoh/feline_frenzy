@@ -472,10 +472,9 @@ namespace NIKE {
 
 	}
 
-	void State::EnemyDeathState::playSFX([[maybe_unused]] Entity::Type& entity, bool play_or_no)
+	void State::EnemyDeathState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
 	{
 		UNREFERENCED_PARAMETER(entity);
-
 		/*if (play_or_no) {
 			// Temporary hardcoded SFX
 			int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6);
