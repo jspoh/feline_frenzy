@@ -1,5 +1,15 @@
 {
     "Components": {
+        "Audio::SFX": {
+            "Audio_ID": "ChangeElement.wav",
+            "B_Play_SFX": false,
+            "Channel_Group_ID": "EnvironmentSFX",
+            "Pitch": 1.0,
+            "Volume": 1.0
+        },
+        "Element::Source": {
+            "Element": 3
+        },
         "Render::Texture": {
             "B_Blend": true,
             "B_Flip": {
@@ -9,8 +19,8 @@
             "B_Stretch": false,
             "Color": {
                 "w": 0.0,
-                "x": 0.0,
-                "y": 0.0,
+                "x": 0.17211580276489258,
+                "y": 0.8877550959587097,
                 "z": 0.0
             },
             "Frame_Index": {
@@ -21,26 +31,26 @@
                 "x": 1,
                 "y": 1
             },
-            "Intensity": 0.0,
-            "Texture_ID": "E_Button.png"
+            "Intensity": 0.09000001847743988,
+            "Texture_ID": "Grass icon.png"
         },
         "Transform::Transform": {
             "Position": {
-                "x": 0.0,
-                "y": -230.0
+                "x": 606.785400390625,
+                "y": 157.0849609375
             },
             "Rotation": 0.0,
             "Scale": {
-                "x": 99.99998474121094,
-                "y": 99.99998474121094
+                "x": 208.09471130371094,
+                "y": 208.09471130371094
             },
-            "Screen Position": true
+            "Screen Position": false
         }
     },
     "MetaData": {
-        "Layer ID": 4,
+        "Layer ID": 3,
         "Tags": [
-            "portal_ui"
+            "element_src"
         ]
     }
 }

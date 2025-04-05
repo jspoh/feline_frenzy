@@ -33,7 +33,7 @@ namespace NIKE {
 			void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 
 			// Portal interactions
-			void handlePortalInteractions(const std::set<Entity::Type>& vents_entities, bool& is_spawn_portal);
+			void handlePortalInteractions(bool& is_spawn_portal, float& elapsed_time_before);
 
 			// Spawn Enemy
 			void spawnEnemy(const Entity::Type& spawner);

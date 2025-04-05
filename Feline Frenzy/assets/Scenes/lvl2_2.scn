@@ -9,9 +9,9 @@
             },
             "BGMC": {
                 "loop": true,
-              "tracks": [
-                "Boss_Music.wav"
-              ]
+                "tracks": [
+                    "Boss_Music.wav"
+                ]
             },
             "BulletSFX": {
                 "loop": false,
@@ -172,7 +172,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0846",
+                            "Name": "entity_0421",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
