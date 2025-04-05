@@ -171,7 +171,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0489",
+                            "Name": "entity_0232",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1790,7 +1790,7 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 25,
-                            "Name": "entity_0522",
+                            "Name": "entity_0265",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2231,7 +2231,11 @@
                                     },
                                     "Transform::Transform": null
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "portal_ui"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "portal_ui"
@@ -2259,7 +2263,11 @@
                                     },
                                     "Transform::Transform": null
                                 },
-                                "MetaData": null
+                                "MetaData": {
+                                    "Tags": [
+                                        "portal_ui"
+                                    ]
+                                }
                             },
                             "Tags": [
                                 "portal_ui"

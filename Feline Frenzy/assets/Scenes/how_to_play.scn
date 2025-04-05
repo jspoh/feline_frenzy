@@ -255,6 +255,7 @@
                             "Tags": []
                         },
                         "UI Btn": {
+                            "Disabled": false,
                             "Input_State": 0,
                             "Scripts": {
                                 "OnClick": {

@@ -173,7 +173,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0303",
+                            "Name": "entity_0150",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -911,7 +911,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 25,
-                            "Name": "entity_0327",
+                            "Name": "entity_0174",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []

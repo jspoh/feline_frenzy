@@ -82,194 +82,69 @@ namespace NIKE {
 					//child transform
 					auto c_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(child_entity);
 
-					// recalculate offset if child is a gun
+					// handle gun
 					const std::string child_prefab = NIKE_METADATA_SERVICE->getEntityPrefabID(child_entity);
 					if (child_prefab == "gun_enemy_n.prefab" || child_prefab == "gun_enemy_n_2.prefab") {
 
-						float angle_rad = (float)M_PI + 1;		// angle from enemy to player
-
-						auto getGunOffset = [&]() {
-							// get player world pos
+						auto getGunTransformData = [&]() -> std::optional<std::pair<Vector2f, float>> {
 							auto opt_player_entity = NIKE_METADATA_SERVICE->getEntityByName("player");
-
 							if (!opt_player_entity.has_value()) {
 								NIKEE_CORE_ERROR("Player entity not found");
-								return Vector2f{ 0, 0 };
+								return std::nullopt;
 							}
 
 							Entity::Type player_entity = opt_player_entity.value();
-
-							// get player transform pos
-							auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(player_entity);
-							auto transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-							if (transform_comp == comps.end()) {
-								NIKEE_CORE_ERROR("Player entity missing Transform component");
-								return Vector2f{ 0, 0 };
+							auto player_comps = NIKE_ECS_MANAGER->getAllEntityComponents(player_entity);
+							auto player_transform_comp = player_comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (player_transform_comp == player_comps.end()) {
+								NIKEE_CORE_ERROR("Player missing Transform");
+								return std::nullopt;
 							}
-							Transform::Transform& player_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
-							const Vector2f player_pos = player_transform.position;
+							const Vector2f player_pos = std::static_pointer_cast<Transform::Transform>(player_transform_comp->second)->position;
 
-							// get current enemy (gun's parent) pos
-							if (!parent_entity.has_value()) {
-								return Vector2f{ 0, 0 };
+							if (!parent_entity.has_value()) return std::nullopt;
+
+							auto parent_comps = NIKE_ECS_MANAGER->getAllEntityComponents(parent_entity.value());
+							auto parent_transform_comp = parent_comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+							if (parent_transform_comp == parent_comps.end()) {
+								NIKEE_CORE_ERROR("Parent missing Transform");
+								return std::nullopt;
 							}
+							const Vector2f parent_pos = std::static_pointer_cast<Transform::Transform>(parent_transform_comp->second)->position;
 
-							comps = NIKE_ECS_MANAGER->getAllEntityComponents(parent_entity.value());
-							transform_comp = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-							if (transform_comp == comps.end()) {
-								NIKEE_CORE_ERROR("Parent entity missing Transform component");
-								return Vector2f{ 0, 0 };
-							}
-							Transform::Transform& parent_transform = *std::static_pointer_cast<Transform::Transform>(transform_comp->second);
-							const Vector2f parent_pos = parent_transform.position;
+							Vector2f dir = player_pos - parent_pos;
+							float angle_rad = std::atan2(dir.y, dir.x); // Angle in radians
 
-							// calculate angle between enemy and player
-							const Vector2f enemy_to_player = parent_pos - player_pos;
-							angle_rad = -atan2(enemy_to_player.y, enemy_to_player.x);
+							static constexpr float GUN_DISTANCE = 75.f;
+							Vector2f offset = Vector2f{ std::cos(angle_rad), std::sin(angle_rad) } *GUN_DISTANCE;
 
-							static constexpr float GUN_DISTANCE = 110.f;
+							return std::make_pair(offset, angle_rad);
+						};
 
-							// calculate offset for closest point on bounding circle with radius GUM_DISTANCE from enemy to player
-							const Vector2f gun_offset = Vector2f{ -cos(angle_rad), sin(angle_rad) } *GUN_DISTANCE;
+						auto gun_data = getGunTransformData();
+						if (gun_data.has_value() && c_trans.has_value()) {
+							auto& c_transform = c_trans.value().get();
+							
+							Vector2f pivot_offset = Vector2f(0.0f, -20.0f);  // Modify this to your desired pivot offset
 
-							// modify child transform values
-							return gun_offset;
-							};
+							// Move gun to position around the pivot
+							c_transform.position = gun_data->first + pivot_offset;
 
-						const Vector2f gun_offset = getGunOffset();
+							// Set rotation in degrees
+							const float angle_deg = (gun_data->second * 180.f / (float)M_PI) + 90.f;
+							c_transform.rotation = angle_deg;
 
-						if (c_trans.has_value()) {
-							c_trans.value().get().position = gun_offset;
-						}
+							// Get gun components
+							auto gun_comps = NIKE_ECS_MANAGER->getAllEntityComponents(child_entity);
 
-						// get gun entity components
-						auto gun_comps = NIKE_ECS_MANAGER->getAllEntityComponents(child_entity);
-						auto gun_comp_animation_sprite = gun_comps.find(Utility::convertTypeString(typeid(Animation::Sprite).name()));
-						auto gun_comp_texture = gun_comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
-						if (gun_comp_animation_sprite != gun_comps.end() && c_trans.has_value() && gun_comp_texture != gun_comps.end()) {
-							Animation::Sprite& gun_sprite = *std::static_pointer_cast<Animation::Sprite>(gun_comp_animation_sprite->second);
-							Render::Texture& gun_texture = *std::static_pointer_cast<Render::Texture>(gun_comp_texture->second);
+							auto sprite_comp_it = gun_comps.find(Utility::convertTypeString(typeid(Animation::Sprite).name()));
+							if (sprite_comp_it != gun_comps.end()) {
+								Animation::Sprite& gun_sprite = *std::static_pointer_cast<Animation::Sprite>(sprite_comp_it->second);
 
-							auto radToDeg = [](float rad) -> float {
-								return static_cast<float>(rad * (180.0 / M_PI)); // M_PI is a constant in cmath for the value of pi
-								};
-
-							// update spritesheet used based on section
-							// circle will be divided into 8 sections, with a focus on nsew
-							//cout << angle_rad << endl;
-							if (angle_rad >= M_PI_3 && angle_rad <= M_PI - M_PI_3) {
-								// up
-								//cout << "top" << endl;
-								gun_sprite.start_index.y = 3;
-								gun_sprite.end_index.y = 3;
-								gun_texture.b_flip.x = false;
-								c_trans.value().get().rotation = 0.f + radToDeg(-angle_rad) + 90.f;
-							}
-							else if (angle_rad >= -2 * M_PI_3&& angle_rad <= -M_PI_3) {
-								// down
-								//cout << "bottom" << endl;
 								gun_sprite.start_index.y = 0;
 								gun_sprite.end_index.y = 0;
-								gun_texture.b_flip.x = false;
-								c_trans.value().get().rotation = 0.f + radToDeg(-angle_rad) - 90.f;
+
 							}
-							else if (angle_rad >= -M_PI_6 && angle_rad <= M_PI_6) {
-								//cout << "left" << endl;
-								gun_texture.b_flip.x = true;
-
-								gun_sprite.start_index.y = 3;
-								gun_sprite.end_index.y = 3;
-
-								c_trans.value().get().rotation = 90.f + radToDeg(-angle_rad);
-							}
-							else if (angle_rad >= 5 * M_PI_6 || angle_rad <= -5 * M_PI_6) {
-								// right
-								//cout << "right" << endl;
-								gun_texture.b_flip.x = false;
-
-								gun_sprite.start_index.y = 3;
-								gun_sprite.end_index.y = 3;
-								
-								c_trans.value().get().rotation = 270.f + radToDeg(-angle_rad) - 180.f;
-							}
-							else if (angle_rad >= M_PI_6 && angle_rad <= M_PI_3) {
-								//cout << "top left" << endl;
-
-								gun_texture.b_flip.x = true;
-
-								gun_sprite.start_index.y = 2;
-								gun_sprite.end_index.y = 2;
-
-								c_trans.value().get().rotation = 0.f;
-							}
-							else if (angle_rad >= 2 * M_PI_3 && angle_rad <= 5 * M_PI_6) {
-								//cout << "top right" << endl;
-
-								gun_texture.b_flip.x = false;
-
-								gun_sprite.start_index.y = 2;
-								gun_sprite.end_index.y = 2;
-
-								c_trans.value().get().rotation = 0.f;
-							}
-							else if (angle_rad >= -M_PI_3 && angle_rad <= - M_PI_6) {
-								//cout << "bottom left" << endl;
-
-								gun_texture.b_flip.x = true;
-
-								gun_sprite.start_index.y = 1;
-								gun_sprite.end_index.y = 1;
-
-								c_trans.value().get().rotation = 0.f;
-							}
-							else if (angle_rad >= -5 * M_PI_6 && angle_rad <= -2 * M_PI_3) {
-								//cout << "bottom right" << endl;
-
-								gun_texture.b_flip.x = false;
-
-								gun_sprite.start_index.y = 1;
-								gun_sprite.end_index.y = 1;
-
-								c_trans.value().get().rotation = 0.f;
-							}
-							
-
-							//else if (angle_rad > M_PI_4 && angle_rad < M_PI - M_PI_4) {
-							//	// down
-							//	cout << "// down" << endl;
-							//	gun_sprite.start_index.y = 0;
-							//	gun_sprite.end_index.y = 0;
-							//}
-							//else if (angle_rad > 0 && angle_rad < M_PI_4) {
-							//	// bottom left 
-							//	cout << "bottom left " << endl;
-							//	gun_sprite.start_index.y = 1;
-							//	gun_sprite.end_index.y = 1;
-							//	// flip texture
-							//	gun_texture.b_flip.x = true;
-							//}
-							//else if (angle_rad > M_PI - M_PI_4 && angle_rad < M_PI) {
-							//	// bottom right 
-							//	cout << "bottom right " << endl;
-							//	gun_sprite.start_index.y = 1;
-							//	gun_sprite.end_index.y = 1;
-							//	gun_texture.b_flip.x = false;
-							//}
-							//else if (angle_rad < 0 && angle_rad > -M_PI_4) {
-							//	// top left
-							//	cout << "top left" << endl;
-							//	gun_sprite.start_index.y = 2;
-							//	gun_sprite.end_index.y = 2;
-							//	// flip texture
-							//	gun_texture.b_flip.x = true;
-							//}
-							//else if (angle_rad < -M_PI + M_PI_4 && angle_rad > -M_PI_4) {
-							//	// top right
-							//	cout << "top right" << endl;
-							//	gun_sprite.start_index.y = 2;
-							//	gun_sprite.end_index.y = 2;
-							//	gun_texture.b_flip.x = false;
-							//}
 						}
 					}
 

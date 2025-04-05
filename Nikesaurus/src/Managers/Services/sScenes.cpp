@@ -45,7 +45,34 @@ namespace NIKE {
 	}
 	void Scenes::Layer::sortEntitiesBasedOnYPosition() {
 		if (entities.empty()) return;
+
+		// Make a copy to sort
 		std::vector<Entity::Type> sortedEntities = entities;
+
+		// Step 1: Apply world transform for child entities
+		std::unordered_map<Entity::Type, Vector2f> originalOffsets;
+
+		for (auto& entity : sortedEntities) {
+			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+			if (!child) continue;
+
+			auto parent = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+			if (!parent.has_value()) continue;
+
+			auto parentTransform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent.value());
+			auto childTransform = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+
+			if (!parentTransform || !childTransform) continue;
+
+			auto& c_transform = childTransform.value().get();
+			const auto& p_transform = parentTransform.value().get();
+
+			originalOffsets[entity] = c_transform.position;
+			c_transform.position += p_transform.position;
+		}
+
+		// Step 2: Y-Sort based on world positions
 		std::sort(sortedEntities.begin(), sortedEntities.end(), [](Entity::Type a, Entity::Type b) {
 			size_t orderA = NIKE_METADATA_SERVICE->getEntityLayerOrder(a);
 			size_t orderB = NIKE_METADATA_SERVICE->getEntityLayerOrder(b);
@@ -58,9 +85,19 @@ namespace NIKE {
 			float bottomB = tB.position.y - (tB.scale.y * 0.5f);
 			return bottomA > bottomB;
 			});
-		for (size_t i = 0; i < sortedEntities.size(); ++i)
-			setEntityOrder(sortedEntities[i], i);
+
+		// Step 3: Restore local offsets for children
+		for (const auto& [entity, offset] : originalOffsets) {
+			auto c_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
+			if (c_trans.has_value()) {
+				c_trans.value().get().position = offset;
+			}
+		}
+
+		// Final update
+		entities = std::move(sortedEntities);
 	}
+
 	void Scenes::Layer::setEntityOrder(Entity::Type entity, size_t order_in_layer) {
 		if (entities.empty() || order_in_layer >= entities.size()) return;
 		size_t current_index = getEntityOrder(entity);
