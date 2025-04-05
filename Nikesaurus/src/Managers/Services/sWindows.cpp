@@ -444,6 +444,8 @@ namespace NIKE {
 			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
 				NIKE_AUDIO_SERVICE->resumeAllChannels();
 			}
+#else
+			NIKE_AUDIO_SERVICE->resumeAllChannels();
 #endif
 
 		}
