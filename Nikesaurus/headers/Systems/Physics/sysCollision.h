@@ -1,4 +1,13 @@
-﻿#pragma once
+﻿/*****************************************************************//**
+* \file   sysCollision.h
+* \brief  Collision system
+*
+* \author Min Khant Ko, 2301320, ko.m@digipen.edu (100%)
+* \date   September 2024
+* All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+*********************************************************************/
+
+#pragma once
 #ifndef COLLISION_MANAGER_HPP
 #define COLLISION_MANAGER_HPP
 
