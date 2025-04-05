@@ -403,6 +403,8 @@ namespace NIKE {
 		const float spread_angle = 100.0f; // 180 degrees for the semi-circle
 		const float angle_step = spread_angle / (num_bullets - 1); // Divide the arc by the number of bullets
 
+		// SFX bool for only playing SFX once
+		bool sfxPlayed = false;
 		// Create bullets in the semi-circle pattern
 		for (int i = 0; i < num_bullets; ++i) {
 			// Create bullet entities
@@ -456,42 +458,46 @@ namespace NIKE {
 
 			// Bullet SFX
 			// Set bullet SFX
-			auto bullet_sfx_opt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
-			if (bullet_sfx_opt.has_value()) {
-				auto& sfx_comp = bullet_sfx_opt.value().get();
-				std::string original_sfxID = sfx_comp.audio_id; // Get ID set by prefab
+			if (!sfxPlayed) {
+				auto bullet_sfx_opt = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(bullet_entity);
+				if (bullet_sfx_opt.has_value()) {
+					auto& sfx_comp = bullet_sfx_opt.value().get();
+					std::string original_sfxID = sfx_comp.audio_id; // Get ID set by prefab
 
-				std::string baseFilename = "";
+					std::string baseFilename = "";
 
-				// Determine type and range based on original ID (Adjust base names/ranges as needed)
-				if (original_sfxID.find("Shoot_Fire") != std::string::npos) { // Check if "Shoot_Fire" is present
-					baseFilename = "Boss_Shoot_Fire_Semi";
-				}
-				else if (original_sfxID.find("Shoot_Water") != std::string::npos) {
-					baseFilename = "Boss_Shoot_Water_Semi";
-				}
-				else if (original_sfxID.find("Shoot_Wind") != std::string::npos) {
-					baseFilename = "Boss_Shoot_Wind_Semi";
-				}
-				else if (original_sfxID.find("Laser") != std::string::npos) {
-					baseFilename = "Laser";
-				}
-				else if (original_sfxID.find("Pop") != std::string::npos) {
-					baseFilename = "Pop";
-				}
-				// Add more checks if needed (e.g., for a default "EnemyBullet")
+					// Determine type and range based on original ID (Adjust base names/ranges as needed)
+					if (original_sfxID.find("Shoot_Fire") != std::string::npos) { // Check if "Shoot_Fire" is present
+						baseFilename = "Boss_Shoot_Fire_Semi";
+					}
+					else if (original_sfxID.find("Shoot_Water") != std::string::npos) {
+						baseFilename = "Boss_Shoot_Water_Semi";
+					}
+					else if (original_sfxID.find("Shoot_Wind") != std::string::npos) {
+						baseFilename = "Boss_Shoot_Wind_Semi";
+					}
+					else if (original_sfxID.find("Laser") != std::string::npos) {
+						baseFilename = "Laser";
+					}
+					else if (original_sfxID.find("Pop") != std::string::npos) {
+						baseFilename = "Pop";
+					}
+					// Add more checks if needed (e.g., for a default "EnemyBullet")
 
-				std::string randomized_sfxID = original_sfxID;
+					std::string randomized_sfxID = original_sfxID;
 
-				if (!baseFilename.empty()) {
-					randomized_sfxID = baseFilename + ".wav";
-				}
-				else {
-					NIKEE_CORE_WARN("shootBullet: Unknown enemy bullet SFX base type for '%s', using original.", original_sfxID.c_str());
-				}
+					if (!baseFilename.empty()) {
+						randomized_sfxID = baseFilename + ".wav";
+					}
+					else {
+						NIKEE_CORE_WARN("shootBullet: Unknown enemy bullet SFX base type for '%s', using original.", original_sfxID.c_str());
+					}
 
-				// Play directly
-				NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.6f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false); // Different pitch from player
+					// Play directly
+					NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.6f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false); // Different pitch from player
+					sfxPlayed = true;
+			}
+
 			}
 		}
 	}

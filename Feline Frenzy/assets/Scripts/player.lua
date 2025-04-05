@@ -124,7 +124,7 @@ function Player:Animate(entity, args)
             SetLastDirection(entity, 7)
         end
 
-        PlaySFX(entity, true)
+        --PlaySFX(entity, true)
     end
 end
 
