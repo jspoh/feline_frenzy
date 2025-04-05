@@ -39,6 +39,9 @@
         "Element::Entity": {
             "Element": 3
         },
+        "Element::Combo": {
+            "LastHits": []
+        },
         "Enemy::Attack": {
             "Cooldown": 1.0,
             "Function": "enemyBullet",

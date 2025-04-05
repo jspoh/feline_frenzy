@@ -48,10 +48,10 @@ namespace NIKE {
 			void updateStatusEffects(Entity::Type entity);
 
 			// Apply status effects
-			void applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic);
+			void applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic, const Entity::Type entity);
 
 			// Remove status effect
-			void removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic);
+			void removeStatusEffect(Element::Combo& e_combo, Physics::Dynamics& e_dynamic, Entity::Type entity);
 
 			// Lifesteal Status
 			void applyLifesteal(float& health, float lifesteal_amount);
