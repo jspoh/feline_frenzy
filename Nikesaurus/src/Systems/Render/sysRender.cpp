@@ -150,6 +150,10 @@ namespace NIKE {
 							Animation::Sprite& gun_sprite = *std::static_pointer_cast<Animation::Sprite>(gun_comp_animation_sprite->second);
 							Render::Texture& gun_texture = *std::static_pointer_cast<Render::Texture>(gun_comp_texture->second);
 
+							auto radToDeg = [](float rad) -> float {
+								return static_cast<float>(rad * (180.0 / M_PI)); // M_PI is a constant in cmath for the value of pi
+								};
+
 							// update spritesheet used based on section
 							// circle will be divided into 8 sections, with a focus on nsew
 							//cout << angle_rad << endl;
@@ -159,7 +163,7 @@ namespace NIKE {
 								gun_sprite.start_index.y = 3;
 								gun_sprite.end_index.y = 3;
 								gun_texture.b_flip.x = false;
-								c_trans.value().get().rotation = 0.f;
+								c_trans.value().get().rotation = 0.f + radToDeg(-angle_rad) + 90.f;
 							}
 							else if (angle_rad >= -2 * M_PI_3&& angle_rad <= -M_PI_3) {
 								// down
@@ -167,7 +171,7 @@ namespace NIKE {
 								gun_sprite.start_index.y = 0;
 								gun_sprite.end_index.y = 0;
 								gun_texture.b_flip.x = false;
-								c_trans.value().get().rotation = 0.f;
+								c_trans.value().get().rotation = 0.f + radToDeg(-angle_rad) - 90.f;
 							}
 							else if (angle_rad >= -M_PI_6 && angle_rad <= M_PI_6) {
 								//cout << "left" << endl;
@@ -176,7 +180,7 @@ namespace NIKE {
 								gun_sprite.start_index.y = 3;
 								gun_sprite.end_index.y = 3;
 
-								c_trans.value().get().rotation = 90.f;
+								c_trans.value().get().rotation = 90.f + radToDeg(-angle_rad);
 							}
 							else if (angle_rad >= 5 * M_PI_6 || angle_rad <= -5 * M_PI_6) {
 								// right
@@ -186,7 +190,7 @@ namespace NIKE {
 								gun_sprite.start_index.y = 3;
 								gun_sprite.end_index.y = 3;
 								
-								c_trans.value().get().rotation = 270.f;
+								c_trans.value().get().rotation = 270.f + radToDeg(-angle_rad) - 180.f;
 							}
 							else if (angle_rad >= M_PI_6 && angle_rad <= M_PI_3) {
 								//cout << "top left" << endl;

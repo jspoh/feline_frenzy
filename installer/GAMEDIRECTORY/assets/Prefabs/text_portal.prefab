@@ -1,0 +1,38 @@
+{
+    "Components": {
+        "Render::Text": {
+            "Color": {
+                "w": 0.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Font_ID": "Skranji-Bold.ttf",
+            "Origin": 0,
+            "Scale": 1.0,
+            "Size": {
+                "x": 441.0,
+                "y": 38.0
+            },
+            "Text": "Press E to Interact"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": -400.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "Screen Position": true
+        }
+    },
+    "MetaData": {
+        "Layer ID": 4,
+        "Tags": [
+            "portal_ui"
+        ]
+    }
+}

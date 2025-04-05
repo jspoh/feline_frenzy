@@ -55,6 +55,7 @@
                 "hpcontainer",
                 "objects",
                 "player",
+                "portal_ui",
                 "vent"
             ]
         }
@@ -169,7 +170,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0190",
+                            "Name": "entity_0060",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1119,6 +1120,63 @@
                                     "y": 0.0
                                 },
                                 "Position": {
+                                    "x": 0.7127685546875,
+                                    "y": -1170.7091064453125
+                                },
+                                "Resolution": 0,
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 256.0,
+                                    "y": 2600.0
+                                }
+                            },
+                            "Physics::Dynamics": {
+                                "Drag": 0.0,
+                                "Force": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Mass": 1.0,
+                                "Max_Speed": 0.0,
+                                "Velocity": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                }
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 1.2720947265625,
+                                    "y": 906.13623046875
+                                },
+                                "Rotation": 90.0,
+                                "Scale": {
+                                    "x": 296.732177734375,
+                                    "y": 2498.170166015625
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 14,
+                            "Name": "bottom_wall",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": true,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
                                     "x": -1405.6329345703125,
                                     "y": 0.77911376953125
                                 },
@@ -1144,13 +1202,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 1158.955810546875,
-                                    "y": 27.81219482421875
+                                    "x": 1151.548095703125,
+                                    "y": 131.33795166015625
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 234.43576049804688,
-                                    "y": 1013.1701049804688
+                                    "x": 256.0,
+                                    "y": 1283.6739501953125
                                 },
                                 "Screen Position": false
                             }
@@ -1158,7 +1216,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 14,
+                            "Layer_Order": 15,
                             "Name": "Right_Collision",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1201,13 +1259,13 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -1165.0299072265625,
-                                    "y": 0.77911376953125
+                                    "x": -1154.568603515625,
+                                    "y": 121.08518981933594
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 256.0,
-                                    "y": 1000.0
+                                    "y": 1283.6739501953125
                                 },
                                 "Screen Position": false
                             }
@@ -1215,7 +1273,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 15,
+                            "Layer_Order": 16,
                             "Name": "Left_Collision",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1228,7 +1286,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 16,
+                            "Layer_Order": 17,
                             "Name": "Grass_Element",
                             "Prefab_ID": "lv2_plant.prefab",
                             "Prefab_Override": {
@@ -1259,7 +1317,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 17,
+                            "Layer_Order": 18,
                             "Name": "Spark4",
                             "Prefab_ID": "lv2_spark.prefab",
                             "Prefab_Override": {
@@ -1323,7 +1381,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 18,
+                            "Layer_Order": 19,
                             "Name": "middle_wall_4",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1336,7 +1394,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 19,
+                            "Layer_Order": 20,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel2.prefab",
                             "Prefab_Override": {
@@ -1513,7 +1571,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 20,
+                            "Layer_Order": 21,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1572,7 +1630,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 21,
+                            "Layer_Order": 22,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1629,7 +1687,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 22,
+                            "Layer_Order": 23,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1673,7 +1731,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 23,
+                            "Layer_Order": 24,
                             "Name": "middle_wall_3",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1730,8 +1788,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 24,
-                            "Name": "bottom_wall",
+                            "Layer_Order": 25,
+                            "Name": "entity_0093",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2149,6 +2207,62 @@
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 4,
+                            "Name": "portal_ui",
+                            "Prefab_ID": "ui_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
+                            ]
                         }
                     }
                 }
