@@ -288,6 +288,7 @@ namespace NIKE {
 
 	void GameLogic::Manager::applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic, const Entity::Type entity) {
 
+		UNREFERENCED_PARAMETER(entity);
 
 		switch (e_combo.status_effect) {
 		case Element::Status::BURN:

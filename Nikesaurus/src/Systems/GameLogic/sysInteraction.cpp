@@ -82,19 +82,20 @@ namespace NIKE {
             handleScreenOverlay();
 
             // Player Tab Element Swapping
-            for (auto& player : player_tag) {
-                const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
-                auto& player_element = player_element_comp.value().get();
+            //std::set<Entity::Type> player_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+            //for (auto& player : player_tag) {
+            //    const auto player_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player);
+            //    auto& player_element = player_element_comp.value().get();
 
-                if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_R)) {
-                    if (player_element.element == Element::Elements::GRASS) {
-                        player_element.element = Element::Elements::FIRE;
-                    }
-                    else {
-                        player_element.element = static_cast<Element::Elements>(static_cast<int>(player_element.element) + 1);
-                    }
-                }
-            }
+            //    if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_R)) {
+            //        if (player_element.element == Element::Elements::GRASS) {
+            //            player_element.element = Element::Elements::FIRE;
+            //        }
+            //        else {
+            //            player_element.element = static_cast<Element::Elements>(static_cast<int>(player_element.element) + 1);
+            //        }
+            //    }
+            //}
 
             // When hitting objects
             for (auto& [entity, isHit] : hitEntities) {
@@ -213,7 +214,7 @@ namespace NIKE {
          *********************************************************************/
 
 
-        void initPauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& options, const std::string& how_to_play, const std::string& quit)
+        void initPauseOverlay(const std::string& background_texture, const std::string& resume, [[maybe_unused]] const std::string& options, const std::string& how_to_play, const std::string& quit)
         {
 
             // Prevent duplicate creation
@@ -243,7 +244,7 @@ namespace NIKE {
             if (!NIKE_METADATA_SERVICE->getEntityByName(resume)) {
                 // Create Resume button
                 NIKE_UI_SERVICE->createButton(resume,
-                    Transform::Transform(Vector2f(-10.0f, 120.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
+                    Transform::Transform(Vector2f(-10.0f, 110.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
                     Render::Text(),
                     Render::Texture("UI_ResumeGame_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
                 NIKE_UI_SERVICE->setButtonInputState(resume, UI::InputStates::PRESSED);
@@ -260,26 +261,26 @@ namespace NIKE {
             }
 
 
-            if (!NIKE_METADATA_SERVICE->getEntityByName(options)) {
-                // Create Option button
+            //if (!NIKE_METADATA_SERVICE->getEntityByName(options)) {
+            //    // Create Option button
 
-                NIKE_UI_SERVICE->createButton(options,
-                    Transform::Transform(Vector2f(-10.0f, 45.0f), Vector2f(210.0f, 55.0f), 0.0f, true),
-                    Render::Text(),
-                    Render::Texture("UI_Options_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
-                NIKE_UI_SERVICE->setButtonInputState(options, UI::InputStates::TRIGGERED);
+            //    NIKE_UI_SERVICE->createButton(options,
+            //        Transform::Transform(Vector2f(-10.0f, 45.0f), Vector2f(210.0f, 55.0f), 0.0f, true),
+            //        Render::Text(),
+            //        Render::Texture("UI_Options_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
+            //    NIKE_UI_SERVICE->setButtonInputState(options, UI::InputStates::TRIGGERED);
 
-                auto options_hover_script = Lua::Script();
-                options_hover_script.script_id = "menu_button.lua";
-                options_hover_script.update_function = "HoverButton";
-                options_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
-                NIKE_UI_SERVICE->setButtonScript(options, options_hover_script, "OnHover");
-            }
+            //    auto options_hover_script = Lua::Script();
+            //    options_hover_script.script_id = "menu_button.lua";
+            //    options_hover_script.update_function = "HoverButton";
+            //    options_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
+            //    NIKE_UI_SERVICE->setButtonScript(options, options_hover_script, "OnHover");
+            //}
 
             if (!NIKE_METADATA_SERVICE->getEntityByName(how_to_play)) {
                 // Create How to play button
                 NIKE_UI_SERVICE->createButton(how_to_play,
-                    Transform::Transform(Vector2f(-10.0f, -25.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
+                    Transform::Transform(Vector2f(-10.0f, 5.0f), Vector2f(275.0f, 55.0f), 0.0f, true),
                     Render::Text(),
                     Render::Texture("UI_HowToPlayButton_Spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
 
@@ -295,7 +296,7 @@ namespace NIKE {
             if (!NIKE_METADATA_SERVICE->getEntityByName(quit)) {
                 // Create Quit button
                 NIKE_UI_SERVICE->createButton(quit,
-                    Transform::Transform(Vector2f(-10.0f, -95.0f), Vector2f(245.0f, 55.0f), 0.0f, true),
+                    Transform::Transform(Vector2f(-10.0f, -105.0f), Vector2f(245.0f, 55.0f), 0.0f, true),
                     Render::Text(),
                     Render::Texture("UI_QuitButton_Spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
 
@@ -324,7 +325,7 @@ namespace NIKE {
             show_pause_menu = show;
 
             const std::vector<std::string> elements = {
-                "Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit"
+                "Paused_UI.png", "Resume", "How_To_Play", "Quit"
             };
 
             for (const auto& element : elements) {

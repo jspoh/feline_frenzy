@@ -98,6 +98,38 @@ namespace NIKE {
 			}
 		);
 
+		NIKE_SERIALIZE_SERVICE->registerComponent<Combo>(
+			// Serialize
+			[](Combo const& comp) -> nlohmann::json {
+				return {
+					{ "LastHits", comp.last_hits }
+				};
+			},
+
+			// Deserialize
+			[](Combo& comp, nlohmann::json const& data) {
+				if (data.contains("LastHits")) {
+					comp.last_hits = data["LastHits"].get<std::deque<Elements>>();
+				}
+			},
+
+			// Override Serialize
+			[](Combo const& comp, Combo const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
+				if (comp.last_hits != other_comp.last_hits) {
+					delta["LastHits"] = comp.last_hits;
+				}
+				return delta;
+			},
+
+			// Override Deserialize
+			[](Combo& comp, nlohmann::json const& delta) {
+				if (delta.contains("LastHits")) {
+					comp.last_hits = delta["LastHits"].get<std::deque<Elements>>();
+				}
+			}
+		);
+
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Source>();
 	}
 
@@ -177,38 +209,6 @@ namespace NIKE {
 							comp.element = new_element;
 						}
 					}
-				}
-			}
-		);
-
-		NIKE_SERIALIZE_SERVICE->registerComponent<Combo>(
-			// Serialize
-			[](Combo const& comp) -> nlohmann::json {
-				return {
-					{ "LastHits", comp.last_hits }
-				};
-			},
-
-			// Deserialize
-			[](Combo& comp, nlohmann::json const& data) {
-				if (data.contains("LastHits")) {
-					comp.last_hits = data["LastHits"].get<std::deque<Elements>>();
-				}
-			},
-
-			// Override Serialize
-			[](Combo const& comp, Combo const& other_comp) -> nlohmann::json {
-				nlohmann::json delta;
-				if (comp.last_hits != other_comp.last_hits) {
-					delta["LastHits"] = comp.last_hits;
-				}
-				return delta;
-			},
-
-			// Override Deserialize
-			[](Combo& comp, nlohmann::json const& delta) {
-				if (delta.contains("LastHits")) {
-					comp.last_hits = delta["LastHits"].get<std::deque<Elements>>();
 				}
 			}
 		);

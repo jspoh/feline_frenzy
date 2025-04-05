@@ -476,7 +476,8 @@ namespace NIKE {
 		playSFX(entity, true); // BOSS DEATH SFX (?)
 
 		// Interaction::gameOverlay("You_Win_bg.png", "Play Again", "Quit");
-		NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
+		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+
 	}
 
 	void State::BossDeathState::onUpdate([[maybe_unused]] Entity::Type& entity)
@@ -488,6 +489,7 @@ namespace NIKE {
 			if (animation_comp.value().get().completed_animations >= 1) {
 				playSFX(entity, false);
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
+				NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, "cut_scene_after_boss.scn"));
 			}
 		}
 	}
