@@ -134,7 +134,10 @@ namespace NIKE {
 				}
 
 				//Deserialize data into component
-				comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+				if (auto comp = NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type))
+				{
+					comp_registry->deserializeComponent(comp_name, comp.get(), comp_data);
+				}
 			}
 			else {
 				success = false;
