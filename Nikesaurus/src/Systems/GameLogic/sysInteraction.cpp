@@ -216,11 +216,10 @@ namespace NIKE {
         void initPauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& options, const std::string& how_to_play, const std::string& quit)
         {
 
-            static bool is_initialized = false;
             // Prevent duplicate creation
-            if (is_initialized) return;
+            if (NIKE_UI_SERVICE->is_pause_initialized) return;
 
-            is_initialized = true;
+            NIKE_UI_SERVICE->is_pause_initialized = true;
 
 
             if (!NIKE_METADATA_SERVICE->getEntityByName(background_texture)) {
@@ -406,7 +405,7 @@ namespace NIKE {
         }
 
         void handleScreenOverlay() {
-            cout << "RUnning" << endl;
+
             auto screen_overlay = NIKE_METADATA_SERVICE->getEntitiesByTag("portal_ui");
             
             bool in_range = false;

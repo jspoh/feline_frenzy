@@ -130,6 +130,8 @@ namespace NIKE {
 			//Default destructor
 			~Service() = default;
 
+			// Game overlay
+			bool is_pause_initialized;
 			std::unordered_map<Entity::Type, bool> inRangeEntities;
 
 			//Create Shaped button
