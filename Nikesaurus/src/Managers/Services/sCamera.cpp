@@ -159,12 +159,12 @@ namespace NIKE {
 			NIKE_INPUT_SERVICE->setCrosshair(false);
 		}
 
-
 		return cam_to_ndc_xform * view_xform;
 	};
 
 	Matrix_33 Camera::Service::getFixedWorldToNDCXform() const
 	{
+
 		//Default camera altributes
 		Render::Cam def;
 		def.position = { 0.0f, 0.0f };
