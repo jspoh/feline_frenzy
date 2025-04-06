@@ -20,6 +20,9 @@ namespace NIKE {
 		extern const float player_shot_cooldown;
 		extern float player_last_shot_time;
 
+		// Footstep grouping
+		void SetCurrentFootstepSet(const std::string& basename, int variations);
+
 	}
 }
 

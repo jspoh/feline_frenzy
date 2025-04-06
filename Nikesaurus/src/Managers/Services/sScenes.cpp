@@ -8,6 +8,7 @@
  *********************************************************************/
 #include "Core/stdafx.h"
 #include "Managers/Services/sScenes.h"
+#include "Managers/Services/Lua/sLuaGameBinds.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
@@ -131,6 +132,29 @@ namespace NIKE {
 		b_ysort = data.value("B_YSort", false);
 	}
 
+	// --- Helper function to set footstep sounds (now calls C++ function) ---
+	void SetFootstepSoundsForScene(const std::string& scene_id) {
+		std::string new_basename = "Footstep_Grass_"; // Default
+		int new_variations = 8; // Default
+
+		// --- DEFINE YOUR SCENE-TO-SOUND MAPPING HERE ---
+		// Example:
+		if (scene_id == "lvl2_1.scn" || scene_id == "lvl2_2.scn") { // Metal levels
+			new_basename = "Footstep_Metal_";
+			new_variations = 10;
+		}
+		else if (scene_id == "main_menu.scn" || scene_id == "SettingsTest.scn") { // Menus
+			new_basename = "";
+			new_variations = 0;
+		}
+		// Add more 'else if' blocks...
+		// --- END MAPPING ---
+
+		// Call the C++ function declared in sLuaGameBinds.h
+		NIKE::Lua::SetCurrentFootstepSet(new_basename, new_variations);
+	}
+	// --- END HELPER FUNCTION ---
+
 	/*****************************************************************//**
 	 * Scene manager functions
 	 *********************************************************************/
@@ -170,6 +194,10 @@ namespace NIKE {
 		createLayer();
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 
+		// --- CALL FOOTSTEP HELPER ---
+		SetFootstepSoundsForScene(curr_scene);
+		// --- END CALL ---
+
 		// Check for settings/options scene
 		if (curr_scene == "SettingsTest.scn") { // Use your actual settings scene filename
 			NIKE_UI_SERVICE->updateVolumeSliderPositions();
@@ -193,7 +221,13 @@ namespace NIKE {
 			// Immediately play the new BGM track (this temporary override does not modify the scene file)
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
 			// BGMC will also restart (and muted at first) if BGM track is different
-			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.8f * NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+
+			if (newBGMC == "Level_2_Music.wav" || newBGMC == "Boos_Music.wav") {
+				NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.6f * NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			}
+			else {
+				NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.8f * NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			}
 			bgmcGroup->setVolume(0.01f); // setVolume() is based on the volume set in playAudio()!!!
 		}
 	}
@@ -216,6 +250,10 @@ namespace NIKE {
 		createLayer();
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
 
+		// --- CALL FOOTSTEP HELPER ---
+		SetFootstepSoundsForScene(curr_scene);
+
+		// --- END CALL ---
 		// Check for settings/options scene
 		if (curr_scene == "SettingsTest.scn") { // Use your actual settings scene filename
 			NIKE_UI_SERVICE->updateVolumeSliderPositions();
@@ -234,7 +272,13 @@ namespace NIKE {
 				bgmcGroup->stop();
 
 			NIKE_AUDIO_SERVICE->playAudio(newBGM, "", NIKE_AUDIO_SERVICE->getBGMChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
-			NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true); // No volume if not "init" to global... debug volume later
+			if (newBGMC == "Level_2_Music.wav" || newBGMC == "Boos_Music.wav") {
+				NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.6f * NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			}
+			else {
+				NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), 0.8f * NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true);
+			}
+			//NIKE_AUDIO_SERVICE->playAudio(newBGMC, "", NIKE_AUDIO_SERVICE->getBGMCChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalBGMVolume(), 1.f, true, true); // No volume if not "init" to global... debug volume later
 			bgmcGroup->setVolume(0.01f); // setVolume() is based on the volume set in playAudio()!!!
 		}
 	}

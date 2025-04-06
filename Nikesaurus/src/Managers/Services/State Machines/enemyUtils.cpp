@@ -494,7 +494,7 @@ namespace NIKE {
 					}
 
 					// Play directly
-					NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.6f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false); // Different pitch from player
+					NIKE_AUDIO_SERVICE->playAudio(randomized_sfxID, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 0.5f, false, false); // Different pitch from player
 					sfxPlayed = true;
 			}
 

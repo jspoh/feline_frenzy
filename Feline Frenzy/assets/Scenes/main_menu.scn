@@ -263,7 +263,7 @@
                                 }
                             },
                             "Audio::SFX": {
-                                "Audio_ID": "MenuYesOpen.wav",
+                                "Audio_ID": "UI_Select.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
@@ -386,7 +386,7 @@
                                 }
                             },
                             "Audio::SFX": {
-                                "Audio_ID": "MenuYesOpen.wav",
+                                "Audio_ID": "UI_Select.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
@@ -624,7 +624,7 @@
                                 }
                             },
                             "Audio::SFX": {
-                                "Audio_ID": "MenuYesOpen.wav",
+                                "Audio_ID": "UI_Select.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
@@ -741,7 +741,7 @@
                                 }
                             },
                             "Audio::SFX": {
-                                "Audio_ID": "MenuYesOpen.wav",
+                                "Audio_ID": "UI_Select.wav",
                                 "B_Play_SFX": false,
                                 "Channel_Group_ID": "SFX",
                                 "Pitch": 1.0,
