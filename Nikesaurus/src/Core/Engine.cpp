@@ -331,9 +331,6 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 
-		// Define config file path (adjust if it's not in the root relative to executable)
-		const std::string configFilePath = "Config.json";
-
 		//Update loop
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
@@ -380,6 +377,10 @@ namespace NIKE {
 		}
 		// Updating Config.json (currently only for volume settings)
 		try {
+
+			// Define config file path (adjust if it's not in the root relative to executable)
+			const std::string configFilePath = "AudioSettings.json";
+
 			NIKEE_CORE_INFO("Attempting to save configuration to {}", configFilePath);
 			// 1. Load the current config data
 			nlohmann::json current_config_data = NIKE_SERIALIZE_SERVICE->loadJsonFile(configFilePath);
