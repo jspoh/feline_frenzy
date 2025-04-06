@@ -2496,7 +2496,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 4,
-                            "Layer_Order": 5,
+                            "Layer_Order": 6,
                             "Name": "portal_text",
                             "Prefab_ID": "text_portal.prefab",
                             "Prefab_Override": {

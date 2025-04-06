@@ -20,6 +20,26 @@ namespace NIKE {
 
 	void GameLogic::Manager::update() 
 	{
+		// Handle status effects
+		for (auto& [entity, hasEffect] : statusEntities) {
+			if (!hasEffect) continue; // Skip objects that haven't been hit
+
+			auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
+			if (!texture_comp) continue;
+
+			auto& intensity = texture_comp.value().get().intensity;
+
+			float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
+
+			intensity += (0.0f - intensity) * alpha_speed; // Fade towards 0
+			intensity = std::clamp(intensity, 0.0f, 1.0f);
+
+			// Stop updating once intensity is very close to 0
+			if (intensity <= 0.01f) {
+				hasEffect = false;
+			}
+		}
+
 		//Get layers
 		auto& layers = NIKE_SCENES_SERVICE->getLayers();
 
@@ -306,16 +326,31 @@ namespace NIKE {
 		const auto e_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(entity);
 		const auto e_health_comp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(entity);
 		const auto e_dynamic_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		const auto e_element_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(entity);
 
-		if (!e_combo_comp.has_value() || !e_health_comp.has_value()) return;
+		if (!e_combo_comp.has_value() || !e_health_comp.has_value() || !e_element_comp.has_value()) return;
 
 		auto& e_combo = e_combo_comp.value().get();
 		auto& e_health = e_health_comp.value().get();
 		auto& e_dynamic = e_dynamic_comp.value().get();
+		auto& e_element = e_element_comp.value().get();
 
 		// Exit if no status effect
 		if (e_combo.status_effect == Element::Status::NONE || e_combo.status_timer <= 0.0f) { 
 			return; 
+		}
+
+		// Get the element corresponding to the status effect
+		Element::Elements status_element = Element::getElementFromStatus(e_combo.status_effect);
+
+		// Don't apply to same element 
+		if (e_element.element == status_element) {
+			return;
+		}
+
+		// Only apply if the attacker's element counters the target's element
+		if (!Element::doesElementCounterTarget(status_element, e_element.element)) {
+			return;
 		}
 
 		// Decrease tick timer
@@ -335,26 +370,49 @@ namespace NIKE {
 			removeStatusEffect(e_combo, e_dynamic, entity);
 		}
 
-		NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
+		//NIKEE_CORE_INFO("Element Status Timer: {}", e_combo.status_timer);
 	}
 
 	void GameLogic::Manager::applyStatusEffect(Element::Combo& e_combo, Combat::Health& e_health, Physics::Dynamics& e_dynamic, const Entity::Type entity) {
 
-		UNREFERENCED_PARAMETER(entity);
+		int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 5); // Assuming variations 1-5
+		std::string sfxToPlay = "Enemy_Pawn_Hit_0" + std::to_string(randomVariant) + ".wav";
+		std::string slowSfx = "Laser1.wav";
 
+		auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity);
 		switch (e_combo.status_effect) {
 		case Element::Status::BURN:
 			NIKEE_CORE_INFO("BURN TICK: -1 HP");
+		
+			NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+			statusEntities[entity] = true;
+			// Set intensity to max (1.0f) when hit
+
+			if (texture_comp) {
+				texture_comp.value().get().intensity = 1.0f;
+			};
+
+
 			applyBurn(e_health.health, 10.f);
 			break;
 
 		case Element::Status::FREEZE:
 			NIKEE_CORE_INFO("FROZEN TICK");
+			NIKE_AUDIO_SERVICE->playAudio(slowSfx, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+			statusEntities[entity] = true;
 			applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed / 2, e_combo.temp_max_speed);
 			break;
 
 		case Element::Status::POISON:
 			NIKEE_CORE_INFO("POISON TICK: -1 HP");
+
+			NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
+			statusEntities[entity] = true;
+
+			if (texture_comp) {
+				texture_comp.value().get().intensity = 1.0f;
+			};
+
 			applyLifesteal(e_health.health, 5.f);
 			break;
 		}

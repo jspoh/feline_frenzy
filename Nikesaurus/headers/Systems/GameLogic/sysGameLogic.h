@@ -26,6 +26,8 @@ namespace NIKE {
 		    Manager(Manager const& copy) = delete;
 		    void operator=(Manager const& copy) = delete;
 
+			std::unordered_map<Entity::Type, bool> statusEntities;
+
 			// Combat BGM (BGMC) control
 			void updateBGMCVolume();
 

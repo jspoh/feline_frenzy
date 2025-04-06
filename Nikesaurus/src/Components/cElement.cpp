@@ -12,6 +12,25 @@
 #include "Components/cElement.h"
 
 namespace NIKE {
+
+	bool Element::doesElementCounterTarget(Element::Elements attacker, Element::Elements target) {
+		switch (attacker) {
+			case Element::Elements::WATER: return target == Element::Elements::FIRE;   // Water counters Fire
+			case Element::Elements::FIRE: return target == Element::Elements::GRASS;  // Fire counters Grass
+			case Element::Elements::GRASS: return target == Element::Elements::WATER; // Grass counters Water
+			default: return false;
+		}
+	}
+
+	Element::Elements Element::getElementFromStatus(Element::Status status) {
+		switch (status) {
+			case Element::Status::BURN:   return Element::Elements::FIRE;
+			case Element::Status::FREEZE: return Element::Elements::WATER;
+			case Element::Status::POISON: return Element::Elements::GRASS;
+			default: return Element::Elements::NONE;
+		}
+	}
+
 	float Element::getElementMultiplier(Element::Elements attacker, Element::Elements defender) {
 		return Element::elemental_multiplier_table[static_cast<int>(attacker)][static_cast<int>(defender)];
 	}

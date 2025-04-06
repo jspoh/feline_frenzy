@@ -185,7 +185,7 @@ namespace NIKE {
                             //float& source_intensity = source_render_comp.value().get().intensity;
                             Vector4f& source_alpha = source_render_comp.value().get().color;
 
-                            float target_alpha = in_range ? 1.0f : 0.0f; // Set target alpha
+                            float target_alpha = in_range ? 1.0f : 0.1f; // Set target alpha
                             float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
                             // Smoothly interpolate alpha
@@ -348,7 +348,7 @@ namespace NIKE {
                 {
                     if (element == "Paused_UI.png") {
                         if (NIKE_UI_SERVICE->is_how_to_play_overlay) {
-                            texture_comp.value().get().texture_id = "How_to_play.png";
+                            texture_comp.value().get().texture_id = "Paused_How_To_Play.png";
                         }
                         else {
                             texture_comp.value().get().texture_id = "Paused_UI.png";
@@ -382,7 +382,7 @@ namespace NIKE {
                 auto bg_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(background.value());
 
                 if (NIKE_UI_SERVICE->is_how_to_play_overlay) {
-                    bg_texture.value().get().texture_id = "How_to_play.png";
+                    bg_texture.value().get().texture_id = "Paused_How_To_Play.png";
                 }
                 else {
                     bg_texture.value().get().texture_id = "Paused_UI.png";
@@ -807,25 +807,32 @@ namespace NIKE {
 
             // Apply elemental damage multiplier
             if (attacker_element_comp) {
-                const auto attacker_element = attacker_element_comp.value().get().element;
+                const auto& attacker_element = attacker_element_comp.value().get().element;
 
                 if (target_element_comp) {
-                    const auto target_element = target_element_comp.value().get().element;
+                    const auto& target_element = target_element_comp.value().get().element;
 
                     // Set multiplier
                     multiplier = Element::getElementMultiplier(attacker_element, target_element);
                 }
 
                 // If damage dealer has element comp & target has combo comp
-                const auto target_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(target);
+                const auto& target_combo_comp = NIKE_ECS_MANAGER->getEntityComponent<Element::Combo>(target);
                 if (target_combo_comp) {
-                    // Update combo component
-                    int status_applied = target_combo_comp.value().get().registerHit(attacker_element);
+                    auto& target_combo = target_combo_comp.value().get();
 
-                    // Adding status animation
-                    if (status_applied != 0) {
-                        spawnStatusAnimation(target, status_applied);
+                    // Don't apply to same element && Non advantaged
+                    if (target_element_comp && Element::doesElementCounterTarget(attacker_element, target_element_comp.value().get().element)){
+
+                        // Update combo component
+                        int status_applied = target_combo.registerHit(attacker_element);
+
+                        // Adding status animation
+                        if (status_applied != 0) {
+                            spawnStatusAnimation(target, status_applied);
+                        }
                     }
+
                 }
             }
 
@@ -1006,7 +1013,7 @@ namespace NIKE {
             Vector2f source_scale = source_transform_comp.value().get().scale;
 
             // Set source range
-            float source_range = 2;
+            float source_range = 1.8f;
 
             // Calculations
             float avg_scale_x = (source_scale.x + player_scale.x) / 2;
