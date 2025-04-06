@@ -125,7 +125,7 @@
                     "Entity": {
                         "Components": {
                             "Enemy::Spawner": {
-                                "Cooldown": 3.0,
+                                "Cooldown": 4.5,
                                 "EnemiesSpawned": 0,
                                 "EnemyElement": 0,
                                 "EnemyLimit": 3,
@@ -183,7 +183,7 @@
                     "Entity": {
                         "Components": {
                             "Enemy::Spawner": {
-                                "Cooldown": 3.0,
+                                "Cooldown": 4.5,
                                 "EnemiesSpawned": 0,
                                 "EnemyElement": 0,
                                 "EnemyLimit": 3,
@@ -2245,7 +2245,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 4,
-                            "Layer_Order": 6,
+                            "Layer_Order": 5,
                             "Name": "portal_find_tex",
                             "Prefab_ID": "text_find_portal.prefab",
                             "Prefab_Override": {
