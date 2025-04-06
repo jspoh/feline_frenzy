@@ -2,8 +2,6 @@
     "AudioConfig": {
         "BGM Channel Group": "BGM",
         "BGMC Channel Group": "BGMC",
-        "GlobalBGMVolume": 0.5,
-        "GlobalSFXVolume": 0.5,
         "SFX Channel Group": "SFX"
     },
     "CameraConfig": {

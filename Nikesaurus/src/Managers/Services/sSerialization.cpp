@@ -178,8 +178,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -320,8 +324,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -359,8 +367,12 @@ namespace NIKE {
 		//Get file path
 		auto file_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_id);
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -555,8 +567,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Read data from file
 		file >> data;
@@ -682,8 +698,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return empty data if there is no data
 		if (!std::filesystem::exists(file_path))
