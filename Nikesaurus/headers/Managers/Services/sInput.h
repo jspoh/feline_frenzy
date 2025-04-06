@@ -114,7 +114,7 @@ namespace NIKE {
 
 			struct Cursor {
 				bool is_crosshair = false;
-				int cursor_entered;
+				bool cursor_entered;
 			};
 
 			Cursor cursor;
@@ -155,10 +155,10 @@ namespace NIKE {
 			Vector2f getMouseScroll() const;
 
 			//Get Cursor Entered
-			int getCursorEntererd() const;
+			bool getCursorEntererd() const;
 
 			//Get Is Crosshair
-			int getCrosshair() const;
+			bool getCrosshair() const;
 
 			//Set Crosshair
 			void setCrosshair(bool is_crosshair);

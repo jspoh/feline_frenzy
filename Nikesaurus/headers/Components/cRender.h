@@ -148,6 +148,13 @@ namespace NIKE {
 			ParticleEmitter();
 		};
 
+		enum class VideoMode {
+			PLAYING = 0,
+			PAUSED,
+			RESTART,
+			END
+		};
+
 		struct Video {
 
 			//Video ID
@@ -168,7 +175,7 @@ namespace NIKE {
 			static std::shared_ptr<Audio::IChannelGroup> channel_group;
 
 			//Video variables
-			bool b_is_playing;
+			VideoMode video_mode;
 			bool b_loop;
 			float curr_time;
 			float duration;
@@ -178,7 +185,7 @@ namespace NIKE {
 			float audio_timer;
 
 			Video() : video_id{ "" }, mpeg{ nullptr }, rgb_data{ nullptr }, b_init{ true }, texture_id{ 0 }, texture_size(),
-				b_is_playing{ false }, b_loop{ true }, curr_time{ 0.0f }, duration{ 0.0f }, 
+				video_mode{ VideoMode::PAUSED }, b_loop{ true }, curr_time{ 0.0f }, duration{ 0.0f },
 				frame_timer{ 0.0f }, audio_timer{ 0.0f } {}
 
 			~Video() {

@@ -131,16 +131,31 @@ void NIKE::VideoPlayer::Manager::update(Render::Video& video) {
     //Return if mpeg is still not set
     if (!video.mpeg) return;
 
-    //Get if video is playing
-    video.b_is_playing = !plm_has_ended(video.mpeg);
+    //Restart video
+    if (video.video_mode == Render::VideoMode::RESTART) {
+        plm_rewind(video.mpeg);
+        video.video_mode = Render::VideoMode::PLAYING;
+    }
+
+    //End video
+    if (video.video_mode == Render::VideoMode::END || plm_has_ended(video.mpeg)) {
+        video.video_mode = Render::VideoMode::END;
+        plm_rewind(video.mpeg);
+    }
 
     //Update loop mode
     if (video.b_loop != static_cast<bool>(plm_get_loop(video.mpeg))) {
         plm_set_loop(video.mpeg, video.b_loop);
+
+        //Set back to playing if video mode end
+        if (video.video_mode == Render::VideoMode::END) {
+            plm_rewind(video.mpeg);
+            video.video_mode = Render::VideoMode::PLAYING;
+        }
     }
 
     //Check if video is active
-    if (video.b_is_playing || video.b_loop) {
+    if (video.video_mode == Render::VideoMode::PLAYING) {
 
         //Update video data
         video.curr_time = static_cast<float>(plm_get_time(video.mpeg));
