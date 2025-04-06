@@ -132,6 +132,7 @@ namespace NIKE {
 
 			// Game overlay
 			bool is_pause_initialized;
+			bool is_how_to_play_overlay;
 			std::unordered_map<Entity::Type, bool> inRangeEntities;
 
 			//Create Shaped button

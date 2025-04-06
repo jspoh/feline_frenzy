@@ -123,11 +123,11 @@ namespace NIKE {
 		return mouse.offset;
 	}
 
-	int Input::Service::getCursorEntererd() const {
+	bool Input::Service::getCursorEntererd() const {
 		return cursor.cursor_entered;
 	}
 
-	int Input::Service::getCrosshair() const {
+	bool Input::Service::getCrosshair() const {
 		return cursor.is_crosshair;
 	}
 

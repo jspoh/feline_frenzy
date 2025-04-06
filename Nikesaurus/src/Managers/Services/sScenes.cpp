@@ -271,6 +271,7 @@ namespace NIKE {
 			});
 
 		// Hide pause overlay
+		NIKE_UI_SERVICE->is_how_to_play_overlay = false;
 		Interaction::togglePauseOverlay(false);
 	}
 

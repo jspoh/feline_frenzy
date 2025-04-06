@@ -34,7 +34,7 @@ namespace NIKE {
                 if (player_tag.empty()) {
                     return;
                 }
-
+                NIKE_UI_SERVICE->is_how_to_play_overlay = false;
                 show_pause_menu = !show_pause_menu;
 
                 static float saved_mouse_offset = 0.f;
@@ -52,7 +52,7 @@ namespace NIKE {
                     }
 
 
-                    initPauseOverlay("Paused_UI.png", "Resume", "Settings", "How_To_Play", "Quit");
+                    initPauseOverlay("Paused_UI.png", "Resume", "Back", "How_To_Play", "Quit");
 
                     NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PAUSE, ""));
                 }
@@ -214,14 +214,14 @@ namespace NIKE {
          *********************************************************************/
 
 
-        void initPauseOverlay(const std::string& background_texture, const std::string& resume, [[maybe_unused]] const std::string& options, const std::string& how_to_play, const std::string& quit)
+        void initPauseOverlay(const std::string& background_texture, const std::string& resume, [[maybe_unused]] const std::string& back, const std::string& how_to_play, const std::string& quit)
         {
 
             // Prevent duplicate creation
             if (NIKE_UI_SERVICE->is_pause_initialized) return;
 
             NIKE_UI_SERVICE->is_pause_initialized = true;
-
+            NIKE_UI_SERVICE->is_how_to_play_overlay = false;
 
             if (!NIKE_METADATA_SERVICE->getEntityByName(background_texture)) {
                 // Create the overlay entity
@@ -260,23 +260,6 @@ namespace NIKE {
                 NIKE_UI_SERVICE->setButtonScript(resume, resume_click_script, "OnClick");
             }
 
-
-            //if (!NIKE_METADATA_SERVICE->getEntityByName(options)) {
-            //    // Create Option button
-
-            //    NIKE_UI_SERVICE->createButton(options,
-            //        Transform::Transform(Vector2f(-10.0f, 45.0f), Vector2f(210.0f, 55.0f), 0.0f, true),
-            //        Render::Text(),
-            //        Render::Texture("UI_Options_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
-            //    NIKE_UI_SERVICE->setButtonInputState(options, UI::InputStates::TRIGGERED);
-
-            //    auto options_hover_script = Lua::Script();
-            //    options_hover_script.script_id = "menu_button.lua";
-            //    options_hover_script.update_function = "HoverButton";
-            //    options_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
-            //    NIKE_UI_SERVICE->setButtonScript(options, options_hover_script, "OnHover");
-            //}
-
             if (!NIKE_METADATA_SERVICE->getEntityByName(how_to_play)) {
                 // Create How to play button
                 NIKE_UI_SERVICE->createButton(how_to_play,
@@ -291,6 +274,11 @@ namespace NIKE {
                 how_to_play_hover_script.update_function = "HoverButton";
                 how_to_play_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
                 NIKE_UI_SERVICE->setButtonScript(how_to_play, how_to_play_hover_script, "OnHover");
+
+                auto how_to_play_click_script = Lua::Script();
+                how_to_play_click_script.script_id = "ChangeScene.lua";
+                how_to_play_click_script.update_function = "ShowHowToPlay";
+                NIKE_UI_SERVICE->setButtonScript(how_to_play, how_to_play_click_script, "OnClick");
 
             }
             if (!NIKE_METADATA_SERVICE->getEntityByName(quit)) {
@@ -316,6 +304,28 @@ namespace NIKE {
 
             }
 
+
+            if (!NIKE_METADATA_SERVICE->getEntityByName(back)) {
+                // Create Option button
+
+                NIKE_UI_SERVICE->createButton(back,
+                    Transform::Transform(Vector2f(-10.0f, -300.0f), Vector2f(180.0f, 55.0f), 0.0f, true),
+                    Render::Text(),
+                    Render::Texture("UI_Back_spritesheet.png", Vector4f(), true, 0.0f, false, Vector2i(7, 1)));
+                NIKE_UI_SERVICE->setButtonInputState(back, UI::InputStates::TRIGGERED);
+
+                auto back_hover_script = Lua::Script();
+                back_hover_script.script_id = "menu_button.lua";
+                back_hover_script.update_function = "HoverButton";
+                back_hover_script.named_args["audio"] = std::string("MenuHoverOverSFX.wav");
+                NIKE_UI_SERVICE->setButtonScript(back, back_hover_script, "OnHover");
+
+                auto back_script = Lua::Script();
+                back_script.script_id = "ChangeScene.lua";
+                back_script.update_function = "HideHowToPlay";
+                NIKE_UI_SERVICE->setButtonScript(back, back_script, "OnClick");
+            }
+
         }
 
         void togglePauseOverlay(bool show)
@@ -325,7 +335,7 @@ namespace NIKE {
             show_pause_menu = show;
 
             const std::vector<std::string> elements = {
-                "Paused_UI.png", "Resume", "How_To_Play", "Quit"
+                "Paused_UI.png", "Resume", "How_To_Play", "Quit", "Back"
             };
 
             for (const auto& element : elements) {
@@ -336,14 +346,73 @@ namespace NIKE {
                 // Change opacity for all buttons here
                 if (texture_comp.has_value())
                 {
-                    texture_comp.value().get().color.a = show ? 1.0f : 0.0f;
+                    if (element == "Paused_UI.png") {
+                        if (NIKE_UI_SERVICE->is_how_to_play_overlay) {
+                            texture_comp.value().get().texture_id = "How_to_play.png";
+                        }
+                        else {
+                            texture_comp.value().get().texture_id = "Paused_UI.png";
+                        }
+                    }
+                    if (element == "Back") {
+                        texture_comp.value().get().color.a = NIKE_UI_SERVICE->is_how_to_play_overlay ? 1.0f : 0.0f;
+                    }
+                    else {
+                        texture_comp.value().get().color.a = show ? 1.0f : 0.0f;
+                    }
                 }
                 
                 if (element != "Paused_UI.png")
-                {
                     NIKE_UI_SERVICE->setButtonDisabled(element, !show);
-                }
             }
+
+
+        }
+
+        // scuffed
+        void toggle_how_to_play_overlay() {
+
+            const std::vector<std::string> elements = {
+                "Resume", "How_To_Play", "Quit", "Back"
+            };
+
+            auto background = NIKE_METADATA_SERVICE->getEntityByName("Paused_UI.png");
+
+            if (background.has_value()) {
+                auto bg_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(background.value());
+
+                if (NIKE_UI_SERVICE->is_how_to_play_overlay) {
+                    bg_texture.value().get().texture_id = "How_to_play.png";
+                }
+                else {
+                    bg_texture.value().get().texture_id = "Paused_UI.png";
+                }
+
+            }
+
+
+            for (const auto& element : elements) {
+                auto entity = NIKE_METADATA_SERVICE->getEntityByName(element);
+                if (!entity.has_value()) continue;
+
+                auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(entity.value());
+                // Change opacity for all buttons here
+                if (texture_comp.has_value())
+                {
+                    if (element == "Back") {
+                        NIKE_UI_SERVICE->setButtonDisabled(element, !NIKE_UI_SERVICE->is_how_to_play_overlay);
+                        texture_comp.value().get().color.a = NIKE_UI_SERVICE->is_how_to_play_overlay ? 1.0f : 0.0f;
+                    }
+                    else {
+                        NIKE_UI_SERVICE->setButtonDisabled(element, NIKE_UI_SERVICE->is_how_to_play_overlay);
+                        texture_comp.value().get().color.a = !NIKE_UI_SERVICE->is_how_to_play_overlay ? 1.0f : 0.0f;
+                    }
+                    
+
+                }
+
+            }
+
         }
 
         void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text)

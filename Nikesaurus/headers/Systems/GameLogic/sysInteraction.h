@@ -31,6 +31,8 @@ namespace NIKE {
 
         void togglePauseOverlay(bool show);
 
+        void toggle_how_to_play_overlay();
+
         // HARD CODED
         void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
 

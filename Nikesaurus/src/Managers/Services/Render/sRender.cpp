@@ -702,24 +702,25 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderCursor(bool is_crosshair, bool cursor_entered) {
+	void Render::Service::renderCursor(bool is_crosshair, [[maybe_unused]]bool cursor_entered) {
+
 		//Render cursor 
 		// FIX CURSOR IN FULLSCREEN, CURSOR OFFSET
 
 #ifndef NDEBUG
 		if (!NIKE_LVLEDITOR_SERVICE->getGameState())
 			return;
-#endif
 
 		if (!cursor_entered) {
 			NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 			return;
 		}
+#endif
 
 		//Setup show cursor
 		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_HIDDEN);
 
-		auto texture_render = [&]() {
+		auto texture_render = [bool_ch = is_crosshair, this]() {
 			static Render::Texture crosshair = { "crosshair.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
 			static Render::Texture cursor = { "cursor_highlighted.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
 
@@ -727,17 +728,16 @@ namespace NIKE {
 			Transform::Transform cur_transform = { Vector2f(0.f, 0.f), Vector2f(50.0f, 50.0f), 0.0f };
 			cur_transform.scale.x *= NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
 			cur_transform.scale.y *= NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
-			cur_transform.position.x = is_crosshair ? NIKE_INPUT_SERVICE->getMouseWorldPos().x : NIKE_INPUT_SERVICE->getMouseWorldPos().x + cur_transform.scale.x / 2;
-			cur_transform.position.y = is_crosshair ? NIKE_INPUT_SERVICE->getMouseWorldPos().y : NIKE_INPUT_SERVICE->getMouseWorldPos().y - cur_transform.scale.y / 2;;
+			cur_transform.position.x = bool_ch ? NIKE_INPUT_SERVICE->getMouseWorldPos().x : NIKE_INPUT_SERVICE->getMouseWorldPos().x + cur_transform.scale.x / 2;
+			cur_transform.position.y = bool_ch ? NIKE_INPUT_SERVICE->getMouseWorldPos().y : NIKE_INPUT_SERVICE->getMouseWorldPos().y - cur_transform.scale.y / 2;;
 			cur_transform.use_screen_pos = true;
 
 			// Render cursor
 			transformMatrix(cur_transform, cur_matrix, NIKE_CAMERA_SERVICE->getWorldToNDCXform(false));
-			renderObject(cur_matrix, is_crosshair ? crosshair : cursor);
-			};
+			renderObject(cur_matrix, bool_ch ? crosshair : cursor);
+		};
 
 		screen_render_queue.push(texture_render);
-
 	}
 
 	void Render::Service::renderParticleSystem(const NIKE::SysParticle::ParticleSystem& ps, [[maybe_unused]] bool use_screen_pos, const std::string& texture_ref) {

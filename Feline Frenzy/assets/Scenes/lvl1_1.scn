@@ -2447,10 +2447,10 @@
                                 "Components": {
                                     "Render::Text": {
                                         "Color": {
-                                            "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
+                                            "w": 1.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
                                         }
                                     },
                                     "Transform::Transform": null
@@ -2476,6 +2476,34 @@
                                     "Render::Text": {
                                         "Color": {
                                             "w": 0.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "screen_text"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
                                             "x": 0.0,
                                             "y": 0.0,
                                             "z": 0.0
@@ -2486,7 +2514,7 @@
                                 "MetaData": null
                             },
                             "Tags": [
-                                "screen_text"
+                                "portal_ui"
                             ]
                         }
                     }
