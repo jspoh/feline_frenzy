@@ -1185,7 +1185,7 @@
                                 "Volume": 1.0
                             },
                             "Element::Source": {
-                                "Element": 0
+                                "Element": 2
                             },
                             "Render::Texture": {
                                 "B_Blend": true,
