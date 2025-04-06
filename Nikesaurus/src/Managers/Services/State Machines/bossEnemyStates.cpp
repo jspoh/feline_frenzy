@@ -484,6 +484,15 @@ namespace NIKE {
 	{
 		// cout << "update Idle State" << endl;
 		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		// Delete healthbar entities as well
+		for (auto healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("bosshpcontainer"))
+		{
+			NIKE_METADATA_SERVICE->destroyEntity(healthbar);
+		}
+		for (auto healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("boss_healthbar"))
+		{
+			NIKE_METADATA_SERVICE->destroyEntity(healthbar);
+		}
 		if (animation_comp.has_value())
 		{
 			if (animation_comp.value().get().completed_animations >= 1) {

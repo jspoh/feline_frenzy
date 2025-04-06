@@ -339,6 +339,67 @@
                 {
                     "Entity": {
                         "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Element::Source": {
+                                "Element": 0
+                            },
+                            "Render::Texture": {
+                                "B_Blend": true,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.09000000357627869,
+                                "Texture_ID": "Water icon.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -619.02392578125,
+                                    "y": -491.6417236328125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 215.88560485839844,
+                                    "y": 215.88560485839844
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 1,
+                            "Layer_Order": 11,
+                            "Name": "water_elem",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
                             "Animation::Base": {
                                 "Animation_Count": 0,
                                 "B_PingPong": false,
