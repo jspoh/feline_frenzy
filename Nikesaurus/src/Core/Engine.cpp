@@ -18,6 +18,7 @@
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
+#include <ShlObj.h>
 
 namespace NIKE {
 
@@ -378,8 +379,15 @@ namespace NIKE {
 		// Updating Config.json (currently only for volume settings)
 		try {
 
-			// Define config file path (adjust if it's not in the root relative to executable)
-			const std::string configFilePath = "AudioSettings.json";
+			static char documents_path[MAX_PATH] = "";
+
+			// Get the path to the Desktop folder
+			if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+				cerr << "Failed to get desktop path!" << endl;
+			}
+
+			// Open crash log file
+			std::string configFilePath(std::string{ documents_path } + R"(\feline-frenzy-logs\AudioSettings.json)");
 
 			NIKEE_CORE_INFO("Attempting to save configuration to {}", configFilePath);
 			// 1. Load the current config data
