@@ -405,6 +405,9 @@ namespace NIKE {
 			// --- Add calls here to save other services' settings if needed ---
 			// Example: NIKE_SOME_OTHER_SERVICE->saveSettings(current_config_data);
 
+			// Ensure the directory exists
+			std::filesystem::create_directories(std::filesystem::path(configFilePath).parent_path());
+
 			// 3. Save the modified JSON back to the file
 			std::fstream file(configFilePath, std::ios::out | std::ios::trunc);
 			if (file.is_open()) {
