@@ -176,7 +176,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0010",
+                            "Name": "entity_0096",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -340,9 +340,9 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
-                                "Channel_Group_ID": "",
+                                "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
@@ -1414,7 +1414,12 @@
                                             "z": 0.0
                                         }
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 0.0,
+                                            "y": -209.09088134765625
+                                        }
+                                    }
                                 },
                                 "MetaData": null
                             },
