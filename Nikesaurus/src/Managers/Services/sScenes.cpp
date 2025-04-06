@@ -140,6 +140,11 @@ namespace NIKE {
 		if (!NIKE_ASSETS_SERVICE->isAssetRegistered(curr_scene))
 			throw std::runtime_error("Error scene file does not exist");
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+
+		// Check for settings/options scene
+		if (curr_scene == "SettingsTest.scn") { // Use your actual settings scene filename
+			NIKE_UI_SERVICE->updateVolumeSliderPositions();
+		}
 	}
 
 	// In changeScene we no longer clear the audio channel groups (which would remove the JSON‐stored playlist).
@@ -164,6 +169,12 @@ namespace NIKE {
 		layers.clear();
 		createLayer();
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+
+		// Check for settings/options scene
+		if (curr_scene == "SettingsTest.scn") { // Use your actual settings scene filename
+			NIKE_UI_SERVICE->updateVolumeSliderPositions();
+		}
+
 		if (curr_scene.substr(0, 3) == "lvl" && scene_id != "lvl1_1.scn")
 			restorePlayerData();
 
@@ -204,6 +215,11 @@ namespace NIKE {
 		layers.clear();
 		createLayer();
 		NIKE_ASSETS_SERVICE->getExecutable(curr_scene);
+
+		// Check for settings/options scene
+		if (curr_scene == "SettingsTest.scn") { // Use your actual settings scene filename
+			NIKE_UI_SERVICE->updateVolumeSliderPositions();
+		}
 
 		std::string newBGM = NIKE_AUDIO_SERVICE->getBGMTrackForScene();
 		std::string newBGMC = NIKE_AUDIO_SERVICE->getBGMCTrackForScene();
