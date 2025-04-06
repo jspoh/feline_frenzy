@@ -340,9 +340,9 @@
                     "Entity": {
                         "Components": {
                             "Audio::SFX": {
-                                "Audio_ID": "",
+                                "Audio_ID": "ChangeElement.wav",
                                 "B_Play_SFX": false,
-                                "Channel_Group_ID": "",
+                                "Channel_Group_ID": "EnvironmentSFX",
                                 "Pitch": 1.0,
                                 "Volume": 1.0
                             },
@@ -389,7 +389,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 11,
+                            "Layer_Order": 1,
                             "Name": "water_elem",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -460,7 +460,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
+                            "Layer_Order": 2,
                             "Name": "Water_Element",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -473,7 +473,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 3,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel2.prefab",
                             "Prefab_Override": {
@@ -582,7 +582,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 3,
+                            "Layer_Order": 4,
                             "Name": "Grass_Element",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -653,7 +653,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 4,
+                            "Layer_Order": 5,
                             "Name": "Fire_Element",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -666,7 +666,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 5,
+                            "Layer_Order": 6,
                             "Name": "barrel_3",
                             "Prefab_ID": "barrel2.prefab",
                             "Prefab_Override": {
@@ -761,7 +761,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 6,
+                            "Layer_Order": 7,
                             "Name": "top_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -900,7 +900,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 7,
+                            "Layer_Order": 8,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -946,7 +946,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 8,
+                            "Layer_Order": 9,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -990,7 +990,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 9,
+                            "Layer_Order": 10,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1034,7 +1034,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 10,
+                            "Layer_Order": 11,
                             "Name": "bottom_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1414,7 +1414,12 @@
                                             "z": 0.0
                                         }
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 0.0,
+                                            "y": -209.09088134765625
+                                        }
+                                    }
                                 },
                                 "MetaData": null
                             },
@@ -1442,7 +1447,12 @@
                                             "z": 1.0
                                         }
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 0.0,
+                                            "y": -272.95452880859375
+                                        }
+                                    }
                                 },
                                 "MetaData": null
                             },
@@ -1481,8 +1491,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 51.1363525390625,
-                                    "y": -386.5909118652344
+                                    "x": 59.3182373046875,
+                                    "y": -360.0000305175781
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1535,7 +1545,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 0.0,
-                                    "y": -382.4999694824219
+                                    "y": -353.8635559082031
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
