@@ -58,6 +58,7 @@
                 "objects",
                 "player",
                 "portal_ui",
+                "screen_text",
                 "statusAnimation",
                 "vent"
             ]
@@ -173,7 +174,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0150",
+                            "Name": "entity_0162",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -911,7 +912,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 25,
-                            "Name": "entity_0174",
+                            "Name": "entity_0186",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2820,6 +2821,63 @@
                             },
                             "Tags": [
                                 "portal_ui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "portal_find_tex",
+                            "Prefab_ID": "text_find_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Render::Texture": {
+                                        "B_Blend": true,
+                                        "B_Flip": {
+                                            "x": false,
+                                            "y": false
+                                        },
+                                        "B_Stretch": false,
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "Frame_Index": {
+                                            "x": 0,
+                                            "y": 0
+                                        },
+                                        "Frame_Size": {
+                                            "x": 1,
+                                            "y": 1
+                                        },
+                                        "Intensity": 0.0,
+                                        "Texture_ID": "E_Button.png"
+                                    },
+                                    "Transform::Transform": {
+                                        "Scale": {
+                                            "x": 0.9999998807907104,
+                                            "y": 0.9999998807907104
+                                        }
+                                    }
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "screen_text"
                             ]
                         }
                     }

@@ -58,6 +58,7 @@
                 "hpcontainer",
                 "objects",
                 "player",
+                "portal_ui",
                 "statusAnimation",
                 "vent"
             ]
@@ -173,7 +174,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0277",
+                            "Name": "entity_0875",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -739,13 +740,13 @@
                                 "Faction": 1
                             },
                             "Combat::Health": {
-                                "Health": 60.0,
+                                "Health": 100.0,
                                 "Lives": 1,
                                 "MaxHealth": 100.0,
                                 "invulnerable_flag": false
                             },
                             "Element::Entity": {
-                                "Element": 1
+                                "Element": 2
                             },
                             "GameLogic::ILogic": {
                                 "Named_Args": {
@@ -1328,6 +1329,62 @@
                             "Prefab_Override": null,
                             "Tags": [
                                 "elementui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 3,
+                            "Name": "e_key",
+                            "Prefab_ID": "ui_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 4,
+                            "Name": "interact_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
                             ]
                         }
                     }

@@ -155,7 +155,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0101",
+                            "Name": "entity_1024",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -279,7 +279,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0103",
+                            "Name": "entity_1026",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -292,7 +292,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0104",
+                            "Name": "entity_1027",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {

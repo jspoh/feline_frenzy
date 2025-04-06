@@ -64,7 +64,7 @@ namespace NIKE {
 					}
 				}
 
-				//Check for logic comp
+				// Handle Logic component 
 				const auto e_logic_comp = NIKE_ECS_MANAGER->getEntityComponent<GameLogic::ILogic>(entity);
 				if (e_logic_comp.has_value()) {
 					auto& e_logic = e_logic_comp.value().get();
@@ -80,12 +80,12 @@ namespace NIKE {
 					NIKE_LUA_SERVICE->executeScript(e_logic.script);
 				}
 
-				// Check if player tag exists
-				std::set<Entity::Type> player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
+				// Player tag
+				auto player_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("player");
 
 				updateStatusEffects(entity);
 
-				// Check for Spawner comp
+				// Spawner Logic
 				const auto e_spawner_comp = NIKE_ECS_MANAGER->getEntityComponent<Enemy::Spawner>(entity);
 				if (e_spawner_comp.has_value()) {
 					auto& e_spawner = e_spawner_comp.value().get();
@@ -108,8 +108,8 @@ namespace NIKE {
 						}
 					}
 
-					// Check if enemies are all dead
-					std::set<Entity::Type> enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
+					// Enemy tag
+					auto enemy_tags = NIKE_METADATA_SERVICE->getEntitiesByTag("enemy");
 
 					static bool is_spawn_portal = false;
 
@@ -124,12 +124,12 @@ namespace NIKE {
 					if ((enemy_tags.empty() && e_spawner.enemies_spawned == e_spawner.enemy_limit) || 
 						is_spawn_portal)
 					{
-						auto portal_ui_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("screen_text");
+						auto overlay_text_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("screen_text");
 
 						// UI Overlay Opacity
-						for (const auto& portal_ui : portal_ui_entities)
+						for (const auto& overlay_entity : overlay_text_tag)
 						{
-							auto text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(portal_ui);
+							auto text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(overlay_entity);
 
 
 							elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
@@ -162,7 +162,10 @@ namespace NIKE {
 				}
 
 				// Elemental UI 
-				for (auto& elementui : NIKE_METADATA_SERVICE->getEntitiesByTag("elementui")) {
+				auto elem_ui_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("elementui");
+				auto hp_container_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer");
+
+				for (auto& elementui : elem_ui_tag) {
 					// If player not dead
 					if (player_entities.empty()) {
 						continue;
@@ -181,14 +184,12 @@ namespace NIKE {
 							elementui_texture.value().get().frame_index.x = element_state;
 							
 							// Hardcoded af
-							for (auto& hp_container : NIKE_METADATA_SERVICE->getEntitiesByTag("hpcontainer")) {
+							for (auto& hp_container : hp_container_tag) {
 								const auto e_container_texture = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(hp_container);
 								if (!e_container_texture.has_value()) {
 									continue;
 								}
 								e_container_texture.value().get().frame_index.x = element_state;
-
-							
 
 							}
 						}
@@ -196,7 +197,9 @@ namespace NIKE {
 				}
 
 				// Health bar logic
-				for (auto& healthbar : NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar")) {
+				auto healthbar_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("healthbar");
+
+				for (auto& healthbar : healthbar_tag) {
 
 					if (player_entities.empty()) {
 
