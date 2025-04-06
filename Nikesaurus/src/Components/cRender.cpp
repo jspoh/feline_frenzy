@@ -579,6 +579,10 @@ namespace NIKE {
 
 			// Override Deserialize
 			[](Render::Video& comp, nlohmann::json const& delta) {
+				if (delta.contains("Video_ID")) {
+					comp.video_id = delta["Video_ID"];
+				}
+
 				if (delta.contains("B_Loop")) {
 					comp.b_loop = delta["B_Loop"];
 				}
@@ -1924,7 +1928,42 @@ namespace NIKE {
 				{
 					ImGui::Text("Video Duration: %.3f secs / %.3f secs", comp.curr_time, comp.duration);
 
-					ImGui::Text("Video Playing: %s", comp.b_is_playing ? "True" : "False");
+					//Video Mode
+					{
+						ImGui::Text("Adjust Video Mode:");
+						const char* mode_names[] = { "PLAYING", "PAUSE", "RESTART", "END" };
+
+						// Hold the current selection and the previous value
+						static Render::VideoMode before_selected_mode;
+						static int previous_mode = static_cast<int>(comp.video_mode);
+						int current_mode = static_cast<int>(comp.video_mode);
+
+						// Combo returns one bool check
+						if (ImGui::Combo("##VideoMode", &current_mode, mode_names, IM_ARRAYSIZE(mode_names))) {
+							Render::VideoMode new_mode = static_cast<Render::VideoMode>(current_mode);
+							if (new_mode != comp.video_mode) {
+
+								// Save action
+								LevelEditor::Action save_mode;
+								save_mode.do_action = [&, mode = new_mode]() {
+									comp.video_mode = mode;
+									};
+
+								// Undo action
+								save_mode.undo_action = [&, mode = before_selected_mode]() {
+									comp.video_mode = mode;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_mode));
+
+								// Update the previous value
+								before_selected_mode = comp.video_mode;
+
+								// Apply the new origin
+								comp.video_mode = new_mode;
+							}
+						}
+					}
 
 					ImGui::Text("Video Looping:");
 

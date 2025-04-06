@@ -1133,7 +1133,7 @@ namespace NIKE {
 						//Clamp aspect ratio of texture
 						e_transform.scale = e_video.texture_size.normalized() * e_transform.scale.length();
 
-						//Text render function
+						//Video render function
 						auto video_render = [e_transform, cam_ndcx, &e_video]() {
 
 							//Transform matrix
