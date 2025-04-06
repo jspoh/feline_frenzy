@@ -147,6 +147,7 @@ namespace NIKE {
 
 			ParticleEmitter();
 		};
+
 		struct Video {
 
 			//Video ID
@@ -179,6 +180,18 @@ namespace NIKE {
 			Video() : video_id{ "" }, mpeg{ nullptr }, rgb_data{ nullptr }, b_init{ true }, texture_id{ 0 }, texture_size(),
 				b_is_playing{ false }, b_loop{ true }, curr_time{ 0.0f }, duration{ 0.0f }, 
 				frame_timer{ 0.0f }, audio_timer{ 0.0f } {}
+
+			~Video() {
+				if (mpeg) {
+					plm_destroy(mpeg);
+					mpeg = nullptr;
+				}
+
+				if (rgb_data) {
+					delete[] rgb_data;
+					rgb_data = nullptr;
+				}
+			}
 		};
 
 		void registerComponents();
