@@ -317,6 +317,7 @@ namespace NIKE {
 				NIKE_FSM_SERVICE->update(const_cast<Entity::Type&>(entity));
 			}
 		}
+
 		// Update BGMC volume
 		updateBGMCVolume();
 	}

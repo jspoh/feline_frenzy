@@ -18,6 +18,7 @@
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
+#include <ShlObj.h>
 
 namespace NIKE {
 
@@ -331,9 +332,6 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 
-		// Define config file path (adjust if it's not in the root relative to executable)
-		const std::string configFilePath = "Config.json";
-
 		//Update loop
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
@@ -380,6 +378,17 @@ namespace NIKE {
 		}
 		// Updating Config.json (currently only for volume settings)
 		try {
+
+			static char documents_path[MAX_PATH] = "";
+
+			// Get the path to the Desktop folder
+			if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+				cerr << "Failed to get desktop path!" << endl;
+			}
+
+			// Open crash log file
+			std::string configFilePath(std::string{ documents_path } + R"(\feline-frenzy-logs\AudioSettings.json)");
+
 			NIKEE_CORE_INFO("Attempting to save configuration to {}", configFilePath);
 			// 1. Load the current config data
 			nlohmann::json current_config_data = NIKE_SERIALIZE_SERVICE->loadJsonFile(configFilePath);
@@ -395,6 +404,9 @@ namespace NIKE {
 
 			// --- Add calls here to save other services' settings if needed ---
 			// Example: NIKE_SOME_OTHER_SERVICE->saveSettings(current_config_data);
+
+			// Ensure the directory exists
+			std::filesystem::create_directories(std::filesystem::path(configFilePath).parent_path());
 
 			// 3. Save the modified JSON back to the file
 			std::fstream file(configFilePath, std::ios::out | std::ios::trunc);

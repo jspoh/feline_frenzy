@@ -13,7 +13,7 @@ AppId={{DBE1979A-0CA9-4A8B-81DE-029260E99EE2}
 ; Standard app data stuff
 ; !!NOTE!!: Replace all instances of "Feline-Frenzy" with your game name.
 AppName=Feline-Frenzy
-AppVerName=Feline-Frenzy Version 1.1
+AppVerName=Feline-Frenzy Version 1
 AppPublisher=DigiPen Institute of Technology
 AppPublisherURL=http://www.digipen.edu/
 AppSupportURL=http://www.digipen.edu/
@@ -35,7 +35,7 @@ OutputBaseFilename=Feline-Frenzy_Setup
 LicenseFile=INSTALLERFILES\DigiPen_EULA.txt
 
 ; Path to the icon for the installer (TCR check requires custom icon)
-SetupIconFile=.\INSTALLERFILES\Icon_32x32.ico
+SetupIconFile=.\INSTALLERFILES\Icon_256x256.ico
 
 ; Compression scheme for the installer. Check Inno Setup help files for more options.
 Compression=lzma

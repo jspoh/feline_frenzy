@@ -13,6 +13,7 @@
 #include "Core/Engine.h"
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/Assets/sAssets.h"
+#include <ShlObj.h>
 
 namespace NIKE {
 
@@ -491,10 +492,23 @@ namespace NIKE {
 			createChannelGroup(sfx_channel_group_id);
 			createChannelGroup(bgmc_channel_group_id);
 
+			static char documents_path[MAX_PATH] = "";
+
+			// Get the path to the Desktop folder
+			if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+				cerr << "Failed to get desktop path!" << endl;
+			}
+
+			// Open crash log file
+			std::string configFilePath(std::string{ documents_path } + R"(\feline-frenzy-logs\AudioSettings.json)");
+
+			//Deserialize Config File
+			auto audio_setting_config = NIKE_SERIALIZE_SERVICE->loadJsonFile(configFilePath);
+
 			// Volume loading
 			// Load global volumes, defaulting to 0.5 if not found
-			float loadedBGMVol = data.value("GlobalBGMVolume", 0.5f);
-			float loadedSFXVol = data.value("GlobalSFXVolume", 0.5f);
+			float loadedBGMVol = audio_setting_config.value("GlobalBGMVolume", 0.5f);
+			float loadedSFXVol = audio_setting_config.value("GlobalSFXVolume", 0.5f);
 
 			// Clamp values just in case they are invalid in the file
 			gGlobalBGMVolume = std::clamp(loadedBGMVol, 0.0f, 1.0f);
@@ -768,23 +782,10 @@ namespace NIKE {
 
 	// Save volume settings
 	void Audio::Service::saveAudioConfig(nlohmann::json& config_data) {
-		try {
-			// Find or create the "AudioConfig" section
-			if (!config_data.contains("AudioConfig")) {
-				config_data["AudioConfig"] = nlohmann::json::object();
-				NIKEE_CORE_WARN("Creating missing 'AudioConfig' section in JSON data for saving.");
-			}
-			auto& audio_config = config_data["AudioConfig"];
 
-			// Save the current global volumes
-			audio_config["GlobalBGMVolume"] = gGlobalBGMVolume;
-			audio_config["GlobalSFXVolume"] = gGlobalSFXVolume;
-
-			NIKEE_CORE_INFO("Prepared audio volumes for saving: BGM={}, SFX={}", gGlobalBGMVolume, gGlobalSFXVolume);
-		}
-		catch (const nlohmann::json::exception& e) {
-			NIKEE_CORE_ERROR("Error preparing audio config for saving: {}", e.what());
-		}
+		// Save the current global volumes
+		config_data["GlobalBGMVolume"] = gGlobalBGMVolume;
+		config_data["GlobalSFXVolume"] = gGlobalSFXVolume;
 	}
 
 	void Audio::Service::pauseAllChannels() {
