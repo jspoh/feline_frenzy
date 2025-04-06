@@ -132,7 +132,9 @@ namespace NIKE {
 							auto text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(overlay_entity);
 
 
-							elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+							if (elapsed_time_before < 3.0f)
+								elapsed_time_before += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+
 							// Update text alpha
 							if (text_comp.has_value())
 							{

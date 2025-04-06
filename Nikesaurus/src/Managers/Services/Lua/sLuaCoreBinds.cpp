@@ -9,6 +9,7 @@
 #include "Core/stdafx.h"
 #include "Core/Engine.h"
 #include "Managers/Services/Lua/sLuaCoreBinds.h"
+#include "Systems/GameLogic/sysInteraction.h"
 
 namespace NIKE {
 
@@ -249,32 +250,6 @@ namespace NIKE {
     void Lua::luaSceneBinds(sol::state& lua_state) {
 
         lua_state.set_function("ChangeScene", [&](std::string const& scene) {
-            const float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-
-            constexpr float fade_duration = 2.f;
-            constexpr float max_alpha = 255.0f;
-            float elapsed_time = 0.0f;
-            while (elapsed_time < fade_duration) {
-                // Fade by steps
-                float alpha_change = (max_alpha / fade_duration) * dt;
-                auto const& overlay_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("overlay");
-                for (const auto& entity : overlay_entities)
-                {
-                    // Change entitiy's alpha value for fade
-                    auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-                    // Why is the comp here nullopt??
-                    if (e_shape_comp.has_value())
-                    {
-                        e_shape_comp.value().get().color.a += alpha_change;
-                        if (e_shape_comp.value().get().color.a > max_alpha) {
-                            e_shape_comp.value().get().color.a = max_alpha;
-                        }
-                    }
-                }
-                // Use delta time for fading
-                elapsed_time += dt;
-            }
-
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::CHANGE, scene));
             });
 
@@ -284,28 +259,6 @@ namespace NIKE {
             });
 
         lua_state.set_function("PreviousScene", [&]() {
-            constexpr float fade_duration = 2.f;
-            constexpr float max_alpha = 255.0f;
-            float elapsed_time = 0.0f;
-            while (elapsed_time < fade_duration) {
-                // Fade by steps
-                float alpha_change = (max_alpha / fade_duration) * NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-                auto const& overlay_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("overlay");
-                for (const auto& entity : overlay_entities)
-                {
-                    // Change entitiy's alpha value for fade
-                    auto e_shape_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Shape>(entity);
-                    if (e_shape_comp.has_value())
-                    {
-                        e_shape_comp.value().get().color.a += alpha_change;
-                        if (e_shape_comp.value().get().color.a > max_alpha) {
-                            e_shape_comp.value().get().color.a = max_alpha;
-                        }
-                    }
-                }
-                // Use delta time for fading
-                elapsed_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-            }
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PREVIOUS, ""));
             });
 
@@ -323,6 +276,16 @@ namespace NIKE {
 
         lua_state.set_function("PauseScene", [&]() {
             NIKE_SCENES_SERVICE->queueSceneEvent(Scenes::SceneEvent(Scenes::Actions::PAUSE, ""));
+        });
+
+        lua_state.set_function("ShowHowToPlay", [&]() {
+            NIKE_UI_SERVICE->is_how_to_play_overlay = true;
+            Interaction::toggle_how_to_play_overlay();
+         });
+
+        lua_state.set_function("HideHowToPlay", [&]() {
+            NIKE_UI_SERVICE->is_how_to_play_overlay = false;
+            Interaction::toggle_how_to_play_overlay();
             });
 
     }

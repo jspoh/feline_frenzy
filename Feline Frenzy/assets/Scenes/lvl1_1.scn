@@ -155,7 +155,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_1024",
+                            "Name": "entity_0084",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -279,7 +279,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_1026",
+                            "Name": "entity_0086",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -292,7 +292,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_1027",
+                            "Name": "entity_0087",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -2441,34 +2441,6 @@
                             "B_Locked": false,
                             "Layer_ID": 4,
                             "Layer_Order": 4,
-                            "Name": "portal_text",
-                            "Prefab_ID": "text_portal.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Render::Text": {
-                                        "Color": {
-                                            "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        }
-                                    },
-                                    "Transform::Transform": null
-                                },
-                                "MetaData": null
-                            },
-                            "Tags": [
-                                "portal_ui"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 4,
-                            "Layer_Order": 5,
                             "Name": "portal_find_tex",
                             "Prefab_ID": "text_find_portal.prefab",
                             "Prefab_Override": {
@@ -2487,6 +2459,34 @@
                             },
                             "Tags": [
                                 "screen_text"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
                             ]
                         }
                     }
